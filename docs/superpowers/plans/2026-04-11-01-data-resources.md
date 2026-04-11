@@ -16,15 +16,26 @@
 stsl/
   resources/
     effect_resource.gd       ← 카드/릴릭 효과 원자 단위
-    card_resource.gd         ← 카드 데이터
-    hero_resource.gd         ← 팀원(역사 인물) 데이터
-    intent_resource.gd       ← 몬스터 1회 행동 데이터
-    enemy_resource.gd        ← 몬스터 데이터
+    card_resource.gd         ← 카드 데이터 (play_animation 포함)
+    hero_resource.gd         ← 팀원(역사 인물) 데이터 (character_scene 참조)
+    intent_resource.gd       ← 몬스터 1회 행동 데이터 (play_animation 포함)
+    enemy_resource.gd        ← 몬스터 데이터 (character_scene 참조)
     relic_resource.gd        ← 유물 데이터
   autoload/
     game_manager.gd          ← 런 상태, 현재 층/챕터, 골드, 릴릭 목록
     team_manager.gd          ← 팀원 목록, 현재 HP, 생사 상태
     deck_manager.gd          ← 드로우/손패/버림/소진 더미, 에너지
+  characters/
+    heroes/
+      napoleon/
+        napoleon.tscn        ← 나폴레옹 플레이스홀더 씬
+      yi_sun_sin/
+        yi_sun_sin.tscn      ← 이순신 플레이스홀더 씬
+      cleopatra/
+        cleopatra.tscn       ← 클레오파트라 플레이스홀더 씬
+    enemies/
+      satyr/
+        satyr.tscn           ← 사티로스 플레이스홀더 씬
   tests/
     test_runner.gd           ← SceneTree 기반 헤드리스 진입점
     test_resources.gd        ← Resource 기본값 검증
@@ -32,6 +43,12 @@ stsl/
     test_deck_manager.gd     ← DeckManager 로직 검증
   project.godot              ← Autoload 등록 (수정)
 ```
+
+> **애니메이션 설계 원칙**
+> - 캐릭터/몬스터 씬은 `PackedScene`으로 Resource에서 참조. 씬 내부에 `AnimationPlayer` + `ColorRect`(플레이스홀더)
+> - Blender로 스프라이트 시트 제작 후 씬 내부의 `ColorRect`만 `AnimatedSprite2D`로 교체하면 됨
+> - 카드 플레이 시 `CardResource.play_animation` → 해당 캐릭터 씬의 `AnimationPlayer.play()` 호출
+> - 카드 아트(`art: Texture2D`)는 정적 이미지이므로 Texture2D 유지
 
 ---
 
@@ -211,6 +228,7 @@ func test_card_resource_defaults() -> void:
     _assert(card.card_type == CardResource.CardType.ATTACK, "기본 타입 ATTACK")
     _assert(card.effects.size() == 0, "기본 effects 비어있음")
     _assert(card.owner_id == "", "기본 owner_id 비어있음")
+    _assert(card.play_animation == "", "기본 play_animation 비어있음")
 ```
 
 - [ ] **Step 2: 실패 확인**
@@ -237,7 +255,9 @@ enum CardType { ATTACK, SKILL, POWER }
 @export var effects: Array[EffectResource] = []
 @export var upgraded: bool = false
 @export var description: String = ""
-@export var art: Texture2D
+@export var art: Texture2D                 # 카드 일러스트 (정적 이미지)
+@export var play_animation: String = ""    # 카드 사용 시 캐릭터가 재생할 애니메이션 이름
+                                           # 예: "attack_blitz", "skill_turtle_ship"
 ```
 
 - [ ] **Step 4: 통과 확인**
@@ -303,7 +323,9 @@ extends Resource
 @export var historical_figure: String = ""   # 역사 인물 원래 이름
 @export var max_hp: int = 70
 @export var card_pool: Array[CardResource] = []
-@export var portrait: Texture2D
+@export var character_scene: PackedScene     # 캐릭터 애니메이션 씬 (AnimationPlayer 포함)
+                                             # Blender 스프라이트 시트 교체 시 씬 내부만 수정
+@export var portrait: Texture2D              # UI용 초상화 (정적 이미지)
 ```
 
 - [ ] **Step 4: 통과 확인**
@@ -355,6 +377,7 @@ func test_enemy_resource_defaults() -> void:
     _assert(intent.value == 0, "intent 기본 value == 0")
     _assert(intent.action_type == IntentResource.ActionType.ATTACK, "기본 행동 ATTACK")
     _assert(intent.target == IntentResource.TargetType.RANDOM, "기본 타겟 RANDOM")
+    _assert(intent.play_animation == "", "기본 play_animation 비어있음")
 ```
 
 - [ ] **Step 2: 실패 확인**
@@ -378,7 +401,9 @@ enum TargetType { LOWEST_HP, LAST_ATTACKER, RANDOM, ALL }
 @export var action_type: ActionType = ActionType.ATTACK
 @export var value: int = 0
 @export var target: TargetType = TargetType.RANDOM
-@export var condition: String = ""   # 발동 조건 표현식 (빈 문자열 = 항상)
+@export var condition: String = ""         # 발동 조건 표현식 (빈 문자열 = 항상)
+@export var play_animation: String = ""    # 이 행동 실행 시 몬스터가 재생할 애니메이션
+                                           # 예: "attack_charge", "buff_enrage"
 ```
 
 - [ ] **Step 4: EnemyResource 구현**
@@ -396,7 +421,7 @@ enum Grade { NORMAL, ELITE, BOSS }
 @export var max_hp: int = 30
 @export var intent_pattern: Array[IntentResource] = []
 @export var phase_thresholds: Array[float] = []  # 페이즈 전환 HP 비율 (예: [0.6, 0.3])
-@export var art: Texture2D
+@export var character_scene: PackedScene    # 몬스터 애니메이션 씬 (AnimationPlayer 포함)
 ```
 
 - [ ] **Step 5: 통과 확인**
@@ -984,15 +1009,97 @@ git push origin main
 
 ---
 
+### Task 11: 플레이스홀더 캐릭터 씬 제작
+
+각 캐릭터/몬스터 씬에 `AnimationPlayer` + `ColorRect`(색상 블록)로 구성된 플레이스홀더를 만든다.
+Blender 스프라이트 시트가 나오면 `ColorRect`만 `AnimatedSprite2D`로 교체하면 된다.
+
+**Files:**
+- Create: `characters/heroes/napoleon/napoleon.tscn`
+- Create: `characters/heroes/yi_sun_sin/yi_sun_sin.tscn`
+- Create: `characters/heroes/cleopatra/cleopatra.tscn`
+- Create: `characters/enemies/satyr/satyr.tscn`
+
+> 씬은 Godot 에디터에서 직접 생성한다. 헤드리스 테스트 대상이 아니며, 에디터에서 씬을 열어 애니메이션이 재생되는지 확인한다.
+
+- [ ] **Step 1: 공통 캐릭터 베이스 구조 파악**
+
+모든 캐릭터 씬이 같은 구조를 가진다:
+```
+Node2D (root)
+  └ ColorRect          ← 플레이스홀더 색상 블록 (캐릭터별 고유 색상)
+  └ AnimationPlayer    ← idle, attack, hurt, death 애니메이션
+```
+
+- [ ] **Step 2: napoleon.tscn 생성**
+
+Godot 에디터에서:
+1. `characters/heroes/napoleon/` 폴더 생성
+2. 새 씬 생성 → Root: `Node2D`, 이름 `Napoleon`
+3. 자식 노드 추가:
+   - `ColorRect`: Position `(-40, -80)`, Size `(80, 80)`, Color `#4169E1` (파란색)
+   - `AnimationPlayer`: 이름 `AnimationPlayer`
+4. `AnimationPlayer`에 애니메이션 추가:
+   - **`idle`** (loop): 길이 1.2초
+     - `ColorRect` position.y: 0s→`-80`, 0.6s→`-88`, 1.2s→`-80` (살짝 위아래 bounce)
+   - **`attack`**: 길이 0.5초
+     - `ColorRect` position.x: 0s→`-40`, 0.2s→`20`, 0.5s→`-40` (앞으로 돌진)
+   - **`hurt`**: 길이 0.4초
+     - `ColorRect` modulate: 0s→`white`, 0.1s→`#FF4444`, 0.4s→`white` (빨간 flash)
+   - **`death`**: 길이 0.8초
+     - `ColorRect` modulate.a: 0s→`1.0`, 0.8s→`0.0` (fade out)
+5. `idle` 애니메이션을 Autoplay로 설정
+6. 씬 저장: `characters/heroes/napoleon/napoleon.tscn`
+
+- [ ] **Step 3: yi_sun_sin.tscn 생성**
+
+Step 2와 동일한 구조, 색상만 `#228B22` (초록색).
+저장: `characters/heroes/yi_sun_sin/yi_sun_sin.tscn`
+
+- [ ] **Step 4: cleopatra.tscn 생성**
+
+Step 2와 동일한 구조, 색상만 `#DAA520` (골든색).
+저장: `characters/heroes/cleopatra/cleopatra.tscn`
+
+- [ ] **Step 5: satyr.tscn 생성 (몬스터 예시)**
+
+1. `characters/enemies/satyr/` 폴더 생성
+2. 새 씬 → Root: `Node2D`, 이름 `Satyr`
+3. 자식 노드:
+   - `ColorRect`: Position `(-30, -60)`, Size `(60, 60)`, Color `#8B0000` (어두운 빨간색)
+   - `AnimationPlayer`
+4. 애니메이션:
+   - **`idle`** (loop): 길이 1.0초, ColorRect position.y bounce (`-60` → `-66` → `-60`)
+   - **`attack`**: 길이 0.5초, ColorRect position.x 앞으로 돌진 (`-30` → `-90` → `-30`, 몬스터는 왼쪽 방향이므로 x 감소)
+   - **`hurt`**: 길이 0.4초, ColorRect modulate 빨간 flash
+   - **`death`**: 길이 0.8초, modulate.a fade out
+5. 저장: `characters/enemies/satyr/satyr.tscn`
+
+- [ ] **Step 6: 에디터에서 씬 확인**
+
+각 씬을 열어:
+- `idle` 애니메이션이 자동 재생되는지 확인
+- `attack`, `hurt`, `death` 애니메이션을 수동으로 재생해 동작 확인
+
+- [ ] **Step 7: 커밋**
+
+```bash
+git add characters/
+git commit -m "feat: 플레이스홀더 캐릭터/몬스터 씬 (ColorRect + AnimationPlayer)"
+git push origin main
+```
+
+---
+
 ## Self-Review
 
 ### Spec Coverage
 
 | GDD 항목 | 구현 태스크 |
 |---|---|
-| CardResource 구조 | Task 3 |
-| HeroResource 구조 | Task 4 |
-| EnemyResource + IntentResource 구조 | Task 5 |
+| CardResource 구조 + play_animation | Task 3 |
+| HeroResource 구조 + character_scene | Task 4 |
+| EnemyResource + IntentResource + play_animation | Task 5 |
 | RelicResource 구조 (owner_id, base_effect, bonus_effect) | Task 6 |
 | EffectResource (피해/방어/상태이상/드로우/에너지) | Task 2 |
 | GameManager (GameState enum, 런 상태) | Task 9 |
@@ -1000,6 +1107,7 @@ git push origin main
 | DeckManager (드로우/손패/버림/에너지) | Task 8 |
 | Autoload 등록 | Task 10 |
 | 헤드리스 테스트 기반 | Task 1 |
+| 플레이스홀더 캐릭터 씬 (AnimationPlayer 구조) | Task 11 |
 
 **누락 없음.**
 
