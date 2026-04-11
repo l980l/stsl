@@ -1,0 +1,25 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# 임포트된 에셋 (재생성 가능)
+*.import
+
+# 모노 빌드 결과물
+.mono/
+data_*/
+mono_crash.*.json
+
+# 내보내기 템플릿
+export_presets.cfg
+
+# 환경변수
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 로컬 설정
+.claude/
+docs/.obsidian/
