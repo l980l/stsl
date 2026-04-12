@@ -8,6 +8,7 @@ var HeroResource = preload("res://resources/hero_resource.gd")
 var IntentResource = preload("res://resources/intent_resource.gd")
 var EnemyResource = preload("res://resources/enemy_resource.gd")
 var RelicResource = preload("res://resources/relic_resource.gd")
+var GameManagerClass = preload("res://autoload/game_manager.gd")
 
 var passed: int = 0
 var failed: int = 0
@@ -18,6 +19,7 @@ func run_all() -> Dictionary:
 	test_hero_resource_defaults()
 	test_enemy_resource_defaults()
 	test_relic_resource_defaults()
+	test_game_manager_defaults()
 	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
@@ -71,3 +73,11 @@ func test_relic_resource_defaults() -> void:
 	var relic = RelicResource.new()
 	_assert(relic.owner_id == "", "기본 owner_id 비어있음 = 공용 릴릭")
 	_assert(relic.relic_name == "", "기본 relic_name 비어있음")
+
+func test_game_manager_defaults() -> void:
+	print("[TestResources] test_game_manager_defaults")
+	var gm = GameManagerClass.new()
+	_assert(gm.current_state == GameManagerClass.GameState.MAP, "초기 상태 MAP")
+	_assert(gm.current_chapter == 1, "초기 챕터 1")
+	_assert(gm.gold == 0, "초기 골드 0")
+	_assert(gm.relics.size() == 0, "초기 릴릭 없음")
