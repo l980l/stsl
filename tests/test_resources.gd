@@ -5,6 +5,8 @@ extends RefCounted
 var EffectResource = preload("res://resources/effect_resource.gd")
 var CardResource = preload("res://resources/card_resource.gd")
 var HeroResource = preload("res://resources/hero_resource.gd")
+var IntentResource = preload("res://resources/intent_resource.gd")
+var EnemyResource = preload("res://resources/enemy_resource.gd")
 
 var passed: int = 0
 var failed: int = 0
@@ -13,6 +15,7 @@ func run_all() -> Dictionary:
 	test_effect_resource_defaults()
 	test_card_resource_defaults()
 	test_hero_resource_defaults()
+	test_enemy_resource_defaults()
 	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
@@ -46,3 +49,17 @@ func test_hero_resource_defaults() -> void:
 	_assert(hero.max_hp == 70, "기본 max_hp == 70")
 	_assert(hero.card_pool.size() == 0, "기본 카드풀 비어있음")
 	_assert(hero.hero_id == "", "기본 hero_id 비어있음")
+
+func test_enemy_resource_defaults() -> void:
+	print("[TestResources] test_enemy_resource_defaults")
+	var enemy = EnemyResource.new()
+	_assert(enemy.grade == EnemyResource.Grade.NORMAL, "기본 등급 NORMAL")
+	_assert(enemy.max_hp == 30, "기본 max_hp == 30")
+	_assert(enemy.intent_pattern.size() == 0, "기본 행동 패턴 비어있음")
+	_assert(enemy.phase_thresholds.size() == 0, "기본 페이즈 비어있음")
+
+	var intent = IntentResource.new()
+	_assert(intent.value == 0, "intent 기본 value == 0")
+	_assert(intent.action_type == IntentResource.ActionType.ATTACK, "기본 행동 ATTACK")
+	_assert(intent.target == IntentResource.TargetType.RANDOM, "기본 타겟 RANDOM")
+	_assert(intent.play_animation == "", "기본 play_animation 비어있음")
