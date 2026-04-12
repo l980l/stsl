@@ -7,6 +7,7 @@ var CardResource = preload("res://resources/card_resource.gd")
 var HeroResource = preload("res://resources/hero_resource.gd")
 var IntentResource = preload("res://resources/intent_resource.gd")
 var EnemyResource = preload("res://resources/enemy_resource.gd")
+var RelicResource = preload("res://resources/relic_resource.gd")
 
 var passed: int = 0
 var failed: int = 0
@@ -16,6 +17,7 @@ func run_all() -> Dictionary:
 	test_card_resource_defaults()
 	test_hero_resource_defaults()
 	test_enemy_resource_defaults()
+	test_relic_resource_defaults()
 	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
@@ -63,3 +65,9 @@ func test_enemy_resource_defaults() -> void:
 	_assert(intent.action_type == IntentResource.ActionType.ATTACK, "기본 행동 ATTACK")
 	_assert(intent.target == IntentResource.TargetType.RANDOM, "기본 타겟 RANDOM")
 	_assert(intent.play_animation == "", "기본 play_animation 비어있음")
+
+func test_relic_resource_defaults() -> void:
+	print("[TestResources] test_relic_resource_defaults")
+	var relic = RelicResource.new()
+	_assert(relic.owner_id == "", "기본 owner_id 비어있음 = 공용 릴릭")
+	_assert(relic.relic_name == "", "기본 relic_name 비어있음")
