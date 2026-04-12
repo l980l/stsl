@@ -16,6 +16,8 @@ var failed: int = 0
 
 func run_all() -> Dictionary:
 	test_setup_battle()
+	test_play_card_damage()
+	test_play_card_block()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -74,3 +76,34 @@ func test_setup_battle() -> void:
 	_assert(bm.is_enemy_alive(0), "셋업 후 적 생존")
 	_assert(bm.is_battle_active, "배틀 활성")
 	_assert(bm.get_enemy_block(0) == 0, "초기 블록 0")
+
+func test_play_card_damage() -> void:
+	print("[TestBattleManager] test_play_card_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	bm.setup_battle([_make_enemy(30, [])])
+
+	var effect := _make_effect(EffectRes.EffectType.DAMAGE, 10, "SINGLE")
+	var card := _make_card("napoleon", 1, [effect])
+	bm.deck_mgr.hand.append(card)
+	bm.deck_mgr.current_energy = 3
+	bm.is_player_turn = true
+
+	var result := bm.play_card(card, 0)
+	_assert(result, "카드 플레이 성공 반환")
+	_assert(bm.get_enemy_hp(0) == 20, "피해 10 적용 → HP 30 → 20")
+
+func test_play_card_block() -> void:
+	print("[TestBattleManager] test_play_card_block")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	bm.setup_battle([_make_enemy(30, [])])
+
+	var effect := _make_effect(EffectRes.EffectType.BLOCK, 8, "SELF")
+	var card := _make_card("napoleon", 1, [effect])
+	bm.deck_mgr.hand.append(card)
+	bm.deck_mgr.current_energy = 3
+	bm.is_player_turn = true
+
+	bm.play_card(card, 0)
+	_assert(bm._hero_block.get("napoleon", 0) == 8, "블록 8 추가")
