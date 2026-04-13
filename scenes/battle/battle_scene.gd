@@ -327,7 +327,36 @@ func _update_enemy_ui(index: int) -> void:
 # ─────────────────────────────────────────────
 
 func _refresh_hand() -> void:
-	pass
+	for btn in _card_buttons:
+		if is_instance_valid(btn):
+			btn.queue_free()
+	_card_buttons.clear()
+
+	var hand: Array = DeckManager.hand
+	if hand.is_empty():
+		return
+
+	var total_w: float = hand.size() * (CARD_W + 10) - 10
+	var start_x: float = (WINDOW_W - total_w) / 2.0
+
+	for i in range(hand.size()):
+		var card: Resource = hand[i]
+		var can_play: bool = DeckManager.can_play(card)
+
+		var btn := Button.new()
+		btn.position = Vector2(start_x + i * (CARD_W + 10), BOTTOM_Y)
+		btn.size = Vector2(CARD_W, CARD_H)
+
+		var card_name: String = card.get("card_name") if card.get("card_name") != null else "?"
+		var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
+		btn.text = "[%d]\n%s\n%s" % [card.cost, card_name, owner_id]
+		btn.add_theme_font_size_override("font_size", 13)
+		btn.disabled = not can_play
+
+		var captured_card := card
+		btn.pressed.connect(func(): _on_card_pressed(captured_card))
+		add_child(btn)
+		_card_buttons.append(btn)
 
 # ─────────────────────────────────────────────
 # 인터랙션 핸들러 (Task 4~5에서 구현)
@@ -348,8 +377,12 @@ func _on_player_turn_started() -> void:
 func _on_enemy_turn_started() -> void:
 	pass
 
-func _on_energy_changed(_new_energy: int) -> void:
-	pass
+func _on_energy_changed(new_energy: int) -> void:
+	_energy_label.text = "⚡ %d / %d" % [new_energy, DeckManager.MAX_ENERGY]
+	# 카드 버튼 활성/비활성 갱신
+	var hand: Array = DeckManager.hand
+	for i in range(min(_card_buttons.size(), hand.size())):
+		_card_buttons[i].disabled = not DeckManager.can_play(hand[i])
 
 func _on_card_played(_card: Resource) -> void:
 	pass
