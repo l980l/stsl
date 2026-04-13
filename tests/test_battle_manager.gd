@@ -24,6 +24,8 @@ func run_all() -> Dictionary:
 	test_vulnerable_increases_damage()
 	test_poison_tick_enemy()
 	test_poison_tick_hero()
+	test_enemy_turn_attacks_hero()
+	test_enemy_intent_advances()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -192,3 +194,27 @@ func test_poison_tick_hero() -> void:
 	bm.start_player_turn()
 	_assert(bm.team_mgr.get_current_hp("napoleon") == 66, "독 4 틱 → HP 70 → 66")
 	_assert(bm._hero_status["napoleon"].get("poison", -1) == 3, "독 스택 4 → 3")
+
+func test_enemy_turn_attacks_hero() -> void:
+	print("[TestBattleManager] test_enemy_turn_attacks_hero")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	var intent := _make_intent(IntentRes.ActionType.ATTACK, 6, IntentRes.TargetType.RANDOM)
+	bm.setup_battle([_make_enemy(30, [intent])])
+
+	bm._execute_enemy_turn()
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 64, "적 공격 6 → HP 70 → 64")
+
+func test_enemy_intent_advances() -> void:
+	print("[TestBattleManager] test_enemy_intent_advances")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	var intent0 := _make_intent(IntentRes.ActionType.ATTACK, 5, IntentRes.TargetType.RANDOM)
+	var intent1 := _make_intent(IntentRes.ActionType.BUFF, 8, IntentRes.TargetType.RANDOM)
+	bm.setup_battle([_make_enemy(30, [intent0, intent1])])
+
+	_assert(bm._enemy_intent_index[0] == 0, "초기 인덱스 0")
+	bm._execute_enemy_turn()
+	_assert(bm._enemy_intent_index[0] == 1, "1회 후 인덱스 1")
+	bm._execute_enemy_turn()
+	_assert(bm._enemy_intent_index[0] == 0, "2회 후 인덱스 0 (순환)")
