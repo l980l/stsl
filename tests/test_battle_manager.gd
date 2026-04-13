@@ -18,6 +18,12 @@ func run_all() -> Dictionary:
 	test_setup_battle()
 	test_play_card_damage()
 	test_play_card_block()
+	test_block_absorbs_damage()
+	test_block_resets_on_player_turn()
+	test_weak_reduces_damage()
+	test_vulnerable_increases_damage()
+	test_poison_tick_enemy()
+	test_poison_tick_hero()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -107,3 +113,82 @@ func test_play_card_block() -> void:
 
 	bm.play_card(card, 0)
 	_assert(bm._hero_block.get("napoleon", 0) == 8, "블록 8 추가")
+
+func test_block_absorbs_damage() -> void:
+	print("[TestBattleManager] test_block_absorbs_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	bm.setup_battle([_make_enemy(30, [])])
+	bm._hero_block["napoleon"] = 10
+
+	bm._deal_damage_to_hero("napoleon", 15)
+	_assert(bm._hero_block.get("napoleon", -1) == 0, "블록 10 전부 소진")
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 65, "HP 70 → 65 (블록 10 흡수, 나머지 5 피해)")
+
+func test_block_resets_on_player_turn() -> void:
+	print("[TestBattleManager] test_block_resets_on_player_turn")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	bm.setup_battle([_make_enemy(30, [])])
+	bm._hero_block["napoleon"] = 5
+	bm.is_battle_active = true
+
+	bm.start_player_turn()
+	_assert(bm._hero_block.get("napoleon", -1) == 0, "턴 시작 시 블록 0으로 초기화")
+
+func test_weak_reduces_damage() -> void:
+	print("[TestBattleManager] test_weak_reduces_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	bm.setup_battle([_make_enemy(30, [])])
+	bm._hero_status["napoleon"] = {"weak": 1}
+
+	var effect := _make_effect(EffectRes.EffectType.DAMAGE, 10, "SINGLE")
+	var card := _make_card("napoleon", 1, [effect])
+	bm.deck_mgr.hand.append(card)
+	bm.deck_mgr.current_energy = 3
+	bm.is_player_turn = true
+
+	bm.play_card(card, 0)
+	_assert(bm.get_enemy_hp(0) == 23, "약화 적용 → 피해 10 → 7 (HP 30 → 23)")
+
+func test_vulnerable_increases_damage() -> void:
+	print("[TestBattleManager] test_vulnerable_increases_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	bm.setup_battle([_make_enemy(30, [])])
+	bm._enemy_status[0]["vulnerable"] = 1
+
+	var effect := _make_effect(EffectRes.EffectType.DAMAGE, 10, "SINGLE")
+	var card := _make_card("napoleon", 1, [effect])
+	bm.deck_mgr.hand.append(card)
+	bm.deck_mgr.current_energy = 3
+	bm.is_player_turn = true
+
+	bm.play_card(card, 0)
+	_assert(bm.get_enemy_hp(0) == 15, "취약 적용 → 피해 10 → 15 (HP 30 → 15)")
+
+func test_poison_tick_enemy() -> void:
+	print("[TestBattleManager] test_poison_tick_enemy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	var intent := _make_intent(IntentRes.ActionType.BUFF, 5, IntentRes.TargetType.RANDOM)
+	var enemy := _make_enemy(30, [intent])
+	bm.setup_battle([enemy])
+	bm._enemy_status[0]["poison"] = 3
+
+	bm._execute_enemy_turn()
+	_assert(bm.get_enemy_hp(0) == 27, "독 3 틱 → HP 30 → 27")
+	_assert(bm._enemy_status[0].get("poison", -1) == 2, "독 스택 3 → 2")
+
+func test_poison_tick_hero() -> void:
+	print("[TestBattleManager] test_poison_tick_hero")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	bm.setup_battle([_make_enemy(30, [])])
+	bm._hero_status["napoleon"] = {"poison": 4}
+	bm.is_battle_active = true
+
+	bm.start_player_turn()
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 66, "독 4 틱 → HP 70 → 66")
+	_assert(bm._hero_status["napoleon"].get("poison", -1) == 3, "독 스택 4 → 3")
