@@ -28,6 +28,26 @@ attack 애니메이션이 `Vector2(60, 0)` — 항상 오른쪽 돌진.
 
 ---
 
+## [Plan 02] TargetType.ALL 단일 대상만 공격 (battle_manager.gd:244)
+
+`_pick_hero_target()`에서 `TargetType.ALL`이 `living[0]`만 반환함.
+
+- **원인:** `_pick_hero_target`이 단일 hero_id를 반환하는 설계라 ALL 타입과 맞지 않음
+- **영향:** ALL 의도를 가진 적(히드라 보스 등)이 첫 번째 영웅만 공격함
+- **해결 방향:** `_execute_intent()` 내 ATTACK 처리 시 `intent.target == TargetType.ALL`이면 `get_living_heroes()`를 루프로 전체 타격하는 별도 분기 추가
+
+---
+
+## [Plan 02] hero_damaged 시그널 — 블록 완전 흡수 시 amount=0 발화 (battle_manager.gd:153)
+
+블록이 피해를 전부 흡수한 경우에도 `hero_damaged.emit(hero_id, 0)` 발화됨.
+
+- **원인:** `_deal_damage_to_hero()`에서 amount 감소 후 조건 없이 emit
+- **영향:** UI에서 0 피해 이펙트가 표시될 수 있음. `enemy_damaged`는 동일 패턴이므로 두 곳 모두 수정 필요
+- **해결 방향:** `if amount > 0` 조건 추가 후 emit
+
+---
+
 ## [Plan 01] TeamManager/DeckManager ObjectDB 경고
 
 **파일:** `tests/test_team_manager.gd`, `tests/test_deck_manager.gd`
