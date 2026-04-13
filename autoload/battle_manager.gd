@@ -182,6 +182,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
 		enemy_died.emit(enemy_index)
+		_check_win_condition()
 
 func _execute_enemy_turn() -> void:
 	enemy_turn_started.emit()

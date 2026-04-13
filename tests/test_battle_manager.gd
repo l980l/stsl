@@ -26,6 +26,8 @@ func run_all() -> Dictionary:
 	test_poison_tick_hero()
 	test_enemy_turn_attacks_hero()
 	test_enemy_intent_advances()
+	test_win_condition()
+	test_lose_condition()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -218,3 +220,33 @@ func test_enemy_intent_advances() -> void:
 	_assert(bm._enemy_intent_index[0] == 1, "1회 후 인덱스 1")
 	bm._execute_enemy_turn()
 	_assert(bm._enemy_intent_index[0] == 0, "2회 후 인덱스 0 (순환)")
+
+func test_win_condition() -> void:
+	print("[TestBattleManager] test_win_condition")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	bm.setup_battle([_make_enemy(10, [])])
+
+	var signal_received := {"won": false}
+	bm.battle_won.connect(func():
+		signal_received["won"] = true
+	)
+
+	bm._deal_damage_to_enemy(0, 10)
+	_assert(signal_received["won"], "모든 적 처치 → battle_won 발동")
+	_assert(not bm.is_battle_active, "배틀 비활성")
+
+func test_lose_condition() -> void:
+	print("[TestBattleManager] test_lose_condition")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 10))
+	bm.setup_battle([_make_enemy(30, [])])
+
+	var signal_received := {"lost": false}
+	bm.battle_lost.connect(func():
+		signal_received["lost"] = true
+	)
+
+	bm._deal_damage_to_hero("napoleon", 10)
+	_assert(signal_received["lost"], "모든 영웅 사망 → battle_lost 발동")
+	_assert(not bm.is_battle_active, "배틀 비활성")
