@@ -272,6 +272,9 @@ func get_enemy_block(index: int) -> int:
 		return 0
 	return _enemy_block[index]
 
+func get_hero_block(hero_id: String) -> int:
+	return _hero_block.get(hero_id, 0)
+
 func is_enemy_alive(index: int) -> bool:
 	if index < 0 or index >= _enemy_alive.size():
 		return false

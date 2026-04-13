@@ -288,7 +288,7 @@ func _update_hero_ui(hero_id: String) -> void:
 			return
 		var cur_hp: int = TeamManager.get_current_hp(hero_id)
 		entry["hp_lbl"].text = "HP  %d / %d" % [cur_hp, hero.max_hp]
-		var block: int = BattleManager._hero_block.get(hero_id, 0)
+		var block: int = BattleManager.get_hero_block(hero_id)
 		entry["block_lbl"].text = "🛡 %d" % block if block > 0 else ""
 		if not TeamManager.is_alive(hero_id):
 			entry["panel"].modulate = Color(0.4, 0.4, 0.4)
