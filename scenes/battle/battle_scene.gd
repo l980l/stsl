@@ -162,23 +162,165 @@ func _connect_signals() -> void:
 # ─────────────────────────────────────────────
 
 func _start_test_battle() -> void:
-	pass  # Task 2에서 구현
+	var HeroRes = load("res://resources/hero_resource.gd")
+	var EnemyRes = load("res://resources/enemy_resource.gd")
+	var CardRes = load("res://resources/card_resource.gd")
+
+	# 영웅 설정
+	TeamManager.clear()
+	var napoleon = HeroRes.new()
+	napoleon.hero_id = "napoleon"
+	napoleon.hero_name = "나폴레옹"
+	napoleon.max_hp = 70
+	napoleon.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
+	TeamManager.add_hero(napoleon)
+
+	# 덱 설정 (스트라이크 3장 + 디펜드 2장)
+	DeckManager.clear()
+	for _i in range(3):
+		var card = CardRes.new()
+		card.card_name = "스트라이크"
+		card.owner_id = "napoleon"
+		card.cost = 1
+		card.play_animation = "attack"
+		var eff = EffectRes.new()
+		eff.effect_type = EffectRes.EffectType.DAMAGE
+		eff.value = 6
+		eff.target = "SINGLE"
+		card.effects = [eff]
+		DeckManager.add_card_to_deck(card)
+	for _i in range(2):
+		var card = CardRes.new()
+		card.card_name = "디펜드"
+		card.owner_id = "napoleon"
+		card.cost = 1
+		card.play_animation = "idle"
+		var eff = EffectRes.new()
+		eff.effect_type = EffectRes.EffectType.BLOCK
+		eff.value = 5
+		eff.target = "SELF"
+		card.effects = [eff]
+		DeckManager.add_card_to_deck(card)
+
+	# 적 설정
+	var IntentResClass = load("res://resources/intent_resource.gd")
+	var satyr = EnemyRes.new()
+	satyr.enemy_name = "사티로스"
+	satyr.max_hp = 30
+	satyr.character_scene = load("res://characters/enemies/satyr/satyr.tscn")
+	var intent = IntentResClass.new()
+	intent.action_type = IntentResClass.ActionType.ATTACK
+	intent.value = 6
+	intent.target = IntentResClass.TargetType.RANDOM
+	satyr.intent_pattern = [intent]
+
+	BattleManager.setup_battle([satyr])
+	_setup_heroes()
+	_setup_enemies()
+	BattleManager.start_player_turn()
 
 # ─────────────────────────────────────────────
 # 영웅/적 표시 (Task 2에서 구현)
 # ─────────────────────────────────────────────
 
 func _setup_heroes() -> void:
-	pass
+	# 기존 캐릭터 노드 정리
+	for char_node in _hero_char_nodes.values():
+		char_node.queue_free()
+	_hero_char_nodes.clear()
+	for entry in _hero_nodes:
+		entry["panel"].visible = false
+		entry["hero_id"] = ""
+
+	var heroes := TeamManager.heroes
+	for i in range(min(heroes.size(), 3)):
+		var hero: Resource = heroes[i]
+		var entry: Dictionary = _hero_nodes[i]
+		entry["panel"].visible = true
+		entry["hero_id"] = hero.hero_id
+		entry["name_lbl"].text = hero.get("hero_name") if hero.get("hero_name") != null else hero.hero_id
+
+		# 캐릭터 씬 인스턴스화
+		if hero.character_scene != null:
+			var char_node = hero.character_scene.instantiate()
+			char_node.position = Vector2(HERO_X + 170, 80 + i * (SLOT_H + SLOT_GAP) + 120)
+			add_child(char_node)
+			_hero_char_nodes[hero.hero_id] = char_node
+
+		_update_hero_ui(hero.hero_id)
 
 func _setup_enemies() -> void:
-	pass
+	# 기존 캐릭터 노드 정리
+	for i in range(_enemy_char_nodes.size()):
+		if _enemy_char_nodes[i] != null:
+			_enemy_char_nodes[i].queue_free()
+			_enemy_char_nodes[i] = null
+	for entry in _enemy_nodes:
+		entry["panel"].visible = false
 
-func _update_hero_ui(_hero_id: String) -> void:
-	pass
+	var count := 0
+	while count < 3 and BattleManager.get_enemy(count) != null:
+		count += 1
 
-func _update_enemy_ui(_index: int) -> void:
-	pass
+	for i in range(count):
+		var enemy: Resource = BattleManager.get_enemy(i)
+		var entry: Dictionary = _enemy_nodes[i]
+		entry["panel"].visible = true
+		entry["btn"].disabled = false
+		entry["name_lbl"].text = enemy.get("enemy_name") if enemy.get("enemy_name") != null else "적"
+
+		# 캐릭터 씬 인스턴스화 (좌우 반전: scale.x = -1)
+		if enemy.character_scene != null:
+			var char_node = enemy.character_scene.instantiate()
+			char_node.position = Vector2(ENEMY_X + 190, 80 + i * (SLOT_H + SLOT_GAP) + 120)
+			char_node.scale = Vector2(-1, 1)  # 적은 왼쪽 향함
+			add_child(char_node)
+			_enemy_char_nodes[i] = char_node
+
+		_update_enemy_ui(i)
+
+func _update_hero_ui(hero_id: String) -> void:
+	for entry in _hero_nodes:
+		if entry["hero_id"] != hero_id:
+			continue
+		var hero: Resource = TeamManager.get_hero(hero_id)
+		if hero == null:
+			return
+		var cur_hp: int = TeamManager.get_current_hp(hero_id)
+		entry["hp_lbl"].text = "HP  %d / %d" % [cur_hp, hero.max_hp]
+		var block: int = BattleManager._hero_block.get(hero_id, 0)
+		entry["block_lbl"].text = "🛡 %d" % block if block > 0 else ""
+		if not TeamManager.is_alive(hero_id):
+			entry["panel"].modulate = Color(0.4, 0.4, 0.4)
+		return
+
+func _update_enemy_ui(index: int) -> void:
+	var entry: Dictionary = _enemy_nodes[index]
+	var enemy: Resource = BattleManager.get_enemy(index)
+	if enemy == null:
+		return
+	var cur_hp: int = BattleManager.get_enemy_hp(index)
+	entry["hp_lbl"].text = "HP  %d / %d" % [cur_hp, enemy.max_hp]
+	var block: int = BattleManager.get_enemy_block(index)
+	entry["block_lbl"].text = "🛡 %d" % block if block > 0 else ""
+
+	# 의도 표시
+	var intent: Resource = BattleManager.get_enemy_current_intent(index)
+	if intent != null:
+		match intent.action_type:
+			IntentRes.ActionType.ATTACK:
+				entry["intent_lbl"].text = "⚔ %d" % intent.value
+			IntentRes.ActionType.BUFF:
+				entry["intent_lbl"].text = "🛡 %d" % intent.value
+			IntentRes.ActionType.DEBUFF:
+				entry["intent_lbl"].text = "💀 약화"
+			_:
+				entry["intent_lbl"].text = "?"
+
+	if not BattleManager.is_enemy_alive(index):
+		entry["panel"].modulate = Color(0.3, 0.3, 0.3)
+		entry["btn"].disabled = true
+		entry["intent_lbl"].text = "✝"
 
 # ─────────────────────────────────────────────
 # 카드 핸드 (Task 3에서 구현)

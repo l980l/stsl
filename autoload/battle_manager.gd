@@ -285,6 +285,11 @@ func get_enemy_current_intent(index: int) -> Resource:
 		return null
 	return pattern[_enemy_intent_index[index]]
 
+func get_enemy(index: int) -> Resource:
+	if index < 0 or index >= _enemies.size():
+		return null
+	return _enemies[index]
+
 func clear() -> void:
 	_enemies.clear()
 	_enemy_hp.clear()
