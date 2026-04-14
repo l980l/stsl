@@ -411,7 +411,8 @@ func _on_card_played(card: Resource) -> void:
 	var anim_name: String = card.get("play_animation") if card.get("play_animation") != null else ""
 	if anim_name == "":
 		return
-	var char_node = _hero_char_nodes.get(card.get("owner_id", ""))
+	var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
+	var char_node = _hero_char_nodes.get(owner_id)
 	if char_node == null or not char_node.has_node("AnimationPlayer"):
 		return
 	var anim_player: AnimationPlayer = char_node.get_node("AnimationPlayer")
