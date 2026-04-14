@@ -272,6 +272,9 @@ func get_enemy_block(index: int) -> int:
 		return 0
 	return _enemy_block[index]
 
+func get_hero_block(hero_id: String) -> int:
+	return _hero_block.get(hero_id, 0)
+
 func is_enemy_alive(index: int) -> bool:
 	if index < 0 or index >= _enemy_alive.size():
 		return false
@@ -284,6 +287,11 @@ func get_enemy_current_intent(index: int) -> Resource:
 	if pattern.is_empty():
 		return null
 	return pattern[_enemy_intent_index[index]]
+
+func get_enemy(index: int) -> Resource:
+	if index < 0 or index >= _enemies.size():
+		return null
+	return _enemies[index]
 
 func clear() -> void:
 	_enemies.clear()
