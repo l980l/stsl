@@ -396,10 +396,6 @@ func _on_end_turn_pressed() -> void:
 	_message_label.text = ""
 	_end_turn_btn.disabled = true
 	BattleManager.end_player_turn()
-	# 적 턴 완료 후 적 클릭 버튼 재활성
-	for i in range(_enemy_nodes.size()):
-		if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
-			_enemy_nodes[i]["btn"].disabled = false
 
 func _on_player_turn_started() -> void:
 	_end_turn_btn.disabled = false
@@ -414,6 +410,10 @@ func _on_player_turn_started() -> void:
 	for i in range(_enemy_nodes.size()):
 		if _enemy_nodes[i]["panel"].visible:
 			_update_enemy_ui(i)
+	# 살아있는 적 클릭 버튼 재활성
+	for i in range(_enemy_nodes.size()):
+		if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
+			_enemy_nodes[i]["btn"].disabled = false
 
 func _on_enemy_turn_started() -> void:
 	_end_turn_btn.disabled = true
