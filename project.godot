@@ -13,6 +13,14 @@ config_version=5
 config/name="STSL"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
+config/run/main_scene="res://scenes/battle/battle_scene.tscn"
+
+[autoload]
+
+GameManager="*res://autoload/game_manager.gd"
+TeamManager="*res://autoload/team_manager.gd"
+DeckManager="*res://autoload/deck_manager.gd"
+BattleManager="*res://autoload/battle_manager.gd"
 
 [display]
 
@@ -28,10 +36,3 @@ window/size/resizable=false
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
-
-[autoload]
-
-GameManager="*res://autoload/game_manager.gd"
-TeamManager="*res://autoload/team_manager.gd"
-DeckManager="*res://autoload/deck_manager.gd"
-BattleManager="*res://autoload/battle_manager.gd"

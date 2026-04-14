@@ -392,13 +392,37 @@ func _on_enemy_pressed(index: int) -> void:
 	_message_label.text = ""
 
 func _on_end_turn_pressed() -> void:
-	pass
+	_selected_card = null
+	_message_label.text = ""
+	_end_turn_btn.disabled = true
+	BattleManager.end_player_turn()
+	# 적 턴 완료 후 적 클릭 버튼 재활성
+	for i in range(_enemy_nodes.size()):
+		if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
+			_enemy_nodes[i]["btn"].disabled = false
 
 func _on_player_turn_started() -> void:
-	pass
+	_end_turn_btn.disabled = false
+	_message_label.text = "플레이어 턴"
+	_energy_label.text = "⚡ %d / %d" % [DeckManager.current_energy, DeckManager.MAX_ENERGY]
+	# 영웅 블록 UI 갱신 (start_player_turn이 블록 초기화했으므로)
+	for entry in _hero_nodes:
+		var hid: String = entry["hero_id"]
+		if hid != "":
+			_update_hero_ui(hid)
+	# 적 의도 갱신
+	for i in range(_enemy_nodes.size()):
+		if _enemy_nodes[i]["panel"].visible:
+			_update_enemy_ui(i)
 
 func _on_enemy_turn_started() -> void:
-	pass
+	_end_turn_btn.disabled = true
+	_selected_card = null
+	_message_label.text = "적 턴..."
+	# 적 클릭 버튼 비활성
+	for entry in _enemy_nodes:
+		if entry["panel"].visible and not entry["btn"].disabled:
+			entry["btn"].disabled = true
 
 func _on_energy_changed(new_energy: int) -> void:
 	_energy_label.text = "⚡ %d / %d" % [new_energy, DeckManager.MAX_ENERGY]
@@ -453,7 +477,13 @@ func _on_hero_died(hero_id: String) -> void:
 			ap.play("death")
 
 func _on_battle_won() -> void:
-	pass
+	_message_label.text = "🏆 승리!"
+	_end_turn_btn.disabled = true
+	_selected_card = null
+	for entry in _enemy_nodes:
+		entry["btn"].disabled = true
 
 func _on_battle_lost() -> void:
-	pass
+	_message_label.text = "💀 패배..."
+	_end_turn_btn.disabled = true
+	_selected_card = null
