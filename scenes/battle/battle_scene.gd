@@ -362,11 +362,34 @@ func _refresh_hand() -> void:
 # 인터랙션 핸들러 (Task 4~5에서 구현)
 # ─────────────────────────────────────────────
 
-func _on_card_pressed(_card: Resource) -> void:
-	pass
+func _on_card_pressed(card: Resource) -> void:
+	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
+		return
 
-func _on_enemy_pressed(_index: int) -> void:
-	pass
+	# 타겟 선택이 필요한지 확인 (SINGLE DAMAGE 효과)
+	var needs_target := false
+	for effect in card.effects:
+		if effect.effect_type == EffectRes.EffectType.DAMAGE and effect.target == "SINGLE":
+			needs_target = true
+			break
+
+	if needs_target:
+		_selected_card = card
+		_message_label.text = "공격 대상을 선택하세요 ▶"
+	else:
+		# 즉시 플레이 (블록, 전체 공격 등)
+		BattleManager.play_card(card, -1)
+		_selected_card = null
+		_message_label.text = ""
+
+func _on_enemy_pressed(index: int) -> void:
+	if _selected_card == null or not BattleManager.is_player_turn:
+		return
+	if not BattleManager.is_enemy_alive(index):
+		return
+	BattleManager.play_card(_selected_card, index)
+	_selected_card = null
+	_message_label.text = ""
 
 func _on_end_turn_pressed() -> void:
 	pass
@@ -384,20 +407,49 @@ func _on_energy_changed(new_energy: int) -> void:
 	for i in range(min(_card_buttons.size(), hand.size())):
 		_card_buttons[i].disabled = not DeckManager.can_play(hand[i])
 
-func _on_card_played(_card: Resource) -> void:
-	pass
+func _on_card_played(card: Resource) -> void:
+	var anim_name: String = card.get("play_animation") if card.get("play_animation") != null else ""
+	if anim_name == "":
+		return
+	var char_node = _hero_char_nodes.get(card.get("owner_id", ""))
+	if char_node == null or not char_node.has_node("AnimationPlayer"):
+		return
+	var anim_player: AnimationPlayer = char_node.get_node("AnimationPlayer")
+	if anim_player.has_animation(anim_name):
+		anim_player.play(anim_name)
 
-func _on_hero_damaged(_hero_id: String, _amount: int) -> void:
-	pass
+func _on_hero_damaged(hero_id: String, _amount: int) -> void:
+	_update_hero_ui(hero_id)
+	# hurt 애니메이션 트리거
+	var char_node = _hero_char_nodes.get(hero_id)
+	if char_node and char_node.has_node("AnimationPlayer"):
+		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+		if ap.has_animation("hurt"):
+			ap.play("hurt")
 
-func _on_enemy_damaged(_index: int, _amount: int) -> void:
-	pass
+func _on_enemy_damaged(index: int, _amount: int) -> void:
+	_update_enemy_ui(index)
+	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
+	if char_node and char_node.has_node("AnimationPlayer"):
+		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+		if ap.has_animation("hurt"):
+			ap.play("hurt")
 
-func _on_enemy_died(_index: int) -> void:
-	pass
+func _on_enemy_died(index: int) -> void:
+	_update_enemy_ui(index)
+	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
+	if char_node and char_node.has_node("AnimationPlayer"):
+		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+		if ap.has_animation("death"):
+			ap.play("death")
 
-func _on_hero_died(_hero_id: String) -> void:
-	pass
+func _on_hero_died(hero_id: String) -> void:
+	_update_hero_ui(hero_id)
+	var char_node = _hero_char_nodes.get(hero_id)
+	if char_node and char_node.has_node("AnimationPlayer"):
+		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+		if ap.has_animation("death"):
+			ap.play("death")
 
 func _on_battle_won() -> void:
 	pass
