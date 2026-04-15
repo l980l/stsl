@@ -497,4 +497,6 @@ func _on_battle_lost() -> void:
 	_message_label.text = "💀 패배..."
 	_end_turn_btn.disabled = true
 	_selected_card = null
+	for entry in _enemy_nodes:
+		entry["btn"].disabled = true
 	GameManager.complete_battle(false)
