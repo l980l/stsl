@@ -15,32 +15,32 @@
 ```
 stsl/
   resources/
-    effect_resource.gd       ← 카드/릴릭 효과 원자 단위
-    card_resource.gd         ← 카드 데이터 (play_animation 포함)
-    hero_resource.gd         ← 팀원(역사 인물) 데이터 (character_scene 참조)
-    intent_resource.gd       ← 몬스터 1회 행동 데이터 (play_animation 포함)
-    enemy_resource.gd        ← 몬스터 데이터 (character_scene 참조)
-    relic_resource.gd        ← 유물 데이터
+	effect_resource.gd       ← 카드/릴릭 효과 원자 단위
+	card_resource.gd         ← 카드 데이터 (play_animation 포함)
+	hero_resource.gd         ← 팀원(역사 인물) 데이터 (character_scene 참조)
+	intent_resource.gd       ← 몬스터 1회 행동 데이터 (play_animation 포함)
+	enemy_resource.gd        ← 몬스터 데이터 (character_scene 참조)
+	relic_resource.gd        ← 유물 데이터
   autoload/
-    game_manager.gd          ← 런 상태, 현재 층/챕터, 골드, 릴릭 목록
-    team_manager.gd          ← 팀원 목록, 현재 HP, 생사 상태
-    deck_manager.gd          ← 드로우/손패/버림/소진 더미, 에너지
+	game_manager.gd          ← 런 상태, 현재 층/챕터, 골드, 릴릭 목록
+	team_manager.gd          ← 팀원 목록, 현재 HP, 생사 상태
+	deck_manager.gd          ← 드로우/손패/버림/소진 더미, 에너지
   characters/
-    heroes/
-      napoleon/
-        napoleon.tscn        ← 나폴레옹 플레이스홀더 씬
-      yi_sun_sin/
-        yi_sun_sin.tscn      ← 이순신 플레이스홀더 씬
-      cleopatra/
-        cleopatra.tscn       ← 클레오파트라 플레이스홀더 씬
-    enemies/
-      satyr/
-        satyr.tscn           ← 사티로스 플레이스홀더 씬
+	heroes/
+	  napoleon/
+		napoleon.tscn        ← 나폴레옹 플레이스홀더 씬
+	  yi_sun_sin/
+		yi_sun_sin.tscn      ← 이순신 플레이스홀더 씬
+	  cleopatra/
+		cleopatra.tscn       ← 클레오파트라 플레이스홀더 씬
+	enemies/
+	  satyr/
+		satyr.tscn           ← 사티로스 플레이스홀더 씬
   tests/
-    test_runner.gd           ← SceneTree 기반 헤드리스 진입점
-    test_resources.gd        ← Resource 기본값 검증
-    test_team_manager.gd     ← TeamManager 로직 검증
-    test_deck_manager.gd     ← DeckManager 로직 검증
+	test_runner.gd           ← SceneTree 기반 헤드리스 진입점
+	test_resources.gd        ← Resource 기본값 검증
+	test_team_manager.gd     ← TeamManager 로직 검증
+	test_deck_manager.gd     ← DeckManager 로직 검증
   project.godot              ← Autoload 등록 (수정)
 ```
 
@@ -64,19 +64,19 @@ stsl/
 extends SceneTree
 
 func _init() -> void:
-    var total_passed: int = 0
-    var total_failed: int = 0
+	var total_passed: int = 0
+	var total_failed: int = 0
 
-    # 테스트 클래스 목록 — 이후 태스크에서 추가
-    var suites: Array = []
+	# 테스트 클래스 목록 — 이후 태스크에서 추가
+	var suites: Array = []
 
-    for suite in suites:
-        var result: Dictionary = suite.run_all()
-        total_passed += result.passed
-        total_failed += result.failed
+	for suite in suites:
+		var result: Dictionary = suite.run_all()
+		total_passed += result.passed
+		total_failed += result.failed
 
-    print("\n=== Results: %d passed, %d failed ===" % [total_passed, total_failed])
-    quit(1 if total_failed > 0 else 0)
+	print("\n=== Results: %d passed, %d failed ===" % [total_passed, total_failed])
+	quit(1 if total_failed > 0 else 0)
 ```
 
 - [ ] **Step 2: 헤드리스 실행 확인**
@@ -119,23 +119,23 @@ var passed: int = 0
 var failed: int = 0
 
 func run_all() -> Dictionary:
-    test_effect_resource_defaults()
-    return {"passed": passed, "failed": failed}
+	test_effect_resource_defaults()
+	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
-    if condition:
-        passed += 1
-        print("  PASS: " + msg)
-    else:
-        failed += 1
-        push_error("  FAIL: " + msg)
+	if condition:
+		passed += 1
+		print("  PASS: " + msg)
+	else:
+		failed += 1
+		push_error("  FAIL: " + msg)
 
 func test_effect_resource_defaults() -> void:
-    print("[TestResources] test_effect_resource_defaults")
-    var effect = EffectResource.new()
-    _assert(effect.value == 0, "기본 value == 0")
-    _assert(effect.target == "SINGLE", "기본 target == SINGLE")
-    _assert(effect.status_type == "", "기본 status_type 비어있음")
+	print("[TestResources] test_effect_resource_defaults")
+	var effect = EffectResource.new()
+	_assert(effect.value == 0, "기본 value == 0")
+	_assert(effect.target == "SINGLE", "기본 target == SINGLE")
+	_assert(effect.status_type == "", "기본 status_type 비어있음")
 ```
 
 test_runner.gd의 suites 배열 수정:
@@ -160,21 +160,21 @@ class_name EffectResource
 extends Resource
 
 enum EffectType {
-    DAMAGE,       # 피해
-    BLOCK,        # 방어도
-    APPLY_STATUS, # 상태이상 부여 (status_type 참조)
-    DRAW,         # 카드 드로우
-    ENERGY,       # 에너지 획득
-    SUMMON_TOKEN, # 병사 토큰 소환 (나폴레옹)
-    CHARM,        # 매혹 부여 (클레오파트라)
-    HEAL,         # HP 회복
+	DAMAGE,       # 피해
+	BLOCK,        # 방어도
+	APPLY_STATUS, # 상태이상 부여 (status_type 참조)
+	DRAW,         # 카드 드로우
+	ENERGY,       # 에너지 획득
+	SUMMON_TOKEN, # 병사 토큰 소환 (나폴레옹)
+	CHARM,        # 매혹 부여 (클레오파트라)
+	HEAL,         # HP 회복
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
 @export var value: int = 0
 @export var target: String = "SINGLE"   # SINGLE / ALL / SELF
 @export var status_type: String = ""    # APPLY_STATUS 시 상태이상 종류
-                                        # "poison","weak","vulnerable","taunt","strength"
+										# "poison","weak","vulnerable","taunt","strength"
 ```
 
 - [ ] **Step 4: 통과 확인**
@@ -213,22 +213,22 @@ git commit -m "feat: EffectResource 데이터 클래스"
 `test_resources.gd`의 `run_all()` 내 마지막 줄 앞에 추가:
 ```gdscript
 func run_all() -> Dictionary:
-    test_effect_resource_defaults()
-    test_card_resource_defaults()      # 추가
-    return {"passed": passed, "failed": failed}
+	test_effect_resource_defaults()
+	test_card_resource_defaults()      # 추가
+	return {"passed": passed, "failed": failed}
 ```
 
 아래 메서드 추가:
 ```gdscript
 func test_card_resource_defaults() -> void:
-    print("[TestResources] test_card_resource_defaults")
-    var card = CardResource.new()
-    _assert(card.cost == 1, "기본 cost == 1")
-    _assert(card.upgraded == false, "기본 upgraded == false")
-    _assert(card.card_type == CardResource.CardType.ATTACK, "기본 타입 ATTACK")
-    _assert(card.effects.size() == 0, "기본 effects 비어있음")
-    _assert(card.owner_id == "", "기본 owner_id 비어있음")
-    _assert(card.play_animation == "", "기본 play_animation 비어있음")
+	print("[TestResources] test_card_resource_defaults")
+	var card = CardResource.new()
+	_assert(card.cost == 1, "기본 cost == 1")
+	_assert(card.upgraded == false, "기본 upgraded == false")
+	_assert(card.card_type == CardResource.CardType.ATTACK, "기본 타입 ATTACK")
+	_assert(card.effects.size() == 0, "기본 effects 비어있음")
+	_assert(card.owner_id == "", "기본 owner_id 비어있음")
+	_assert(card.play_animation == "", "기본 play_animation 비어있음")
 ```
 
 - [ ] **Step 2: 실패 확인**
@@ -257,7 +257,7 @@ enum CardType { ATTACK, SKILL, POWER }
 @export var description: String = ""
 @export var art: Texture2D                 # 카드 일러스트 (정적 이미지)
 @export var play_animation: String = ""    # 카드 사용 시 캐릭터가 재생할 애니메이션 이름
-                                           # 예: "attack_blitz", "skill_turtle_ship"
+										   # 예: "attack_blitz", "skill_turtle_ship"
 ```
 
 - [ ] **Step 4: 통과 확인**
@@ -288,19 +288,19 @@ git commit -m "feat: CardResource 데이터 클래스"
 `run_all()` 내 추가:
 ```gdscript
 func run_all() -> Dictionary:
-    test_effect_resource_defaults()
-    test_card_resource_defaults()
-    test_hero_resource_defaults()      # 추가
-    return {"passed": passed, "failed": failed}
+	test_effect_resource_defaults()
+	test_card_resource_defaults()
+	test_hero_resource_defaults()      # 추가
+	return {"passed": passed, "failed": failed}
 ```
 
 ```gdscript
 func test_hero_resource_defaults() -> void:
-    print("[TestResources] test_hero_resource_defaults")
-    var hero = HeroResource.new()
-    _assert(hero.max_hp == 70, "기본 max_hp == 70")
-    _assert(hero.card_pool.size() == 0, "기본 카드풀 비어있음")
-    _assert(hero.hero_id == "", "기본 hero_id 비어있음")
+	print("[TestResources] test_hero_resource_defaults")
+	var hero = HeroResource.new()
+	_assert(hero.max_hp == 70, "기본 max_hp == 70")
+	_assert(hero.card_pool.size() == 0, "기본 카드풀 비어있음")
+	_assert(hero.hero_id == "", "기본 hero_id 비어있음")
 ```
 
 - [ ] **Step 2: 실패 확인**
@@ -324,7 +324,7 @@ extends Resource
 @export var max_hp: int = 70
 @export var card_pool: Array[CardResource] = []
 @export var character_scene: PackedScene     # 캐릭터 애니메이션 씬 (AnimationPlayer 포함)
-                                             # Blender 스프라이트 시트 교체 시 씬 내부만 수정
+											 # Blender 스프라이트 시트 교체 시 씬 내부만 수정
 @export var portrait: Texture2D              # UI용 초상화 (정적 이미지)
 ```
 
@@ -357,27 +357,27 @@ git commit -m "feat: HeroResource 데이터 클래스"
 `run_all()` 내 추가:
 ```gdscript
 func run_all() -> Dictionary:
-    test_effect_resource_defaults()
-    test_card_resource_defaults()
-    test_hero_resource_defaults()
-    test_enemy_resource_defaults()    # 추가
-    return {"passed": passed, "failed": failed}
+	test_effect_resource_defaults()
+	test_card_resource_defaults()
+	test_hero_resource_defaults()
+	test_enemy_resource_defaults()    # 추가
+	return {"passed": passed, "failed": failed}
 ```
 
 ```gdscript
 func test_enemy_resource_defaults() -> void:
-    print("[TestResources] test_enemy_resource_defaults")
-    var enemy = EnemyResource.new()
-    _assert(enemy.grade == EnemyResource.Grade.NORMAL, "기본 등급 NORMAL")
-    _assert(enemy.max_hp == 30, "기본 max_hp == 30")
-    _assert(enemy.intent_pattern.size() == 0, "기본 행동 패턴 비어있음")
-    _assert(enemy.phase_thresholds.size() == 0, "기본 페이즈 비어있음")
+	print("[TestResources] test_enemy_resource_defaults")
+	var enemy = EnemyResource.new()
+	_assert(enemy.grade == EnemyResource.Grade.NORMAL, "기본 등급 NORMAL")
+	_assert(enemy.max_hp == 30, "기본 max_hp == 30")
+	_assert(enemy.intent_pattern.size() == 0, "기본 행동 패턴 비어있음")
+	_assert(enemy.phase_thresholds.size() == 0, "기본 페이즈 비어있음")
 
-    var intent = IntentResource.new()
-    _assert(intent.value == 0, "intent 기본 value == 0")
-    _assert(intent.action_type == IntentResource.ActionType.ATTACK, "기본 행동 ATTACK")
-    _assert(intent.target == IntentResource.TargetType.RANDOM, "기본 타겟 RANDOM")
-    _assert(intent.play_animation == "", "기본 play_animation 비어있음")
+	var intent = IntentResource.new()
+	_assert(intent.value == 0, "intent 기본 value == 0")
+	_assert(intent.action_type == IntentResource.ActionType.ATTACK, "기본 행동 ATTACK")
+	_assert(intent.target == IntentResource.TargetType.RANDOM, "기본 타겟 RANDOM")
+	_assert(intent.play_animation == "", "기본 play_animation 비어있음")
 ```
 
 - [ ] **Step 2: 실패 확인**
@@ -403,7 +403,7 @@ enum TargetType { LOWEST_HP, LAST_ATTACKER, RANDOM, ALL }
 @export var target: TargetType = TargetType.RANDOM
 @export var condition: String = ""         # 발동 조건 표현식 (빈 문자열 = 항상)
 @export var play_animation: String = ""    # 이 행동 실행 시 몬스터가 재생할 애니메이션
-                                           # 예: "attack_charge", "buff_enrage"
+										   # 예: "attack_charge", "buff_enrage"
 ```
 
 - [ ] **Step 4: EnemyResource 구현**
@@ -452,20 +452,20 @@ git commit -m "feat: IntentResource + EnemyResource 데이터 클래스"
 `run_all()` 내 추가:
 ```gdscript
 func run_all() -> Dictionary:
-    test_effect_resource_defaults()
-    test_card_resource_defaults()
-    test_hero_resource_defaults()
-    test_enemy_resource_defaults()
-    test_relic_resource_defaults()    # 추가
-    return {"passed": passed, "failed": failed}
+	test_effect_resource_defaults()
+	test_card_resource_defaults()
+	test_hero_resource_defaults()
+	test_enemy_resource_defaults()
+	test_relic_resource_defaults()    # 추가
+	return {"passed": passed, "failed": failed}
 ```
 
 ```gdscript
 func test_relic_resource_defaults() -> void:
-    print("[TestResources] test_relic_resource_defaults")
-    var relic = RelicResource.new()
-    _assert(relic.owner_id == "", "기본 owner_id 비어있음 = 공용 릴릭")
-    _assert(relic.relic_name == "", "기본 relic_name 비어있음")
+	print("[TestResources] test_relic_resource_defaults")
+	var relic = RelicResource.new()
+	_assert(relic.owner_id == "", "기본 owner_id 비어있음 = 공용 릴릭")
+	_assert(relic.relic_name == "", "기본 relic_name 비어있음")
 ```
 
 - [ ] **Step 2: 실패 확인**
@@ -528,47 +528,47 @@ var passed: int = 0
 var failed: int = 0
 
 func run_all() -> Dictionary:
-    test_add_hero()
-    test_take_damage()
-    test_hero_death()
-    return {"passed": passed, "failed": failed}
+	test_add_hero()
+	test_take_damage()
+	test_hero_death()
+	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
-    if condition:
-        passed += 1
-        print("  PASS: " + msg)
-    else:
-        failed += 1
-        push_error("  FAIL: " + msg)
+	if condition:
+		passed += 1
+		print("  PASS: " + msg)
+	else:
+		failed += 1
+		push_error("  FAIL: " + msg)
 
 func _make_hero(id: String, hp: int) -> HeroResource:
-    var hero = HeroResource.new()
-    hero.hero_id = id
-    hero.max_hp = hp
-    return hero
+	var hero = HeroResource.new()
+	hero.hero_id = id
+	hero.max_hp = hp
+	return hero
 
 func test_add_hero() -> void:
-    print("[TestTeamManager] test_add_hero")
-    var tm = TeamManagerClass.new()
-    var hero = _make_hero("napoleon", 80)
-    tm.add_hero(hero)
-    _assert(tm.get_current_hp("napoleon") == 80, "추가 후 HP == max_hp")
-    _assert(tm.is_alive("napoleon") == true, "추가 후 생존 상태")
+	print("[TestTeamManager] test_add_hero")
+	var tm = TeamManagerClass.new()
+	var hero = _make_hero("napoleon", 80)
+	tm.add_hero(hero)
+	_assert(tm.get_current_hp("napoleon") == 80, "추가 후 HP == max_hp")
+	_assert(tm.is_alive("napoleon") == true, "추가 후 생존 상태")
 
 func test_take_damage() -> void:
-    print("[TestTeamManager] test_take_damage")
-    var tm = TeamManagerClass.new()
-    tm.add_hero(_make_hero("napoleon", 80))
-    tm.take_damage("napoleon", 20)
-    _assert(tm.get_current_hp("napoleon") == 60, "20 피해 후 HP == 60")
+	print("[TestTeamManager] test_take_damage")
+	var tm = TeamManagerClass.new()
+	tm.add_hero(_make_hero("napoleon", 80))
+	tm.take_damage("napoleon", 20)
+	_assert(tm.get_current_hp("napoleon") == 60, "20 피해 후 HP == 60")
 
 func test_hero_death() -> void:
-    print("[TestTeamManager] test_hero_death")
-    var tm = TeamManagerClass.new()
-    tm.add_hero(_make_hero("napoleon", 80))
-    tm.take_damage("napoleon", 80)
-    _assert(tm.get_current_hp("napoleon") == 0, "치사 피해 후 HP == 0")
-    _assert(tm.is_alive("napoleon") == false, "치사 피해 후 사망 상태")
+	print("[TestTeamManager] test_hero_death")
+	var tm = TeamManagerClass.new()
+	tm.add_hero(_make_hero("napoleon", 80))
+	tm.take_damage("napoleon", 80)
+	_assert(tm.get_current_hp("napoleon") == 0, "치사 피해 후 HP == 0")
+	_assert(tm.is_alive("napoleon") == false, "치사 피해 후 사망 상태")
 ```
 
 test_runner.gd suites 갱신:
@@ -601,56 +601,56 @@ signal hero_died(hero_id: String)
 signal hero_revived(hero_id: String)
 
 func add_hero(hero: HeroResource) -> void:
-    heroes.append(hero)
-    _hero_hp[hero.hero_id] = hero.max_hp
-    _hero_alive[hero.hero_id] = true
+	heroes.append(hero)
+	_hero_hp[hero.hero_id] = hero.max_hp
+	_hero_alive[hero.hero_id] = true
 
 func take_damage(hero_id: String, amount: int) -> void:
-    if not _hero_alive.get(hero_id, false):
-        return
-    _hero_hp[hero_id] = max(0, _hero_hp[hero_id] - amount)
-    if _hero_hp[hero_id] == 0:
-        _hero_alive[hero_id] = false
-        hero_died.emit(hero_id)
+	if not _hero_alive.get(hero_id, false):
+		return
+	_hero_hp[hero_id] = max(0, _hero_hp[hero_id] - amount)
+	if _hero_hp[hero_id] == 0:
+		_hero_alive[hero_id] = false
+		hero_died.emit(hero_id)
 
 func heal(hero_id: String, amount: int) -> void:
-    if not _hero_alive.get(hero_id, false):
-        return
-    var hero: HeroResource = get_hero(hero_id)
-    if hero == null:
-        return
-    _hero_hp[hero_id] = min(hero.max_hp, _hero_hp[hero_id] + amount)
+	if not _hero_alive.get(hero_id, false):
+		return
+	var hero: HeroResource = get_hero(hero_id)
+	if hero == null:
+		return
+	_hero_hp[hero_id] = min(hero.max_hp, _hero_hp[hero_id] + amount)
 
 func revive(hero_id: String, hp: int) -> void:
-    if not _hero_hp.has(hero_id):
-        return
-    _hero_alive[hero_id] = true
-    _hero_hp[hero_id] = hp
-    hero_revived.emit(hero_id)
+	if not _hero_hp.has(hero_id):
+		return
+	_hero_alive[hero_id] = true
+	_hero_hp[hero_id] = hp
+	hero_revived.emit(hero_id)
 
 func get_current_hp(hero_id: String) -> int:
-    return _hero_hp.get(hero_id, 0)
+	return _hero_hp.get(hero_id, 0)
 
 func is_alive(hero_id: String) -> bool:
-    return _hero_alive.get(hero_id, false)
+	return _hero_alive.get(hero_id, false)
 
 func get_hero(hero_id: String) -> HeroResource:
-    for hero in heroes:
-        if hero.hero_id == hero_id:
-            return hero
-    return null
+	for hero in heroes:
+		if hero.hero_id == hero_id:
+			return hero
+	return null
 
 func get_living_heroes() -> Array[HeroResource]:
-    var result: Array[HeroResource] = []
-    for hero in heroes:
-        if _hero_alive.get(hero.hero_id, false):
-            result.append(hero)
-    return result
+	var result: Array[HeroResource] = []
+	for hero in heroes:
+		if _hero_alive.get(hero.hero_id, false):
+			result.append(hero)
+	return result
 
 func clear() -> void:
-    heroes.clear()
-    _hero_hp.clear()
-    _hero_alive.clear()
+	heroes.clear()
+	_hero_hp.clear()
+	_hero_alive.clear()
 ```
 
 - [ ] **Step 4: 통과 확인**
@@ -690,65 +690,65 @@ var passed: int = 0
 var failed: int = 0
 
 func run_all() -> Dictionary:
-    test_draw_cards()
-    test_energy_cost()
-    test_reshuffle_on_empty()
-    test_discard_hand()
-    return {"passed": passed, "failed": failed}
+	test_draw_cards()
+	test_energy_cost()
+	test_reshuffle_on_empty()
+	test_discard_hand()
+	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
-    if condition:
-        passed += 1
-        print("  PASS: " + msg)
-    else:
-        failed += 1
-        push_error("  FAIL: " + msg)
+	if condition:
+		passed += 1
+		print("  PASS: " + msg)
+	else:
+		failed += 1
+		push_error("  FAIL: " + msg)
 
 func _make_card(name: String, cost: int = 1) -> CardResource:
-    var card = CardResource.new()
-    card.card_name = name
-    card.cost = cost
-    return card
+	var card = CardResource.new()
+	card.card_name = name
+	card.cost = cost
+	return card
 
 func test_draw_cards() -> void:
-    print("[TestDeckManager] test_draw_cards")
-    var dm = DeckManagerClass.new()
-    for i in range(10):
-        dm.draw_pile.append(_make_card("card_%d" % i))
-    dm.draw_cards(5)
-    _assert(dm.hand.size() == 5, "5장 드로우 후 손패 5장")
-    _assert(dm.draw_pile.size() == 5, "드로우 후 드로우 파일 5장")
+	print("[TestDeckManager] test_draw_cards")
+	var dm = DeckManagerClass.new()
+	for i in range(10):
+		dm.draw_pile.append(_make_card("card_%d" % i))
+	dm.draw_cards(5)
+	_assert(dm.hand.size() == 5, "5장 드로우 후 손패 5장")
+	_assert(dm.draw_pile.size() == 5, "드로우 후 드로우 파일 5장")
 
 func test_energy_cost() -> void:
-    print("[TestDeckManager] test_energy_cost")
-    var dm = DeckManagerClass.new()
-    dm.current_energy = 3
-    var card = _make_card("attack", 2)
-    dm.hand.append(card)
-    dm.draw_pile.append(_make_card("dummy"))  # discard 후 draw_pile에 넣기 위해
-    var result = dm.play_card(card)
-    _assert(result == true, "에너지 충분 시 카드 사용 성공")
-    _assert(dm.current_energy == 1, "2 비용 카드 후 에너지 == 1")
-    _assert(dm.hand.size() == 0, "플레이 후 손패에서 제거됨")
-    _assert(dm.discard_pile.size() == 1, "플레이 후 버림 더미에 추가됨")
+	print("[TestDeckManager] test_energy_cost")
+	var dm = DeckManagerClass.new()
+	dm.current_energy = 3
+	var card = _make_card("attack", 2)
+	dm.hand.append(card)
+	dm.draw_pile.append(_make_card("dummy"))  # discard 후 draw_pile에 넣기 위해
+	var result = dm.play_card(card)
+	_assert(result == true, "에너지 충분 시 카드 사용 성공")
+	_assert(dm.current_energy == 1, "2 비용 카드 후 에너지 == 1")
+	_assert(dm.hand.size() == 0, "플레이 후 손패에서 제거됨")
+	_assert(dm.discard_pile.size() == 1, "플레이 후 버림 더미에 추가됨")
 
 func test_reshuffle_on_empty() -> void:
-    print("[TestDeckManager] test_reshuffle_on_empty")
-    var dm = DeckManagerClass.new()
-    for i in range(3):
-        dm.discard_pile.append(_make_card("card_%d" % i))
-    dm.draw_cards(5)  # 드로우 파일 비어있음 → 버림 더미 셔플해서 충전
-    _assert(dm.hand.size() == 3, "버림 더미 3장 → 손패 3장 드로우")
-    _assert(dm.discard_pile.size() == 0, "셔플 후 버림 더미 비어있음")
+	print("[TestDeckManager] test_reshuffle_on_empty")
+	var dm = DeckManagerClass.new()
+	for i in range(3):
+		dm.discard_pile.append(_make_card("card_%d" % i))
+	dm.draw_cards(5)  # 드로우 파일 비어있음 → 버림 더미 셔플해서 충전
+	_assert(dm.hand.size() == 3, "버림 더미 3장 → 손패 3장 드로우")
+	_assert(dm.discard_pile.size() == 0, "셔플 후 버림 더미 비어있음")
 
 func test_discard_hand() -> void:
-    print("[TestDeckManager] test_discard_hand")
-    var dm = DeckManagerClass.new()
-    for i in range(5):
-        dm.hand.append(_make_card("card_%d" % i))
-    dm.discard_hand()
-    _assert(dm.hand.size() == 0, "턴 종료 후 손패 비어있음")
-    _assert(dm.discard_pile.size() == 5, "턴 종료 후 버림 더미 5장")
+	print("[TestDeckManager] test_discard_hand")
+	var dm = DeckManagerClass.new()
+	for i in range(5):
+		dm.hand.append(_make_card("card_%d" % i))
+	dm.discard_hand()
+	_assert(dm.hand.size() == 0, "턴 종료 후 손패 비어있음")
+	_assert(dm.discard_pile.size() == 5, "턴 종료 후 버림 더미 5장")
 ```
 
 test_runner.gd suites 갱신:
@@ -786,67 +786,67 @@ signal hand_changed()
 signal energy_changed(new_energy: int)
 
 func start_turn() -> void:
-    current_energy = MAX_ENERGY
-    energy_changed.emit(current_energy)
-    draw_cards(HAND_SIZE)
+	current_energy = MAX_ENERGY
+	energy_changed.emit(current_energy)
+	draw_cards(HAND_SIZE)
 
 func draw_cards(count: int) -> void:
-    for i in range(count):
-        if draw_pile.is_empty():
-            _reshuffle()
-        if draw_pile.is_empty():
-            break
-        var card: CardResource = draw_pile.pop_back()
-        hand.append(card)
-        card_drawn.emit(card)
-    hand_changed.emit()
+	for i in range(count):
+		if draw_pile.is_empty():
+			_reshuffle()
+		if draw_pile.is_empty():
+			break
+		var card: CardResource = draw_pile.pop_back()
+		hand.append(card)
+		card_drawn.emit(card)
+	hand_changed.emit()
 
 func _reshuffle() -> void:
-    draw_pile = discard_pile.duplicate()
-    draw_pile.shuffle()
-    discard_pile.clear()
+	draw_pile = discard_pile.duplicate()
+	draw_pile.shuffle()
+	discard_pile.clear()
 
 func can_play(card: CardResource) -> bool:
-    return hand.has(card) and current_energy >= card.cost
+	return hand.has(card) and current_energy >= card.cost
 
 func play_card(card: CardResource) -> bool:
-    if not can_play(card):
-        return false
-    current_energy -= card.cost
-    energy_changed.emit(current_energy)
-    hand.erase(card)
-    discard_pile.append(card)
-    card_played.emit(card)
-    hand_changed.emit()
-    return true
+	if not can_play(card):
+		return false
+	current_energy -= card.cost
+	energy_changed.emit(current_energy)
+	hand.erase(card)
+	discard_pile.append(card)
+	card_played.emit(card)
+	hand_changed.emit()
+	return true
 
 func exhaust_card(card: CardResource) -> void:
-    hand.erase(card)
-    exhaust_pile.append(card)
-    hand_changed.emit()
+	hand.erase(card)
+	exhaust_pile.append(card)
+	hand_changed.emit()
 
 func discard_hand() -> void:
-    for card in hand:
-        discard_pile.append(card)
-    hand.clear()
-    hand_changed.emit()
+	for card in hand:
+		discard_pile.append(card)
+	hand.clear()
+	hand_changed.emit()
 
 func add_card_to_deck(card: CardResource) -> void:
-    discard_pile.append(card)
+	discard_pile.append(card)
 
 func get_full_deck() -> Array[CardResource]:
-    var full: Array[CardResource] = []
-    full.append_array(draw_pile)
-    full.append_array(hand)
-    full.append_array(discard_pile)
-    return full
+	var full: Array[CardResource] = []
+	full.append_array(draw_pile)
+	full.append_array(hand)
+	full.append_array(discard_pile)
+	return full
 
 func clear() -> void:
-    draw_pile.clear()
-    hand.clear()
-    discard_pile.clear()
-    exhaust_pile.clear()
-    current_energy = 0
+	draw_pile.clear()
+	hand.clear()
+	discard_pile.clear()
+	exhaust_pile.clear()
+	current_energy = 0
 ```
 
 - [ ] **Step 4: 통과 확인**
@@ -895,36 +895,36 @@ signal gold_changed(new_gold: int)
 signal relic_added(relic: RelicResource)
 
 func change_state(new_state: GameState) -> void:
-    current_state = new_state
-    state_changed.emit(new_state)
+	current_state = new_state
+	state_changed.emit(new_state)
 
 func add_gold(amount: int) -> void:
-    gold += amount
-    gold_changed.emit(gold)
+	gold += amount
+	gold_changed.emit(gold)
 
 func spend_gold(amount: int) -> bool:
-    if gold < amount:
-        return false
-    gold -= amount
-    gold_changed.emit(gold)
-    return true
+	if gold < amount:
+		return false
+	gold -= amount
+	gold_changed.emit(gold)
+	return true
 
 func add_relic(relic: RelicResource) -> void:
-    relics.append(relic)
-    relic_added.emit(relic)
+	relics.append(relic)
+	relic_added.emit(relic)
 
 func has_relic(relic_name: String) -> bool:
-    for r in relics:
-        if r.relic_name == relic_name:
-            return true
-    return false
+	for r in relics:
+		if r.relic_name == relic_name:
+			return true
+	return false
 
 func reset() -> void:
-    current_state = GameState.MAP
-    current_floor = 0
-    current_chapter = 1
-    gold = 0
-    relics.clear()
+	current_state = GameState.MAP
+	current_floor = 0
+	current_chapter = 1
+	gold = 0
+	relics.clear()
 ```
 
 - [ ] **Step 2: GameManager 기본값 테스트 추가**
@@ -932,23 +932,23 @@ func reset() -> void:
 `tests/test_resources.gd`의 `run_all()` 내 추가:
 ```gdscript
 func run_all() -> Dictionary:
-    test_effect_resource_defaults()
-    test_card_resource_defaults()
-    test_hero_resource_defaults()
-    test_enemy_resource_defaults()
-    test_relic_resource_defaults()
-    test_game_manager_defaults()    # 추가
-    return {"passed": passed, "failed": failed}
+	test_effect_resource_defaults()
+	test_card_resource_defaults()
+	test_hero_resource_defaults()
+	test_enemy_resource_defaults()
+	test_relic_resource_defaults()
+	test_game_manager_defaults()    # 추가
+	return {"passed": passed, "failed": failed}
 ```
 
 ```gdscript
 func test_game_manager_defaults() -> void:
-    print("[TestResources] test_game_manager_defaults")
-    var gm = GameManagerClass.new()
-    _assert(gm.current_state == GameManagerClass.GameState.MAP, "초기 상태 MAP")
-    _assert(gm.current_chapter == 1, "초기 챕터 1")
-    _assert(gm.gold == 0, "초기 골드 0")
-    _assert(gm.relics.size() == 0, "초기 릴릭 없음")
+	print("[TestResources] test_game_manager_defaults")
+	var gm = GameManagerClass.new()
+	_assert(gm.current_state == GameManagerClass.GameState.MAP, "초기 상태 MAP")
+	_assert(gm.current_chapter == 1, "초기 챕터 1")
+	_assert(gm.gold == 0, "초기 골드 0")
+	_assert(gm.relics.size() == 0, "초기 릴릭 없음")
 ```
 
 - [ ] **Step 3: 통과 확인**
@@ -1041,13 +1041,13 @@ Godot 에디터에서:
    - `AnimationPlayer`: 이름 `AnimationPlayer`
 4. `AnimationPlayer`에 애니메이션 추가:
    - **`idle`** (loop): 길이 1.2초
-     - `ColorRect` position.y: 0s→`-80`, 0.6s→`-88`, 1.2s→`-80` (살짝 위아래 bounce)
+	 - `ColorRect` position.y: 0s→`-80`, 0.6s→`-88`, 1.2s→`-80` (살짝 위아래 bounce)
    - **`attack`**: 길이 0.5초
-     - `ColorRect` position.x: 0s→`-40`, 0.2s→`20`, 0.5s→`-40` (앞으로 돌진)
+	 - `ColorRect` position.x: 0s→`-40`, 0.2s→`20`, 0.5s→`-40` (앞으로 돌진)
    - **`hurt`**: 길이 0.4초
-     - `ColorRect` modulate: 0s→`white`, 0.1s→`#FF4444`, 0.4s→`white` (빨간 flash)
+	 - `ColorRect` modulate: 0s→`white`, 0.1s→`#FF4444`, 0.4s→`white` (빨간 flash)
    - **`death`**: 길이 0.8초
-     - `ColorRect` modulate.a: 0s→`1.0`, 0.8s→`0.0` (fade out)
+	 - `ColorRect` modulate.a: 0s→`1.0`, 0.8s→`0.0` (fade out)
 5. `idle` 애니메이션을 Autoplay로 설정
 6. 씬 저장: `characters/heroes/napoleon/napoleon.tscn`
 
