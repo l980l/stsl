@@ -5,13 +5,15 @@ const CARD_W := 140
 const CARD_H := 200
 
 func _ready() -> void:
+	if GameManager.card_rewards.is_empty():
+		GameManager.complete_card_pick()
+		return
 	_build_ui()
 
 func _build_ui() -> void:
 	# 배경
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.1)
-	bg.position = Vector2.ZERO
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
@@ -24,22 +26,17 @@ func _build_ui() -> void:
 	title.add_theme_font_size_override("font_size", 32)
 	add_child(title)
 
-	var rewards := GameManager.card_rewards
-	if rewards.is_empty():
-		# 보상 없음 — 바로 맵으로
-		GameManager.complete_card_pick()
-		return
-
-	var total_w: float = rewards.size() * (CARD_W + 20) - 20
+	var total_w: float = GameManager.card_rewards.size() * (CARD_W + 20) - 20
 	var start_x: float = (1920.0 - total_w) / 2.0
 
-	for i in range(rewards.size()):
-		var card: Resource = rewards[i]
+	for i in range(GameManager.card_rewards.size()):
+		var card: Resource = GameManager.card_rewards[i]
 		var btn := Button.new()
 		btn.position = Vector2(start_x + i * (CARD_W + 20), 400)
 		btn.size = Vector2(CARD_W, CARD_H)
 		var card_name: String = card.get("card_name") if card.get("card_name") != null else "?"
-		btn.text = "[%d]\n%s\n%s" % [card.cost, card_name, card.get("owner_id") if card.get("owner_id") != null else ""]
+		var cost: int = card.get("cost") if card.get("cost") != null else 0
+		btn.text = "[%d]\n%s\n%s" % [cost, card_name, card.get("owner_id") if card.get("owner_id") != null else ""]
 		btn.add_theme_font_size_override("font_size", 15)
 		var captured_card := card
 		btn.pressed.connect(func(): _on_card_selected(captured_card))
