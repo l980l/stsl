@@ -45,7 +45,9 @@ static func _pick_room_type(floor_num: int, col: int) -> MapNodeRes.RoomType:
 	if floor_num == 3 and col == 1: return MapNodeRes.RoomType.REST
 	if floor_num == 3 and col == 2: return MapNodeRes.RoomType.SHOP
 	if floor_num == 4 and col == 1: return MapNodeRes.RoomType.ELITE
+	if floor_num == 5 and col == 1: return MapNodeRes.RoomType.EVENT
 	if floor_num == 6 and col == 0: return MapNodeRes.RoomType.ELITE
+	if floor_num == 6 and col == 1: return MapNodeRes.RoomType.EVENT
 	if floor_num == 6 and col == 2: return MapNodeRes.RoomType.SHOP
 	if floor_num == 7 and col == 1: return MapNodeRes.RoomType.SHOP
 	if floor_num == 7 and col == 2: return MapNodeRes.RoomType.REST

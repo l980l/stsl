@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=3 uid="uid://rest_scene"]
+
+[ext_resource type="Script" path="res://scenes/rest/rest_scene.gd" id="1_script"]
+
+[node name="RestScene" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="BG" type="ColorRect" parent="."]
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0.1, 0.07, 0.04, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 660.0
+offset_top = 350.0
+offset_right = 1260.0
+offset_bottom = 730.0
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+text = "휴식처"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 36
+
+[node name="DescLabel" type="Label" parent="VBoxContainer"]
+text = "잠시 쉬어가며 체력을 회복하거나 그냥 떠날 수 있다."
+horizontal_alignment = 1
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="ButtonContainer" type="HBoxContainer" parent="VBoxContainer"]
+alignment = 1
+
+[node name="HealButton" type="Button" parent="ButtonContainer"]
+text = "HP 30% 회복"
+
+[node name="LeaveButton" type="Button" parent="ButtonContainer"]
+text = "그냥 나가기"
+
+[connection signal="pressed" from="VBoxContainer/ButtonContainer/HealButton" to="." method="_on_heal_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonContainer/LeaveButton" to="." method="_on_leave_pressed"]

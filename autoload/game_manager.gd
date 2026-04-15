@@ -16,6 +16,7 @@ var available_node_ids: Array = []  # 현재 클릭 가능한 노드 ID 목록
 var current_node_id: int = -1
 var pending_enemies: Array = []     # 다음 배틀 적 데이터
 var card_rewards: Array = []        # 다음 카드 보상 목록
+var pending_event: Resource = null  # 현재 이벤트 데이터 (EventResource)
 # ─────────────────────────────────────────────────────
 
 signal state_changed(new_state: GameState)
@@ -61,6 +62,7 @@ func reset() -> void:
 	current_node_id = -1
 	pending_enemies.clear()
 	card_rewards.clear()
+	pending_event = null
 
 # ── Plan 04: 런 관리 ──────────────────────────────────
 
@@ -130,10 +132,12 @@ func enter_node(node_id: int) -> void:
 			change_state(GameState.BATTLE)
 			_request_scene("res://scenes/battle/battle_scene.tscn")
 		MapNodeRes.RoomType.REST:
-			_heal_all_heroes(10)
-			_advance_nodes_from(node_id)
-			change_state(GameState.MAP)
-			_request_scene("res://scenes/map/map_scene.tscn")
+			change_state(GameState.REST)
+			_request_scene("res://scenes/rest/rest_scene.tscn")
+		MapNodeRes.RoomType.EVENT:
+			pending_event = _get_random_event()
+			change_state(GameState.EVENT)
+			_request_scene("res://scenes/event/event_scene.tscn")
 		MapNodeRes.RoomType.SHOP:
 			# Plan 05에서 구현 — 지금은 건너뜀
 			_advance_nodes_from(node_id)
@@ -453,6 +457,67 @@ func _napoleon_card_pool() -> Array:
 	cards.append(c5)
 
 	return cards
+
+func _get_random_event() -> Resource:
+	var pool := _build_event_pool()
+	return pool[randi() % pool.size()]
+
+func _build_event_pool() -> Array:
+	var EventRes = load("res://resources/event_resource.gd")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var events := []
+
+	# 1. 황금 상자
+	var e1: Resource = EventRes.new()
+	e1.event_name = "황금 상자"
+	e1.description = "낡은 황금 상자가 놓여 있다."
+	var c1a: Resource = ChoiceRes.new(); c1a.label = "열기"
+	c1a.effect_type = ChoiceRes.EffectType.GOLD; c1a.value = 30
+	var c1b: Resource = ChoiceRes.new(); c1b.label = "무시"
+	c1b.effect_type = ChoiceRes.EffectType.NONE
+	e1.choices = [c1a, c1b]; events.append(e1)
+
+	# 2. 상처 입은 전사
+	var e2: Resource = EventRes.new()
+	e2.event_name = "상처 입은 전사"
+	e2.description = "부상당한 병사가 치료를 요청한다."
+	var c2a: Resource = ChoiceRes.new(); c2a.label = "치료 (골드 -20)"
+	c2a.effect_type = ChoiceRes.EffectType.HEAL; c2a.value = 15; c2a.cost_gold = 20
+	var c2b: Resource = ChoiceRes.new(); c2b.label = "무시"
+	c2b.effect_type = ChoiceRes.EffectType.NONE
+	e2.choices = [c2a, c2b]; events.append(e2)
+
+	# 3. 고대 도서관
+	var e3: Resource = EventRes.new()
+	e3.event_name = "고대 도서관"
+	e3.description = "신비로운 지식이 담긴 도서관. 공부하면 지식을 얻지만 기력을 소모한다."
+	var c3a: Resource = ChoiceRes.new(); c3a.label = "공부 (HP -5)"
+	c3a.effect_type = ChoiceRes.EffectType.DRAW_UP; c3a.value = 1; c3a.cost_hp = 5
+	var c3b: Resource = ChoiceRes.new(); c3b.label = "무시"
+	c3b.effect_type = ChoiceRes.EffectType.NONE
+	e3.choices = [c3a, c3b]; events.append(e3)
+
+	# 4. 저주받은 제단
+	var e4: Resource = EventRes.new()
+	e4.event_name = "저주받은 제단"
+	e4.description = "제단에 무언가를 바치면 강력한 유물을 얻을 수 있다."
+	var c4a: Resource = ChoiceRes.new(); c4a.label = "카드 바치기 (덱에서 1장 제거)"
+	c4a.effect_type = ChoiceRes.EffectType.REMOVE_CARD; c4a.value = 1
+	var c4b: Resource = ChoiceRes.new(); c4b.label = "무시"
+	c4b.effect_type = ChoiceRes.EffectType.NONE
+	e4.choices = [c4a, c4b]; events.append(e4)
+
+	# 5. 동료 만남
+	var e5: Resource = EventRes.new()
+	e5.event_name = "동료 만남"
+	e5.description = "역사 속 영웅이 합류를 요청한다."
+	var c5a: Resource = ChoiceRes.new(); c5a.label = "합류시키기"
+	c5a.effect_type = ChoiceRes.EffectType.ADD_HERO
+	var c5b: Resource = ChoiceRes.new(); c5b.label = "거절"
+	c5b.effect_type = ChoiceRes.EffectType.NONE
+	e5.choices = [c5a, c5b]; events.append(e5)
+
+	return events
 
 func _request_scene(path: String) -> void:
 	var tree: SceneTree = get_tree()
