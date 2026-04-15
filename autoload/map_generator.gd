@@ -8,7 +8,7 @@ const MapNodeRes = preload("res://resources/map_node_resource.gd")
 const FLOORS := 10
 const COLS := 3
 
-static func generate() -> Array:
+static func generate() -> Array:  # -> Array[MapNodeResource]
 	var nodes: Array = []
 
 	# Floor 0~8: 각 3개 노드 (총 27개)
@@ -49,6 +49,7 @@ static func _pick_room_type(floor_num: int, col: int) -> MapNodeRes.RoomType:
 	if floor_num == 6 and col == 2: return MapNodeRes.RoomType.SHOP
 	if floor_num == 7 and col == 1: return MapNodeRes.RoomType.SHOP
 	if floor_num == 7 and col == 2: return MapNodeRes.RoomType.REST
+	# floor 8 전체 ELITE — 보스 직전 층 난이도 상승 (스펙 의도)
 	if floor_num == 8:               return MapNodeRes.RoomType.ELITE
 	return MapNodeRes.RoomType.BATTLE
 
