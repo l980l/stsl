@@ -201,6 +201,8 @@ func _execute_enemy_turn() -> void:
 		_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
 	_check_win_condition()
 	_check_lose_condition()
+	if is_battle_active:
+		start_player_turn()
 
 func _execute_intent(enemy_index: int, intent: Resource) -> void:
 	match intent.action_type:
