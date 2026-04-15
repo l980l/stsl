@@ -68,46 +68,42 @@ func start_run() -> void:
 	reset()
 
 	# TeamManager 초기화 (나폴레옹 1명)
-	var team_mgr = Engine.get_singleton("TeamManager")
-	if team_mgr != null:
-		team_mgr.clear()
-		var HeroRes = load("res://resources/hero_resource.gd")
-		var napoleon: Resource = HeroRes.new()
-		napoleon.hero_id = "napoleon"
-		napoleon.hero_name = "나폴레옹"
-		napoleon.max_hp = 70
-		napoleon.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
-		team_mgr.add_hero(napoleon)
+	TeamManager.clear()
+	var HeroRes = load("res://resources/hero_resource.gd")
+	var napoleon: Resource = HeroRes.new()
+	napoleon.hero_id = "napoleon"
+	napoleon.hero_name = "나폴레옹"
+	napoleon.max_hp = 70
+	napoleon.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
+	TeamManager.add_hero(napoleon)
 
 	# DeckManager 초기화 (스트라이크 3 + 디펜드 2)
-	var deck_mgr = Engine.get_singleton("DeckManager")
-	if deck_mgr != null:
-		deck_mgr.clear()
-		var CardRes = load("res://resources/card_resource.gd")
-		var EffRes = load("res://resources/effect_resource.gd")
-		for _i in range(3):
-			var card: Resource = CardRes.new()
-			card.card_name = "스트라이크"
-			card.owner_id = "napoleon"
-			card.cost = 1
-			card.play_animation = "attack"
-			var eff: Resource = EffRes.new()
-			eff.effect_type = EffRes.EffectType.DAMAGE
-			eff.value = 6
-			eff.target = "SINGLE"
-			card.effects = [eff]
-			deck_mgr.add_card_to_deck(card)
-		for _i in range(2):
-			var card: Resource = CardRes.new()
-			card.card_name = "디펜드"
-			card.owner_id = "napoleon"
-			card.cost = 1
-			card.play_animation = "idle"
-			var eff: Resource = EffRes.new()
-			eff.effect_type = EffRes.EffectType.BLOCK
-			eff.value = 5
-			card.effects = [eff]
-			deck_mgr.add_card_to_deck(card)
+	DeckManager.clear()
+	var CardRes = load("res://resources/card_resource.gd")
+	var EffRes = load("res://resources/effect_resource.gd")
+	for _i in range(3):
+		var card: Resource = CardRes.new()
+		card.card_name = "스트라이크"
+		card.owner_id = "napoleon"
+		card.cost = 1
+		card.play_animation = "attack"
+		var eff: Resource = EffRes.new()
+		eff.effect_type = EffRes.EffectType.DAMAGE
+		eff.value = 6
+		eff.target = "SINGLE"
+		card.effects = [eff]
+		DeckManager.add_card_to_deck(card)
+	for _i in range(2):
+		var card: Resource = CardRes.new()
+		card.card_name = "디펜드"
+		card.owner_id = "napoleon"
+		card.cost = 1
+		card.play_animation = "idle"
+		var eff: Resource = EffRes.new()
+		eff.effect_type = EffRes.EffectType.BLOCK
+		eff.value = 5
+		card.effects = [eff]
+		DeckManager.add_card_to_deck(card)
 
 	# 맵 생성
 	var MapGen = load("res://autoload/map_generator.gd")
@@ -145,6 +141,7 @@ func enter_node(node_id: int) -> void:
 			_request_scene("res://scenes/map/map_scene.tscn")
 
 func complete_battle(won: bool) -> void:
+	pending_enemies.clear()  # 전투 종료 후 이전 적 데이터 정리
 	if won:
 		card_rewards = _generate_card_rewards()
 		change_state(GameState.CARD_PICK)
@@ -171,11 +168,8 @@ func _advance_nodes_from(node_id: int) -> void:
 func _heal_all_heroes(amount: int) -> void:
 	if not is_inside_tree():
 		return
-	var team_mgr = Engine.get_singleton("TeamManager")
-	if team_mgr == null:
-		return
-	for hero in team_mgr.heroes:
-		team_mgr.heal(hero.hero_id, amount)
+	for hero in TeamManager.heroes:
+		TeamManager.heal(hero.hero_id, amount)
 
 func _make_enemies_for_node(node: Resource) -> Array:
 	var satyr_scene = load("res://characters/enemies/satyr/satyr.tscn")
