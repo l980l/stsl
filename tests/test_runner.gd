@@ -5,6 +5,8 @@ var TestResources = preload("res://tests/test_resources.gd")
 var TestTeamManager = preload("res://tests/test_team_manager.gd")
 var TestDeckManager = preload("res://tests/test_deck_manager.gd")
 var TestBattleManager = preload("res://tests/test_battle_manager.gd")
+var TestMapGenerator = preload("res://tests/test_map_generator.gd")
+var TestGameManager = preload("res://tests/test_game_manager.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -14,6 +16,8 @@ func _init() -> void:
 		TestTeamManager.new(),
 		TestDeckManager.new(),
 		TestBattleManager.new(),
+		TestMapGenerator.new(),
+		TestGameManager.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()
