@@ -190,7 +190,7 @@ func _make_enemies_for_node(node: Resource) -> Array:
 		MapNodeRes.RoomType.ELITE:
 			return _make_elite_enemies()
 		MapNodeRes.RoomType.BOSS:
-			return [_make_satyr(_satyr_scene(), 80, 10)]
+			return _make_boss_enemies()
 		_:
 			return []
 
@@ -323,6 +323,52 @@ func _make_snake(scene: PackedScene, hp: int) -> Resource:
 	i2.target = IntentRes.TargetType.RANDOM
 	enemy.intent_pattern = [i1, i2]
 	return enemy
+
+func _make_boss_enemies() -> Array:
+	var EnemyRes = load("res://resources/enemy_resource.gd")
+	var IntentRes = load("res://resources/intent_resource.gd")
+	var scene := _satyr_scene()
+	var hydra: Resource = EnemyRes.new()
+	hydra.enemy_name = "히드라"
+	hydra.max_hp = 200
+	hydra.character_scene = scene
+	hydra.phase_thresholds = [0.6, 0.3]
+
+	# Phase 0 (100%~60%): ATTACK(10) x2
+	var p0a1: Resource = IntentRes.new()
+	p0a1.action_type = IntentRes.ActionType.ATTACK
+	p0a1.value = 10; p0a1.target = IntentRes.TargetType.RANDOM
+	var p0a2: Resource = IntentRes.new()
+	p0a2.action_type = IntentRes.ActionType.ATTACK
+	p0a2.value = 10; p0a2.target = IntentRes.TargetType.RANDOM
+
+	# Phase 1 (60%~30%): ATTACK(12) x3
+	var p1a1: Resource = IntentRes.new()
+	p1a1.action_type = IntentRes.ActionType.ATTACK
+	p1a1.value = 12; p1a1.target = IntentRes.TargetType.RANDOM
+	var p1a2: Resource = IntentRes.new()
+	p1a2.action_type = IntentRes.ActionType.ATTACK
+	p1a2.value = 12; p1a2.target = IntentRes.TargetType.RANDOM
+	var p1a3: Resource = IntentRes.new()
+	p1a3.action_type = IntentRes.ActionType.ATTACK
+	p1a3.value = 12; p1a3.target = IntentRes.TargetType.LOWEST_HP
+
+	# Phase 2 (30%~0%): ATTACK(12) x3 + BUFF(10)
+	var p2a1: Resource = IntentRes.new()
+	p2a1.action_type = IntentRes.ActionType.ATTACK
+	p2a1.value = 12; p2a1.target = IntentRes.TargetType.RANDOM
+	var p2a2: Resource = IntentRes.new()
+	p2a2.action_type = IntentRes.ActionType.ATTACK
+	p2a2.value = 12; p2a2.target = IntentRes.TargetType.RANDOM
+	var p2a3: Resource = IntentRes.new()
+	p2a3.action_type = IntentRes.ActionType.ATTACK
+	p2a3.value = 12; p2a3.target = IntentRes.TargetType.LOWEST_HP
+	var p2b: Resource = IntentRes.new()
+	p2b.action_type = IntentRes.ActionType.BUFF
+	p2b.value = 10
+
+	hydra.phase_patterns = [[p0a1, p0a2], [p1a1, p1a2, p1a3], [p2a1, p2a2, p2a3, p2b]]
+	return [hydra]
 
 func _generate_card_rewards() -> Array:
 	var pool: Array = _napoleon_card_pool()

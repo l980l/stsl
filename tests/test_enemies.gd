@@ -17,6 +17,9 @@ func run_all() -> Dictionary:
 	test_elite_enemy_hp()
 	test_minotaur_pattern()
 	test_medusa_pattern_and_status_type()
+	test_hydra_phase_count()
+	test_phase_transition()
+	test_phase2_transition()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -91,6 +94,77 @@ func test_medusa_pattern_and_status_type() -> void:
 	_assert(med.intent_pattern.size() == 4, "메두사 패턴 4개")
 	_assert(med.intent_pattern[1].status_type == "weak", "메두사 2번째 = weak")
 	_assert(med.intent_pattern[2].status_type == "vulnerable", "메두사 3번째 = vulnerable")
+
+func _make_hydra() -> Array:
+	# game_manager._make_boss_enemies()와 동일 로직 — Autoload 없이 테스트용
+	var EnemyRes = preload("res://resources/enemy_resource.gd")
+	var IntentRes = preload("res://resources/intent_resource.gd")
+	var hydra: Resource = EnemyRes.new()
+	hydra.enemy_name = "히드라"
+	hydra.max_hp = 200
+	hydra.phase_thresholds = [0.6, 0.3]
+	var p0a1: Resource = IntentRes.new(); p0a1.action_type = IntentRes.ActionType.ATTACK; p0a1.value = 10; p0a1.target = IntentRes.TargetType.RANDOM
+	var p0a2: Resource = IntentRes.new(); p0a2.action_type = IntentRes.ActionType.ATTACK; p0a2.value = 10; p0a2.target = IntentRes.TargetType.RANDOM
+	var p1a1: Resource = IntentRes.new(); p1a1.action_type = IntentRes.ActionType.ATTACK; p1a1.value = 12; p1a1.target = IntentRes.TargetType.RANDOM
+	var p1a2: Resource = IntentRes.new(); p1a2.action_type = IntentRes.ActionType.ATTACK; p1a2.value = 12; p1a2.target = IntentRes.TargetType.RANDOM
+	var p1a3: Resource = IntentRes.new(); p1a3.action_type = IntentRes.ActionType.ATTACK; p1a3.value = 12; p1a3.target = IntentRes.TargetType.LOWEST_HP
+	var p2a1: Resource = IntentRes.new(); p2a1.action_type = IntentRes.ActionType.ATTACK; p2a1.value = 12; p2a1.target = IntentRes.TargetType.RANDOM
+	var p2a2: Resource = IntentRes.new(); p2a2.action_type = IntentRes.ActionType.ATTACK; p2a2.value = 12; p2a2.target = IntentRes.TargetType.RANDOM
+	var p2a3: Resource = IntentRes.new(); p2a3.action_type = IntentRes.ActionType.ATTACK; p2a3.value = 12; p2a3.target = IntentRes.TargetType.LOWEST_HP
+	var p2b: Resource = IntentRes.new(); p2b.action_type = IntentRes.ActionType.BUFF; p2b.value = 10
+	hydra.phase_patterns = [[p0a1, p0a2], [p1a1, p1a2, p1a3], [p2a1, p2a2, p2a3, p2b]]
+	hydra.intent_pattern = hydra.phase_patterns[0]
+	return [hydra]
+
+func test_hydra_phase_count() -> void:
+	print("[TestEnemies] test_hydra_phase_count")
+	var enemies: Array = _make_hydra()
+	_assert(enemies.size() == 1, "보스 1마리")
+	_assert(enemies[0].enemy_name == "히드라", "보스 이름 = 히드라")
+	_assert(enemies[0].phase_thresholds.size() == 2, "히드라 페이즈 임계값 2개")
+	_assert(enemies[0].phase_patterns.size() == 3, "히드라 페이즈 패턴 3개")
+
+func test_phase_transition() -> void:
+	print("[TestEnemies] test_phase_transition")
+	var BM = preload("res://autoload/battle_manager.gd")
+	var TM = preload("res://autoload/team_manager.gd")
+	var HeroRes = preload("res://resources/hero_resource.gd")
+	var bm: Node = BM.new()
+	var tm: Node = TM.new()
+	var hero: Resource = HeroRes.new()
+	hero.hero_id = "napoleon"; hero.max_hp = 70; hero.hero_name = "나폴레옹"
+	tm.add_hero(hero)
+	bm.team_mgr = tm
+	var enemies: Array = _make_hydra()
+	bm.setup_battle(enemies)
+	_assert(bm._enemy_phase[0] == 0, "초기 페이즈 = 0")
+	# HP를 59%로 설정
+	bm._enemy_hp[0] = int(enemies[0].max_hp * 0.59)
+	bm._check_phase_transition(0)
+	_assert(bm._enemy_phase[0] == 1, "HP 59% → 페이즈 1")
+	bm.free()
+	tm.free()
+
+func test_phase2_transition() -> void:
+	print("[TestEnemies] test_phase2_transition")
+	var BM = preload("res://autoload/battle_manager.gd")
+	var TM = preload("res://autoload/team_manager.gd")
+	var HeroRes = preload("res://resources/hero_resource.gd")
+	var bm: Node = BM.new()
+	var tm: Node = TM.new()
+	var hero: Resource = HeroRes.new()
+	hero.hero_id = "napoleon"; hero.max_hp = 70; hero.hero_name = "나폴레옹"
+	tm.add_hero(hero)
+	bm.team_mgr = tm
+	var enemies: Array = _make_hydra()
+	bm.setup_battle(enemies)
+	bm._enemy_hp[0] = int(enemies[0].max_hp * 0.59)
+	bm._check_phase_transition(0)
+	bm._enemy_hp[0] = int(enemies[0].max_hp * 0.29)
+	bm._check_phase_transition(0)
+	_assert(bm._enemy_phase[0] == 2, "HP 29% → 페이즈 2")
+	bm.free()
+	tm.free()
 
 func test_discard_random() -> void:
 	print("[TestEnemies] test_discard_random")
