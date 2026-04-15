@@ -2,7 +2,7 @@
 class_name MapNodeResource
 extends Resource
 
-enum RoomType { BATTLE, ELITE, REST, SHOP, BOSS }
+enum RoomType { BATTLE, ELITE, REST, SHOP, BOSS, EVENT }
 
 @export var node_id: int = 0
 @export var floor_num: int = 0      # 0 = 첫째 층, 9 = 보스 층
