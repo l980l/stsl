@@ -34,7 +34,7 @@ func _ready() -> void:
 	BattleManager.team_mgr = TeamManager
 	BattleManager.deck_mgr = DeckManager
 	_connect_signals()
-	_start_test_battle()
+	_start_battle()
 
 # ─────────────────────────────────────────────
 # UI 빌드
@@ -158,8 +158,17 @@ func _connect_signals() -> void:
 	TeamManager.hero_died.connect(_on_hero_died)
 
 # ─────────────────────────────────────────────
-# 테스트 배틀 초기화 (Task 2에서 완성)
+# 배틀 초기화
 # ─────────────────────────────────────────────
+
+func _start_battle() -> void:
+	if not GameManager.pending_enemies.is_empty():
+		BattleManager.setup_battle(GameManager.pending_enemies)
+		_setup_heroes()
+		_setup_enemies()
+		BattleManager.start_player_turn()
+	else:
+		_start_test_battle()  # GameManager 없이 단독 실행 시 폴백
 
 func _start_test_battle() -> void:
 	var HeroRes = load("res://resources/hero_resource.gd")
@@ -482,8 +491,10 @@ func _on_battle_won() -> void:
 	_selected_card = null
 	for entry in _enemy_nodes:
 		entry["btn"].disabled = true
+	GameManager.complete_battle(true)
 
 func _on_battle_lost() -> void:
 	_message_label.text = "💀 패배..."
 	_end_turn_btn.disabled = true
 	_selected_card = null
+	GameManager.complete_battle(false)
