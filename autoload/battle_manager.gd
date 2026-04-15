@@ -220,7 +220,8 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			if target_id != "":
 				_apply_status_to_hero(target_id, "weak", intent.value)
 		IntentRes.ActionType.SPECIAL:
-			pass
+			if deck_mgr:
+				deck_mgr.discard_random(intent.value)
 
 func _pick_hero_target(target_type: int, enemy_index: int) -> String:
 	if team_mgr == null:

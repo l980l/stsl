@@ -2,7 +2,7 @@
 class_name DeckManagerClass
 extends Node
 
-const HAND_SIZE: int = 5
+var base_draw_count: int = 5
 const MAX_ENERGY: int = 3
 
 var draw_pile: Array = []
@@ -19,7 +19,7 @@ signal energy_changed(new_energy: int)
 func start_turn() -> void:
 	current_energy = MAX_ENERGY
 	energy_changed.emit(current_energy)
-	draw_cards(HAND_SIZE)
+	draw_cards(base_draw_count)
 
 func draw_cards(count: int) -> void:
 	for i in range(count):
@@ -71,6 +71,13 @@ func get_full_deck() -> Array:
 	full.append_array(hand)
 	full.append_array(discard_pile)
 	return full
+
+func discard_random(n: int) -> void:
+	for _i in range(min(n, hand.size())):
+		var idx := randi() % hand.size()
+		discard_pile.append(hand[idx])
+		hand.remove_at(idx)
+	hand_changed.emit()
 
 func clear() -> void:
 	draw_pile.clear()
