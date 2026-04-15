@@ -1,6 +1,6 @@
 # Known Issues & 기술 부채
 
-Plan 01 완료 시점 기준. 미래 플랜 작업 시 참고하세요.
+Plan 04 완료 시점 기준. 미래 플랜 작업 시 참고하세요.
 
 ---
 
@@ -57,3 +57,27 @@ attack 애니메이션이 `Vector2(60, 0)` — 항상 오른쪽 돌진.
 - **원인:** `Node`를 상속하지만 SceneTree 없이 인스턴싱
 - **영향:** 기능 동작에는 문제없음. 경고만 출력
 - **해결 방향:** 테스트 러너 개선 시 `add_child()`로 트리에 추가하거나, 테스트 전용 인스턴스는 `Node` 상속 없이 처리
+
+---
+
+## [Plan 04] MapGenerator.generate() 반환 타입 타입 힌트 누락
+
+**파일:** `autoload/map_generator.gd`
+
+`static func generate() -> Array:` — `Array[MapNodeResource]`로 선언 불가.
+
+- **원인:** GDScript 4 헤드리스 모드에서 `class_name` 기반 제네릭 배열 타입(`Array[MapNodeResource]`)이 외부 스크립트 preload 컨텍스트에서 파싱 오류 발생
+- **영향:** 타입 안전성 약화. 잘못된 타입 배열 원소를 런타임까지 감지 불가
+- **해결 방향:** Godot 헤드리스 파싱 이슈 해결 후 `-> Array[MapNodeResource]`로 복원. 현재는 `# -> Array[MapNodeResource]` 주석으로 의도 표기
+
+---
+
+## [Plan 04] _napoleon_card_pool() 풀 크기 하드코딩
+
+**파일:** `autoload/game_manager.gd`
+
+`_generate_card_rewards()`에서 `pool.slice(0, 3)` — 풀 크기 5 고정 가정.
+
+- **원인:** 카드 풀이 항상 5장 이상임을 가정
+- **영향:** 카드 풀이 3장 미만으로 줄면 보상이 부족하게 생성됨 (현재는 무해)
+- **해결 방향:** `pool.slice(0, min(3, pool.size()))`로 방어 처리
