@@ -20,6 +20,7 @@ var _enemy_alive: Array = []
 var _enemy_block: Array = []
 var _enemy_status: Array = []
 var _enemy_intent_index: Array = []
+var _enemy_phase: Array = []
 var _last_attacker: Dictionary = {}
 
 # 영웅 상태 (HP는 TeamManager가 관리)
@@ -52,6 +53,9 @@ func setup_battle(enemies: Array) -> void:
 		_enemy_block.append(0)
 		_enemy_status.append({})
 		_enemy_intent_index.append(0)
+	_enemy_phase.clear()
+	for _e in _enemies:
+		_enemy_phase.append(0)
 	is_battle_active = true
 	battle_started.emit()
 
@@ -136,6 +140,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
 		enemy_died.emit(enemy_index)
+	_check_phase_transition(enemy_index)
 	_check_win_condition()
 
 func _deal_damage_to_hero(hero_id: String, amount: int) -> void:
@@ -193,7 +198,7 @@ func _execute_enemy_turn() -> void:
 		_tick_enemy_poison(i)
 		if not _enemy_alive[i]:
 			continue
-		var pattern: Array = _enemies[i].intent_pattern
+		var pattern: Array = _get_active_pattern(i)
 		if pattern.is_empty():
 			continue
 		var intent: Resource = pattern[_enemy_intent_index[i]]
@@ -218,9 +223,11 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 		IntentRes.ActionType.DEBUFF:
 			var target_id: String = _pick_hero_target(intent.target, enemy_index)
 			if target_id != "":
-				_apply_status_to_hero(target_id, "weak", intent.value)
+				var stype: String = intent.status_type
+				_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
-			pass
+			if deck_mgr:
+				deck_mgr.discard_random(intent.value)
 
 func _pick_hero_target(target_type: int, enemy_index: int) -> String:
 	if team_mgr == null:
@@ -285,7 +292,7 @@ func is_enemy_alive(index: int) -> bool:
 func get_enemy_current_intent(index: int) -> Resource:
 	if index < 0 or index >= _enemies.size():
 		return null
-	var pattern: Array = _enemies[index].intent_pattern
+	var pattern: Array = _get_active_pattern(index)
 	if pattern.is_empty():
 		return null
 	return pattern[_enemy_intent_index[index]]
@@ -302,8 +309,30 @@ func clear() -> void:
 	_enemy_block.clear()
 	_enemy_status.clear()
 	_enemy_intent_index.clear()
+	_enemy_phase.clear()
 	_hero_block.clear()
 	_hero_status.clear()
 	_last_attacker.clear()
 	is_battle_active = false
 	is_player_turn = false
+
+func _get_active_pattern(enemy_index: int) -> Array:
+	var enemy: Resource = _enemies[enemy_index]
+	var phase: int = _enemy_phase[enemy_index]
+	if not enemy.phase_patterns.is_empty() and phase < enemy.phase_patterns.size():
+		return enemy.phase_patterns[phase]
+	return enemy.intent_pattern
+
+func _check_phase_transition(enemy_index: int) -> void:
+	if not _enemy_alive[enemy_index]:
+		return
+	var enemy: Resource = _enemies[enemy_index]
+	if enemy.phase_thresholds.is_empty():
+		return
+	var current_phase: int = _enemy_phase[enemy_index]
+	if current_phase >= enemy.phase_thresholds.size():
+		return
+	var hp_ratio: float = float(_enemy_hp[enemy_index]) / float(enemy.max_hp)
+	if hp_ratio <= enemy.phase_thresholds[current_phase]:
+		_enemy_phase[enemy_index] += 1
+		_enemy_intent_index[enemy_index] = 0

@@ -10,3 +10,4 @@ enum TargetType { LOWEST_HP, LAST_ATTACKER, RANDOM, ALL }
 @export var target: TargetType = TargetType.RANDOM
 @export var condition: String = ""
 @export var play_animation: String = ""
+@export var status_type: String = "weak"  # DEBUFF 시 부여할 상태이상 키
