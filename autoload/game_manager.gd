@@ -169,6 +169,8 @@ func _advance_nodes_from(node_id: int) -> void:
 	available_node_ids = node.connections.duplicate()
 
 func _heal_all_heroes(amount: int) -> void:
+	if not is_inside_tree():
+		return
 	var team_mgr = Engine.get_singleton("TeamManager")
 	if team_mgr == null:
 		return
