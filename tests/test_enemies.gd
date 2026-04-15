@@ -14,6 +14,9 @@ func run_all() -> Dictionary:
 	test_cyclops_first_intent_is_buff()
 	test_snake_pattern_length()
 	test_discard_random()
+	test_elite_enemy_hp()
+	test_minotaur_pattern()
+	test_medusa_pattern_and_status_type()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -65,6 +68,29 @@ func test_snake_pattern_length() -> void:
 	var snake := gm._make_snake(gm._satyr_scene(), 20)
 	_assert(snake.intent_pattern.size() == 2, "메두사의 뱀 패턴 2개")
 	_assert(snake.enemy_name == "메두사의 뱀", "메두사의 뱀 이름")
+	_assert(snake.intent_pattern[1].status_type == "vulnerable", "메두사의 뱀 DEBUFF = vulnerable")
+
+func test_elite_enemy_hp() -> void:
+	print("[TestEnemies] test_elite_enemy_hp")
+	var gm := _make_gm()
+	var enemies := gm._make_elite_enemies()
+	_assert(enemies.size() >= 1, "엘리트 룸 적 1마리 이상")
+	_assert(enemies[0].max_hp >= 60, "엘리트 HP >= 60")
+
+func test_minotaur_pattern() -> void:
+	print("[TestEnemies] test_minotaur_pattern")
+	var gm := _make_gm()
+	var m := gm._make_minotaur(gm._satyr_scene())
+	_assert(m.intent_pattern.size() == 3, "미노타우로스 패턴 3개")
+	_assert(m.intent_pattern[2].value == 20, "미노타우로스 세 번째 공격 20")
+
+func test_medusa_pattern_and_status_type() -> void:
+	print("[TestEnemies] test_medusa_pattern_and_status_type")
+	var gm := _make_gm()
+	var med := gm._make_medusa(gm._satyr_scene())
+	_assert(med.intent_pattern.size() == 4, "메두사 패턴 4개")
+	_assert(med.intent_pattern[1].status_type == "weak", "메두사 2번째 = weak")
+	_assert(med.intent_pattern[2].status_type == "vulnerable", "메두사 3번째 = vulnerable")
 
 func test_discard_random() -> void:
 	print("[TestEnemies] test_discard_random")

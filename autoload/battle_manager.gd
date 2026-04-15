@@ -218,7 +218,8 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 		IntentRes.ActionType.DEBUFF:
 			var target_id: String = _pick_hero_target(intent.target, enemy_index)
 			if target_id != "":
-				_apply_status_to_hero(target_id, "weak", intent.value)
+				var stype: String = intent.status_type
+				_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
 			if deck_mgr:
 				deck_mgr.discard_random(intent.value)

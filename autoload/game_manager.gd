@@ -188,12 +188,66 @@ func _make_enemies_for_node(node: Resource) -> Array:
 		MapNodeRes.RoomType.BATTLE:
 			return _make_normal_enemies()
 		MapNodeRes.RoomType.ELITE:
-			return [_make_satyr(_satyr_scene(), 45, 8),
-					_make_satyr(_satyr_scene(), 30, 6)]
+			return _make_elite_enemies()
 		MapNodeRes.RoomType.BOSS:
 			return [_make_satyr(_satyr_scene(), 80, 10)]
 		_:
 			return []
+
+func _make_elite_enemies() -> Array:
+	var scene := _satyr_scene()
+	if randi() % 2 == 0:
+		return [_make_minotaur(scene)]
+	else:
+		return [_make_medusa(scene)]
+
+func _make_minotaur(scene: PackedScene) -> Resource:
+	var EnemyRes = load("res://resources/enemy_resource.gd")
+	var IntentRes = load("res://resources/intent_resource.gd")
+	var enemy: Resource = EnemyRes.new()
+	enemy.enemy_name = "미노타우로스"
+	enemy.max_hp = 90
+	enemy.character_scene = scene
+	var i1: Resource = IntentRes.new()
+	i1.action_type = IntentRes.ActionType.ATTACK
+	i1.value = 12
+	i1.target = IntentRes.TargetType.RANDOM
+	var i2: Resource = IntentRes.new()
+	i2.action_type = IntentRes.ActionType.ATTACK
+	i2.value = 12
+	i2.target = IntentRes.TargetType.RANDOM
+	var i3: Resource = IntentRes.new()
+	i3.action_type = IntentRes.ActionType.ATTACK
+	i3.value = 20
+	i3.target = IntentRes.TargetType.ALL
+	enemy.intent_pattern = [i1, i2, i3]
+	return enemy
+
+func _make_medusa(scene: PackedScene) -> Resource:
+	var EnemyRes = load("res://resources/enemy_resource.gd")
+	var IntentRes = load("res://resources/intent_resource.gd")
+	var enemy: Resource = EnemyRes.new()
+	enemy.enemy_name = "메두사"
+	enemy.max_hp = 75
+	enemy.character_scene = scene
+	var i1: Resource = IntentRes.new()
+	i1.action_type = IntentRes.ActionType.ATTACK
+	i1.value = 10
+	i1.target = IntentRes.TargetType.RANDOM
+	var i2: Resource = IntentRes.new()
+	i2.action_type = IntentRes.ActionType.DEBUFF
+	i2.value = 2
+	i2.status_type = "weak"
+	var i3: Resource = IntentRes.new()
+	i3.action_type = IntentRes.ActionType.DEBUFF
+	i3.value = 2
+	i3.status_type = "vulnerable"
+	var i4: Resource = IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK
+	i4.value = 15
+	i4.target = IntentRes.TargetType.RANDOM
+	enemy.intent_pattern = [i1, i2, i3, i4]
+	return enemy
 
 func _make_satyr(scene: PackedScene, hp: int, dmg: int) -> Resource:
 	var EnemyRes = load("res://resources/enemy_resource.gd")
@@ -265,7 +319,7 @@ func _make_snake(scene: PackedScene, hp: int) -> Resource:
 	var i2: Resource = IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF
 	i2.value = 1
-	i2.condition = "vulnerable"
+	i2.status_type = "vulnerable"
 	i2.target = IntentRes.TargetType.RANDOM
 	enemy.intent_pattern = [i1, i2]
 	return enemy
