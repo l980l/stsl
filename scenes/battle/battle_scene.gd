@@ -395,11 +395,22 @@ func _on_card_pressed(card: Resource) -> void:
 	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
 		return
 
-	# 타겟 선택이 필요한지 확인 (SINGLE DAMAGE 효과)
+	# 타겟 선택이 필요한지 확인
 	var needs_target := false
 	for effect in card.effects:
-		if effect.effect_type == EffectRes.EffectType.DAMAGE and effect.target == "SINGLE":
-			needs_target = true
+		match effect.effect_type:
+			EffectRes.EffectType.DAMAGE:
+				if effect.target == "SINGLE":
+					needs_target = true
+			EffectRes.EffectType.APPLY_STATUS:
+				if effect.target == "SINGLE":
+					needs_target = true
+			EffectRes.EffectType.COUNTER_BLOCK, \
+			EffectRes.EffectType.CONSUME_MORALE, \
+			EffectRes.EffectType.POISON_BURST, \
+			EffectRes.EffectType.CONDITIONAL_DMG:
+				needs_target = true
+		if needs_target:
 			break
 
 	if needs_target:
