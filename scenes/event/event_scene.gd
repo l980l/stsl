@@ -43,7 +43,11 @@ func _apply_choice(choice: Resource) -> void:
 				DeckManager.draw_pile.remove_at(
 					randi() % DeckManager.draw_pile.size())
 		choice.EffectType.ADD_HERO:
-			# Plan 07 이후 구현 예정
-			print("동료 영입: Plan 07에서 구현 예정")
+			var pool := GameManager._recruit_hero_pool()
+			if pool.is_empty():
+				return
+			var hero: Resource = pool[randi() % pool.size()]
+			TeamManager.add_hero(hero)
+			GameManager._add_initial_deck_for(hero)
 		choice.EffectType.NONE:
 			pass

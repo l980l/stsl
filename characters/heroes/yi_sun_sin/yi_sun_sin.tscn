@@ -10,6 +10,6 @@ offset_left = -40.0
 offset_top = -80.0
 offset_right = 40.0
 offset_bottom = 0.0
-color = Color(0.133, 0.545, 0.133, 1)
+color = Color(0, 0.6, 0.8, 1)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

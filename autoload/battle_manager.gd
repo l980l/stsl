@@ -126,6 +126,46 @@ func _apply_card_effects(card: Resource, target_enemy_index: int) -> void:
 			EffectRes.EffectType.HEAL:
 				if team_mgr:
 					team_mgr.heal(card.owner_id, effect.value)
+			EffectRes.EffectType.GAIN_MORALE:
+				var cur: int = _hero_status.get(card.owner_id, {}).get("morale", 0)
+				if not _hero_status.has(card.owner_id):
+					_hero_status[card.owner_id] = {}
+				_hero_status[card.owner_id]["morale"] = cur + effect.value
+				status_applied.emit(card.owner_id, "morale", effect.value)
+			EffectRes.EffectType.CONSUME_MORALE:
+				var morale: int = _hero_status.get(card.owner_id, {}).get("morale", 0)
+				if morale >= effect.value:
+					_hero_status[card.owner_id]["morale"] = morale - effect.value
+					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+						_deal_damage_to_enemy(target_enemy_index, effect.bonus_value)
+			EffectRes.EffectType.POISON_BURST:
+				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+					var poison: int = _enemy_status[target_enemy_index].get("poison", 0)
+					if poison > 0:
+						_deal_damage_to_enemy(target_enemy_index, poison)
+						_enemy_status[target_enemy_index]["poison"] = 0
+			EffectRes.EffectType.COUNTER_BLOCK:
+				var block: int = _hero_block.get(card.owner_id, 0)
+				var dmg: int = int(block * effect.value / 100.0)
+				if target_enemy_index >= 0 and dmg > 0:
+					_deal_damage_to_enemy(target_enemy_index, dmg)
+			EffectRes.EffectType.BLOCK_ALL:
+				if team_mgr:
+					for hero in team_mgr.heroes:
+						_hero_block[hero.hero_id] = _hero_block.get(hero.hero_id, 0) + effect.value
+			EffectRes.EffectType.HEAL_ALL:
+				if team_mgr:
+					for hero in team_mgr.heroes:
+						team_mgr.heal(hero.hero_id, effect.value)
+			EffectRes.EffectType.FORMATION_BLOCK:
+				if team_mgr:
+					var count: int = team_mgr.get_living_heroes().size()
+					_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + count * effect.value
+			EffectRes.EffectType.CONDITIONAL_DMG:
+				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+					var has_status: bool = _enemy_status[target_enemy_index].get(effect.status_type, 0) > 0
+					var dmg: int = effect.bonus_value if has_status else effect.value
+					_deal_damage_to_enemy(target_enemy_index, dmg)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
 	if not _enemy_alive[enemy_index]:
