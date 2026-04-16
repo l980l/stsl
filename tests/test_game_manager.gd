@@ -18,6 +18,10 @@ func run_all() -> Dictionary:
 	test_complete_shop_returns_to_map()
 	test_elite_battle_gives_two_card_picks()
 	test_complete_rest_returns_to_map()
+	test_upgrade_card_damage()
+	test_upgrade_card_reduces_cost()
+	test_upgrade_card_no_op_if_already_upgraded()
+	test_enter_card_upgrade_sets_state()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -110,3 +114,58 @@ func test_complete_rest_returns_to_map() -> void:
 	gm.enter_node(0)
 	gm.complete_rest()
 	_assert(gm.current_state == 0, "complete_rest 후 상태 MAP(0)으로 변경")  # GameState.MAP == 0
+
+func test_upgrade_card_damage() -> void:
+	print("[TestGameManager] test_upgrade_card_damage")
+	var gm := _make_gm()
+	var CardRes = load("res://resources/card_resource.gd")
+	var EffRes = load("res://resources/effect_resource.gd")
+	var card: Resource = CardRes.new()
+	card.cost = 1
+	var eff: Resource = EffRes.new()
+	eff.effect_type = EffRes.EffectType.DAMAGE
+	eff.value = 6
+	card.effects = [eff]
+	gm.upgrade_card(card)
+	_assert(card.upgraded == true, "업그레이드 후 upgraded = true")
+	_assert(eff.value == 9, "데미지 +3 → 9")
+	_assert(card.cost == 1, "비용 1 카드는 비용 변경 없음")
+
+func test_upgrade_card_reduces_cost() -> void:
+	print("[TestGameManager] test_upgrade_card_reduces_cost")
+	var gm := _make_gm()
+	var CardRes = load("res://resources/card_resource.gd")
+	var EffRes = load("res://resources/effect_resource.gd")
+	var card: Resource = CardRes.new()
+	card.cost = 2
+	var eff: Resource = EffRes.new()
+	eff.effect_type = EffRes.EffectType.BLOCK
+	eff.value = 5
+	card.effects = [eff]
+	gm.upgrade_card(card)
+	_assert(card.cost == 1, "비용 2 카드 강화 시 비용 1로 감소")
+	_assert(eff.value == 8, "블록 +3 → 8")
+
+func test_upgrade_card_no_op_if_already_upgraded() -> void:
+	print("[TestGameManager] test_upgrade_card_no_op_if_already_upgraded")
+	var gm := _make_gm()
+	var CardRes = load("res://resources/card_resource.gd")
+	var EffRes = load("res://resources/effect_resource.gd")
+	var card: Resource = CardRes.new()
+	card.cost = 1
+	card.upgraded = true
+	var eff: Resource = EffRes.new()
+	eff.effect_type = EffRes.EffectType.DAMAGE
+	eff.value = 6
+	card.effects = [eff]
+	gm.upgrade_card(card)
+	_assert(eff.value == 6, "이미 강화된 카드는 수치 변경 없음")
+
+func test_enter_card_upgrade_sets_state() -> void:
+	print("[TestGameManager] test_enter_card_upgrade_sets_state")
+	var MapNodeRes = load("res://resources/map_node_resource.gd")
+	var gm := _make_gm()
+	gm.run_map[0].room_type = MapNodeRes.RoomType.REST
+	gm.enter_node(0)
+	gm.enter_card_upgrade()
+	_assert(gm.current_state == 7, "카드 강화 진입 시 상태 CARD_UPGRADE(7)으로 변경")  # GameState.CARD_UPGRADE == 7
