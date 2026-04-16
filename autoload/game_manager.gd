@@ -217,6 +217,16 @@ func complete_shop() -> void:
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
 
+func recruit_random_hero() -> void:
+	var pool := _recruit_hero_pool()
+	if pool.is_empty():
+		return
+	var hero: Resource = pool[randi() % pool.size()]
+	var tm := _get_tm()
+	if tm:
+		tm.add_hero(hero)
+	_add_initial_deck_for(hero)
+
 func complete_event() -> void:
 	pending_event = null
 	_advance_nodes_from(current_node_id)

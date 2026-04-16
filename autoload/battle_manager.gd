@@ -100,6 +100,9 @@ func end_player_turn() -> void:
 	_execute_enemy_turn()
 
 func _apply_card_effects(card: Resource, target_enemy_index: int) -> void:
+	# 카드 소유 영웅이 사망 상태면 효과 없음
+	if team_mgr and not team_mgr.is_alive(card.owner_id):
+		return
 	for effect in card.effects:
 		match effect.effect_type:
 			EffectRes.EffectType.DAMAGE:

@@ -19,6 +19,7 @@ func run_all() -> Dictionary:
 	test_has_save_false_when_no_file()
 	test_relic_serialization_roundtrip()
 	test_deck_from_dict_preserves_effects()
+	test_upgraded_flag_preserved_in_save()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -179,3 +180,23 @@ func test_deck_from_dict_preserves_effects() -> void:
 	_assert(restored_card.card_name == "포이즌 스트라이크", "카드 이름 복원")
 	_assert(restored_card.effects.size() == 2, "이펙트 2개 복원")
 	_assert(restored_card.effects[1].status_type == "poison", "status_type 복원")
+
+func test_upgraded_flag_preserved_in_save() -> void:
+	print("[TestSave] test_upgraded_flag_preserved_in_save")
+	var dm := DeckManagerClass.new()
+	var card := CardRes.new()
+	card.card_name = "스트라이크"
+	card.owner_id = "napoleon"
+	card.cost = 1
+	card.upgraded = true
+	var eff := EffRes.new(); eff.effect_type = EffRes.EffectType.DAMAGE; eff.value = 9; eff.target = "SINGLE"
+	card.effects = [eff]
+	dm.add_card_to_deck(card)
+
+	var d: Dictionary = dm.to_dict()
+	var dm2 := DeckManagerClass.new()
+	dm2.from_dict(d)
+
+	var restored: Resource = dm2.draw_pile[0]
+	_assert(restored.upgraded == true, "강화된 카드 upgraded=true 저장/복원")
+	_assert(restored.effects[0].value == 9, "강화 수치 복원")

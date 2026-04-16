@@ -33,6 +33,7 @@ func run_all() -> Dictionary:
 	test_enemy_damaged_not_emitted_when_fully_blocked()
 	test_harpy_special_removes_from_deck()
 	test_charm_skips_enemy_turn()
+	test_dead_hero_card_has_no_effect()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -338,3 +339,25 @@ func test_charm_skips_enemy_turn() -> void:
 	bm.end_player_turn()  # 적 턴 — charm 있으므로 공격 스킵
 	_assert(bm.team_mgr.get_current_hp("napoleon") == 70, "charm 상태 시 적 공격 스킵 → HP 불변")
 	_assert(bm._enemy_status[0].get("charm", -1) == 0, "charm 스택 1→0 감소")
+
+func test_dead_hero_card_has_no_effect() -> void:
+	print("[TestBattleManager] test_dead_hero_card_has_no_effect")
+	var bm := _make_bm()
+	var napoleon := _make_hero("napoleon", 70)
+	bm.team_mgr.add_hero(napoleon)
+	var enemy := _make_enemy(30, [])
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+
+	# 나폴레옹을 사망 처리
+	bm.team_mgr._hero_hp["napoleon"] = 0
+	bm.team_mgr._hero_alive["napoleon"] = false
+
+	# 사망 영웅 카드로 공격 시도
+	var dmg_eff := _make_effect(EffectRes.EffectType.DAMAGE, 10, "SINGLE")
+	var card := _make_card("napoleon", 0, [dmg_eff])
+	bm.deck_mgr.hand.append(card)
+	bm.deck_mgr.current_energy = 3
+	bm.play_card(card, 0)
+
+	_assert(bm.get_enemy_hp(0) == 30, "사망 영웅 카드 사용 시 효과 없음 → 적 HP 불변")
