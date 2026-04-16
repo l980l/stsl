@@ -2,13 +2,14 @@
 class_name GameManagerClass
 extends Node
 
-enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST }
+enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER }
 
 var current_state: GameState = GameState.MAP
 var current_floor: int = 0
 var current_chapter: int = 1
 var gold: int = 0
 var relics: Array = []
+var run_won: bool = false
 
 # ── Plan 04: 런 스테이트 ──────────────────────────────
 var run_map: Array = []             # Array[MapNodeResource]
@@ -87,6 +88,7 @@ func reset() -> void:
 	pending_enemies.clear()
 	card_rewards.clear()
 	pending_event = null
+	run_won = false
 
 # ── Plan 04: 런 관리 ──────────────────────────────────
 
@@ -192,22 +194,28 @@ func complete_battle(won: bool) -> void:
 		change_state(GameState.CARD_PICK)
 		_request_scene("res://scenes/card_pick/card_pick_scene.tscn")
 	else:
+		run_won = false
 		run_ended.emit(false)
 		var _sm_fail = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
 		if _sm_fail:
 			_sm_fail.clear_save()
-		change_state(GameState.MAP)
-		_request_scene("res://scenes/map/map_scene.tscn")
+		change_state(GameState.GAME_OVER)
+		_request_scene("res://scenes/game_over/game_over_scene.tscn")
 
 func complete_card_pick() -> void:
 	var node: Resource = run_map[current_node_id]
 	_advance_nodes_from(current_node_id)
 	var MapNodeRes = load("res://resources/map_node_resource.gd")
 	if node.room_type == MapNodeRes.RoomType.BOSS:
+		run_won = true
 		run_ended.emit(true)
 		var _sm_win = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
 		if _sm_win:
 			_sm_win.clear_save()
+		card_rewards.clear()
+		change_state(GameState.GAME_OVER)
+		_request_scene("res://scenes/game_over/game_over_scene.tscn")
+		return
 	card_rewards.clear()
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")

@@ -13,6 +13,7 @@ func run_all() -> Dictionary:
 	test_enter_node_marks_visited()
 	test_enter_battle_sets_pending_enemies()
 	test_complete_battle_generates_rewards()
+	test_battle_lost_goes_to_game_over()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -62,3 +63,11 @@ func test_complete_battle_generates_rewards() -> void:
 	# → card_rewards는 빈 배열. complete_battle이 예외 없이 완료되면 정상
 	_assert(gm.card_rewards is Array, "complete_battle 후 card_rewards는 Array")
 	_assert(gm.current_state == 2, "complete_battle 후 상태 CARD_PICK(2)으로 변경")  # GameState.CARD_PICK == 2
+
+func test_battle_lost_goes_to_game_over() -> void:
+	print("[TestGameManager] test_battle_lost_goes_to_game_over")
+	var gm := _make_gm()
+	gm.enter_node(0)
+	gm.complete_battle(false)
+	_assert(gm.run_won == false, "패배 시 run_won == false")
+	_assert(gm.current_state == 6, "패배 시 상태 GAME_OVER(6)으로 변경")  # GameState.GAME_OVER == 6
