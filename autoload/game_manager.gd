@@ -19,6 +19,7 @@ var pending_enemies: Array = []     # 다음 배틀 적 데이터
 var card_rewards: Array = []        # 다음 카드 보상 목록
 var pending_event: Resource = null  # 현재 이벤트 데이터 (EventResource)
 var card_rewards_pick_count: int = 1  # 카드픽 화면에서 선택 가능한 카드 수
+var pending_boss_upgrade: bool = false  # 보스 후 카드 강화 대기 여부
 # ─────────────────────────────────────────────────────
 
 signal state_changed(new_state: GameState)
@@ -91,63 +92,52 @@ func reset() -> void:
 	pending_event = null
 	run_won = false
 	card_rewards_pick_count = 1
+	pending_boss_upgrade = false
 
 # ── Plan 04: 런 관리 ──────────────────────────────────
 
-func start_run() -> void:
+func start_run(initial_hero_id: String = "napoleon") -> void:
 	reset()
 
-	# TeamManager 초기화 (나폴레옹 1명)
 	var tm := _get_tm()
 	if tm:
 		tm.clear()
-	var HeroRes = load("res://resources/hero_resource.gd")
-	var napoleon: Resource = HeroRes.new()
-	napoleon.hero_id = "napoleon"
-	napoleon.hero_name = "나폴레옹"
-	napoleon.max_hp = 70
-	napoleon.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
-	if tm:
-		tm.add_hero(napoleon)
-
-	# DeckManager 초기화 (스트라이크 3 + 디펜드 2)
 	var dm := _get_dm()
 	if dm:
 		dm.clear()
-	var CardRes = load("res://resources/card_resource.gd")
-	var EffRes = load("res://resources/effect_resource.gd")
-	for _i in range(3):
-		var card: Resource = CardRes.new()
-		card.card_name = "스트라이크"
-		card.owner_id = "napoleon"
-		card.cost = 1
-		card.play_animation = "attack"
-		var eff: Resource = EffRes.new()
-		eff.effect_type = EffRes.EffectType.DAMAGE
-		eff.value = 6
-		eff.target = "SINGLE"
-		card.effects = [eff]
-		if dm:
-			dm.add_card_to_deck(card)
-	for _i in range(2):
-		var card: Resource = CardRes.new()
-		card.card_name = "디펜드"
-		card.owner_id = "napoleon"
-		card.cost = 1
-		card.play_animation = "idle"
-		var eff: Resource = EffRes.new()
-		eff.effect_type = EffRes.EffectType.BLOCK
-		eff.value = 5
-		card.effects = [eff]
-		if dm:
-			dm.add_card_to_deck(card)
+
+	# 초기 영웅 생성 및 추가
+	var hero := _make_hero_by_id(initial_hero_id)
+	if tm:
+		tm.add_hero(hero)
+
+	# 초기 덱 생성
+	_add_initial_deck_for(hero)
 
 	# 맵 생성
 	var MapGen = load("res://autoload/map_generator.gd")
 	run_map = MapGen.generate()
-	available_node_ids = [0, 1, 2]  # floor 0 전체 접근 가능
+	available_node_ids = [0, 1, 2]
 	run_started.emit()
-	# 씬 전환 없음 — MapScene._ready()에서 호출되므로 이미 MapScene에 있음
+
+func _make_hero_by_id(hero_id: String) -> Resource:
+	var HeroRes = load("res://resources/hero_resource.gd")
+	var hero: Resource = HeroRes.new()
+	hero.hero_id = hero_id
+	match hero_id:
+		"napoleon":
+			hero.hero_name = "나폴레옹"
+			hero.max_hp = 70
+			hero.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
+		"cleopatra":
+			hero.hero_name = "클레오파트라"
+			hero.max_hp = 60
+			hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
+		"yi_sun_sin":
+			hero.hero_name = "이순신"
+			hero.max_hp = 75
+			hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
+	return hero
 
 func enter_node(node_id: int) -> void:
 	if node_id not in available_node_ids:
@@ -212,21 +202,23 @@ func complete_card_pick() -> void:
 	var node: Resource = run_map[current_node_id]
 	_advance_nodes_from(current_node_id)
 	var MapNodeRes = load("res://resources/map_node_resource.gd")
-	if node.room_type == MapNodeRes.RoomType.BOSS:
-		run_won = true
-		run_ended.emit(true)
-		var _sm_win = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
-		if _sm_win:
-			_sm_win.clear_save()
-		card_rewards.clear()
-		change_state(GameState.GAME_OVER)
-		_request_scene("res://scenes/game_over/game_over_scene.tscn")
-		return
 	card_rewards.clear()
+	if node.room_type == MapNodeRes.RoomType.BOSS:
+		# 보스 승리: 카드 강화 1회 후 게임 오버(승)
+		pending_boss_upgrade = true
+		change_state(GameState.CARD_UPGRADE)
+		_request_scene("res://scenes/card_upgrade/card_upgrade_scene.tscn")
+		return
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
 
 func complete_shop() -> void:
+	_advance_nodes_from(current_node_id)
+	change_state(GameState.MAP)
+	_request_scene("res://scenes/map/map_scene.tscn")
+
+func complete_event() -> void:
+	pending_event = null
 	_advance_nodes_from(current_node_id)
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
@@ -242,6 +234,16 @@ func enter_card_upgrade() -> void:
 	_request_scene("res://scenes/card_upgrade/card_upgrade_scene.tscn")
 
 func complete_card_upgrade() -> void:
+	if pending_boss_upgrade:
+		pending_boss_upgrade = false
+		run_won = true
+		run_ended.emit(true)
+		var _sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
+		if _sm:
+			_sm.clear_save()
+		change_state(GameState.GAME_OVER)
+		_request_scene("res://scenes/game_over/game_over_scene.tscn")
+		return
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
 
@@ -554,6 +556,20 @@ func _add_initial_deck_for(hero: Resource) -> void:
 	var EffRes = load("res://resources/effect_resource.gd")
 	var dm := _get_dm()
 	match hero.hero_id:
+		"napoleon":
+			for _i in range(3):
+				var c: Resource = CardRes.new(); c.card_name = "스트라이크"
+				c.owner_id = "napoleon"; c.cost = 1; c.play_animation = "attack"
+				var e: Resource = EffRes.new(); e.effect_type = EffRes.EffectType.DAMAGE
+				e.value = 6; e.target = "SINGLE"
+				c.effects = [e]
+				if dm: dm.add_card_to_deck(c)
+			for _i in range(2):
+				var c: Resource = CardRes.new(); c.card_name = "디펜드"
+				c.owner_id = "napoleon"; c.cost = 1; c.play_animation = "idle"
+				var e: Resource = EffRes.new(); e.effect_type = EffRes.EffectType.BLOCK; e.value = 5
+				c.effects = [e]
+				if dm: dm.add_card_to_deck(c)
 		"cleopatra":
 			for _i in range(2):
 				var c: Resource = CardRes.new(); c.card_name = "독침"

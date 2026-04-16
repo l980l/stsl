@@ -39,8 +39,7 @@ func _build_ui() -> void:
 
 func _on_new_game() -> void:
 	SaveManager.clear_save()
-	GameManager.start_run()
-	get_tree().change_scene_to_file("res://scenes/map/map_scene.tscn")
+	get_tree().change_scene_to_file("res://scenes/hero_select/hero_select_scene.tscn")
 
 func _on_continue() -> void:
 	SaveManager.load_save()

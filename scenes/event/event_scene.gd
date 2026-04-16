@@ -20,10 +20,7 @@ func _ready() -> void:
 
 func _on_choice_selected(choice: Resource) -> void:
 	_apply_choice(choice)
-	GameManager.pending_event = null
-	GameManager._advance_nodes_from(GameManager.current_node_id)
-	GameManager.change_state(GameManager.GameState.MAP)
-	GameManager._request_scene("res://scenes/map/map_scene.tscn")
+	GameManager.complete_event()
 
 func _apply_choice(choice: Resource) -> void:
 	match choice.effect_type:
