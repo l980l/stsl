@@ -466,9 +466,9 @@ func _napoleon_card_pool() -> Array:
 	var EffRes = load("res://resources/effect_resource.gd")
 	var cards: Array = []
 
-	# 1. 헤비 스트라이크 — DAMAGE 9, cost 2
+	# 1. 아우스터리츠 — DAMAGE 9, cost 2 (나폴레옹 최대 승전)
 	var c1: Resource = CardRes.new()
-	c1.card_name = "헤비 스트라이크"
+	c1.card_name = "아우스터리츠"
 	c1.owner_id = "napoleon"
 	c1.cost = 2
 	c1.play_animation = "attack"
@@ -479,9 +479,9 @@ func _napoleon_card_pool() -> Array:
 	c1.effects = [e1]
 	cards.append(c1)
 
-	# 2. 클리브 — ALL DAMAGE 4, cost 1
+	# 2. 포병 일제사격 — ALL DAMAGE 4, cost 1 (나폴레옹의 포병 전술)
 	var c2: Resource = CardRes.new()
-	c2.card_name = "클리브"
+	c2.card_name = "포병 일제사격"
 	c2.owner_id = "napoleon"
 	c2.cost = 1
 	c2.play_animation = "attack"
@@ -492,9 +492,9 @@ func _napoleon_card_pool() -> Array:
 	c2.effects = [e2]
 	cards.append(c2)
 
-	# 3. 아이언 웨이브 — DAMAGE 5 + BLOCK 5, cost 1
+	# 3. 아르콜레 돌파 — DAMAGE 5 + BLOCK 5, cost 1 (나폴레옹이 직접 깃발 들고 돌파한 다리 전투)
 	var c3: Resource = CardRes.new()
-	c3.card_name = "아이언 웨이브"
+	c3.card_name = "아르콜레 돌파"
 	c3.owner_id = "napoleon"
 	c3.cost = 1
 	c3.play_animation = "attack"
@@ -508,9 +508,9 @@ func _napoleon_card_pool() -> Array:
 	c3.effects = [e3a, e3b]
 	cards.append(c3)
 
-	# 4. 아이언 디펜스 — BLOCK 8, cost 1
+	# 4. 그랑다르메의 방패 — BLOCK 8, cost 1 (대육군)
 	var c4: Resource = CardRes.new()
-	c4.card_name = "아이언 디펜스"
+	c4.card_name = "그랑다르메의 방패"
 	c4.owner_id = "napoleon"
 	c4.cost = 1
 	c4.play_animation = "idle"
@@ -520,9 +520,9 @@ func _napoleon_card_pool() -> Array:
 	c4.effects = [e4]
 	cards.append(c4)
 
-	# 5. 포이즌 스트라이크 — DAMAGE 3 + poison 2, cost 1
+	# 5. 예나의 기습 — DAMAGE 3 + poison 2, cost 1 (예나 전투의 기습 공격)
 	var c5: Resource = CardRes.new()
-	c5.card_name = "포이즌 스트라이크"
+	c5.card_name = "예나의 기습"
 	c5.owner_id = "napoleon"
 	c5.cost = 1
 	c5.play_animation = "attack"
@@ -537,7 +537,7 @@ func _napoleon_card_pool() -> Array:
 
 	# 6. 돌격 — DAMAGE 8 + 사기+1
 	var c6: Resource = CardRes.new()
-	c6.card_name = "돌격"; c6.owner_id = "napoleon"; c6.cost = 1; c6.play_animation = "attack"
+	c6.card_name = "경기병 돌격"; c6.owner_id = "napoleon"; c6.cost = 1; c6.play_animation = "attack"
 	var e6a: Resource = EffRes.new(); e6a.effect_type = EffRes.EffectType.DAMAGE; e6a.value = 8; e6a.target = "SINGLE"
 	var e6b: Resource = EffRes.new(); e6b.effect_type = EffRes.EffectType.GAIN_MORALE; e6b.value = 1
 	c6.effects = [e6a, e6b]; cards.append(c6)
@@ -551,48 +551,48 @@ func _napoleon_card_pool() -> Array:
 
 	# 8. 사기 폭발 — 사기 3 소모 → DAMAGE 20
 	var c8: Resource = CardRes.new()
-	c8.card_name = "사기 폭발"; c8.owner_id = "napoleon"; c8.cost = 0; c8.play_animation = "attack"
+	c8.card_name = "황제의 기개"; c8.owner_id = "napoleon"; c8.cost = 0; c8.play_animation = "attack"
 	var e8: Resource = EffRes.new(); e8.effect_type = EffRes.EffectType.CONSUME_MORALE
 	e8.value = 3; e8.bonus_value = 20; e8.target = "SINGLE"
 	c8.effects = [e8]; cards.append(c8)
 
 	# 9. 군기 확립 — DRAW 2 + 사기+1
 	var c9: Resource = CardRes.new()
-	c9.card_name = "군기 확립"; c9.owner_id = "napoleon"; c9.cost = 1; c9.play_animation = "idle"
+	c9.card_name = "원수 서임"; c9.owner_id = "napoleon"; c9.cost = 1; c9.play_animation = "idle"
 	var e9a: Resource = EffRes.new(); e9a.effect_type = EffRes.EffectType.DRAW; e9a.value = 2
 	var e9b: Resource = EffRes.new(); e9b.effect_type = EffRes.EffectType.GAIN_MORALE; e9b.value = 1
 	c9.effects = [e9a, e9b]; cards.append(c9)
 
 	# 10. 포격 — DAMAGE 14 (사기 2이상이면 DAMAGE 20 → CONDITIONAL_DMG 간략화)
 	var c10: Resource = CardRes.new()
-	c10.card_name = "포격"; c10.owner_id = "napoleon"; c10.cost = 2; c10.play_animation = "attack"
+	c10.card_name = "보로디노 포격"; c10.owner_id = "napoleon"; c10.cost = 2; c10.play_animation = "attack"
 	var e10: Resource = EffRes.new(); e10.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e10.value = 14; e10.bonus_value = 20; e10.status_type = "morale"; e10.target = "SINGLE"
 	c10.effects = [e10]; cards.append(c10)
 
 	# 11. 연속 타격 — DAMAGE 4 + ENERGY +1
 	var c11: Resource = CardRes.new()
-	c11.card_name = "연속 타격"; c11.owner_id = "napoleon"; c11.cost = 1; c11.play_animation = "attack"
+	c11.card_name = "살보 사격"; c11.owner_id = "napoleon"; c11.cost = 1; c11.play_animation = "attack"
 	var e11a: Resource = EffRes.new(); e11a.effect_type = EffRes.EffectType.DAMAGE; e11a.value = 4; e11a.target = "SINGLE"
 	var e11b: Resource = EffRes.new(); e11b.effect_type = EffRes.EffectType.ENERGY; e11b.value = 1
 	c11.effects = [e11a, e11b]; cards.append(c11)
 
 	# 12. 돌격 명령 — 사기+2 + DRAW 1
 	var c12: Resource = CardRes.new()
-	c12.card_name = "돌격 명령"; c12.owner_id = "napoleon"; c12.cost = 1; c12.play_animation = "idle"
+	c12.card_name = "총공세 명령"; c12.owner_id = "napoleon"; c12.cost = 1; c12.play_animation = "idle"
 	var e12a: Resource = EffRes.new(); e12a.effect_type = EffRes.EffectType.GAIN_MORALE; e12a.value = 2
 	var e12b: Resource = EffRes.new(); e12b.effect_type = EffRes.EffectType.DRAW; e12b.value = 1
 	c12.effects = [e12a, e12b]; cards.append(c12)
 
 	# 13. 전열 정비 — DRAW 1, cost 0
 	var c13: Resource = CardRes.new()
-	c13.card_name = "전열 정비"; c13.owner_id = "napoleon"; c13.cost = 0; c13.play_animation = "idle"
+	c13.card_name = "전열 재편"; c13.owner_id = "napoleon"; c13.cost = 0; c13.play_animation = "idle"
 	var e13: Resource = EffRes.new(); e13.effect_type = EffRes.EffectType.DRAW; e13.value = 1
 	c13.effects = [e13]; cards.append(c13)
 
 	# 14. 쾌속 전진 — DAMAGE 3 (간략화: 사기 스케일 대신 고정)
 	var c14: Resource = CardRes.new()
-	c14.card_name = "쾌속 전진"; c14.owner_id = "napoleon"; c14.cost = 1; c14.play_animation = "attack"
+	c14.card_name = "신속 기동"; c14.owner_id = "napoleon"; c14.cost = 1; c14.play_animation = "attack"
 	var e14: Resource = EffRes.new(); e14.effect_type = EffRes.EffectType.DAMAGE; e14.value = 3; e14.target = "SINGLE"
 	c14.effects = [e14]; cards.append(c14)
 
@@ -604,46 +604,46 @@ func _cleopatra_card_pool() -> Array:
 	var cards: Array = []
 
 	# 1. 독안개 — 독 3 (ALL), cost 2
-	var c1: Resource = CardRes.new(); c1.card_name = "독안개"; c1.owner_id = "cleopatra"; c1.cost = 2; c1.play_animation = "attack"
+	var c1: Resource = CardRes.new(); c1.card_name = "나일의 안개"; c1.owner_id = "cleopatra"; c1.cost = 2; c1.play_animation = "attack"
 	var e1: Resource = EffRes.new(); e1.effect_type = EffRes.EffectType.APPLY_STATUS; e1.status_type = "poison"; e1.value = 3; e1.target = "ALL"
 	c1.effects = [e1]; cards.append(c1)
 
 	# 2. 독구름 — DAMAGE 2 ALL + 독 2 ALL, cost 1
-	var c2: Resource = CardRes.new(); c2.card_name = "독구름"; c2.owner_id = "cleopatra"; c2.cost = 1; c2.play_animation = "attack"
+	var c2: Resource = CardRes.new(); c2.card_name = "사막의 독무"; c2.owner_id = "cleopatra"; c2.cost = 1; c2.play_animation = "attack"
 	var e2a: Resource = EffRes.new(); e2a.effect_type = EffRes.EffectType.DAMAGE; e2a.value = 2; e2a.target = "ALL"
 	var e2b: Resource = EffRes.new(); e2b.effect_type = EffRes.EffectType.APPLY_STATUS; e2b.status_type = "poison"; e2b.value = 2; e2b.target = "ALL"
 	c2.effects = [e2a, e2b]; cards.append(c2)
 
 	# 3. 뱀의 독 — 독 8 SINGLE, cost 1
-	var c3: Resource = CardRes.new(); c3.card_name = "뱀의 독"; c3.owner_id = "cleopatra"; c3.cost = 1; c3.play_animation = "attack"
+	var c3: Resource = CardRes.new(); c3.card_name = "아스프의 독니"; c3.owner_id = "cleopatra"; c3.cost = 1; c3.play_animation = "attack"
 	var e3: Resource = EffRes.new(); e3.effect_type = EffRes.EffectType.APPLY_STATUS; e3.status_type = "poison"; e3.value = 8; e3.target = "SINGLE"
 	c3.effects = [e3]; cards.append(c3)
 
 	# 4. 독 폭발 — POISON_BURST, cost 1
-	var c4: Resource = CardRes.new(); c4.card_name = "독 폭발"; c4.owner_id = "cleopatra"; c4.cost = 1; c4.play_animation = "attack"
+	var c4: Resource = CardRes.new(); c4.card_name = "나일의 분노"; c4.owner_id = "cleopatra"; c4.cost = 1; c4.play_animation = "attack"
 	var e4: Resource = EffRes.new(); e4.effect_type = EffRes.EffectType.POISON_BURST; e4.target = "SINGLE"
 	c4.effects = [e4]; cards.append(c4)
 
 	# 5. 이중 독 — CONDITIONAL_DMG(value=2, bonus=8, cond=poison), cost 1
-	var c5: Resource = CardRes.new(); c5.card_name = "이중 독"; c5.owner_id = "cleopatra"; c5.cost = 1; c5.play_animation = "attack"
+	var c5: Resource = CardRes.new(); c5.card_name = "독사의 마수"; c5.owner_id = "cleopatra"; c5.cost = 1; c5.play_animation = "attack"
 	var e5: Resource = EffRes.new(); e5.effect_type = EffRes.EffectType.CONDITIONAL_DMG; e5.value = 2; e5.bonus_value = 8; e5.status_type = "poison"; e5.target = "SINGLE"
 	c5.effects = [e5]; cards.append(c5)
 
 	# 6. 치명독 — DAMAGE 4 + 독 5 + vulnerable 1, cost 2
-	var c6: Resource = CardRes.new(); c6.card_name = "치명독"; c6.owner_id = "cleopatra"; c6.cost = 2; c6.play_animation = "attack"
+	var c6: Resource = CardRes.new(); c6.card_name = "파라오의 독"; c6.owner_id = "cleopatra"; c6.cost = 2; c6.play_animation = "attack"
 	var e6a: Resource = EffRes.new(); e6a.effect_type = EffRes.EffectType.DAMAGE; e6a.value = 4; e6a.target = "SINGLE"
 	var e6b: Resource = EffRes.new(); e6b.effect_type = EffRes.EffectType.APPLY_STATUS; e6b.status_type = "poison"; e6b.value = 5; e6b.target = "SINGLE"
 	var e6c: Resource = EffRes.new(); e6c.effect_type = EffRes.EffectType.APPLY_STATUS; e6c.status_type = "vulnerable"; e6c.value = 1; e6c.target = "SINGLE"
 	c6.effects = [e6a, e6b, e6c]; cards.append(c6)
 
 	# 7. 독 강화 — DRAW 1 + ENERGY 1, cost 0 (간략화)
-	var c7: Resource = CardRes.new(); c7.card_name = "독 강화"; c7.owner_id = "cleopatra"; c7.cost = 0; c7.play_animation = "idle"
+	var c7: Resource = CardRes.new(); c7.card_name = "이시스의 가호"; c7.owner_id = "cleopatra"; c7.cost = 0; c7.play_animation = "idle"
 	var e7a: Resource = EffRes.new(); e7a.effect_type = EffRes.EffectType.DRAW; e7a.value = 1
 	var e7b: Resource = EffRes.new(); e7b.effect_type = EffRes.EffectType.ENERGY; e7b.value = 1
 	c7.effects = [e7a, e7b]; cards.append(c7)
 
 	# 8. 독 회복 — HEAL 6 (독 합계 기반 간략화), cost 1
-	var c8: Resource = CardRes.new(); c8.card_name = "독 회복"; c8.owner_id = "cleopatra"; c8.cost = 1; c8.play_animation = "idle"
+	var c8: Resource = CardRes.new(); c8.card_name = "나일의 축복"; c8.owner_id = "cleopatra"; c8.cost = 1; c8.play_animation = "idle"
 	var e8: Resource = EffRes.new(); e8.effect_type = EffRes.EffectType.HEAL; e8.value = 6
 	c8.effects = [e8]; cards.append(c8)
 
@@ -665,17 +665,17 @@ func _cleopatra_card_pool() -> Array:
 	c11.effects = [e11a, e11b]; cards.append(c11)
 
 	# 12. 독 방패 — BLOCK 10 (독 조건 간략화), cost 1
-	var c12: Resource = CardRes.new(); c12.card_name = "독 방패"; c12.owner_id = "cleopatra"; c12.cost = 1; c12.play_animation = "idle"
+	var c12: Resource = CardRes.new(); c12.card_name = "람세스의 방패"; c12.owner_id = "cleopatra"; c12.cost = 1; c12.play_animation = "idle"
 	var e12: Resource = EffRes.new(); e12.effect_type = EffRes.EffectType.BLOCK; e12.value = 10
 	c12.effects = [e12]; cards.append(c12)
 
 	# 13. 왕실 칙령 — DRAW 2 (서치 간략화), cost 2
-	var c13: Resource = CardRes.new(); c13.card_name = "왕실 칙령"; c13.owner_id = "cleopatra"; c13.cost = 2; c13.play_animation = "idle"
+	var c13: Resource = CardRes.new(); c13.card_name = "알렉산드리아 칙령"; c13.owner_id = "cleopatra"; c13.cost = 2; c13.play_animation = "idle"
 	var e13: Resource = EffRes.new(); e13.effect_type = EffRes.EffectType.DRAW; e13.value = 2
 	c13.effects = [e13]; cards.append(c13)
 
 	# 14. 재생독 — DAMAGE 3 + 독 1 ALL, cost 1
-	var c14: Resource = CardRes.new(); c14.card_name = "재생독"; c14.owner_id = "cleopatra"; c14.cost = 1; c14.play_animation = "attack"
+	var c14: Resource = CardRes.new(); c14.card_name = "독의 씨앗"; c14.owner_id = "cleopatra"; c14.cost = 1; c14.play_animation = "attack"
 	var e14a: Resource = EffRes.new(); e14a.effect_type = EffRes.EffectType.DAMAGE; e14a.value = 3; e14a.target = "SINGLE"
 	var e14b: Resource = EffRes.new(); e14b.effect_type = EffRes.EffectType.APPLY_STATUS; e14b.status_type = "poison"; e14b.value = 1; e14b.target = "ALL"
 	c14.effects = [e14a, e14b]; cards.append(c14)
