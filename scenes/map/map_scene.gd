@@ -11,6 +11,7 @@ const NODE_H := 50
 
 var _node_buttons: Dictionary = {}  # node_id → Button
 var _floor_label: Label
+var _relic_container: HBoxContainer
 
 func _ready() -> void:
 	if GameManager.run_map.is_empty():
@@ -41,6 +42,13 @@ func _build_ui() -> void:
 	_floor_label.size = Vector2(300, 40)
 	_floor_label.add_theme_font_size_override("font_size", 18)
 	add_child(_floor_label)
+
+	# 릴릭 표시
+	_relic_container = HBoxContainer.new()
+	_relic_container.position = Vector2(50, 60)
+	_relic_container.size = Vector2(1820, 40)
+	add_child(_relic_container)
+	_refresh_relics()
 
 	# 연결선 먼저 그리기 (버튼 뒤에)
 	_draw_connections()
@@ -100,6 +108,16 @@ func _node_center(node: Resource) -> Vector2:
 
 func _node_top_left(node: Resource) -> Vector2:
 	return _node_center(node) - Vector2(NODE_W / 2.0, NODE_H / 2.0)
+
+func _refresh_relics() -> void:
+	for child in _relic_container.get_children():
+		child.queue_free()
+	for relic in GameManager.relics:
+		var lbl := Label.new()
+		lbl.text = "[%s]" % relic.relic_name
+		lbl.add_theme_font_size_override("font_size", 14)
+		lbl.modulate = Color(1.0, 0.85, 0.3)
+		_relic_container.add_child(lbl)
 
 func _room_type_text(room_type: int) -> String:
 	match room_type:

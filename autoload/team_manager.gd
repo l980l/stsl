@@ -56,6 +56,13 @@ func get_living_heroes() -> Array:
 			result.append(hero)
 	return result
 
+func increase_max_hp(hero_id: String, amount: int) -> void:
+	for hero in heroes:
+		if hero.hero_id == hero_id:
+			hero.max_hp += amount
+			_hero_hp[hero_id] = _hero_hp.get(hero_id, hero.max_hp) + amount
+			return
+
 func clear() -> void:
 	heroes.clear()
 	_hero_hp.clear()
