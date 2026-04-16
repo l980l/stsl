@@ -22,6 +22,9 @@ func run_all() -> Dictionary:
 	test_upgrade_card_reduces_cost()
 	test_upgrade_card_no_op_if_already_upgraded()
 	test_enter_card_upgrade_sets_state()
+	test_boss_card_pick_goes_to_upgrade()
+	test_complete_event_returns_to_map()
+	test_start_run_with_cleopatra()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -169,3 +172,30 @@ func test_enter_card_upgrade_sets_state() -> void:
 	gm.enter_node(0)
 	gm.enter_card_upgrade()
 	_assert(gm.current_state == 7, "카드 강화 진입 시 상태 CARD_UPGRADE(7)으로 변경")  # GameState.CARD_UPGRADE == 7
+
+func test_boss_card_pick_goes_to_upgrade() -> void:
+	print("[TestGameManager] test_boss_card_pick_goes_to_upgrade")
+	var MapNodeRes = load("res://resources/map_node_resource.gd")
+	var gm := _make_gm()
+	gm.run_map[0].room_type = MapNodeRes.RoomType.BOSS
+	gm.enter_node(0)
+	gm.complete_battle(true)
+	gm.complete_card_pick()
+	_assert(gm.current_state == 7, "보스 카드픽 완료 후 CARD_UPGRADE(7) 상태")
+	_assert(gm.pending_boss_upgrade == true, "pending_boss_upgrade == true")
+
+func test_complete_event_returns_to_map() -> void:
+	print("[TestGameManager] test_complete_event_returns_to_map")
+	var gm := _make_gm()
+	gm.current_node_id = 0
+	gm.complete_event()
+	_assert(gm.current_state == 0, "complete_event 후 MAP(0) 상태")
+	_assert(gm.pending_event == null, "pending_event 초기화")
+
+func test_start_run_with_cleopatra() -> void:
+	print("[TestGameManager] test_start_run_with_cleopatra")
+	var gm := _make_gm()
+	# start_run은 싱글톤(TeamManager/DeckManager) 없이도 크래시 없이 완료돼야 함
+	gm.start_run("cleopatra")
+	_assert(gm.run_map.size() == 28, "클레오파트라로 시작해도 맵 28개 노드")
+	_assert(gm.available_node_ids == [0, 1, 2], "초기 접근 가능 노드 [0,1,2]")
