@@ -26,6 +26,30 @@ signal run_started()
 signal node_entered(node_id: int)
 signal run_ended(won: bool)
 
+func _get_tm() -> Object:
+	if Engine.has_singleton("TeamManager"):
+		return Engine.get_singleton("TeamManager")
+	var ml := Engine.get_main_loop()
+	if ml and ml.root:
+		return ml.root.get_node_or_null("TeamManager")
+	return null
+
+func _get_dm() -> Object:
+	if Engine.has_singleton("DeckManager"):
+		return Engine.get_singleton("DeckManager")
+	var ml := Engine.get_main_loop()
+	if ml and ml.root:
+		return ml.root.get_node_or_null("DeckManager")
+	return null
+
+func _get_bm() -> Object:
+	if Engine.has_singleton("BattleManager"):
+		return Engine.get_singleton("BattleManager")
+	var ml := Engine.get_main_loop()
+	if ml and ml.root:
+		return ml.root.get_node_or_null("BattleManager")
+	return null
+
 func change_state(new_state: GameState) -> void:
 	current_state = new_state
 	state_changed.emit(new_state)
@@ -70,17 +94,22 @@ func start_run() -> void:
 	reset()
 
 	# TeamManager 초기화 (나폴레옹 1명)
-	TeamManager.clear()
+	var tm := _get_tm()
+	if tm:
+		tm.clear()
 	var HeroRes = load("res://resources/hero_resource.gd")
 	var napoleon: Resource = HeroRes.new()
 	napoleon.hero_id = "napoleon"
 	napoleon.hero_name = "나폴레옹"
 	napoleon.max_hp = 70
 	napoleon.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
-	TeamManager.add_hero(napoleon)
+	if tm:
+		tm.add_hero(napoleon)
 
 	# DeckManager 초기화 (스트라이크 3 + 디펜드 2)
-	DeckManager.clear()
+	var dm := _get_dm()
+	if dm:
+		dm.clear()
 	var CardRes = load("res://resources/card_resource.gd")
 	var EffRes = load("res://resources/effect_resource.gd")
 	for _i in range(3):
@@ -94,7 +123,8 @@ func start_run() -> void:
 		eff.value = 6
 		eff.target = "SINGLE"
 		card.effects = [eff]
-		DeckManager.add_card_to_deck(card)
+		if dm:
+			dm.add_card_to_deck(card)
 	for _i in range(2):
 		var card: Resource = CardRes.new()
 		card.card_name = "디펜드"
@@ -105,7 +135,8 @@ func start_run() -> void:
 		eff.effect_type = EffRes.EffectType.BLOCK
 		eff.value = 5
 		card.effects = [eff]
-		DeckManager.add_card_to_deck(card)
+		if dm:
+			dm.add_card_to_deck(card)
 
 	# 맵 생성
 	var MapGen = load("res://autoload/map_generator.gd")
@@ -188,8 +219,11 @@ func _advance_nodes_from(node_id: int) -> void:
 func _heal_all_heroes(amount: int) -> void:
 	if not is_inside_tree():
 		return
-	for hero in TeamManager.heroes:
-		TeamManager.heal(hero.hero_id, amount)
+	var tm := _get_tm()
+	if tm == null:
+		return
+	for hero in tm.heroes:
+		tm.heal(hero.hero_id, amount)
 
 func _satyr_scene() -> PackedScene:
 	return load("res://characters/enemies/satyr/satyr.tscn")
@@ -391,8 +425,11 @@ func _make_boss_enemies() -> Array:
 	return [hydra]
 
 func _generate_card_rewards() -> Array:
+	var tm := _get_tm()
+	if tm == null:
+		return []
 	var pool: Array = []
-	for hero in TeamManager.heroes:
+	for hero in tm.heroes:
 		match hero.hero_id:
 			"napoleon":   pool.append_array(_napoleon_card_pool())
 			"cleopatra":  pool.append_array(_cleopatra_card_pool())
@@ -401,8 +438,11 @@ func _generate_card_rewards() -> Array:
 	return pool.slice(0, min(3, pool.size()))
 
 func _recruit_hero_pool() -> Array:
+	var tm := _get_tm()
+	if tm == null:
+		return []
 	var existing := []
-	for h in TeamManager.heroes:
+	for h in tm.heroes:
 		existing.append(h.hero_id)
 	var pool := []
 	if "cleopatra" not in existing:
@@ -432,6 +472,7 @@ func _make_yi_sun_sin_hero() -> Resource:
 func _add_initial_deck_for(hero: Resource) -> void:
 	var CardRes = load("res://resources/card_resource.gd")
 	var EffRes = load("res://resources/effect_resource.gd")
+	var dm := _get_dm()
 	match hero.hero_id:
 		"cleopatra":
 			for _i in range(2):
@@ -441,25 +482,29 @@ func _add_initial_deck_for(hero: Resource) -> void:
 				e.value = 3; e.target = "SINGLE"
 				var ep: Resource = EffRes.new(); ep.effect_type = EffRes.EffectType.APPLY_STATUS
 				ep.status_type = "poison"; ep.value = 3; ep.target = "SINGLE"
-				c.effects = [e, ep]; DeckManager.add_card_to_deck(c)
+				c.effects = [e, ep]
+				if dm: dm.add_card_to_deck(c)
 			for _i in range(2):
 				var c: Resource = CardRes.new(); c.card_name = "왕실 방어"
 				c.owner_id = "cleopatra"; c.cost = 1; c.play_animation = "idle"
 				var e: Resource = EffRes.new(); e.effect_type = EffRes.EffectType.BLOCK; e.value = 6
-				c.effects = [e]; DeckManager.add_card_to_deck(c)
+				c.effects = [e]
+				if dm: dm.add_card_to_deck(c)
 		"yi_sun_sin":
 			for _i in range(2):
 				var c: Resource = CardRes.new(); c.card_name = "방패"
 				c.owner_id = "yi_sun_sin"; c.cost = 1; c.play_animation = "idle"
 				var e: Resource = EffRes.new(); e.effect_type = EffRes.EffectType.BLOCK; e.value = 7
-				c.effects = [e]; DeckManager.add_card_to_deck(c)
+				c.effects = [e]
+				if dm: dm.add_card_to_deck(c)
 			for _i in range(2):
 				var c: Resource = CardRes.new(); c.card_name = "역공"
 				c.owner_id = "yi_sun_sin"; c.cost = 1; c.play_animation = "attack"
 				var eb: Resource = EffRes.new(); eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 3
 				var ed: Resource = EffRes.new(); ed.effect_type = EffRes.EffectType.DAMAGE
 				ed.value = 3; ed.target = "SINGLE"
-				c.effects = [eb, ed]; DeckManager.add_card_to_deck(c)
+				c.effects = [eb, ed]
+				if dm: dm.add_card_to_deck(c)
 
 func _napoleon_card_pool() -> Array:
 	var CardRes = load("res://resources/card_resource.gd")
@@ -899,45 +944,51 @@ func trigger_relics(trigger: int, context: Dictionary = {}) -> void:
 func _is_hero_alive(hero_id: String) -> bool:
 	if not is_inside_tree():
 		return false
-	return TeamManager.is_alive(hero_id)
+	var tm := _get_tm()
+	return tm != null and tm.is_alive(hero_id)
 
 func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> void:
 	var RelicRes = load("res://resources/relic_resource.gd")
+	var tm := _get_tm()
+	var dm := _get_dm()
 	match relic.effect_type:
 		RelicRes.EffectType.HEAL:
-			if is_inside_tree():
-				for hero in TeamManager.heroes:
-					TeamManager.heal(hero.hero_id, value)
+			if is_inside_tree() and tm:
+				for hero in tm.heroes:
+					tm.heal(hero.hero_id, value)
 		RelicRes.EffectType.ENERGY:
-			if is_inside_tree() and DeckManager:
-				DeckManager.current_energy += value
-				DeckManager.energy_changed.emit(DeckManager.current_energy)
+			if is_inside_tree() and dm:
+				dm.current_energy += value
+				dm.energy_changed.emit(dm.current_energy)
 		RelicRes.EffectType.DRAW:
-			if is_inside_tree() and DeckManager:
-				DeckManager.draw_cards(value)
+			if is_inside_tree() and dm:
+				dm.draw_cards(value)
 		RelicRes.EffectType.BLOCK:
-			if is_inside_tree() and BattleManager:
-				for hero in TeamManager.heroes:
-					BattleManager._hero_block[hero.hero_id] = \
-						BattleManager._hero_block.get(hero.hero_id, 0) + value
+			var bm_block := _get_bm()
+			if is_inside_tree() and bm_block and tm:
+				for hero in tm.heroes:
+					bm_block._hero_block[hero.hero_id] = \
+						bm_block._hero_block.get(hero.hero_id, 0) + value
 		RelicRes.EffectType.APPLY_STATUS_ENEMY:
-			if is_inside_tree() and BattleManager and BattleManager.is_battle_active:
-				for i in range(BattleManager._enemies.size()):
-					if BattleManager._enemy_alive[i]:
-						BattleManager._apply_status_to_enemy(i, "poison", value)
+			var bm_ase := _get_bm()
+			if is_inside_tree() and bm_ase and bm_ase.is_battle_active:
+				for i in range(bm_ase._enemies.size()):
+					if bm_ase._enemy_alive[i]:
+						bm_ase._apply_status_to_enemy(i, "poison", value)
 		RelicRes.EffectType.GAIN_MORALE:
-			if is_inside_tree() and BattleManager:
-				BattleManager._apply_status_to_hero(relic.owner_hero_id, "morale", value)
+			var bm_gm := _get_bm()
+			if is_inside_tree() and bm_gm:
+				bm_gm._apply_status_to_hero(relic.owner_hero_id, "morale", value)
 		RelicRes.EffectType.MAX_HP:
-			if is_inside_tree():
-				for hero in TeamManager.heroes:
-					TeamManager.increase_max_hp(hero.hero_id, value)
+			if is_inside_tree() and tm:
+				for hero in tm.heroes:
+					tm.increase_max_hp(hero.hero_id, value)
 		RelicRes.EffectType.ON_HERO_DAMAGED:
 			# ON_HERO_DAMAGED는 context에서 처리
 			var amount: int = context.get("amount", 0)
-			if amount >= relic.condition_value and is_inside_tree() and DeckManager:
-				DeckManager.current_energy += 1
-				DeckManager.energy_changed.emit(DeckManager.current_energy)
+			if amount >= relic.condition_value and is_inside_tree() and dm:
+				dm.current_energy += 1
+				dm.energy_changed.emit(dm.current_energy)
 
 func _build_relic_pool() -> Array:
 	var RelicRes = load("res://resources/relic_resource.gd")

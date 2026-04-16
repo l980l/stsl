@@ -188,7 +188,8 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
 	_enemy_block[enemy_index] -= absorbed
 	amount -= absorbed
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - amount)
-	enemy_damaged.emit(enemy_index, amount)
+	if amount > 0:
+		enemy_damaged.emit(enemy_index, amount)
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
 		enemy_died.emit(enemy_index)
@@ -212,7 +213,7 @@ func _deal_damage_to_hero(hero_id: String, amount: int) -> void:
 			var RelicRes = load("res://resources/relic_resource.gd")
 			_gm_hd.trigger_relics(RelicRes.TriggerType.ON_HERO_DAMAGED,
 				{"hero_id": hero_id, "amount": amount})
-	hero_damaged.emit(hero_id, amount)
+		hero_damaged.emit(hero_id, amount)
 	_check_lose_condition()
 
 func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) -> void:
@@ -269,19 +270,29 @@ func _execute_enemy_turn() -> void:
 func _execute_intent(enemy_index: int, intent: Resource) -> void:
 	match intent.action_type:
 		IntentRes.ActionType.ATTACK:
-			var target_id: String = _pick_hero_target(intent.target, enemy_index)
-			if target_id != "":
-				var dmg: int = intent.value
-				if _enemy_status[enemy_index].get("weak", 0) > 0:
-					dmg = int(dmg * 0.75)
-				_deal_damage_to_hero(target_id, dmg)
+			var dmg: int = intent.value
+			if _enemy_status[enemy_index].get("weak", 0) > 0:
+				dmg = int(dmg * 0.75)
+			if intent.target == IntentRes.TargetType.ALL:
+				if team_mgr:
+					for hero in team_mgr.get_living_heroes():
+						_deal_damage_to_hero(hero.hero_id, dmg)
+			else:
+				var target_id: String = _pick_hero_target(intent.target, enemy_index)
+				if target_id != "":
+					_deal_damage_to_hero(target_id, dmg)
 		IntentRes.ActionType.BUFF:
 			_enemy_block[enemy_index] += intent.value
 		IntentRes.ActionType.DEBUFF:
-			var target_id: String = _pick_hero_target(intent.target, enemy_index)
-			if target_id != "":
-				var stype: String = intent.status_type
-				_apply_status_to_hero(target_id, stype, intent.value)
+			var stype: String = intent.status_type
+			if intent.target == IntentRes.TargetType.ALL:
+				if team_mgr:
+					for hero in team_mgr.get_living_heroes():
+						_apply_status_to_hero(hero.hero_id, stype, intent.value)
+			else:
+				var target_id: String = _pick_hero_target(intent.target, enemy_index)
+				if target_id != "":
+					_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
 			if deck_mgr:
 				deck_mgr.discard_random(intent.value)
@@ -306,8 +317,6 @@ func _pick_hero_target(target_type: int, enemy_index: int) -> String:
 			if last_id != "" and team_mgr.is_alive(last_id):
 				return last_id
 			return living[randi() % living.size()].hero_id
-		IntentRes.TargetType.ALL:
-			return living[0].hero_id
 	return ""
 
 func _check_win_condition() -> void:
