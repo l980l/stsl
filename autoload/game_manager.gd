@@ -145,9 +145,19 @@ func enter_node(node_id: int) -> void:
 			_request_scene("res://scenes/map/map_scene.tscn")
 
 func complete_battle(won: bool) -> void:
-	pending_enemies.clear()  # 전투 종료 후 이전 적 데이터 정리
+	pending_enemies.clear()
 	if won:
+		var RelicRes = load("res://resources/relic_resource.gd")
+		trigger_relics(RelicRes.TriggerType.BATTLE_WIN)
 		card_rewards = _generate_card_rewards()
+		# 보스 처치 시 릴릭 보상 추가
+		if current_node_id >= 0 and current_node_id < run_map.size():
+			var node: Resource = run_map[current_node_id]
+			var MapNodeRes = load("res://resources/map_node_resource.gd")
+			if node.room_type == MapNodeRes.RoomType.BOSS:
+				var relic := get_random_relic()
+				if relic:
+					add_relic(relic)
 		change_state(GameState.CARD_PICK)
 		_request_scene("res://scenes/card_pick/card_pick_scene.tscn")
 	else:
@@ -813,3 +823,151 @@ func _request_scene(path: String) -> void:
 	var tree: SceneTree = get_tree()
 	if tree != null:
 		tree.change_scene_to_file(path)
+
+# ── 릴릭 시스템 ─────────────────────────────────
+
+func get_random_relic() -> Resource:
+	var pool := _build_relic_pool()
+	var owned_names: Array = []
+	for r in relics:
+		owned_names.append(r.relic_name)
+	var available: Array = []
+	for r in pool:
+		if r.relic_name not in owned_names:
+			available.append(r)
+	if available.is_empty():
+		return null
+	return available[randi() % available.size()]
+
+func trigger_relics(trigger: int, context: Dictionary = {}) -> void:
+	for relic in relics:
+		if relic.trigger != trigger:
+			continue
+		var effective_value: int = relic.value
+		if relic.owner_hero_id != "":
+			if not _is_hero_alive(relic.owner_hero_id):
+				continue
+			effective_value = relic.bonus_value
+		_apply_relic_effect(relic, effective_value, context)
+
+func _is_hero_alive(hero_id: String) -> bool:
+	if not is_inside_tree():
+		return false
+	return TeamManager.is_alive(hero_id)
+
+func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> void:
+	var RelicRes = load("res://resources/relic_resource.gd")
+	match relic.effect_type:
+		RelicRes.EffectType.HEAL:
+			if is_inside_tree():
+				for hero in TeamManager.heroes:
+					TeamManager.heal(hero.hero_id, value)
+		RelicRes.EffectType.ENERGY:
+			if is_inside_tree() and DeckManager:
+				DeckManager.current_energy += value
+				DeckManager.energy_changed.emit(DeckManager.current_energy)
+		RelicRes.EffectType.DRAW:
+			if is_inside_tree() and DeckManager:
+				DeckManager.draw_cards(value)
+		RelicRes.EffectType.BLOCK:
+			if is_inside_tree() and BattleManager:
+				for hero in TeamManager.heroes:
+					BattleManager._hero_block[hero.hero_id] = \
+						BattleManager._hero_block.get(hero.hero_id, 0) + value
+		RelicRes.EffectType.APPLY_STATUS_ENEMY:
+			if is_inside_tree() and BattleManager and BattleManager.is_battle_active:
+				for i in range(BattleManager._enemies.size()):
+					if BattleManager._enemy_alive[i]:
+						BattleManager._apply_status_to_enemy(i, "poison", value)
+		RelicRes.EffectType.GAIN_MORALE:
+			if is_inside_tree() and BattleManager:
+				BattleManager._apply_status_to_hero(relic.owner_hero_id, "morale", value)
+		RelicRes.EffectType.MAX_HP:
+			if is_inside_tree():
+				for hero in TeamManager.heroes:
+					TeamManager.increase_max_hp(hero.hero_id, value)
+		RelicRes.EffectType.ON_HERO_DAMAGED:
+			# ON_HERO_DAMAGED는 context에서 처리
+			var amount: int = context.get("amount", 0)
+			if amount >= relic.condition_value and is_inside_tree() and DeckManager:
+				DeckManager.current_energy += 1
+				DeckManager.energy_changed.emit(DeckManager.current_energy)
+
+func _build_relic_pool() -> Array:
+	var RelicRes = load("res://resources/relic_resource.gd")
+	var pool: Array = []
+
+	# 1. 버닝 블러드 — 전투 승리 시 HP +6
+	var r1: Resource = RelicRes.new(); r1.relic_name = "버닝 블러드"
+	r1.description = "전투 승리 시 팀 전체 HP +6"
+	r1.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r1.effect_type = RelicRes.EffectType.HEAL; r1.value = 6
+	pool.append(r1)
+
+	# 2. 불사조 깃털 — 플레이어 턴 시작 시 에너지 +1
+	var r2: Resource = RelicRes.new(); r2.relic_name = "불사조 깃털"
+	r2.description = "플레이어 턴 시작 시 에너지 +1"
+	r2.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r2.effect_type = RelicRes.EffectType.ENERGY; r2.value = 1
+	pool.append(r2)
+
+	# 3. 독약 병 — 전투 시작 시 무작위 적 독 3
+	var r3: Resource = RelicRes.new(); r3.relic_name = "독약 병"
+	r3.description = "전투 시작 시 무작위 적에게 독 3"
+	r3.trigger = RelicRes.TriggerType.BATTLE_START
+	r3.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY; r3.value = 3
+	pool.append(r3)
+
+	# 4. 전쟁 북 — 플레이어 턴 시작 시 카드 +1
+	var r4: Resource = RelicRes.new(); r4.relic_name = "전쟁 북"
+	r4.description = "플레이어 턴 시작 시 카드 1장 추가 드로우"
+	r4.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r4.effect_type = RelicRes.EffectType.DRAW; r4.value = 1
+	pool.append(r4)
+
+	# 5. 고대 유물 — 패시브: 최대 HP +15
+	var r5: Resource = RelicRes.new(); r5.relic_name = "고대 유물"
+	r5.description = "팀 전체 최대 HP +15"
+	r5.trigger = RelicRes.TriggerType.PASSIVE
+	r5.effect_type = RelicRes.EffectType.MAX_HP; r5.value = 15
+	pool.append(r5)
+
+	# 6. 모래시계 — 플레이어 턴 종료 시 카드 회복 (DRAW로 간략화)
+	var r6: Resource = RelicRes.new(); r6.relic_name = "모래시계"
+	r6.description = "턴 종료 시 덱에서 카드 1장 드로우"
+	r6.trigger = RelicRes.TriggerType.PLAYER_TURN_END
+	r6.effect_type = RelicRes.EffectType.DRAW; r6.value = 1
+	pool.append(r6)
+
+	# 7. 피의 돌 — 영웅 피해 ≥5 시 에너지 +1 (ON_HERO_DAMAGED)
+	var r7: Resource = RelicRes.new(); r7.relic_name = "피의 돌"
+	r7.description = "피해 5 이상 받을 시 에너지 +1"
+	r7.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
+	r7.effect_type = RelicRes.EffectType.ON_HERO_DAMAGED; r7.value = 1; r7.condition_value = 5
+	pool.append(r7)
+
+	# 8. 황제의 인장 — 나폴레옹 전용: 전투 시작 사기+2 (생존 시 사기+2)
+	var r8: Resource = RelicRes.new(); r8.relic_name = "황제의 인장"
+	r8.description = "전투 시작 시 사기 +2 (나폴레옹 생존 시 적용)"
+	r8.trigger = RelicRes.TriggerType.BATTLE_START
+	r8.effect_type = RelicRes.EffectType.GAIN_MORALE
+	r8.owner_hero_id = "napoleon"; r8.value = 0; r8.bonus_value = 2
+	pool.append(r8)
+
+	# 9. 독사의 팔찌 — 클레오파트라 전용: 전투 시작 독 2 (생존 시 독 4)
+	var r9: Resource = RelicRes.new(); r9.relic_name = "독사의 팔찌"
+	r9.description = "전투 시작 시 무작위 적 독 2 (클레오파트라 생존 시 독 4)"
+	r9.trigger = RelicRes.TriggerType.BATTLE_START
+	r9.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
+	r9.owner_hero_id = "cleopatra"; r9.value = 2; r9.bonus_value = 4
+	pool.append(r9)
+
+	# 10. 거북선 모형 — 이순신 전용: 턴 시작 BLOCK +2 (생존 시 +4)
+	var r10: Resource = RelicRes.new(); r10.relic_name = "거북선 모형"
+	r10.description = "플레이어 턴 시작 시 방어도 +2 (이순신 생존 시 +4)"
+	r10.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r10.effect_type = RelicRes.EffectType.BLOCK
+	r10.owner_hero_id = "yi_sun_sin"; r10.value = 2; r10.bonus_value = 4
+	pool.append(r10)
+
+	return pool

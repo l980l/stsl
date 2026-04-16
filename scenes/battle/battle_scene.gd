@@ -27,6 +27,7 @@ var _enemy_char_nodes: Array = []      # index → Node2D
 var _energy_label: Label
 var _end_turn_btn: Button
 var _message_label: Label
+var _relic_container: HBoxContainer
 var _selected_card: Resource = null
 
 func _ready() -> void:
@@ -73,6 +74,13 @@ func _build_ui() -> void:
 	_end_turn_btn.disabled = true
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
 	add_child(_end_turn_btn)
+
+	# 릴릭 표시
+	_relic_container = HBoxContainer.new()
+	_relic_container.position = Vector2(200, 8)
+	_relic_container.size = Vector2(1500, 36)
+	add_child(_relic_container)
+	_refresh_relics()
 
 	# 영웅 슬롯 3개 (초기 숨김)
 	for i in range(3):
@@ -131,6 +139,18 @@ func _make_enemy_slot(index: int) -> Dictionary:
 
 	return { "panel": panel, "intent_lbl": intent_lbl, "btn": btn,
 			 "name_lbl": name_lbl, "hp_lbl": hp_lbl, "block_lbl": block_lbl }
+
+func _refresh_relics() -> void:
+	for child in _relic_container.get_children():
+		child.queue_free()
+	if not GameManager or not GameManager.is_inside_tree():
+		return
+	for relic in GameManager.relics:
+		var lbl := Label.new()
+		lbl.text = "[%s]" % relic.relic_name
+		lbl.add_theme_font_size_override("font_size", 13)
+		lbl.modulate = Color(1.0, 0.85, 0.3)
+		_relic_container.add_child(lbl)
 
 func _make_label(pos: Vector2, sz: Vector2, font_size: int) -> Label:
 	var lbl := Label.new()
