@@ -28,6 +28,9 @@ func run_all() -> Dictionary:
 	test_enemy_intent_advances()
 	test_win_condition()
 	test_lose_condition()
+	test_enemy_all_attack_hits_all_heroes()
+	test_hero_damaged_not_emitted_when_fully_blocked()
+	test_enemy_damaged_not_emitted_when_fully_blocked()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -250,3 +253,60 @@ func test_lose_condition() -> void:
 	bm._deal_damage_to_hero("napoleon", 10)
 	_assert(signal_received["lost"], "모든 영웅 사망 → battle_lost 발동")
 	_assert(not bm.is_battle_active, "배틀 비활성")
+
+func test_enemy_all_attack_hits_all_heroes() -> void:
+	print("[TestBattleManager] test_enemy_all_attack_hits_all_heroes")
+	var bm := _make_bm()
+	var hero1 := _make_hero("napoleon", 70)
+	var hero2 := _make_hero("cleopatra", 60)
+	bm.team_mgr.add_hero(hero1)
+	bm.team_mgr.add_hero(hero2)
+	# ALL 공격 인텐트 생성
+	var intent := IntentRes.new()
+	intent.action_type = IntentRes.ActionType.ATTACK
+	intent.value = 10
+	intent.target = IntentRes.TargetType.ALL
+	var enemy := _make_enemy(30, [intent])
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm.end_player_turn()  # 적 턴 실행
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 60, "ALL 공격 → napoleon HP 70→60")
+	_assert(bm.team_mgr.get_current_hp("cleopatra") == 50, "ALL 공격 → cleopatra HP 60→50")
+
+func test_hero_damaged_not_emitted_when_fully_blocked() -> void:
+	print("[TestBattleManager] test_hero_damaged_not_emitted_when_fully_blocked")
+	var bm := _make_bm()
+	var hero := _make_hero("napoleon", 70)
+	bm.team_mgr.add_hero(hero)
+	bm.setup_battle([_make_enemy(30, [])])
+	bm.start_player_turn()
+
+	# 블록 10 부여
+	bm._hero_block["napoleon"] = 10
+
+	var damage_emitted: Array = []
+	bm.hero_damaged.connect(func(id, amt): damage_emitted.append(amt))
+
+	# 피해 10 → 블록 10이 전부 흡수 → amount == 0
+	bm._deal_damage_to_hero("napoleon", 10)
+	_assert(damage_emitted.is_empty(), "블록 완전 흡수 시 hero_damaged 발화 없음")
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 70, "HP 변화 없음")
+
+func test_enemy_damaged_not_emitted_when_fully_blocked() -> void:
+	print("[TestBattleManager] test_enemy_damaged_not_emitted_when_fully_blocked")
+	var bm := _make_bm()
+	var hero := _make_hero("napoleon", 70)
+	bm.team_mgr.add_hero(hero)
+	bm.setup_battle([_make_enemy(30, [])])
+	bm.start_player_turn()
+
+	# 적 블록 10 부여
+	bm._enemy_block[0] = 10
+
+	var damage_emitted: Array = []
+	bm.enemy_damaged.connect(func(idx, amt): damage_emitted.append(amt))
+
+	# 피해 10 → 블록 10이 전부 흡수
+	bm._deal_damage_to_enemy(0, 10)
+	_assert(damage_emitted.is_empty(), "블록 완전 흡수 시 enemy_damaged 발화 없음")
+	_assert(bm.get_enemy_hp(0) == 30, "적 HP 변화 없음")
