@@ -16,6 +16,7 @@ func run_all() -> Dictionary:
 	test_battle_lost_goes_to_game_over()
 	test_enter_shop_sets_state()
 	test_complete_shop_returns_to_map()
+	test_elite_battle_gives_two_card_picks()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -90,3 +91,12 @@ func test_complete_shop_returns_to_map() -> void:
 	gm.enter_node(0)
 	gm.complete_shop()
 	_assert(gm.current_state == 0, "complete_shop 후 상태 MAP(0)으로 변경")  # GameState.MAP == 0
+
+func test_elite_battle_gives_two_card_picks() -> void:
+	print("[TestGameManager] test_elite_battle_gives_two_card_picks")
+	var MapNodeRes = load("res://resources/map_node_resource.gd")
+	var gm := _make_gm()
+	gm.run_map[0].room_type = MapNodeRes.RoomType.ELITE
+	gm.enter_node(0)
+	gm.complete_battle(true)
+	_assert(gm.card_rewards_pick_count == 2, "엘리트 전투 승리 시 카드 2장 선택 가능")

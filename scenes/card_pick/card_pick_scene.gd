@@ -4,27 +4,31 @@ extends Node2D
 const CARD_W := 140
 const CARD_H := 200
 
+var _picked_count: int = 0
+var _pick_max: int = 1
+var _card_buttons: Array = []  # {card, btn}
+var _title_label: Label = null
+
 func _ready() -> void:
 	if GameManager.card_rewards.is_empty():
 		GameManager.complete_card_pick()
 		return
+	_pick_max = GameManager.card_rewards_pick_count
 	_build_ui()
 
 func _build_ui() -> void:
-	# 배경
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.1)
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
-	# 제목
-	var title := Label.new()
-	title.text = "카드를 선택하세요 (1장)"
-	title.position = Vector2(660, 100)
-	title.size = Vector2(600, 60)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 32)
-	add_child(title)
+	_title_label = Label.new()
+	_title_label.text = "카드를 선택하세요 (%d/%d)" % [_picked_count, _pick_max]
+	_title_label.position = Vector2(660, 100)
+	_title_label.size = Vector2(600, 60)
+	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_title_label.add_theme_font_size_override("font_size", 32)
+	add_child(_title_label)
 
 	var total_w: float = GameManager.card_rewards.size() * (CARD_W + 20) - 20
 	var start_x: float = (1920.0 - total_w) / 2.0
@@ -39,10 +43,11 @@ func _build_ui() -> void:
 		btn.text = "[%d]\n%s\n%s" % [cost, card_name, card.get("owner_id") if card.get("owner_id") != null else ""]
 		btn.add_theme_font_size_override("font_size", 15)
 		var captured_card := card
-		btn.pressed.connect(func(): _on_card_selected(captured_card))
+		var captured_btn := btn
+		btn.pressed.connect(func(): _on_card_selected(captured_card, captured_btn))
 		add_child(btn)
+		_card_buttons.append({"card": card, "btn": btn})
 
-	# 건너뛰기 버튼
 	var skip_btn := Button.new()
 	skip_btn.position = Vector2(880, 680)
 	skip_btn.size = Vector2(160, 50)
@@ -51,9 +56,13 @@ func _build_ui() -> void:
 	skip_btn.pressed.connect(_on_skip)
 	add_child(skip_btn)
 
-func _on_card_selected(card: Resource) -> void:
+func _on_card_selected(card: Resource, btn: Button) -> void:
 	DeckManager.add_card_to_deck(card)
-	GameManager.complete_card_pick()
+	btn.disabled = true
+	_picked_count += 1
+	_title_label.text = "카드를 선택하세요 (%d/%d)" % [_picked_count, _pick_max]
+	if _picked_count >= _pick_max:
+		GameManager.complete_card_pick()
 
 func _on_skip() -> void:
 	GameManager.complete_card_pick()
