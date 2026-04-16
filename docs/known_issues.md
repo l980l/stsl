@@ -1,10 +1,12 @@
 # Known Issues & 기술 부채
 
-Plan 04 완료 시점 기준. 미래 플랜 작업 시 참고하세요.
+최종 수정: 2026-04-16 (Plan 17 기준)
 
 ---
 
-## [Plan 01] RelicResource 타입 우회
+## 미해결
+
+### [Plan 01] RelicResource 타입 우회
 
 **파일:** `resources/relic_resource.gd:10-11`
 
@@ -16,68 +18,50 @@ Plan 04 완료 시점 기준. 미래 플랜 작업 시 참고하세요.
 
 ---
 
-## [Plan 01] 적 공격 방향
+### [Plan 01] 적 공격 방향
 
 **파일:** `characters/character_placeholder.gd:38`
 
 attack 애니메이션이 `Vector2(60, 0)` — 항상 오른쪽 돌진.
 
 - **원인:** 영웅/적이 공통 스크립트 사용. 방향 구분 없음
-- **영향:** 전투 씬 구현 시 적 캐릭터가 반대 방향으로 튀는 것처럼 보임
-- **해결 방향:** `@export var attack_direction: int = 1` 추가 후 적은 `-1` 사용. 단, Blender 스프라이트 교체 시 스크립트 자체를 제거하므로 우선순위 낮음
+- **영향:** 전투 씬에서 적 캐릭터가 반대 방향으로 튀는 것처럼 보임
+- **우선순위:** 낮음 (Blender 스프라이트 교체 시 스크립트 자체 제거 예정)
 
 ---
 
-## [Plan 02] TargetType.ALL 단일 대상만 공격 (battle_manager.gd:244)
-
-`_pick_hero_target()`에서 `TargetType.ALL`이 `living[0]`만 반환함.
-
-- **원인:** `_pick_hero_target`이 단일 hero_id를 반환하는 설계라 ALL 타입과 맞지 않음
-- **영향:** ALL 의도를 가진 적(히드라 보스 등)이 첫 번째 영웅만 공격함
-- **해결 방향:** `_execute_intent()` 내 ATTACK 처리 시 `intent.target == TargetType.ALL`이면 `get_living_heroes()`를 루프로 전체 타격하는 별도 분기 추가
-
----
-
-## [Plan 02] hero_damaged 시그널 — 블록 완전 흡수 시 amount=0 발화 (battle_manager.gd:153)
-
-블록이 피해를 전부 흡수한 경우에도 `hero_damaged.emit(hero_id, 0)` 발화됨.
-
-- **원인:** `_deal_damage_to_hero()`에서 amount 감소 후 조건 없이 emit
-- **영향:** UI에서 0 피해 이펙트가 표시될 수 있음. `enemy_damaged`는 동일 패턴이므로 두 곳 모두 수정 필요
-- **해결 방향:** `if amount > 0` 조건 추가 후 emit
-
----
-
-## [Plan 01] TeamManager/DeckManager ObjectDB 경고
-
-**파일:** `tests/test_team_manager.gd`, `tests/test_deck_manager.gd`
+### [Plan 01] TeamManager/DeckManager ObjectDB 경고
 
 테스트 종료 시 `ObjectDB instances leaked` 경고 출력.
 
 - **원인:** `Node`를 상속하지만 SceneTree 없이 인스턴싱
 - **영향:** 기능 동작에는 문제없음. 경고만 출력
-- **해결 방향:** 테스트 러너 개선 시 `add_child()`로 트리에 추가하거나, 테스트 전용 인스턴스는 `Node` 상속 없이 처리
+- **해결 방향:** 테스트 러너에서 `add_child()`로 트리에 추가하거나 테스트 전용 RefCounted 방식 전환
 
 ---
 
-## [Plan 04] MapGenerator.generate() 반환 타입 타입 힌트 누락
+### [Plan 04] MapGenerator.generate() 반환 타입 타입 힌트 누락
 
 **파일:** `autoload/map_generator.gd`
 
 `static func generate() -> Array:` — `Array[MapNodeResource]`로 선언 불가.
 
-- **원인:** GDScript 4 헤드리스 모드에서 `class_name` 기반 제네릭 배열 타입(`Array[MapNodeResource]`)이 외부 스크립트 preload 컨텍스트에서 파싱 오류 발생
-- **영향:** 타입 안전성 약화. 잘못된 타입 배열 원소를 런타임까지 감지 불가
-- **해결 방향:** Godot 헤드리스 파싱 이슈 해결 후 `-> Array[MapNodeResource]`로 복원. 현재는 `# -> Array[MapNodeResource]` 주석으로 의도 표기
+- **원인:** GDScript 4 헤드리스 모드에서 `class_name` 기반 제네릭 배열 타입이 파싱 오류 발생
+- **해결 방향:** Godot 헤드리스 파싱 이슈 해결 후 `-> Array[MapNodeResource]`로 복원
 
 ---
 
-## [Plan 04] _napoleon_card_pool() 풀 크기 하드코딩
+## 해결됨
 
-**파일:** `autoload/game_manager.gd`
-
-`_generate_card_rewards()`에서 `pool.slice(0, 3)` — 풀 크기 5 고정 가정.
-
-- **원인:** 카드 풀이 항상 5장 이상임을 가정
-- **영향:** 카드 풀이 3장 미만으로 줄면 보상이 부족하게 생성됨 (현재는 무해)
-- **해결 방향:** `pool.slice(0, min(3, pool.size()))`로 방어 처리
+| 이슈 | Plan | 내용 |
+|---|---|---|
+| `TargetType.ALL` 단일 대상만 공격 | Plan 05 | `_execute_intent()` 내 ALL 루프 처리 추가 |
+| `hero_damaged` amount=0 발화 | Plan 02 | `if amount > 0` 조건 추가 |
+| `enemy_damaged` amount=0 발화 | Plan 02 | `if amount > 0` 조건 추가 |
+| 하르피아 SPECIAL 실효 없음 | Plan 13 | 손패 대신 전체 덱에서 영구 제거로 변경 |
+| 카드픽 수량 항상 1장 | Plan 13 | `card_rewards_pick_count` 도입, 엘리트/보스 2장 |
+| `test_relic_resource_defaults` 크래시 | Plan 14 | `owner_id` → `owner_hero_id` 수정 |
+| RestScene 정적 노드 중복 UI | Plan 15 | `rest_scene.tscn` 정적 노드 제거 |
+| 사망 영웅 카드 효과 적용 | Plan 17 | `_apply_card_effects()` 사망 체크 추가 |
+| 강화 카드 저장/복원 누락 | Plan 17 | `deck_manager.to_dict/from_dict`에 `upgraded` 추가 |
+| 이벤트 씬 private 메서드 직접 호출 | Plan 17 | `recruit_random_hero()`, `complete_event()` 공개화 |
