@@ -231,6 +231,11 @@ func complete_shop() -> void:
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
 
+func complete_rest() -> void:
+	_advance_nodes_from(current_node_id)
+	change_state(GameState.MAP)
+	_request_scene("res://scenes/map/map_scene.tscn")
+
 func generate_shop_inventory() -> Dictionary:
 	var tm := _get_tm()
 	var card_pool: Array = []
