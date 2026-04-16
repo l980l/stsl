@@ -256,6 +256,12 @@ func _execute_enemy_turn() -> void:
 		_tick_enemy_poison(i)
 		if not _enemy_alive[i]:
 			continue
+		# 매혹(charm) 상태: 행동 스킵 후 스택 감소
+		var charm: int = _enemy_status[i].get("charm", 0)
+		if charm > 0:
+			_enemy_status[i]["charm"] = charm - 1
+			_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % _get_active_pattern(i).size()
+			continue
 		var pattern: Array = _get_active_pattern(i)
 		if pattern.is_empty():
 			continue
@@ -294,8 +300,15 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				if target_id != "":
 					_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
+			# 플레이어 덱에서 카드 영구 제거 (손패가 아닌 전체 덱 기준)
 			if deck_mgr:
-				deck_mgr.discard_random(intent.value)
+				var full: Array = deck_mgr.get_full_deck()
+				for _i in range(intent.value):
+					if full.is_empty():
+						break
+					var idx: int = randi() % full.size()
+					deck_mgr.remove_from_deck(full[idx])
+					full.remove_at(idx)
 
 func _pick_hero_target(target_type: int, enemy_index: int) -> String:
 	if team_mgr == null:

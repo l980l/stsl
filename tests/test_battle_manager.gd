@@ -31,6 +31,8 @@ func run_all() -> Dictionary:
 	test_enemy_all_attack_hits_all_heroes()
 	test_hero_damaged_not_emitted_when_fully_blocked()
 	test_enemy_damaged_not_emitted_when_fully_blocked()
+	test_harpy_special_removes_from_deck()
+	test_charm_skips_enemy_turn()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -310,3 +312,29 @@ func test_enemy_damaged_not_emitted_when_fully_blocked() -> void:
 	bm._deal_damage_to_enemy(0, 10)
 	_assert(damage_emitted.is_empty(), "블록 완전 흡수 시 enemy_damaged 발화 없음")
 	_assert(bm.get_enemy_hp(0) == 30, "적 HP 변화 없음")
+
+func test_harpy_special_removes_from_deck() -> void:
+	print("[TestBattleManager] test_harpy_special_removes_from_deck")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	# 덱에 카드 3장 추가
+	for i in range(3):
+		var c := _make_card("napoleon", 1, [])
+		bm.deck_mgr.draw_pile.append(c)
+	var intent := _make_intent(IntentRes.ActionType.SPECIAL, 1, IntentRes.TargetType.RANDOM)
+	bm.setup_battle([_make_enemy(30, [intent])])
+	bm.start_player_turn()
+	bm.end_player_turn()  # 적 턴 실행
+	_assert(bm.deck_mgr.get_full_deck().size() == 2, "SPECIAL → 덱에서 카드 1장 영구 제거 (3→2)")
+
+func test_charm_skips_enemy_turn() -> void:
+	print("[TestBattleManager] test_charm_skips_enemy_turn")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	var intent := _make_intent(IntentRes.ActionType.ATTACK, 10, IntentRes.TargetType.RANDOM)
+	bm.setup_battle([_make_enemy(30, [intent])])
+	bm._enemy_status[0]["charm"] = 1
+	bm.start_player_turn()
+	bm.end_player_turn()  # 적 턴 — charm 있으므로 공격 스킵
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 70, "charm 상태 시 적 공격 스킵 → HP 불변")
+	_assert(bm._enemy_status[0].get("charm", -1) == 0, "charm 스택 1→0 감소")

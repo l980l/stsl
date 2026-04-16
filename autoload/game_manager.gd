@@ -18,6 +18,7 @@ var current_node_id: int = -1
 var pending_enemies: Array = []     # 다음 배틀 적 데이터
 var card_rewards: Array = []        # 다음 카드 보상 목록
 var pending_event: Resource = null  # 현재 이벤트 데이터 (EventResource)
+var card_rewards_pick_count: int = 1  # 카드픽 화면에서 선택 가능한 카드 수
 # ─────────────────────────────────────────────────────
 
 signal state_changed(new_state: GameState)
@@ -89,6 +90,7 @@ func reset() -> void:
 	card_rewards.clear()
 	pending_event = null
 	run_won = false
+	card_rewards_pick_count = 1
 
 # ── Plan 04: 런 관리 ──────────────────────────────────
 
@@ -181,14 +183,20 @@ func complete_battle(won: bool) -> void:
 		var RelicRes = load("res://resources/relic_resource.gd")
 		trigger_relics(RelicRes.TriggerType.BATTLE_WIN)
 		card_rewards = _generate_card_rewards()
-		# 보스 처치 시 릴릭 보상 추가
+		# 룸 타입별 카드 보상 수량 및 보스 릴릭 처리
 		if current_node_id >= 0 and current_node_id < run_map.size():
 			var node: Resource = run_map[current_node_id]
 			var MapNodeRes = load("res://resources/map_node_resource.gd")
-			if node.room_type == MapNodeRes.RoomType.BOSS:
-				var relic := get_random_relic()
-				if relic:
-					add_relic(relic)
+			match node.room_type:
+				MapNodeRes.RoomType.ELITE:
+					card_rewards_pick_count = 2
+				MapNodeRes.RoomType.BOSS:
+					card_rewards_pick_count = 2
+					var relic := get_random_relic()
+					if relic:
+						add_relic(relic)
+				_:
+					card_rewards_pick_count = 1
 		change_state(GameState.CARD_PICK)
 		_request_scene("res://scenes/card_pick/card_pick_scene.tscn")
 	else:
