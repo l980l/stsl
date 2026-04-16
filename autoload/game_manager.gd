@@ -2,7 +2,7 @@
 class_name GameManagerClass
 extends Node
 
-enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER }
+enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGRADE }
 
 var current_state: GameState = GameState.MAP
 var current_floor: int = 0
@@ -235,6 +235,42 @@ func complete_rest() -> void:
 	_advance_nodes_from(current_node_id)
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
+
+func enter_card_upgrade() -> void:
+	_advance_nodes_from(current_node_id)
+	change_state(GameState.CARD_UPGRADE)
+	_request_scene("res://scenes/card_upgrade/card_upgrade_scene.tscn")
+
+func complete_card_upgrade() -> void:
+	change_state(GameState.MAP)
+	_request_scene("res://scenes/map/map_scene.tscn")
+
+func upgrade_card(card: Resource) -> void:
+	if card.upgraded:
+		return
+	var EffRes = load("res://resources/effect_resource.gd")
+	for effect in card.effects:
+		match effect.effect_type:
+			EffRes.EffectType.DAMAGE, EffRes.EffectType.CONDITIONAL_DMG:
+				effect.value += 3
+				effect.bonus_value += 3
+			EffRes.EffectType.BLOCK, EffRes.EffectType.BLOCK_ALL, \
+			EffRes.EffectType.FORMATION_BLOCK, EffRes.EffectType.COUNTER_BLOCK:
+				effect.value += 3
+			EffRes.EffectType.HEAL, EffRes.EffectType.HEAL_ALL:
+				effect.value += 3
+			EffRes.EffectType.DRAW:
+				effect.value += 1
+			EffRes.EffectType.GAIN_MORALE:
+				effect.value += 1
+			EffRes.EffectType.CONSUME_MORALE:
+				effect.value += 1
+				effect.bonus_value += 5
+			EffRes.EffectType.ENERGY:
+				effect.value += 1
+	if card.cost >= 2:
+		card.cost -= 1
+	card.upgraded = true
 
 func generate_shop_inventory() -> Dictionary:
 	var tm := _get_tm()
