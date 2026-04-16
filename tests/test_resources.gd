@@ -71,7 +71,7 @@ func test_enemy_resource_defaults() -> void:
 func test_relic_resource_defaults() -> void:
 	print("[TestResources] test_relic_resource_defaults")
 	var relic = RelicResource.new()
-	_assert(relic.owner_id == "", "기본 owner_id 비어있음 = 공용 릴릭")
+	_assert(relic.owner_hero_id == "", "기본 owner_hero_id 비어있음 = 공용 릴릭")
 	_assert(relic.relic_name == "", "기본 relic_name 비어있음")
 
 func test_game_manager_defaults() -> void:
