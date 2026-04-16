@@ -12,6 +12,7 @@ const NODE_H := 50
 var _node_buttons: Dictionary = {}  # node_id → Button
 var _floor_label: Label
 var _relic_container: HBoxContainer
+var _deck_overlay: Control = null
 
 func _ready() -> void:
 	_build_ui()
@@ -47,6 +48,15 @@ func _build_ui() -> void:
 	_relic_container.size = Vector2(1820, 40)
 	add_child(_relic_container)
 	_refresh_relics()
+
+	# 덱 보기 버튼
+	var deck_btn := Button.new()
+	deck_btn.text = "덱 보기"
+	deck_btn.position = Vector2(50, 570)
+	deck_btn.size = Vector2(160, 40)
+	deck_btn.add_theme_font_size_override("font_size", 16)
+	deck_btn.pressed.connect(_show_deck_viewer)
+	add_child(deck_btn)
 
 	# 연결선 먼저 그리기 (버튼 뒤에)
 	_draw_connections()
@@ -125,3 +135,73 @@ func _room_type_text(room_type: int) -> String:
 		MapNodeRes.RoomType.SHOP: return "🏪 상점"
 		MapNodeRes.RoomType.BOSS: return "👑 보스"
 		_: return "?"
+
+func _show_deck_viewer() -> void:
+	if _deck_overlay:
+		return
+
+	var dm: Object = null
+	if Engine.has_singleton("DeckManager"):
+		dm = Engine.get_singleton("DeckManager")
+	elif get_tree() and get_tree().root:
+		dm = get_tree().root.get_node_or_null("DeckManager")
+
+	var all_cards: Array = []
+	if dm:
+		all_cards = dm.draw_pile.duplicate()
+		all_cards.append_array(dm.discard_pile)
+		all_cards.append_array(dm.hand)
+
+	_deck_overlay = Control.new()
+	_deck_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_deck_overlay)
+
+	var dim := ColorRect.new()
+	dim.color = Color(0.0, 0.0, 0.0, 0.75)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_deck_overlay.add_child(dim)
+
+	var panel := ColorRect.new()
+	panel.color = Color(0.1, 0.1, 0.2)
+	panel.position = Vector2(460, 100)
+	panel.size = Vector2(1000, 850)
+	_deck_overlay.add_child(panel)
+
+	var header := Label.new()
+	header.text = "덱 목록  (%d장)" % all_cards.size()
+	header.position = Vector2(460, 110)
+	header.size = Vector2(1000, 50)
+	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	header.add_theme_font_size_override("font_size", 26)
+	_deck_overlay.add_child(header)
+
+	var scroll := ScrollContainer.new()
+	scroll.position = Vector2(470, 170)
+	scroll.size = Vector2(980, 700)
+	_deck_overlay.add_child(scroll)
+
+	var vbox := VBoxContainer.new()
+	vbox.custom_minimum_size = Vector2(960, 0)
+	scroll.add_child(vbox)
+
+	for card in all_cards:
+		var card_name: String = card.get("card_name") if card.get("card_name") != null else "?"
+		var cost: int = card.get("cost") if card.get("cost") != null else 0
+		var owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
+		var lbl := Label.new()
+		lbl.text = "[%d코스트]  %s  (%s)" % [cost, card_name, owner]
+		lbl.add_theme_font_size_override("font_size", 16)
+		vbox.add_child(lbl)
+
+	var close_btn := Button.new()
+	close_btn.text = "닫기"
+	close_btn.position = Vector2(880, 960)
+	close_btn.size = Vector2(160, 45)
+	close_btn.add_theme_font_size_override("font_size", 18)
+	close_btn.pressed.connect(_hide_deck_viewer)
+	_deck_overlay.add_child(close_btn)
+
+func _hide_deck_viewer() -> void:
+	if _deck_overlay:
+		_deck_overlay.queue_free()
+		_deck_overlay = null
