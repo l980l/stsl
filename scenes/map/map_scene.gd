@@ -14,32 +14,6 @@ var _floor_label: Label
 var _relic_container: HBoxContainer
 
 func _ready() -> void:
-	if SaveManager.has_save() and GameManager.run_map.is_empty():
-		_show_continue_dialog()
-	elif GameManager.run_map.is_empty():
-		GameManager.start_run()
-		_build_ui()
-		_refresh_map()
-	else:
-		_build_ui()
-		_refresh_map()
-
-func _show_continue_dialog() -> void:
-	var dialog := ConfirmationDialog.new()
-	dialog.dialog_text = "이전 런을 이어하시겠습니까?"
-	dialog.confirmed.connect(_on_continue_confirmed)
-	dialog.canceled.connect(_on_new_run)
-	add_child(dialog)
-	dialog.popup_centered()
-
-func _on_continue_confirmed() -> void:
-	SaveManager.load_save()
-	_build_ui()
-	_refresh_map()
-
-func _on_new_run() -> void:
-	SaveManager.clear_save()
-	GameManager.start_run()
 	_build_ui()
 	_refresh_map()
 
