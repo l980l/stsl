@@ -79,6 +79,55 @@ func discard_random(n: int) -> void:
 		hand.remove_at(idx)
 	hand_changed.emit()
 
+func to_dict() -> Dictionary:
+	var full := draw_pile.duplicate()
+	full.append_array(discard_pile)
+	full.append_array(exhaust_pile)
+	# hand는 맵 저장 시점에 비어있음 — 무시
+	var card_data := []
+	for card in full:
+		var effects_data := []
+		for eff in card.effects:
+			effects_data.append({
+				"effect_type": eff.effect_type,
+				"value": eff.value,
+				"target": eff.target,
+				"status_type": eff.status_type,
+				"bonus_value": eff.bonus_value,
+			})
+		card_data.append({
+			"card_name": card.card_name,
+			"owner_id": card.owner_id,
+			"cost": card.cost,
+			"play_animation": card.play_animation,
+			"effects": effects_data,
+		})
+	return {"base_draw_count": base_draw_count, "full_deck": card_data}
+
+func from_dict(data: Dictionary) -> void:
+	clear()
+	base_draw_count = data.get("base_draw_count", 5)
+	var CardRes = load("res://resources/card_resource.gd")
+	var EffRes = load("res://resources/effect_resource.gd")
+	for cd in data.get("full_deck", []):
+		var card: Resource = CardRes.new()
+		card.card_name = cd["card_name"]
+		card.owner_id = cd["owner_id"]
+		card.cost = cd["cost"]
+		card.play_animation = cd.get("play_animation", "idle")
+		var effects := []
+		for ed in cd.get("effects", []):
+			var eff: Resource = EffRes.new()
+			eff.effect_type = ed["effect_type"]
+			eff.value = ed["value"]
+			eff.target = ed.get("target", "SINGLE")
+			eff.status_type = ed.get("status_type", "")
+			eff.bonus_value = ed.get("bonus_value", 0)
+			effects.append(eff)
+		card.effects = effects
+		draw_pile.append(card)
+	draw_pile.shuffle()
+
 func clear() -> void:
 	draw_pile.clear()
 	hand.clear()
