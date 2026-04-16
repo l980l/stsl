@@ -14,6 +14,8 @@ func run_all() -> Dictionary:
 	test_enter_battle_sets_pending_enemies()
 	test_complete_battle_generates_rewards()
 	test_battle_lost_goes_to_game_over()
+	test_enter_shop_sets_state()
+	test_complete_shop_returns_to_map()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -71,3 +73,20 @@ func test_battle_lost_goes_to_game_over() -> void:
 	gm.complete_battle(false)
 	_assert(gm.run_won == false, "패배 시 run_won == false")
 	_assert(gm.current_state == 6, "패배 시 상태 GAME_OVER(6)으로 변경")  # GameState.GAME_OVER == 6
+
+func test_enter_shop_sets_state() -> void:
+	print("[TestGameManager] test_enter_shop_sets_state")
+	var MapNodeRes = load("res://resources/map_node_resource.gd")
+	var gm := _make_gm()
+	gm.run_map[0].room_type = MapNodeRes.RoomType.SHOP
+	gm.enter_node(0)
+	_assert(gm.current_state == 4, "SHOP 노드 진입 시 상태 SHOP(4)으로 변경")  # GameState.SHOP == 4
+
+func test_complete_shop_returns_to_map() -> void:
+	print("[TestGameManager] test_complete_shop_returns_to_map")
+	var MapNodeRes = load("res://resources/map_node_resource.gd")
+	var gm := _make_gm()
+	gm.run_map[0].room_type = MapNodeRes.RoomType.SHOP
+	gm.enter_node(0)
+	gm.complete_shop()
+	_assert(gm.current_state == 0, "complete_shop 후 상태 MAP(0)으로 변경")  # GameState.MAP == 0

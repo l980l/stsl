@@ -172,10 +172,8 @@ func enter_node(node_id: int) -> void:
 			change_state(GameState.EVENT)
 			_request_scene("res://scenes/event/event_scene.tscn")
 		MapNodeRes.RoomType.SHOP:
-			# Plan 05에서 구현 — 지금은 건너뜀
-			_advance_nodes_from(node_id)
-			change_state(GameState.MAP)
-			_request_scene("res://scenes/map/map_scene.tscn")
+			change_state(GameState.SHOP)
+			_request_scene("res://scenes/shop/shop_scene.tscn")
 
 func complete_battle(won: bool) -> void:
 	pending_enemies.clear()
@@ -219,6 +217,31 @@ func complete_card_pick() -> void:
 	card_rewards.clear()
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
+
+func complete_shop() -> void:
+	_advance_nodes_from(current_node_id)
+	change_state(GameState.MAP)
+	_request_scene("res://scenes/map/map_scene.tscn")
+
+func generate_shop_inventory() -> Dictionary:
+	var tm := _get_tm()
+	var card_pool: Array = []
+	if tm:
+		for hero in tm.heroes:
+			match hero.hero_id:
+				"napoleon":   card_pool.append_array(_napoleon_card_pool())
+				"cleopatra":  card_pool.append_array(_cleopatra_card_pool())
+				"yi_sun_sin": card_pool.append_array(_yi_sun_sin_card_pool())
+	card_pool.shuffle()
+	return {
+		"cards": card_pool.slice(0, min(3, card_pool.size())),
+		"card_price": 75,
+		"relic": get_random_relic(),
+		"relic_price": 150,
+		"remove_price": 100,
+		"heal_price": 30,
+		"heal_amount": 20,
+	}
 
 func _advance_nodes_from(node_id: int) -> void:
 	var node: Resource = run_map[node_id]
