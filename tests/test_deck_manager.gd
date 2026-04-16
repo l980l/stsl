@@ -13,6 +13,7 @@ func run_all() -> Dictionary:
 	test_energy_cost()
 	test_reshuffle_on_empty()
 	test_discard_hand()
+	test_remove_from_deck()
 	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
@@ -67,3 +68,22 @@ func test_discard_hand() -> void:
 	dm.discard_hand()
 	_assert(dm.hand.size() == 0, "턴 종료 후 손패 비어있음")
 	_assert(dm.discard_pile.size() == 5, "턴 종료 후 버림 더미 5장")
+
+func test_remove_from_deck() -> void:
+	print("[TestDeckManager] test_remove_from_deck")
+	var dm = DeckManagerClass.new()
+	var card1 = _make_card("strike")
+	var card2 = _make_card("defend")
+	dm.draw_pile.append(card1)
+	dm.discard_pile.append(card2)
+
+	var r1 := dm.remove_from_deck(card1)
+	_assert(r1 == true, "draw_pile 카드 제거 성공")
+	_assert(dm.draw_pile.size() == 0, "draw_pile에서 제거됨")
+
+	var r2 := dm.remove_from_deck(card2)
+	_assert(r2 == true, "discard_pile 카드 제거 성공")
+	_assert(dm.discard_pile.size() == 0, "discard_pile에서 제거됨")
+
+	var r3 := dm.remove_from_deck(card1)
+	_assert(r3 == false, "없는 카드 제거 시 false 반환")

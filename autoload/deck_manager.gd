@@ -128,6 +128,15 @@ func from_dict(data: Dictionary) -> void:
 		draw_pile.append(card)
 	draw_pile.shuffle()
 
+func remove_from_deck(card: Resource) -> bool:
+	if draw_pile.has(card):
+		draw_pile.erase(card)
+		return true
+	if discard_pile.has(card):
+		discard_pile.erase(card)
+		return true
+	return false
+
 func clear() -> void:
 	draw_pile.clear()
 	hand.clear()
