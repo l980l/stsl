@@ -162,6 +162,9 @@ func complete_battle(won: bool) -> void:
 		_request_scene("res://scenes/card_pick/card_pick_scene.tscn")
 	else:
 		run_ended.emit(false)
+		var _sm_fail = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
+		if _sm_fail:
+			_sm_fail.clear_save()
 		change_state(GameState.MAP)
 		_request_scene("res://scenes/map/map_scene.tscn")
 
@@ -171,6 +174,9 @@ func complete_card_pick() -> void:
 	var MapNodeRes = load("res://resources/map_node_resource.gd")
 	if node.room_type == MapNodeRes.RoomType.BOSS:
 		run_ended.emit(true)
+		var _sm_win = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
+		if _sm_win:
+			_sm_win.clear_save()
 	card_rewards.clear()
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
@@ -819,10 +825,50 @@ func _build_event_pool() -> Array:
 
 	return events
 
+func to_dict() -> Dictionary:
+	var map_data := []
+	for node in run_map:
+		map_data.append({
+			"node_id": node.node_id,
+			"floor_num": node.floor_num,
+			"column": node.column,
+			"room_type": node.room_type,
+			"connections": node.connections.duplicate(),
+			"visited": node.visited,
+		})
+	return {
+		"current_floor": current_floor,
+		"gold": gold,
+		"current_node_id": current_node_id,
+		"available_node_ids": available_node_ids.duplicate(),
+		"run_map": map_data,
+	}
+
+func from_dict(data: Dictionary) -> void:
+	current_floor = data.get("current_floor", 0)
+	gold = data.get("gold", 0)
+	current_node_id = data.get("current_node_id", -1)
+	available_node_ids = data.get("available_node_ids", [0, 1, 2])
+	run_map.clear()
+	var MapNodeRes = load("res://resources/map_node_resource.gd")
+	for nd in data.get("run_map", []):
+		var node: Resource = MapNodeRes.new()
+		node.node_id = nd["node_id"]
+		node.floor_num = nd["floor_num"]
+		node.column = nd["column"]
+		node.room_type = nd["room_type"]
+		node.connections = nd["connections"].duplicate()
+		node.visited = nd["visited"]
+		run_map.append(node)
+
 func _request_scene(path: String) -> void:
-	var tree: SceneTree = get_tree()
-	if tree != null:
-		tree.change_scene_to_file(path)
+	if is_inside_tree():
+		# 맵으로 돌아갈 때 저장
+		if path == "res://scenes/map/map_scene.tscn" and not run_map.is_empty():
+			var _sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
+			if _sm:
+				_sm.save()
+		get_tree().change_scene_to_file(path)
 
 # ── 릴릭 시스템 ─────────────────────────────────
 

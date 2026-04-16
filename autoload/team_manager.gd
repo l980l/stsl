@@ -56,6 +56,36 @@ func get_living_heroes() -> Array:
 			result.append(hero)
 	return result
 
+func to_dict() -> Dictionary:
+	var hero_data := []
+	for hero in heroes:
+		hero_data.append({
+			"hero_id": hero.hero_id,
+			"hero_name": hero.hero_name,
+			"max_hp": hero.max_hp,
+			"current_hp": get_current_hp(hero.hero_id),
+		})
+	return {"heroes": hero_data}
+
+func from_dict(data: Dictionary) -> void:
+	clear()
+	var HeroRes = load("res://resources/hero_resource.gd")
+	for hd in data.get("heroes", []):
+		var hero: Resource = HeroRes.new()
+		hero.hero_id = hd["hero_id"]
+		hero.hero_name = hd["hero_name"]
+		hero.max_hp = hd["max_hp"]
+		hero.character_scene = _get_hero_scene(hd["hero_id"])
+		add_hero(hero)
+		_hero_hp[hero.hero_id] = hd["current_hp"]
+
+func _get_hero_scene(hero_id: String) -> PackedScene:
+	match hero_id:
+		"napoleon": return load("res://characters/heroes/napoleon/napoleon.tscn")
+		"cleopatra": return load("res://characters/heroes/cleopatra/cleopatra.tscn")
+		"yi_sun_sin": return load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
+	return null
+
 func increase_max_hp(hero_id: String, amount: int) -> void:
 	for hero in heroes:
 		if hero.hero_id == hero_id:

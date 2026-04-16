@@ -11,6 +11,7 @@ var TestEnemies = preload("res://tests/test_enemies.gd")
 var TestEvent = preload("res://tests/test_event.gd")
 var TestHeroes = preload("res://tests/test_heroes.gd")
 var TestRelics = preload("res://tests/test_relics.gd")
+var TestSave = preload("res://tests/test_save.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -26,6 +27,7 @@ func _init() -> void:
 		TestEvent.new(),
 		TestHeroes.new(),
 		TestRelics.new(),
+		TestSave.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()
