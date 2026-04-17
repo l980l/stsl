@@ -36,6 +36,7 @@ signal enemy_died(enemy_index: int)
 signal enemy_damaged(enemy_index: int, amount: int)
 signal hero_damaged(hero_id: String, amount: int)
 signal status_applied(target: String, status_type: String, stacks: int)
+signal morale_changed(hero_id: String, new_value: int)
 
 func setup_battle(enemies: Array) -> void:
 	_enemies = enemies.duplicate()
@@ -79,12 +80,12 @@ func start_player_turn() -> void:
 		_gm_pts.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START)
 	player_turn_started.emit()
 
-func play_card(card: Resource, target_enemy_index: int) -> bool:
+func play_card(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> bool:
 	if not is_player_turn or not is_battle_active:
 		return false
 	if deck_mgr == null or not deck_mgr.play_card(card):
 		return false
-	_apply_card_effects(card, target_enemy_index)
+	_apply_card_effects(card, target_enemy_index, target_hero_id)
 	return true
 
 func end_player_turn() -> void:
@@ -99,7 +100,7 @@ func end_player_turn() -> void:
 		deck_mgr.discard_hand()
 	_execute_enemy_turn()
 
-func _apply_card_effects(card: Resource, target_enemy_index: int) -> void:
+func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> void:
 	# 카드 소유 영웅이 사망 상태면 효과 없음
 	if team_mgr and not team_mgr.is_alive(card.owner_id):
 		return
@@ -140,17 +141,21 @@ func _apply_card_effects(card: Resource, target_enemy_index: int) -> void:
 					deck_mgr.energy_changed.emit(deck_mgr.current_energy)
 			EffectRes.EffectType.HEAL:
 				if team_mgr:
-					team_mgr.heal(card.owner_id, effect.value)
+					var heal_id: String = target_hero_id if target_hero_id != "" else card.owner_id
+					team_mgr.heal(heal_id, effect.value)
 			EffectRes.EffectType.GAIN_MORALE:
-				var cur: int = _hero_status.get(card.owner_id, {}).get("morale", 0)
 				if not _hero_status.has(card.owner_id):
 					_hero_status[card.owner_id] = {}
-				_hero_status[card.owner_id]["morale"] = cur + effect.value
+				var new_morale: int = _hero_status[card.owner_id].get("morale", 0) + effect.value
+				_hero_status[card.owner_id]["morale"] = new_morale
 				status_applied.emit(card.owner_id, "morale", effect.value)
+				morale_changed.emit(card.owner_id, new_morale)
 			EffectRes.EffectType.CONSUME_MORALE:
 				var morale: int = _hero_status.get(card.owner_id, {}).get("morale", 0)
 				if morale >= effect.value:
-					_hero_status[card.owner_id]["morale"] = morale - effect.value
+					var new_morale: int = morale - effect.value
+					_hero_status[card.owner_id]["morale"] = new_morale
+					morale_changed.emit(card.owner_id, new_morale)
 					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 						_deal_damage_to_enemy(target_enemy_index, effect.bonus_value)
 			EffectRes.EffectType.POISON_BURST:
@@ -178,8 +183,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int) -> void:
 					_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + count * effect.value
 			EffectRes.EffectType.CONDITIONAL_DMG:
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-					var has_status: bool = _enemy_status[target_enemy_index].get(effect.status_type, 0) > 0
-					var dmg: int = effect.bonus_value if has_status else effect.value
+					var condition_met: bool
+					if effect.status_type == "morale":
+						condition_met = _hero_status.get(card.owner_id, {}).get("morale", 0) > 0
+					else:
+						condition_met = _enemy_status[target_enemy_index].get(effect.status_type, 0) > 0
+					var dmg: int = effect.bonus_value if condition_met else effect.value
 					_deal_damage_to_enemy(target_enemy_index, dmg)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
