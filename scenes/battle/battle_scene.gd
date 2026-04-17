@@ -121,13 +121,12 @@ func _make_enemy_slot(index: int) -> Dictionary:
 	intent_lbl.modulate = Color(1.0, 0.8, 0.2)
 	intent_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
-	# 클릭 버튼 (투명, 캐릭터 영역 위에 올림)
+	# 클릭 버튼 — 패널 전체를 커버 (텍스트 없음, flat)
 	var btn := Button.new()
 	btn.flat = true
-	btn.position = Vector2(ENEMY_X + 20, y + 40)
-	btn.size = Vector2(SLOT_W - 40, 160)
-	btn.add_theme_font_size_override("font_size", 14)
-	btn.text = "▶ 공격"
+	btn.position = Vector2(ENEMY_X, y)
+	btn.size = Vector2(SLOT_W, SLOT_H)
+	btn.text = ""
 	var captured_index := index
 	btn.pressed.connect(func(): _on_enemy_pressed(captured_index))
 	add_child(btn)
