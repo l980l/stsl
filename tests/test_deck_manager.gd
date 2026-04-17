@@ -14,6 +14,9 @@ func run_all() -> Dictionary:
 	test_reshuffle_on_empty()
 	test_discard_hand()
 	test_remove_from_deck()
+	test_cost_reduction_applies_to_next_card()
+	test_cost_reduction_resets_after_one_card()
+	test_cost_reduction_cannot_go_below_zero()
 	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
@@ -87,3 +90,39 @@ func test_remove_from_deck() -> void:
 
 	var r3 := dm.remove_from_deck(card1)
 	_assert(r3 == false, "없는 카드 제거 시 false 반환")
+
+func test_cost_reduction_applies_to_next_card() -> void:
+	print("[TestDeckManager] test_cost_reduction_applies_to_next_card")
+	var dm = DeckManagerClass.new()
+	dm.current_energy = 3
+	dm.pending_cost_reduction = 1
+	var card = _make_card("test_card", 2)
+	dm.hand.append(card)
+	_assert(dm.can_play(card), "reduction 1이면 cost 2 카드를 energy 3으로 사용 가능")
+	dm.play_card(card)
+	_assert(dm.current_energy == 2, "실제 차감 에너지 = 2-1 = 1 → 남은 energy = 2")
+
+func test_cost_reduction_resets_after_one_card() -> void:
+	print("[TestDeckManager] test_cost_reduction_resets_after_one_card")
+	var dm = DeckManagerClass.new()
+	dm.current_energy = 3
+	dm.pending_cost_reduction = 2
+	var card1 = _make_card("c1", 1)
+	var card2 = _make_card("c2", 1)
+	dm.hand.append(card1)
+	dm.hand.append(card2)
+	dm.play_card(card1)
+	_assert(dm.pending_cost_reduction == 0, "카드 1장 사용 후 pending_cost_reduction 초기화")
+	dm.play_card(card2)
+	_assert(dm.current_energy == 2, "두 번째 카드는 reduction 없이 cost 1 차감 → energy 2")
+
+func test_cost_reduction_cannot_go_below_zero() -> void:
+	print("[TestDeckManager] test_cost_reduction_cannot_go_below_zero")
+	var dm = DeckManagerClass.new()
+	dm.current_energy = 3
+	dm.pending_cost_reduction = 5
+	var card = _make_card("c", 1)
+	dm.hand.append(card)
+	_assert(dm.can_play(card), "reduction > cost여도 사용 가능")
+	dm.play_card(card)
+	_assert(dm.current_energy == 3, "max(0, 1-5) = 0 차감 → energy 그대로")
