@@ -194,6 +194,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						condition_met = _enemy_status[target_enemy_index].get(effect.status_type, 0) > 0
 					var dmg: int = effect.bonus_value if condition_met else effect.value
 					_deal_damage_to_enemy(target_enemy_index, dmg)
+	_apply_synergy_bonus(card, target_enemy_index)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
 	if not _enemy_alive[enemy_index]:
@@ -438,3 +439,57 @@ func _check_phase_transition(enemy_index: int) -> void:
 	if hp_ratio <= enemy.phase_thresholds[current_phase]:
 		_enemy_phase[enemy_index] += 1
 		_enemy_intent_index[enemy_index] = 0
+
+
+func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
+	if team_mgr == null:
+		return
+	var owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
+	for effect in card.effects:
+		match effect.effect_type:
+			EffectRes.EffectType.GAIN_MORALE:
+				if owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
+					_hero_block["yi_sun_sin"] = _hero_block.get("yi_sun_sin", 0) + 3
+			EffectRes.EffectType.CONSUME_MORALE:
+				if owner == "napoleon" and team_mgr.is_alive("cleopatra"):
+					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+						_apply_status_to_enemy(target_enemy_index, "charm", 1)
+			EffectRes.EffectType.DAMAGE:
+				if owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
+					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+						if _enemy_status[target_enemy_index].get("poison", 0) > 0:
+							_deal_damage_to_enemy(target_enemy_index, 4)
+
+
+func get_active_synergies() -> Array:
+	if team_mgr == null:
+		return []
+	var synergies: Array = []
+	var n: bool = team_mgr.is_alive("napoleon")
+	var y: bool = team_mgr.is_alive("yi_sun_sin")
+	var c: bool = team_mgr.is_alive("cleopatra")
+	if n and y:
+		synergies.append("철벽 진군 (나폴레옹×이순신)")
+	if y and c:
+		synergies.append("독침 반격 (이순신×클레오파트라)")
+	if n and c:
+		synergies.append("혼란의 돌격 (나폴레옹×클레오파트라)")
+	return synergies
+
+
+func has_synergy_bonus(card: Resource) -> bool:
+	if team_mgr == null:
+		return false
+	var owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
+	for effect in card.effects:
+		match effect.effect_type:
+			EffectRes.EffectType.GAIN_MORALE:
+				if owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
+					return true
+			EffectRes.EffectType.CONSUME_MORALE:
+				if owner == "napoleon" and team_mgr.is_alive("cleopatra"):
+					return true
+			EffectRes.EffectType.DAMAGE:
+				if owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
+					return true
+	return false
