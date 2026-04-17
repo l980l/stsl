@@ -377,8 +377,10 @@ func _refresh_hand() -> void:
 
 		var card_name: String = card.get("card_name") if card.get("card_name") != null else "?"
 		var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
-		btn.text = "[%d]\n%s\n%s" % [card.cost, card_name, owner_id]
-		btn.add_theme_font_size_override("font_size", 13)
+		var upgraded_mark: String = " ★" if card.get("upgraded") else ""
+		var effect_desc: String = _card_effect_text(card)
+		btn.text = "[%d] %s%s\n%s\n%s" % [card.cost, card_name, upgraded_mark, owner_id, effect_desc]
+		btn.add_theme_font_size_override("font_size", 11)
 		btn.disabled = not can_play
 
 		var captured_card := card
@@ -530,3 +532,49 @@ func _on_battle_lost() -> void:
 	for entry in _enemy_nodes:
 		entry["btn"].disabled = true
 	GameManager.complete_battle(false)
+
+# ─────────────────────────────────────────────
+# 카드 효과 텍스트 헬퍼
+# ─────────────────────────────────────────────
+
+func _card_effect_text(card: Resource) -> String:
+	var lines: Array = []
+	for eff in card.effects:
+		match eff.effect_type:
+			EffectRes.EffectType.DAMAGE:
+				lines.append("피해 %d%s" % [eff.value, " (전체)" if eff.target == "ALL" else ""])
+			EffectRes.EffectType.BLOCK:
+				lines.append("방어 %d" % eff.value)
+			EffectRes.EffectType.BLOCK_ALL:
+				lines.append("전체 방어 %d" % eff.value)
+			EffectRes.EffectType.FORMATION_BLOCK:
+				lines.append("영웅수×%d 방어" % eff.value)
+			EffectRes.EffectType.APPLY_STATUS:
+				var st_name: String = {"poison":"독","weak":"약화","vulnerable":"취약",
+					"morale":"사기","charm":"매혹","strength":"강화","taunt":"도발"}.get(eff.status_type, eff.status_type)
+				lines.append("%s %d" % [st_name, eff.value])
+			EffectRes.EffectType.DRAW:
+				lines.append("드로우 %d" % eff.value)
+			EffectRes.EffectType.ENERGY:
+				lines.append("에너지 +%d" % eff.value)
+			EffectRes.EffectType.HEAL:
+				lines.append("회복 %d" % eff.value)
+			EffectRes.EffectType.HEAL_ALL:
+				lines.append("전체 회복 %d" % eff.value)
+			EffectRes.EffectType.GAIN_MORALE:
+				lines.append("사기 +%d" % eff.value)
+			EffectRes.EffectType.CONSUME_MORALE:
+				lines.append("사기→피해 %d" % eff.bonus_value)
+			EffectRes.EffectType.POISON_BURST:
+				lines.append("독 즉발")
+			EffectRes.EffectType.COUNTER_BLOCK:
+				lines.append("방어도×%d%%" % eff.value)
+			EffectRes.EffectType.COST_NEXT:
+				lines.append("다음 비용 -%d" % eff.value)
+			EffectRes.EffectType.CONDITIONAL_DMG:
+				lines.append("%d/%d(%s)" % [eff.bonus_value, eff.value, eff.status_type])
+			EffectRes.EffectType.SUMMON_TOKEN:
+				lines.append("병사 소환")
+			EffectRes.EffectType.CHARM:
+				lines.append("매혹 %d" % eff.value)
+	return "\n".join(lines)
