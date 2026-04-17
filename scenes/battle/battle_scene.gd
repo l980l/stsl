@@ -30,6 +30,25 @@ var _message_label: Label
 var _relic_container: HBoxContainer
 var _selected_card: Resource = null
 
+var _hero_status_containers: Dictionary = {}
+var _enemy_status_containers: Array = []
+
+const STATUS_EMOJI := {
+	"poison": "☠", "weak": "↓", "vulnerable": "⚡",
+	"morale": "★", "charm": "♥", "strength": "↑",
+	"taunt": "►", "counter_block": "🛡"
+}
+const STATUS_TOOLTIP := {
+	"poison": "독: 턴 종료 시 N 피해. 매 턴 1 감소",
+	"weak": "약화: 공격 피해 25% 감소. 매 턴 1 감소",
+	"vulnerable": "취약: 받는 피해 50% 증가. 매 턴 1 감소",
+	"morale": "사기: CONSUME_MORALE 카드로 추가 피해 제공",
+	"charm": "매혹: 다음 행동 아군에게 적용",
+	"strength": "강화: 피해 +N",
+	"taunt": "도발: 이 대상이 우선 공격 받음",
+	"counter_block": "반격 방어: 피해 = 현재 방어도 기반"
+}
+
 func _ready() -> void:
 	_build_ui()
 	BattleManager.team_mgr = TeamManager
@@ -105,8 +124,14 @@ func _make_hero_slot(index: int) -> Dictionary:
 	var block_lbl := _make_label(Vector2(HERO_X + 10, y + 250), Vector2(SLOT_W - 20, 22), 14)
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 
+	var status_box := HBoxContainer.new()
+	status_box.position = Vector2(HERO_X + 4, y + SLOT_H - 22)
+	status_box.size = Vector2(SLOT_W - 8, 20)
+	add_child(status_box)
+
 	return { "panel": panel, "name_lbl": name_lbl,
-			 "hp_lbl": hp_lbl, "block_lbl": block_lbl, "hero_id": "" }
+			 "hp_lbl": hp_lbl, "block_lbl": block_lbl,
+			 "hero_id": "", "status_box": status_box }
 
 func _make_enemy_slot(index: int) -> Dictionary:
 	var y := 80 + index * (SLOT_H + SLOT_GAP)
@@ -136,8 +161,14 @@ func _make_enemy_slot(index: int) -> Dictionary:
 	var block_lbl := _make_label(Vector2(ENEMY_X + 10, y + 254), Vector2(SLOT_W - 20, 22), 13)
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 
+	var status_box := HBoxContainer.new()
+	status_box.position = Vector2(ENEMY_X + 4, y + SLOT_H - 22)
+	status_box.size = Vector2(SLOT_W - 8, 20)
+	add_child(status_box)
+
 	return { "panel": panel, "intent_lbl": intent_lbl, "btn": btn,
-			 "name_lbl": name_lbl, "hp_lbl": hp_lbl, "block_lbl": block_lbl }
+			 "name_lbl": name_lbl, "hp_lbl": hp_lbl, "block_lbl": block_lbl,
+			 "status_box": status_box }
 
 func _refresh_relics() -> void:
 	for child in _relic_container.get_children():
@@ -175,6 +206,7 @@ func _connect_signals() -> void:
 	BattleManager.battle_won.connect(_on_battle_won)
 	BattleManager.battle_lost.connect(_on_battle_lost)
 	TeamManager.hero_died.connect(_on_hero_died)
+	BattleManager.status_applied.connect(_on_status_applied)
 
 # ─────────────────────────────────────────────
 # 배틀 초기화
@@ -275,6 +307,7 @@ func _setup_heroes() -> void:
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
 
+		_hero_status_containers[hero.hero_id] = entry["status_box"]
 		_update_hero_ui(hero.hero_id)
 
 func _setup_enemies() -> void:
@@ -305,6 +338,9 @@ func _setup_enemies() -> void:
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
 
+		if i >= _enemy_status_containers.size():
+			_enemy_status_containers.resize(i + 1)
+		_enemy_status_containers[i] = entry["status_box"]
 		_update_enemy_ui(i)
 
 func _update_hero_ui(hero_id: String) -> void:
@@ -320,6 +356,7 @@ func _update_hero_ui(hero_id: String) -> void:
 		entry["block_lbl"].text = "🛡 %d" % block if block > 0 else ""
 		if not TeamManager.is_alive(hero_id):
 			entry["panel"].modulate = Color(0.4, 0.4, 0.4)
+		_refresh_status_icons_hero(hero_id)
 		return
 
 func _update_enemy_ui(index: int) -> void:
@@ -349,6 +386,8 @@ func _update_enemy_ui(index: int) -> void:
 		entry["panel"].modulate = Color(0.3, 0.3, 0.3)
 		entry["btn"].disabled = true
 		entry["intent_lbl"].text = "✝"
+
+	_refresh_status_icons_enemy(index)
 
 # ─────────────────────────────────────────────
 # 카드 핸드 (Task 3에서 구현)
@@ -536,6 +575,51 @@ func _on_battle_lost() -> void:
 # ─────────────────────────────────────────────
 # 카드 효과 텍스트 헬퍼
 # ─────────────────────────────────────────────
+
+func _refresh_status_icons_hero(hero_id: String) -> void:
+	var box: HBoxContainer = _hero_status_containers.get(hero_id)
+	if box == null:
+		return
+	for child in box.get_children():
+		child.queue_free()
+	var status: Dictionary = BattleManager.get_hero_status(hero_id)
+	for key in status:
+		var val: int = status[key]
+		if val <= 0:
+			continue
+		var lbl := Label.new()
+		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
+		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.tooltip_text = STATUS_TOOLTIP.get(key, key).replace("N", str(val))
+		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+		box.add_child(lbl)
+
+func _refresh_status_icons_enemy(index: int) -> void:
+	if index >= _enemy_status_containers.size():
+		return
+	var box: HBoxContainer = _enemy_status_containers[index]
+	if box == null:
+		return
+	for child in box.get_children():
+		child.queue_free()
+	var status: Dictionary = BattleManager.get_enemy_status(index)
+	for key in status:
+		var val: int = status[key]
+		if val <= 0:
+			continue
+		var lbl := Label.new()
+		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
+		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.tooltip_text = STATUS_TOOLTIP.get(key, key).replace("N", str(val))
+		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+		box.add_child(lbl)
+
+func _on_status_applied(target: String, _status_type: String, _stacks: int) -> void:
+	if target.begins_with("enemy_"):
+		var idx := target.substr(6).to_int()
+		_refresh_status_icons_enemy(idx)
+	else:
+		_refresh_status_icons_hero(target)
 
 func _card_effect_text(card: Resource) -> String:
 	var lines: Array = []
