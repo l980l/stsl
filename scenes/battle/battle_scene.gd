@@ -30,6 +30,12 @@ var _message_label: Label
 var _relic_container: HBoxContainer
 var _selected_card: Resource = null
 
+var _drag_card: Resource = null
+var _drag_preview: Label = null
+var _potential_drag_card: Resource = null
+var _drag_start_pos: Vector2 = Vector2.ZERO
+const DRAG_THRESHOLD := 10.0
+
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 
@@ -423,6 +429,8 @@ func _refresh_hand() -> void:
 		btn.disabled = not can_play
 
 		var captured_card := card
+		var captured_card2 := card
+		btn.button_down.connect(func(): _on_card_button_down(captured_card2))
 		btn.pressed.connect(func(): _on_card_pressed(captured_card))
 		add_child(btn)
 		_card_buttons.append(btn)
@@ -432,6 +440,8 @@ func _refresh_hand() -> void:
 # ─────────────────────────────────────────────
 
 func _on_card_pressed(card: Resource) -> void:
+	if _drag_card != null:
+		return
 	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
 		return
 
@@ -662,3 +672,82 @@ func _card_effect_text(card: Resource) -> String:
 			EffectRes.EffectType.CHARM:
 				lines.append("매혹 %d" % eff.value)
 	return "\n".join(lines)
+
+func _on_card_button_down(card: Resource) -> void:
+	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
+		return
+	_potential_drag_card = card
+	_drag_start_pos = get_viewport().get_mouse_position()
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		if _potential_drag_card != null and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			var dist := get_viewport().get_mouse_position().distance_to(_drag_start_pos)
+			if dist > DRAG_THRESHOLD and _drag_card == null:
+				_start_drag(_potential_drag_card)
+			if _drag_card != null:
+				_drag_preview.position = get_viewport().get_mouse_position() + Vector2(8, 8)
+	elif event is InputEventMouseButton \
+			and event.button_index == MOUSE_BUTTON_LEFT \
+			and not event.pressed:
+		if _drag_card != null:
+			_finish_drag(get_viewport().get_mouse_position())
+		_potential_drag_card = null
+
+func _start_drag(card: Resource) -> void:
+	_drag_card = card
+	_selected_card = null
+	_message_label.text = "드래그하여 타겟 지정 ▶"
+	_drag_preview = Label.new()
+	_drag_preview.text = "[%d] %s" % [card.cost, card.get("card_name") if card.get("card_name") else "?"]
+	_drag_preview.add_theme_font_size_override("font_size", 14)
+	_drag_preview.size = Vector2(120, 30)
+	_drag_preview.modulate = Color(1.0, 1.0, 0.6, 0.85)
+	_drag_preview.z_index = 10
+	add_child(_drag_preview)
+	for i in range(_enemy_nodes.size()):
+		if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
+			_enemy_nodes[i]["panel"].color = Color(0.35, 0.12, 0.12)
+
+func _finish_drag(drop_pos: Vector2) -> void:
+	var needs_target := false
+	for effect in _drag_card.effects:
+		match effect.effect_type:
+			EffectRes.EffectType.DAMAGE:
+				if effect.target == "SINGLE":
+					needs_target = true
+			EffectRes.EffectType.APPLY_STATUS:
+				if effect.target == "SINGLE":
+					needs_target = true
+			EffectRes.EffectType.COUNTER_BLOCK, \
+			EffectRes.EffectType.CONSUME_MORALE, \
+			EffectRes.EffectType.POISON_BURST, \
+			EffectRes.EffectType.CONDITIONAL_DMG:
+				needs_target = true
+		if needs_target:
+			break
+
+	if needs_target:
+		for i in range(_enemy_nodes.size()):
+			var panel: ColorRect = _enemy_nodes[i]["panel"]
+			if not panel.visible or not BattleManager.is_enemy_alive(i):
+				continue
+			if panel.get_global_rect().has_point(drop_pos):
+				BattleManager.play_card(_drag_card, i)
+				_cleanup_drag()
+				return
+		_cleanup_drag()
+	else:
+		BattleManager.play_card(_drag_card, -1)
+		_cleanup_drag()
+
+func _cleanup_drag() -> void:
+	if _drag_preview != null:
+		_drag_preview.queue_free()
+		_drag_preview = null
+	_drag_card = null
+	_selected_card = null
+	_message_label.text = ""
+	for entry in _enemy_nodes:
+		if entry["panel"].visible:
+			entry["panel"].color = Color(0.18, 0.10, 0.10)
