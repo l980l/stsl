@@ -30,6 +30,31 @@ var _message_label: Label
 var _relic_container: HBoxContainer
 var _selected_card: Resource = null
 
+var _drag_card: Resource = null
+var _drag_preview: Label = null
+var _potential_drag_card: Resource = null
+var _drag_start_pos: Vector2 = Vector2.ZERO
+const DRAG_THRESHOLD := 10.0
+
+var _hero_status_containers: Dictionary = {}
+var _enemy_status_containers: Array = []
+
+const STATUS_EMOJI := {
+	"poison": "☠", "weak": "↓", "vulnerable": "⚡",
+	"morale": "★", "charm": "♥", "strength": "↑",
+	"taunt": "►", "counter_block": "🛡"
+}
+const STATUS_TOOLTIP := {
+	"poison": "독: 턴 종료 시 N 피해. 매 턴 1 감소",
+	"weak": "약화: 공격 피해 25% 감소. 매 턴 1 감소",
+	"vulnerable": "취약: 받는 피해 50% 증가. 매 턴 1 감소",
+	"morale": "사기: CONSUME_MORALE 카드로 추가 피해 제공",
+	"charm": "매혹: 다음 행동 아군에게 적용",
+	"strength": "강화: 피해 +N",
+	"taunt": "도발: 이 대상이 우선 공격 받음",
+	"counter_block": "반격 방어: 피해 = 현재 방어도 기반"
+}
+
 func _ready() -> void:
 	_build_ui()
 	BattleManager.team_mgr = TeamManager
@@ -105,8 +130,14 @@ func _make_hero_slot(index: int) -> Dictionary:
 	var block_lbl := _make_label(Vector2(HERO_X + 10, y + 250), Vector2(SLOT_W - 20, 22), 14)
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 
+	var status_box := HBoxContainer.new()
+	status_box.position = Vector2(HERO_X + 4, y + SLOT_H - 22)
+	status_box.size = Vector2(SLOT_W - 8, 20)
+	add_child(status_box)
+
 	return { "panel": panel, "name_lbl": name_lbl,
-			 "hp_lbl": hp_lbl, "block_lbl": block_lbl, "hero_id": "" }
+			 "hp_lbl": hp_lbl, "block_lbl": block_lbl,
+			 "hero_id": "", "status_box": status_box }
 
 func _make_enemy_slot(index: int) -> Dictionary:
 	var y := 80 + index * (SLOT_H + SLOT_GAP)
@@ -121,13 +152,12 @@ func _make_enemy_slot(index: int) -> Dictionary:
 	intent_lbl.modulate = Color(1.0, 0.8, 0.2)
 	intent_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
-	# 클릭 버튼 (투명, 캐릭터 영역 위에 올림)
+	# 클릭 버튼 — 패널 전체를 커버 (텍스트 없음, flat)
 	var btn := Button.new()
 	btn.flat = true
-	btn.position = Vector2(ENEMY_X + 20, y + 40)
-	btn.size = Vector2(SLOT_W - 40, 160)
-	btn.add_theme_font_size_override("font_size", 14)
-	btn.text = "▶ 공격"
+	btn.position = Vector2(ENEMY_X, y)
+	btn.size = Vector2(SLOT_W, SLOT_H)
+	btn.text = ""
 	var captured_index := index
 	btn.pressed.connect(func(): _on_enemy_pressed(captured_index))
 	add_child(btn)
@@ -137,8 +167,14 @@ func _make_enemy_slot(index: int) -> Dictionary:
 	var block_lbl := _make_label(Vector2(ENEMY_X + 10, y + 254), Vector2(SLOT_W - 20, 22), 13)
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 
+	var status_box := HBoxContainer.new()
+	status_box.position = Vector2(ENEMY_X + 4, y + SLOT_H - 22)
+	status_box.size = Vector2(SLOT_W - 8, 20)
+	add_child(status_box)
+
 	return { "panel": panel, "intent_lbl": intent_lbl, "btn": btn,
-			 "name_lbl": name_lbl, "hp_lbl": hp_lbl, "block_lbl": block_lbl }
+			 "name_lbl": name_lbl, "hp_lbl": hp_lbl, "block_lbl": block_lbl,
+			 "status_box": status_box }
 
 func _refresh_relics() -> void:
 	for child in _relic_container.get_children():
@@ -176,6 +212,7 @@ func _connect_signals() -> void:
 	BattleManager.battle_won.connect(_on_battle_won)
 	BattleManager.battle_lost.connect(_on_battle_lost)
 	TeamManager.hero_died.connect(_on_hero_died)
+	BattleManager.status_applied.connect(_on_status_applied)
 
 # ─────────────────────────────────────────────
 # 배틀 초기화
@@ -276,6 +313,7 @@ func _setup_heroes() -> void:
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
 
+		_hero_status_containers[hero.hero_id] = entry["status_box"]
 		_update_hero_ui(hero.hero_id)
 
 func _setup_enemies() -> void:
@@ -306,6 +344,9 @@ func _setup_enemies() -> void:
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
 
+		if i >= _enemy_status_containers.size():
+			_enemy_status_containers.resize(i + 1)
+		_enemy_status_containers[i] = entry["status_box"]
 		_update_enemy_ui(i)
 
 func _update_hero_ui(hero_id: String) -> void:
@@ -321,6 +362,7 @@ func _update_hero_ui(hero_id: String) -> void:
 		entry["block_lbl"].text = "🛡 %d" % block if block > 0 else ""
 		if not TeamManager.is_alive(hero_id):
 			entry["panel"].modulate = Color(0.4, 0.4, 0.4)
+		_refresh_status_icons_hero(hero_id)
 		return
 
 func _update_enemy_ui(index: int) -> void:
@@ -351,6 +393,8 @@ func _update_enemy_ui(index: int) -> void:
 		entry["btn"].disabled = true
 		entry["intent_lbl"].text = "✝"
 
+	_refresh_status_icons_enemy(index)
+
 # ─────────────────────────────────────────────
 # 카드 핸드 (Task 3에서 구현)
 # ─────────────────────────────────────────────
@@ -378,11 +422,15 @@ func _refresh_hand() -> void:
 
 		var card_name: String = card.get("card_name") if card.get("card_name") != null else "?"
 		var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
-		btn.text = "[%d]\n%s\n%s" % [card.cost, card_name, owner_id]
-		btn.add_theme_font_size_override("font_size", 13)
+		var upgraded_mark: String = " ★" if card.get("upgraded") else ""
+		var effect_desc: String = _card_effect_text(card)
+		btn.text = "[%d] %s%s\n%s\n%s" % [card.cost, card_name, upgraded_mark, owner_id, effect_desc]
+		btn.add_theme_font_size_override("font_size", 11)
 		btn.disabled = not can_play
 
 		var captured_card := card
+		var captured_card2 := card
+		btn.button_down.connect(func(): _on_card_button_down(captured_card2))
 		btn.pressed.connect(func(): _on_card_pressed(captured_card))
 		add_child(btn)
 		_card_buttons.append(btn)
@@ -392,6 +440,8 @@ func _refresh_hand() -> void:
 # ─────────────────────────────────────────────
 
 func _on_card_pressed(card: Resource) -> void:
+	if _drag_card != null:
+		return
 	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
 		return
 
@@ -531,3 +581,173 @@ func _on_battle_lost() -> void:
 	for entry in _enemy_nodes:
 		entry["btn"].disabled = true
 	GameManager.complete_battle(false)
+
+# ─────────────────────────────────────────────
+# 카드 효과 텍스트 헬퍼
+# ─────────────────────────────────────────────
+
+func _refresh_status_icons_hero(hero_id: String) -> void:
+	var box: HBoxContainer = _hero_status_containers.get(hero_id)
+	if box == null:
+		return
+	for child in box.get_children():
+		child.queue_free()
+	var status: Dictionary = BattleManager.get_hero_status(hero_id)
+	for key in status:
+		var val: int = status[key]
+		if val <= 0:
+			continue
+		var lbl := Label.new()
+		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
+		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.tooltip_text = STATUS_TOOLTIP.get(key, key).replace("N", str(val))
+		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+		box.add_child(lbl)
+
+func _refresh_status_icons_enemy(index: int) -> void:
+	if index >= _enemy_status_containers.size():
+		return
+	var box: HBoxContainer = _enemy_status_containers[index]
+	if box == null:
+		return
+	for child in box.get_children():
+		child.queue_free()
+	var status: Dictionary = BattleManager.get_enemy_status(index)
+	for key in status:
+		var val: int = status[key]
+		if val <= 0:
+			continue
+		var lbl := Label.new()
+		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
+		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.tooltip_text = STATUS_TOOLTIP.get(key, key).replace("N", str(val))
+		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+		box.add_child(lbl)
+
+func _on_status_applied(target: String, _status_type: String, _stacks: int) -> void:
+	if target.begins_with("enemy_"):
+		var idx := target.substr(6).to_int()
+		_refresh_status_icons_enemy(idx)
+	else:
+		_refresh_status_icons_hero(target)
+
+func _card_effect_text(card: Resource) -> String:
+	var lines: Array = []
+	for eff in card.effects:
+		match eff.effect_type:
+			EffectRes.EffectType.DAMAGE:
+				lines.append("피해 %d%s" % [eff.value, " (전체)" if eff.target == "ALL" else ""])
+			EffectRes.EffectType.BLOCK:
+				lines.append("방어 %d" % eff.value)
+			EffectRes.EffectType.BLOCK_ALL:
+				lines.append("전체 방어 %d" % eff.value)
+			EffectRes.EffectType.FORMATION_BLOCK:
+				lines.append("영웅수×%d 방어" % eff.value)
+			EffectRes.EffectType.APPLY_STATUS:
+				var st_name: String = {"poison":"독","weak":"약화","vulnerable":"취약",
+					"morale":"사기","charm":"매혹","strength":"강화","taunt":"도발"}.get(eff.status_type, eff.status_type)
+				lines.append("%s %d" % [st_name, eff.value])
+			EffectRes.EffectType.DRAW:
+				lines.append("드로우 %d" % eff.value)
+			EffectRes.EffectType.ENERGY:
+				lines.append("에너지 +%d" % eff.value)
+			EffectRes.EffectType.HEAL:
+				lines.append("회복 %d" % eff.value)
+			EffectRes.EffectType.HEAL_ALL:
+				lines.append("전체 회복 %d" % eff.value)
+			EffectRes.EffectType.GAIN_MORALE:
+				lines.append("사기 +%d" % eff.value)
+			EffectRes.EffectType.CONSUME_MORALE:
+				lines.append("사기→피해 %d" % eff.bonus_value)
+			EffectRes.EffectType.POISON_BURST:
+				lines.append("독 즉발")
+			EffectRes.EffectType.COUNTER_BLOCK:
+				lines.append("방어도×%d%%" % eff.value)
+			EffectRes.EffectType.COST_NEXT:
+				lines.append("다음 비용 -%d" % eff.value)
+			EffectRes.EffectType.CONDITIONAL_DMG:
+				lines.append("%d/%d(%s)" % [eff.bonus_value, eff.value, eff.status_type])
+			EffectRes.EffectType.SUMMON_TOKEN:
+				lines.append("병사 소환")
+			EffectRes.EffectType.CHARM:
+				lines.append("매혹 %d" % eff.value)
+	return "\n".join(lines)
+
+func _on_card_button_down(card: Resource) -> void:
+	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
+		return
+	_potential_drag_card = card
+	_drag_start_pos = get_viewport().get_mouse_position()
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		if _potential_drag_card != null and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			var dist := get_viewport().get_mouse_position().distance_to(_drag_start_pos)
+			if dist > DRAG_THRESHOLD and _drag_card == null:
+				_start_drag(_potential_drag_card)
+			if _drag_card != null:
+				_drag_preview.position = get_viewport().get_mouse_position() + Vector2(8, 8)
+	elif event is InputEventMouseButton \
+			and event.button_index == MOUSE_BUTTON_LEFT \
+			and not event.pressed:
+		if _drag_card != null:
+			_finish_drag(get_viewport().get_mouse_position())
+		_potential_drag_card = null
+
+func _start_drag(card: Resource) -> void:
+	_drag_card = card
+	_selected_card = null
+	_message_label.text = "드래그하여 타겟 지정 ▶"
+	_drag_preview = Label.new()
+	_drag_preview.text = "[%d] %s" % [card.cost, card.get("card_name") if card.get("card_name") else "?"]
+	_drag_preview.add_theme_font_size_override("font_size", 14)
+	_drag_preview.size = Vector2(120, 30)
+	_drag_preview.modulate = Color(1.0, 1.0, 0.6, 0.85)
+	_drag_preview.z_index = 10
+	add_child(_drag_preview)
+	for i in range(_enemy_nodes.size()):
+		if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
+			_enemy_nodes[i]["panel"].color = Color(0.35, 0.12, 0.12)
+
+func _finish_drag(drop_pos: Vector2) -> void:
+	var needs_target := false
+	for effect in _drag_card.effects:
+		match effect.effect_type:
+			EffectRes.EffectType.DAMAGE:
+				if effect.target == "SINGLE":
+					needs_target = true
+			EffectRes.EffectType.APPLY_STATUS:
+				if effect.target == "SINGLE":
+					needs_target = true
+			EffectRes.EffectType.COUNTER_BLOCK, \
+			EffectRes.EffectType.CONSUME_MORALE, \
+			EffectRes.EffectType.POISON_BURST, \
+			EffectRes.EffectType.CONDITIONAL_DMG:
+				needs_target = true
+		if needs_target:
+			break
+
+	if needs_target:
+		for i in range(_enemy_nodes.size()):
+			var panel: ColorRect = _enemy_nodes[i]["panel"]
+			if not panel.visible or not BattleManager.is_enemy_alive(i):
+				continue
+			if panel.get_global_rect().has_point(drop_pos):
+				BattleManager.play_card(_drag_card, i)
+				_cleanup_drag()
+				return
+		_cleanup_drag()
+	else:
+		BattleManager.play_card(_drag_card, -1)
+		_cleanup_drag()
+
+func _cleanup_drag() -> void:
+	if _drag_preview != null:
+		_drag_preview.queue_free()
+		_drag_preview = null
+	_drag_card = null
+	_selected_card = null
+	_message_label.text = ""
+	for entry in _enemy_nodes:
+		if entry["panel"].visible:
+			entry["panel"].color = Color(0.18, 0.10, 0.10)
