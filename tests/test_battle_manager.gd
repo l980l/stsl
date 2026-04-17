@@ -45,6 +45,7 @@ func run_all() -> Dictionary:
 	test_synergy_napoleon_yisunsin()
 	test_synergy_yisunsin_cleopatra()
 	test_synergy_napoleon_cleopatra()
+	test_synergy_napoleon_cleopatra_no_morale()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -615,3 +616,26 @@ func test_synergy_napoleon_cleopatra() -> void:
 	bm.play_card(card, 0)
 	_assert(bm._enemy_status[0].get("charm", 0) == 1,
 		"혼란의 돌격: 나폴레옹 CONSUME_MORALE → 적 charm +1")
+
+
+func test_synergy_napoleon_cleopatra_no_morale() -> void:
+	print("[TestBattleManager] test_synergy_napoleon_cleopatra_no_morale")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 50))
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
+	bm.setup_battle([_make_enemy(50, [])])
+	bm.start_player_turn()
+	# morale = 0, so CONSUME_MORALE fails → no charm
+	var card = CardRes.new()
+	card.card_name = "사기소모_실패_테스트"
+	card.owner_id = "napoleon"
+	card.cost = 0
+	var eff = EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.CONSUME_MORALE
+	eff.value = 1
+	eff.bonus_value = 5
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+	bm.play_card(card, 0)
+	_assert(bm._enemy_status[0].get("charm", 0) == 0,
+		"혼란의 돌격: 사기 부족 시 charm 미부여")

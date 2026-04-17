@@ -158,6 +158,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					morale_changed.emit(card.owner_id, new_morale)
 					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 						_deal_damage_to_enemy(target_enemy_index, effect.bonus_value)
+					# 나폴레옹 × 클레오파트라 시너지: 소모 성공 시에만 charm 부여
+					if card.owner_id == "napoleon" and team_mgr and team_mgr.is_alive("cleopatra"):
+						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+							_apply_status_to_enemy(target_enemy_index, "charm", 1)
 			EffectRes.EffectType.POISON_BURST:
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					var poison: int = _enemy_status[target_enemy_index].get("poison", 0)
@@ -450,10 +454,6 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 			EffectRes.EffectType.GAIN_MORALE:
 				if owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
 					_hero_block["yi_sun_sin"] = _hero_block.get("yi_sun_sin", 0) + 3
-			EffectRes.EffectType.CONSUME_MORALE:
-				if owner == "napoleon" and team_mgr.is_alive("cleopatra"):
-					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-						_apply_status_to_enemy(target_enemy_index, "charm", 1)
 			EffectRes.EffectType.DAMAGE:
 				if owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
 					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
