@@ -40,6 +40,8 @@ func run_all() -> Dictionary:
 	test_morale_changed_signal_emitted()
 	test_morale_changed_emitted_on_consume_success()
 	test_morale_changed_not_emitted_on_consume_fail()
+	test_cost_next_reduces_next_card_cost()
+	test_charm_attacks_other_enemy()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -490,3 +492,40 @@ func test_morale_changed_not_emitted_on_consume_fail() -> void:
 	bm._apply_card_effects(card, 0)
 
 	_assert(signals_received.is_empty(), "사기 부족 시 morale_changed 미발화")
+
+func test_cost_next_reduces_next_card_cost() -> void:
+	print("[TestBattleManager] test_cost_next_reduces_next_card_cost")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	bm.setup_battle([_make_enemy(30, [])])
+	bm.start_player_turn()
+
+	var card_cn := CardRes.new()
+	card_cn.card_name = "cost_next_card"
+	card_cn.owner_id = "napoleon"
+	card_cn.cost = 0
+	var eff_cn := EffectRes.new()
+	eff_cn.effect_type = EffectRes.EffectType.COST_NEXT
+	eff_cn.value = 1
+	card_cn.effects = [eff_cn]
+	bm.deck_mgr.hand.append(card_cn)
+	bm.play_card(card_cn, -1)
+	_assert(bm.deck_mgr.pending_cost_reduction == 1, "COST_NEXT 사용 후 pending_cost_reduction == 1")
+
+func test_charm_attacks_other_enemy() -> void:
+	print("[TestBattleManager] test_charm_attacks_other_enemy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
+	var intent := _make_intent(IntentRes.ActionType.ATTACK, 10, IntentRes.TargetType.RANDOM)
+	var enemy0 := _make_enemy(50, [intent])
+	var enemy1 := _make_enemy(50, [intent])
+	bm.setup_battle([enemy0, enemy1])
+	bm._enemy_status[0]["charm"] = 1
+	bm.start_player_turn()
+	bm.end_player_turn()
+
+	var napoleon_hp: int = bm.team_mgr.get_current_hp("napoleon")
+	var enemy1_hp: int = bm.get_enemy_hp(1)
+	_assert(napoleon_hp == 60, "enemy1이 napoleon 공격 → HP 70-10=60")
+	_assert(enemy1_hp == 40, "charm된 enemy0가 enemy1 공격 → enemy1 HP 50-10=40")
+	_assert(bm._enemy_status[0].get("charm", -1) == 0, "charm 스택 감소")
