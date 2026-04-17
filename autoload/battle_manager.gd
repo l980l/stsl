@@ -384,6 +384,14 @@ func get_enemy(index: int) -> Resource:
 		return null
 	return _enemies[index]
 
+func get_hero_status(hero_id: String) -> Dictionary:
+	return _hero_status.get(hero_id, {}).duplicate()
+
+func get_enemy_status(index: int) -> Dictionary:
+	if index < 0 or index >= _enemy_status.size():
+		return {}
+	return _enemy_status[index].duplicate()
+
 func clear() -> void:
 	_enemies.clear()
 	_enemy_hp.clear()

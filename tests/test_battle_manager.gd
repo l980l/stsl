@@ -34,6 +34,8 @@ func run_all() -> Dictionary:
 	test_harpy_special_removes_from_deck()
 	test_charm_skips_enemy_turn()
 	test_dead_hero_card_has_no_effect()
+	test_get_hero_status_empty_by_default()
+	test_get_enemy_status_after_apply()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -361,3 +363,23 @@ func test_dead_hero_card_has_no_effect() -> void:
 	bm.play_card(card, 0)
 
 	_assert(bm.get_enemy_hp(0) == 30, "사망 영웅 카드 사용 시 효과 없음 → 적 HP 불변")
+
+func test_get_hero_status_empty_by_default() -> void:
+	print("[TestBattleManager] test_get_hero_status_empty_by_default")
+	var bm := BattleManagerClass.new()
+	var status: Dictionary = bm.get_hero_status("napoleon")
+	_assert(status.is_empty(), "영웅 상태 기본값 빈 딕셔너리")
+
+func test_get_enemy_status_after_apply() -> void:
+	print("[TestBattleManager] test_get_enemy_status_after_apply")
+	var EnemyRes = load("res://resources/enemy_resource.gd")
+	var bm := BattleManagerClass.new()
+	var enemy = EnemyRes.new()
+	enemy.enemy_name = "테스트적"
+	enemy.max_hp = 30
+	bm.setup_battle([enemy])
+	bm._apply_status_to_enemy(0, "poison", 3)
+	var status: Dictionary = bm.get_enemy_status(0)
+	_assert(status.get("poison", 0) == 3, "적 상태 poison 3 조회")
+	var empty: Dictionary = bm.get_enemy_status(99)
+	_assert(empty.is_empty(), "범위 밖 인덱스 빈 딕셔너리")
