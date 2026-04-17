@@ -181,6 +181,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				if team_mgr:
 					var count: int = team_mgr.get_living_heroes().size()
 					_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + count * effect.value
+			EffectRes.EffectType.COST_NEXT:
+				if deck_mgr:
+					deck_mgr.pending_cost_reduction += effect.value
 			EffectRes.EffectType.CONDITIONAL_DMG:
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					var condition_met: bool
@@ -269,11 +272,23 @@ func _execute_enemy_turn() -> void:
 		_tick_enemy_poison(i)
 		if not _enemy_alive[i]:
 			continue
-		# 매혹(charm) 상태: 행동 스킵 후 스택 감소
+		# 매혹(charm) 상태: 다른 생존 적 공격, 없으면 행동 스킵
 		var charm: int = _enemy_status[i].get("charm", 0)
 		if charm > 0:
 			_enemy_status[i]["charm"] = charm - 1
 			_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % _get_active_pattern(i).size()
+			var other_targets: Array = []
+			for j in range(_enemies.size()):
+				if j != i and _enemy_alive[j]:
+					other_targets.append(j)
+			if not other_targets.is_empty():
+				var target_j: int = other_targets[randi() % other_targets.size()]
+				var pattern: Array = _get_active_pattern(i)
+				if not pattern.is_empty():
+					var prev_idx: int = (_enemy_intent_index[i] - 1 + pattern.size()) % pattern.size()
+					var intent: Resource = pattern[prev_idx]
+					if intent.action_type == IntentRes.ActionType.ATTACK:
+						_deal_damage_to_enemy(target_j, intent.value)
 			continue
 		var pattern: Array = _get_active_pattern(i)
 		if pattern.is_empty():
