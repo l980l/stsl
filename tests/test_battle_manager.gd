@@ -38,6 +38,8 @@ func run_all() -> Dictionary:
 	test_get_enemy_status_after_apply()
 	test_conditional_dmg_checks_owner_morale()
 	test_morale_changed_signal_emitted()
+	test_morale_changed_emitted_on_consume_success()
+	test_morale_changed_not_emitted_on_consume_fail()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -437,3 +439,54 @@ func test_morale_changed_signal_emitted() -> void:
 	_assert(signals_received.size() == 1, "morale_changed 시그널 1회 발화")
 	_assert(signals_received[0][0] == "napoleon", "hero_id = napoleon")
 	_assert(signals_received[0][1] == 2, "new morale value = 2")
+
+func test_morale_changed_emitted_on_consume_success() -> void:
+	print("[TestBattleManager] test_morale_changed_emitted_on_consume_success")
+	var bm := _make_bm()
+	var hero := _make_hero("napoleon", 70)
+	bm.team_mgr.add_hero(hero)
+	bm.setup_battle([_make_enemy(30, [])])
+	bm.start_player_turn()
+	bm._hero_status["napoleon"] = {"morale": 3}
+
+	var signals_received: Array = []
+	bm.morale_changed.connect(func(hid, val): signals_received.append([hid, val]))
+
+	var card := CardRes.new()
+	card.card_name = "consume_test"
+	card.owner_id = "napoleon"
+	card.cost = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.CONSUME_MORALE
+	eff.value = 3
+	eff.bonus_value = 10
+	card.effects = [eff]
+	bm._apply_card_effects(card, 0)
+
+	_assert(signals_received.size() == 1, "소비 성공 시 morale_changed 1회 발화")
+	_assert(signals_received[0][1] == 0, "소비 후 사기 = 0")
+
+func test_morale_changed_not_emitted_on_consume_fail() -> void:
+	print("[TestBattleManager] test_morale_changed_not_emitted_on_consume_fail")
+	var bm := _make_bm()
+	var hero := _make_hero("napoleon", 70)
+	bm.team_mgr.add_hero(hero)
+	bm.setup_battle([_make_enemy(30, [])])
+	bm.start_player_turn()
+	bm._hero_status["napoleon"] = {"morale": 1}
+
+	var signals_received: Array = []
+	bm.morale_changed.connect(func(hid, val): signals_received.append([hid, val]))
+
+	var card := CardRes.new()
+	card.card_name = "consume_fail_test"
+	card.owner_id = "napoleon"
+	card.cost = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.CONSUME_MORALE
+	eff.value = 3
+	eff.bonus_value = 10
+	card.effects = [eff]
+	bm._apply_card_effects(card, 0)
+
+	_assert(signals_received.is_empty(), "사기 부족 시 morale_changed 미발화")

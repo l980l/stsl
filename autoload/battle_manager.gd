@@ -184,6 +184,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.CONDITIONAL_DMG:
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					var condition_met: bool
+					# "morale"는 카드 소유자 영웅의 상태를 검사. 그 외는 대상 적의 상태를 검사.
 					if effect.status_type == "morale":
 						condition_met = _hero_status.get(card.owner_id, {}).get("morale", 0) > 0
 					else:
