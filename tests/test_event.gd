@@ -14,6 +14,10 @@ func run_all() -> Dictionary:
 	test_hero_recruit_event_exists()
 	test_add_relic_choice_structure()
 	test_gold_with_cost_hp_structure()
+	test_pool_has_ten_events()
+	test_prometheus_event_exists()
+	test_hades_event_uses_add_relic()
+	test_hermes_event_has_two_choices()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -66,12 +70,52 @@ func _build_pool() -> Array:
 	c5b.effect_type = ChoiceRes.EffectType.NONE
 	e5.choices = [c5a, c5b]; events.append(e5)
 
+	# 6. 프로메테우스의 불
+	var e6: Resource = EventRes.new(); e6.event_name = "프로메테우스의 불"
+	var c6a: Resource = ChoiceRes.new(); c6a.label = "불씨를 받는다 (드로우 +1, HP -20)"
+	c6a.effect_type = ChoiceRes.EffectType.DRAW_UP; c6a.value = 1; c6a.cost_hp = 20
+	var c6b: Resource = ChoiceRes.new(); c6b.label = "거절한다"
+	c6b.effect_type = ChoiceRes.EffectType.NONE
+	e6.choices = [c6a, c6b]; events.append(e6)
+
+	# 7. 헤라클레스의 시련
+	var e7: Resource = EventRes.new(); e7.event_name = "헤라클레스의 시련"
+	var c7a: Resource = ChoiceRes.new(); c7a.label = "맞선다 (골드 +60, HP -25)"
+	c7a.effect_type = ChoiceRes.EffectType.GOLD; c7a.value = 60; c7a.cost_hp = 25
+	var c7b: Resource = ChoiceRes.new(); c7b.label = "포기한다"
+	c7b.effect_type = ChoiceRes.EffectType.NONE
+	e7.choices = [c7a, c7b]; events.append(e7)
+
+	# 8. 키르케의 마법
+	var e8: Resource = EventRes.new(); e8.event_name = "키르케의 마법"
+	var c8a: Resource = ChoiceRes.new(); c8a.label = "마법을 받는다 (HP +25, 골드 -50)"
+	c8a.effect_type = ChoiceRes.EffectType.HEAL; c8a.value = 25; c8a.cost_gold = 50
+	var c8b: Resource = ChoiceRes.new(); c8b.label = "거절한다"
+	c8b.effect_type = ChoiceRes.EffectType.NONE
+	e8.choices = [c8a, c8b]; events.append(e8)
+
+	# 9. 하데스의 계약
+	var e9: Resource = EventRes.new(); e9.event_name = "하데스의 계약"
+	var c9a: Resource = ChoiceRes.new(); c9a.label = "계약한다 (렐릭 획득, HP -30)"
+	c9a.effect_type = ChoiceRes.EffectType.ADD_RELIC; c9a.cost_hp = 30
+	var c9b: Resource = ChoiceRes.new(); c9b.label = "거절한다"
+	c9b.effect_type = ChoiceRes.EffectType.NONE
+	e9.choices = [c9a, c9b]; events.append(e9)
+
+	# 10. 헤르메스의 도박
+	var e10: Resource = EventRes.new(); e10.event_name = "헤르메스의 도박"
+	var c10a: Resource = ChoiceRes.new(); c10a.label = "황금을 받는다 (골드 +50)"
+	c10a.effect_type = ChoiceRes.EffectType.GOLD; c10a.value = 50
+	var c10b: Resource = ChoiceRes.new(); c10b.label = "덱을 가볍게 한다 (카드 1장 제거)"
+	c10b.effect_type = ChoiceRes.EffectType.REMOVE_CARD; c10b.value = 1
+	e10.choices = [c10a, c10b]; events.append(e10)
+
 	return events
 
 func test_event_pool_size() -> void:
 	print("[TestEvent] test_event_pool_size")
 	var pool := _build_pool()
-	_assert(pool.size() == 5, "이벤트 풀 5종")
+	_assert(pool.size() == 10, "이벤트 풀 10종")
 
 func test_gold_event_exists() -> void:
 	print("[TestEvent] test_gold_event_exists")
@@ -147,3 +191,45 @@ func test_gold_with_cost_hp_structure() -> void:
 	_assert(choice.effect_type == ChoiceRes.EffectType.GOLD, "GOLD 타입 설정 가능")
 	_assert(choice.value == 60, "value 60")
 	_assert(choice.cost_hp == 25, "cost_hp 25 설정 가능")
+
+func test_pool_has_ten_events() -> void:
+	print("[TestEvent] test_pool_has_ten_events")
+	var pool := _build_pool()
+	_assert(pool.size() == 10, "이벤트 풀 10종")
+
+func test_prometheus_event_exists() -> void:
+	print("[TestEvent] test_prometheus_event_exists")
+	var pool := _build_pool()
+	var found := false
+	for e in pool:
+		if e.event_name == "프로메테우스의 불":
+			found = true
+			var ChoiceRes = load("res://resources/event_choice_resource.gd")
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.DRAW_UP, "선택 A: DRAW_UP")
+			_assert(e.choices[0].cost_hp == 20, "cost_hp == 20")
+	_assert(found, "프로메테우스의 불 이벤트 존재")
+
+func test_hades_event_uses_add_relic() -> void:
+	print("[TestEvent] test_hades_event_uses_add_relic")
+	var pool := _build_pool()
+	var found := false
+	for e in pool:
+		if e.event_name == "하데스의 계약":
+			found = true
+			var ChoiceRes = load("res://resources/event_choice_resource.gd")
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.ADD_RELIC, "선택 A: ADD_RELIC")
+			_assert(e.choices[0].cost_hp == 30, "cost_hp == 30")
+	_assert(found, "하데스의 계약 이벤트 존재")
+
+func test_hermes_event_has_two_choices() -> void:
+	print("[TestEvent] test_hermes_event_has_two_choices")
+	var pool := _build_pool()
+	var found := false
+	for e in pool:
+		if e.event_name == "헤르메스의 도박":
+			found = true
+			var ChoiceRes = load("res://resources/event_choice_resource.gd")
+			_assert(e.choices.size() == 2, "선택지 2개")
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.GOLD, "선택 A: GOLD")
+			_assert(e.choices[1].effect_type == ChoiceRes.EffectType.REMOVE_CARD, "선택 B: REMOVE_CARD")
+	_assert(found, "헤르메스의 도박 이벤트 존재")
