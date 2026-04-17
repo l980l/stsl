@@ -25,6 +25,9 @@ func _on_choice_selected(choice: Resource) -> void:
 func _apply_choice(choice: Resource) -> void:
 	match choice.effect_type:
 		choice.EffectType.GOLD:
+			if choice.cost_hp > 0:
+				for hero in TeamManager.heroes:
+					TeamManager.take_damage(hero.hero_id, choice.cost_hp)
 			GameManager.add_gold(choice.value)
 		choice.EffectType.HEAL:
 			if GameManager.spend_gold(choice.cost_gold):
@@ -39,6 +42,13 @@ func _apply_choice(choice: Resource) -> void:
 			if not DeckManager.draw_pile.is_empty():
 				DeckManager.draw_pile.remove_at(
 					randi() % DeckManager.draw_pile.size())
+		choice.EffectType.ADD_RELIC:
+			if choice.cost_hp > 0:
+				for hero in TeamManager.heroes:
+					TeamManager.take_damage(hero.hero_id, choice.cost_hp)
+			var relic = GameManager.get_random_relic()
+			if relic:
+				GameManager.add_relic(relic)
 		choice.EffectType.ADD_HERO:
 			GameManager.recruit_random_hero()
 		choice.EffectType.NONE:

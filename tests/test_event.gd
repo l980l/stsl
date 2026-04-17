@@ -12,6 +12,8 @@ func run_all() -> Dictionary:
 	test_draw_event_costs_hp()
 	test_remove_card_event_exists()
 	test_hero_recruit_event_exists()
+	test_add_relic_choice_structure()
+	test_gold_with_cost_hp_structure()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -125,3 +127,23 @@ func test_hero_recruit_event_exists() -> void:
 			if ch.effect_type == ChoiceRes.EffectType.ADD_HERO:
 				found = true
 	_assert(found, "동료 영입 이벤트 존재")
+
+func test_add_relic_choice_structure() -> void:
+	print("[TestEvent] test_add_relic_choice_structure")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var choice: Resource = ChoiceRes.new()
+	choice.effect_type = ChoiceRes.EffectType.ADD_RELIC
+	choice.cost_hp = 30
+	_assert(choice.effect_type == ChoiceRes.EffectType.ADD_RELIC, "ADD_RELIC 타입 설정 가능")
+	_assert(choice.cost_hp == 30, "cost_hp 30 설정 가능")
+
+func test_gold_with_cost_hp_structure() -> void:
+	print("[TestEvent] test_gold_with_cost_hp_structure")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var choice: Resource = ChoiceRes.new()
+	choice.effect_type = ChoiceRes.EffectType.GOLD
+	choice.value = 60
+	choice.cost_hp = 25
+	_assert(choice.effect_type == ChoiceRes.EffectType.GOLD, "GOLD 타입 설정 가능")
+	_assert(choice.value == 60, "value 60")
+	_assert(choice.cost_hp == 25, "cost_hp 25 설정 가능")
