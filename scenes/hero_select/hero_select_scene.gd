@@ -26,13 +26,22 @@ func _ready() -> void:
 	_build_ui()
 
 func _build_ui() -> void:
+	var is_recruit: bool = GameManager.pending_boss_recruit
+
+	var owned_ids: Array = []
+	if is_recruit:
+		var tm = Engine.get_singleton("TeamManager") if Engine.has_singleton("TeamManager") else null
+		if tm:
+			for h in tm.heroes:
+				owned_ids.append(h.hero_id)
+
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.1)
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
 	var title := Label.new()
-	title.text = "시작 영웅을 선택하세요"
+	title.text = "동료를 영입하세요" if is_recruit else "시작 영웅을 선택하세요"
 	title.position = Vector2(660, 60)
 	title.size = Vector2(600, 60)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -48,9 +57,10 @@ func _build_ui() -> void:
 	for i in range(HEROES.size()):
 		var data: Dictionary = HEROES[i]
 		var x: float = start_x + i * (CARD_W + GAP)
+		var already_owned: bool = is_recruit and data["id"] in owned_ids
 
 		var panel := ColorRect.new()
-		panel.color = Color(0.1, 0.1, 0.2)
+		panel.color = Color(0.05, 0.05, 0.08) if already_owned else Color(0.1, 0.1, 0.2)
 		panel.position = Vector2(x, 160)
 		panel.size = Vector2(CARD_W, CARD_H)
 		add_child(panel)
@@ -72,14 +82,24 @@ func _build_ui() -> void:
 		add_child(desc_lbl)
 
 		var btn := Button.new()
-		btn.text = data["name"] + " 선택"
+		if already_owned:
+			btn.text = "이미 보유 중"
+			btn.disabled = true
+		elif is_recruit:
+			btn.text = data["name"] + " 영입"
+		else:
+			btn.text = data["name"] + " 선택"
 		btn.position = Vector2(x + 60, 690)
 		btn.size = Vector2(CARD_W - 120, 60)
 		btn.add_theme_font_size_override("font_size", 20)
-		var captured_id: String = data["id"]
-		btn.pressed.connect(func(): _on_hero_selected(captured_id))
+		if not already_owned:
+			var captured_id: String = data["id"]
+			btn.pressed.connect(func(): _on_hero_selected(captured_id))
 		add_child(btn)
 
 func _on_hero_selected(hero_id: String) -> void:
-	GameManager.start_run(hero_id)
-	get_tree().change_scene_to_file("res://scenes/map/map_scene.tscn")
+	if GameManager.pending_boss_recruit:
+		GameManager.complete_hero_recruit(hero_id)
+	else:
+		GameManager.start_run(hero_id)
+		get_tree().change_scene_to_file("res://scenes/map/map_scene.tscn")
