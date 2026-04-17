@@ -158,6 +158,7 @@ func _make_enemy_slot(index: int) -> Dictionary:
 	btn.position = Vector2(ENEMY_X, y)
 	btn.size = Vector2(SLOT_W, SLOT_H)
 	btn.text = ""
+	btn.visible = false
 	var captured_index := index
 	btn.pressed.connect(func(): _on_enemy_pressed(captured_index))
 	add_child(btn)
@@ -213,6 +214,7 @@ func _connect_signals() -> void:
 	BattleManager.battle_lost.connect(_on_battle_lost)
 	TeamManager.hero_died.connect(_on_hero_died)
 	BattleManager.status_applied.connect(_on_status_applied)
+	BattleManager.morale_changed.connect(_on_morale_changed)
 
 # ─────────────────────────────────────────────
 # 배틀 초기화
@@ -324,6 +326,7 @@ func _setup_enemies() -> void:
 			_enemy_char_nodes[i] = null
 	for entry in _enemy_nodes:
 		entry["panel"].visible = false
+		entry["btn"].visible = false
 
 	var count := 0
 	while count < 3 and BattleManager.get_enemy(count) != null:
@@ -333,6 +336,7 @@ func _setup_enemies() -> void:
 		var enemy: Resource = BattleManager.get_enemy(i)
 		var entry: Dictionary = _enemy_nodes[i]
 		entry["panel"].visible = true
+		entry["btn"].visible = true
 		entry["btn"].disabled = false
 		entry["name_lbl"].text = enemy.get("enemy_name") if enemy.get("enemy_name") != null else "적"
 
@@ -357,9 +361,13 @@ func _update_hero_ui(hero_id: String) -> void:
 		if hero == null:
 			return
 		var cur_hp: int = TeamManager.get_current_hp(hero_id)
-		entry["hp_lbl"].text = "HP  %d / %d" % [cur_hp, hero.max_hp]
 		var block: int = BattleManager.get_hero_block(hero_id)
-		entry["block_lbl"].text = "🛡 %d" % block if block > 0 else ""
+		var block_str: String = "  🛡%d" % block if block > 0 else ""
+		var status: Dictionary = BattleManager.get_hero_status(hero_id)
+		var morale: int = status.get("morale", 0)
+		var morale_str: String = "  ★%d" % morale if morale > 0 else ""
+		entry["hp_lbl"].text = "HP %d/%d%s%s" % [cur_hp, hero.max_hp, block_str, morale_str]
+		entry["block_lbl"].text = ""
 		if not TeamManager.is_alive(hero_id):
 			entry["panel"].modulate = Color(0.4, 0.4, 0.4)
 		_refresh_status_icons_hero(hero_id)
@@ -371,9 +379,10 @@ func _update_enemy_ui(index: int) -> void:
 	if enemy == null:
 		return
 	var cur_hp: int = BattleManager.get_enemy_hp(index)
-	entry["hp_lbl"].text = "HP  %d / %d" % [cur_hp, enemy.max_hp]
 	var block: int = BattleManager.get_enemy_block(index)
-	entry["block_lbl"].text = "🛡 %d" % block if block > 0 else ""
+	var block_str: String = "  🛡%d" % block if block > 0 else ""
+	entry["hp_lbl"].text = "HP %d/%d%s" % [cur_hp, enemy.max_hp, block_str]
+	entry["block_lbl"].text = ""
 
 	# 의도 표시
 	var intent: Resource = BattleManager.get_enemy_current_intent(index)
@@ -439,47 +448,11 @@ func _refresh_hand() -> void:
 # 인터랙션 핸들러 (Task 4~5에서 구현)
 # ─────────────────────────────────────────────
 
-func _on_card_pressed(card: Resource) -> void:
-	if _drag_card != null:
-		return
-	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
-		return
+func _on_card_pressed(_card: Resource) -> void:
+	pass  # 드래그 앤 드롭 방식으로만 카드 사용 가능
 
-	# 타겟 선택이 필요한지 확인
-	var needs_target := false
-	for effect in card.effects:
-		match effect.effect_type:
-			EffectRes.EffectType.DAMAGE:
-				if effect.target == "SINGLE":
-					needs_target = true
-			EffectRes.EffectType.APPLY_STATUS:
-				if effect.target == "SINGLE":
-					needs_target = true
-			EffectRes.EffectType.COUNTER_BLOCK, \
-			EffectRes.EffectType.CONSUME_MORALE, \
-			EffectRes.EffectType.POISON_BURST, \
-			EffectRes.EffectType.CONDITIONAL_DMG:
-				needs_target = true
-		if needs_target:
-			break
-
-	if needs_target:
-		_selected_card = card
-		_message_label.text = "공격 대상을 선택하세요 ▶"
-	else:
-		# 즉시 플레이 (블록, 전체 공격 등)
-		BattleManager.play_card(card, -1)
-		_selected_card = null
-		_message_label.text = ""
-
-func _on_enemy_pressed(index: int) -> void:
-	if _selected_card == null or not BattleManager.is_player_turn:
-		return
-	if not BattleManager.is_enemy_alive(index):
-		return
-	BattleManager.play_card(_selected_card, index)
-	_selected_card = null
-	_message_label.text = ""
+func _on_enemy_pressed(_index: int) -> void:
+	pass  # 드래그 앤 드롭 방식으로만 타겟 지정 가능
 
 func _on_end_turn_pressed() -> void:
 	_selected_card = null
@@ -522,6 +495,7 @@ func _on_energy_changed(new_energy: int) -> void:
 		_card_buttons[i].disabled = not DeckManager.can_play(hand[i])
 
 func _on_card_played(card: Resource) -> void:
+	call_deferred("_refresh_all_hero_ui")
 	var anim_name: String = card.get("play_animation") if card.get("play_animation") != null else ""
 	if anim_name == "":
 		return
@@ -532,6 +506,11 @@ func _on_card_played(card: Resource) -> void:
 	var anim_player: AnimationPlayer = char_node.get_node("AnimationPlayer")
 	if anim_player.has_animation(anim_name):
 		anim_player.play(anim_name)
+
+func _refresh_all_hero_ui() -> void:
+	for entry in _hero_nodes:
+		if entry["hero_id"] != "":
+			_update_hero_ui(entry["hero_id"])
 
 func _on_hero_damaged(hero_id: String, _amount: int) -> void:
 	_update_hero_ui(hero_id)
@@ -624,6 +603,9 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 		box.add_child(lbl)
 
+func _on_morale_changed(hero_id: String, _new_value: int) -> void:
+	_update_hero_ui(hero_id)
+
 func _on_status_applied(target: String, _status_type: String, _stacks: int) -> void:
 	if target.begins_with("enemy_"):
 		var idx := target.substr(6).to_int()
@@ -694,10 +676,29 @@ func _input(event: InputEvent) -> void:
 			_finish_drag(get_viewport().get_mouse_position())
 		_potential_drag_card = null
 
+func _card_target_type(card: Resource) -> String:
+	# "enemy" / "ally" / "none"
+	for effect in card.effects:
+		match effect.effect_type:
+			EffectRes.EffectType.DAMAGE:
+				if effect.target == "SINGLE":
+					return "enemy"
+			EffectRes.EffectType.APPLY_STATUS:
+				if effect.target == "SINGLE":
+					return "enemy"
+			EffectRes.EffectType.COUNTER_BLOCK, \
+			EffectRes.EffectType.CONSUME_MORALE, \
+			EffectRes.EffectType.POISON_BURST, \
+			EffectRes.EffectType.CONDITIONAL_DMG:
+				return "enemy"
+			EffectRes.EffectType.HEAL:
+				if effect.target == "SINGLE":
+					return "ally"
+	return "none"
+
 func _start_drag(card: Resource) -> void:
 	_drag_card = card
 	_selected_card = null
-	_message_label.text = "드래그하여 타겟 지정 ▶"
 	_drag_preview = Label.new()
 	_drag_preview.text = "[%d] %s" % [card.cost, card.get("card_name") if card.get("card_name") else "?"]
 	_drag_preview.add_theme_font_size_override("font_size", 14)
@@ -705,41 +706,50 @@ func _start_drag(card: Resource) -> void:
 	_drag_preview.modulate = Color(1.0, 1.0, 0.6, 0.85)
 	_drag_preview.z_index = 10
 	add_child(_drag_preview)
-	for i in range(_enemy_nodes.size()):
-		if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
-			_enemy_nodes[i]["panel"].color = Color(0.35, 0.12, 0.12)
+	match _card_target_type(card):
+		"enemy":
+			_message_label.text = "적을 선택하세요 ▶"
+			for i in range(_enemy_nodes.size()):
+				if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
+					_enemy_nodes[i]["panel"].color = Color(0.35, 0.12, 0.12)
+		"ally":
+			_message_label.text = "아군을 선택하세요 ▶"
+			for entry in _hero_nodes:
+				if entry["panel"].visible:
+					entry["panel"].color = Color(0.12, 0.25, 0.12)
+		"none":
+			_message_label.text = "놓아서 사용 ▶"
 
 func _finish_drag(drop_pos: Vector2) -> void:
-	var needs_target := false
-	for effect in _drag_card.effects:
-		match effect.effect_type:
-			EffectRes.EffectType.DAMAGE:
-				if effect.target == "SINGLE":
-					needs_target = true
-			EffectRes.EffectType.APPLY_STATUS:
-				if effect.target == "SINGLE":
-					needs_target = true
-			EffectRes.EffectType.COUNTER_BLOCK, \
-			EffectRes.EffectType.CONSUME_MORALE, \
-			EffectRes.EffectType.POISON_BURST, \
-			EffectRes.EffectType.CONDITIONAL_DMG:
-				needs_target = true
-		if needs_target:
-			break
-
-	if needs_target:
-		for i in range(_enemy_nodes.size()):
-			var panel: ColorRect = _enemy_nodes[i]["panel"]
-			if not panel.visible or not BattleManager.is_enemy_alive(i):
-				continue
-			if panel.get_global_rect().has_point(drop_pos):
-				BattleManager.play_card(_drag_card, i)
-				_cleanup_drag()
-				return
+	if drop_pos.y >= BOTTOM_Y:
 		_cleanup_drag()
-	else:
-		BattleManager.play_card(_drag_card, -1)
-		_cleanup_drag()
+		return
+	match _card_target_type(_drag_card):
+		"enemy":
+			for i in range(_enemy_nodes.size()):
+				var panel: ColorRect = _enemy_nodes[i]["panel"]
+				if not panel.visible or not BattleManager.is_enemy_alive(i):
+					continue
+				if panel.get_global_rect().has_point(drop_pos):
+					BattleManager.play_card(_drag_card, i)
+					_cleanup_drag()
+					return
+			_cleanup_drag()
+		"ally":
+			for entry in _hero_nodes:
+				if not entry["panel"].visible:
+					continue
+				var hero_id: String = entry["hero_id"]
+				if not TeamManager.is_alive(hero_id):
+					continue
+				if entry["panel"].get_global_rect().has_point(drop_pos):
+					BattleManager.play_card(_drag_card, -1, hero_id)
+					_cleanup_drag()
+					return
+			_cleanup_drag()
+		"none":
+			BattleManager.play_card(_drag_card, -1)
+			_cleanup_drag()
 
 func _cleanup_drag() -> void:
 	if _drag_preview != null:
@@ -751,3 +761,6 @@ func _cleanup_drag() -> void:
 	for entry in _enemy_nodes:
 		if entry["panel"].visible:
 			entry["panel"].color = Color(0.18, 0.10, 0.10)
+	for entry in _hero_nodes:
+		if entry["panel"].visible:
+			entry["panel"].color = Color(0.12, 0.12, 0.2)
