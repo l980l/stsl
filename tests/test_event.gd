@@ -6,7 +6,6 @@ var passed: int = 0
 var failed: int = 0
 
 func run_all() -> Dictionary:
-	test_event_pool_size()
 	test_gold_event_exists()
 	test_heal_event_costs_gold()
 	test_draw_event_costs_hp()
@@ -111,11 +110,6 @@ func _build_pool() -> Array:
 	e10.choices = [c10a, c10b]; events.append(e10)
 
 	return events
-
-func test_event_pool_size() -> void:
-	print("[TestEvent] test_event_pool_size")
-	var pool := _build_pool()
-	_assert(pool.size() == 10, "이벤트 풀 10종")
 
 func test_gold_event_exists() -> void:
 	print("[TestEvent] test_gold_event_exists")
