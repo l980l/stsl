@@ -150,3 +150,4 @@ func clear() -> void:
 	discard_pile.clear()
 	exhaust_pile.clear()
 	current_energy = 0
+	pending_cost_reduction = 0
