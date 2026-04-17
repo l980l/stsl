@@ -2,7 +2,7 @@
 class_name GameManagerClass
 extends Node
 
-enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGRADE }
+enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGRADE, HERO_RECRUIT }
 
 var current_state: GameState = GameState.MAP
 var current_floor: int = 0
@@ -20,6 +20,7 @@ var card_rewards: Array = []        # 다음 카드 보상 목록
 var pending_event: Resource = null  # 현재 이벤트 데이터 (EventResource)
 var card_rewards_pick_count: int = 1  # 카드픽 화면에서 선택 가능한 카드 수
 var pending_boss_upgrade: bool = false  # 보스 후 카드 강화 대기 여부
+var pending_boss_recruit: bool = false  # 보스 후 영웅 영입 대기 여부
 # ─────────────────────────────────────────────────────
 
 signal state_changed(new_state: GameState)
@@ -93,6 +94,7 @@ func reset() -> void:
 	run_won = false
 	card_rewards_pick_count = 1
 	pending_boss_upgrade = false
+	pending_boss_recruit = false
 
 # ── Plan 04: 런 관리 ──────────────────────────────────
 
@@ -180,13 +182,16 @@ func complete_battle(won: bool) -> void:
 			match node.room_type:
 				MapNodeRes.RoomType.ELITE:
 					card_rewards_pick_count = 2
+					add_gold(randi_range(20, 25))
 				MapNodeRes.RoomType.BOSS:
 					card_rewards_pick_count = 2
+					add_gold(40)
 					var relic := get_random_relic()
 					if relic:
 						add_relic(relic)
 				_:
 					card_rewards_pick_count = 1
+					add_gold(randi_range(10, 15))
 		change_state(GameState.CARD_PICK)
 		_request_scene("res://scenes/card_pick/card_pick_scene.tscn")
 	else:
@@ -246,16 +251,34 @@ func enter_card_upgrade() -> void:
 func complete_card_upgrade() -> void:
 	if pending_boss_upgrade:
 		pending_boss_upgrade = false
-		run_won = true
-		run_ended.emit(true)
-		var _sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
-		if _sm:
-			_sm.clear_save()
-		change_state(GameState.GAME_OVER)
-		_request_scene("res://scenes/game_over/game_over_scene.tscn")
+		var pool := _recruit_hero_pool()
+		if not pool.is_empty():
+			pending_boss_recruit = true
+			change_state(GameState.HERO_RECRUIT)
+			_request_scene("res://scenes/hero_select/hero_select_scene.tscn")
+			return
+		_end_run_won()
 		return
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
+
+func complete_hero_recruit(hero_id: String) -> void:
+	pending_boss_recruit = false
+	var hero: Resource = _make_hero_by_id(hero_id)
+	var tm := _get_tm()
+	if tm:
+		tm.add_hero(hero)
+	_add_initial_deck_for(hero)
+	_end_run_won()
+
+func _end_run_won() -> void:
+	run_won = true
+	run_ended.emit(true)
+	var _sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
+	if _sm:
+		_sm.clear_save()
+	change_state(GameState.GAME_OVER)
+	_request_scene("res://scenes/game_over/game_over_scene.tscn")
 
 func upgrade_card(card: Resource) -> void:
 	if card.upgraded:
@@ -1064,8 +1087,10 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 					tm.heal(hero.hero_id, value)
 		RelicRes.EffectType.ENERGY:
 			if is_inside_tree() and dm:
-				dm.current_energy += value
-				dm.energy_changed.emit(dm.current_energy)
+				var dmg_amount: int = context.get("amount", 0)
+				if relic.condition_value == 0 or dmg_amount >= relic.condition_value:
+					dm.current_energy += value
+					dm.energy_changed.emit(dm.current_energy)
 		RelicRes.EffectType.DRAW:
 			if is_inside_tree() and dm:
 				dm.draw_cards(value)
@@ -1089,12 +1114,8 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 			if is_inside_tree() and tm:
 				for hero in tm.heroes:
 					tm.increase_max_hp(hero.hero_id, value)
-		RelicRes.EffectType.ON_HERO_DAMAGED:
-			# ON_HERO_DAMAGED는 context에서 처리
-			var amount: int = context.get("amount", 0)
-			if amount >= relic.condition_value and is_inside_tree() and dm:
-				dm.current_energy += 1
-				dm.energy_changed.emit(dm.current_energy)
+		RelicRes.EffectType.COST_REDUCTION:
+			pass  # PASSIVE 릴릭에서 별도 처리
 
 func _build_relic_pool() -> Array:
 	var RelicRes = load("res://resources/relic_resource.gd")
@@ -1146,7 +1167,7 @@ func _build_relic_pool() -> Array:
 	var r7: Resource = RelicRes.new(); r7.relic_name = "피의 돌"
 	r7.description = "피해 5 이상 받을 시 에너지 +1"
 	r7.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
-	r7.effect_type = RelicRes.EffectType.ON_HERO_DAMAGED; r7.value = 1; r7.condition_value = 5
+	r7.effect_type = RelicRes.EffectType.ENERGY; r7.value = 1; r7.condition_value = 5
 	pool.append(r7)
 
 	# 8. 황제의 인장 — 나폴레옹 전용: 전투 시작 사기+2 (생존 시 사기+2)

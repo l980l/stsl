@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="STSL"
+run/main_scene="res://scenes/main_menu/main_menu_scene.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 config/run/main_scene="res://scenes/main_menu/main_menu_scene.tscn"
