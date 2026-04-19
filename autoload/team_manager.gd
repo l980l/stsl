@@ -8,6 +8,7 @@ var _hero_alive: Dictionary = {}
 
 signal hero_died(hero_id: String)
 signal hero_revived(hero_id: String)
+signal hero_healed(hero_id: String, amount: int)
 
 func add_hero(hero: Resource) -> void:
 	heroes.append(hero)
@@ -28,7 +29,11 @@ func heal(hero_id: String, amount: int) -> void:
 	var hero: Resource = get_hero(hero_id)
 	if hero == null:
 		return
+	var prev_hp: int = _hero_hp[hero_id]
 	_hero_hp[hero_id] = min(hero.max_hp, _hero_hp[hero_id] + amount)
+	var actual: int = _hero_hp[hero_id] - prev_hp
+	if actual > 0:
+		hero_healed.emit(hero_id, actual)
 
 func revive(hero_id: String, hp: int) -> void:
 	if not _hero_hp.has(hero_id):

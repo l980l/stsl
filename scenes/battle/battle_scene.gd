@@ -219,6 +219,7 @@ func _connect_signals() -> void:
 	BattleManager.enemy_turn_started.connect(_on_enemy_turn_started)
 	BattleManager.hero_damaged.connect(_on_hero_damaged)
 	BattleManager.enemy_damaged.connect(_on_enemy_damaged)
+	TeamManager.hero_healed.connect(_on_hero_healed)
 	BattleManager.enemy_died.connect(_on_enemy_died)
 	BattleManager.battle_won.connect(_on_battle_won)
 	BattleManager.battle_lost.connect(_on_battle_lost)
@@ -540,6 +541,29 @@ func _spawn_damage_popup(world_pos: Vector2, amount: int, fully_blocked: bool) -
 	tw.tween_property(lbl, "position:y", world_pos.y - 60.0, 0.8)
 	tw.tween_property(lbl, "modulate:a", 0.0, 0.8)
 	tw.chain().tween_callback(lbl.queue_free)
+
+func _spawn_heal_popup(world_pos: Vector2, amount: int) -> void:
+	var lbl := Label.new()
+	lbl.text = "+" + str(amount)
+	lbl.modulate = Color(0.2, 1.0, 0.4)
+	lbl.add_theme_font_size_override("font_size", 28)
+	lbl.position = world_pos
+	lbl.z_index = 20
+	add_child(lbl)
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(lbl, "position:y", world_pos.y - 60.0, 0.8)
+	tw.tween_property(lbl, "modulate:a", 0.0, 0.8)
+	tw.chain().tween_callback(lbl.queue_free)
+
+func _on_hero_healed(hero_id: String, amount: int) -> void:
+	_update_hero_ui(hero_id)
+	for entry in _hero_nodes:
+		if entry["hero_id"] == hero_id and entry["panel"].visible:
+			var panel: ColorRect = entry["panel"]
+			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
+			_spawn_heal_popup(popup_pos, amount)
+			break
 
 func _on_hero_damaged(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)
