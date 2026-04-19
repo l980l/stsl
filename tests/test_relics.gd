@@ -27,6 +27,9 @@ func run_all() -> Dictionary:
 	test_damage_hero_effect_bypasses_block()
 	test_cursed_relic_has_is_cursed_true()
 	test_penalty_effect_type_settable()
+	test_relic_pool_has_new_relics()
+	test_cursed_relics_in_pool()
+	test_hero_relics_second_set()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -46,7 +49,10 @@ func _build_pool() -> Array:
 	var names := [
 		"버닝 블러드", "불사조 깃털", "독약 병", "전쟁 북",
 		"고대 유물", "모래시계", "피의 돌",
-		"황제의 인장", "독사의 팔찌", "거북선 모형"
+		"황제의 인장", "독사의 팔찌", "거북선 모형",
+		"포병 나팔", "난중일기", "파라오의 인장",
+		"악마의 계약", "저주받은 왕관", "피의 서약",
+		"전술가의 지도", "강철 의지", "고대의 방패"
 	]
 	for n in names:
 		var r := RelicRes.new()
@@ -78,7 +84,7 @@ func _make_enemy(hp: int) -> Resource:
 func test_relic_pool_size() -> void:
 	print("[TestRelics] test_relic_pool_size")
 	var pool := _build_pool()
-	_assert(pool.size() == 10, "릴릭 풀 10종")
+	_assert(pool.size() == 19, "릴릭 풀 19종")
 
 func test_trigger_type_values() -> void:
 	print("[TestRelics] test_trigger_type_values")
@@ -180,3 +186,40 @@ func test_penalty_effect_type_settable() -> void:
 	var r := RelicRes.new()
 	r.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO
 	_assert(r.penalty_effect_type == RelicRes.EffectType.DAMAGE_HERO, "penalty_effect_type DAMAGE_HERO 설정 가능")
+
+func test_relic_pool_has_new_relics() -> void:
+	print("[TestRelics] test_relic_pool_has_new_relics")
+	var new_names := [
+		"포병 나팔", "난중일기", "파라오의 인장",
+		"악마의 계약", "저주받은 왕관", "피의 서약",
+		"전술가의 지도", "강철 의지", "고대의 방패"
+	]
+	var pool := _build_pool()
+	for name in new_names:
+		var found := false
+		for r in pool:
+			if r.relic_name == name:
+				found = true
+				break
+		_assert(found, "렐릭 존재: %s" % name)
+
+func test_cursed_relics_in_pool() -> void:
+	print("[TestRelics] test_cursed_relics_in_pool")
+	var cursed_names := ["악마의 계약", "저주받은 왕관", "피의 서약"]
+	for name in cursed_names:
+		var r := RelicRes.new()
+		r.relic_name = name
+		r.is_cursed = true
+		_assert(r.is_cursed, "저주 렐릭 is_cursed: %s" % name)
+
+func test_hero_relics_second_set() -> void:
+	print("[TestRelics] test_hero_relics_second_set")
+	var pool := _build_pool()
+	var second_set := ["포병 나팔", "난중일기", "파라오의 인장"]
+	for name in second_set:
+		var found := false
+		for r in pool:
+			if r.relic_name == name:
+				found = true
+				break
+		_assert(found, "2번째 전용 렐릭 존재: %s" % name)

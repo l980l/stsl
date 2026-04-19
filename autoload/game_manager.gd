@@ -1286,4 +1286,79 @@ func _build_relic_pool() -> Array:
 	r10.owner_hero_id = "yi_sun_sin"; r10.value = 2; r10.bonus_value = 4
 	pool.append(r10)
 
+	# 11. 포병 나팔 — 나폴레옹 전용: 턴 시작 사기 +1
+	var r11: Resource = RelicRes.new(); r11.relic_name = "포병 나팔"
+	r11.description = "플레이어 턴 시작 시 사기 +1 (나폴레옹 생존 시 적용)"
+	r11.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r11.effect_type = RelicRes.EffectType.GAIN_MORALE
+	r11.owner_hero_id = "napoleon"; r11.value = 0; r11.bonus_value = 1
+	pool.append(r11)
+
+	# 12. 난중일기 — 이순신 전용: 전투 승리 시 팀 HP +8
+	var r12: Resource = RelicRes.new(); r12.relic_name = "난중일기"
+	r12.description = "전투 승리 시 팀 HP +8 (이순신 생존 시 적용)"
+	r12.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r12.effect_type = RelicRes.EffectType.HEAL
+	r12.owner_hero_id = "yi_sun_sin"; r12.value = 0; r12.bonus_value = 8
+	pool.append(r12)
+
+	# 13. 파라오의 인장 — 클레오파트라 전용: 턴 시작 무작위 적 독 +1
+	var r13: Resource = RelicRes.new(); r13.relic_name = "파라오의 인장"
+	r13.description = "플레이어 턴 시작 시 무작위 적 독 +1 (클레오파트라 생존 시 적용)"
+	r13.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r13.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
+	r13.owner_hero_id = "cleopatra"; r13.value = 0; r13.bonus_value = 1
+	pool.append(r13)
+
+	# 14. 악마의 계약 — 저주: 전투 승리 팀 HP +20 / 매 턴 무작위 영웅 HP -3
+	var r14: Resource = RelicRes.new(); r14.relic_name = "악마의 계약"
+	r14.description = "전투 승리 시 팀 HP +20. 단, 매 플레이어 턴 시작 시 무작위 영웅 HP -3"
+	r14.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r14.effect_type = RelicRes.EffectType.HEAL; r14.value = 20
+	r14.is_cursed = true
+	r14.penalty_trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r14.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r14.penalty_value = 3
+	pool.append(r14)
+
+	# 15. 저주받은 왕관 — 저주: 최대 HP +25 / 매 전투 시작 무작위 영웅 HP -8
+	var r15: Resource = RelicRes.new(); r15.relic_name = "저주받은 왕관"
+	r15.description = "최대 HP +25. 단, 매 전투 시작 시 무작위 영웅 HP -8"
+	r15.trigger = RelicRes.TriggerType.PASSIVE
+	r15.effect_type = RelicRes.EffectType.MAX_HP; r15.value = 25
+	r15.is_cursed = true
+	r15.penalty_trigger = RelicRes.TriggerType.BATTLE_START
+	r15.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r15.penalty_value = 8
+	pool.append(r15)
+
+	# 16. 피의 서약 — 저주: 턴 시작 에너지 +1 / 턴 종료 무작위 영웅 HP -4
+	var r16: Resource = RelicRes.new(); r16.relic_name = "피의 서약"
+	r16.description = "플레이어 턴 시작 시 에너지 +1. 단, 턴 종료 시 무작위 영웅 HP -4"
+	r16.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r16.effect_type = RelicRes.EffectType.ENERGY; r16.value = 1
+	r16.is_cursed = true
+	r16.penalty_trigger = RelicRes.TriggerType.PLAYER_TURN_END
+	r16.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r16.penalty_value = 4
+	pool.append(r16)
+
+	# 17. 전술가의 지도 — 공용: 전투 시작 카드 +1 드로우
+	var r17: Resource = RelicRes.new(); r17.relic_name = "전술가의 지도"
+	r17.description = "전투 시작 시 카드 1장 추가 드로우"
+	r17.trigger = RelicRes.TriggerType.BATTLE_START
+	r17.effect_type = RelicRes.EffectType.DRAW; r17.value = 1
+	pool.append(r17)
+
+	# 18. 강철 의지 — 공용: 전투 시작 에너지 +1
+	var r18: Resource = RelicRes.new(); r18.relic_name = "강철 의지"
+	r18.description = "전투 시작 시 에너지 +1"
+	r18.trigger = RelicRes.TriggerType.BATTLE_START
+	r18.effect_type = RelicRes.EffectType.ENERGY; r18.value = 1
+	pool.append(r18)
+
+	# 19. 고대의 방패 — 공용: 전투 시작 팀 전체 방어도 +4
+	var r19: Resource = RelicRes.new(); r19.relic_name = "고대의 방패"
+	r19.description = "전투 시작 시 팀 전체 방어도 +4"
+	r19.trigger = RelicRes.TriggerType.BATTLE_START
+	r19.effect_type = RelicRes.EffectType.BLOCK; r19.value = 4
+	pool.append(r19)
+
 	return pool
