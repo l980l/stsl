@@ -13,7 +13,7 @@ func run_all() -> Dictionary:
 	test_hero_recruit_event_exists()
 	test_add_relic_choice_structure()
 	test_gold_with_cost_hp_structure()
-	test_pool_has_ten_events()
+	test_pool_has_eleven_events()
 	test_prometheus_event_exists()
 	test_hades_event_uses_add_relic()
 	test_hermes_event_has_two_choices()
@@ -195,8 +195,8 @@ func test_gold_with_cost_hp_structure() -> void:
 	_assert(choice.value == 60, "value 60")
 	_assert(choice.cost_hp == 25, "cost_hp 25 설정 가능")
 
-func test_pool_has_ten_events() -> void:
-	print("[TestEvent] test_pool_has_ten_events")
+func test_pool_has_eleven_events() -> void:
+	print("[TestEvent] test_pool_has_eleven_events")
 	var pool := _build_pool()
 	_assert(pool.size() == 11, "이벤트 풀 11종")
 
@@ -226,8 +226,15 @@ func test_hades_event_uses_add_relic() -> void:
 
 func test_devil_deal_event_exists() -> void:
 	print("[TestEvent] test_devil_deal_event_exists")
+	var pool := _build_pool()
 	var ChoiceRes = load("res://resources/event_choice_resource.gd")
-	_assert(ChoiceRes.EffectType.ADD_RELIC_GAMBLE == 7, "ADD_RELIC_GAMBLE == 7")
+	var found := false
+	for e in pool:
+		if e.event_name == "악마의 거래":
+			found = true
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.ADD_RELIC_GAMBLE, "선택 A: ADD_RELIC_GAMBLE")
+			_assert(e.choices[1].effect_type == ChoiceRes.EffectType.NONE, "선택 B: NONE")
+	_assert(found, "악마의 거래 이벤트 존재")
 
 func test_hermes_event_has_two_choices() -> void:
 	print("[TestEvent] test_hermes_event_has_two_choices")
