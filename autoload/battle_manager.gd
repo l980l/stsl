@@ -209,8 +209,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
 	_enemy_block[enemy_index] -= absorbed
 	amount -= absorbed
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - amount)
-	if amount > 0:
-		enemy_damaged.emit(enemy_index, amount)
+	enemy_damaged.emit(enemy_index, amount)
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
 		enemy_died.emit(enemy_index)
@@ -234,7 +233,7 @@ func _deal_damage_to_hero(hero_id: String, amount: int) -> void:
 			var RelicRes = load("res://resources/relic_resource.gd")
 			_gm_hd.trigger_relics(RelicRes.TriggerType.ON_HERO_DAMAGED,
 				{"hero_id": hero_id, "amount": amount})
-		hero_damaged.emit(hero_id, amount)
+	hero_damaged.emit(hero_id, amount)
 	_check_lose_condition()
 
 func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) -> void:

@@ -296,15 +296,14 @@ func test_hero_damaged_not_emitted_when_fully_blocked() -> void:
 	bm.setup_battle([_make_enemy(30, [])])
 	bm.start_player_turn()
 
-	# 블록 10 부여
 	bm._hero_block["napoleon"] = 10
 
 	var damage_emitted: Array = []
 	bm.hero_damaged.connect(func(id, amt): damage_emitted.append(amt))
 
-	# 피해 10 → 블록 10이 전부 흡수 → amount == 0
 	bm._deal_damage_to_hero("napoleon", 10)
-	_assert(damage_emitted.is_empty(), "블록 완전 흡수 시 hero_damaged 발화 없음")
+	_assert(damage_emitted.size() == 1, "블록 완전 흡수 시에도 hero_damaged 발화")
+	_assert(damage_emitted[0] == 0, "amount == 0 으로 발화")
 	_assert(bm.team_mgr.get_current_hp("napoleon") == 70, "HP 변화 없음")
 
 func test_enemy_damaged_not_emitted_when_fully_blocked() -> void:
@@ -315,15 +314,14 @@ func test_enemy_damaged_not_emitted_when_fully_blocked() -> void:
 	bm.setup_battle([_make_enemy(30, [])])
 	bm.start_player_turn()
 
-	# 적 블록 10 부여
 	bm._enemy_block[0] = 10
 
 	var damage_emitted: Array = []
 	bm.enemy_damaged.connect(func(idx, amt): damage_emitted.append(amt))
 
-	# 피해 10 → 블록 10이 전부 흡수
 	bm._deal_damage_to_enemy(0, 10)
-	_assert(damage_emitted.is_empty(), "블록 완전 흡수 시 enemy_damaged 발화 없음")
+	_assert(damage_emitted.size() == 1, "블록 완전 흡수 시에도 enemy_damaged 발화")
+	_assert(damage_emitted[0] == 0, "amount == 0 으로 발화")
 	_assert(bm.get_enemy_hp(0) == 30, "적 HP 변화 없음")
 
 func test_harpy_special_removes_from_deck() -> void:
