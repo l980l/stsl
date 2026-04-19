@@ -821,9 +821,9 @@ func _cleopatra_card_pool() -> Array:
 	var e8: Resource = EffRes.new(); e8.effect_type = EffRes.EffectType.HEAL; e8.value = 6
 	c8.effects = [e8]; cards.append(c8)
 
-	# 9. 유혹 — APPLY_STATUS(charm 2), cost 1
+	# 9. 유혹 — APPLY_STATUS(charm 1), cost 1
 	var c9: Resource = CardRes.new(); c9.card_name = "유혹"; c9.owner_id = "cleopatra"; c9.cost = 1; c9.play_animation = "idle"
-	var e9: Resource = EffRes.new(); e9.effect_type = EffRes.EffectType.APPLY_STATUS; e9.status_type = "charm"; e9.value = 2; e9.target = "SINGLE"
+	var e9: Resource = EffRes.new(); e9.effect_type = EffRes.EffectType.APPLY_STATUS; e9.status_type = "charm"; e9.value = 1; e9.target = "SINGLE"
 	c9.effects = [e9]; cards.append(c9)
 
 	# 10. 저주의 시선 — weak 2 + vulnerable 2, cost 1
@@ -1047,6 +1047,16 @@ func _build_event_pool() -> Array:
 	c10b.effect_type = ChoiceRes.EffectType.REMOVE_CARD; c10b.value = 1
 	e10.choices = [c10a, c10b]; events.append(e10)
 
+	# 11. 악마의 거래
+	var e11: Resource = EventRes.new()
+	e11.event_name = "악마의 거래"
+	e11.description = "어둠 속 제단에서 목소리가 들린다.\n'내 힘을 원하느냐? 대가는 네가 치르게 될 것이다.'\n50% 확률로 강력한 렐릭 또는 저주 렐릭을 얻는다."
+	var c11a: Resource = ChoiceRes.new(); c11a.label = "받아들인다"
+	c11a.effect_type = ChoiceRes.EffectType.ADD_RELIC_GAMBLE
+	var c11b: Resource = ChoiceRes.new(); c11b.label = "거절한다"
+	c11b.effect_type = ChoiceRes.EffectType.NONE
+	e11.choices = [c11a, c11b]; events.append(e11)
+
 	return events
 
 func to_dict() -> Dictionary:
@@ -1097,13 +1107,33 @@ func _request_scene(path: String) -> void:
 # ── 릴릭 시스템 ─────────────────────────────────
 
 func get_random_relic() -> Resource:
+	var tm := _get_tm()
 	var pool := _build_relic_pool()
 	var owned_names: Array = []
 	for r in relics:
 		owned_names.append(r.relic_name)
 	var available: Array = []
 	for r in pool:
-		if r.relic_name not in owned_names:
+		if r.relic_name in owned_names:
+			continue
+		if r.is_cursed:
+			continue
+		if r.owner_hero_id != "":
+			if tm == null or not tm.has_hero(r.owner_hero_id):
+				continue
+		available.append(r)
+	if available.is_empty():
+		return null
+	return available[randi() % available.size()]
+
+func get_random_cursed_relic() -> Resource:
+	var pool := _build_relic_pool()
+	var owned_names: Array = []
+	for r in relics:
+		owned_names.append(r.relic_name)
+	var available: Array = []
+	for r in pool:
+		if r.is_cursed and r.relic_name not in owned_names:
 			available.append(r)
 	if available.is_empty():
 		return null
@@ -1111,14 +1141,30 @@ func get_random_relic() -> Resource:
 
 func trigger_relics(trigger: int, context: Dictionary = {}) -> void:
 	for relic in relics:
-		if relic.trigger != trigger:
-			continue
-		var effective_value: int = relic.value
-		if relic.owner_hero_id != "":
-			if not _is_hero_alive(relic.owner_hero_id):
-				continue
-			effective_value = relic.bonus_value
-		_apply_relic_effect(relic, effective_value, context)
+		# 메인 효과
+		if relic.trigger == trigger:
+			var effective_value: int = relic.value
+			if relic.owner_hero_id == "" or _is_hero_alive(relic.owner_hero_id):
+				if relic.owner_hero_id != "":
+					effective_value = relic.bonus_value
+				_apply_relic_effect(relic, effective_value, context)
+		# 패널티 효과 (저주 렐릭)
+		if relic.is_cursed and relic.penalty_trigger == trigger and relic.penalty_value > 0:
+			_apply_penalty_effect(relic)
+
+func _apply_penalty_effect(relic: Resource) -> void:
+	var RelicRes = load("res://resources/relic_resource.gd")
+	var tm := _get_tm()
+	if not is_inside_tree() or tm == null:
+		return
+	match relic.penalty_effect_type:
+		RelicRes.EffectType.DAMAGE_HERO:
+			var living: Array = tm.get_living_heroes()
+			if not living.is_empty():
+				var target = living[randi() % living.size()]
+				tm.take_damage(target.hero_id, relic.penalty_value)
+		_:
+			push_warning("_apply_penalty_effect: 미처리 penalty_effect_type = %d" % relic.penalty_effect_type)
 
 func _is_hero_alive(hero_id: String) -> bool:
 	if not is_inside_tree():
@@ -1166,6 +1212,12 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 					tm.increase_max_hp(hero.hero_id, value)
 		RelicRes.EffectType.COST_REDUCTION:
 			pass  # PASSIVE 릴릭에서 별도 처리
+		RelicRes.EffectType.DAMAGE_HERO:
+			if is_inside_tree() and tm:
+				var living: Array = tm.get_living_heroes()
+				if not living.is_empty():
+					var target = living[randi() % living.size()]
+					tm.take_damage(target.hero_id, value)
 
 func _build_relic_pool() -> Array:
 	var RelicRes = load("res://resources/relic_resource.gd")
@@ -1243,5 +1295,80 @@ func _build_relic_pool() -> Array:
 	r10.effect_type = RelicRes.EffectType.BLOCK
 	r10.owner_hero_id = "yi_sun_sin"; r10.value = 2; r10.bonus_value = 4
 	pool.append(r10)
+
+	# 11. 포병 나팔 — 나폴레옹 전용: 턴 시작 사기 +1
+	var r11: Resource = RelicRes.new(); r11.relic_name = "포병 나팔"
+	r11.description = "플레이어 턴 시작 시 사기 +1 (나폴레옹 생존 시 적용)"
+	r11.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r11.effect_type = RelicRes.EffectType.GAIN_MORALE
+	r11.owner_hero_id = "napoleon"; r11.value = 0; r11.bonus_value = 1
+	pool.append(r11)
+
+	# 12. 난중일기 — 이순신 전용: 전투 승리 시 팀 HP +8
+	var r12: Resource = RelicRes.new(); r12.relic_name = "난중일기"
+	r12.description = "전투 승리 시 팀 HP +8 (이순신 생존 시 적용)"
+	r12.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r12.effect_type = RelicRes.EffectType.HEAL
+	r12.owner_hero_id = "yi_sun_sin"; r12.value = 0; r12.bonus_value = 8
+	pool.append(r12)
+
+	# 13. 파라오의 인장 — 클레오파트라 전용: 턴 시작 무작위 적 독 +1
+	var r13: Resource = RelicRes.new(); r13.relic_name = "파라오의 인장"
+	r13.description = "플레이어 턴 시작 시 무작위 적 독 +1 (클레오파트라 생존 시 적용)"
+	r13.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r13.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
+	r13.owner_hero_id = "cleopatra"; r13.value = 0; r13.bonus_value = 1
+	pool.append(r13)
+
+	# 14. 악마의 계약 — 저주: 전투 승리 팀 HP +20 / 매 턴 무작위 영웅 HP -3
+	var r14: Resource = RelicRes.new(); r14.relic_name = "악마의 계약"
+	r14.description = "전투 승리 시 팀 HP +20. 단, 매 플레이어 턴 시작 시 무작위 영웅 HP -3"
+	r14.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r14.effect_type = RelicRes.EffectType.HEAL; r14.value = 20
+	r14.is_cursed = true
+	r14.penalty_trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r14.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r14.penalty_value = 3
+	pool.append(r14)
+
+	# 15. 저주받은 왕관 — 저주: 최대 HP +25 / 매 전투 시작 무작위 영웅 HP -8
+	var r15: Resource = RelicRes.new(); r15.relic_name = "저주받은 왕관"
+	r15.description = "최대 HP +25. 단, 매 전투 시작 시 무작위 영웅 HP -8"
+	r15.trigger = RelicRes.TriggerType.PASSIVE
+	r15.effect_type = RelicRes.EffectType.MAX_HP; r15.value = 25
+	r15.is_cursed = true
+	r15.penalty_trigger = RelicRes.TriggerType.BATTLE_START
+	r15.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r15.penalty_value = 8
+	pool.append(r15)
+
+	# 16. 피의 서약 — 저주: 턴 시작 에너지 +1 / 턴 종료 무작위 영웅 HP -4
+	var r16: Resource = RelicRes.new(); r16.relic_name = "피의 서약"
+	r16.description = "플레이어 턴 시작 시 에너지 +1. 단, 턴 종료 시 무작위 영웅 HP -4"
+	r16.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r16.effect_type = RelicRes.EffectType.ENERGY; r16.value = 1
+	r16.is_cursed = true
+	r16.penalty_trigger = RelicRes.TriggerType.PLAYER_TURN_END
+	r16.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r16.penalty_value = 4
+	pool.append(r16)
+
+	# 17. 전술가의 지도 — 공용: 전투 시작 카드 +1 드로우
+	var r17: Resource = RelicRes.new(); r17.relic_name = "전술가의 지도"
+	r17.description = "전투 시작 시 카드 1장 추가 드로우"
+	r17.trigger = RelicRes.TriggerType.BATTLE_START
+	r17.effect_type = RelicRes.EffectType.DRAW; r17.value = 1
+	pool.append(r17)
+
+	# 18. 강철 의지 — 공용: 전투 시작 에너지 +1
+	var r18: Resource = RelicRes.new(); r18.relic_name = "강철 의지"
+	r18.description = "전투 시작 시 에너지 +1"
+	r18.trigger = RelicRes.TriggerType.BATTLE_START
+	r18.effect_type = RelicRes.EffectType.ENERGY; r18.value = 1
+	pool.append(r18)
+
+	# 19. 고대의 방패 — 공용: 전투 시작 팀 전체 방어도 +4
+	var r19: Resource = RelicRes.new(); r19.relic_name = "고대의 방패"
+	r19.description = "전투 시작 시 팀 전체 방어도 +4"
+	r19.trigger = RelicRes.TriggerType.BATTLE_START
+	r19.effect_type = RelicRes.EffectType.BLOCK; r19.value = 4
+	pool.append(r19)
 
 	return pool

@@ -219,6 +219,7 @@ func _connect_signals() -> void:
 	BattleManager.enemy_turn_started.connect(_on_enemy_turn_started)
 	BattleManager.hero_damaged.connect(_on_hero_damaged)
 	BattleManager.enemy_damaged.connect(_on_enemy_damaged)
+	TeamManager.hero_healed.connect(_on_hero_healed)
 	BattleManager.enemy_died.connect(_on_enemy_died)
 	BattleManager.battle_won.connect(_on_battle_won)
 	BattleManager.battle_lost.connect(_on_battle_lost)
@@ -523,8 +524,55 @@ func _refresh_all_hero_ui() -> void:
 		if entry["hero_id"] != "":
 			_update_hero_ui(entry["hero_id"])
 
-func _on_hero_damaged(hero_id: String, _amount: int) -> void:
+func _spawn_damage_popup(world_pos: Vector2, amount: int, fully_blocked: bool) -> void:
+	var lbl := Label.new()
+	if fully_blocked:
+		lbl.text = "BLOCK"
+		lbl.modulate = Color(0.4, 0.8, 1.0)
+	else:
+		lbl.text = str(amount)
+		lbl.modulate = Color(1.0, 0.2, 0.2)
+	lbl.add_theme_font_size_override("font_size", 28)
+	lbl.position = world_pos
+	lbl.z_index = 20
+	add_child(lbl)
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(lbl, "position:y", world_pos.y - 60.0, 0.8)
+	tw.tween_property(lbl, "modulate:a", 0.0, 0.8)
+	tw.chain().tween_callback(lbl.queue_free)
+
+func _spawn_heal_popup(world_pos: Vector2, amount: int) -> void:
+	var lbl := Label.new()
+	lbl.text = "+" + str(amount)
+	lbl.modulate = Color(0.2, 1.0, 0.4)
+	lbl.add_theme_font_size_override("font_size", 28)
+	lbl.position = world_pos
+	lbl.z_index = 20
+	add_child(lbl)
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(lbl, "position:y", world_pos.y - 60.0, 0.8)
+	tw.tween_property(lbl, "modulate:a", 0.0, 0.8)
+	tw.chain().tween_callback(lbl.queue_free)
+
+func _on_hero_healed(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)
+	for entry in _hero_nodes:
+		if entry["hero_id"] == hero_id and entry["panel"].visible:
+			var panel: ColorRect = entry["panel"]
+			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
+			_spawn_heal_popup(popup_pos, amount)
+			break
+
+func _on_hero_damaged(hero_id: String, amount: int) -> void:
+	_update_hero_ui(hero_id)
+	for entry in _hero_nodes:
+		if entry["hero_id"] == hero_id and entry["panel"].visible:
+			var panel: ColorRect = entry["panel"]
+			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
+			_spawn_damage_popup(popup_pos, amount, amount == 0)
+			break
 	# hurt 애니메이션 트리거
 	var char_node = _hero_char_nodes.get(hero_id)
 	if char_node and char_node.has_node("AnimationPlayer"):
@@ -532,8 +580,12 @@ func _on_hero_damaged(hero_id: String, _amount: int) -> void:
 		if ap.has_animation("hurt"):
 			ap.play("hurt")
 
-func _on_enemy_damaged(index: int, _amount: int) -> void:
+func _on_enemy_damaged(index: int, amount: int) -> void:
 	_update_enemy_ui(index)
+	if index < _enemy_nodes.size() and _enemy_nodes[index]["panel"].visible:
+		var panel: ColorRect = _enemy_nodes[index]["panel"]
+		var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
+		_spawn_damage_popup(popup_pos, amount, amount == 0)
 	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
 	if char_node and char_node.has_node("AnimationPlayer"):
 		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")

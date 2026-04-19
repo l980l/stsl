@@ -46,7 +46,15 @@ func _apply_choice(choice: Resource) -> void:
 			if choice.cost_hp > 0:
 				for hero in TeamManager.heroes:
 					TeamManager.take_damage(hero.hero_id, choice.cost_hp)
-			var relic = GameManager.get_random_relic()
+			var relic: Resource = GameManager.get_random_relic()
+			if relic:
+				GameManager.add_relic(relic)
+		choice.EffectType.ADD_RELIC_GAMBLE:
+			var relic: Resource
+			if randf() < 0.5:
+				relic = GameManager.get_random_relic()
+			else:
+				relic = GameManager.get_random_cursed_relic()
 			if relic:
 				GameManager.add_relic(relic)
 		choice.EffectType.ADD_HERO:
