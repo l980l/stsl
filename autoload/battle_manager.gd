@@ -276,10 +276,27 @@ func _execute_enemy_turn() -> void:
 		_tick_enemy_poison(i)
 		if not _enemy_alive[i]:
 			continue
-		# 매혹(charm): 2스택 이상이면 1턴 행동 스킵 후 스택 초기화
+		# 매혹(charm) 스택 3이면 홀림(enthrall)으로 전환
 		var charm: int = _enemy_status[i].get("charm", 0)
-		if charm >= 2:
+		if charm >= 3:
 			_enemy_status[i]["charm"] = 0
+			_enemy_status[i]["enthrall"] = _enemy_status[i].get("enthrall", 0) + 1
+		# 홀림(enthrall): 자신을 제외한 다른 몬스터를 랜덤 공격
+		var enthrall: int = _enemy_status[i].get("enthrall", 0)
+		if enthrall > 0:
+			_enemy_status[i]["enthrall"] = enthrall - 1
+			var other_targets: Array = []
+			for j in range(_enemies.size()):
+				if j != i and _enemy_alive[j]:
+					other_targets.append(j)
+			if not other_targets.is_empty():
+				var target_j: int = other_targets[randi() % other_targets.size()]
+				var pattern: Array = _get_active_pattern(i)
+				if not pattern.is_empty():
+					var intent: Resource = pattern[_enemy_intent_index[i]]
+					if intent.action_type == IntentRes.ActionType.ATTACK:
+						_deal_damage_to_enemy(target_j, intent.value)
+			_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % _get_active_pattern(i).size()
 			continue
 		var pattern: Array = _get_active_pattern(i)
 		if pattern.is_empty():

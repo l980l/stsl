@@ -821,9 +821,9 @@ func _cleopatra_card_pool() -> Array:
 	var e8: Resource = EffRes.new(); e8.effect_type = EffRes.EffectType.HEAL; e8.value = 6
 	c8.effects = [e8]; cards.append(c8)
 
-	# 9. 유혹 — APPLY_STATUS(charm 2), cost 1
+	# 9. 유혹 — APPLY_STATUS(charm 1), cost 1
 	var c9: Resource = CardRes.new(); c9.card_name = "유혹"; c9.owner_id = "cleopatra"; c9.cost = 1; c9.play_animation = "idle"
-	var e9: Resource = EffRes.new(); e9.effect_type = EffRes.EffectType.APPLY_STATUS; e9.status_type = "charm"; e9.value = 2; e9.target = "SINGLE"
+	var e9: Resource = EffRes.new(); e9.effect_type = EffRes.EffectType.APPLY_STATUS; e9.status_type = "charm"; e9.value = 1; e9.target = "SINGLE"
 	c9.effects = [e9]; cards.append(c9)
 
 	# 10. 저주의 시선 — weak 2 + vulnerable 2, cost 1

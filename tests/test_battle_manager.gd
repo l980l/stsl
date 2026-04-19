@@ -32,7 +32,7 @@ func run_all() -> Dictionary:
 	test_hero_damaged_emitted_with_zero_when_fully_blocked()
 	test_enemy_damaged_emitted_with_zero_when_fully_blocked()
 	test_harpy_special_removes_from_deck()
-	test_charm_skips_enemy_turn()
+	test_charm_converts_to_enthrall_at_3()
 	test_dead_hero_card_has_no_effect()
 	test_get_hero_status_empty_by_default()
 	test_get_enemy_status_after_apply()
@@ -41,7 +41,7 @@ func run_all() -> Dictionary:
 	test_morale_changed_emitted_on_consume_success()
 	test_morale_changed_not_emitted_on_consume_fail()
 	test_cost_next_reduces_next_card_cost()
-	test_charm_attacks_other_enemy()
+	test_enthrall_attacks_other_enemy()
 	test_synergy_napoleon_yisunsin()
 	test_synergy_yisunsin_cleopatra()
 	test_synergy_napoleon_cleopatra()
@@ -338,24 +338,17 @@ func test_harpy_special_removes_from_deck() -> void:
 	bm.end_player_turn()  # 적 턴 실행
 	_assert(bm.deck_mgr.get_full_deck().size() == 2, "SPECIAL → 덱에서 카드 1장 영구 제거 (3→2)")
 
-func test_charm_skips_enemy_turn() -> void:
-	print("[TestBattleManager] test_charm_skips_enemy_turn")
+func test_charm_converts_to_enthrall_at_3() -> void:
+	print("[TestBattleManager] test_charm_converts_to_enthrall_at_3")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
 	var intent := _make_intent(IntentRes.ActionType.ATTACK, 10, IntentRes.TargetType.RANDOM)
 	bm.setup_battle([_make_enemy(30, [intent])])
-	# 1스택: 매혹 미발동 — 적이 정상 공격
-	bm._enemy_status[0]["charm"] = 1
+	bm._enemy_status[0]["charm"] = 3
 	bm.start_player_turn()
-	bm.end_player_turn()
-	_assert(bm.team_mgr.get_current_hp("napoleon") == 60, "charm 1스택: 매혹 미발동 → 적 공격 정상 (70-10=60)")
-	_assert(bm._enemy_status[0].get("charm", -1) == 1, "1스택은 소모되지 않음")
-	# 2스택: 매혹 발동 — 적 행동 스킵, 스택 초기화
-	bm._enemy_status[0]["charm"] = 2
-	bm.start_player_turn()
-	bm.end_player_turn()
-	_assert(bm.team_mgr.get_current_hp("napoleon") == 60, "charm 2스택: 매혹 발동 → 적 공격 스킵 (HP 불변)")
-	_assert(bm._enemy_status[0].get("charm", -1) == 0, "2스택 소모 후 0으로 초기화")
+	bm.end_player_turn()  # charm 3 → enthrall 전환, 다른 적 없어 공격 스킵
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 70, "홀림 턴: 다른 적 없어 영웅 HP 불변")
+	_assert(bm._enemy_status[0].get("charm", -1) == 0, "charm 스택 → 0 초기화")
 
 func test_dead_hero_card_has_no_effect() -> void:
 	print("[TestBattleManager] test_dead_hero_card_has_no_effect")
@@ -521,24 +514,23 @@ func test_cost_next_reduces_next_card_cost() -> void:
 	bm.play_card(card_cn, -1)
 	_assert(bm.deck_mgr.pending_cost_reduction == 1, "COST_NEXT 사용 후 pending_cost_reduction == 1")
 
-func test_charm_attacks_other_enemy() -> void:
-	print("[TestBattleManager] test_charm_attacks_other_enemy")
+func test_enthrall_attacks_other_enemy() -> void:
+	print("[TestBattleManager] test_enthrall_attacks_other_enemy")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
 	var intent := _make_intent(IntentRes.ActionType.ATTACK, 10, IntentRes.TargetType.RANDOM)
 	var enemy0 := _make_enemy(50, [intent])
 	var enemy1 := _make_enemy(50, [intent])
 	bm.setup_battle([enemy0, enemy1])
-	# charm 2스택: enemy0 행동 스킵, enemy1만 napoleon 공격
-	bm._enemy_status[0]["charm"] = 2
+	bm._enemy_status[0]["enthrall"] = 1  # 홀림 1턴 직접 부여
 	bm.start_player_turn()
 	bm.end_player_turn()
 
 	var napoleon_hp: int = bm.team_mgr.get_current_hp("napoleon")
 	var enemy1_hp: int = bm.get_enemy_hp(1)
-	_assert(napoleon_hp == 60, "enemy1만 napoleon 공격 → HP 70-10=60")
-	_assert(enemy1_hp == 50, "charm된 enemy0는 다른 적 공격 안 함 → enemy1 HP 불변")
-	_assert(bm._enemy_status[0].get("charm", -1) == 0, "charm 2스택 소모 후 0 초기화")
+	_assert(napoleon_hp == 60, "enemy1이 napoleon 공격 → HP 70-10=60")
+	_assert(enemy1_hp == 40, "홀림된 enemy0가 enemy1 공격 → enemy1 HP 50-10=40")
+	_assert(bm._enemy_status[0].get("enthrall", -1) == 0, "홀림 스택 1→0 소모")
 
 
 func test_synergy_napoleon_yisunsin() -> void:
