@@ -1047,6 +1047,16 @@ func _build_event_pool() -> Array:
 	c10b.effect_type = ChoiceRes.EffectType.REMOVE_CARD; c10b.value = 1
 	e10.choices = [c10a, c10b]; events.append(e10)
 
+	# 11. 악마의 거래
+	var e11: Resource = EventRes.new()
+	e11.event_name = "악마의 거래"
+	e11.description = "어둠 속 제단에서 목소리가 들린다.\n'내 힘을 원하느냐? 대가는 네가 치르게 될 것이다.'\n50% 확률로 강력한 렐릭 또는 저주 렐릭을 얻는다."
+	var c11a: Resource = ChoiceRes.new(); c11a.label = "받아들인다"
+	c11a.effect_type = ChoiceRes.EffectType.ADD_RELIC_GAMBLE
+	var c11b: Resource = ChoiceRes.new(); c11b.label = "거절한다"
+	c11b.effect_type = ChoiceRes.EffectType.NONE
+	e11.choices = [c11a, c11b]; events.append(e11)
+
 	return events
 
 func to_dict() -> Dictionary:

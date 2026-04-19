@@ -17,6 +17,7 @@ func run_all() -> Dictionary:
 	test_prometheus_event_exists()
 	test_hades_event_uses_add_relic()
 	test_hermes_event_has_two_choices()
+	test_devil_deal_event_exists()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -214,6 +215,11 @@ func test_hades_event_uses_add_relic() -> void:
 			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.ADD_RELIC, "선택 A: ADD_RELIC")
 			_assert(e.choices[0].cost_hp == 30, "cost_hp == 30")
 	_assert(found, "하데스의 계약 이벤트 존재")
+
+func test_devil_deal_event_exists() -> void:
+	print("[TestEvent] test_devil_deal_event_exists")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	_assert(ChoiceRes.EffectType.ADD_RELIC_GAMBLE == 7, "ADD_RELIC_GAMBLE == 7")
 
 func test_hermes_event_has_two_choices() -> void:
 	print("[TestEvent] test_hermes_event_has_two_choices")

@@ -49,6 +49,14 @@ func _apply_choice(choice: Resource) -> void:
 			var relic = GameManager.get_random_relic()
 			if relic:
 				GameManager.add_relic(relic)
+		choice.EffectType.ADD_RELIC_GAMBLE:
+			var relic
+			if randf() < 0.5:
+				relic = GameManager.get_random_relic()
+			else:
+				relic = GameManager.get_random_cursed_relic()
+			if relic:
+				GameManager.add_relic(relic)
 		choice.EffectType.ADD_HERO:
 			GameManager.recruit_random_hero()
 		choice.EffectType.NONE:
