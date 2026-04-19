@@ -1153,6 +1153,8 @@ func _apply_penalty_effect(relic: Resource) -> void:
 			if not living.is_empty():
 				var target = living[randi() % living.size()]
 				tm.take_damage(target.hero_id, relic.penalty_value)
+		_:
+			push_warning("_apply_penalty_effect: 미처리 penalty_effect_type = %d" % relic.penalty_effect_type)
 
 func _is_hero_alive(hero_id: String) -> bool:
 	if not is_inside_tree():
@@ -1201,12 +1203,11 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 		RelicRes.EffectType.COST_REDUCTION:
 			pass  # PASSIVE 릴릭에서 별도 처리
 		RelicRes.EffectType.DAMAGE_HERO:
-			var tm_dh := _get_tm()
-			if is_inside_tree() and tm_dh:
-				var living: Array = tm_dh.get_living_heroes()
+			if is_inside_tree() and tm:
+				var living: Array = tm.get_living_heroes()
 				if not living.is_empty():
 					var target = living[randi() % living.size()]
-					tm_dh.take_damage(target.hero_id, value)
+					tm.take_damage(target.hero_id, value)
 
 func _build_relic_pool() -> Array:
 	var RelicRes = load("res://resources/relic_resource.gd")
