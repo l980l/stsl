@@ -13,62 +13,57 @@ func _ready() -> void:
 	_build_ui(upgradeable)
 
 func _get_upgradeable_cards() -> Array:
-	var dm: Object = null
-	if Engine.has_singleton("DeckManager"):
-		dm = Engine.get_singleton("DeckManager")
-	elif get_tree() and get_tree().root:
-		dm = get_tree().root.get_node_or_null("DeckManager")
-	if dm == null:
-		return []
-	var all: Array = dm.draw_pile.duplicate()
-	all.append_array(dm.discard_pile)
+	# hand도 포함 — 전투 중 손패 카드는 discard_pile에 없을 수 있음
+	var all: Array = DeckManager.draw_pile.duplicate()
+	all.append_array(DeckManager.discard_pile)
+	all.append_array(DeckManager.hand)
 	var result: Array = []
 	for card in all:
-		if not card.get("upgraded"):
+		if not card.upgraded:
 			result.append(card)
 	return result
 
 func _build_ui(upgradeable: Array) -> void:
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.1)
+	bg.position = Vector2.ZERO
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
 	var title := Label.new()
 	title.text = "강화할 카드를 선택하세요"
-	title.position = Vector2(660, 30)
-	title.size = Vector2(600, 60)
+	title.position = Vector2(560, 30)
+	title.size = Vector2(800, 60)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 32)
 	add_child(title)
 
+	var scroll_w: int = COLS * (CARD_W + 20) - 20  # 940
 	var scroll := ScrollContainer.new()
-	scroll.position = Vector2(160, 110)
-	scroll.size = Vector2(1600, 870)
+	scroll.position = Vector2((1920 - scroll_w) / 2, 110)
+	scroll.size = Vector2(scroll_w, 870)
 	add_child(scroll)
 
 	var grid := GridContainer.new()
 	grid.columns = COLS
 	grid.add_theme_constant_override("h_separation", 20)
 	grid.add_theme_constant_override("v_separation", 20)
+	grid.custom_minimum_size = Vector2(scroll_w, 0)
 	scroll.add_child(grid)
 
-	for card in upgradeable:
+	for card: Resource in upgradeable:
 		var btn := Button.new()
 		btn.custom_minimum_size = Vector2(CARD_W, CARD_H)
-		var card_name: String = card.get("card_name") if card.get("card_name") != null else "?"
-		var cost: int = card.get("cost") if card.get("cost") != null else 0
-		var owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
-		btn.text = "[%d]\n%s\n%s\n→ 강화" % [cost, card_name, owner]
+		btn.text = "[%d]\n%s\n%s\n→ 강화" % [card.cost, card.card_name, card.owner_id]
 		btn.add_theme_font_size_override("font_size", 14)
-		var captured_card := card
+		var captured_card: Resource = card
 		btn.pressed.connect(func(): _on_card_selected(captured_card))
 		grid.add_child(btn)
 
 	var skip_btn := Button.new()
-	skip_btn.text = "건너뛰기"
-	skip_btn.position = Vector2(880, 1010)
+	skip_btn.position = Vector2(880, 1000)
 	skip_btn.size = Vector2(160, 50)
+	skip_btn.text = "건너뛰기"
 	skip_btn.add_theme_font_size_override("font_size", 18)
 	skip_btn.pressed.connect(GameManager.complete_card_upgrade)
 	add_child(skip_btn)
