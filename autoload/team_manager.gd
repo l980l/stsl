@@ -49,6 +49,9 @@ func get_hero(hero_id: String) -> Resource:
 			return hero
 	return null
 
+func has_hero(hero_id: String) -> bool:
+	return get_hero(hero_id) != null
+
 func get_living_heroes() -> Array:
 	var result: Array = []
 	for hero in heroes:

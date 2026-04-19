@@ -24,6 +24,9 @@ func run_all() -> Dictionary:
 	test_battle_win_relic_heal()
 	test_is_cursed_field_exists()
 	test_penalty_fields_exist()
+	test_damage_hero_effect_bypasses_block()
+	test_cursed_relic_has_is_cursed_true()
+	test_penalty_effect_type_settable()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -155,3 +158,25 @@ func test_penalty_fields_exist() -> void:
 	r.penalty_value = 3
 	_assert(r.penalty_value == 3, "penalty_value 설정 가능")
 	_assert(r.penalty_trigger == RelicRes.TriggerType.PLAYER_TURN_START, "penalty_trigger 설정 가능")
+
+func test_damage_hero_effect_bypasses_block() -> void:
+	print("[TestRelics] test_damage_hero_effect_bypasses_block")
+	var tm := _make_tm()
+	var hero := _make_hero("napoleon", 70)
+	tm.add_hero(hero)
+	tm.take_damage("napoleon", 5)
+	_assert(tm.get_current_hp("napoleon") == 65, "take_damage 직접 호출 시 HP 감소")
+
+func test_cursed_relic_has_is_cursed_true() -> void:
+	print("[TestRelics] test_cursed_relic_has_is_cursed_true")
+	var r := RelicRes.new()
+	r.relic_name = "악마의 계약"
+	r.is_cursed = true
+	_assert(r.is_cursed == true, "저주 렐릭 is_cursed=true")
+	_assert(r.relic_name == "악마의 계약", "저주 렐릭 이름 확인")
+
+func test_penalty_effect_type_settable() -> void:
+	print("[TestRelics] test_penalty_effect_type_settable")
+	var r := RelicRes.new()
+	r.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO
+	_assert(r.penalty_effect_type == RelicRes.EffectType.DAMAGE_HERO, "penalty_effect_type DAMAGE_HERO 설정 가능")

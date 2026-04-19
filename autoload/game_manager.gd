@@ -1097,13 +1097,33 @@ func _request_scene(path: String) -> void:
 # ── 릴릭 시스템 ─────────────────────────────────
 
 func get_random_relic() -> Resource:
+	var tm := _get_tm()
 	var pool := _build_relic_pool()
 	var owned_names: Array = []
 	for r in relics:
 		owned_names.append(r.relic_name)
 	var available: Array = []
 	for r in pool:
-		if r.relic_name not in owned_names:
+		if r.relic_name in owned_names:
+			continue
+		if r.is_cursed:
+			continue
+		if r.owner_hero_id != "":
+			if tm == null or not tm.has_hero(r.owner_hero_id):
+				continue
+		available.append(r)
+	if available.is_empty():
+		return null
+	return available[randi() % available.size()]
+
+func get_random_cursed_relic() -> Resource:
+	var pool := _build_relic_pool()
+	var owned_names: Array = []
+	for r in relics:
+		owned_names.append(r.relic_name)
+	var available: Array = []
+	for r in pool:
+		if r.is_cursed and r.relic_name not in owned_names:
 			available.append(r)
 	if available.is_empty():
 		return null
@@ -1111,14 +1131,28 @@ func get_random_relic() -> Resource:
 
 func trigger_relics(trigger: int, context: Dictionary = {}) -> void:
 	for relic in relics:
-		if relic.trigger != trigger:
-			continue
-		var effective_value: int = relic.value
-		if relic.owner_hero_id != "":
-			if not _is_hero_alive(relic.owner_hero_id):
-				continue
-			effective_value = relic.bonus_value
-		_apply_relic_effect(relic, effective_value, context)
+		# 메인 효과
+		if relic.trigger == trigger:
+			var effective_value: int = relic.value
+			if relic.owner_hero_id == "" or _is_hero_alive(relic.owner_hero_id):
+				if relic.owner_hero_id != "":
+					effective_value = relic.bonus_value
+				_apply_relic_effect(relic, effective_value, context)
+		# 패널티 효과 (저주 렐릭)
+		if relic.is_cursed and relic.penalty_trigger == trigger and relic.penalty_value > 0:
+			_apply_penalty_effect(relic)
+
+func _apply_penalty_effect(relic: Resource) -> void:
+	var RelicRes = load("res://resources/relic_resource.gd")
+	var tm := _get_tm()
+	if not is_inside_tree() or tm == null:
+		return
+	match relic.penalty_effect_type:
+		RelicRes.EffectType.DAMAGE_HERO:
+			var living: Array = tm.get_living_heroes()
+			if not living.is_empty():
+				var target = living[randi() % living.size()]
+				tm.take_damage(target.hero_id, relic.penalty_value)
 
 func _is_hero_alive(hero_id: String) -> bool:
 	if not is_inside_tree():
@@ -1166,6 +1200,13 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 					tm.increase_max_hp(hero.hero_id, value)
 		RelicRes.EffectType.COST_REDUCTION:
 			pass  # PASSIVE 릴릭에서 별도 처리
+		RelicRes.EffectType.DAMAGE_HERO:
+			var tm_dh := _get_tm()
+			if is_inside_tree() and tm_dh:
+				var living: Array = tm_dh.get_living_heroes()
+				if not living.is_empty():
+					var target = living[randi() % living.size()]
+					tm_dh.take_damage(target.hero_id, value)
 
 func _build_relic_pool() -> Array:
 	var RelicRes = load("res://resources/relic_resource.gd")
