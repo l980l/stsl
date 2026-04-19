@@ -29,8 +29,8 @@ func run_all() -> Dictionary:
 	test_win_condition()
 	test_lose_condition()
 	test_enemy_all_attack_hits_all_heroes()
-	test_hero_damaged_not_emitted_when_fully_blocked()
-	test_enemy_damaged_not_emitted_when_fully_blocked()
+	test_hero_damaged_emitted_with_zero_when_fully_blocked()
+	test_enemy_damaged_emitted_with_zero_when_fully_blocked()
 	test_harpy_special_removes_from_deck()
 	test_charm_skips_enemy_turn()
 	test_dead_hero_card_has_no_effect()
@@ -288,8 +288,8 @@ func test_enemy_all_attack_hits_all_heroes() -> void:
 	_assert(bm.team_mgr.get_current_hp("napoleon") == 60, "ALL 공격 → napoleon HP 70→60")
 	_assert(bm.team_mgr.get_current_hp("cleopatra") == 50, "ALL 공격 → cleopatra HP 60→50")
 
-func test_hero_damaged_not_emitted_when_fully_blocked() -> void:
-	print("[TestBattleManager] test_hero_damaged_not_emitted_when_fully_blocked")
+func test_hero_damaged_emitted_with_zero_when_fully_blocked() -> void:
+	print("[TestBattleManager] test_hero_damaged_emitted_with_zero_when_fully_blocked")
 	var bm := _make_bm()
 	var hero := _make_hero("napoleon", 70)
 	bm.team_mgr.add_hero(hero)
@@ -306,8 +306,8 @@ func test_hero_damaged_not_emitted_when_fully_blocked() -> void:
 	_assert(damage_emitted[0] == 0, "amount == 0 으로 발화")
 	_assert(bm.team_mgr.get_current_hp("napoleon") == 70, "HP 변화 없음")
 
-func test_enemy_damaged_not_emitted_when_fully_blocked() -> void:
-	print("[TestBattleManager] test_enemy_damaged_not_emitted_when_fully_blocked")
+func test_enemy_damaged_emitted_with_zero_when_fully_blocked() -> void:
+	print("[TestBattleManager] test_enemy_damaged_emitted_with_zero_when_fully_blocked")
 	var bm := _make_bm()
 	var hero := _make_hero("napoleon", 70)
 	bm.team_mgr.add_hero(hero)
