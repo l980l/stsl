@@ -22,6 +22,8 @@ func run_all() -> Dictionary:
 	test_relic_no_duplicate_names()
 	test_increase_max_hp()
 	test_battle_win_relic_heal()
+	test_is_cursed_field_exists()
+	test_penalty_fields_exist()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -87,6 +89,7 @@ func test_effect_type_values() -> void:
 	_assert(RelicRes.EffectType.HEAL == 0, "HEAL == 0")
 	_assert(RelicRes.EffectType.APPLY_STATUS_ENEMY == 3, "APPLY_STATUS_ENEMY == 3")
 	_assert(RelicRes.EffectType.BLOCK == 8, "BLOCK == 8")
+	_assert(RelicRes.EffectType.DAMAGE_HERO == 9, "DAMAGE_HERO == 9")
 
 func test_relic_battle_start_trigger() -> void:
 	print("[TestRelics] test_relic_battle_start_trigger")
@@ -137,3 +140,18 @@ func test_battle_win_relic_heal() -> void:
 	_assert(relic.trigger == RelicRes.TriggerType.BATTLE_WIN, "버닝 블러드 트리거 BATTLE_WIN")
 	_assert(relic.effect_type == RelicRes.EffectType.HEAL, "버닝 블러드 효과 HEAL")
 	_assert(relic.value == 6, "버닝 블러드 회복량 6")
+
+func test_is_cursed_field_exists() -> void:
+	print("[TestRelics] test_is_cursed_field_exists")
+	var r := RelicRes.new()
+	_assert(r.is_cursed == false, "is_cursed 기본값 false")
+
+func test_penalty_fields_exist() -> void:
+	print("[TestRelics] test_penalty_fields_exist")
+	var r := RelicRes.new()
+	r.is_cursed = true
+	r.penalty_trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r.penalty_effect_type = RelicRes.EffectType.HEAL
+	r.penalty_value = 3
+	_assert(r.penalty_value == 3, "penalty_value 설정 가능")
+	_assert(r.penalty_trigger == RelicRes.TriggerType.PLAYER_TURN_START, "penalty_trigger 설정 가능")

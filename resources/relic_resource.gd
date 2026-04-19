@@ -13,7 +13,8 @@ enum TriggerType {
 
 enum EffectType {
 	HEAL, ENERGY, DRAW, APPLY_STATUS_ENEMY, MAX_HP, RECOVER_CARD,
-	GAIN_MORALE, COST_REDUCTION, BLOCK
+	GAIN_MORALE, COST_REDUCTION, BLOCK,
+	DAMAGE_HERO
 }
 
 @export var relic_name: String = ""
@@ -24,3 +25,7 @@ enum EffectType {
 @export var owner_hero_id: String = ""  # "" = 공용. 특정 id = 해당 캐릭터 전용
 @export var bonus_value: int = 0        # 전용 캐릭터 생존 시 value 대신 사용
 @export var condition_value: int = 0    # ON_HERO_DAMAGED: 최소 피해량 조건
+@export var is_cursed: bool = false
+@export var penalty_trigger: TriggerType = TriggerType.PASSIVE
+@export var penalty_effect_type: EffectType = EffectType.DAMAGE_HERO
+@export var penalty_value: int = 0
