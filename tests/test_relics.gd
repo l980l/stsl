@@ -40,9 +40,6 @@ func _assert(cond: bool, msg: String) -> void:
 		failed += 1
 		print("  FAIL: " + msg)
 
-func _make_relic_pool() -> Array:
-	return load("res://resources/relic_resource.gd").new()._get_pool_for_test()
-
 func _build_pool() -> Array:
 	# game_manager.gd와 동일한 로직 인라인
 	var pool: Array = []
