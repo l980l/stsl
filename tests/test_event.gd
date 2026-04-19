@@ -110,6 +110,14 @@ func _build_pool() -> Array:
 	c10b.effect_type = ChoiceRes.EffectType.REMOVE_CARD; c10b.value = 1
 	e10.choices = [c10a, c10b]; events.append(e10)
 
+	# 11. 악마의 거래
+	var e11: Resource = EventRes.new(); e11.event_name = "악마의 거래"
+	var c11a: Resource = ChoiceRes.new(); c11a.label = "받아들인다"
+	c11a.effect_type = ChoiceRes.EffectType.ADD_RELIC_GAMBLE
+	var c11b: Resource = ChoiceRes.new(); c11b.label = "거절한다"
+	c11b.effect_type = ChoiceRes.EffectType.NONE
+	e11.choices = [c11a, c11b]; events.append(e11)
+
 	return events
 
 func test_gold_event_exists() -> void:
@@ -190,7 +198,7 @@ func test_gold_with_cost_hp_structure() -> void:
 func test_pool_has_ten_events() -> void:
 	print("[TestEvent] test_pool_has_ten_events")
 	var pool := _build_pool()
-	_assert(pool.size() == 10, "이벤트 풀 10종")
+	_assert(pool.size() == 11, "이벤트 풀 11종")
 
 func test_prometheus_event_exists() -> void:
 	print("[TestEvent] test_prometheus_event_exists")
