@@ -42,6 +42,10 @@ func run_all() -> Dictionary:
 	test_morale_changed_not_emitted_on_consume_fail()
 	test_cost_next_reduces_next_card_cost()
 	test_charm_attacks_other_enemy()
+	test_synergy_napoleon_yisunsin()
+	test_synergy_yisunsin_cleopatra()
+	test_synergy_napoleon_cleopatra()
+	test_synergy_napoleon_cleopatra_no_morale()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -342,11 +346,18 @@ func test_charm_skips_enemy_turn() -> void:
 	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
 	var intent := _make_intent(IntentRes.ActionType.ATTACK, 10, IntentRes.TargetType.RANDOM)
 	bm.setup_battle([_make_enemy(30, [intent])])
+	# 1스택: 매혹 미발동 — 적이 정상 공격
 	bm._enemy_status[0]["charm"] = 1
 	bm.start_player_turn()
-	bm.end_player_turn()  # 적 턴 — charm 있으므로 공격 스킵
-	_assert(bm.team_mgr.get_current_hp("napoleon") == 70, "charm 상태 시 적 공격 스킵 → HP 불변")
-	_assert(bm._enemy_status[0].get("charm", -1) == 0, "charm 스택 1→0 감소")
+	bm.end_player_turn()
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 60, "charm 1스택: 매혹 미발동 → 적 공격 정상 (70-10=60)")
+	_assert(bm._enemy_status[0].get("charm", -1) == 1, "1스택은 소모되지 않음")
+	# 2스택: 매혹 발동 — 적 행동 스킵, 스택 초기화
+	bm._enemy_status[0]["charm"] = 2
+	bm.start_player_turn()
+	bm.end_player_turn()
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 60, "charm 2스택: 매혹 발동 → 적 공격 스킵 (HP 불변)")
+	_assert(bm._enemy_status[0].get("charm", -1) == 0, "2스택 소모 후 0으로 초기화")
 
 func test_dead_hero_card_has_no_effect() -> void:
 	print("[TestBattleManager] test_dead_hero_card_has_no_effect")
@@ -520,12 +531,111 @@ func test_charm_attacks_other_enemy() -> void:
 	var enemy0 := _make_enemy(50, [intent])
 	var enemy1 := _make_enemy(50, [intent])
 	bm.setup_battle([enemy0, enemy1])
-	bm._enemy_status[0]["charm"] = 1
+	# charm 2스택: enemy0 행동 스킵, enemy1만 napoleon 공격
+	bm._enemy_status[0]["charm"] = 2
 	bm.start_player_turn()
 	bm.end_player_turn()
 
 	var napoleon_hp: int = bm.team_mgr.get_current_hp("napoleon")
 	var enemy1_hp: int = bm.get_enemy_hp(1)
-	_assert(napoleon_hp == 60, "enemy1이 napoleon 공격 → HP 70-10=60")
-	_assert(enemy1_hp == 40, "charm된 enemy0가 enemy1 공격 → enemy1 HP 50-10=40")
-	_assert(bm._enemy_status[0].get("charm", -1) == 0, "charm 스택 감소")
+	_assert(napoleon_hp == 60, "enemy1만 napoleon 공격 → HP 70-10=60")
+	_assert(enemy1_hp == 50, "charm된 enemy0는 다른 적 공격 안 함 → enemy1 HP 불변")
+	_assert(bm._enemy_status[0].get("charm", -1) == 0, "charm 2스택 소모 후 0 초기화")
+
+
+func test_synergy_napoleon_yisunsin() -> void:
+	print("[TestBattleManager] test_synergy_napoleon_yisunsin")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 50))
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 50))
+	bm.setup_battle([_make_enemy(50, [])])
+	bm.start_player_turn()
+
+	var card = CardRes.new()
+	card.card_name = "사기_부여_테스트"
+	card.owner_id = "napoleon"
+	card.cost = 0
+	var eff = EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.GAIN_MORALE
+	eff.value = 1
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+
+	bm.play_card(card, -1)
+	_assert(bm.get_hero_block("yi_sun_sin") == 3,
+		"철벽 진군: 나폴레옹 GAIN_MORALE → 이순신 BLOCK +3")
+
+
+func test_synergy_yisunsin_cleopatra() -> void:
+	print("[TestBattleManager] test_synergy_yisunsin_cleopatra")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 50))
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
+	bm.setup_battle([_make_enemy(50, [])])
+	bm.start_player_turn()
+	bm._enemy_status[0]["poison"] = 3
+
+	var card = CardRes.new()
+	card.card_name = "공격_테스트"
+	card.owner_id = "yi_sun_sin"
+	card.cost = 0
+	var eff = EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE
+	eff.value = 5
+	eff.target = "SINGLE"
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+
+	bm.play_card(card, 0)
+	_assert(bm.get_enemy_hp(0) == 41,
+		"독침 반격: 이순신 DAMAGE 5 + 시너지 4 = 9 피해 → 적 HP 50-9=41")
+
+
+func test_synergy_napoleon_cleopatra() -> void:
+	print("[TestBattleManager] test_synergy_napoleon_cleopatra")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 50))
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
+	bm.setup_battle([_make_enemy(50, [])])
+	bm.start_player_turn()
+	if not bm._hero_status.has("napoleon"):
+		bm._hero_status["napoleon"] = {}
+	bm._hero_status["napoleon"]["morale"] = 3
+
+	var card = CardRes.new()
+	card.card_name = "사기소모_테스트"
+	card.owner_id = "napoleon"
+	card.cost = 0
+	var eff = EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.CONSUME_MORALE
+	eff.value = 1
+	eff.bonus_value = 5
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+
+	bm.play_card(card, 0)
+	_assert(bm._enemy_status[0].get("charm", 0) == 1,
+		"혼란의 돌격: 나폴레옹 CONSUME_MORALE → 적 charm +1")
+
+
+func test_synergy_napoleon_cleopatra_no_morale() -> void:
+	print("[TestBattleManager] test_synergy_napoleon_cleopatra_no_morale")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 50))
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
+	bm.setup_battle([_make_enemy(50, [])])
+	bm.start_player_turn()
+	# morale = 0, so CONSUME_MORALE fails → no charm
+	var card = CardRes.new()
+	card.card_name = "사기소모_실패_테스트"
+	card.owner_id = "napoleon"
+	card.cost = 0
+	var eff = EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.CONSUME_MORALE
+	eff.value = 1
+	eff.bonus_value = 5
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+	bm.play_card(card, 0)
+	_assert(bm._enemy_status[0].get("charm", 0) == 0,
+		"혼란의 돌격: 사기 부족 시 charm 미부여")

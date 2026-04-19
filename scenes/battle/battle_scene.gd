@@ -38,6 +38,7 @@ const DRAG_THRESHOLD := 10.0
 
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
+var _synergy_lbl: Label = null
 
 const STATUS_EMOJI := {
 	"poison": "☠", "weak": "↓", "vulnerable": "⚡",
@@ -106,6 +107,15 @@ func _build_ui() -> void:
 	_relic_container.size = Vector2(1500, 36)
 	add_child(_relic_container)
 	_refresh_relics()
+
+	# 시너지 HUD
+	_synergy_lbl = Label.new()
+	_synergy_lbl.position = Vector2(20, 750)
+	_synergy_lbl.size = Vector2(360, 80)
+	_synergy_lbl.add_theme_font_size_override("font_size", 13)
+	_synergy_lbl.modulate = Color(1.0, 0.0, 1.0)
+	_synergy_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	add_child(_synergy_lbl)
 
 	# 영웅 슬롯 3개 (초기 숨김)
 	for i in range(3):
@@ -477,6 +487,7 @@ func _on_player_turn_started() -> void:
 	for i in range(_enemy_nodes.size()):
 		if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
 			_enemy_nodes[i]["btn"].disabled = false
+	_refresh_synergy_hud()
 
 func _on_enemy_turn_started() -> void:
 	_end_turn_btn.disabled = true
@@ -654,6 +665,12 @@ func _card_effect_text(card: Resource) -> String:
 			EffectRes.EffectType.CHARM:
 				lines.append("매혹 %d" % eff.value)
 	return "\n".join(lines)
+
+func _refresh_synergy_hud() -> void:
+	if _synergy_lbl == null:
+		return
+	var synergies: Array = BattleManager.get_active_synergies()
+	_synergy_lbl.text = "\n".join(synergies) if synergies.size() > 0 else ""
 
 func _on_card_button_down(card: Resource) -> void:
 	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
