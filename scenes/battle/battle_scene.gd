@@ -66,32 +66,14 @@ func _ready() -> void:
 	_start_battle()
 
 func _build_debug_tooltip() -> void:
-	var panel := PanelContainer.new()
-	panel.position = Vector2(WINDOW_W - 220, WINDOW_H - 110)
-	panel.size = Vector2(210, 100)
-	panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(panel)
-
-	var vbox := VBoxContainer.new()
-	panel.add_child(vbox)
-
-	var title := Label.new()
-	title.text = "🛠 디버그 단축키"
-	title.add_theme_font_size_override("font_size", 13)
-	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
-	vbox.add_child(title)
-
-	var sep := HSeparator.new()
-	vbox.add_child(sep)
-
-	var keys := [
-		["F9", "전투 즉시 승리"],
-	]
-	for entry in keys:
-		var lbl := Label.new()
-		lbl.text = "[%s]  %s" % [entry[0], entry[1]]
-		lbl.add_theme_font_size_override("font_size", 12)
-		vbox.add_child(lbl)
+	var lbl := Label.new()
+	lbl.text = "🛠 디버그 단축키"
+	lbl.position = Vector2(WINDOW_W - 180, WINDOW_H - 30)
+	lbl.add_theme_font_size_override("font_size", 13)
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
+	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+	lbl.tooltip_text = "[F9]  전투 즉시 승리\n      (이후 클릭 한 번 더 필요)"
+	add_child(lbl)
 
 # ─────────────────────────────────────────────
 # UI 빌드
@@ -790,7 +772,7 @@ func _input(event: InputEvent) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if OS.is_debug_build() and event.pressed and not event.echo and event.keycode == KEY_F9:
-		BattleManager.debug_instant_win.call_deferred()
+		BattleManager.debug_instant_win()
 
 func _card_target_type(card: Resource) -> String:
 	# "enemy" / "ally" / "none"
