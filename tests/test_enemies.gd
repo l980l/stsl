@@ -52,24 +52,24 @@ func test_normal_enemy_variety() -> void:
 func test_harpy_pattern_length() -> void:
 	print("[TestEnemies] test_harpy_pattern_length")
 	var gm := _make_gm()
-	var harpy: Resource = EnemiesAct1.harpy(gm._satyr_scene(), 25)
-	_assert(harpy.intent_pattern.size() == 3, "하르피아 패턴 3개")
+	var harpy: Resource = EnemiesAct1.harpy(gm._satyr_scene())
+	_assert(harpy.intent_pattern.size() == 5, "하르피아 패턴 5개")
 	_assert(harpy.enemy_name == "하르피아", "하르피아 이름")
-	_assert(harpy.max_hp == 25, "하르피아 HP = 25")
+	_assert(harpy.max_hp == 280, "하르피아 HP = 280")
 
 func test_cyclops_first_intent_is_buff() -> void:
 	print("[TestEnemies] test_cyclops_first_intent_is_buff")
 	var gm := _make_gm()
-	var cyclops: Resource = EnemiesAct1.cyclops(gm._satyr_scene(), 45)
+	var cyclops: Resource = EnemiesAct1.cyclops(gm._satyr_scene())
 	_assert(cyclops.intent_pattern.size() == 2, "사이클롭스 패턴 2개")
 	_assert(cyclops.intent_pattern[0].action_type == IntentRes.ActionType.BUFF,
 		"사이클롭스 첫 행동 = BUFF(준비)")
-	_assert(cyclops.intent_pattern[1].value == 18, "사이클롭스 강타 = 18")
+	_assert(cyclops.intent_pattern[1].value == 200, "사이클롭스 강타 = 200")
 
 func test_snake_pattern_length() -> void:
 	print("[TestEnemies] test_snake_pattern_length")
 	var gm := _make_gm()
-	var snake: Resource = EnemiesAct1.snake(gm._satyr_scene(), 20)
+	var snake: Resource = EnemiesAct1.snake(gm._satyr_scene())
 	_assert(snake.intent_pattern.size() == 2, "메두사의 뱀 패턴 2개")
 	_assert(snake.enemy_name == "메두사의 뱀", "메두사의 뱀 이름")
 	_assert(snake.intent_pattern[1].status_type == "vulnerable", "메두사의 뱀 DEBUFF = vulnerable")
@@ -79,14 +79,14 @@ func test_elite_enemy_hp() -> void:
 	var gm := _make_gm()
 	var enemies := gm._make_elite_enemies()
 	_assert(enemies.size() >= 1, "엘리트 룸 적 1마리 이상")
-	_assert(enemies[0].max_hp >= 60, "엘리트 HP >= 60")
+	_assert(enemies[0].max_hp >= 1700, "엘리트 HP >= 1700")
 
 func test_minotaur_pattern() -> void:
 	print("[TestEnemies] test_minotaur_pattern")
 	var gm := _make_gm()
 	var m: Resource = EnemiesAct1.minotaur(gm._satyr_scene())
 	_assert(m.intent_pattern.size() == 3, "미노타우로스 패턴 3개")
-	_assert(m.intent_pattern[2].value == 20, "미노타우로스 세 번째 공격 20")
+	_assert(m.intent_pattern[2].value == 260, "미노타우로스 세 번째 공격 260")
 
 func test_medusa_pattern_and_status_type() -> void:
 	print("[TestEnemies] test_medusa_pattern_and_status_type")
@@ -95,6 +95,7 @@ func test_medusa_pattern_and_status_type() -> void:
 	_assert(med.intent_pattern.size() == 4, "메두사 패턴 4개")
 	_assert(med.intent_pattern[1].status_type == "weak", "메두사 2번째 = weak")
 	_assert(med.intent_pattern[2].status_type == "vulnerable", "메두사 3번째 = vulnerable")
+	_assert(med.max_hp == 1700, "메두사 HP = 1700")
 
 func _make_hydra() -> Array:
 	# game_manager._make_boss_enemies()와 동일 로직 — Autoload 없이 테스트용

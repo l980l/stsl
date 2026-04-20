@@ -390,11 +390,13 @@ func _satyr_scene() -> PackedScene:
 
 func _make_normal_enemies() -> Array:
 	var scene := _satyr_scene()
-	match randi() % 4:
-		0: return [_EnemiesAct1.satyr(scene, 30, 6)]
-		1: return [_EnemiesAct1.harpy(scene, 25)]
-		2: return [_EnemiesAct1.cyclops(scene, 45)]
-		_: return [_EnemiesAct1.snake(scene, 20)]
+	match randi() % 6:
+		0: return [_EnemiesAct1.satyr(scene)]
+		1: return [_EnemiesAct1.harpy(scene)]
+		2: return [_EnemiesAct1.cyclops(scene)]
+		3: return [_EnemiesAct1.snake(scene)]
+		4: return [_EnemiesAct1.cerberus(scene)]
+		_: return [_EnemiesAct1.myrmidon(scene)]
 
 const _ACT_HP_MULT: Dictionary = {1: 1.0, 2: 1.3}
 const _ACT_DMG_MULT: Dictionary = {1: 1.0, 2: 1.2}
@@ -430,9 +432,10 @@ func _make_enemies_for_node(node: Resource) -> Array:
 
 func _make_elite_enemies() -> Array:
 	var scene := _satyr_scene()
-	if randi() % 2 == 0:
-		return [_EnemiesAct1.minotaur(scene)]
-	return [_EnemiesAct1.medusa(scene)]
+	match randi() % 3:
+		0: return [_EnemiesAct1.minotaur(scene)]
+		1: return [_EnemiesAct1.medusa(scene)]
+		_: return [_EnemiesAct1.gorgon(scene)]
 
 func _make_boss_enemies() -> Array:
 	return [_EnemiesAct1.hydra(_satyr_scene())]

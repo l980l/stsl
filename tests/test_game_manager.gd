@@ -236,11 +236,11 @@ func test_act_difficulty() -> void:
 	var EnemiesAct1 = preload("res://resources/enemies/enemies_act1.gd")
 	var scene := gm._satyr_scene()
 
-	var e1: Resource = EnemiesAct1.satyr(scene, 30, 6)
+	var e1: Resource = EnemiesAct1.satyr(scene)
 	gm._apply_act_difficulty([e1], 1)
 	var hp1: int = e1.max_hp
 
-	var e2: Resource = EnemiesAct1.satyr(scene, 30, 6)
+	var e2: Resource = EnemiesAct1.satyr(scene)
 	gm._apply_act_difficulty([e2], 2)
 	var hp2: int = e2.max_hp
 
