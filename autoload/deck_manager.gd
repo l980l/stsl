@@ -53,7 +53,7 @@ func play_card(card: Resource) -> bool:
 	pending_cost_reduction = 0
 	if not debug_unlimited_energy:
 		current_energy -= effective_cost
-		energy_changed.emit(current_energy)
+	energy_changed.emit(current_energy)
 	hand.erase(card)
 	discard_pile.append(card)
 	card_played.emit(card)

@@ -514,6 +514,7 @@ func _open_enemy_hp_dialog(index: int) -> void:
 	spin.value = current_hp
 	spin.step = 1
 	dlg.add_child(spin)
+	dlg.custom_minimum_size = Vector2(320, 100)
 	dlg.confirmed.connect(func():
 		BattleManager.debug_set_enemy_hp(index, int(spin.value))
 		_message_label.text = "[DEBUG] 적[%d] HP → %d" % [index, int(spin.value)]
@@ -853,6 +854,7 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 		vbox.add_child(cb)
 		checks.append(cb)
 	dlg.add_child(scroll)
+	dlg.custom_minimum_size = Vector2(600, 560)
 	dlg.confirmed.connect(func():
 		var picked: Array = []
 		for c in checks:
