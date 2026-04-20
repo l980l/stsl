@@ -220,14 +220,14 @@ static func _pharaoh_decree() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _cleopatras_kiss() -> Resource:
-	# 클레오파트라의 입맞춤 — DIVINE, 2코, SKILL, 조종: CHARM 2 ALL + POISON 3 ALL (0강)
+	# 클레오파트라의 입맞춤 — DIVINE, 2코, SKILL, 조종: CHARM 1 ALL + POISON 3 ALL (0강)
 	var c := CardRes.new()
 	c.card_name = "클레오파트라의 입맞춤"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "idle"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.CHARM
-	e1.value = 2; e1.base_value = 2; e1.target = "ALL"
+	e1.value = 1; e1.base_value = 1; e1.target = "ALL"
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.APPLY_STATUS
 	e2.status_type = "poison"; e2.value = 3; e2.base_value = 3; e2.target = "ALL"
@@ -451,14 +451,14 @@ static func _poison_ritual() -> Resource:
 	c.effects = [e1, e2]; return c
 
 static func _queens_embrace() -> Resource:
-	# 여왕의 포옹 — RARE, 2코, SKILL, 조종: CHARM 2 ALL + DRAW 2
+	# 여왕의 포옹 — RARE, 2코, SKILL, 조종: CHARM 1 ALL + DRAW 2
 	var c := CardRes.new()
 	c.card_name = "여왕의 포옹"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CHARM
-	ea.value = 2; ea.base_value = 2; ea.target = "ALL"
+	ea.value = 1; ea.base_value = 1; ea.target = "ALL"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 2; eb.base_value = 2
@@ -495,14 +495,14 @@ static func _nile_doom() -> Resource:
 	c.effects = [e]; return c
 
 static func _charming_assault() -> Resource:
-	# 매혹의 강습 — RARE, 1코, ATTACK, 조종: CHARM 2 + DMG 100
+	# 매혹의 강습 — RARE, 1코, ATTACK, 조종: CHARM 1 + DMG 100
 	var c := CardRes.new()
 	c.card_name = "매혹의 강습"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CHARM
-	ea.value = 2; ea.base_value = 2; ea.target = "SINGLE"
+	ea.value = 1; ea.base_value = 1; ea.target = "SINGLE"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DAMAGE
 	eb.value = 100; eb.base_value = 100; eb.target = "SINGLE"

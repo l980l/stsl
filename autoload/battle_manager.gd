@@ -61,7 +61,10 @@ func setup_battle(enemies: Array) -> void:
 		_enemy_hp.append(enemy.max_hp)
 		_enemy_alive.append(true)
 		_enemy_block.append(0)
-		_enemy_status.append({})
+		var initial_status: Dictionary = {}
+		if enemy.charm_resistance > 0:
+			initial_status["charm_resistance"] = enemy.charm_resistance
+		_enemy_status.append(initial_status)
 		_enemy_intent_index.append(0)
 	_enemy_phase.clear()
 	for _e in _enemies:
@@ -297,7 +300,8 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 		_enemy_status[enemy_index]["poison_dur"] = 3
 	elif status_type == "charm":
 		var new_charm: int = _enemy_status[enemy_index].get("charm", 0) + stacks
-		if new_charm >= 3:
+		var threshold: int = 3 + _enemy_status[enemy_index].get("charm_resistance", 0)
+		if new_charm >= threshold:
 			_enemy_status[enemy_index]["charm"] = 0
 			_enemy_status[enemy_index]["enthrall"] = _enemy_status[enemy_index].get("enthrall", 0) + 1
 			status_applied.emit("enemy_%d" % enemy_index, "enthrall", 1)
