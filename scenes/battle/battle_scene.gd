@@ -447,6 +447,9 @@ func _refresh_hand() -> void:
 		btn.text = "[%d] %s%s\n%s\n%s" % [card.cost, card_name, upgraded_mark, owner_id, effect_desc]
 		btn.add_theme_font_size_override("font_size", 11)
 		btn.disabled = not can_play
+		if BattleManager.has_synergy_bonus(card):
+			btn.add_theme_color_override("font_color", Color(1.0, 0.2, 1.0))
+			btn.add_theme_color_override("font_hover_color", Color(1.0, 0.4, 1.0))
 
 		var captured_card := card
 		var captured_card2 := card
