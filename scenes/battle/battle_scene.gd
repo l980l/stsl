@@ -759,7 +759,7 @@ func _input(event: InputEvent) -> void:
 		_potential_drag_card = null
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if event.pressed and not event.echo and event.keycode == KEY_F9:
+	if OS.is_debug_build() and event.pressed and not event.echo and event.keycode == KEY_F9:
 		BattleManager.debug_instant_win()
 
 func _card_target_type(card: Resource) -> String:
