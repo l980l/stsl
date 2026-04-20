@@ -72,7 +72,7 @@ func _build_debug_tooltip() -> void:
 	lbl.add_theme_font_size_override("font_size", 13)
 	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
 	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-	lbl.tooltip_text = "[F9]  전투 즉시 승리\n      (이후 클릭 한 번 더 필요)"
+	lbl.tooltip_text = "[Shift+Q]  전투 즉시 승리\n           (이후 클릭 한 번 더 필요)"
 	add_child(lbl)
 
 # ─────────────────────────────────────────────
@@ -771,8 +771,9 @@ func _input(event: InputEvent) -> void:
 		_potential_drag_card = null
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if OS.is_debug_build() and event.pressed and not event.echo and event.keycode == KEY_F9:
-		BattleManager.debug_instant_win()
+	if OS.is_debug_build() and event.pressed and not event.echo:
+		if event.keycode == KEY_Q and event.shift_pressed:
+			BattleManager.debug_instant_win()
 
 func _card_target_type(card: Resource) -> String:
 	# "enemy" / "ally" / "none"
