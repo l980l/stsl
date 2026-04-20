@@ -23,3 +23,8 @@ Thumbs.db
 # 로컬 설정
 .claude/
 docs/.obsidian/
+
+# 도감 (generate_catalog.gd로 재생성 가능)
+docs/catalog/*.csv
+docs/catalog/*.md
+!docs/catalog/README.md
