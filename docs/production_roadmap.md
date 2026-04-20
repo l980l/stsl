@@ -134,27 +134,18 @@ COST_NEXT 카드 효과 구현 완료. 매혹(Charm) 시스템 개선 완료 (�
 - ✅ Acts 간 전환 흐름: 보스 처치 → 영웅 영입 → Act 2 맵 진입
 - ✅ Act 2 난이도 조정 (적 HP ×1.3, 공격 ×1.2)
 
-### 2-1.5. 콘텐츠 데이터 .tres 외부화 (Act 2 콘텐츠 구현 전 선행)
+### 2-1.5. 콘텐츠 데이터 외부화 (Act 2 콘텐츠 구현 전 선행) ✅
 
-> **배경:** 현재 카드·적·렐릭·이벤트 데이터가 `game_manager.gd` 코드에 하드코딩돼 있어 파일이 1300+ 줄로 비대함. Act 2부터 콘텐츠를 추가하기 전에 데이터 관리 방식을 Godot 네이티브 `.tres` 리소스 파일로 전환한다.
+> **배경:** 카드·적·렐릭·이벤트 데이터가 `game_manager.gd` 코드에 하드코딩돼 있어 파일이 1415+ 줄로 비대했음. GDScript 데이터 파일(`resources/data/`) 방식으로 분리 완료.
 
-**방식:** 카드/적/렐릭/이벤트 각각 개별 `.tres` 파일로 저장. `game_manager.gd`는 `load("res://resources/cards/napoleon/charge.tres")` 형태로만 참조. 에디터 인스펙터에서 직접 편집 가능.
+**방식:** `resources/data/` 디렉토리에 카테고리별 GDScript 파일. `static func`으로 Resource 배열 반환. `game_manager.gd`는 `preload`로 위임.
 
-**디렉토리 구조:**
-```
-resources/
-  cards/napoleon/   cleopatra/   yi_sun_sin/   (각 카드별 .tres)
-  enemies/act1/     act2/        (각 적별 .tres)
-  relics/           (각 렐릭별 .tres)
-  events/act1/      act2/        (각 이벤트별 .tres)
-```
-
-- 🔲 기존 카드 데이터 .tres 분리 (나폴레옹·클레오파트라·이순신 스타터 카드)
-- 🔲 기존 Act 1 적 데이터 .tres 분리 (사티로스·하르피아·사이클롭스·뱀·미노타우로스·메두사·히드라)
-- 🔲 기존 렐릭 데이터 .tres 분리 (공용 ~10종 + 영웅 전용 + 저주)
-- 🔲 기존 이벤트 데이터 .tres 분리 (현재 11종)
-- 🔲 `game_manager.gd` 콘텐츠 생성 코드 → .tres 로드 방식으로 교체
-- 🔲 Act 2부터 모든 신규 콘텐츠는 .tres 방식으로 추가
+- ✅ 기존 카드 데이터 외부화 (`resources/data/cards_napoleon.gd`, `cards_cleopatra.gd`, `cards_yi_sun_sin.gd`)
+- ✅ 기존 Act 1 적 데이터 외부화 (`resources/data/enemies_act1.gd`)
+- ✅ 기존 렐릭 데이터 외부화 (`resources/data/relics.gd`)
+- ✅ 기존 이벤트 데이터 외부화 (`resources/data/events_act1.gd`)
+- ✅ `game_manager.gd` 콘텐츠 코드 제거 (1415줄 → 657줄)
+- 🔲 Act 2부터 모든 신규 콘텐츠는 동일 방식으로 추가 (`enemies_act2.gd`, `events_act2.gd`)
 
 ### 2-2. Act 2 적 (이집트 신화)
 - 🔲 일반 적 6종: 아누비스 전령, 미이라 전사, 스카라베 군집, 세크메트의 사제, 사막 독사, 샤브티 인형
