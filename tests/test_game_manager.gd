@@ -229,14 +229,16 @@ func test_act_transition() -> void:
 func test_act_difficulty() -> void:
 	print("[TestGameManager] test_act_difficulty")
 	var gm := _make_gm()
+	var EnemiesAct1 = preload("res://resources/data/enemies_act1.gd")
+	var scene := gm._satyr_scene()
 
-	var enemies_act1 := gm._make_normal_enemies()
-	gm._apply_act_difficulty(enemies_act1, 1)
-	var hp1: int = enemies_act1[0].max_hp
+	var e1: Resource = EnemiesAct1.satyr(scene, 30, 6)
+	gm._apply_act_difficulty([e1], 1)
+	var hp1: int = e1.max_hp
 
-	var enemies_act2 := gm._make_normal_enemies()
-	gm._apply_act_difficulty(enemies_act2, 2)
-	var hp2: int = enemies_act2[0].max_hp
+	var e2: Resource = EnemiesAct1.satyr(scene, 30, 6)
+	gm._apply_act_difficulty([e2], 2)
+	var hp2: int = e2.max_hp
 
 	_assert(hp2 > hp1, "Act 2 enemy HP > Act 1 HP (multiplier 1.3)")
 	passed += 1
