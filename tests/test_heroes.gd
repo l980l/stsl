@@ -78,7 +78,7 @@ func _make_card(owner_id: String, effects: Array) -> Resource:
 func test_napoleon_card_pool_size() -> void:
 	print("[TestHeroes] test_napoleon_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._napoleon_card_pool().size() == 14, "나폴레옹 카드 풀 14장")
+	_assert(gm._napoleon_card_pool().size() == 38, "나폴레옹 카드 풀 38장")
 
 func test_cleopatra_card_pool_size() -> void:
 	print("[TestHeroes] test_cleopatra_card_pool_size")
