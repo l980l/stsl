@@ -18,3 +18,6 @@
 전술가의 지도,전투 시작 시 카드 1장 추가 드로우,BATTLE_START,DRAW,1,0,,,,,
 강철 의지,전투 시작 시 에너지 +1,BATTLE_START,ENERGY,1,0,,,,,
 고대의 방패,전투 시작 시 팀 전체 방어도 +4,BATTLE_START,BLOCK,4,0,,,,,
+앙크의 생명,전투 승리 시 팀 전체 HP +12,BATTLE_WIN,HEAL,12,0,,,,,
+호루스의 눈,플레이어 턴 시작 시 카드 1장 드로우. 클레오파트라 생존 시 +2장,TURN_START,DRAW,1,2,cleopatra,,,,
+스카라베 부적,전투 시작 시 팀 전체 방어도 +8,BATTLE_START,BLOCK,8,0,,,,,

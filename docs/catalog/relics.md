@@ -2,7 +2,7 @@
 
 > 이 파일은 `tools/generate_catalog.gd`로 자동 생성됩니다. 직접 수정 금지.
 
-## 공용 풀 (19종)
+## 공용 풀 (22종)
 
 | 이름 | 트리거 | 효과 | 값 | 전용 영웅 | 저주 |
 |------|--------|------|-----|-----------|------|
@@ -28,3 +28,6 @@
 | 전술가의 지도 | BATTLE_START | DRAW | 1 | — | — |
 | 강철 의지 | BATTLE_START | ENERGY | 1 | — | — |
 | 고대의 방패 | BATTLE_START | BLOCK | 4 | — | — |
+| 앙크의 생명 | BATTLE_WIN | HEAL | 12 | — | — |
+| 호루스의 눈 | TURN_START | DRAW | 1 | cleopatra | — |
+| 스카라베 부적 | BATTLE_START | BLOCK | 8 | — | — |

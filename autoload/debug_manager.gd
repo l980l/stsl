@@ -59,7 +59,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			var opts: Array = []
 			for card in DeckManager.get_full_deck():
 				var suffix := " +%d" % card.upgrade_level if card.upgrade_level > 0 else ""
-				opts.append(["%s%s (코%d)" % [card.card_name, suffix, card.cost], card])
+				opts.append(["%s%s (코%d)  |  %s" % [card.card_name, suffix, card.cost, _effect_summary(card)], card, _rarity_color(card.rarity)])
 			_make_checkbox_dialog("덱 편집 — 제거할 카드", opts, "제거", func(picked: Array):
 				for card in picked:
 					if not DeckManager.remove_from_deck(card):
@@ -73,7 +73,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				if not card.can_upgrade():
 					continue
 				var suffix := " +%d → +%d" % [card.upgrade_level, card.upgrade_level + 1]
-				opts.append(["%s%s (코%d)" % [card.card_name, suffix, card.cost], card])
+				opts.append(["%s%s (코%d)  |  %s" % [card.card_name, suffix, card.cost, _effect_summary(card)], card, _rarity_color(card.rarity)])
 			_make_checkbox_dialog("카드 강화", opts, "강화", func(picked: Array):
 				for card in picked:
 					GameManager.upgrade_card(card)
@@ -81,14 +81,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 					DeckManager.hand_changed.emit()
 			)
 
-func _rarity_name(r: int) -> String:
+func _rarity_color(r: int) -> Color:
 	match r:
-		CardResource.Rarity.COMMON:    return "C"
-		CardResource.Rarity.UNCOMMON:  return "UC"
-		CardResource.Rarity.RARE:      return "R"
-		CardResource.Rarity.LEGENDARY: return "L"
-		CardResource.Rarity.DIVINE:    return "D"
-		_: return "?"
+		CardResource.Rarity.COMMON:    return Color(1.0, 1.0, 1.0)
+		CardResource.Rarity.UNCOMMON:  return Color(0.3, 0.6, 1.0)
+		CardResource.Rarity.RARE:      return Color(0.7, 0.3, 1.0)
+		CardResource.Rarity.LEGENDARY: return Color(1.0, 0.6, 0.1)
+		CardResource.Rarity.DIVINE:    return Color(1.0, 0.2, 0.2)
+		_: return Color(1.0, 1.0, 1.0)
 
 func _collect_party_card_pools() -> Array:
 	var results: Array = []
@@ -101,8 +101,8 @@ func _collect_party_card_pools() -> Array:
 			continue
 		for card in script.pool():
 			var fx := _effect_summary(card)
-			var label := "[%s] %s  C%d %s  |  %s" % [hero.hero_id, card.card_name, card.cost, _rarity_name(card.rarity), fx]
-			results.append([label, card])
+			var label := "[%s] %s  C%d  |  %s" % [hero.hero_id, card.card_name, card.cost, fx]
+			results.append([label, card, _rarity_color(card.rarity)])
 	return results
 
 func _effect_summary(card: Resource) -> String:
@@ -126,6 +126,8 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 		var cb := CheckBox.new()
 		cb.text = opt[0]
 		cb.set_meta("payload", opt[1])
+		if opt.size() >= 3:
+			cb.add_theme_color_override("font_color", opt[2])
 		vbox.add_child(cb)
 		checks.append(cb)
 	dlg.add_child(scroll)
