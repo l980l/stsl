@@ -760,7 +760,7 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_F9:
 			BattleManager.debug_instant_win()
-			accept_event()
+			get_viewport().set_input_as_handled()
 
 func _card_target_type(card: Resource) -> String:
 	# "enemy" / "ally" / "none"
