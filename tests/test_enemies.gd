@@ -3,6 +3,7 @@ class_name TestEnemies
 extends RefCounted
 
 const GameManagerClass = preload("res://autoload/game_manager.gd")
+const EnemiesAct1 = preload("res://resources/enemies/enemies_act1.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
 var passed: int = 0
@@ -51,7 +52,7 @@ func test_normal_enemy_variety() -> void:
 func test_harpy_pattern_length() -> void:
 	print("[TestEnemies] test_harpy_pattern_length")
 	var gm := _make_gm()
-	var harpy := gm._make_harpy(gm._satyr_scene(), 25)
+	var harpy: Resource = EnemiesAct1.harpy(gm._satyr_scene(), 25)
 	_assert(harpy.intent_pattern.size() == 3, "하르피아 패턴 3개")
 	_assert(harpy.enemy_name == "하르피아", "하르피아 이름")
 	_assert(harpy.max_hp == 25, "하르피아 HP = 25")
@@ -59,7 +60,7 @@ func test_harpy_pattern_length() -> void:
 func test_cyclops_first_intent_is_buff() -> void:
 	print("[TestEnemies] test_cyclops_first_intent_is_buff")
 	var gm := _make_gm()
-	var cyclops := gm._make_cyclops(gm._satyr_scene(), 45)
+	var cyclops: Resource = EnemiesAct1.cyclops(gm._satyr_scene(), 45)
 	_assert(cyclops.intent_pattern.size() == 2, "사이클롭스 패턴 2개")
 	_assert(cyclops.intent_pattern[0].action_type == IntentRes.ActionType.BUFF,
 		"사이클롭스 첫 행동 = BUFF(준비)")
@@ -68,7 +69,7 @@ func test_cyclops_first_intent_is_buff() -> void:
 func test_snake_pattern_length() -> void:
 	print("[TestEnemies] test_snake_pattern_length")
 	var gm := _make_gm()
-	var snake := gm._make_snake(gm._satyr_scene(), 20)
+	var snake: Resource = EnemiesAct1.snake(gm._satyr_scene(), 20)
 	_assert(snake.intent_pattern.size() == 2, "메두사의 뱀 패턴 2개")
 	_assert(snake.enemy_name == "메두사의 뱀", "메두사의 뱀 이름")
 	_assert(snake.intent_pattern[1].status_type == "vulnerable", "메두사의 뱀 DEBUFF = vulnerable")
@@ -83,14 +84,14 @@ func test_elite_enemy_hp() -> void:
 func test_minotaur_pattern() -> void:
 	print("[TestEnemies] test_minotaur_pattern")
 	var gm := _make_gm()
-	var m := gm._make_minotaur(gm._satyr_scene())
+	var m: Resource = EnemiesAct1.minotaur(gm._satyr_scene())
 	_assert(m.intent_pattern.size() == 3, "미노타우로스 패턴 3개")
 	_assert(m.intent_pattern[2].value == 20, "미노타우로스 세 번째 공격 20")
 
 func test_medusa_pattern_and_status_type() -> void:
 	print("[TestEnemies] test_medusa_pattern_and_status_type")
 	var gm := _make_gm()
-	var med := gm._make_medusa(gm._satyr_scene())
+	var med: Resource = EnemiesAct1.medusa(gm._satyr_scene())
 	_assert(med.intent_pattern.size() == 4, "메두사 패턴 4개")
 	_assert(med.intent_pattern[1].status_type == "weak", "메두사 2번째 = weak")
 	_assert(med.intent_pattern[2].status_type == "vulnerable", "메두사 3번째 = vulnerable")

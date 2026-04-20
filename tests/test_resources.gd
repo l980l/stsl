@@ -78,6 +78,6 @@ func test_game_manager_defaults() -> void:
 	print("[TestResources] test_game_manager_defaults")
 	var gm = GameManagerClass.new()
 	_assert(gm.current_state == GameManagerClass.GameState.MAP, "초기 상태 MAP")
-	_assert(gm.current_chapter == 1, "초기 챕터 1")
+	_assert(gm.current_act == 1, "초기 액트 1")
 	_assert(gm.gold == 0, "초기 골드 0")
 	_assert(gm.relics.size() == 0, "초기 릴릭 없음")

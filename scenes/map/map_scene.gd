@@ -187,9 +187,9 @@ func _show_deck_viewer() -> void:
 	for card in all_cards:
 		var card_name: String = card.get("card_name") if card.get("card_name") != null else "?"
 		var cost: int = card.get("cost") if card.get("cost") != null else 0
-		var owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
+		var card_owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
 		var lbl := Label.new()
-		lbl.text = "[%d코스트]  %s  (%s)" % [cost, card_name, owner]
+		lbl.text = "[%d코스트]  %s  (%s)" % [cost, card_name, card_owner]
 		lbl.add_theme_font_size_override("font_size", 16)
 		vbox.add_child(lbl)
 

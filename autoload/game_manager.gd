@@ -2,11 +2,19 @@
 class_name GameManagerClass
 extends Node
 
+const _NapoleonCards  = preload("res://resources/cards/cards_napoleon.gd")
+const _CleopatraCards = preload("res://resources/cards/cards_cleopatra.gd")
+const _YiSunSinCards  = preload("res://resources/cards/cards_yi_sun_sin.gd")
+const _EnemiesAct1    = preload("res://resources/enemies/enemies_act1.gd")
+const _RelicData      = preload("res://resources/relics/relics.gd")
+const _EventsAct1     = preload("res://resources/events/events_act1.gd")
+
 enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGRADE, HERO_RECRUIT }
 
 var current_state: GameState = GameState.MAP
 var current_floor: int = 0
-var current_chapter: int = 1
+const MAX_ACTS: int = 2
+var current_act: int = 1
 var gold: int = 0
 var relics: Array = []
 var run_won: bool = false
@@ -82,7 +90,7 @@ func has_relic(relic_name: String) -> bool:
 func reset() -> void:
 	current_state = GameState.MAP
 	current_floor = 0
-	current_chapter = 1
+	current_act = 1
 	gold = 0
 	relics.clear()
 	run_map.clear()
@@ -118,7 +126,7 @@ func start_run(initial_hero_id: String = "napoleon") -> void:
 
 	# 맵 생성
 	var MapGen = load("res://autoload/map_generator.gd")
-	run_map = MapGen.generate()
+	run_map = MapGen.generate(current_act)
 	available_node_ids = [0, 1, 2]
 	run_started.emit()
 
@@ -257,7 +265,10 @@ func complete_card_upgrade() -> void:
 			change_state(GameState.HERO_RECRUIT)
 			_request_scene("res://scenes/hero_select/hero_select_scene.tscn")
 			return
-		_end_run_won()
+		if current_act < MAX_ACTS:
+			_start_next_act()
+		else:
+			_end_run_won()
 		return
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
@@ -269,7 +280,22 @@ func complete_hero_recruit(hero_id: String) -> void:
 	if tm:
 		tm.add_hero(hero)
 	_add_initial_deck_for(hero)
-	_end_run_won()
+	if current_act < MAX_ACTS:
+		_start_next_act()
+	else:
+		_end_run_won()
+
+func _start_next_act() -> void:
+	current_act += 1
+	current_floor = 0
+	current_node_id = -1
+	pending_boss_upgrade = false
+	pending_boss_recruit = false
+	var MapGen = load("res://autoload/map_generator.gd")
+	run_map = MapGen.generate(current_act)
+	available_node_ids = [0, 1, 2]
+	change_state(GameState.MAP)
+	_request_scene("res://scenes/map/map_scene.tscn")
 
 func _end_run_won() -> void:
 	run_won = true
@@ -346,198 +372,51 @@ func _satyr_scene() -> PackedScene:
 func _make_normal_enemies() -> Array:
 	var scene := _satyr_scene()
 	match randi() % 4:
-		0: return [_make_satyr(scene, 30, 6)]
-		1: return [_make_harpy(scene, 25)]
-		2: return [_make_cyclops(scene, 45)]
-		_: return [_make_snake(scene, 20)]
+		0: return [_EnemiesAct1.satyr(scene, 30, 6)]
+		1: return [_EnemiesAct1.harpy(scene, 25)]
+		2: return [_EnemiesAct1.cyclops(scene, 45)]
+		_: return [_EnemiesAct1.snake(scene, 20)]
+
+const _ACT_HP_MULT: Dictionary = {1: 1.0, 2: 1.3}
+const _ACT_DMG_MULT: Dictionary = {1: 1.0, 2: 1.2}
+
+func _apply_act_difficulty(enemies: Array, act: int) -> void:
+	var hp_m: float = _ACT_HP_MULT.get(act, 1.0)
+	var dmg_m: float = _ACT_DMG_MULT.get(act, 1.0)
+	var IntentRes = load("res://resources/intent_resource.gd")
+	for enemy in enemies:
+		enemy.max_hp = int(enemy.max_hp * hp_m)
+		for intent in enemy.intent_pattern:
+			if intent.action_type == IntentRes.ActionType.ATTACK:
+				intent.value = int(intent.value * dmg_m)
+		for phase_pattern in enemy.phase_patterns:
+			for intent in phase_pattern:
+				if intent.action_type == IntentRes.ActionType.ATTACK:
+					intent.value = int(intent.value * dmg_m)
 
 func _make_enemies_for_node(node: Resource) -> Array:
 	var MapNodeRes = load("res://resources/map_node_resource.gd")
+	var enemies: Array
 	match node.room_type:
 		MapNodeRes.RoomType.BATTLE:
-			return _make_normal_enemies()
+			enemies = _make_normal_enemies()
 		MapNodeRes.RoomType.ELITE:
-			return _make_elite_enemies()
+			enemies = _make_elite_enemies()
 		MapNodeRes.RoomType.BOSS:
-			return _make_boss_enemies()
+			enemies = _make_boss_enemies()
 		_:
-			return []
+			enemies = []
+	_apply_act_difficulty(enemies, current_act)
+	return enemies
 
 func _make_elite_enemies() -> Array:
 	var scene := _satyr_scene()
 	if randi() % 2 == 0:
-		return [_make_minotaur(scene)]
-	else:
-		return [_make_medusa(scene)]
-
-func _make_minotaur(scene: PackedScene) -> Resource:
-	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var IntentRes = load("res://resources/intent_resource.gd")
-	var enemy: Resource = EnemyRes.new()
-	enemy.enemy_name = "미노타우로스"
-	enemy.max_hp = 90
-	enemy.character_scene = scene
-	var i1: Resource = IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK
-	i1.value = 12
-	i1.target = IntentRes.TargetType.RANDOM
-	var i2: Resource = IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK
-	i2.value = 12
-	i2.target = IntentRes.TargetType.RANDOM
-	var i3: Resource = IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK
-	i3.value = 20
-	i3.target = IntentRes.TargetType.ALL
-	enemy.intent_pattern = [i1, i2, i3]
-	return enemy
-
-func _make_medusa(scene: PackedScene) -> Resource:
-	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var IntentRes = load("res://resources/intent_resource.gd")
-	var enemy: Resource = EnemyRes.new()
-	enemy.enemy_name = "메두사"
-	enemy.max_hp = 75
-	enemy.character_scene = scene
-	var i1: Resource = IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK
-	i1.value = 10
-	i1.target = IntentRes.TargetType.RANDOM
-	var i2: Resource = IntentRes.new()
-	i2.action_type = IntentRes.ActionType.DEBUFF
-	i2.value = 2
-	i2.status_type = "weak"
-	var i3: Resource = IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF
-	i3.value = 2
-	i3.status_type = "vulnerable"
-	var i4: Resource = IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK
-	i4.value = 15
-	i4.target = IntentRes.TargetType.RANDOM
-	enemy.intent_pattern = [i1, i2, i3, i4]
-	return enemy
-
-func _make_satyr(scene: PackedScene, hp: int, dmg: int) -> Resource:
-	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var IntentRes = load("res://resources/intent_resource.gd")
-	var enemy: Resource = EnemyRes.new()
-	enemy.enemy_name = "사티로스"
-	enemy.max_hp = hp
-	enemy.character_scene = scene
-	var intent: Resource = IntentRes.new()
-	intent.action_type = IntentRes.ActionType.ATTACK
-	intent.value = dmg
-	intent.target = IntentRes.TargetType.RANDOM
-	enemy.intent_pattern = [intent]
-	return enemy
-
-func _make_harpy(scene: PackedScene, hp: int) -> Resource:
-	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var IntentRes = load("res://resources/intent_resource.gd")
-	var enemy: Resource = EnemyRes.new()
-	enemy.enemy_name = "하르피아"
-	enemy.max_hp = hp
-	enemy.character_scene = scene
-	# 패턴: ATTACK(4) → ATTACK(4) → SPECIAL(discard 1, value=1)
-	var i1: Resource = IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK
-	i1.value = 4
-	i1.target = IntentRes.TargetType.RANDOM
-	var i2: Resource = IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK
-	i2.value = 4
-	i2.target = IntentRes.TargetType.RANDOM
-	var i3: Resource = IntentRes.new()
-	i3.action_type = IntentRes.ActionType.SPECIAL
-	i3.value = 1
-	enemy.intent_pattern = [i1, i2, i3]
-	return enemy
-
-func _make_cyclops(scene: PackedScene, hp: int) -> Resource:
-	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var IntentRes = load("res://resources/intent_resource.gd")
-	var enemy: Resource = EnemyRes.new()
-	enemy.enemy_name = "사이클롭스"
-	enemy.max_hp = hp
-	enemy.character_scene = scene
-	# 패턴: BUFF(value=0, 준비) → ATTACK(value=18, target=RANDOM)
-	var i1: Resource = IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF
-	i1.value = 0
-	i1.condition = "준비"
-	var i2: Resource = IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK
-	i2.value = 18
-	i2.target = IntentRes.TargetType.RANDOM
-	enemy.intent_pattern = [i1, i2]
-	return enemy
-
-func _make_snake(scene: PackedScene, hp: int) -> Resource:
-	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var IntentRes = load("res://resources/intent_resource.gd")
-	var enemy: Resource = EnemyRes.new()
-	enemy.enemy_name = "메두사의 뱀"
-	enemy.max_hp = hp
-	enemy.character_scene = scene
-	# 패턴: ATTACK(value=5, target=RANDOM) → DEBUFF(value=1, "vulnerable")
-	var i1: Resource = IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK
-	i1.value = 5
-	i1.target = IntentRes.TargetType.RANDOM
-	var i2: Resource = IntentRes.new()
-	i2.action_type = IntentRes.ActionType.DEBUFF
-	i2.value = 1
-	i2.status_type = "vulnerable"
-	i2.target = IntentRes.TargetType.RANDOM
-	enemy.intent_pattern = [i1, i2]
-	return enemy
+		return [_EnemiesAct1.minotaur(scene)]
+	return [_EnemiesAct1.medusa(scene)]
 
 func _make_boss_enemies() -> Array:
-	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var IntentRes = load("res://resources/intent_resource.gd")
-	var scene := _satyr_scene()
-	var hydra: Resource = EnemyRes.new()
-	hydra.enemy_name = "히드라"
-	hydra.max_hp = 200
-	hydra.character_scene = scene
-	hydra.phase_thresholds = [0.6, 0.3]
-
-	# Phase 0 (100%~60%): ATTACK(10) x2
-	var p0a1: Resource = IntentRes.new()
-	p0a1.action_type = IntentRes.ActionType.ATTACK
-	p0a1.value = 10; p0a1.target = IntentRes.TargetType.RANDOM
-	var p0a2: Resource = IntentRes.new()
-	p0a2.action_type = IntentRes.ActionType.ATTACK
-	p0a2.value = 10; p0a2.target = IntentRes.TargetType.RANDOM
-
-	# Phase 1 (60%~30%): ATTACK(12) x3
-	var p1a1: Resource = IntentRes.new()
-	p1a1.action_type = IntentRes.ActionType.ATTACK
-	p1a1.value = 12; p1a1.target = IntentRes.TargetType.RANDOM
-	var p1a2: Resource = IntentRes.new()
-	p1a2.action_type = IntentRes.ActionType.ATTACK
-	p1a2.value = 12; p1a2.target = IntentRes.TargetType.RANDOM
-	var p1a3: Resource = IntentRes.new()
-	p1a3.action_type = IntentRes.ActionType.ATTACK
-	p1a3.value = 12; p1a3.target = IntentRes.TargetType.LOWEST_HP
-
-	# Phase 2 (30%~0%): ATTACK(12) x3 + BUFF(10)
-	var p2a1: Resource = IntentRes.new()
-	p2a1.action_type = IntentRes.ActionType.ATTACK
-	p2a1.value = 12; p2a1.target = IntentRes.TargetType.RANDOM
-	var p2a2: Resource = IntentRes.new()
-	p2a2.action_type = IntentRes.ActionType.ATTACK
-	p2a2.value = 12; p2a2.target = IntentRes.TargetType.RANDOM
-	var p2a3: Resource = IntentRes.new()
-	p2a3.action_type = IntentRes.ActionType.ATTACK
-	p2a3.value = 12; p2a3.target = IntentRes.TargetType.LOWEST_HP
-	var p2b: Resource = IntentRes.new()
-	p2b.action_type = IntentRes.ActionType.BUFF
-	p2b.value = 10
-
-	hydra.phase_patterns = [[p0a1, p0a2], [p1a1, p1a2, p1a3], [p2a1, p2a2, p2a3, p2b]]
-	return [hydra]
+	return [_EnemiesAct1.hydra(_satyr_scene())]
 
 func _generate_card_rewards() -> Array:
 	var tm := _get_tm()
@@ -585,479 +464,32 @@ func _make_yi_sun_sin_hero() -> Resource:
 	return hero
 
 func _add_initial_deck_for(hero: Resource) -> void:
-	var CardRes = load("res://resources/card_resource.gd")
-	var EffRes = load("res://resources/effect_resource.gd")
 	var dm := _get_dm()
+	if dm == null:
+		return
+	var cards: Array = []
 	match hero.hero_id:
-		"napoleon":
-			for _i in range(3):
-				var c: Resource = CardRes.new(); c.card_name = "스트라이크"
-				c.owner_id = "napoleon"; c.cost = 1; c.play_animation = "attack"
-				var e: Resource = EffRes.new(); e.effect_type = EffRes.EffectType.DAMAGE
-				e.value = 6; e.target = "SINGLE"
-				c.effects = [e]
-				if dm: dm.add_card_to_deck(c)
-			for _i in range(2):
-				var c: Resource = CardRes.new(); c.card_name = "디펜드"
-				c.owner_id = "napoleon"; c.cost = 1; c.play_animation = "idle"
-				var e: Resource = EffRes.new(); e.effect_type = EffRes.EffectType.BLOCK; e.value = 5
-				c.effects = [e]
-				if dm: dm.add_card_to_deck(c)
-		"cleopatra":
-			for _i in range(2):
-				var c: Resource = CardRes.new(); c.card_name = "독침"
-				c.owner_id = "cleopatra"; c.cost = 1; c.play_animation = "attack"
-				var e: Resource = EffRes.new(); e.effect_type = EffRes.EffectType.DAMAGE
-				e.value = 3; e.target = "SINGLE"
-				var ep: Resource = EffRes.new(); ep.effect_type = EffRes.EffectType.APPLY_STATUS
-				ep.status_type = "poison"; ep.value = 3; ep.target = "SINGLE"
-				c.effects = [e, ep]
-				if dm: dm.add_card_to_deck(c)
-			for _i in range(2):
-				var c: Resource = CardRes.new(); c.card_name = "왕실 방어"
-				c.owner_id = "cleopatra"; c.cost = 1; c.play_animation = "idle"
-				var e: Resource = EffRes.new(); e.effect_type = EffRes.EffectType.BLOCK; e.value = 6
-				c.effects = [e]
-				if dm: dm.add_card_to_deck(c)
-		"yi_sun_sin":
-			for _i in range(2):
-				var c: Resource = CardRes.new(); c.card_name = "방패"
-				c.owner_id = "yi_sun_sin"; c.cost = 1; c.play_animation = "idle"
-				var e: Resource = EffRes.new(); e.effect_type = EffRes.EffectType.BLOCK; e.value = 7
-				c.effects = [e]
-				if dm: dm.add_card_to_deck(c)
-			for _i in range(2):
-				var c: Resource = CardRes.new(); c.card_name = "역공"
-				c.owner_id = "yi_sun_sin"; c.cost = 1; c.play_animation = "attack"
-				var eb: Resource = EffRes.new(); eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 3
-				var ed: Resource = EffRes.new(); ed.effect_type = EffRes.EffectType.DAMAGE
-				ed.value = 3; ed.target = "SINGLE"
-				c.effects = [eb, ed]
-				if dm: dm.add_card_to_deck(c)
+		"napoleon":   cards = _NapoleonCards.starter_deck()
+		"cleopatra":  cards = _CleopatraCards.starter_deck()
+		"yi_sun_sin": cards = _YiSunSinCards.starter_deck()
+	for card in cards:
+		dm.add_card_to_deck(card)
 
 func _napoleon_card_pool() -> Array:
-	var CardRes = load("res://resources/card_resource.gd")
-	var EffRes = load("res://resources/effect_resource.gd")
-	var cards: Array = []
-
-	# 1. 아우스터리츠 — DAMAGE 9, cost 2 (나폴레옹 최대 승전)
-	var c1: Resource = CardRes.new()
-	c1.card_name = "아우스터리츠"
-	c1.owner_id = "napoleon"
-	c1.cost = 2
-	c1.play_animation = "attack"
-	var e1: Resource = EffRes.new()
-	e1.effect_type = EffRes.EffectType.DAMAGE
-	e1.value = 9
-	e1.target = "SINGLE"
-	c1.effects = [e1]
-	cards.append(c1)
-
-	# 2. 포병 일제사격 — ALL DAMAGE 4, cost 1 (나폴레옹의 포병 전술)
-	var c2: Resource = CardRes.new()
-	c2.card_name = "포병 일제사격"
-	c2.owner_id = "napoleon"
-	c2.cost = 1
-	c2.play_animation = "attack"
-	var e2: Resource = EffRes.new()
-	e2.effect_type = EffRes.EffectType.DAMAGE
-	e2.value = 4
-	e2.target = "ALL"
-	c2.effects = [e2]
-	cards.append(c2)
-
-	# 3. 아르콜레 돌파 — DAMAGE 5 + BLOCK 5, cost 1 (나폴레옹이 직접 깃발 들고 돌파한 다리 전투)
-	var c3: Resource = CardRes.new()
-	c3.card_name = "아르콜레 돌파"
-	c3.owner_id = "napoleon"
-	c3.cost = 1
-	c3.play_animation = "attack"
-	var e3a: Resource = EffRes.new()
-	e3a.effect_type = EffRes.EffectType.DAMAGE
-	e3a.value = 5
-	e3a.target = "SINGLE"
-	var e3b: Resource = EffRes.new()
-	e3b.effect_type = EffRes.EffectType.BLOCK
-	e3b.value = 5
-	c3.effects = [e3a, e3b]
-	cards.append(c3)
-
-	# 4. 그랑다르메의 방패 — BLOCK 8, cost 1 (대육군)
-	var c4: Resource = CardRes.new()
-	c4.card_name = "그랑다르메의 방패"
-	c4.owner_id = "napoleon"
-	c4.cost = 1
-	c4.play_animation = "idle"
-	var e4: Resource = EffRes.new()
-	e4.effect_type = EffRes.EffectType.BLOCK
-	e4.value = 8
-	c4.effects = [e4]
-	cards.append(c4)
-
-	# 5. 예나의 기습 — DAMAGE 3 + poison 2, cost 1 (예나 전투의 기습 공격)
-	var c5: Resource = CardRes.new()
-	c5.card_name = "예나의 기습"
-	c5.owner_id = "napoleon"
-	c5.cost = 1
-	c5.play_animation = "attack"
-	var e5a: Resource = EffRes.new()
-	e5a.effect_type = EffRes.EffectType.DAMAGE
-	e5a.value = 3; e5a.target = "SINGLE"
-	var e5b: Resource = EffRes.new()
-	e5b.effect_type = EffRes.EffectType.APPLY_STATUS
-	e5b.status_type = "poison"; e5b.value = 2; e5b.target = "SINGLE"
-	c5.effects = [e5a, e5b]
-	cards.append(c5)
-
-	# 6. 돌격 — DAMAGE 8 + 사기+1
-	var c6: Resource = CardRes.new()
-	c6.card_name = "경기병 돌격"; c6.owner_id = "napoleon"; c6.cost = 1; c6.play_animation = "attack"
-	var e6a: Resource = EffRes.new(); e6a.effect_type = EffRes.EffectType.DAMAGE; e6a.value = 8; e6a.target = "SINGLE"
-	var e6b: Resource = EffRes.new(); e6b.effect_type = EffRes.EffectType.GAIN_MORALE; e6b.value = 1
-	c6.effects = [e6a, e6b]; cards.append(c6)
-
-	# 7. 황제의 명령 — DAMAGE 5 ALL + 사기+2
-	var c7: Resource = CardRes.new()
-	c7.card_name = "황제의 명령"; c7.owner_id = "napoleon"; c7.cost = 2; c7.play_animation = "attack"
-	var e7a: Resource = EffRes.new(); e7a.effect_type = EffRes.EffectType.DAMAGE; e7a.value = 5; e7a.target = "ALL"
-	var e7b: Resource = EffRes.new(); e7b.effect_type = EffRes.EffectType.GAIN_MORALE; e7b.value = 2
-	c7.effects = [e7a, e7b]; cards.append(c7)
-
-	# 8. 사기 폭발 — 사기 3 소모 → DAMAGE 20
-	var c8: Resource = CardRes.new()
-	c8.card_name = "황제의 기개"; c8.owner_id = "napoleon"; c8.cost = 0; c8.play_animation = "attack"
-	var e8: Resource = EffRes.new(); e8.effect_type = EffRes.EffectType.CONSUME_MORALE
-	e8.value = 3; e8.bonus_value = 20; e8.target = "SINGLE"
-	c8.effects = [e8]; cards.append(c8)
-
-	# 9. 군기 확립 — DRAW 2 + 사기+1
-	var c9: Resource = CardRes.new()
-	c9.card_name = "원수 서임"; c9.owner_id = "napoleon"; c9.cost = 1; c9.play_animation = "idle"
-	var e9a: Resource = EffRes.new(); e9a.effect_type = EffRes.EffectType.DRAW; e9a.value = 2
-	var e9b: Resource = EffRes.new(); e9b.effect_type = EffRes.EffectType.GAIN_MORALE; e9b.value = 1
-	c9.effects = [e9a, e9b]; cards.append(c9)
-
-	# 10. 포격 — DAMAGE 14 (사기 2이상이면 DAMAGE 20 → CONDITIONAL_DMG 간략화)
-	var c10: Resource = CardRes.new()
-	c10.card_name = "보로디노 포격"; c10.owner_id = "napoleon"; c10.cost = 2; c10.play_animation = "attack"
-	var e10: Resource = EffRes.new(); e10.effect_type = EffRes.EffectType.CONDITIONAL_DMG
-	e10.value = 14; e10.bonus_value = 20; e10.status_type = "morale"; e10.target = "SINGLE"
-	c10.effects = [e10]; cards.append(c10)
-
-	# 11. 연속 타격 — DAMAGE 4 + ENERGY +1
-	var c11: Resource = CardRes.new()
-	c11.card_name = "살보 사격"; c11.owner_id = "napoleon"; c11.cost = 1; c11.play_animation = "attack"
-	var e11a: Resource = EffRes.new(); e11a.effect_type = EffRes.EffectType.DAMAGE; e11a.value = 4; e11a.target = "SINGLE"
-	var e11b: Resource = EffRes.new(); e11b.effect_type = EffRes.EffectType.ENERGY; e11b.value = 1
-	c11.effects = [e11a, e11b]; cards.append(c11)
-
-	# 12. 돌격 명령 — 사기+2 + DRAW 1
-	var c12: Resource = CardRes.new()
-	c12.card_name = "총공세 명령"; c12.owner_id = "napoleon"; c12.cost = 1; c12.play_animation = "idle"
-	var e12a: Resource = EffRes.new(); e12a.effect_type = EffRes.EffectType.GAIN_MORALE; e12a.value = 2
-	var e12b: Resource = EffRes.new(); e12b.effect_type = EffRes.EffectType.DRAW; e12b.value = 1
-	c12.effects = [e12a, e12b]; cards.append(c12)
-
-	# 13. 전열 정비 — DRAW 1, cost 0
-	var c13: Resource = CardRes.new()
-	c13.card_name = "전열 재편"; c13.owner_id = "napoleon"; c13.cost = 0; c13.play_animation = "idle"
-	var e13: Resource = EffRes.new(); e13.effect_type = EffRes.EffectType.DRAW; e13.value = 1
-	c13.effects = [e13]; cards.append(c13)
-
-	# 14. 쾌속 전진 — DAMAGE 3 (간략화: 사기 스케일 대신 고정)
-	var c14: Resource = CardRes.new()
-	c14.card_name = "신속 기동"; c14.owner_id = "napoleon"; c14.cost = 1; c14.play_animation = "attack"
-	var e14: Resource = EffRes.new(); e14.effect_type = EffRes.EffectType.DAMAGE; e14.value = 3; e14.target = "SINGLE"
-	c14.effects = [e14]; cards.append(c14)
-
-	return cards
+	return _NapoleonCards.pool()
 
 func _cleopatra_card_pool() -> Array:
-	var CardRes = load("res://resources/card_resource.gd")
-	var EffRes = load("res://resources/effect_resource.gd")
-	var cards: Array = []
-
-	# 1. 독안개 — 독 3 (ALL), cost 2
-	var c1: Resource = CardRes.new(); c1.card_name = "나일의 안개"; c1.owner_id = "cleopatra"; c1.cost = 2; c1.play_animation = "attack"
-	var e1: Resource = EffRes.new(); e1.effect_type = EffRes.EffectType.APPLY_STATUS; e1.status_type = "poison"; e1.value = 3; e1.target = "ALL"
-	c1.effects = [e1]; cards.append(c1)
-
-	# 2. 독구름 — DAMAGE 2 ALL + 독 2 ALL, cost 1
-	var c2: Resource = CardRes.new(); c2.card_name = "사막의 독무"; c2.owner_id = "cleopatra"; c2.cost = 1; c2.play_animation = "attack"
-	var e2a: Resource = EffRes.new(); e2a.effect_type = EffRes.EffectType.DAMAGE; e2a.value = 2; e2a.target = "ALL"
-	var e2b: Resource = EffRes.new(); e2b.effect_type = EffRes.EffectType.APPLY_STATUS; e2b.status_type = "poison"; e2b.value = 2; e2b.target = "ALL"
-	c2.effects = [e2a, e2b]; cards.append(c2)
-
-	# 3. 뱀의 독 — 독 8 SINGLE, cost 1
-	var c3: Resource = CardRes.new(); c3.card_name = "아스프의 독니"; c3.owner_id = "cleopatra"; c3.cost = 1; c3.play_animation = "attack"
-	var e3: Resource = EffRes.new(); e3.effect_type = EffRes.EffectType.APPLY_STATUS; e3.status_type = "poison"; e3.value = 8; e3.target = "SINGLE"
-	c3.effects = [e3]; cards.append(c3)
-
-	# 4. 독 폭발 — POISON_BURST, cost 1
-	var c4: Resource = CardRes.new(); c4.card_name = "나일의 분노"; c4.owner_id = "cleopatra"; c4.cost = 1; c4.play_animation = "attack"
-	var e4: Resource = EffRes.new(); e4.effect_type = EffRes.EffectType.POISON_BURST; e4.target = "SINGLE"
-	c4.effects = [e4]; cards.append(c4)
-
-	# 5. 이중 독 — CONDITIONAL_DMG(value=2, bonus=8, cond=poison), cost 1
-	var c5: Resource = CardRes.new(); c5.card_name = "독사의 마수"; c5.owner_id = "cleopatra"; c5.cost = 1; c5.play_animation = "attack"
-	var e5: Resource = EffRes.new(); e5.effect_type = EffRes.EffectType.CONDITIONAL_DMG; e5.value = 2; e5.bonus_value = 8; e5.status_type = "poison"; e5.target = "SINGLE"
-	c5.effects = [e5]; cards.append(c5)
-
-	# 6. 치명독 — DAMAGE 4 + 독 5 + vulnerable 1, cost 2
-	var c6: Resource = CardRes.new(); c6.card_name = "파라오의 독"; c6.owner_id = "cleopatra"; c6.cost = 2; c6.play_animation = "attack"
-	var e6a: Resource = EffRes.new(); e6a.effect_type = EffRes.EffectType.DAMAGE; e6a.value = 4; e6a.target = "SINGLE"
-	var e6b: Resource = EffRes.new(); e6b.effect_type = EffRes.EffectType.APPLY_STATUS; e6b.status_type = "poison"; e6b.value = 5; e6b.target = "SINGLE"
-	var e6c: Resource = EffRes.new(); e6c.effect_type = EffRes.EffectType.APPLY_STATUS; e6c.status_type = "vulnerable"; e6c.value = 1; e6c.target = "SINGLE"
-	c6.effects = [e6a, e6b, e6c]; cards.append(c6)
-
-	# 7. 독 강화 — DRAW 1 + ENERGY 1, cost 0 (간략화)
-	var c7: Resource = CardRes.new(); c7.card_name = "이시스의 가호"; c7.owner_id = "cleopatra"; c7.cost = 0; c7.play_animation = "idle"
-	var e7a: Resource = EffRes.new(); e7a.effect_type = EffRes.EffectType.DRAW; e7a.value = 1
-	var e7b: Resource = EffRes.new(); e7b.effect_type = EffRes.EffectType.ENERGY; e7b.value = 1
-	c7.effects = [e7a, e7b]; cards.append(c7)
-
-	# 8. 독 회복 — HEAL 6 (독 합계 기반 간략화), cost 1
-	var c8: Resource = CardRes.new(); c8.card_name = "나일의 축복"; c8.owner_id = "cleopatra"; c8.cost = 1; c8.play_animation = "idle"
-	var e8: Resource = EffRes.new(); e8.effect_type = EffRes.EffectType.HEAL; e8.value = 6
-	c8.effects = [e8]; cards.append(c8)
-
-	# 9. 유혹 — APPLY_STATUS(charm 1), cost 1
-	var c9: Resource = CardRes.new(); c9.card_name = "유혹"; c9.owner_id = "cleopatra"; c9.cost = 1; c9.play_animation = "idle"
-	var e9: Resource = EffRes.new(); e9.effect_type = EffRes.EffectType.APPLY_STATUS; e9.status_type = "charm"; e9.value = 1; e9.target = "SINGLE"
-	c9.effects = [e9]; cards.append(c9)
-
-	# 10. 저주의 시선 — weak 2 + vulnerable 2, cost 1
-	var c10: Resource = CardRes.new(); c10.card_name = "저주의 시선"; c10.owner_id = "cleopatra"; c10.cost = 1; c10.play_animation = "idle"
-	var e10a: Resource = EffRes.new(); e10a.effect_type = EffRes.EffectType.APPLY_STATUS; e10a.status_type = "weak"; e10a.value = 2; e10a.target = "SINGLE"
-	var e10b: Resource = EffRes.new(); e10b.effect_type = EffRes.EffectType.APPLY_STATUS; e10b.status_type = "vulnerable"; e10b.value = 2; e10b.target = "SINGLE"
-	c10.effects = [e10a, e10b]; cards.append(c10)
-
-	# 11. 파라오의 명 — BLOCK 8 + DRAW 2, cost 1
-	var c11: Resource = CardRes.new(); c11.card_name = "파라오의 명"; c11.owner_id = "cleopatra"; c11.cost = 1; c11.play_animation = "idle"
-	var e11a: Resource = EffRes.new(); e11a.effect_type = EffRes.EffectType.BLOCK; e11a.value = 8
-	var e11b: Resource = EffRes.new(); e11b.effect_type = EffRes.EffectType.DRAW; e11b.value = 2
-	c11.effects = [e11a, e11b]; cards.append(c11)
-
-	# 12. 독 방패 — BLOCK 10 (독 조건 간략화), cost 1
-	var c12: Resource = CardRes.new(); c12.card_name = "람세스의 방패"; c12.owner_id = "cleopatra"; c12.cost = 1; c12.play_animation = "idle"
-	var e12: Resource = EffRes.new(); e12.effect_type = EffRes.EffectType.BLOCK; e12.value = 10
-	c12.effects = [e12]; cards.append(c12)
-
-	# 13. 왕실 칙령 — DRAW 2 (서치 간략화), cost 2
-	var c13: Resource = CardRes.new(); c13.card_name = "알렉산드리아 칙령"; c13.owner_id = "cleopatra"; c13.cost = 2; c13.play_animation = "idle"
-	var e13: Resource = EffRes.new(); e13.effect_type = EffRes.EffectType.DRAW; e13.value = 2
-	c13.effects = [e13]; cards.append(c13)
-
-	# 14. 재생독 — DAMAGE 3 + 독 1 ALL, cost 1
-	var c14: Resource = CardRes.new(); c14.card_name = "독의 씨앗"; c14.owner_id = "cleopatra"; c14.cost = 1; c14.play_animation = "attack"
-	var e14a: Resource = EffRes.new(); e14a.effect_type = EffRes.EffectType.DAMAGE; e14a.value = 3; e14a.target = "SINGLE"
-	var e14b: Resource = EffRes.new(); e14b.effect_type = EffRes.EffectType.APPLY_STATUS; e14b.status_type = "poison"; e14b.value = 1; e14b.target = "ALL"
-	c14.effects = [e14a, e14b]; cards.append(c14)
-
-	return cards
+	return _CleopatraCards.pool()
 
 func _yi_sun_sin_card_pool() -> Array:
-	var CardRes = load("res://resources/card_resource.gd")
-	var EffRes = load("res://resources/effect_resource.gd")
-	var cards: Array = []
-
-	# 1. 거북선 돌격 — DAMAGE 6 + COUNTER_BLOCK(60%), cost 2
-	var c1: Resource = CardRes.new(); c1.card_name = "거북선 돌격"; c1.owner_id = "yi_sun_sin"; c1.cost = 2; c1.play_animation = "attack"
-	var e1a: Resource = EffRes.new(); e1a.effect_type = EffRes.EffectType.DAMAGE; e1a.value = 6; e1a.target = "SINGLE"
-	var e1b: Resource = EffRes.new(); e1b.effect_type = EffRes.EffectType.COUNTER_BLOCK; e1b.value = 60; e1b.target = "SINGLE"
-	c1.effects = [e1a, e1b]; cards.append(c1)
-
-	# 2. 반격 — COUNTER_BLOCK(100%), cost 1
-	var c2: Resource = CardRes.new(); c2.card_name = "반격"; c2.owner_id = "yi_sun_sin"; c2.cost = 1; c2.play_animation = "attack"
-	var e2: Resource = EffRes.new(); e2.effect_type = EffRes.EffectType.COUNTER_BLOCK; e2.value = 100; e2.target = "SINGLE"
-	c2.effects = [e2]; cards.append(c2)
-
-	# 3. 철갑 — BLOCK 14, cost 1
-	var c3: Resource = CardRes.new(); c3.card_name = "철갑"; c3.owner_id = "yi_sun_sin"; c3.cost = 1; c3.play_animation = "idle"
-	var e3: Resource = EffRes.new(); e3.effect_type = EffRes.EffectType.BLOCK; e3.value = 14
-	c3.effects = [e3]; cards.append(c3)
-
-	# 4. 학익진 — BLOCK_ALL 5, cost 2
-	var c4: Resource = CardRes.new(); c4.card_name = "학익진"; c4.owner_id = "yi_sun_sin"; c4.cost = 2; c4.play_animation = "idle"
-	var e4: Resource = EffRes.new(); e4.effect_type = EffRes.EffectType.BLOCK_ALL; e4.value = 5
-	c4.effects = [e4]; cards.append(c4)
-
-	# 5. 배수진 — HEAL -8 + BLOCK 18, cost 1
-	var c5: Resource = CardRes.new(); c5.card_name = "배수진"; c5.owner_id = "yi_sun_sin"; c5.cost = 1; c5.play_animation = "idle"
-	var e5a: Resource = EffRes.new(); e5a.effect_type = EffRes.EffectType.HEAL; e5a.value = -8
-	var e5b: Resource = EffRes.new(); e5b.effect_type = EffRes.EffectType.BLOCK; e5b.value = 18
-	c5.effects = [e5a, e5b]; cards.append(c5)
-
-	# 6. 노량 해전 — DAMAGE 24 (조건 간략화: 항상 사용 가능), cost 2
-	var c6: Resource = CardRes.new(); c6.card_name = "노량 해전"; c6.owner_id = "yi_sun_sin"; c6.cost = 2; c6.play_animation = "attack"
-	var e6: Resource = EffRes.new(); e6.effect_type = EffRes.EffectType.DAMAGE; e6.value = 24; e6.target = "SINGLE"
-	c6.effects = [e6]; cards.append(c6)
-
-	# 7. 진형 강화 — FORMATION_BLOCK 5, cost 1
-	var c7: Resource = CardRes.new(); c7.card_name = "진형 강화"; c7.owner_id = "yi_sun_sin"; c7.cost = 1; c7.play_animation = "idle"
-	var e7: Resource = EffRes.new(); e7.effect_type = EffRes.EffectType.FORMATION_BLOCK; e7.value = 5
-	c7.effects = [e7]; cards.append(c7)
-
-	# 8. 수군 훈련 — BLOCK 5 + DRAW 1, cost 1
-	var c8: Resource = CardRes.new(); c8.card_name = "수군 훈련"; c8.owner_id = "yi_sun_sin"; c8.cost = 1; c8.play_animation = "idle"
-	var e8a: Resource = EffRes.new(); e8a.effect_type = EffRes.EffectType.BLOCK; e8a.value = 5
-	var e8b: Resource = EffRes.new(); e8b.effect_type = EffRes.EffectType.DRAW; e8b.value = 1
-	c8.effects = [e8a, e8b]; cards.append(c8)
-
-	# 9. 한산대첩 — DAMAGE 8 ALL + BLOCK_ALL 8, cost 3
-	var c9: Resource = CardRes.new(); c9.card_name = "한산대첩"; c9.owner_id = "yi_sun_sin"; c9.cost = 3; c9.play_animation = "attack"
-	var e9a: Resource = EffRes.new(); e9a.effect_type = EffRes.EffectType.DAMAGE; e9a.value = 8; e9a.target = "ALL"
-	var e9b: Resource = EffRes.new(); e9b.effect_type = EffRes.EffectType.BLOCK_ALL; e9b.value = 8
-	c9.effects = [e9a, e9b]; cards.append(c9)
-
-	# 10. 불굴 — HEAL_ALL 12, cost 2
-	var c10: Resource = CardRes.new(); c10.card_name = "불굴"; c10.owner_id = "yi_sun_sin"; c10.cost = 2; c10.play_animation = "idle"
-	var e10: Resource = EffRes.new(); e10.effect_type = EffRes.EffectType.HEAL_ALL; e10.value = 12
-	c10.effects = [e10]; cards.append(c10)
-
-	# 11. 엄정한 훈련 — DRAW 2 + BLOCK 4, cost 1
-	var c11: Resource = CardRes.new(); c11.card_name = "엄정한 훈련"; c11.owner_id = "yi_sun_sin"; c11.cost = 1; c11.play_animation = "idle"
-	var e11a: Resource = EffRes.new(); e11a.effect_type = EffRes.EffectType.DRAW; e11a.value = 2
-	var e11b: Resource = EffRes.new(); e11b.effect_type = EffRes.EffectType.BLOCK; e11b.value = 4
-	c11.effects = [e11a, e11b]; cards.append(c11)
-
-	# 12. 거북선 방패 — BLOCK 8, cost 1
-	var c12: Resource = CardRes.new(); c12.card_name = "거북선 방패"; c12.owner_id = "yi_sun_sin"; c12.cost = 1; c12.play_animation = "idle"
-	var e12: Resource = EffRes.new(); e12.effect_type = EffRes.EffectType.BLOCK; e12.value = 8
-	c12.effects = [e12]; cards.append(c12)
-
-	# 13. 필사즉생 — DAMAGE 10 (HP 기반 간략화), cost 1
-	var c13: Resource = CardRes.new(); c13.card_name = "필사즉생"; c13.owner_id = "yi_sun_sin"; c13.cost = 1; c13.play_animation = "attack"
-	var e13: Resource = EffRes.new(); e13.effect_type = EffRes.EffectType.DAMAGE; e13.value = 10; e13.target = "SINGLE"
-	c13.effects = [e13]; cards.append(c13)
-
-	# 14. 해군 기동 — BLOCK 3, cost 0
-	var c14: Resource = CardRes.new(); c14.card_name = "해군 기동"; c14.owner_id = "yi_sun_sin"; c14.cost = 0; c14.play_animation = "idle"
-	var e14: Resource = EffRes.new(); e14.effect_type = EffRes.EffectType.BLOCK; e14.value = 3
-	c14.effects = [e14]; cards.append(c14)
-
-	return cards
+	return _YiSunSinCards.pool()
 
 func _get_random_event() -> Resource:
 	var pool := _build_event_pool()
 	return pool[randi() % pool.size()]
 
 func _build_event_pool() -> Array:
-	var EventRes = load("res://resources/event_resource.gd")
-	var ChoiceRes = load("res://resources/event_choice_resource.gd")
-	var events := []
-
-	# 1. 황금 상자
-	var e1: Resource = EventRes.new()
-	e1.event_name = "황금 상자"
-	e1.description = "낡은 황금 상자가 놓여 있다."
-	var c1a: Resource = ChoiceRes.new(); c1a.label = "열기"
-	c1a.effect_type = ChoiceRes.EffectType.GOLD; c1a.value = 30
-	var c1b: Resource = ChoiceRes.new(); c1b.label = "무시"
-	c1b.effect_type = ChoiceRes.EffectType.NONE
-	e1.choices = [c1a, c1b]; events.append(e1)
-
-	# 2. 상처 입은 전사
-	var e2: Resource = EventRes.new()
-	e2.event_name = "상처 입은 전사"
-	e2.description = "부상당한 병사가 치료를 요청한다."
-	var c2a: Resource = ChoiceRes.new(); c2a.label = "치료 (골드 -20)"
-	c2a.effect_type = ChoiceRes.EffectType.HEAL; c2a.value = 15; c2a.cost_gold = 20
-	var c2b: Resource = ChoiceRes.new(); c2b.label = "무시"
-	c2b.effect_type = ChoiceRes.EffectType.NONE
-	e2.choices = [c2a, c2b]; events.append(e2)
-
-	# 3. 고대 도서관
-	var e3: Resource = EventRes.new()
-	e3.event_name = "고대 도서관"
-	e3.description = "신비로운 지식이 담긴 도서관. 공부하면 지식을 얻지만 기력을 소모한다."
-	var c3a: Resource = ChoiceRes.new(); c3a.label = "공부 (HP -5)"
-	c3a.effect_type = ChoiceRes.EffectType.DRAW_UP; c3a.value = 1; c3a.cost_hp = 5
-	var c3b: Resource = ChoiceRes.new(); c3b.label = "무시"
-	c3b.effect_type = ChoiceRes.EffectType.NONE
-	e3.choices = [c3a, c3b]; events.append(e3)
-
-	# 4. 저주받은 제단
-	var e4: Resource = EventRes.new()
-	e4.event_name = "저주받은 제단"
-	e4.description = "제단에 무언가를 바치면 강력한 유물을 얻을 수 있다."
-	var c4a: Resource = ChoiceRes.new(); c4a.label = "카드 바치기 (덱에서 1장 제거)"
-	c4a.effect_type = ChoiceRes.EffectType.REMOVE_CARD; c4a.value = 1
-	var c4b: Resource = ChoiceRes.new(); c4b.label = "무시"
-	c4b.effect_type = ChoiceRes.EffectType.NONE
-	e4.choices = [c4a, c4b]; events.append(e4)
-
-	# 5. 동료 만남
-	var e5: Resource = EventRes.new()
-	e5.event_name = "동료 만남"
-	e5.description = "역사 속 영웅이 합류를 요청한다."
-	var c5a: Resource = ChoiceRes.new(); c5a.label = "합류시키기"
-	c5a.effect_type = ChoiceRes.EffectType.ADD_HERO
-	var c5b: Resource = ChoiceRes.new(); c5b.label = "거절"
-	c5b.effect_type = ChoiceRes.EffectType.NONE
-	e5.choices = [c5a, c5b]; events.append(e5)
-
-	# 6. 프로메테우스의 불
-	var e6: Resource = EventRes.new()
-	e6.event_name = "프로메테우스의 불"
-	e6.description = "제우스에게 불을 훔친 티탄이 불씨를 건넨다. 받겠는가?"
-	var c6a: Resource = ChoiceRes.new(); c6a.label = "불씨를 받는다 (드로우 +1, HP -20)"
-	c6a.effect_type = ChoiceRes.EffectType.DRAW_UP; c6a.value = 1; c6a.cost_hp = 20
-	var c6b: Resource = ChoiceRes.new(); c6b.label = "거절한다"
-	c6b.effect_type = ChoiceRes.EffectType.NONE
-	e6.choices = [c6a, c6b]; events.append(e6)
-
-	# 7. 헤라클레스의 시련
-	var e7: Resource = EventRes.new()
-	e7.event_name = "헤라클레스의 시련"
-	e7.description = "헤라클레스가 힘겨루기를 제안한다. 이기면 황금을 준다."
-	var c7a: Resource = ChoiceRes.new(); c7a.label = "맞선다 (골드 +60, HP -25)"
-	c7a.effect_type = ChoiceRes.EffectType.GOLD; c7a.value = 60; c7a.cost_hp = 25
-	var c7b: Resource = ChoiceRes.new(); c7b.label = "포기한다"
-	c7b.effect_type = ChoiceRes.EffectType.NONE
-	e7.choices = [c7a, c7b]; events.append(e7)
-
-	# 8. 키르케의 마법
-	var e8: Resource = EventRes.new()
-	e8.event_name = "키르케의 마법"
-	e8.description = "마법사 키르케가 황금을 받고 체력을 회복시켜 주겠다고 한다."
-	var c8a: Resource = ChoiceRes.new(); c8a.label = "마법을 받는다 (HP +25, 골드 -50)"
-	c8a.effect_type = ChoiceRes.EffectType.HEAL; c8a.value = 25; c8a.cost_gold = 50
-	var c8b: Resource = ChoiceRes.new(); c8b.label = "거절한다"
-	c8b.effect_type = ChoiceRes.EffectType.NONE
-	e8.choices = [c8a, c8b]; events.append(e8)
-
-	# 9. 하데스의 계약
-	var e9: Resource = EventRes.new()
-	e9.event_name = "하데스의 계약"
-	e9.description = "저승의 신 하데스가 강력한 유물을 제시한다. 대신 생명력을 요구한다."
-	var c9a: Resource = ChoiceRes.new(); c9a.label = "계약한다 (렐릭 획득, HP -30)"
-	c9a.effect_type = ChoiceRes.EffectType.ADD_RELIC; c9a.cost_hp = 30
-	var c9b: Resource = ChoiceRes.new(); c9b.label = "거절한다"
-	c9b.effect_type = ChoiceRes.EffectType.NONE
-	e9.choices = [c9a, c9b]; events.append(e9)
-
-	# 10. 헤르메스의 도박
-	var e10: Resource = EventRes.new()
-	e10.event_name = "헤르메스의 도박"
-	e10.description = "교활한 헤르메스가 황금과 덱 경량화 중 하나를 선택하라 한다."
-	var c10a: Resource = ChoiceRes.new(); c10a.label = "황금을 받는다 (골드 +50)"
-	c10a.effect_type = ChoiceRes.EffectType.GOLD; c10a.value = 50
-	var c10b: Resource = ChoiceRes.new(); c10b.label = "덱을 가볍게 한다 (카드 1장 제거)"
-	c10b.effect_type = ChoiceRes.EffectType.REMOVE_CARD; c10b.value = 1
-	e10.choices = [c10a, c10b]; events.append(e10)
-
-	# 11. 악마의 거래
-	var e11: Resource = EventRes.new()
-	e11.event_name = "악마의 거래"
-	e11.description = "어둠 속 제단에서 목소리가 들린다.\n'내 힘을 원하느냐? 대가는 네가 치르게 될 것이다.'\n50% 확률로 강력한 렐릭 또는 저주 렐릭을 얻는다."
-	var c11a: Resource = ChoiceRes.new(); c11a.label = "받아들인다"
-	c11a.effect_type = ChoiceRes.EffectType.ADD_RELIC_GAMBLE
-	var c11b: Resource = ChoiceRes.new(); c11b.label = "거절한다"
-	c11b.effect_type = ChoiceRes.EffectType.NONE
-	e11.choices = [c11a, c11b]; events.append(e11)
-
-	return events
+	return _EventsAct1.build_pool()
 
 func to_dict() -> Dictionary:
 	var map_data := []
@@ -1071,6 +503,7 @@ func to_dict() -> Dictionary:
 			"visited": node.visited,
 		})
 	return {
+		"current_act": current_act,
 		"current_floor": current_floor,
 		"gold": gold,
 		"current_node_id": current_node_id,
@@ -1079,6 +512,7 @@ func to_dict() -> Dictionary:
 	}
 
 func from_dict(data: Dictionary) -> void:
+	current_act = data.get("current_act", 1)
 	current_floor = data.get("current_floor", 0)
 	gold = data.get("gold", 0)
 	current_node_id = data.get("current_node_id", -1)
@@ -1220,155 +654,4 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 					tm.take_damage(target.hero_id, value)
 
 func _build_relic_pool() -> Array:
-	var RelicRes = load("res://resources/relic_resource.gd")
-	var pool: Array = []
-
-	# 1. 버닝 블러드 — 전투 승리 시 HP +6
-	var r1: Resource = RelicRes.new(); r1.relic_name = "버닝 블러드"
-	r1.description = "전투 승리 시 팀 전체 HP +6"
-	r1.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r1.effect_type = RelicRes.EffectType.HEAL; r1.value = 6
-	pool.append(r1)
-
-	# 2. 불사조 깃털 — 플레이어 턴 시작 시 에너지 +1
-	var r2: Resource = RelicRes.new(); r2.relic_name = "불사조 깃털"
-	r2.description = "플레이어 턴 시작 시 에너지 +1"
-	r2.trigger = RelicRes.TriggerType.PLAYER_TURN_START
-	r2.effect_type = RelicRes.EffectType.ENERGY; r2.value = 1
-	pool.append(r2)
-
-	# 3. 독약 병 — 전투 시작 시 무작위 적 독 3
-	var r3: Resource = RelicRes.new(); r3.relic_name = "독약 병"
-	r3.description = "전투 시작 시 무작위 적에게 독 3"
-	r3.trigger = RelicRes.TriggerType.BATTLE_START
-	r3.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY; r3.value = 3
-	pool.append(r3)
-
-	# 4. 전쟁 북 — 플레이어 턴 시작 시 카드 +1
-	var r4: Resource = RelicRes.new(); r4.relic_name = "전쟁 북"
-	r4.description = "플레이어 턴 시작 시 카드 1장 추가 드로우"
-	r4.trigger = RelicRes.TriggerType.PLAYER_TURN_START
-	r4.effect_type = RelicRes.EffectType.DRAW; r4.value = 1
-	pool.append(r4)
-
-	# 5. 고대 유물 — 패시브: 최대 HP +15
-	var r5: Resource = RelicRes.new(); r5.relic_name = "고대 유물"
-	r5.description = "팀 전체 최대 HP +15"
-	r5.trigger = RelicRes.TriggerType.PASSIVE
-	r5.effect_type = RelicRes.EffectType.MAX_HP; r5.value = 15
-	pool.append(r5)
-
-	# 6. 모래시계 — 플레이어 턴 종료 시 카드 회복 (DRAW로 간략화)
-	var r6: Resource = RelicRes.new(); r6.relic_name = "모래시계"
-	r6.description = "턴 종료 시 덱에서 카드 1장 드로우"
-	r6.trigger = RelicRes.TriggerType.PLAYER_TURN_END
-	r6.effect_type = RelicRes.EffectType.DRAW; r6.value = 1
-	pool.append(r6)
-
-	# 7. 피의 돌 — 영웅 피해 ≥5 시 에너지 +1 (ON_HERO_DAMAGED)
-	var r7: Resource = RelicRes.new(); r7.relic_name = "피의 돌"
-	r7.description = "피해 5 이상 받을 시 에너지 +1"
-	r7.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
-	r7.effect_type = RelicRes.EffectType.ENERGY; r7.value = 1; r7.condition_value = 5
-	pool.append(r7)
-
-	# 8. 황제의 인장 — 나폴레옹 전용: 전투 시작 사기+2 (생존 시 사기+2)
-	var r8: Resource = RelicRes.new(); r8.relic_name = "황제의 인장"
-	r8.description = "전투 시작 시 사기 +2 (나폴레옹 생존 시 적용)"
-	r8.trigger = RelicRes.TriggerType.BATTLE_START
-	r8.effect_type = RelicRes.EffectType.GAIN_MORALE
-	r8.owner_hero_id = "napoleon"; r8.value = 0; r8.bonus_value = 2
-	pool.append(r8)
-
-	# 9. 독사의 팔찌 — 클레오파트라 전용: 전투 시작 독 2 (생존 시 독 4)
-	var r9: Resource = RelicRes.new(); r9.relic_name = "독사의 팔찌"
-	r9.description = "전투 시작 시 무작위 적 독 2 (클레오파트라 생존 시 독 4)"
-	r9.trigger = RelicRes.TriggerType.BATTLE_START
-	r9.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
-	r9.owner_hero_id = "cleopatra"; r9.value = 2; r9.bonus_value = 4
-	pool.append(r9)
-
-	# 10. 거북선 모형 — 이순신 전용: 턴 시작 BLOCK +2 (생존 시 +4)
-	var r10: Resource = RelicRes.new(); r10.relic_name = "거북선 모형"
-	r10.description = "플레이어 턴 시작 시 방어도 +2 (이순신 생존 시 +4)"
-	r10.trigger = RelicRes.TriggerType.PLAYER_TURN_START
-	r10.effect_type = RelicRes.EffectType.BLOCK
-	r10.owner_hero_id = "yi_sun_sin"; r10.value = 2; r10.bonus_value = 4
-	pool.append(r10)
-
-	# 11. 포병 나팔 — 나폴레옹 전용: 턴 시작 사기 +1
-	var r11: Resource = RelicRes.new(); r11.relic_name = "포병 나팔"
-	r11.description = "플레이어 턴 시작 시 사기 +1 (나폴레옹 생존 시 적용)"
-	r11.trigger = RelicRes.TriggerType.PLAYER_TURN_START
-	r11.effect_type = RelicRes.EffectType.GAIN_MORALE
-	r11.owner_hero_id = "napoleon"; r11.value = 0; r11.bonus_value = 1
-	pool.append(r11)
-
-	# 12. 난중일기 — 이순신 전용: 전투 승리 시 팀 HP +8
-	var r12: Resource = RelicRes.new(); r12.relic_name = "난중일기"
-	r12.description = "전투 승리 시 팀 HP +8 (이순신 생존 시 적용)"
-	r12.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r12.effect_type = RelicRes.EffectType.HEAL
-	r12.owner_hero_id = "yi_sun_sin"; r12.value = 0; r12.bonus_value = 8
-	pool.append(r12)
-
-	# 13. 파라오의 인장 — 클레오파트라 전용: 턴 시작 무작위 적 독 +1
-	var r13: Resource = RelicRes.new(); r13.relic_name = "파라오의 인장"
-	r13.description = "플레이어 턴 시작 시 무작위 적 독 +1 (클레오파트라 생존 시 적용)"
-	r13.trigger = RelicRes.TriggerType.PLAYER_TURN_START
-	r13.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
-	r13.owner_hero_id = "cleopatra"; r13.value = 0; r13.bonus_value = 1
-	pool.append(r13)
-
-	# 14. 악마의 계약 — 저주: 전투 승리 팀 HP +20 / 매 턴 무작위 영웅 HP -3
-	var r14: Resource = RelicRes.new(); r14.relic_name = "악마의 계약"
-	r14.description = "전투 승리 시 팀 HP +20. 단, 매 플레이어 턴 시작 시 무작위 영웅 HP -3"
-	r14.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r14.effect_type = RelicRes.EffectType.HEAL; r14.value = 20
-	r14.is_cursed = true
-	r14.penalty_trigger = RelicRes.TriggerType.PLAYER_TURN_START
-	r14.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r14.penalty_value = 3
-	pool.append(r14)
-
-	# 15. 저주받은 왕관 — 저주: 최대 HP +25 / 매 전투 시작 무작위 영웅 HP -8
-	var r15: Resource = RelicRes.new(); r15.relic_name = "저주받은 왕관"
-	r15.description = "최대 HP +25. 단, 매 전투 시작 시 무작위 영웅 HP -8"
-	r15.trigger = RelicRes.TriggerType.PASSIVE
-	r15.effect_type = RelicRes.EffectType.MAX_HP; r15.value = 25
-	r15.is_cursed = true
-	r15.penalty_trigger = RelicRes.TriggerType.BATTLE_START
-	r15.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r15.penalty_value = 8
-	pool.append(r15)
-
-	# 16. 피의 서약 — 저주: 턴 시작 에너지 +1 / 턴 종료 무작위 영웅 HP -4
-	var r16: Resource = RelicRes.new(); r16.relic_name = "피의 서약"
-	r16.description = "플레이어 턴 시작 시 에너지 +1. 단, 턴 종료 시 무작위 영웅 HP -4"
-	r16.trigger = RelicRes.TriggerType.PLAYER_TURN_START
-	r16.effect_type = RelicRes.EffectType.ENERGY; r16.value = 1
-	r16.is_cursed = true
-	r16.penalty_trigger = RelicRes.TriggerType.PLAYER_TURN_END
-	r16.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r16.penalty_value = 4
-	pool.append(r16)
-
-	# 17. 전술가의 지도 — 공용: 전투 시작 카드 +1 드로우
-	var r17: Resource = RelicRes.new(); r17.relic_name = "전술가의 지도"
-	r17.description = "전투 시작 시 카드 1장 추가 드로우"
-	r17.trigger = RelicRes.TriggerType.BATTLE_START
-	r17.effect_type = RelicRes.EffectType.DRAW; r17.value = 1
-	pool.append(r17)
-
-	# 18. 강철 의지 — 공용: 전투 시작 에너지 +1
-	var r18: Resource = RelicRes.new(); r18.relic_name = "강철 의지"
-	r18.description = "전투 시작 시 에너지 +1"
-	r18.trigger = RelicRes.TriggerType.BATTLE_START
-	r18.effect_type = RelicRes.EffectType.ENERGY; r18.value = 1
-	pool.append(r18)
-
-	# 19. 고대의 방패 — 공용: 전투 시작 팀 전체 방어도 +4
-	var r19: Resource = RelicRes.new(); r19.relic_name = "고대의 방패"
-	r19.description = "전투 시작 시 팀 전체 방어도 +4"
-	r19.trigger = RelicRes.TriggerType.BATTLE_START
-	r19.effect_type = RelicRes.EffectType.BLOCK; r19.value = 4
-	pool.append(r19)
-
-	return pool
+	return _RelicData.build_pool()

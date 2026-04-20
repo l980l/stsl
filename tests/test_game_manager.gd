@@ -25,6 +25,9 @@ func run_all() -> Dictionary:
 	test_boss_card_pick_goes_to_upgrade()
 	test_complete_event_returns_to_map()
 	test_start_run_with_cleopatra()
+	test_act_serialization()
+	test_act_transition()
+	test_act_difficulty()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -199,3 +202,43 @@ func test_start_run_with_cleopatra() -> void:
 	gm.start_run("cleopatra")
 	_assert(gm.run_map.size() == 28, "클레오파트라로 시작해도 맵 28개 노드")
 	_assert(gm.available_node_ids == [0, 1, 2], "초기 접근 가능 노드 [0,1,2]")
+
+func test_act_serialization() -> void:
+	print("[TestGameManager] test_act_serialization")
+	var gm := _make_gm()
+	gm.current_act = 2
+	var d := gm.to_dict()
+	_assert(d.get("current_act") == 2, "to_dict current_act=2")
+	gm.current_act = 1
+	gm.from_dict(d)
+	_assert(gm.current_act == 2, "from_dict restores current_act")
+	passed += 1
+
+func test_act_transition() -> void:
+	print("[TestGameManager] test_act_transition")
+	var gm := _make_gm()
+	gm.current_act = 1
+	gm._start_next_act()
+	_assert(gm.current_act == 2, "act incremented to 2")
+	_assert(gm.current_floor == 0, "floor reset")
+	_assert(gm.current_node_id == -1, "node_id reset")
+	_assert(gm.run_map.size() == 28, "Act 2 map generated (28 nodes)")
+	_assert(gm.available_node_ids == [0, 1, 2], "available nodes reset")
+	passed += 1
+
+func test_act_difficulty() -> void:
+	print("[TestGameManager] test_act_difficulty")
+	var gm := _make_gm()
+	var EnemiesAct1 = preload("res://resources/enemies/enemies_act1.gd")
+	var scene := gm._satyr_scene()
+
+	var e1: Resource = EnemiesAct1.satyr(scene, 30, 6)
+	gm._apply_act_difficulty([e1], 1)
+	var hp1: int = e1.max_hp
+
+	var e2: Resource = EnemiesAct1.satyr(scene, 30, 6)
+	gm._apply_act_difficulty([e2], 2)
+	var hp2: int = e2.max_hp
+
+	_assert(hp2 > hp1, "Act 2 enemy HP > Act 1 HP (multiplier 1.3)")
+	passed += 1

@@ -291,11 +291,11 @@ func _execute_enemy_turn() -> void:
 					other_targets.append(j)
 			if not other_targets.is_empty():
 				var target_j: int = other_targets[randi() % other_targets.size()]
-				var pattern: Array = _get_active_pattern(i)
-				if not pattern.is_empty():
-					var intent: Resource = pattern[_enemy_intent_index[i]]
-					if intent.action_type == IntentRes.ActionType.ATTACK:
-						_deal_damage_to_enemy(target_j, intent.value)
+				var charm_pattern: Array = _get_active_pattern(i)
+				if not charm_pattern.is_empty():
+					var charm_intent: Resource = charm_pattern[_enemy_intent_index[i]]
+					if charm_intent.action_type == IntentRes.ActionType.ATTACK:
+						_deal_damage_to_enemy(target_j, charm_intent.value)
 			_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % _get_active_pattern(i).size()
 			continue
 		var pattern: Array = _get_active_pattern(i)
@@ -464,14 +464,14 @@ func _check_phase_transition(enemy_index: int) -> void:
 func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 	if team_mgr == null:
 		return
-	var owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
+	var card_owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
 	for effect in card.effects:
 		match effect.effect_type:
 			EffectRes.EffectType.GAIN_MORALE:
-				if owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
+				if card_owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
 					_hero_block["yi_sun_sin"] = _hero_block.get("yi_sun_sin", 0) + 3
 			EffectRes.EffectType.DAMAGE:
-				if owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
+				if card_owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
 					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 						if _enemy_status[target_enemy_index].get("poison", 0) > 0:
 							_deal_damage_to_enemy(target_enemy_index, 4)
@@ -496,16 +496,16 @@ func get_active_synergies() -> Array:
 func has_synergy_bonus(card: Resource) -> bool:
 	if team_mgr == null:
 		return false
-	var owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
+	var card_owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
 	for effect in card.effects:
 		match effect.effect_type:
 			EffectRes.EffectType.GAIN_MORALE:
-				if owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
+				if card_owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
 					return true
 			EffectRes.EffectType.CONSUME_MORALE:
-				if owner == "napoleon" and team_mgr.is_alive("cleopatra"):
+				if card_owner == "napoleon" and team_mgr.is_alive("cleopatra"):
 					return true
 			EffectRes.EffectType.DAMAGE:
-				if owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
+				if card_owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
 					return true
 	return false
