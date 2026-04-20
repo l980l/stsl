@@ -18,6 +18,13 @@ func run_all() -> Dictionary:
 	test_hades_event_uses_add_relic()
 	test_hermes_event_has_two_choices()
 	test_devil_deal_event_exists()
+	test_act2_pool_size_ten()
+	test_act2_book_of_the_dead()
+	test_act2_pharaoh_tomb_relic()
+	test_act2_ra_sunboat_add_hero()
+	test_act2_mummy_curse_gamble()
+	test_act2_oasis_three_choices()
+	test_act2_no_greek_names()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -236,6 +243,8 @@ func test_devil_deal_event_exists() -> void:
 			_assert(e.choices[1].effect_type == ChoiceRes.EffectType.NONE, "선택 B: NONE")
 	_assert(found, "악마의 거래 이벤트 존재")
 
+const EventsAct2 = preload("res://resources/events/events_act2.gd")
+
 func test_hermes_event_has_two_choices() -> void:
 	print("[TestEvent] test_hermes_event_has_two_choices")
 	var pool := _build_pool()
@@ -248,3 +257,79 @@ func test_hermes_event_has_two_choices() -> void:
 			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.GOLD, "선택 A: GOLD")
 			_assert(e.choices[1].effect_type == ChoiceRes.EffectType.REMOVE_CARD, "선택 B: REMOVE_CARD")
 	_assert(found, "헤르메스의 도박 이벤트 존재")
+
+# ──────────────────────────────────────────────
+# Act 2 이벤트 테스트
+# ──────────────────────────────────────────────
+
+func test_act2_pool_size_ten() -> void:
+	print("[TestEvent] test_act2_pool_size_ten")
+	var pool := EventsAct2.build_pool()
+	_assert(pool.size() == 10, "Act2 이벤트 풀 10종")
+
+func test_act2_book_of_the_dead() -> void:
+	print("[TestEvent] test_act2_book_of_the_dead")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var pool := EventsAct2.build_pool()
+	var found := false
+	for e in pool:
+		if e.event_name == "사자의 서":
+			found = true
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.DRAW_UP, "선택 A: DRAW_UP")
+			_assert(e.choices[0].cost_hp == 15, "cost_hp == 15")
+	_assert(found, "사자의 서 이벤트 존재")
+
+func test_act2_pharaoh_tomb_relic() -> void:
+	print("[TestEvent] test_act2_pharaoh_tomb_relic")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var pool := EventsAct2.build_pool()
+	var found := false
+	for e in pool:
+		if e.event_name == "파라오의 무덤":
+			found = true
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.ADD_RELIC, "선택 A: ADD_RELIC")
+			_assert(e.choices[0].cost_hp == 35, "cost_hp == 35")
+	_assert(found, "파라오의 무덤 이벤트 존재")
+
+func test_act2_ra_sunboat_add_hero() -> void:
+	print("[TestEvent] test_act2_ra_sunboat_add_hero")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var pool := EventsAct2.build_pool()
+	var found := false
+	for e in pool:
+		if e.event_name == "라의 태양선":
+			found = true
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.ADD_HERO, "선택 A: ADD_HERO")
+	_assert(found, "라의 태양선 이벤트 존재")
+
+func test_act2_mummy_curse_gamble() -> void:
+	print("[TestEvent] test_act2_mummy_curse_gamble")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var pool := EventsAct2.build_pool()
+	var found := false
+	for e in pool:
+		if e.event_name == "미라의 저주":
+			found = true
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.ADD_RELIC_GAMBLE, "선택 A: ADD_RELIC_GAMBLE")
+	_assert(found, "미라의 저주 이벤트 존재")
+
+func test_act2_oasis_three_choices() -> void:
+	print("[TestEvent] test_act2_oasis_three_choices")
+	var pool := EventsAct2.build_pool()
+	var found := false
+	for e in pool:
+		if e.event_name == "오아시스 상인":
+			found = true
+			_assert(e.choices.size() == 3, "오아시스 상인 선택지 3개")
+	_assert(found, "오아시스 상인 이벤트 존재")
+
+func test_act2_no_greek_names() -> void:
+	print("[TestEvent] test_act2_no_greek_names")
+	var pool := EventsAct2.build_pool()
+	var greek_names := ["프로메테우스", "헤라클레스", "하데스", "헤르메스", "키르케", "황금 상자", "악마의 거래"]
+	var has_greek := false
+	for e in pool:
+		for name in greek_names:
+			if name in e.event_name:
+				has_greek = true
+	_assert(not has_greek, "Act2 풀에 그리스 고유 이름 없음")

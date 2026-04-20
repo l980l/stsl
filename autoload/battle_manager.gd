@@ -29,6 +29,9 @@ var _last_attacker: Dictionary = {}
 var _hero_block: Dictionary = {}
 var _hero_status: Dictionary = {}
 
+# 지속 효과 (POWER 카드): { "poison_per_turn": { "owner": "cleopatra", "value": 1 }, ... }
+var _active_powers: Dictionary = {}
+
 signal battle_started()
 signal battle_won()
 signal battle_lost()
@@ -50,6 +53,7 @@ func setup_battle(enemies: Array) -> void:
 	_hero_block.clear()
 	_hero_status.clear()
 	_last_attacker.clear()
+	_active_powers.clear()
 	for enemy in _enemies:
 		_enemy_hp.append(enemy.max_hp)
 		_enemy_alive.append(true)
@@ -80,6 +84,11 @@ func start_player_turn() -> void:
 					if not _hero_status.has(hero.hero_id):
 						_hero_status[hero.hero_id] = {}
 					_hero_status[hero.hero_id][stype] = cur - 1
+	if _active_powers.has("poison_per_turn"):
+		var ppt: Dictionary = _active_powers["poison_per_turn"]
+		for i in range(_enemies.size()):
+			if _enemy_alive[i]:
+				_apply_status_to_enemy(i, "poison", ppt["value"])
 	if deck_mgr:
 		deck_mgr.start_turn()
 	var _gm_pts = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
@@ -131,7 +140,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.BLOCK:
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + effect.value
 			EffectRes.EffectType.APPLY_STATUS:
-				if effect.target == "ALL":
+				if effect.status_type == "poison_per_turn":
+					_active_powers["poison_per_turn"] = { "owner": card.owner_id, "value": effect.value }
+				elif effect.target == "ALL":
 					for i in range(_enemies.size()):
 						if _enemy_alive[i]:
 							_apply_status_to_enemy(i, effect.status_type, effect.value)
@@ -158,6 +169,13 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				_hero_status[card.owner_id]["morale"] = new_morale
 				status_applied.emit(card.owner_id, "morale", effect.value)
 				morale_changed.emit(card.owner_id, new_morale)
+			EffectRes.EffectType.CHARM:
+				if effect.target == "ALL":
+					for ei in range(_enemies.size()):
+						if _enemy_alive[ei]:
+							_apply_status_to_enemy(ei, "charm", effect.value)
+				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+					_apply_status_to_enemy(target_enemy_index, "charm", effect.value)
 			EffectRes.EffectType.CONSUME_MORALE:
 				var morale: int = _hero_status.get(card.owner_id, {}).get("morale", 0)
 				if morale >= effect.value:
@@ -265,6 +283,15 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 	if status_type == "poison":
 		_enemy_status[enemy_index]["poison_dmg"] = _enemy_status[enemy_index].get("poison_dmg", 0) + stacks
 		_enemy_status[enemy_index]["poison_dur"] = 3
+	elif status_type == "charm":
+		var new_charm: int = _enemy_status[enemy_index].get("charm", 0) + stacks
+		if new_charm >= 3:
+			_enemy_status[enemy_index]["charm"] = 0
+			_enemy_status[enemy_index]["enthrall"] = _enemy_status[enemy_index].get("enthrall", 0) + 1
+			status_applied.emit("enemy_%d" % enemy_index, "enthrall", 1)
+			return
+		else:
+			_enemy_status[enemy_index]["charm"] = new_charm
 	else:
 		_enemy_status[enemy_index][status_type] = _enemy_status[enemy_index].get(status_type, 0) + stacks
 	status_applied.emit("enemy_%d" % enemy_index, status_type, stacks)
@@ -416,6 +443,17 @@ func _pick_hero_target(target_type: int, enemy_index: int) -> String:
 			return living[randi() % living.size()].hero_id
 	return ""
 
+func debug_instant_win() -> void:
+	if not is_battle_active:
+		return
+	for i in range(_enemies.size()):
+		if _enemy_alive[i]:
+			_enemy_hp[i] = 0
+			_enemy_alive[i] = false
+			enemy_died.emit(i)
+	is_battle_active = false
+	battle_won.emit()
+
 func _check_win_condition() -> void:
 	if not is_battle_active:
 		return
@@ -507,6 +545,11 @@ func _check_phase_transition(enemy_index: int) -> void:
 	if hp_ratio <= enemy.phase_thresholds[current_phase]:
 		_enemy_phase[enemy_index] += 1
 		_enemy_intent_index[enemy_index] = 0
+		if enemy.get("phase_heal_ratios") != null and current_phase < enemy.phase_heal_ratios.size():
+			var heal_ratio: float = enemy.phase_heal_ratios[current_phase]
+			if heal_ratio > 0.0:
+				_enemy_hp[enemy_index] = int(enemy.max_hp * heal_ratio)
+				enemy_damaged.emit(enemy_index, _enemy_hp[enemy_index])
 
 
 func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:

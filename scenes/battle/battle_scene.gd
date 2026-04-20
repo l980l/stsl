@@ -58,10 +58,22 @@ const STATUS_TOOLTIP := {
 
 func _ready() -> void:
 	_build_ui()
+	if OS.is_debug_build():
+		_build_debug_tooltip()
 	BattleManager.team_mgr = TeamManager
 	BattleManager.deck_mgr = DeckManager
 	_connect_signals()
 	_start_battle()
+
+func _build_debug_tooltip() -> void:
+	var lbl := Label.new()
+	lbl.text = "🛠 디버그 단축키"
+	lbl.position = Vector2(WINDOW_W - 180, WINDOW_H - 30)
+	lbl.add_theme_font_size_override("font_size", 13)
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
+	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+	lbl.tooltip_text = "[Shift+Q]  전투 즉시 승리"
+	add_child(lbl)
 
 # ─────────────────────────────────────────────
 # UI 빌드
@@ -758,6 +770,11 @@ func _input(event: InputEvent) -> void:
 			_finish_drag(get_viewport().get_mouse_position())
 		_potential_drag_card = null
 
+func _unhandled_key_input(event: InputEvent) -> void:
+	if OS.is_debug_build() and event.pressed and not event.echo:
+		if event.keycode == KEY_Q and event.shift_pressed:
+			BattleManager.debug_instant_win()
+
 func _card_target_type(card: Resource) -> String:
 	# "enemy" / "ally" / "none"
 	for effect in card.effects:
@@ -766,6 +783,9 @@ func _card_target_type(card: Resource) -> String:
 				if effect.target == "SINGLE":
 					return "enemy"
 			EffectRes.EffectType.APPLY_STATUS:
+				if effect.target == "SINGLE":
+					return "enemy"
+			EffectRes.EffectType.CHARM:
 				if effect.target == "SINGLE":
 					return "enemy"
 			EffectRes.EffectType.COUNTER_BLOCK, \

@@ -4,6 +4,7 @@ extends RefCounted
 
 const GameManagerClass = preload("res://autoload/game_manager.gd")
 const EnemiesAct1 = preload("res://resources/enemies/enemies_act1.gd")
+const EnemiesAct2 = preload("res://resources/enemies/enemies_act2.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
 var passed: int = 0
@@ -22,6 +23,20 @@ func run_all() -> Dictionary:
 	test_hydra_phase_count()
 	test_phase_transition()
 	test_phase2_transition()
+	test_act2_boss_name()
+	test_act2_boss_phase_heal_ratios()
+	test_act2_normal_sand_scout()
+	test_act2_normal_desert_scorpion()
+	test_act2_normal_mummy_warrior()
+	test_act2_normal_sphinx_cub()
+	test_act2_normal_sand_ifrit()
+	test_act2_normal_ka_spirit()
+	test_act2_elite_apep_snake()
+	test_act2_elite_seth_hound()
+	test_act2_elite_ba_bird()
+	test_act2_osiris_structure()
+	test_act2_osiris_phase_transition_heals()
+	test_act2_gm_act_switch()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -196,3 +211,148 @@ func test_discard_random() -> void:
 	dm.discard_random(2)
 	_assert(dm.hand.size() == 1, "discard_random(2) 후 hand 1장 남음")
 	_assert(dm.discard_pile.size() == 2, "discard_pile에 2장 추가")
+
+# ──────────────────────────────────────────────
+# Act 2 적 테스트
+# ──────────────────────────────────────────────
+
+func _make_dummy_scene() -> PackedScene:
+	return load("res://characters/enemies/satyr/satyr.tscn")
+
+func _make_bm_with_hero() -> Node:
+	var BM = preload("res://autoload/battle_manager.gd")
+	var TM = preload("res://autoload/team_manager.gd")
+	var HeroRes = preload("res://resources/hero_resource.gd")
+	var bm: Node = BM.new()
+	var tm: Node = TM.new()
+	var hero: Resource = HeroRes.new()
+	hero.hero_id = "napoleon"; hero.max_hp = 1000; hero.hero_name = "나폴레옹"
+	tm.add_hero(hero)
+	bm.team_mgr = tm
+	return bm
+
+func test_act2_boss_name() -> void:
+	print("[TestEnemies] test_act2_boss_name")
+	var e := EnemiesAct2.osiris(_make_dummy_scene())
+	_assert(e.enemy_name == "오시리스", "Act2 보스 이름 오시리스")
+
+func test_act2_boss_phase_heal_ratios() -> void:
+	print("[TestEnemies] test_act2_boss_phase_heal_ratios")
+	var e := EnemiesAct2.osiris(_make_dummy_scene())
+	_assert(e.phase_heal_ratios.size() == 1, "phase_heal_ratios 1개")
+	_assert(e.phase_heal_ratios[0] == 0.6, "부활 비율 60%")
+
+func test_act2_normal_sand_scout() -> void:
+	print("[TestEnemies] test_act2_normal_sand_scout")
+	var e := EnemiesAct2.sand_scout(_make_dummy_scene())
+	_assert(e.enemy_name == "사막 척후병", "이름 확인")
+	_assert(e.max_hp == 380, "HP 380")
+	_assert(e.intent_pattern.size() == 3, "인텐트 3개")
+	var has_buff := false
+	for i in e.intent_pattern:
+		if i.action_type == IntentRes.ActionType.BUFF: has_buff = true
+	_assert(has_buff, "strength BUFF 존재")
+
+func test_act2_normal_desert_scorpion() -> void:
+	print("[TestEnemies] test_act2_normal_desert_scorpion")
+	var e := EnemiesAct2.desert_scorpion(_make_dummy_scene())
+	_assert(e.max_hp == 420, "HP 420")
+	var has_poison := false
+	for i in e.intent_pattern:
+		if i.action_type == IntentRes.ActionType.DEBUFF and i.status_type == "poison":
+			has_poison = true
+	_assert(has_poison, "poison DEBUFF 존재")
+
+func test_act2_normal_mummy_warrior() -> void:
+	print("[TestEnemies] test_act2_normal_mummy_warrior")
+	var e := EnemiesAct2.mummy_warrior(_make_dummy_scene())
+	_assert(e.max_hp == 600, "HP 600 (가장 높은 일반 적)")
+
+func test_act2_normal_sphinx_cub() -> void:
+	print("[TestEnemies] test_act2_normal_sphinx_cub")
+	var e := EnemiesAct2.sphinx_cub(_make_dummy_scene())
+	_assert(e.max_hp == 350, "HP 350")
+	var has_special := false
+	for i in e.intent_pattern:
+		if i.action_type == IntentRes.ActionType.SPECIAL: has_special = true
+	_assert(has_special, "SPECIAL 인텐트 존재")
+
+func test_act2_normal_sand_ifrit() -> void:
+	print("[TestEnemies] test_act2_normal_sand_ifrit")
+	var e := EnemiesAct2.sand_ifrit(_make_dummy_scene())
+	_assert(e.intent_pattern.size() == 2, "인텐트 2개 (준비+강타)")
+	_assert(e.intent_pattern[0].action_type == IntentRes.ActionType.BUFF, "첫 턴 BUFF(준비)")
+	_assert(e.intent_pattern[1].target == IntentRes.TargetType.ALL, "강타 ALL 타겟")
+	_assert(e.intent_pattern[1].value >= 200, "강타 200 이상")
+
+func test_act2_normal_ka_spirit() -> void:
+	print("[TestEnemies] test_act2_normal_ka_spirit")
+	var e := EnemiesAct2.ka_spirit(_make_dummy_scene())
+	var has_weak := false; var has_vuln := false
+	for i in e.intent_pattern:
+		if i.action_type == IntentRes.ActionType.DEBUFF:
+			if i.status_type == "weak": has_weak = true
+			if i.status_type == "vulnerable": has_vuln = true
+	_assert(has_weak and has_vuln, "weak + vulnerable 모두 존재")
+
+func test_act2_elite_apep_snake() -> void:
+	print("[TestEnemies] test_act2_elite_apep_snake")
+	var e := EnemiesAct2.apep_snake(_make_dummy_scene())
+	_assert(e.max_hp == 1600, "HP 1600")
+	var has_poison := false
+	for i in e.intent_pattern:
+		if i.action_type == IntentRes.ActionType.DEBUFF and i.status_type == "poison":
+			has_poison = true
+	_assert(has_poison, "poison DEBUFF 존재")
+
+func test_act2_elite_seth_hound() -> void:
+	print("[TestEnemies] test_act2_elite_seth_hound")
+	var e := EnemiesAct2.seth_hound(_make_dummy_scene())
+	_assert(e.max_hp == 1800, "HP 1800 (최고 엘리트)")
+	var last_intent: Resource = e.intent_pattern[e.intent_pattern.size() - 1]
+	_assert(last_intent.target == IntentRes.TargetType.LOWEST_HP, "마지막 인텐트 LOWEST_HP")
+	_assert(last_intent.value >= 280, "암살 280 이상")
+
+func test_act2_elite_ba_bird() -> void:
+	print("[TestEnemies] test_act2_elite_ba_bird")
+	var e := EnemiesAct2.ba_bird(_make_dummy_scene())
+	_assert(e.max_hp == 1500, "HP 1500")
+	var has_special := false
+	for i in e.intent_pattern:
+		if i.action_type == IntentRes.ActionType.SPECIAL and i.value == 2: has_special = true
+	_assert(has_special, "SPECIAL value=2 존재")
+
+func test_act2_osiris_structure() -> void:
+	print("[TestEnemies] test_act2_osiris_structure")
+	var e := EnemiesAct2.osiris(_make_dummy_scene())
+	_assert(e.max_hp == 3000, "HP 3000")
+	_assert(e.phase_thresholds.size() == 1, "phase_thresholds 1개")
+	_assert(e.phase_thresholds[0] == 0.5, "전환 50%")
+	_assert(e.phase_patterns.size() == 2, "페이즈 패턴 2개")
+	_assert(e.phase_patterns[0].size() >= 4, "페이즈0 4턴 이상")
+	_assert(e.phase_patterns[1].size() >= 5, "페이즈1 5턴 이상")
+	var revival_intent: Resource = e.phase_patterns[1][0]
+	_assert(revival_intent.action_type == IntentRes.ActionType.BUFF, "페이즈1 첫 턴 BUFF")
+	_assert(revival_intent.condition == "부활", "condition='부활'")
+
+func test_act2_osiris_phase_transition_heals() -> void:
+	print("[TestEnemies] test_act2_osiris_phase_transition_heals")
+	var bm := _make_bm_with_hero()
+	var enemy := EnemiesAct2.osiris(_make_dummy_scene())
+	bm.setup_battle([enemy])
+	bm._enemy_hp[0] = int(enemy.max_hp * 0.49)
+	bm._check_phase_transition(0)
+	var expected_hp := int(enemy.max_hp * 0.6)
+	_assert(bm._enemy_phase[0] == 1, "페이즈 1로 전환")
+	_assert(bm._enemy_hp[0] == expected_hp, "HP %d으로 복구" % expected_hp)
+	bm.free()
+
+func test_act2_gm_act_switch() -> void:
+	print("[TestEnemies] test_act2_gm_act_switch")
+	var gm := GameManagerClass.new()
+	gm.current_act = 1
+	var boss_act1 := gm._make_boss_enemies()
+	_assert(boss_act1[0].enemy_name == "히드라", "Act1 보스: 히드라")
+	gm.current_act = 2
+	var boss_act2 := gm._make_boss_enemies()
+	_assert(boss_act2[0].enemy_name == "오시리스", "Act2 보스: 오시리스")

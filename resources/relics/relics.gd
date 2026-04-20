@@ -9,6 +9,7 @@ static func build_pool() -> Array:
 		_turtle_ship_model(), _artillery_horn(), _nanjung_ilgi(),
 		_pharaoh_seal(), _devils_contract(), _cursed_crown(),
 		_blood_oath(), _tacticians_map(), _iron_will(), _ancient_shield(),
+		_ankh_of_life(), _eye_of_horus(), _scarab_talisman(),
 	]
 
 static func _burning_blood() -> Resource:
@@ -139,3 +140,24 @@ static func _ancient_shield() -> Resource:
 	r.description = "전투 시작 시 팀 전체 방어도 +4"
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 4; return r
+
+# ──── Act 2 렐릭 (이집트 신화) ────
+
+static func _ankh_of_life() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "앙크의 생명"
+	r.description = "전투 승리 시 팀 전체 HP +12"
+	r.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r.effect_type = RelicRes.EffectType.HEAL; r.value = 12; return r
+
+static func _eye_of_horus() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "호루스의 눈"
+	r.description = "플레이어 턴 시작 시 카드 1장 드로우. 클레오파트라 생존 시 +2장"
+	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r.effect_type = RelicRes.EffectType.DRAW
+	r.value = 1; r.bonus_value = 2; r.owner_hero_id = "cleopatra"; return r
+
+static func _scarab_talisman() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "스카라베 부적"
+	r.description = "전투 시작 시 팀 전체 방어도 +8"
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 8; return r
