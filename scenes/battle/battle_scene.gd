@@ -699,9 +699,12 @@ func _card_effect_text(card: Resource) -> String:
 			EffectRes.EffectType.FORMATION_BLOCK:
 				lines.append("영웅수×%d 방어" % eff.value)
 			EffectRes.EffectType.APPLY_STATUS:
-				var st_name: String = {"poison":"독","weak":"약화","vulnerable":"취약",
-					"morale":"사기","charm":"매혹","strength":"강화","taunt":"도발"}.get(eff.status_type, eff.status_type)
-				lines.append("%s %d" % [st_name, eff.value])
+				if eff.status_type == "poison":
+					lines.append("독 %d 데미지" % [eff.value * 10])
+				else:
+					var st_name: String = {"weak":"약화","vulnerable":"취약",
+						"morale":"사기","charm":"매혹","strength":"강화","taunt":"도발"}.get(eff.status_type, eff.status_type)
+					lines.append("%s %d" % [st_name, eff.value])
 			EffectRes.EffectType.DRAW:
 				lines.append("드로우 %d" % eff.value)
 			EffectRes.EffectType.ENERGY:
