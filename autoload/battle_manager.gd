@@ -423,6 +423,17 @@ func _pick_hero_target(target_type: int, enemy_index: int) -> String:
 			return living[randi() % living.size()].hero_id
 	return ""
 
+func debug_instant_win() -> void:
+	if not is_battle_active:
+		return
+	for i in range(_enemies.size()):
+		if _enemy_alive[i]:
+			_enemy_hp[i] = 0
+			_enemy_alive[i] = false
+			enemy_died.emit(i)
+	is_battle_active = false
+	battle_won.emit()
+
 func _check_win_condition() -> void:
 	if not is_battle_active:
 		return
