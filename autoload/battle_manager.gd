@@ -172,11 +172,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							_apply_status_to_enemy(target_enemy_index, "charm", 1)
 			EffectRes.EffectType.POISON_BURST:
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-					var poison: int = _enemy_status[target_enemy_index].get("poison", 0)
-					if poison > 0:
-						var burst_dmg: int = poison * effect.value / 100 * POISON_DMG_PER_STACK
+					var pdmg: int = _enemy_status[target_enemy_index].get("poison_dmg", 0)
+					if pdmg > 0:
+						var burst_dmg: int = pdmg * effect.value / 100 * POISON_DMG_PER_STACK
 						_deal_damage_to_enemy(target_enemy_index, burst_dmg)
-						_enemy_status[target_enemy_index]["poison"] = 0
+						_enemy_status[target_enemy_index]["poison_dmg"] = 0
+						_enemy_status[target_enemy_index]["poison_dur"] = 0
 			EffectRes.EffectType.COUNTER_BLOCK:
 				var block: int = _hero_block.get(card.owner_id, 0)
 				var dmg: int = int(block * effect.value / 100.0)
@@ -200,11 +201,26 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.CONDITIONAL_DMG:
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					var condition_met: bool
-					# "morale"는 카드 소유자 영웅의 상태를 검사. 그 외는 대상 적의 상태를 검사.
-					if effect.status_type == "morale":
-						condition_met = _hero_status.get(card.owner_id, {}).get("morale", 0) > 0
-					else:
-						condition_met = _enemy_status[target_enemy_index].get(effect.status_type, 0) > 0
+					var es: Dictionary = _enemy_status[target_enemy_index]
+					match effect.status_type:
+						"morale":
+							condition_met = _hero_status.get(card.owner_id, {}).get("morale", 0) > 0
+						"has_poison":
+							condition_met = es.get("poison_dmg", 0) > 0
+						"has_poison_5":
+							condition_met = es.get("poison_dmg", 0) >= 5
+						"has_poison_10":
+							condition_met = es.get("poison_dmg", 0) >= 10
+						"has_debuffs_3":
+							var dc: int = 0
+							for dt: String in ["weak", "vulnerable"]:
+								if es.get(dt, 0) > 0:
+									dc += 1
+							if es.get("poison_dmg", 0) > 0:
+								dc += 1
+							condition_met = dc >= 3
+						_:
+							condition_met = es.get(effect.status_type, 0) > 0
 					var dmg: int = effect.bonus_value if condition_met else effect.value
 					_deal_damage_to_enemy(target_enemy_index, dmg)
 	_apply_synergy_bonus(card, target_enemy_index)
@@ -246,32 +262,51 @@ func _deal_damage_to_hero(hero_id: String, amount: int) -> void:
 	_check_lose_condition()
 
 func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) -> void:
-	_enemy_status[enemy_index][status_type] = \
-		_enemy_status[enemy_index].get(status_type, 0) + stacks
+	if status_type == "poison":
+		_enemy_status[enemy_index]["poison_dmg"] = _enemy_status[enemy_index].get("poison_dmg", 0) + stacks
+		_enemy_status[enemy_index]["poison_dur"] = 3
+	else:
+		_enemy_status[enemy_index][status_type] = _enemy_status[enemy_index].get(status_type, 0) + stacks
 	status_applied.emit("enemy_%d" % enemy_index, status_type, stacks)
 
 func _apply_status_to_hero(hero_id: String, status_type: String, stacks: int) -> void:
 	if not _hero_status.has(hero_id):
 		_hero_status[hero_id] = {}
-	_hero_status[hero_id][status_type] = _hero_status[hero_id].get(status_type, 0) + stacks
+	if status_type == "poison":
+		_hero_status[hero_id]["poison_dmg"] = _hero_status[hero_id].get("poison_dmg", 0) + stacks
+		_hero_status[hero_id]["poison_dur"] = 3
+	else:
+		_hero_status[hero_id][status_type] = _hero_status[hero_id].get(status_type, 0) + stacks
 	status_applied.emit(hero_id, status_type, stacks)
 
 func _tick_hero_poison(hero_id: String) -> void:
 	var status: Dictionary = _hero_status.get(hero_id, {})
-	var poison: int = status.get("poison", 0)
-	if poison <= 0:
+	var dmg: int = status.get("poison_dmg", 0)
+	var dur: int = status.get("poison_dur", 0)
+	if dmg <= 0 or dur <= 0:
 		return
-	team_mgr.take_damage(hero_id, poison * POISON_DMG_PER_STACK)
-	_hero_status[hero_id]["poison"] = max(0, poison - 1)
+	team_mgr.take_damage(hero_id, dmg * POISON_DMG_PER_STACK)
+	dur -= 1
+	if dur <= 0:
+		_hero_status[hero_id]["poison_dmg"] = 0
+		_hero_status[hero_id]["poison_dur"] = 0
+	else:
+		_hero_status[hero_id]["poison_dur"] = dur
 
 func _tick_enemy_poison(enemy_index: int) -> void:
-	var poison: int = _enemy_status[enemy_index].get("poison", 0)
-	if poison <= 0:
+	var dmg: int = _enemy_status[enemy_index].get("poison_dmg", 0)
+	var dur: int = _enemy_status[enemy_index].get("poison_dur", 0)
+	if dmg <= 0 or dur <= 0:
 		return
-	var poison_dmg: int = poison * POISON_DMG_PER_STACK
-	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - poison_dmg)
-	enemy_damaged.emit(enemy_index, poison_dmg)
-	_enemy_status[enemy_index]["poison"] = poison - 1
+	var tick_dmg: int = dmg * POISON_DMG_PER_STACK
+	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - tick_dmg)
+	enemy_damaged.emit(enemy_index, tick_dmg)
+	dur -= 1
+	if dur <= 0:
+		_enemy_status[enemy_index]["poison_dmg"] = 0
+		_enemy_status[enemy_index]["poison_dur"] = 0
+	else:
+		_enemy_status[enemy_index]["poison_dur"] = dur
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
 		enemy_died.emit(enemy_index)
@@ -486,7 +521,7 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 			EffectRes.EffectType.DAMAGE:
 				if card_owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
 					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-						if _enemy_status[target_enemy_index].get("poison", 0) > 0:
+						if _enemy_status[target_enemy_index].get("poison_dmg", 0) > 0:
 							_deal_damage_to_enemy(target_enemy_index, 4)
 
 

@@ -200,23 +200,24 @@ func test_poison_tick_enemy() -> void:
 	var intent := _make_intent(IntentRes.ActionType.BUFF, 5, IntentRes.TargetType.RANDOM)
 	var enemy := _make_enemy(200, [intent])
 	bm.setup_battle([enemy])
-	bm._enemy_status[0]["poison"] = 3
+	bm._enemy_status[0]["poison_dmg"] = 3
+	bm._enemy_status[0]["poison_dur"] = 3
 
 	bm._execute_enemy_turn()
-	_assert(bm.get_enemy_hp(0) == 170, "독 3 틱 → 3×10=30 피해 → HP 200 → 170")
-	_assert(bm._enemy_status[0].get("poison", -1) == 2, "독 스택 3 → 2")
+	_assert(bm.get_enemy_hp(0) == 170, "독 3dmg 틱 → 3×10=30 피해 → HP 200 → 170")
+	_assert(bm._enemy_status[0].get("poison_dur", -1) == 2, "독 지속 3 → 2")
 
 func test_poison_tick_hero() -> void:
 	print("[TestBattleManager] test_poison_tick_hero")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
 	bm.setup_battle([_make_enemy(30, [])])
-	bm._hero_status["napoleon"] = {"poison": 4}
+	bm._hero_status["napoleon"] = {"poison_dmg": 4, "poison_dur": 3}
 	bm.is_battle_active = true
 
 	bm.start_player_turn()
-	_assert(bm.team_mgr.get_current_hp("napoleon") == 30, "독 4 틱 → 4×10=40 피해 → HP 70 → 30")
-	_assert(bm._hero_status["napoleon"].get("poison", -1) == 3, "독 스택 4 → 3")
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 30, "독 4dmg 틱 → 4×10=40 피해 → HP 70 → 30")
+	_assert(bm._hero_status["napoleon"].get("poison_dur", -1) == 2, "독 지속 3 → 2")
 
 func test_enemy_turn_attacks_hero() -> void:
 	print("[TestBattleManager] test_enemy_turn_attacks_hero")
@@ -391,7 +392,7 @@ func test_get_enemy_status_after_apply() -> void:
 	bm.setup_battle([enemy])
 	bm._apply_status_to_enemy(0, "poison", 3)
 	var status: Dictionary = bm.get_enemy_status(0)
-	_assert(status.get("poison", 0) == 3, "적 상태 poison 3 조회")
+	_assert(status.get("poison_dmg", 0) == 3, "적 상태 poison_dmg 3 조회")
 	var empty: Dictionary = bm.get_enemy_status(99)
 	_assert(empty.is_empty(), "범위 밖 인덱스 빈 딕셔너리")
 
@@ -566,7 +567,8 @@ func test_synergy_yisunsin_cleopatra() -> void:
 	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
 	bm.setup_battle([_make_enemy(50, [])])
 	bm.start_player_turn()
-	bm._enemy_status[0]["poison"] = 3
+	bm._enemy_status[0]["poison_dmg"] = 3
+	bm._enemy_status[0]["poison_dur"] = 3
 
 	var card = CardRes.new()
 	card.card_name = "공격_테스트"

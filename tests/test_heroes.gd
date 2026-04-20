@@ -137,13 +137,15 @@ func test_poison_burst_damages_and_clears() -> void:
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("cleopatra", 60))
 	bm.setup_battle([_make_enemy(500)])
-	bm._enemy_status[0]["poison"] = 5
+	bm._enemy_status[0]["poison_dmg"] = 5
+	bm._enemy_status[0]["poison_dur"] = 3
 	var eff := EffectRes.new()
 	eff.effect_type = EffectRes.EffectType.POISON_BURST
 	eff.value = 300  # ×3 배율 (100 단위 인코딩)
 	bm._apply_card_effects(_make_card("cleopatra", [eff]), 0)
 	_assert(bm.get_enemy_hp(0) == 350, "POISON_BURST 독(5) ×3 ×10 = 150 피해 (500-150=350)")
-	_assert(bm._enemy_status[0].get("poison", 0) == 0, "POISON_BURST 후 독 초기화")
+	_assert(bm._enemy_status[0].get("poison_dmg", -1) == 0, "POISON_BURST 후 poison_dmg 초기화")
+	_assert(bm._enemy_status[0].get("poison_dur", -1) == 0, "POISON_BURST 후 poison_dur 초기화")
 
 func test_counter_block_damage() -> void:
 	print("[TestHeroes] test_counter_block_damage")

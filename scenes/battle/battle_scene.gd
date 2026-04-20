@@ -41,12 +41,12 @@ var _enemy_status_containers: Array = []
 var _synergy_lbl: Label = null
 
 const STATUS_EMOJI := {
-	"poison": "☠", "weak": "↓", "vulnerable": "⚡",
+	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
 	"morale": "★", "charm": "♥", "strength": "↑",
 	"taunt": "►", "counter_block": "🛡"
 }
 const STATUS_TOOLTIP := {
-	"poison": "독: 턴 종료 시 N 피해. 매 턴 1 감소",
+	"poison_dmg": "독: 매 턴 N×10 피해. 지속 3턴, 중첩 시 데미지 누적+지속 갱신",
 	"weak": "약화: 공격 피해 25% 감소. 매 턴 1 감소",
 	"vulnerable": "취약: 받는 피해 50% 증가. 매 턴 1 감소",
 	"morale": "사기: CONSUME_MORALE 카드로 추가 피해 제공",
@@ -631,6 +631,19 @@ func _on_battle_lost() -> void:
 # 카드 효과 텍스트 헬퍼
 # ─────────────────────────────────────────────
 
+func _make_status_label(key: String, val: int, status: Dictionary) -> Label:
+	var lbl := Label.new()
+	if key == "poison_dmg":
+		var dur: int = status.get("poison_dur", 0)
+		lbl.text = "☠%d/%d" % [val * 10, dur]
+		lbl.tooltip_text = STATUS_TOOLTIP.get("poison_dmg", "독").replace("N", str(val))
+	else:
+		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
+		lbl.tooltip_text = STATUS_TOOLTIP.get(key, key).replace("N", str(val))
+	lbl.add_theme_font_size_override("font_size", 12)
+	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+	return lbl
+
 func _refresh_status_icons_hero(hero_id: String) -> void:
 	var box: HBoxContainer = _hero_status_containers.get(hero_id)
 	if box == null:
@@ -639,15 +652,12 @@ func _refresh_status_icons_hero(hero_id: String) -> void:
 		child.queue_free()
 	var status: Dictionary = BattleManager.get_hero_status(hero_id)
 	for key in status:
+		if key == "poison_dur":
+			continue
 		var val: int = status[key]
 		if val <= 0:
 			continue
-		var lbl := Label.new()
-		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
-		lbl.add_theme_font_size_override("font_size", 12)
-		lbl.tooltip_text = STATUS_TOOLTIP.get(key, key).replace("N", str(val))
-		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-		box.add_child(lbl)
+		box.add_child(_make_status_label(key, val, status))
 
 func _refresh_status_icons_enemy(index: int) -> void:
 	if index >= _enemy_status_containers.size():
@@ -659,15 +669,12 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		child.queue_free()
 	var status: Dictionary = BattleManager.get_enemy_status(index)
 	for key in status:
+		if key == "poison_dur":
+			continue
 		var val: int = status[key]
 		if val <= 0:
 			continue
-		var lbl := Label.new()
-		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
-		lbl.add_theme_font_size_override("font_size", 12)
-		lbl.tooltip_text = STATUS_TOOLTIP.get(key, key).replace("N", str(val))
-		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-		box.add_child(lbl)
+		box.add_child(_make_status_label(key, val, status))
 
 func _on_morale_changed(hero_id: String, _new_value: int) -> void:
 	_update_hero_ui(hero_id)
