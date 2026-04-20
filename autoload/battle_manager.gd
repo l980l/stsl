@@ -25,6 +25,8 @@ var _enemy_intent_index: Array = []
 var _enemy_phase: Array = []
 var _last_attacker: Dictionary = {}
 
+var debug_hero_invincible: bool = false
+
 # 영웅 상태 (HP는 TeamManager가 관리)
 var _hero_block: Dictionary = {}
 var _hero_status: Dictionary = {}
@@ -266,6 +268,8 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
 	_check_win_condition()
 
 func _deal_damage_to_hero(hero_id: String, amount: int) -> void:
+	if debug_hero_invincible:
+		return
 	if team_mgr == null or not team_mgr.is_alive(hero_id):
 		return
 	var status: Dictionary = _hero_status.get(hero_id, {})
@@ -313,6 +317,8 @@ func _apply_status_to_hero(hero_id: String, status_type: String, stacks: int) ->
 	status_applied.emit(hero_id, status_type, stacks)
 
 func _tick_hero_poison(hero_id: String) -> void:
+	if debug_hero_invincible:
+		return
 	var status: Dictionary = _hero_status.get(hero_id, {})
 	var dmg: int = status.get("poison_dmg", 0)
 	var dur: int = status.get("poison_dur", 0)

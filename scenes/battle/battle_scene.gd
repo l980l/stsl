@@ -40,6 +40,8 @@ var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _synergy_lbl: Label = null
 var _ppt_label: Label = null
+var _debug_badge: Label = null
+var _debug_hp_target_mode: bool = false
 
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
@@ -65,6 +67,13 @@ func _ready() -> void:
 	BattleManager.deck_mgr = DeckManager
 	_connect_signals()
 	_start_battle()
+	if OS.is_debug_build():
+		_debug_badge = Label.new()
+		_debug_badge.position = Vector2(1500, 20)
+		_debug_badge.add_theme_font_size_override("font_size", 14)
+		_debug_badge.add_theme_color_override("font_color", Color.RED)
+		_debug_badge.visible = false
+		add_child(_debug_badge)
 
 func _build_debug_tooltip() -> void:
 	var lbl := Label.new()
@@ -765,6 +774,20 @@ func _card_effect_text(card: Resource) -> String:
 				lines.append("매혹 %d" % eff.value)
 	return "\n".join(lines)
 
+func _refresh_debug_badge() -> void:
+	if _debug_badge == null:
+		return
+	var parts: Array[String] = []
+	if BattleManager.debug_hero_invincible:
+		parts.append("INV")
+	if DeckManager.debug_unlimited_energy:
+		parts.append("E∞")
+	if parts.is_empty():
+		_debug_badge.visible = false
+	else:
+		_debug_badge.text = "[DEBUG: " + ", ".join(parts) + "]"
+		_debug_badge.visible = true
+
 func _refresh_synergy_hud() -> void:
 	if _synergy_lbl == null:
 		return
@@ -796,6 +819,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if OS.is_debug_build() and event.pressed and not event.echo:
 		if event.keycode == KEY_Q and event.shift_pressed:
 			BattleManager.debug_instant_win()
+		elif event.keycode == KEY_I and event.shift_pressed:
+			BattleManager.debug_hero_invincible = not BattleManager.debug_hero_invincible
+			_refresh_debug_badge()
+		elif event.keycode == KEY_E and event.shift_pressed:
+			DeckManager.debug_unlimited_energy = not DeckManager.debug_unlimited_energy
+			_refresh_debug_badge()
+		elif event.keycode == KEY_D and event.shift_pressed:
+			DeckManager.draw_cards(1)
 
 func _card_target_type(card: Resource) -> String:
 	# "enemy" / "ally" / "none"

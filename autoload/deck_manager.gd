@@ -11,6 +11,7 @@ var discard_pile: Array = []
 var exhaust_pile: Array = []
 var current_energy: int = 0
 var pending_cost_reduction: int = 0
+var debug_unlimited_energy: bool = false
 
 signal card_drawn(card: Resource)
 signal card_played(card: Resource)
@@ -40,6 +41,8 @@ func _reshuffle() -> void:
 	discard_pile.clear()
 
 func can_play(card: Resource) -> bool:
+	if debug_unlimited_energy:
+		return hand.has(card)
 	var effective_cost: int = max(0, card.cost - pending_cost_reduction)
 	return hand.has(card) and current_energy >= effective_cost
 
@@ -48,8 +51,9 @@ func play_card(card: Resource) -> bool:
 		return false
 	var effective_cost: int = max(0, card.cost - pending_cost_reduction)
 	pending_cost_reduction = 0
-	current_energy -= effective_cost
-	energy_changed.emit(current_energy)
+	if not debug_unlimited_energy:
+		current_energy -= effective_cost
+		energy_changed.emit(current_energy)
 	hand.erase(card)
 	discard_pile.append(card)
 	card_played.emit(card)
