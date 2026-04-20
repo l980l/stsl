@@ -133,8 +133,14 @@ COST_NEXT 카드 효과 구현 완료. 매혹(Charm) 시스템 개선 완료 (�
 - ✅ 영웅별 카드 15장 기획 v1 (`docs/game_design/cards_{hero}_v1.md`)
 - ✅ 몬스터 10종 + 인카운터 기획 (`docs/game_design/enemies_act1_v1.md`)
 - ✅ **영웅별 카드 40장 기획 v2** (`docs/game_design/cards_{hero}_v2.md`) — 각 아키타입 12~14장
-- 🔲 기획 문서 사용자 리뷰 + 수정
-- 🔲 기획 확정 후 구현 플랜 별도 생성 (CardResource 스키마 변경, 수치 재설정 포함)
+- ✅ 기획 확정 후 구현 플랜 생성 (`docs/superpowers/plans/2026-04-20-card-system-v2-implementation.md`)
+- ✅ **카드 시스템 v2 구현 완료** (PR #30, 2026-04-20)
+  - CardResource: Rarity enum, upgrade_level, can_upgrade() / upgraded 제거
+  - EffectResource: base_value, base_bonus_value 추가
+  - upgrade_card(): 등급별 비율 강화 (UNCOMMON 10% / RARE 12% / LEGENDARY 14% / DIVINE 16%)
+  - 영웅 HP 1000 재설정 (전원)
+  - 나폴레옹 40장 / 클레오파트라 40장 / 이순신 40장 전면 재작성
+  - 적 10종 HP 300~4500 스케일 재작성
 
 ### 1-8. 알려진 버그 수정
 - ✅ TargetType.ALL 전체 영웅 공격 (이미 구현됨 — 테스트 통과 확인)
