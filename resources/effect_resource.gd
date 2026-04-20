@@ -29,3 +29,33 @@ enum EffectType {
 @export var bonus_value: int = 0            # 조건부/추가 효과에 사용
 @export var base_value: int = 0             # 0강 기준값. 강화 공식의 베이스.
 @export var base_bonus_value: int = 0       # bonus_value의 0강 기준값.
+
+func display_text() -> String:
+	match effect_type:
+		EffectType.DAMAGE:
+			return "피해 %d%s" % [value, " (전체)" if target == "ALL" else ""]
+		EffectType.BLOCK:
+			return "방어 %d" % value
+		EffectType.BLOCK_ALL:
+			return "전체 방어 %d" % value
+		EffectType.FORMATION_BLOCK:
+			return "영웅수×%d 방어" % value
+		EffectType.APPLY_STATUS:
+			if status_type == "poison":
+				return "독 %d 데미지" % (value * 10)
+			var st_name: String = {"weak":"약화","vulnerable":"취약",
+				"morale":"사기","charm":"매혹","strength":"강화","taunt":"도발"}.get(status_type, status_type)
+			return "%s %d" % [st_name, value]
+		EffectType.DRAW:        return "드로우 %d" % value
+		EffectType.ENERGY:      return "에너지 +%d" % value
+		EffectType.HEAL:        return "회복 %d" % value
+		EffectType.HEAL_ALL:    return "전체 회복 %d" % value
+		EffectType.GAIN_MORALE: return "사기 +%d" % value
+		EffectType.CONSUME_MORALE: return "사기→피해 %d" % bonus_value
+		EffectType.POISON_BURST:   return "독 즉발"
+		EffectType.COUNTER_BLOCK:  return "방어도×%d%%" % value
+		EffectType.COST_NEXT:      return "다음 비용 -%d" % value
+		EffectType.CONDITIONAL_DMG: return "%d/%d(%s)" % [bonus_value, value, status_type]
+		EffectType.SUMMON_TOKEN:   return "병사 소환"
+		EffectType.CHARM:          return "매혹 %d" % value
+	return ""

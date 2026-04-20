@@ -227,7 +227,7 @@ func _on_open_remove_panel(remove_btn: Button, price: int) -> void:
 		var card: Resource = full_deck[i]
 		var card_btn := Button.new()
 		card_btn.text = "%s (비용 %d)" % [card.card_name, card.cost]
-		card_btn.position = Vector2(10 + (i % 8) * 210, 55 + (i / 8 as int) * 60)
+		card_btn.position = Vector2(10 + (i % 8) * 210, 55 + int(i / 8.0) * 60)
 		card_btn.size = Vector2(200, 50)
 		card_btn.add_theme_font_size_override("font_size", 13)
 		var captured_card := card

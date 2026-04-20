@@ -35,7 +35,7 @@ static func cyclops(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "사이클롭스"; e.max_hp = 700; e.character_scene = scene
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 0; i1.condition = "준비"
+	i1.action_type = IntentRes.ActionType.PREPARE; i1.value = 0; i1.condition = "준비"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 200; i2.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2]

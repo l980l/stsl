@@ -76,14 +76,7 @@ func _ready() -> void:
 		add_child(_debug_badge)
 
 func _build_debug_tooltip() -> void:
-	var lbl := Label.new()
-	lbl.text = "🛠 디버그 단축키"
-	lbl.position = Vector2(WINDOW_W - 180, WINDOW_H - 30)
-	lbl.add_theme_font_size_override("font_size", 13)
-	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
-	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-	lbl.tooltip_text = "[Shift+Q]  전투 즉시 승리"
-	add_child(lbl)
+	pass  # DebugManager autoload에서 전역 처리
 
 # ─────────────────────────────────────────────
 # UI 빌드
@@ -434,9 +427,13 @@ func _update_enemy_ui(index: int) -> void:
 			IntentRes.ActionType.ATTACK:
 				entry["intent_lbl"].text = "⚔ %d" % intent.value
 			IntentRes.ActionType.BUFF:
-				entry["intent_lbl"].text = "🛡 %d" % intent.value
+				match intent.status_type:
+					"strength": entry["intent_lbl"].text = "💪 강화 %d" % intent.value
+					_:          entry["intent_lbl"].text = "🛡 %d" % intent.value
 			IntentRes.ActionType.DEBUFF:
 				entry["intent_lbl"].text = "💀 약화"
+			IntentRes.ActionType.PREPARE:
+				entry["intent_lbl"].text = "⏳ 준비"
 			_:
 				entry["intent_lbl"].text = "?"
 
@@ -510,11 +507,11 @@ func _open_enemy_hp_dialog(index: int) -> void:
 	dlg.add_cancel_button("취소")
 	var spin := SpinBox.new()
 	spin.min_value = 0
-	spin.max_value = 9999
+	spin.max_value = 2147483647
 	spin.value = current_hp
 	spin.step = 1
 	dlg.add_child(spin)
-	dlg.custom_minimum_size = Vector2(320, 100)
+	dlg.min_size = Vector2i(320, 100)
 	dlg.confirmed.connect(func():
 		BattleManager.debug_set_enemy_hp(index, int(spin.value))
 		_message_label.text = "[DEBUG] 적[%d] HP → %d" % [index, int(spin.value)]
@@ -758,46 +755,7 @@ func _on_status_applied(target: String, _status_type: String, _stacks: int) -> v
 func _card_effect_text(card: Resource) -> String:
 	var lines: Array = []
 	for eff in card.effects:
-		match eff.effect_type:
-			EffectRes.EffectType.DAMAGE:
-				lines.append("피해 %d%s" % [eff.value, " (전체)" if eff.target == "ALL" else ""])
-			EffectRes.EffectType.BLOCK:
-				lines.append("방어 %d" % eff.value)
-			EffectRes.EffectType.BLOCK_ALL:
-				lines.append("전체 방어 %d" % eff.value)
-			EffectRes.EffectType.FORMATION_BLOCK:
-				lines.append("영웅수×%d 방어" % eff.value)
-			EffectRes.EffectType.APPLY_STATUS:
-				if eff.status_type == "poison":
-					lines.append("독 %d 데미지" % [eff.value * 10])
-				else:
-					var st_name: String = {"weak":"약화","vulnerable":"취약",
-						"morale":"사기","charm":"매혹","strength":"강화","taunt":"도발"}.get(eff.status_type, eff.status_type)
-					lines.append("%s %d" % [st_name, eff.value])
-			EffectRes.EffectType.DRAW:
-				lines.append("드로우 %d" % eff.value)
-			EffectRes.EffectType.ENERGY:
-				lines.append("에너지 +%d" % eff.value)
-			EffectRes.EffectType.HEAL:
-				lines.append("회복 %d" % eff.value)
-			EffectRes.EffectType.HEAL_ALL:
-				lines.append("전체 회복 %d" % eff.value)
-			EffectRes.EffectType.GAIN_MORALE:
-				lines.append("사기 +%d" % eff.value)
-			EffectRes.EffectType.CONSUME_MORALE:
-				lines.append("사기→피해 %d" % eff.bonus_value)
-			EffectRes.EffectType.POISON_BURST:
-				lines.append("독 즉발")
-			EffectRes.EffectType.COUNTER_BLOCK:
-				lines.append("방어도×%d%%" % eff.value)
-			EffectRes.EffectType.COST_NEXT:
-				lines.append("다음 비용 -%d" % eff.value)
-			EffectRes.EffectType.CONDITIONAL_DMG:
-				lines.append("%d/%d(%s)" % [eff.bonus_value, eff.value, eff.status_type])
-			EffectRes.EffectType.SUMMON_TOKEN:
-				lines.append("병사 소환")
-			EffectRes.EffectType.CHARM:
-				lines.append("매혹 %d" % eff.value)
+		lines.append(eff.display_text())
 	return "\n".join(lines)
 
 func _refresh_debug_badge() -> void:
@@ -814,58 +772,6 @@ func _refresh_debug_badge() -> void:
 		_debug_badge.text = "[DEBUG: " + ", ".join(parts) + "]"
 		_debug_badge.visible = true
 
-func _rarity_name(r: int) -> String:
-	match r:
-		0: return "C"
-		1: return "UC"
-		2: return "R"
-		3: return "L"
-		4: return "D"
-		_: return "?"
-
-func _collect_party_card_pools() -> Array:
-	var results: Array = []
-	for hero in TeamManager.heroes:
-		var path := "res://resources/cards/cards_%s.gd" % hero.hero_id
-		if not ResourceLoader.exists(path):
-			continue
-		var script = load(path)
-		if script == null or not script.has_method("pool"):
-			continue
-		for card in script.pool():
-			var label := "[%s] %s (코%d, %s)" % [hero.hero_id, card.card_name, card.cost, _rarity_name(card.rarity)]
-			results.append([label, card])
-	return results
-
-func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, on_confirm: Callable) -> void:
-	var dlg := AcceptDialog.new()
-	dlg.title = title
-	dlg.get_ok_button().text = confirm_text
-	dlg.add_cancel_button("닫기")
-	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(560, 480)
-	var vbox := VBoxContainer.new()
-	scroll.add_child(vbox)
-	var checks: Array = []
-	for opt in options:
-		var cb := CheckBox.new()
-		cb.text = opt[0]
-		cb.set_meta("payload", opt[1])
-		vbox.add_child(cb)
-		checks.append(cb)
-	dlg.add_child(scroll)
-	dlg.custom_minimum_size = Vector2(600, 560)
-	dlg.confirmed.connect(func():
-		var picked: Array = []
-		for c in checks:
-			if c.button_pressed:
-				picked.append(c.get_meta("payload"))
-		on_confirm.call(picked)
-		dlg.queue_free()
-	)
-	dlg.canceled.connect(func(): dlg.queue_free())
-	add_child(dlg)
-	dlg.popup_centered()
 
 func _refresh_synergy_hud() -> void:
 	if _synergy_lbl == null:
@@ -906,41 +812,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_refresh_debug_badge()
 		elif event.keycode == KEY_D and event.shift_pressed:
 			DeckManager.draw_cards(1)
-		elif event.keycode == KEY_A and event.shift_pressed:
-			var opts := _collect_party_card_pools()
-			_make_checkbox_dialog("카드 추가", opts, "덱 추가", func(picked: Array):
-				for card in picked:
-					DeckManager.add_card_to_deck(card.duplicate(true))
-				if picked.size() > 0:
-					_message_label.text = "디버그: %d장 추가" % picked.size()
-			)
-		elif event.keycode == KEY_R and event.shift_pressed:
-			var opts: Array = []
-			for card in DeckManager.get_full_deck():
-				var suffix := " +%d" % card.upgrade_level if card.upgrade_level > 0 else ""
-				opts.append(["%s%s (코%d)" % [card.card_name, suffix, card.cost], card])
-			_make_checkbox_dialog("덱 편집 — 제거할 카드", opts, "제거", func(picked: Array):
-				for card in picked:
-					if not DeckManager.remove_from_deck(card):
-						DeckManager.hand.erase(card)
-				DeckManager.hand_changed.emit()
-				if picked.size() > 0:
-					_message_label.text = "디버그: %d장 제거" % picked.size()
-			)
-		elif event.keycode == KEY_U and event.shift_pressed:
-			var opts: Array = []
-			for card in DeckManager.get_full_deck():
-				if not card.can_upgrade():
-					continue
-				var suffix := " +%d → +%d" % [card.upgrade_level, card.upgrade_level + 1]
-				opts.append(["%s%s (코%d)" % [card.card_name, suffix, card.cost], card])
-			_make_checkbox_dialog("카드 강화", opts, "강화", func(picked: Array):
-				for card in picked:
-					GameManager.upgrade_card(card)
-				DeckManager.hand_changed.emit()
-				if picked.size() > 0:
-					_message_label.text = "디버그: %d장 강화" % picked.size()
-			)
 		elif event.keycode == KEY_H and event.shift_pressed:
 			_debug_hp_target_mode = not _debug_hp_target_mode
 			if _debug_hp_target_mode:
