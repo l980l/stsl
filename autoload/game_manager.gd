@@ -2,12 +2,12 @@
 class_name GameManagerClass
 extends Node
 
-const _NapoleonCards  = preload("res://resources/data/cards_napoleon.gd")
-const _CleopatraCards = preload("res://resources/data/cards_cleopatra.gd")
-const _YiSunSinCards  = preload("res://resources/data/cards_yi_sun_sin.gd")
-const _EnemiesAct1    = preload("res://resources/data/enemies_act1.gd")
-const _RelicData      = preload("res://resources/data/relics.gd")
-const _EventsAct1    = preload("res://resources/data/events_act1.gd")
+const _NapoleonCards  = preload("res://resources/cards/cards_napoleon.gd")
+const _CleopatraCards = preload("res://resources/cards/cards_cleopatra.gd")
+const _YiSunSinCards  = preload("res://resources/cards/cards_yi_sun_sin.gd")
+const _EnemiesAct1    = preload("res://resources/enemies/enemies_act1.gd")
+const _RelicData      = preload("res://resources/relics/relics.gd")
+const _EventsAct1     = preload("res://resources/events/events_act1.gd")
 
 enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGRADE, HERO_RECRUIT }
 

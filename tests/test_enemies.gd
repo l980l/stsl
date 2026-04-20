@@ -3,7 +3,7 @@ class_name TestEnemies
 extends RefCounted
 
 const GameManagerClass = preload("res://autoload/game_manager.gd")
-const EnemiesAct1 = preload("res://resources/data/enemies_act1.gd")
+const EnemiesAct1 = preload("res://resources/enemies/enemies_act1.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
 var passed: int = 0

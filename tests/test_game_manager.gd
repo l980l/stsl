@@ -229,7 +229,7 @@ func test_act_transition() -> void:
 func test_act_difficulty() -> void:
 	print("[TestGameManager] test_act_difficulty")
 	var gm := _make_gm()
-	var EnemiesAct1 = preload("res://resources/data/enemies_act1.gd")
+	var EnemiesAct1 = preload("res://resources/enemies/enemies_act1.gd")
 	var scene := gm._satyr_scene()
 
 	var e1: Resource = EnemiesAct1.satyr(scene, 30, 6)
