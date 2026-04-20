@@ -5,6 +5,8 @@ extends Node
 const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
+const POISON_DMG_PER_STACK: int = 10
+
 # 의존성 주입 — 프로덕션: BattleScene이 설정, 테스트: 직접 할당
 var team_mgr = null
 var deck_mgr = null
@@ -72,6 +74,12 @@ func start_player_turn() -> void:
 		for hero in team_mgr.heroes:
 			_hero_block[hero.hero_id] = 0
 			_tick_hero_poison(hero.hero_id)
+			for stype: String in ["weak", "vulnerable"]:
+				var cur: int = _hero_status.get(hero.hero_id, {}).get(stype, 0)
+				if cur > 0:
+					if not _hero_status.has(hero.hero_id):
+						_hero_status[hero.hero_id] = {}
+					_hero_status[hero.hero_id][stype] = cur - 1
 	if deck_mgr:
 		deck_mgr.start_turn()
 	var _gm_pts = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
@@ -166,7 +174,8 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					var poison: int = _enemy_status[target_enemy_index].get("poison", 0)
 					if poison > 0:
-						_deal_damage_to_enemy(target_enemy_index, poison)
+						var burst_dmg: int = poison * effect.value / 100 * POISON_DMG_PER_STACK
+						_deal_damage_to_enemy(target_enemy_index, burst_dmg)
 						_enemy_status[target_enemy_index]["poison"] = 0
 			EffectRes.EffectType.COUNTER_BLOCK:
 				var block: int = _hero_block.get(card.owner_id, 0)
@@ -252,15 +261,16 @@ func _tick_hero_poison(hero_id: String) -> void:
 	var poison: int = status.get("poison", 0)
 	if poison <= 0:
 		return
-	team_mgr.take_damage(hero_id, poison)
+	team_mgr.take_damage(hero_id, poison * POISON_DMG_PER_STACK)
 	_hero_status[hero_id]["poison"] = max(0, poison - 1)
 
 func _tick_enemy_poison(enemy_index: int) -> void:
 	var poison: int = _enemy_status[enemy_index].get("poison", 0)
 	if poison <= 0:
 		return
-	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - poison)
-	enemy_damaged.emit(enemy_index, poison)
+	var poison_dmg: int = poison * POISON_DMG_PER_STACK
+	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - poison_dmg)
+	enemy_damaged.emit(enemy_index, poison_dmg)
 	_enemy_status[enemy_index]["poison"] = poison - 1
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
@@ -276,6 +286,9 @@ func _execute_enemy_turn() -> void:
 		_tick_enemy_poison(i)
 		if not _enemy_alive[i]:
 			continue
+		for stype: String in ["weak", "vulnerable"]:
+			if _enemy_status[i].get(stype, 0) > 0:
+				_enemy_status[i][stype] -= 1
 		# 매혹(charm) 스택 3이면 홀림(enthrall)으로 전환
 		var charm: int = _enemy_status[i].get("charm", 0)
 		if charm >= 3:

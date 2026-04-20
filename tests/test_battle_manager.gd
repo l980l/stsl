@@ -47,6 +47,8 @@ func run_all() -> Dictionary:
 	test_synergy_napoleon_cleopatra()
 	test_synergy_napoleon_cleopatra_no_morale()
 	test_has_synergy_bonus()
+	test_enemy_status_decrements_on_enemy_turn()
+	test_hero_status_decrements_on_player_turn()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -196,12 +198,12 @@ func test_poison_tick_enemy() -> void:
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
 	var intent := _make_intent(IntentRes.ActionType.BUFF, 5, IntentRes.TargetType.RANDOM)
-	var enemy := _make_enemy(30, [intent])
+	var enemy := _make_enemy(200, [intent])
 	bm.setup_battle([enemy])
 	bm._enemy_status[0]["poison"] = 3
 
 	bm._execute_enemy_turn()
-	_assert(bm.get_enemy_hp(0) == 27, "독 3 틱 → HP 30 → 27")
+	_assert(bm.get_enemy_hp(0) == 170, "독 3 틱 → 3×10=30 피해 → HP 200 → 170")
 	_assert(bm._enemy_status[0].get("poison", -1) == 2, "독 스택 3 → 2")
 
 func test_poison_tick_hero() -> void:
@@ -213,7 +215,7 @@ func test_poison_tick_hero() -> void:
 	bm.is_battle_active = true
 
 	bm.start_player_turn()
-	_assert(bm.team_mgr.get_current_hp("napoleon") == 66, "독 4 틱 → HP 70 → 66")
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 30, "독 4 틱 → 4×10=40 피해 → HP 70 → 30")
 	_assert(bm._hero_status["napoleon"].get("poison", -1) == 3, "독 스택 4 → 3")
 
 func test_enemy_turn_attacks_hero() -> void:
@@ -653,3 +655,26 @@ func test_has_synergy_bonus() -> void:
 	bm.team_mgr.add_hero(_make_hero("napoleon", 50))
 	_assert(bm.has_synergy_bonus(card) == false,
 		"napoleon GAIN_MORALE 혼자 → false")
+
+func test_enemy_status_decrements_on_enemy_turn() -> void:
+	print("[TestBattleManager] test_enemy_status_decrements_on_enemy_turn")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	var intent := _make_intent(IntentRes.ActionType.BUFF, 0, IntentRes.TargetType.RANDOM)
+	bm.setup_battle([_make_enemy(500, [intent])])
+	bm._enemy_status[0]["weak"] = 2
+	bm._enemy_status[0]["vulnerable"] = 3
+	bm._execute_enemy_turn()
+	_assert(bm._enemy_status[0].get("weak", -1) == 1, "적 weak 2 → 1 (적 턴마다 감소)")
+	_assert(bm._enemy_status[0].get("vulnerable", -1) == 2, "적 vulnerable 3 → 2 (적 턴마다 감소)")
+
+func test_hero_status_decrements_on_player_turn() -> void:
+	print("[TestBattleManager] test_hero_status_decrements_on_player_turn")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	bm.setup_battle([_make_enemy(30, [])])
+	bm._hero_status["napoleon"] = {"weak": 2, "vulnerable": 1}
+	bm.is_battle_active = true
+	bm.start_player_turn()
+	_assert(bm._hero_status["napoleon"].get("weak", -1) == 1, "영웅 weak 2 → 1 (플레이어 턴마다 감소)")
+	_assert(bm._hero_status["napoleon"].get("vulnerable", -1) == 0, "영웅 vulnerable 1 → 0")
