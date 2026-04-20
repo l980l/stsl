@@ -369,9 +369,10 @@ func _execute_enemy_turn() -> void:
 		for stype: String in ["weak", "vulnerable"]:
 			if _enemy_status[i].get(stype, 0) > 0:
 				_enemy_status[i][stype] -= 1
-		# 매혹(charm) 스택 3이면 홀림(enthrall)으로 전환
+		# 매혹(charm) 스택이 임계값(3 + 저항) 이상이면 홀림(enthrall)으로 전환
 		var charm: int = _enemy_status[i].get("charm", 0)
-		if charm >= 3:
+		var charm_threshold: int = 3 + _enemy_status[i].get("charm_resistance", 0)
+		if charm >= charm_threshold:
 			_enemy_status[i]["charm"] = 0
 			_enemy_status[i]["enthrall"] = _enemy_status[i].get("enthrall", 0) + 1
 		# 홀림(enthrall): 자신을 제외한 다른 몬스터를 랜덤 공격
