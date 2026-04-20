@@ -8,7 +8,7 @@ const MapNodeRes = preload("res://resources/map_node_resource.gd")
 const FLOORS := 10
 const COLS := 3
 
-static func generate() -> Array:  # -> Array[MapNodeResource]
+static func generate(act: int = 1) -> Array:  # -> Array[MapNodeResource]
 	var nodes: Array = []
 
 	# Floor 0~8: 각 3개 노드 (총 27개)
@@ -18,7 +18,7 @@ static func generate() -> Array:  # -> Array[MapNodeResource]
 			node.node_id = f * COLS + c
 			node.floor_num = f
 			node.column = c
-			node.room_type = _pick_room_type(f, c)
+			node.room_type = _pick_room_type(f, c, act)
 			nodes.append(node)
 
 	# Floor 9: 보스 노드 (ID 27)
@@ -41,7 +41,8 @@ static func generate() -> Array:  # -> Array[MapNodeResource]
 
 	return nodes
 
-static func _pick_room_type(floor_num: int, col: int) -> MapNodeRes.RoomType:
+static func _pick_room_type(floor_num: int, col: int, act: int = 1) -> MapNodeRes.RoomType:
+	# act 파라미터는 향후 액트별 레이아웃을 위해 예약됨. Phase A: 무시.
 	if floor_num == 3 and col == 1: return MapNodeRes.RoomType.REST
 	if floor_num == 3 and col == 2: return MapNodeRes.RoomType.SHOP
 	if floor_num == 4 and col == 1: return MapNodeRes.RoomType.ELITE

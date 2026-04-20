@@ -119,7 +119,7 @@ func start_run(initial_hero_id: String = "napoleon") -> void:
 
 	# 맵 생성
 	var MapGen = load("res://autoload/map_generator.gd")
-	run_map = MapGen.generate()
+	run_map = MapGen.generate(current_act)
 	available_node_ids = [0, 1, 2]
 	run_started.emit()
 
