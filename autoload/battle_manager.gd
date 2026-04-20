@@ -158,6 +158,13 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				_hero_status[card.owner_id]["morale"] = new_morale
 				status_applied.emit(card.owner_id, "morale", effect.value)
 				morale_changed.emit(card.owner_id, new_morale)
+			EffectRes.EffectType.CHARM:
+				if effect.target == "ALL":
+					for ei in range(_enemies.size()):
+						if _enemy_alive[ei]:
+							_apply_status_to_enemy(ei, "charm", effect.value)
+				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+					_apply_status_to_enemy(target_enemy_index, "charm", effect.value)
 			EffectRes.EffectType.CONSUME_MORALE:
 				var morale: int = _hero_status.get(card.owner_id, {}).get("morale", 0)
 				if morale >= effect.value:
