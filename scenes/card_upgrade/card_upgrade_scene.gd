@@ -40,7 +40,7 @@ func _build_ui(upgradeable: Array) -> void:
 
 	var scroll_w: int = COLS * (CARD_W + 20) - 20  # 940
 	var scroll := ScrollContainer.new()
-	scroll.position = Vector2((1920 - scroll_w) / 2, 110)
+	scroll.position = Vector2((1920 - scroll_w) / 2.0, 110)
 	scroll.size = Vector2(scroll_w, 870)
 	add_child(scroll)
 
