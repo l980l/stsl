@@ -235,7 +235,7 @@ func test_act2_relics_exist() -> void:
 				found = true
 				break
 		_assert(found, "Act2 렐릭 존재: %s" % name)
-	var eye := null
+	var eye: Resource = null
 	for r in pool:
 		if r.relic_name == "호루스의 눈": eye = r
 	_assert(eye != null and eye.owner_hero_id == "cleopatra", "호루스의 눈 — 클레오파트라 전용")
