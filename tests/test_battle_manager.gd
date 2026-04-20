@@ -46,6 +46,7 @@ func run_all() -> Dictionary:
 	test_synergy_yisunsin_cleopatra()
 	test_synergy_napoleon_cleopatra()
 	test_synergy_napoleon_cleopatra_no_morale()
+	test_has_synergy_bonus()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -629,3 +630,26 @@ func test_synergy_napoleon_cleopatra_no_morale() -> void:
 	bm.play_card(card, 0)
 	_assert(bm._enemy_status[0].get("charm", 0) == 0,
 		"혼란의 돌격: 사기 부족 시 charm 미부여")
+
+
+func test_has_synergy_bonus() -> void:
+	print("[TestBattleManager] test_has_synergy_bonus")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 50))
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 50))
+	bm.setup_battle([_make_enemy(30, [])])
+
+	var card = CardRes.new()
+	card.owner_id = "napoleon"
+	card.cost = 0
+	var eff = EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.GAIN_MORALE
+	eff.value = 2
+	card.effects = [eff]
+	_assert(bm.has_synergy_bonus(card) == true,
+		"napoleon GAIN_MORALE + yi_sun_sin 생존 → true")
+
+	bm.team_mgr.clear()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 50))
+	_assert(bm.has_synergy_bonus(card) == false,
+		"napoleon GAIN_MORALE 혼자 → false")
