@@ -258,7 +258,10 @@ func complete_card_upgrade() -> void:
 			change_state(GameState.HERO_RECRUIT)
 			_request_scene("res://scenes/hero_select/hero_select_scene.tscn")
 			return
-		_end_run_won()
+		if current_act < MAX_ACTS:
+			_start_next_act()
+		else:
+			_end_run_won()
 		return
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
@@ -270,7 +273,22 @@ func complete_hero_recruit(hero_id: String) -> void:
 	if tm:
 		tm.add_hero(hero)
 	_add_initial_deck_for(hero)
-	_end_run_won()
+	if current_act < MAX_ACTS:
+		_start_next_act()
+	else:
+		_end_run_won()
+
+func _start_next_act() -> void:
+	current_act += 1
+	current_floor = 0
+	current_node_id = -1
+	pending_boss_upgrade = false
+	pending_boss_recruit = false
+	var MapGen = load("res://autoload/map_generator.gd")
+	run_map = MapGen.generate(current_act)
+	available_node_ids = [0, 1, 2]
+	change_state(GameState.MAP)
+	_request_scene("res://scenes/map/map_scene.tscn")
 
 func _end_run_won() -> void:
 	run_won = true
