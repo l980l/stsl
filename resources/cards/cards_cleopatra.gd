@@ -132,14 +132,14 @@ static func _cursed_gaze() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _temptation() -> Resource:
-	# 유혹 — UNCOMMON, 2코, SKILL, 조종: CHARM 2 (SINGLE)
+	# 유혹 — UNCOMMON, 1코, SKILL, 조종: CHARM 1 (SINGLE)
 	var c := CardRes.new()
 	c.card_name = "유혹"; c.owner_id = "cleopatra"
-	c.cost = 2; c.card_type = CardRes.CardType.SKILL
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CHARM
-	e.value = 2; e.base_value = 2; e.target = "SINGLE"
+	e.value = 1; e.base_value = 1; e.target = "SINGLE"
 	c.effects = [e]; return c
 
 static func _nile_mist() -> Resource:
@@ -310,14 +310,14 @@ static func _double_fang() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _tempting_eye() -> Resource:
-	# 유혹의 눈길 — UNCOMMON, 1코, SKILL, 조종: CHARM 2 + COST_NEXT -1
+	# 유혹의 눈길 — UNCOMMON, 1코, SKILL, 조종: CHARM 1 + COST_NEXT -1
 	var c := CardRes.new()
 	c.card_name = "유혹의 눈길"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CHARM
-	ea.value = 2; ea.base_value = 2; ea.target = "SINGLE"
+	ea.value = 1; ea.base_value = 1; ea.target = "SINGLE"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.COST_NEXT
 	eb.value = 1; eb.base_value = 1
@@ -377,14 +377,14 @@ static func _snake_poison_dance() -> Resource:
 	c.effects = [e]; return c
 
 static func _charming_language() -> Resource:
-	# 매혹의 언어 — UNCOMMON, 1코, SKILL, 조종: CHARM 2 + DRAW 1
+	# 매혹의 언어 — UNCOMMON, 1코, SKILL, 조종: CHARM 1 + DRAW 1
 	var c := CardRes.new()
 	c.card_name = "매혹의 언어"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CHARM
-	ea.value = 2; ea.base_value = 2; ea.target = "SINGLE"
+	ea.value = 1; ea.base_value = 1; ea.target = "SINGLE"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 1; eb.base_value = 1
