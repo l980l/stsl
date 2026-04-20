@@ -757,11 +757,10 @@ func _input(event: InputEvent) -> void:
 		if _drag_card != null:
 			_finish_drag(get_viewport().get_mouse_position())
 		_potential_drag_card = null
-	elif event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_F9:
-			BattleManager.debug_instant_win()
-			if get_viewport():
-				get_viewport().set_input_as_handled()
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event.pressed and not event.echo and event.keycode == KEY_F9:
+		BattleManager.debug_instant_win()
 
 func _card_target_type(card: Resource) -> String:
 	# "enemy" / "ally" / "none"
