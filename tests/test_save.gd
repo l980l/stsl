@@ -188,7 +188,7 @@ func test_upgraded_flag_preserved_in_save() -> void:
 	card.card_name = "스트라이크"
 	card.owner_id = "napoleon"
 	card.cost = 1
-	card.upgraded = true
+	card.upgrade_level = 1
 	var eff := EffRes.new(); eff.effect_type = EffRes.EffectType.DAMAGE; eff.value = 9; eff.target = "SINGLE"
 	card.effects = [eff]
 	dm.add_card_to_deck(card)
@@ -198,5 +198,5 @@ func test_upgraded_flag_preserved_in_save() -> void:
 	dm2.from_dict(d)
 
 	var restored: Resource = dm2.draw_pile[0]
-	_assert(restored.upgraded == true, "강화된 카드 upgraded=true 저장/복원")
+	_assert(restored.upgrade_level == 1, "강화된 카드 upgrade_level=1 저장/복원")
 	_assert(restored.effects[0].value == 9, "강화 수치 복원")

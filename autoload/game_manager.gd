@@ -137,15 +137,15 @@ func _make_hero_by_id(hero_id: String) -> Resource:
 	match hero_id:
 		"napoleon":
 			hero.hero_name = "나폴레옹"
-			hero.max_hp = 70
+			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
 		"cleopatra":
 			hero.hero_name = "클레오파트라"
-			hero.max_hp = 60
+			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
 		"yi_sun_sin":
 			hero.hero_name = "이순신"
-			hero.max_hp = 75
+			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
 	return hero
 
@@ -307,31 +307,50 @@ func _end_run_won() -> void:
 	_request_scene("res://scenes/game_over/game_over_scene.tscn")
 
 func upgrade_card(card: Resource) -> void:
-	if card.upgraded:
+	if not card.can_upgrade():
 		return
+	card.upgrade_level += 1
+	var level: int = card.upgrade_level
+	var CardRes = load("res://resources/card_resource.gd")
 	var EffRes = load("res://resources/effect_resource.gd")
+
+	var rate: float = 0.0
+	match card.rarity:
+		CardRes.Rarity.UNCOMMON:   rate = 0.10
+		CardRes.Rarity.RARE:       rate = 0.12
+		CardRes.Rarity.LEGENDARY:  rate = 0.14
+		CardRes.Rarity.DIVINE:     rate = 0.16
+
+	var PERCENT_TYPES = [
+		EffRes.EffectType.DAMAGE,
+		EffRes.EffectType.BLOCK,
+		EffRes.EffectType.HEAL,
+		EffRes.EffectType.BLOCK_ALL,
+		EffRes.EffectType.HEAL_ALL,
+		EffRes.EffectType.FORMATION_BLOCK,
+		EffRes.EffectType.COUNTER_BLOCK,
+		EffRes.EffectType.POISON_BURST,
+		EffRes.EffectType.CONSUME_MORALE,
+		EffRes.EffectType.CONDITIONAL_DMG,
+	]
+
+	var INT_TYPES = [
+		EffRes.EffectType.DRAW,
+		EffRes.EffectType.ENERGY,
+		EffRes.EffectType.GAIN_MORALE,
+		EffRes.EffectType.APPLY_STATUS,
+		EffRes.EffectType.CHARM,
+		EffRes.EffectType.COST_NEXT,
+		EffRes.EffectType.SUMMON_TOKEN,
+	]
+
 	for effect in card.effects:
-		match effect.effect_type:
-			EffRes.EffectType.DAMAGE, EffRes.EffectType.CONDITIONAL_DMG:
-				effect.value += 3
-				effect.bonus_value += 3
-			EffRes.EffectType.BLOCK, EffRes.EffectType.BLOCK_ALL, \
-			EffRes.EffectType.FORMATION_BLOCK, EffRes.EffectType.COUNTER_BLOCK:
-				effect.value += 3
-			EffRes.EffectType.HEAL, EffRes.EffectType.HEAL_ALL:
-				effect.value += 3
-			EffRes.EffectType.DRAW:
-				effect.value += 1
-			EffRes.EffectType.GAIN_MORALE:
-				effect.value += 1
-			EffRes.EffectType.CONSUME_MORALE:
-				effect.value += 1
-				effect.bonus_value += 5
-			EffRes.EffectType.ENERGY:
-				effect.value += 1
-	if card.cost >= 2:
-		card.cost -= 1
-	card.upgraded = true
+		if effect.effect_type in PERCENT_TYPES:
+			effect.value = int(effect.base_value * (1.0 + rate * level))
+			effect.bonus_value = int(effect.base_bonus_value * (1.0 + rate * level))
+		elif effect.effect_type in INT_TYPES:
+			effect.value = effect.base_value + level
+			effect.bonus_value = effect.base_bonus_value + level if effect.base_bonus_value > 0 else 0
 
 func generate_shop_inventory() -> Dictionary:
 	var tm := _get_tm()
@@ -371,11 +390,13 @@ func _satyr_scene() -> PackedScene:
 
 func _make_normal_enemies() -> Array:
 	var scene := _satyr_scene()
-	match randi() % 4:
-		0: return [_EnemiesAct1.satyr(scene, 30, 6)]
-		1: return [_EnemiesAct1.harpy(scene, 25)]
-		2: return [_EnemiesAct1.cyclops(scene, 45)]
-		_: return [_EnemiesAct1.snake(scene, 20)]
+	match randi() % 6:
+		0: return [_EnemiesAct1.satyr(scene)]
+		1: return [_EnemiesAct1.harpy(scene)]
+		2: return [_EnemiesAct1.cyclops(scene)]
+		3: return [_EnemiesAct1.snake(scene)]
+		4: return [_EnemiesAct1.cerberus(scene)]
+		_: return [_EnemiesAct1.myrmidon(scene)]
 
 const _ACT_HP_MULT: Dictionary = {1: 1.0, 2: 1.3}
 const _ACT_DMG_MULT: Dictionary = {1: 1.0, 2: 1.2}
@@ -411,9 +432,10 @@ func _make_enemies_for_node(node: Resource) -> Array:
 
 func _make_elite_enemies() -> Array:
 	var scene := _satyr_scene()
-	if randi() % 2 == 0:
-		return [_EnemiesAct1.minotaur(scene)]
-	return [_EnemiesAct1.medusa(scene)]
+	match randi() % 3:
+		0: return [_EnemiesAct1.minotaur(scene)]
+		1: return [_EnemiesAct1.medusa(scene)]
+		_: return [_EnemiesAct1.gorgon(scene)]
 
 func _make_boss_enemies() -> Array:
 	return [_EnemiesAct1.hydra(_satyr_scene())]
@@ -450,7 +472,7 @@ func _make_cleopatra_hero() -> Resource:
 	var hero: Resource = HeroRes.new()
 	hero.hero_id = "cleopatra"
 	hero.hero_name = "클레오파트라"
-	hero.max_hp = 60
+	hero.max_hp = 1000
 	hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
 	return hero
 
@@ -459,7 +481,7 @@ func _make_yi_sun_sin_hero() -> Resource:
 	var hero: Resource = HeroRes.new()
 	hero.hero_id = "yi_sun_sin"
 	hero.hero_name = "이순신"
-	hero.max_hp = 75
+	hero.max_hp = 1000
 	hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
 	return hero
 

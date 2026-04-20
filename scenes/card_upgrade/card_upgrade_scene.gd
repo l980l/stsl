@@ -19,7 +19,7 @@ func _get_upgradeable_cards() -> Array:
 	all.append_array(DeckManager.hand)
 	var result: Array = []
 	for card in all:
-		if not card.upgraded:
+		if card.upgrade_level < card.max_upgrade_level():
 			result.append(card)
 	return result
 

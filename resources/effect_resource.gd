@@ -24,7 +24,8 @@ enum EffectType {
 
 @export var effect_type: EffectType = EffectType.DAMAGE
 @export var value: int = 0
-@export var target: String = "SINGLE"   # SINGLE / ALL / SELF
-@export var status_type: String = ""    # APPLY_STATUS 시 상태이상 종류
-                                        # "poison","weak","vulnerable","taunt","strength"
-@export var bonus_value: int = 0        # 조건부/추가 효과에 사용
+@export var target: String = "SINGLE"       # SINGLE / ALL / SELF
+@export var status_type: String = ""        # APPLY_STATUS 시 상태이상 종류: "poison","weak","vulnerable","taunt","strength"
+@export var bonus_value: int = 0            # 조건부/추가 효과에 사용
+@export var base_value: int = 0             # 0강 기준값. 강화 공식의 베이스.
+@export var base_bonus_value: int = 0       # bonus_value의 0강 기준값.
