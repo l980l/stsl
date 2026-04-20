@@ -29,6 +29,9 @@ var _last_attacker: Dictionary = {}
 var _hero_block: Dictionary = {}
 var _hero_status: Dictionary = {}
 
+# 지속 효과 (POWER 카드): { "poison_per_turn": { "owner": "cleopatra", "value": 1 }, ... }
+var _active_powers: Dictionary = {}
+
 signal battle_started()
 signal battle_won()
 signal battle_lost()
@@ -50,6 +53,7 @@ func setup_battle(enemies: Array) -> void:
 	_hero_block.clear()
 	_hero_status.clear()
 	_last_attacker.clear()
+	_active_powers.clear()
 	for enemy in _enemies:
 		_enemy_hp.append(enemy.max_hp)
 		_enemy_alive.append(true)
@@ -80,6 +84,11 @@ func start_player_turn() -> void:
 					if not _hero_status.has(hero.hero_id):
 						_hero_status[hero.hero_id] = {}
 					_hero_status[hero.hero_id][stype] = cur - 1
+	if _active_powers.has("poison_per_turn"):
+		var ppt: Dictionary = _active_powers["poison_per_turn"]
+		for i in range(_enemies.size()):
+			if _enemy_alive[i]:
+				_apply_status_to_enemy(i, "poison", ppt["value"])
 	if deck_mgr:
 		deck_mgr.start_turn()
 	var _gm_pts = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
@@ -131,7 +140,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.BLOCK:
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + effect.value
 			EffectRes.EffectType.APPLY_STATUS:
-				if effect.target == "ALL":
+				if effect.status_type == "poison_per_turn":
+					_active_powers["poison_per_turn"] = { "owner": card.owner_id, "value": effect.value }
+				elif effect.target == "ALL":
 					for i in range(_enemies.size()):
 						if _enemy_alive[i]:
 							_apply_status_to_enemy(i, effect.status_type, effect.value)

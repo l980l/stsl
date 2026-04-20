@@ -772,6 +772,9 @@ func _card_target_type(card: Resource) -> String:
 			EffectRes.EffectType.APPLY_STATUS:
 				if effect.target == "SINGLE":
 					return "enemy"
+			EffectRes.EffectType.CHARM:
+				if effect.target == "SINGLE":
+					return "enemy"
 			EffectRes.EffectType.COUNTER_BLOCK, \
 			EffectRes.EffectType.CONSUME_MORALE, \
 			EffectRes.EffectType.POISON_BURST, \
