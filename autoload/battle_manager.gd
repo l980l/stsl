@@ -615,3 +615,17 @@ func has_synergy_bonus(card: Resource) -> bool:
 				if card_owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
 					return true
 	return false
+
+func debug_set_enemy_hp(index: int, hp: int) -> void:
+	if index < 0 or index >= _enemy_hp.size():
+		return
+	hp = max(0, hp)
+	_enemy_hp[index] = hp
+	if hp == 0 and _enemy_alive[index]:
+		_enemy_alive[index] = false
+		enemy_died.emit(index)
+		_check_win_condition()
+	elif hp > 0 and not _enemy_alive[index]:
+		_enemy_alive[index] = true
+	enemy_damaged.emit(index, 0)
+	_check_phase_transition(index)

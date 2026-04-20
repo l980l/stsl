@@ -503,8 +503,27 @@ func _on_enemy_pressed(index: int) -> void:
 		_open_enemy_hp_dialog(index)
 		return
 
-func _open_enemy_hp_dialog(_index: int) -> void:
-	pass
+func _open_enemy_hp_dialog(index: int) -> void:
+	var current_hp: int = BattleManager._enemy_hp[index] if index < BattleManager._enemy_hp.size() else 0
+	var dlg := AcceptDialog.new()
+	dlg.title = "적[%d] HP 설정 (현재: %d)" % [index, current_hp]
+	dlg.add_cancel_button("취소")
+	var spin := SpinBox.new()
+	spin.min_value = 0
+	spin.max_value = 9999
+	spin.value = current_hp
+	spin.step = 1
+	dlg.add_child(spin)
+	dlg.confirmed.connect(func():
+		BattleManager.debug_set_enemy_hp(index, int(spin.value))
+		_message_label.text = "[DEBUG] 적[%d] HP → %d" % [index, int(spin.value)]
+		dlg.queue_free()
+	)
+	dlg.canceled.connect(func(): dlg.queue_free())
+	add_child(dlg)
+	dlg.popup_centered()
+	spin.get_line_edit().grab_focus()
+	spin.get_line_edit().select_all()
 
 func _on_end_turn_pressed() -> void:
 	_selected_card = null
