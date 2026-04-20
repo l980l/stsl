@@ -42,6 +42,7 @@ signal enemy_damaged(enemy_index: int, amount: int)
 signal hero_damaged(hero_id: String, amount: int)
 signal status_applied(target: String, status_type: String, stacks: int)
 signal morale_changed(hero_id: String, new_value: int)
+signal active_powers_changed()
 
 func setup_battle(enemies: Array) -> void:
 	_enemies = enemies.duplicate()
@@ -89,6 +90,10 @@ func start_player_turn() -> void:
 		for i in range(_enemies.size()):
 			if _enemy_alive[i]:
 				_apply_status_to_enemy(i, "poison", ppt["value"])
+		ppt["turns_remaining"] -= 1
+		if ppt["turns_remaining"] <= 0:
+			_active_powers.erase("poison_per_turn")
+		active_powers_changed.emit()
 	if deck_mgr:
 		deck_mgr.start_turn()
 	var _gm_pts = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
@@ -141,7 +146,8 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + effect.value
 			EffectRes.EffectType.APPLY_STATUS:
 				if effect.status_type == "poison_per_turn":
-					_active_powers["poison_per_turn"] = { "owner": card.owner_id, "value": effect.value }
+					_active_powers["poison_per_turn"] = { "owner": card.owner_id, "value": effect.value, "turns_remaining": 2 }
+					active_powers_changed.emit()
 				elif effect.target == "ALL":
 					for i in range(_enemies.size()):
 						if _enemy_alive[i]:
@@ -510,6 +516,9 @@ func get_enemy_status(index: int) -> Dictionary:
 	if index < 0 or index >= _enemy_status.size():
 		return {}
 	return _enemy_status[index].duplicate()
+
+func get_active_power(key: String) -> Dictionary:
+	return _active_powers.get(key, {}).duplicate()
 
 func clear() -> void:
 	_enemies.clear()

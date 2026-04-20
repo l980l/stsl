@@ -39,6 +39,7 @@ const DRAG_THRESHOLD := 10.0
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _synergy_lbl: Label = null
+var _ppt_label: Label = null
 
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
@@ -128,6 +129,15 @@ func _build_ui() -> void:
 	_synergy_lbl.modulate = Color(1.0, 0.0, 1.0)
 	_synergy_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(_synergy_lbl)
+
+	_ppt_label = Label.new()
+	_ppt_label.position = Vector2(20, 840)
+	_ppt_label.size = Vector2(300, 30)
+	_ppt_label.add_theme_font_size_override("font_size", 14)
+	_ppt_label.modulate = Color(0.4, 1.0, 0.4)
+	_ppt_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_ppt_label.visible = false
+	add_child(_ppt_label)
 
 	# 영웅 슬롯 3개 (초기 숨김)
 	for i in range(3):
@@ -238,6 +248,7 @@ func _connect_signals() -> void:
 	TeamManager.hero_died.connect(_on_hero_died)
 	BattleManager.status_applied.connect(_on_status_applied)
 	BattleManager.morale_changed.connect(_on_morale_changed)
+	BattleManager.active_powers_changed.connect(_on_active_powers_changed)
 
 # ─────────────────────────────────────────────
 # 배틀 초기화
@@ -690,6 +701,17 @@ func _refresh_status_icons_enemy(index: int) -> void:
 
 func _on_morale_changed(hero_id: String, _new_value: int) -> void:
 	_update_hero_ui(hero_id)
+
+func _on_active_powers_changed() -> void:
+	if _ppt_label == null:
+		return
+	var ppt: Dictionary = BattleManager.get_active_power("poison_per_turn")
+	if ppt.is_empty():
+		_ppt_label.visible = false
+	else:
+		_ppt_label.text = "🧪 독의 왕좌: +%d/턴 (%d턴)" % [ppt["value"], ppt["turns_remaining"]]
+		_ppt_label.tooltip_text = "매 플레이어 턴 시작 시 모든 적에게 독 +%d 적용.\n독의 왕좌를 다시 사용하지 않으면 %d턴 후 사라집니다." % [ppt["value"], ppt["turns_remaining"]]
+		_ppt_label.visible = true
 
 func _on_status_applied(target: String, _status_type: String, _stacks: int) -> void:
 	if target.begins_with("enemy_"):
