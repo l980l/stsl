@@ -370,17 +370,37 @@ func _make_normal_enemies() -> Array:
 		2: return [_make_cyclops(scene, 45)]
 		_: return [_make_snake(scene, 20)]
 
+const _ACT_HP_MULT: Dictionary = {1: 1.0, 2: 1.3}
+const _ACT_DMG_MULT: Dictionary = {1: 1.0, 2: 1.2}
+
+func _apply_act_difficulty(enemies: Array, act: int) -> void:
+	var hp_m: float = _ACT_HP_MULT.get(act, 1.0)
+	var dmg_m: float = _ACT_DMG_MULT.get(act, 1.0)
+	var IntentRes = load("res://resources/intent_resource.gd")
+	for enemy in enemies:
+		enemy.max_hp = int(enemy.max_hp * hp_m)
+		for intent in enemy.intent_pattern:
+			if intent.action_type == IntentRes.ActionType.ATTACK:
+				intent.value = int(intent.value * dmg_m)
+		for phase_pattern in enemy.phase_patterns:
+			for intent in phase_pattern:
+				if intent.action_type == IntentRes.ActionType.ATTACK:
+					intent.value = int(intent.value * dmg_m)
+
 func _make_enemies_for_node(node: Resource) -> Array:
 	var MapNodeRes = load("res://resources/map_node_resource.gd")
+	var enemies: Array
 	match node.room_type:
 		MapNodeRes.RoomType.BATTLE:
-			return _make_normal_enemies()
+			enemies = _make_normal_enemies()
 		MapNodeRes.RoomType.ELITE:
-			return _make_elite_enemies()
+			enemies = _make_elite_enemies()
 		MapNodeRes.RoomType.BOSS:
-			return _make_boss_enemies()
+			enemies = _make_boss_enemies()
 		_:
-			return []
+			enemies = []
+	_apply_act_difficulty(enemies, current_act)
+	return enemies
 
 func _make_elite_enemies() -> Array:
 	var scene := _satyr_scene()

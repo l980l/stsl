@@ -27,6 +27,7 @@ func run_all() -> Dictionary:
 	test_start_run_with_cleopatra()
 	test_act_serialization()
 	test_act_transition()
+	test_act_difficulty()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -223,4 +224,19 @@ func test_act_transition() -> void:
 	_assert(gm.current_node_id == -1, "node_id reset")
 	_assert(gm.run_map.size() == 28, "Act 2 map generated (28 nodes)")
 	_assert(gm.available_node_ids == [0, 1, 2], "available nodes reset")
+	passed += 1
+
+func test_act_difficulty() -> void:
+	print("[TestGameManager] test_act_difficulty")
+	var gm := _make_gm()
+
+	var enemies_act1 := gm._make_normal_enemies()
+	gm._apply_act_difficulty(enemies_act1, 1)
+	var hp1: int = enemies_act1[0].max_hp
+
+	var enemies_act2 := gm._make_normal_enemies()
+	gm._apply_act_difficulty(enemies_act2, 2)
+	var hp2: int = enemies_act2[0].max_hp
+
+	_assert(hp2 > hp1, "Act 2 enemy HP > Act 1 HP (multiplier 1.3)")
 	passed += 1
