@@ -123,11 +123,17 @@ COST_NEXT 카드 효과 구현 완료. 매혹(Charm) 시스템 개선 완료 (�
 - 전체 수치 스케일: **영웅 HP 1000** 기준 (기존 HP 60 → 전면 재설정)
 - 공격 베이스 100~150 / 방어 베이스 80~130 / 적 공격 80~300
 
+**확정된 설계 변경 사항 (v2 추가):**
+- **영웅당 카드 풀 40장**으로 확장 (15장은 최소 테스트용)
+- 1-1 카드 풀 목표: 각 영웅 **아키타입 3개 × 13~14장** 완성
+- 등급 분포(40장): COMMON 10 / UNCOMMON 12 / RARE 12 / LEGENDARY 4 / DIVINE 2
+
 **진행 순서:**
-- ✅ 카드 프레임워크 기획 (`docs/game_design/cards_framework_v1.md`)
-- ✅ 영웅별 카드 15장 기획 (`docs/game_design/cards_napoleon/cleopatra/yi_sun_sin_v1.md`)
+- ✅ 카드 프레임워크 기획 (`docs/game_design/cards_framework_v1.md`) + 40장 기준 업데이트
+- ✅ 영웅별 카드 15장 기획 v1 (`docs/game_design/cards_{hero}_v1.md`)
 - ✅ 몬스터 10종 + 인카운터 기획 (`docs/game_design/enemies_act1_v1.md`)
-- 🔲 기획 문서 사용자 리뷰 + 수정 (이순신 LEGENDARY/DIVINE 분포 조정 필요)
+- ✅ **영웅별 카드 40장 기획 v2** (`docs/game_design/cards_{hero}_v2.md`) — 각 아키타입 12~14장
+- 🔲 기획 문서 사용자 리뷰 + 수정
 - 🔲 기획 확정 후 구현 플랜 별도 생성 (CardResource 스키마 변경, 수치 재설정 포함)
 
 ### 1-8. 알려진 버그 수정
