@@ -497,8 +497,14 @@ func _refresh_hand() -> void:
 func _on_card_pressed(_card: Resource) -> void:
 	pass  # 드래그 앤 드롭 방식으로만 카드 사용 가능
 
-func _on_enemy_pressed(_index: int) -> void:
-	pass  # 드래그 앤 드롭 방식으로만 타겟 지정 가능
+func _on_enemy_pressed(index: int) -> void:
+	if _debug_hp_target_mode and OS.is_debug_build():
+		_debug_hp_target_mode = false
+		_open_enemy_hp_dialog(index)
+		return
+
+func _open_enemy_hp_dialog(_index: int) -> void:
+	pass
 
 func _on_end_turn_pressed() -> void:
 	_selected_card = null
@@ -788,6 +794,58 @@ func _refresh_debug_badge() -> void:
 		_debug_badge.text = "[DEBUG: " + ", ".join(parts) + "]"
 		_debug_badge.visible = true
 
+func _rarity_name(r: int) -> String:
+	match r:
+		0: return "C"
+		1: return "UC"
+		2: return "R"
+		3: return "L"
+		4: return "D"
+		_: return "?"
+
+func _collect_party_card_pools() -> Array:
+	var results: Array = []
+	for hero in TeamManager.heroes:
+		var path := "res://resources/cards/cards_%s.gd" % hero.hero_id
+		if not ResourceLoader.exists(path):
+			continue
+		var script = load(path)
+		if script == null or not script.has_method("pool"):
+			continue
+		for card in script.pool():
+			var label := "[%s] %s (코%d, %s)" % [hero.hero_id, card.card_name, card.cost, _rarity_name(card.rarity)]
+			results.append([label, card])
+	return results
+
+func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, on_confirm: Callable) -> void:
+	var dlg := AcceptDialog.new()
+	dlg.title = title
+	dlg.get_ok_button().text = confirm_text
+	dlg.add_cancel_button("닫기")
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(560, 480)
+	var vbox := VBoxContainer.new()
+	scroll.add_child(vbox)
+	var checks: Array = []
+	for opt in options:
+		var cb := CheckBox.new()
+		cb.text = opt[0]
+		cb.set_meta("payload", opt[1])
+		vbox.add_child(cb)
+		checks.append(cb)
+	dlg.add_child(scroll)
+	dlg.confirmed.connect(func():
+		var picked: Array = []
+		for c in checks:
+			if c.button_pressed:
+				picked.append(c.get_meta("payload"))
+		on_confirm.call(picked)
+		dlg.queue_free()
+	)
+	dlg.canceled.connect(func(): dlg.queue_free())
+	add_child(dlg)
+	dlg.popup_centered()
+
 func _refresh_synergy_hud() -> void:
 	if _synergy_lbl == null:
 		return
@@ -827,6 +885,47 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_refresh_debug_badge()
 		elif event.keycode == KEY_D and event.shift_pressed:
 			DeckManager.draw_cards(1)
+		elif event.keycode == KEY_A and event.shift_pressed:
+			var opts := _collect_party_card_pools()
+			_make_checkbox_dialog("카드 추가", opts, "덱 추가", func(picked: Array):
+				for card in picked:
+					DeckManager.add_card_to_deck(card.duplicate(true))
+				if picked.size() > 0:
+					_message_label.text = "디버그: %d장 추가" % picked.size()
+			)
+		elif event.keycode == KEY_R and event.shift_pressed:
+			var opts: Array = []
+			for card in DeckManager.get_full_deck():
+				var suffix := " +%d" % card.upgrade_level if card.upgrade_level > 0 else ""
+				opts.append(["%s%s (코%d)" % [card.card_name, suffix, card.cost], card])
+			_make_checkbox_dialog("덱 편집 — 제거할 카드", opts, "제거", func(picked: Array):
+				for card in picked:
+					if not DeckManager.remove_from_deck(card):
+						DeckManager.hand.erase(card)
+				DeckManager.hand_changed.emit()
+				if picked.size() > 0:
+					_message_label.text = "디버그: %d장 제거" % picked.size()
+			)
+		elif event.keycode == KEY_U and event.shift_pressed:
+			var opts: Array = []
+			for card in DeckManager.get_full_deck():
+				if not card.can_upgrade():
+					continue
+				var suffix := " +%d → +%d" % [card.upgrade_level, card.upgrade_level + 1]
+				opts.append(["%s%s (코%d)" % [card.card_name, suffix, card.cost], card])
+			_make_checkbox_dialog("카드 강화", opts, "강화", func(picked: Array):
+				for card in picked:
+					GameManager.upgrade_card(card)
+				DeckManager.hand_changed.emit()
+				if picked.size() > 0:
+					_message_label.text = "디버그: %d장 강화" % picked.size()
+			)
+		elif event.keycode == KEY_H and event.shift_pressed:
+			_debug_hp_target_mode = not _debug_hp_target_mode
+			if _debug_hp_target_mode:
+				_message_label.text = "[DEBUG] 적을 클릭해 HP를 설정하세요 (다시 Shift+H 취소)"
+			else:
+				_message_label.text = ""
 
 func _card_target_type(card: Resource) -> String:
 	# "enemy" / "ally" / "none"
