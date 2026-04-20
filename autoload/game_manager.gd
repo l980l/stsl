@@ -277,8 +277,12 @@ func complete_card_upgrade() -> void:
 
 func complete_hero_recruit(hero_id: String) -> void:
 	pending_boss_recruit = false
-	var hero: Resource = _make_hero_by_id(hero_id)
 	var tm := _get_tm()
+	if tm:
+		for h in tm.heroes:
+			if h.hero_id == hero_id:
+				return
+	var hero: Resource = _make_hero_by_id(hero_id)
 	if tm:
 		tm.add_hero(hero)
 	_add_initial_deck_for(hero)

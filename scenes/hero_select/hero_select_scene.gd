@@ -30,7 +30,7 @@ func _build_ui() -> void:
 
 	var owned_ids: Array = []
 	if is_recruit:
-		var tm = Engine.get_singleton("TeamManager") if Engine.has_singleton("TeamManager") else null
+		var tm = get_node_or_null("/root/TeamManager")
 		if tm:
 			for h in tm.heroes:
 				owned_ids.append(h.hero_id)
