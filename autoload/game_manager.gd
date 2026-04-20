@@ -137,15 +137,15 @@ func _make_hero_by_id(hero_id: String) -> Resource:
 	match hero_id:
 		"napoleon":
 			hero.hero_name = "나폴레옹"
-			hero.max_hp = 70
+			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
 		"cleopatra":
 			hero.hero_name = "클레오파트라"
-			hero.max_hp = 60
+			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
 		"yi_sun_sin":
 			hero.hero_name = "이순신"
-			hero.max_hp = 75
+			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
 	return hero
 
@@ -469,7 +469,7 @@ func _make_cleopatra_hero() -> Resource:
 	var hero: Resource = HeroRes.new()
 	hero.hero_id = "cleopatra"
 	hero.hero_name = "클레오파트라"
-	hero.max_hp = 60
+	hero.max_hp = 1000
 	hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
 	return hero
 
@@ -478,7 +478,7 @@ func _make_yi_sun_sin_hero() -> Resource:
 	var hero: Resource = HeroRes.new()
 	hero.hero_id = "yi_sun_sin"
 	hero.hero_name = "이순신"
-	hero.max_hp = 75
+	hero.max_hp = 1000
 	hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
 	return hero
 
