@@ -41,7 +41,7 @@ func test_card_resource_defaults() -> void:
 	print("[TestResources] test_card_resource_defaults")
 	var card = CardResource.new()
 	_assert(card.cost == 1, "기본 cost == 1")
-	_assert(card.upgraded == false, "기본 upgraded == false")
+	_assert(card.upgrade_level == 0, "기본 upgrade_level == 0")
 	_assert(card.card_type == CardResource.CardType.ATTACK, "기본 타입 ATTACK")
 	_assert(card.effects.size() == 0, "기본 effects 비어있음")
 	_assert(card.owner_id == "", "기본 owner_id 비어있음")

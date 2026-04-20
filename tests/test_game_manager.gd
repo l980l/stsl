@@ -19,7 +19,7 @@ func run_all() -> Dictionary:
 	test_elite_battle_gives_two_card_picks()
 	test_complete_rest_returns_to_map()
 	test_upgrade_card_damage()
-	test_upgrade_card_reduces_cost()
+	test_upgrade_card_rare_block()
 	test_upgrade_card_no_op_if_already_upgraded()
 	test_enter_card_upgrade_sets_state()
 	test_boss_card_pick_goes_to_upgrade()
@@ -128,29 +128,31 @@ func test_upgrade_card_damage() -> void:
 	var EffRes = load("res://resources/effect_resource.gd")
 	var card: Resource = CardRes.new()
 	card.cost = 1
+	card.rarity = CardRes.Rarity.UNCOMMON  # rate=0.10, max_upgrade_level=1
 	var eff: Resource = EffRes.new()
 	eff.effect_type = EffRes.EffectType.DAMAGE
-	eff.value = 6
+	eff.base_value = 10
+	eff.value = 10
 	card.effects = [eff]
 	gm.upgrade_card(card)
-	_assert(card.upgraded == true, "업그레이드 후 upgraded = true")
-	_assert(eff.value == 9, "데미지 +3 → 9")
-	_assert(card.cost == 1, "비용 1 카드는 비용 변경 없음")
+	_assert(card.upgrade_level == 1, "업그레이드 후 upgrade_level == 1")
+	_assert(eff.value == 11, "UNCOMMON DAMAGE: int(10 * 1.10) == 11")
 
-func test_upgrade_card_reduces_cost() -> void:
-	print("[TestGameManager] test_upgrade_card_reduces_cost")
+func test_upgrade_card_rare_block() -> void:
+	print("[TestGameManager] test_upgrade_card_rare_block")
 	var gm := _make_gm()
 	var CardRes = load("res://resources/card_resource.gd")
 	var EffRes = load("res://resources/effect_resource.gd")
 	var card: Resource = CardRes.new()
-	card.cost = 2
+	card.rarity = CardRes.Rarity.RARE  # rate=0.12, max_upgrade_level=1
 	var eff: Resource = EffRes.new()
 	eff.effect_type = EffRes.EffectType.BLOCK
-	eff.value = 5
+	eff.base_value = 10
+	eff.value = 10
 	card.effects = [eff]
 	gm.upgrade_card(card)
-	_assert(card.cost == 1, "비용 2 카드 강화 시 비용 1로 감소")
-	_assert(eff.value == 8, "블록 +3 → 8")
+	_assert(card.upgrade_level == 1, "업그레이드 후 upgrade_level == 1")
+	_assert(eff.value == 11, "RARE BLOCK: int(10 * 1.12) == 11")
 
 func test_upgrade_card_no_op_if_already_upgraded() -> void:
 	print("[TestGameManager] test_upgrade_card_no_op_if_already_upgraded")
@@ -158,14 +160,16 @@ func test_upgrade_card_no_op_if_already_upgraded() -> void:
 	var CardRes = load("res://resources/card_resource.gd")
 	var EffRes = load("res://resources/effect_resource.gd")
 	var card: Resource = CardRes.new()
-	card.cost = 1
-	card.upgraded = true
+	card.rarity = CardRes.Rarity.UNCOMMON  # max_upgrade_level=1
+	card.upgrade_level = 1  # 이미 최대 강화
 	var eff: Resource = EffRes.new()
 	eff.effect_type = EffRes.EffectType.DAMAGE
-	eff.value = 6
+	eff.base_value = 10
+	eff.value = 11
 	card.effects = [eff]
 	gm.upgrade_card(card)
-	_assert(eff.value == 6, "이미 강화된 카드는 수치 변경 없음")
+	_assert(card.upgrade_level == 1, "최대 강화 카드는 upgrade_level 변경 없음")
+	_assert(eff.value == 11, "최대 강화 카드는 수치 변경 없음")
 
 func test_enter_card_upgrade_sets_state() -> void:
 	print("[TestGameManager] test_enter_card_upgrade_sets_state")

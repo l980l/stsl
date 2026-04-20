@@ -105,7 +105,7 @@ func to_dict() -> Dictionary:
 			"owner_id": card.owner_id,
 			"cost": card.cost,
 			"play_animation": card.play_animation,
-			"upgraded": card.get("upgraded") if card.get("upgraded") != null else false,
+			"upgrade_level": card.upgrade_level,
 			"effects": effects_data,
 		})
 	return {"base_draw_count": base_draw_count, "full_deck": card_data}
@@ -121,7 +121,7 @@ func from_dict(data: Dictionary) -> void:
 		card.owner_id = cd["owner_id"]
 		card.cost = cd["cost"]
 		card.play_animation = cd.get("play_animation", "idle")
-		card.upgraded = cd.get("upgraded", false)
+		card.upgrade_level = cd.get("upgrade_level", 0)
 		var effects := []
 		for ed in cd.get("effects", []):
 			var eff: Resource = EffRes.new()

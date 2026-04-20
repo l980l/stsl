@@ -307,31 +307,50 @@ func _end_run_won() -> void:
 	_request_scene("res://scenes/game_over/game_over_scene.tscn")
 
 func upgrade_card(card: Resource) -> void:
-	if card.upgraded:
+	if not card.can_upgrade():
 		return
+	card.upgrade_level += 1
+	var level: int = card.upgrade_level
+	var CardRes = load("res://resources/card_resource.gd")
 	var EffRes = load("res://resources/effect_resource.gd")
+
+	var rate: float = 0.0
+	match card.rarity:
+		CardRes.Rarity.UNCOMMON:   rate = 0.10
+		CardRes.Rarity.RARE:       rate = 0.12
+		CardRes.Rarity.LEGENDARY:  rate = 0.14
+		CardRes.Rarity.DIVINE:     rate = 0.16
+
+	var PERCENT_TYPES = [
+		EffRes.EffectType.DAMAGE,
+		EffRes.EffectType.BLOCK,
+		EffRes.EffectType.HEAL,
+		EffRes.EffectType.BLOCK_ALL,
+		EffRes.EffectType.HEAL_ALL,
+		EffRes.EffectType.FORMATION_BLOCK,
+		EffRes.EffectType.COUNTER_BLOCK,
+		EffRes.EffectType.POISON_BURST,
+		EffRes.EffectType.CONSUME_MORALE,
+		EffRes.EffectType.CONDITIONAL_DMG,
+	]
+
+	var INT_TYPES = [
+		EffRes.EffectType.DRAW,
+		EffRes.EffectType.ENERGY,
+		EffRes.EffectType.GAIN_MORALE,
+		EffRes.EffectType.APPLY_STATUS,
+		EffRes.EffectType.CHARM,
+		EffRes.EffectType.COST_NEXT,
+		EffRes.EffectType.SUMMON_TOKEN,
+	]
+
 	for effect in card.effects:
-		match effect.effect_type:
-			EffRes.EffectType.DAMAGE, EffRes.EffectType.CONDITIONAL_DMG:
-				effect.value += 3
-				effect.bonus_value += 3
-			EffRes.EffectType.BLOCK, EffRes.EffectType.BLOCK_ALL, \
-			EffRes.EffectType.FORMATION_BLOCK, EffRes.EffectType.COUNTER_BLOCK:
-				effect.value += 3
-			EffRes.EffectType.HEAL, EffRes.EffectType.HEAL_ALL:
-				effect.value += 3
-			EffRes.EffectType.DRAW:
-				effect.value += 1
-			EffRes.EffectType.GAIN_MORALE:
-				effect.value += 1
-			EffRes.EffectType.CONSUME_MORALE:
-				effect.value += 1
-				effect.bonus_value += 5
-			EffRes.EffectType.ENERGY:
-				effect.value += 1
-	if card.cost >= 2:
-		card.cost -= 1
-	card.upgraded = true
+		if effect.effect_type in PERCENT_TYPES:
+			effect.value = int(effect.base_value * (1.0 + rate * level))
+			effect.bonus_value = int(effect.base_bonus_value * (1.0 + rate * level))
+		elif effect.effect_type in INT_TYPES:
+			effect.value = effect.base_value + level
+			effect.bonus_value = effect.base_bonus_value + level if effect.base_bonus_value > 0 else 0
 
 func generate_shop_inventory() -> Dictionary:
 	var tm := _get_tm()
