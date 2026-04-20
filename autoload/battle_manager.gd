@@ -283,6 +283,15 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 	if status_type == "poison":
 		_enemy_status[enemy_index]["poison_dmg"] = _enemy_status[enemy_index].get("poison_dmg", 0) + stacks
 		_enemy_status[enemy_index]["poison_dur"] = 3
+	elif status_type == "charm":
+		var new_charm: int = _enemy_status[enemy_index].get("charm", 0) + stacks
+		if new_charm >= 3:
+			_enemy_status[enemy_index]["charm"] = 0
+			_enemy_status[enemy_index]["enthrall"] = _enemy_status[enemy_index].get("enthrall", 0) + 1
+			status_applied.emit("enemy_%d" % enemy_index, "enthrall", 1)
+			return
+		else:
+			_enemy_status[enemy_index]["charm"] = new_charm
 	else:
 		_enemy_status[enemy_index][status_type] = _enemy_status[enemy_index].get(status_type, 0) + stacks
 	status_applied.emit("enemy_%d" % enemy_index, status_type, stacks)
