@@ -66,54 +66,10 @@ func _apply_upgrade(card: Resource, level: int) -> Resource:
 				effect.bonus_value = effect.base_bonus_value + (i + 1) if effect.base_bonus_value > 0 else 0
 	return c
 
-# ─────────────────────────────────────────
-# 효과 포매터 (battle_scene.gd:_card_effect_text 동기화)
-# ─────────────────────────────────────────
-
-func _format_effect(effect: Resource) -> String:
-	match effect.effect_type:
-		EffRes.EffectType.DAMAGE:
-			var suffix: String = " ALL" if effect.target == "ALL" else ""
-			return "DMG %d%s" % [effect.value, suffix]
-		EffRes.EffectType.BLOCK:
-			var suffix: String = " ALL" if effect.target == "ALL" else ""
-			return "BLOCK %d%s" % [effect.value, suffix]
-		EffRes.EffectType.BLOCK_ALL:
-			return "BLOCK ALL %d" % effect.value
-		EffRes.EffectType.HEAL:
-			return "HEAL %d" % effect.value
-		EffRes.EffectType.HEAL_ALL:
-			return "HEAL ALL %d" % effect.value
-		EffRes.EffectType.DRAW:
-			return "DRAW %d" % effect.value
-		EffRes.EffectType.ENERGY:
-			return "ENERGY +%d" % effect.value
-		EffRes.EffectType.APPLY_STATUS:
-			return "%s %d" % [effect.status_type.to_upper(), effect.value]
-		EffRes.EffectType.CHARM:
-			return "CHARM %d" % effect.value
-		EffRes.EffectType.GAIN_MORALE:
-			return "MORALE +%d" % effect.value
-		EffRes.EffectType.CONSUME_MORALE:
-			return "소모사기 %d → DMG %d" % [effect.value, effect.bonus_value]
-		EffRes.EffectType.POISON_BURST:
-			return "POISON BURST"
-		EffRes.EffectType.COUNTER_BLOCK:
-			return "방어도×%d%% DMG" % effect.value
-		EffRes.EffectType.FORMATION_BLOCK:
-			return "생존영웅×BLOCK %d" % effect.value
-		EffRes.EffectType.COST_NEXT:
-			return "다음카드 비용 -%d" % effect.value
-		EffRes.EffectType.CONDITIONAL_DMG:
-			return "DMG %d(조건:%d)[%s]" % [effect.bonus_value, effect.value, effect.status_type]
-		EffRes.EffectType.SUMMON_TOKEN:
-			return "소환 ×%d" % effect.value
-	return "?"
-
 func _format_effects(card: Resource) -> String:
 	var parts: Array = []
 	for e in card.effects:
-		parts.append(_format_effect(e))
+		parts.append(e.display_text())
 	return " + ".join(parts)
 
 # ─────────────────────────────────────────

@@ -148,7 +148,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + effect.value
 			EffectRes.EffectType.APPLY_STATUS:
 				if effect.status_type == "poison_per_turn":
-					_active_powers["poison_per_turn"] = { "owner": card.owner_id, "value": effect.value, "turns_remaining": 2 }
+					var _existing: Dictionary = _active_powers.get("poison_per_turn", {})
+					var _cur_turns: int = _existing.get("turns_remaining", 0)
+					_active_powers["poison_per_turn"] = { "owner": card.owner_id, "value": effect.value, "turns_remaining": _cur_turns + 2 }
 					active_powers_changed.emit()
 				elif effect.target == "ALL":
 					for i in range(_enemies.size()):
@@ -400,6 +402,9 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 	match intent.action_type:
 		IntentRes.ActionType.ATTACK:
 			var dmg: int = intent.value
+			var strength: int = _enemy_status[enemy_index].get("strength", 0)
+			if strength > 0:
+				dmg = int(dmg * (1.0 + 0.1 * strength))
 			if _enemy_status[enemy_index].get("weak", 0) > 0:
 				dmg = int(dmg * 0.75)
 			if intent.target == IntentRes.TargetType.ALL:
@@ -411,7 +416,10 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				if target_id != "":
 					_deal_damage_to_hero(target_id, dmg)
 		IntentRes.ActionType.BUFF:
-			_enemy_block[enemy_index] += intent.value
+			if intent.status_type != "":
+				_apply_status_to_enemy(enemy_index, intent.status_type, intent.value)
+			else:
+				_enemy_block[enemy_index] += intent.value
 		IntentRes.ActionType.DEBUFF:
 			var stype: String = intent.status_type
 			if intent.target == IntentRes.TargetType.ALL:
@@ -432,6 +440,8 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 					var idx: int = randi() % full.size()
 					deck_mgr.remove_from_deck(full[idx])
 					full.remove_at(idx)
+		IntentRes.ActionType.PREPARE:
+			pass  # 준비 턴 — 아무 효과 없음
 
 func _pick_hero_target(target_type: int, enemy_index: int) -> String:
 	if team_mgr == null:

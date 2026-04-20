@@ -23,6 +23,7 @@ TeamManager="*res://autoload/team_manager.gd"
 DeckManager="*res://autoload/deck_manager.gd"
 BattleManager="*res://autoload/battle_manager.gd"
 SaveManager="*res://autoload/save_manager.gd"
+DebugManager="*res://autoload/debug_manager.gd"
 
 [display]
 
