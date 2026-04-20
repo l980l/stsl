@@ -72,7 +72,7 @@ func _build_debug_tooltip() -> void:
 	lbl.add_theme_font_size_override("font_size", 13)
 	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
 	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-	lbl.tooltip_text = "[Shift+Q]  전투 즉시 승리\n           (이후 클릭 한 번 더 필요)"
+	lbl.tooltip_text = "[Shift+Q]  전투 즉시 승리"
 	add_child(lbl)
 
 # ─────────────────────────────────────────────
