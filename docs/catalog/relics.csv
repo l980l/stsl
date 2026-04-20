@@ -1,4 +1,4 @@
-이름,설명,트리거,효과,값,bonus_value,전용_영웅,저주,penalty_트리거,penalty_효과,penalty_값
+﻿이름,설명,트리거,효과,값,bonus_value,전용_영웅,저주,penalty_트리거,penalty_효과,penalty_값
 버닝 블러드,전투 승리 시 팀 전체 HP +6,BATTLE_WIN,HEAL,6,0,,,,,
 불사조 깃털,플레이어 턴 시작 시 에너지 +1,TURN_START,ENERGY,1,0,,,,,
 독약 병,전투 시작 시 무작위 적에게 독 3,BATTLE_START,STATUS_ENEMY,3,0,,,,,

@@ -1,4 +1,4 @@
-영웅,이름,코스트,타입,희귀도,최대강화,효과_0강,효과_1강,효과_2강
+﻿영웅,이름,코스트,타입,희귀도,최대강화,효과_0강,효과_1강,효과_2강
 napoleon,신속 기동,1,ATTACK,COMMON,0,DMG 100 + MORALE +1,,
 napoleon,전열 재편,0,SKILL,COMMON,0,DRAW 1,,
 napoleon,경기병 돌격,1,ATTACK,UNCOMMON,1,DMG 120 + MORALE +1,DMG 132 + MORALE +2,

@@ -1,4 +1,4 @@
-Act,분류,이름,HP,페이즈,턴,액션,값,타겟,상태,조건
+﻿Act,분류,이름,HP,페이즈,턴,액션,값,타겟,상태,조건
 1,normal,사티로스,350,0,1,ATK,80,RANDOM,weak,
 1,normal,사티로스,350,0,2,ATK,80,RANDOM,weak,
 1,normal,하르피아,280,0,1,ATK,45,RANDOM,weak,

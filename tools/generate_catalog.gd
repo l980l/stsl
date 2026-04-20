@@ -212,7 +212,16 @@ func _write_csv(rel_path: String, rows: Array) -> void:
 				s = "\"" + s.replace("\"", "\"\"") + "\""
 			cells.append(s)
 		lines.append(",".join(cells))
-	_write_text(rel_path, "\n".join(lines) + "\n")
+	var abs_path: String = ProjectSettings.globalize_path(OUT_DIR + rel_path)
+	var f := FileAccess.open(abs_path, FileAccess.WRITE)
+	if f:
+		# UTF-8 BOM — 엑셀에서 한글 깨짐 방지
+		f.store_8(0xEF); f.store_8(0xBB); f.store_8(0xBF)
+		f.store_string("\n".join(lines) + "\n")
+		f.close()
+		print("  → ", abs_path)
+	else:
+		printerr("파일 쓰기 실패: ", abs_path)
 
 # ─────────────────────────────────────────
 # 카드 도감
