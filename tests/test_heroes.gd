@@ -88,7 +88,7 @@ func test_cleopatra_card_pool_size() -> void:
 func test_yi_sun_sin_card_pool_size() -> void:
 	print("[TestHeroes] test_yi_sun_sin_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._yi_sun_sin_card_pool().size() == 14, "이순신 카드 풀 14장")
+	_assert(gm._yi_sun_sin_card_pool().size() == 40, "이순신 카드 풀 40장")
 
 # ──────────────────────────────────────────────
 # BattleManager 신규 효과 테스트
