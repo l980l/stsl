@@ -6,8 +6,10 @@ const _NapoleonCards  = preload("res://resources/cards/cards_napoleon.gd")
 const _CleopatraCards = preload("res://resources/cards/cards_cleopatra.gd")
 const _YiSunSinCards  = preload("res://resources/cards/cards_yi_sun_sin.gd")
 const _EnemiesAct1    = preload("res://resources/enemies/enemies_act1.gd")
+const _EnemiesAct2    = preload("res://resources/enemies/enemies_act2.gd")
 const _RelicData      = preload("res://resources/relics/relics.gd")
 const _EventsAct1     = preload("res://resources/events/events_act1.gd")
+const _EventsAct2     = preload("res://resources/events/events_act2.gd")
 
 enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGRADE, HERO_RECRUIT }
 
@@ -390,6 +392,14 @@ func _satyr_scene() -> PackedScene:
 
 func _make_normal_enemies() -> Array:
 	var scene := _satyr_scene()
+	if current_act == 2:
+		match randi() % 6:
+			0: return [_EnemiesAct2.sand_scout(scene)]
+			1: return [_EnemiesAct2.desert_scorpion(scene)]
+			2: return [_EnemiesAct2.mummy_warrior(scene)]
+			3: return [_EnemiesAct2.sphinx_cub(scene)]
+			4: return [_EnemiesAct2.sand_ifrit(scene)]
+			_: return [_EnemiesAct2.ka_spirit(scene)]
 	match randi() % 6:
 		0: return [_EnemiesAct1.satyr(scene)]
 		1: return [_EnemiesAct1.harpy(scene)]
@@ -432,6 +442,11 @@ func _make_enemies_for_node(node: Resource) -> Array:
 
 func _make_elite_enemies() -> Array:
 	var scene := _satyr_scene()
+	if current_act == 2:
+		match randi() % 3:
+			0: return [_EnemiesAct2.apep_snake(scene)]
+			1: return [_EnemiesAct2.seth_hound(scene)]
+			_: return [_EnemiesAct2.ba_bird(scene)]
 	match randi() % 4:
 		0: return [_EnemiesAct1.minotaur(scene)]
 		1: return [_EnemiesAct1.medusa(scene)]
@@ -439,6 +454,8 @@ func _make_elite_enemies() -> Array:
 		_: return [_EnemiesAct1.scylla(scene)]
 
 func _make_boss_enemies() -> Array:
+	if current_act == 2:
+		return [_EnemiesAct2.osiris(_satyr_scene())]
 	return [_EnemiesAct1.hydra(_satyr_scene())]
 
 func _generate_card_rewards() -> Array:
@@ -512,6 +529,8 @@ func _get_random_event() -> Resource:
 	return pool[randi() % pool.size()]
 
 func _build_event_pool() -> Array:
+	if current_act == 2:
+		return _EventsAct2.build_pool()
 	return _EventsAct1.build_pool()
 
 func to_dict() -> Dictionary:

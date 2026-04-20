@@ -30,6 +30,7 @@ func run_all() -> Dictionary:
 	test_relic_pool_has_new_relics()
 	test_cursed_relics_in_pool()
 	test_hero_relics_second_set()
+	test_act2_relics_exist()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -49,7 +50,8 @@ func _build_pool() -> Array:
 		"황제의 인장", "독사의 팔찌", "거북선 모형",
 		"포병 나팔", "난중일기", "파라오의 인장",
 		"악마의 계약", "저주받은 왕관", "피의 서약",
-		"전술가의 지도", "강철 의지", "고대의 방패"
+		"전술가의 지도", "강철 의지", "고대의 방패",
+		"앙크의 생명", "호루스의 눈", "스카라베 부적"
 	]
 	for n in names:
 		var r := RelicRes.new()
@@ -81,7 +83,7 @@ func _make_enemy(hp: int) -> Resource:
 func test_relic_pool_size() -> void:
 	print("[TestRelics] test_relic_pool_size")
 	var pool := _build_pool()
-	_assert(pool.size() == 19, "릴릭 풀 19종")
+	_assert(pool.size() == 22, "릴릭 풀 22종")
 
 func test_trigger_type_values() -> void:
 	print("[TestRelics] test_trigger_type_values")
@@ -220,3 +222,20 @@ func test_hero_relics_second_set() -> void:
 				found = true
 				break
 		_assert(found, "2번째 전용 렐릭 존재: %s" % name)
+
+func test_act2_relics_exist() -> void:
+	print("[TestRelics] test_act2_relics_exist")
+	var act2_names := ["앙크의 생명", "호루스의 눈", "스카라베 부적"]
+	var RelicsGd = load("res://resources/relics/relics.gd")
+	var pool: Array = RelicsGd.build_pool()
+	for name in act2_names:
+		var found := false
+		for r in pool:
+			if r.relic_name == name:
+				found = true
+				break
+		_assert(found, "Act2 렐릭 존재: %s" % name)
+	var eye := null
+	for r in pool:
+		if r.relic_name == "호루스의 눈": eye = r
+	_assert(eye != null and eye.owner_hero_id == "cleopatra", "호루스의 눈 — 클레오파트라 전용")
