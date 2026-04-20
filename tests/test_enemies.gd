@@ -18,6 +18,7 @@ func run_all() -> Dictionary:
 	test_elite_enemy_hp()
 	test_minotaur_pattern()
 	test_medusa_pattern_and_status_type()
+	test_scylla_pattern()
 	test_hydra_phase_count()
 	test_phase_transition()
 	test_phase2_transition()
@@ -96,6 +97,18 @@ func test_medusa_pattern_and_status_type() -> void:
 	_assert(med.intent_pattern[1].status_type == "weak", "메두사 2번째 = weak")
 	_assert(med.intent_pattern[2].status_type == "vulnerable", "메두사 3번째 = vulnerable")
 	_assert(med.max_hp == 1700, "메두사 HP = 1700")
+
+func test_scylla_pattern() -> void:
+	print("[TestEnemies] test_scylla_pattern")
+	var gm := _make_gm()
+	var s: Resource = EnemiesAct1.scylla(gm._satyr_scene())
+	_assert(s.enemy_name == "스킬라", "스킬라 이름")
+	_assert(s.max_hp == 1900, "스킬라 HP = 1900")
+	_assert(s.phase_thresholds.size() == 1, "스킬라 페이즈 임계값 1개")
+	_assert(s.phase_patterns.size() == 2, "스킬라 페이즈 패턴 2개")
+	_assert(s.phase_patterns[0].size() == 7, "스킬라 페이즈 0 패턴 7개")
+	_assert(s.phase_patterns[1].size() == 3, "스킬라 페이즈 1 패턴 3개")
+	_assert(s.phase_patterns[1][1].status_type == "poison", "스킬라 페이즈 1 독 DEBUFF")
 
 func _make_hydra() -> Array:
 	# game_manager._make_boss_enemies()와 동일 로직 — Autoload 없이 테스트용

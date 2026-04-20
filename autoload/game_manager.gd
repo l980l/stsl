@@ -432,10 +432,11 @@ func _make_enemies_for_node(node: Resource) -> Array:
 
 func _make_elite_enemies() -> Array:
 	var scene := _satyr_scene()
-	match randi() % 3:
+	match randi() % 4:
 		0: return [_EnemiesAct1.minotaur(scene)]
 		1: return [_EnemiesAct1.medusa(scene)]
-		_: return [_EnemiesAct1.gorgon(scene)]
+		2: return [_EnemiesAct1.gorgon(scene)]
+		_: return [_EnemiesAct1.scylla(scene)]
 
 func _make_boss_enemies() -> Array:
 	return [_EnemiesAct1.hydra(_satyr_scene())]

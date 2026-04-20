@@ -153,6 +153,38 @@ static func gorgon(scene: PackedScene) -> Resource:
 	e.intent_pattern = e.phase_patterns[0]
 	return e
 
+static func scylla(scene: PackedScene) -> Resource:
+	var e := EnemyRes.new()
+	e.enemy_name = "스킬라"; e.max_hp = 1900; e.character_scene = scene
+	e.phase_thresholds = [0.5]
+	# 페이즈 0 (머리 2개, 4턴 순환): ATK×2 / DEBUFF poison 3 + ATK / ATK×2 / ATK ALL
+	var p0i1 := IntentRes.new()
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 100; p0i1.target = IntentRes.TargetType.RANDOM
+	var p0i2 := IntentRes.new()
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 100; p0i2.target = IntentRes.TargetType.RANDOM
+	var p0i3 := IntentRes.new()
+	p0i3.action_type = IntentRes.ActionType.DEBUFF; p0i3.value = 3; p0i3.status_type = "poison"
+	p0i3.target = IntentRes.TargetType.RANDOM
+	var p0i4 := IntentRes.new()
+	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 80; p0i4.target = IntentRes.TargetType.RANDOM
+	var p0i5 := IntentRes.new()
+	p0i5.action_type = IntentRes.ActionType.ATTACK; p0i5.value = 100; p0i5.target = IntentRes.TargetType.RANDOM
+	var p0i6 := IntentRes.new()
+	p0i6.action_type = IntentRes.ActionType.ATTACK; p0i6.value = 100; p0i6.target = IntentRes.TargetType.RANDOM
+	var p0i7 := IntentRes.new()
+	p0i7.action_type = IntentRes.ActionType.ATTACK; p0i7.value = 120; p0i7.target = IntentRes.TargetType.ALL
+	# 페이즈 1 (머리 1개 잔존, 3턴 순환): ATK 160 / DEBUFF poison 5 ALL / ATK 160
+	var p1i1 := IntentRes.new()
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 160; p1i1.target = IntentRes.TargetType.RANDOM
+	var p1i2 := IntentRes.new()
+	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 5; p1i2.status_type = "poison"
+	p1i2.target = IntentRes.TargetType.ALL
+	var p1i3 := IntentRes.new()
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 160; p1i3.target = IntentRes.TargetType.RANDOM
+	e.phase_patterns = [[p0i1, p0i2, p0i3, p0i4, p0i5, p0i6, p0i7], [p1i1, p1i2, p1i3]]
+	e.intent_pattern = e.phase_patterns[0]
+	return e
+
 # ──── 보스 ────
 
 static func hydra(scene: PackedScene) -> Resource:
