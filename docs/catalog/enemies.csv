@@ -6,7 +6,7 @@
 1,normal,하르피아,280,0,3,ATK,45,RANDOM,weak,
 1,normal,하르피아,280,0,4,ATK,45,RANDOM,weak,
 1,normal,하르피아,280,0,5,SPECIAL,0,,weak,
-1,normal,사이클롭스,700,0,1,BUFF,0,,weak,준비
+1,normal,사이클롭스,700,0,1,?,0,,weak,준비
 1,normal,사이클롭스,700,0,2,ATK,200,RANDOM,weak,
 1,normal,메두사의 뱀,300,0,1,ATK,60,RANDOM,weak,
 1,normal,메두사의 뱀,300,0,2,DEBUFF,2,RANDOM,vulnerable,

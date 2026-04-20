@@ -59,7 +59,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			var opts: Array = []
 			for card in DeckManager.get_full_deck():
 				var suffix := " +%d" % card.upgrade_level if card.upgrade_level > 0 else ""
-				opts.append(["%s%s (코%d)" % [card.card_name, suffix, card.cost], card])
+				opts.append(["%s%s (코%d)  |  %s" % [card.card_name, suffix, card.cost, _effect_summary(card)], card])
 			_make_checkbox_dialog("덱 편집 — 제거할 카드", opts, "제거", func(picked: Array):
 				for card in picked:
 					if not DeckManager.remove_from_deck(card):
@@ -73,7 +73,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				if not card.can_upgrade():
 					continue
 				var suffix := " +%d → +%d" % [card.upgrade_level, card.upgrade_level + 1]
-				opts.append(["%s%s (코%d)" % [card.card_name, suffix, card.cost], card])
+				opts.append(["%s%s (코%d)  |  %s" % [card.card_name, suffix, card.cost, _effect_summary(card)], card])
 			_make_checkbox_dialog("카드 강화", opts, "강화", func(picked: Array):
 				for card in picked:
 					GameManager.upgrade_card(card)

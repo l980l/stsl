@@ -13,7 +13,7 @@
 **인텐트**: ATK 45 [RANDOM] → ATK 45 [RANDOM] → ATK 45 [RANDOM] → ATK 45 [RANDOM] → SPECIAL
 
 ### 사이클롭스 (HP 700)
-**인텐트**: BUFF(weak) <준비> → ATK 200 [RANDOM]
+**인텐트**: ? <준비> → ATK 200 [RANDOM]
 
 ### 메두사의 뱀 (HP 300)
 **인텐트**: ATK 60 [RANDOM] → DEBUFF 2(vulnerable) [RANDOM]
