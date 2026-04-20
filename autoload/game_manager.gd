@@ -6,7 +6,8 @@ enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGR
 
 var current_state: GameState = GameState.MAP
 var current_floor: int = 0
-var current_chapter: int = 1
+const MAX_ACTS: int = 2
+var current_act: int = 1
 var gold: int = 0
 var relics: Array = []
 var run_won: bool = false
@@ -82,7 +83,7 @@ func has_relic(relic_name: String) -> bool:
 func reset() -> void:
 	current_state = GameState.MAP
 	current_floor = 0
-	current_chapter = 1
+	current_act = 1
 	gold = 0
 	relics.clear()
 	run_map.clear()
@@ -1071,6 +1072,7 @@ func to_dict() -> Dictionary:
 			"visited": node.visited,
 		})
 	return {
+		"current_act": current_act,
 		"current_floor": current_floor,
 		"gold": gold,
 		"current_node_id": current_node_id,
@@ -1079,6 +1081,7 @@ func to_dict() -> Dictionary:
 	}
 
 func from_dict(data: Dictionary) -> void:
+	current_act = data.get("current_act", 1)
 	current_floor = data.get("current_floor", 0)
 	gold = data.get("gold", 0)
 	current_node_id = data.get("current_node_id", -1)
