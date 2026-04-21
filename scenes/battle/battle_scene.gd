@@ -669,7 +669,8 @@ func _spawn_damage_popup(world_pos: Vector2, amount: int, fully_blocked: bool) -
 		lbl.text = str(amount)
 		lbl.modulate = Color(1.0, 0.2, 0.2)
 	lbl.add_theme_font_size_override("font_size", 28)
-	lbl.position = world_pos
+	var offset := Vector2(randf_range(-30.0, 30.0), randf_range(-20.0, 20.0))
+	lbl.position = world_pos + offset
 	lbl.z_index = 20
 	add_child(lbl)
 	var tw := create_tween()
