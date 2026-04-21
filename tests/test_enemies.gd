@@ -48,6 +48,7 @@ func run_all() -> Dictionary:
 	test_norse_encounters_shape()
 	test_norse_act3_boss_name()
 	test_norse_act3_elites()
+	test_relic_pool_count()
 	test_act3_event_pool_shape()
 	return {"passed": passed, "failed": failed}
 
@@ -441,6 +442,13 @@ func test_norse_act3_elites() -> void:
 	for e in elite_enemies:
 		_assert(e.max_hp >= 1800, "HP >= 1800")
 		_assert(e.mythology == "norse", "mythology = norse")
+
+func test_relic_pool_count() -> void:
+	print("[TestEnemies] test_relic_pool_count")
+	var RelicData = load("res://resources/relics/relics.gd")
+	var pool: Array = RelicData.build_pool()
+	assert(pool.size() == 25, "렐릭 풀 25종이어야 함 (기존 22 + Act 3 3종)")
+	_assert(pool.size() == 25, "렐릭 풀 25종 (기존 22 + Act 3 3종)")
 
 func test_act3_event_pool_shape() -> void:
 	print("[TestEnemies] test_act3_event_pool_shape")
