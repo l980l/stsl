@@ -21,11 +21,25 @@ const _RelicData      = preload("res://resources/relics/relics.gd")
 const _EventsAct1     = preload("res://resources/events/events_act1.gd")
 const _EventsAct2     = preload("res://resources/events/events_act2.gd")
 const _EventsAct3     = preload("res://resources/events/events_act3.gd")
+const _KoreanNormals   = preload("res://resources/enemies/korean/korean_normals.gd")
+const _KoreanAct1      = preload("res://resources/enemies/korean/korean_act1.gd")
+const _KoreanAct2      = preload("res://resources/enemies/korean/korean_act2.gd")
+const _KoreanAct3      = preload("res://resources/enemies/korean/korean_act3.gd")
+const _ChineseNormals  = preload("res://resources/enemies/chinese/chinese_normals.gd")
+const _ChineseAct1     = preload("res://resources/enemies/chinese/chinese_act1.gd")
+const _ChineseAct2     = preload("res://resources/enemies/chinese/chinese_act2.gd")
+const _ChineseAct3     = preload("res://resources/enemies/chinese/chinese_act3.gd")
+const _JapaneseNormals = preload("res://resources/enemies/japanese/japanese_normals.gd")
+const _JapaneseAct1    = preload("res://resources/enemies/japanese/japanese_act1.gd")
+const _JapaneseAct2    = preload("res://resources/enemies/japanese/japanese_act2.gd")
+const _JapaneseAct3    = preload("res://resources/enemies/japanese/japanese_act3.gd")
 
 enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGRADE, HERO_RECRUIT }
 
 var current_state: GameState = GameState.MAP
 var current_floor: int = 0
+const MAX_CHAPTERS: int = 2
+var current_chapter: int = 1
 const MAX_ACTS: int = 3
 var current_act: int = 1
 var gold: int = 0
@@ -117,12 +131,13 @@ func reset() -> void:
 	card_rewards_pick_count = 1
 	pending_boss_upgrade = false
 	pending_boss_recruit = false
-	act_mythologies = ["greek", "egyptian", "norse"]
+	act_mythologies = _get_chapter_mythology_pool(current_chapter)
 	act_mythologies.shuffle()
 
 # ── Plan 04: 런 관리 ──────────────────────────────────
 
-func start_run(initial_hero_id: String = "napoleon") -> void:
+func start_run(initial_hero_id: String = "napoleon", chapter: int = 1) -> void:
+	current_chapter = chapter
 	reset()
 
 	var tm := _get_tm()
@@ -323,6 +338,9 @@ func _end_run_won() -> void:
 	var _sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
 	if _sm:
 		_sm.clear_save()
+	var _pm = get_node_or_null("/root/ProgressManager")
+	if _pm:
+		_pm.mark_chapter_cleared(current_chapter)
 	change_state(GameState.GAME_OVER)
 	_request_scene("res://scenes/game_over/game_over_scene.tscn")
 
@@ -405,11 +423,20 @@ func _heal_all_heroes(amount: int) -> void:
 	for hero in tm.heroes:
 		tm.heal(hero.hero_id, amount)
 
+func _get_chapter_mythology_pool(chapter: int) -> Array[String]:
+	match chapter:
+		1: return ["greek", "egyptian", "norse"]
+		2: return ["korean", "chinese", "japanese"]
+	return ["greek", "egyptian", "norse"]
+
 func _get_mythology_registry() -> Dictionary:
 	return {
 		"greek":    {"normals": _GreekNormals,    "acts": [_GreekAct1,    _GreekAct2,    _GreekAct3]},
 		"egyptian": {"normals": _EgyptianNormals, "acts": [_EgyptianAct1, _EgyptianAct2, _EgyptianAct3]},
 		"norse":    {"normals": _NorseNormals,    "acts": [_NorseAct1,    _NorseAct2,    _NorseAct3]},
+		"korean":   {"normals": _KoreanNormals,   "acts": [_KoreanAct1,   _KoreanAct2,   _KoreanAct3]},
+		"chinese":  {"normals": _ChineseNormals,  "acts": [_ChineseAct1,  _ChineseAct2,  _ChineseAct3]},
+		"japanese": {"normals": _JapaneseNormals, "acts": [_JapaneseAct1, _JapaneseAct2, _JapaneseAct3]},
 	}
 
 func _scene_for(_myth: String, _fn_name: String) -> PackedScene:
@@ -511,6 +538,8 @@ func _recruit_hero_pool() -> Array:
 	var tm := _get_tm()
 	if tm == null:
 		return []
+	if tm.heroes.size() >= 3:
+		return []
 	var existing := []
 	for h in tm.heroes:
 		existing.append(h.hero_id)
@@ -562,6 +591,16 @@ func _yi_sun_sin_card_pool() -> Array:
 
 func _get_random_event() -> Resource:
 	var pool := _build_event_pool()
+	var tm := _get_tm()
+	if tm != null and tm.heroes.size() >= 3:
+		var filtered := pool.filter(func(ev: Resource) -> bool:
+			for c in ev.choices:
+				if c.effect_type == c.EffectType.ADD_HERO:
+					return false
+			return true
+		)
+		if not filtered.is_empty():
+			pool = filtered
 	return pool[randi() % pool.size()]
 
 func _build_event_pool() -> Array:
@@ -582,6 +621,7 @@ func to_dict() -> Dictionary:
 			"visited": node.visited,
 		})
 	return {
+		"current_chapter": current_chapter,
 		"current_act": current_act,
 		"current_floor": current_floor,
 		"gold": gold,
@@ -591,6 +631,7 @@ func to_dict() -> Dictionary:
 	}
 
 func from_dict(data: Dictionary) -> void:
+	current_chapter = data.get("current_chapter", 1)
 	current_act = data.get("current_act", 1)
 	current_floor = data.get("current_floor", 0)
 	gold = data.get("gold", 0)

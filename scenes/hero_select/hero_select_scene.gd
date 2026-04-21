@@ -101,5 +101,5 @@ func _on_hero_selected(hero_id: String) -> void:
 	if GameManager.pending_boss_recruit:
 		GameManager.complete_hero_recruit(hero_id)
 	else:
-		GameManager.start_run(hero_id)
+		GameManager.start_run(hero_id, GameManager.current_chapter)
 		get_tree().change_scene_to_file("res://scenes/map/map_scene.tscn")
