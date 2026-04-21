@@ -307,6 +307,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							if es.get("poison_dmg", 0) > 0:
 								dc += 1
 							condition_met = dc >= 3
+						"enemy_count_1":
+							condition_met = _get_living_enemy_count() == 1
+						"hand_size_0":
+							condition_met = deck_mgr != null and deck_mgr.hand.size() == 0
 						_:
 							condition_met = es.get(effect.status_type, 0) > 0
 					var dmg: int = effect.bonus_value if condition_met else effect.value
@@ -616,6 +620,13 @@ func _check_lose_condition() -> void:
 		is_battle_active = false
 		battle_lost.emit()
 
+func _get_living_enemy_count() -> int:
+	var count: int = 0
+	for alive in _enemy_alive:
+		if alive:
+			count += 1
+	return count
+
 func get_enemy_hp(index: int) -> int:
 	if index < 0 or index >= _enemy_hp.size():
 		return 0
@@ -718,6 +729,10 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 					for ei in range(_enemies.size()):
 						if _enemy_alive[ei]:
 							_apply_status_to_enemy(ei, "poison", 2)
+			EffectRes.EffectType.CONDITIONAL_DMG:
+				# 검사의 약속 (무사시 × 이순신): enemy_count_1 조건 카드 시 이순신 BLOCK +15
+				if card_owner == "musashi" and effect.status_type == "enemy_count_1" and team_mgr.is_alive("yi_sun_sin"):
+					_hero_block["yi_sun_sin"] = _hero_block.get("yi_sun_sin", 0) + 15
 			EffectRes.EffectType.HEAL_ALL:
 				# 성전 (잔다르크 × 나폴레옹): HEAL_ALL 시 나폴레옹 MORALE +2
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("napoleon"):
@@ -737,6 +752,7 @@ func get_active_synergies() -> Array:
 	var c: bool = team_mgr.is_alive("cleopatra")
 	var j: bool = team_mgr.is_alive("joan_of_arc")
 	var g: bool = team_mgr.is_alive("genghis_khan")
+	var m: bool = team_mgr.is_alive("musashi")
 	if n and y:
 		synergies.append("철벽 진군 (나폴레옹×이순신)")
 	if y and c:
@@ -747,6 +763,8 @@ func get_active_synergies() -> Array:
 		synergies.append("성전 (잔다르크×나폴레옹)")
 	if g and c:
 		synergies.append("약탈과 독 (칭기즈칸×클레오파트라)")
+	if m and y:
+		synergies.append("검사의 약속 (무사시×이순신)")
 	return synergies
 
 
@@ -765,11 +783,13 @@ func has_synergy_bonus(card: Resource) -> bool:
 			EffectRes.EffectType.DAMAGE:
 				if card_owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
 					return true
+				if card_owner == "genghis_khan" and effect.target == "ALL" and team_mgr.is_alive("cleopatra"):
+					return true
+			EffectRes.EffectType.CONDITIONAL_DMG:
+				if card_owner == "musashi" and effect.status_type == "enemy_count_1" and team_mgr.is_alive("yi_sun_sin"):
+					return true
 			EffectRes.EffectType.HEAL_ALL:
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("napoleon"):
-					return true
-			EffectRes.EffectType.DAMAGE:
-				if card_owner == "genghis_khan" and effect.target == "ALL" and team_mgr.is_alive("cleopatra"):
 					return true
 	return false
 

@@ -94,6 +94,7 @@ func _get_hero_scene(hero_id: String) -> PackedScene:
 		"yi_sun_sin":  return load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
 		"joan_of_arc":  return load("res://characters/heroes/joan_of_arc/joan_of_arc.tscn")
 		"genghis_khan": return load("res://characters/heroes/genghis_khan/genghis_khan.tscn")
+		"musashi":      return load("res://characters/heroes/musashi/musashi.tscn")
 	return null
 
 func increase_max_hp(hero_id: String, amount: int) -> void:
