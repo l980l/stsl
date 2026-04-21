@@ -49,6 +49,7 @@ func run_all() -> Dictionary:
 	test_norse_act3_boss_name()
 	test_norse_act3_elites()
 	test_relic_pool_count()
+	test_act3_event_pool_shape()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -448,3 +449,13 @@ func test_relic_pool_count() -> void:
 	var pool: Array = RelicData.build_pool()
 	assert(pool.size() == 25, "렐릭 풀 25종이어야 함 (기존 22 + Act 3 3종)")
 	_assert(pool.size() == 25, "렐릭 풀 25종 (기존 22 + Act 3 3종)")
+
+func test_act3_event_pool_shape() -> void:
+	print("[TestEnemies] test_act3_event_pool_shape")
+	var EventsAct3 = load("res://resources/events/events_act3.gd")
+	var pool: Array = EventsAct3.build_pool()
+	assert(pool.size() == 10, "Act 3 이벤트는 10종이어야 함")
+	for ev in pool:
+		assert(ev.event_name != "", "이벤트 이름 비어있으면 안 됨")
+		assert(ev.choices.size() >= 2, "선택지 최소 2개")
+	passed += 1
