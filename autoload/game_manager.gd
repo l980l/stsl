@@ -8,9 +8,11 @@ const _YiSunSinCards  = preload("res://resources/cards/cards_yi_sun_sin.gd")
 const _GreekNormals    = preload("res://resources/enemies/greek/greek_normals.gd")
 const _GreekAct1       = preload("res://resources/enemies/greek/greek_act1.gd")
 const _GreekAct2       = preload("res://resources/enemies/greek/greek_act2.gd")
+const _GreekAct3       = preload("res://resources/enemies/greek/greek_act3.gd")
 const _EgyptianNormals = preload("res://resources/enemies/egyptian/egyptian_normals.gd")
 const _EgyptianAct1    = preload("res://resources/enemies/egyptian/egyptian_act1.gd")
 const _EgyptianAct2    = preload("res://resources/enemies/egyptian/egyptian_act2.gd")
+const _EgyptianAct3    = preload("res://resources/enemies/egyptian/egyptian_act3.gd")
 const _NorseNormals    = preload("res://resources/enemies/norse/norse_normals.gd")
 const _NorseAct1       = preload("res://resources/enemies/norse/norse_act1.gd")
 const _NorseAct2       = preload("res://resources/enemies/norse/norse_act2.gd")
@@ -116,6 +118,7 @@ func reset() -> void:
 	pending_boss_upgrade = false
 	pending_boss_recruit = false
 	act_mythologies = ["greek", "egyptian", "norse"]
+	act_mythologies.shuffle()
 
 # ── Plan 04: 런 관리 ──────────────────────────────────
 
@@ -404,8 +407,8 @@ func _heal_all_heroes(amount: int) -> void:
 
 func _get_mythology_registry() -> Dictionary:
 	return {
-		"greek":    {"normals": _GreekNormals,    "acts": [_GreekAct1,    _GreekAct2,    null]},
-		"egyptian": {"normals": _EgyptianNormals, "acts": [_EgyptianAct1, _EgyptianAct2, null]},
+		"greek":    {"normals": _GreekNormals,    "acts": [_GreekAct1,    _GreekAct2,    _GreekAct3]},
+		"egyptian": {"normals": _EgyptianNormals, "acts": [_EgyptianAct1, _EgyptianAct2, _EgyptianAct3]},
 		"norse":    {"normals": _NorseNormals,    "acts": [_NorseAct1,    _NorseAct2,    _NorseAct3]},
 	}
 

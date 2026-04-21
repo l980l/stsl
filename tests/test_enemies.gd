@@ -54,6 +54,9 @@ func run_all() -> Dictionary:
 	test_egyptian_act1_shape()
 	test_norse_act1_shape()
 	test_norse_act2_shape()
+	test_greek_act3_shape()
+	test_egyptian_act3_shape()
+	test_mythology_randomization_structure()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -527,3 +530,50 @@ func test_norse_act2_shape() -> void:
 	_assert(b.max_hp == 4800, "수르트 HP 4800")
 	_assert(b.phase_thresholds.size() == 2, "수르트 3페이즈")
 	_assert(b.mythology == "norse", "수르트 mythology=norse")
+
+func test_greek_act3_shape() -> void:
+	print("[TestEnemies] test_greek_act3_shape")
+	var M = load("res://resources/enemies/greek/greek_act3.gd")
+	assert(M.elites().size() == 3, "greek_act3 엘리트 3종")
+	assert(M.boss() == "kronos", "greek_act3 보스는 크로노스")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.kronos(scene)
+	assert(b.max_hp == 5200, "크로노스 HP 5200")
+	assert(b.phase_thresholds.size() == 2, "크로노스 3페이즈")
+	assert(b.mythology == "greek", "크로노스 mythology=greek")
+	_assert(M.elites().size() == 3, "greek_act3 엘리트 3종")
+	_assert(M.boss() == "kronos", "greek_act3 보스는 크로노스")
+	_assert(b.max_hp == 5200, "크로노스 HP 5200")
+	_assert(b.phase_thresholds.size() == 2, "크로노스 3페이즈")
+	_assert(b.mythology == "greek", "크로노스 mythology=greek")
+
+func test_egyptian_act3_shape() -> void:
+	print("[TestEnemies] test_egyptian_act3_shape")
+	var M = load("res://resources/enemies/egyptian/egyptian_act3.gd")
+	assert(M.elites().size() == 3, "egyptian_act3 엘리트 3종")
+	assert(M.boss() == "ra_horakhty", "egyptian_act3 보스는 라-호라크티")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.ra_horakhty(scene)
+	assert(b.max_hp == 5000, "라-호라크티 HP 5000")
+	assert(b.phase_thresholds.size() == 2, "라-호라크티 3페이즈")
+	assert(b.mythology == "egyptian", "라-호라크티 mythology=egyptian")
+	_assert(M.elites().size() == 3, "egyptian_act3 엘리트 3종")
+	_assert(M.boss() == "ra_horakhty", "egyptian_act3 보스는 라-호라크티")
+	_assert(b.max_hp == 5000, "라-호라크티 HP 5000")
+	_assert(b.phase_thresholds.size() == 2, "라-호라크티 3페이즈")
+	_assert(b.mythology == "egyptian", "라-호라크티 mythology=egyptian")
+
+func test_mythology_randomization_structure() -> void:
+	print("[TestEnemies] test_mythology_randomization_structure")
+	# mythology 목록이 항상 3종 포함 + 중복 없음을 확인
+	var gm := GameManagerClass.new()
+	gm.reset()
+	_assert(gm.act_mythologies.size() == 3, "act_mythologies 항상 3개")
+	_assert(gm.act_mythologies.has("greek"), "그리스 포함")
+	_assert(gm.act_mythologies.has("egyptian"), "이집트 포함")
+	_assert(gm.act_mythologies.has("norse"), "북유럽 포함")
+	# 모든 mythology×act 조합에 null 없음 확인
+	var reg: Dictionary = gm._get_mythology_registry()
+	for myth in gm.act_mythologies:
+		for i in range(3):
+			_assert(reg[myth]["acts"][i] != null, myth + " act" + str(i+1) + " null 없음")
