@@ -591,6 +591,16 @@ func _yi_sun_sin_card_pool() -> Array:
 
 func _get_random_event() -> Resource:
 	var pool := _build_event_pool()
+	var tm := _get_tm()
+	if tm != null and tm.heroes.size() >= 3:
+		var filtered := pool.filter(func(ev: Resource) -> bool:
+			for c in ev.choices:
+				if c.effect_type == c.EffectType.ADD_HERO:
+					return false
+			return true
+		)
+		if not filtered.is_empty():
+			pool = filtered
 	return pool[randi() % pool.size()]
 
 func _build_event_pool() -> Array:
