@@ -54,6 +54,8 @@ func run_all() -> Dictionary:
 	test_egyptian_act1_shape()
 	test_norse_act1_shape()
 	test_norse_act2_shape()
+	test_greek_act3_shape()
+	test_egyptian_act3_shape()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -527,3 +529,35 @@ func test_norse_act2_shape() -> void:
 	_assert(b.max_hp == 4800, "수르트 HP 4800")
 	_assert(b.phase_thresholds.size() == 2, "수르트 3페이즈")
 	_assert(b.mythology == "norse", "수르트 mythology=norse")
+
+func test_greek_act3_shape() -> void:
+	print("[TestEnemies] test_greek_act3_shape")
+	var M = load("res://resources/enemies/greek/greek_act3.gd")
+	assert(M.elites().size() == 3, "greek_act3 엘리트 3종")
+	assert(M.boss() == "kronos", "greek_act3 보스는 크로노스")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.kronos(scene)
+	assert(b.max_hp == 5200, "크로노스 HP 5200")
+	assert(b.phase_thresholds.size() == 2, "크로노스 3페이즈")
+	assert(b.mythology == "greek", "크로노스 mythology=greek")
+	_assert(M.elites().size() == 3, "greek_act3 엘리트 3종")
+	_assert(M.boss() == "kronos", "greek_act3 보스는 크로노스")
+	_assert(b.max_hp == 5200, "크로노스 HP 5200")
+	_assert(b.phase_thresholds.size() == 2, "크로노스 3페이즈")
+	_assert(b.mythology == "greek", "크로노스 mythology=greek")
+
+func test_egyptian_act3_shape() -> void:
+	print("[TestEnemies] test_egyptian_act3_shape")
+	var M = load("res://resources/enemies/egyptian/egyptian_act3.gd")
+	assert(M.elites().size() == 3, "egyptian_act3 엘리트 3종")
+	assert(M.boss() == "ra_horakhty", "egyptian_act3 보스는 라-호라크티")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.ra_horakhty(scene)
+	assert(b.max_hp == 5000, "라-호라크티 HP 5000")
+	assert(b.phase_thresholds.size() == 2, "라-호라크티 3페이즈")
+	assert(b.mythology == "egyptian", "라-호라크티 mythology=egyptian")
+	_assert(M.elites().size() == 3, "egyptian_act3 엘리트 3종")
+	_assert(M.boss() == "ra_horakhty", "egyptian_act3 보스는 라-호라크티")
+	_assert(b.max_hp == 5000, "라-호라크티 HP 5000")
+	_assert(b.phase_thresholds.size() == 2, "라-호라크티 3페이즈")
+	_assert(b.mythology == "egyptian", "라-호라크티 mythology=egyptian")
