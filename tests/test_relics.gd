@@ -82,8 +82,9 @@ func _make_enemy(hp: int) -> Resource:
 
 func test_relic_pool_size() -> void:
 	print("[TestRelics] test_relic_pool_size")
-	var pool := _build_pool()
-	_assert(pool.size() == 22, "릴릭 풀 22종")
+	var RelicsGd = load("res://resources/relics/relics.gd")
+	var pool: Array = RelicsGd.build_pool()
+	_assert(pool.size() == 25, "릴릭 풀 25종")
 
 func test_trigger_type_values() -> void:
 	print("[TestRelics] test_trigger_type_values")

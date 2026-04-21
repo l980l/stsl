@@ -10,6 +10,7 @@ static func build_pool() -> Array:
 		_pharaoh_seal(), _devils_contract(), _cursed_crown(),
 		_blood_oath(), _tacticians_map(), _iron_will(), _ancient_shield(),
 		_ankh_of_life(), _eye_of_horus(), _scarab_talisman(),
+		_rune_of_fate(), _mjolnir_shard(), _idun_apple(),
 	]
 
 static func _burning_blood() -> Resource:
@@ -161,3 +162,23 @@ static func _scarab_talisman() -> Resource:
 	r.description = "전투 시작 시 팀 전체 방어도 +8"
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 8; return r
+
+# ──── Act 3 렐릭 (북유럽 신화) ────
+
+static func _rune_of_fate() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "운명의 룬"
+	r.description = "전투 시작 시 카드 2장 추가 드로우"
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.DRAW; r.value = 2; return r
+
+static func _mjolnir_shard() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "묠니르의 파편"
+	r.description = "전투 시작 시 팀 전체 방어도 +10"
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 10; return r
+
+static func _idun_apple() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "이둔의 사과"
+	r.description = "전투 승리 시 팀 전체 HP +15"
+	r.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r.effect_type = RelicRes.EffectType.HEAL; r.value = 15; return r
