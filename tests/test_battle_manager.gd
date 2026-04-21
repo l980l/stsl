@@ -53,6 +53,8 @@ func run_all() -> Dictionary:
 	test_synergy_joan_napoleon_not_present()
 	test_synergy_genghis_cleopatra_dmg_all()
 	test_synergy_genghis_cleopatra_not_present()
+	test_synergy_musashi_yisunsin_duel()
+	test_synergy_musashi_yisunsin_not_present()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -766,3 +768,42 @@ func test_synergy_genghis_cleopatra_not_present() -> void:
 	bm.play_card(card, -1)
 	_assert(bm.get_enemy_status(0).get("poison", 0) == 0,
 		"약탈과 독: 클레오파트라 없으면 poison 미부여")
+
+func test_synergy_musashi_yisunsin_duel() -> void:
+	print("[TestBattleManager] test_synergy_musashi_yisunsin_duel")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("musashi", 1000))
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 1000))
+	bm.setup_battle([_make_enemy(500, [])])
+	bm.start_player_turn()
+	var card := CardRes.new()
+	card.card_name = "결투_테스트"
+	card.owner_id = "musashi"
+	card.cost = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.CONDITIONAL_DMG
+	eff.value = 100; eff.bonus_value = 160; eff.target = "SINGLE"; eff.status_type = "enemy_count_1"
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+	bm.play_card(card, 0)
+	_assert(bm._hero_block.get("yi_sun_sin", 0) == 15,
+		"검사의 약속: 무사시 결투 카드 → 이순신 BLOCK +15")
+
+func test_synergy_musashi_yisunsin_not_present() -> void:
+	print("[TestBattleManager] test_synergy_musashi_yisunsin_not_present")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("musashi", 1000))
+	bm.setup_battle([_make_enemy(500, [])])
+	bm.start_player_turn()
+	var card := CardRes.new()
+	card.card_name = "결투_이순신없음"
+	card.owner_id = "musashi"
+	card.cost = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.CONDITIONAL_DMG
+	eff.value = 100; eff.bonus_value = 160; eff.target = "SINGLE"; eff.status_type = "enemy_count_1"
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+	bm.play_card(card, 0)
+	_assert(bm._hero_block.get("yi_sun_sin", 0) == 0,
+		"검사의 약속: 이순신 없으면 BLOCK 미부여")

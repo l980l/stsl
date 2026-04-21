@@ -5,7 +5,7 @@ class_name HeroRegistry
 extends RefCounted
 
 static func all_hero_ids() -> Array:
-	return ["napoleon", "cleopatra", "yi_sun_sin", "joan_of_arc", "genghis_khan"]
+	return ["napoleon", "cleopatra", "yi_sun_sin", "joan_of_arc", "genghis_khan", "musashi"]
 
 static func make_hero(hero_id: String) -> Resource:
 	var HeroRes = load("res://resources/hero_resource.gd")
@@ -47,6 +47,13 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.character_scene = load("res://characters/heroes/genghis_khan/genghis_khan.tscn")
 			hero.unlock_condition = "flag:kill_boss:oshiris"
 			hero.unlock_description = "오시리스 처치 후 해금"
+		"musashi":
+			hero.hero_name = "무사시"
+			hero.historical_figure = "미야모토 무사시"
+			hero.max_hp = 1000
+			hero.character_scene = load("res://characters/heroes/musashi/musashi.tscn")
+			hero.unlock_condition = "elite_solo_kills>=5"
+			hero.unlock_description = "1:1 엘리트 5회 처치 후 해금"
 	return hero
 
 static func get_display_info(hero_id: String) -> Dictionary:
@@ -85,5 +92,12 @@ static func get_display_info(hero_id: String) -> Dictionary:
 				"hp": 1000,
 				"desc": "포지션: 기동형 정복자\n고유 메카닉: 몽골 기병(DMG ALL)\n아키타입: 기동(0~1코) / 약탈\n\n스타터: 스트라이크×3 + 디펜드×2",
 				"unlock_description": "오시리스 처치 후 해금",
+			}
+		"musashi":
+			return {
+				"name": "무사시",
+				"hp": 1000,
+				"desc": "포지션: 결투형 검사\n고유 메카닉: 이도류(×2 히트) / 결투·무심 조건\n아키타입: 이도류 / 결투 / 무심\n\n스타터: 참격×3 + 회피×2",
+				"unlock_description": "1:1 엘리트 5회 처치 후 해금",
 			}
 	return {}

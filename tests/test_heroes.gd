@@ -20,9 +20,12 @@ func run_all() -> Dictionary:
 	test_yi_sun_sin_card_pool_size()
 	test_joan_of_arc_card_pool_size()
 	test_genghis_khan_card_pool_size()
+	test_musashi_card_pool_size()
 	test_hit_count_damage_multi_hit()
 	test_cost_zero_turn_allows_free_play()
 	test_block_per_cards_played_scales()
+	test_conditional_dmg_enemy_count_1()
+	test_conditional_dmg_hand_size_0()
 	test_gain_morale_effect()
 	test_consume_morale_insufficient()
 	test_consume_morale_sufficient()
@@ -107,6 +110,11 @@ func test_genghis_khan_card_pool_size() -> void:
 	var gm = _load_gm()
 	_assert(gm._genghis_khan_card_pool().size() == 13, "칭기즈칸 카드 풀 13장")
 
+func test_musashi_card_pool_size() -> void:
+	print("[TestHeroes] test_musashi_card_pool_size")
+	var gm = _load_gm()
+	_assert(gm._musashi_card_pool().size() == 13, "무사시 카드 풀 13장")
+
 func test_hit_count_damage_multi_hit() -> void:
 	print("[TestHeroes] test_hit_count_damage_multi_hit")
 	var bm := _make_bm()
@@ -145,6 +153,32 @@ func test_block_per_cards_played_scales() -> void:
 	eff.value = 30; eff.base_value = 30
 	bm._apply_card_effects(_make_card("genghis_khan", [eff]), 0)
 	_assert(bm._hero_block.get("genghis_khan", 0) == 90, "카드 3장×30=90 방어도")
+
+func test_conditional_dmg_enemy_count_1() -> void:
+	print("[TestHeroes] test_conditional_dmg_enemy_count_1")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("musashi", 1000))
+	bm.setup_battle([_make_enemy(1000)])
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.CONDITIONAL_DMG
+	eff.value = 100; eff.base_value = 100; eff.bonus_value = 160; eff.target = "SINGLE"
+	eff.status_type = "enemy_count_1"
+	bm._apply_card_effects(_make_card("musashi", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 840, "결투 조건 충족(적 1명) — 160 피해 → 적 HP 840")
+
+func test_conditional_dmg_hand_size_0() -> void:
+	print("[TestHeroes] test_conditional_dmg_hand_size_0")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("musashi", 1000))
+	bm.setup_battle([_make_enemy(1000)])
+	# 손패가 비어있을 때 bonus_value 적용
+	bm.deck_mgr.hand.clear()
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.CONDITIONAL_DMG
+	eff.value = 80; eff.base_value = 80; eff.bonus_value = 160; eff.target = "SINGLE"
+	eff.status_type = "hand_size_0"
+	bm._apply_card_effects(_make_card("musashi", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 840, "무심 조건 충족(손패 0) — 160 피해 → 적 HP 840")
 
 # ──────────────────────────────────────────────
 # BattleManager 신규 효과 테스트
