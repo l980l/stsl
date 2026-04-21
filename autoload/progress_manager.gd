@@ -2,6 +2,8 @@
 class_name ProgressManagerClass
 extends Node
 
+signal hero_unlocked(hero_id: String)
+
 const PROGRESS_PATH := "user://progress.json"
 const _DEFAULT_HEROES := ["napoleon", "cleopatra", "yi_sun_sin"]
 
@@ -43,6 +45,47 @@ func set_flag(flag_key: String) -> void:
 
 func has_flag(flag_key: String) -> bool:
 	return unlock_flags.get(flag_key, false)
+
+func increment_flag(flag_key: String, amount: int = 1) -> int:
+	var cur = unlock_flags.get(flag_key, 0)
+	if typeof(cur) != TYPE_INT:
+		cur = 0
+	cur += amount
+	unlock_flags[flag_key] = cur
+	save_progress()
+	return cur
+
+func get_flag_int(flag_key: String) -> int:
+	var v = unlock_flags.get(flag_key, 0)
+	return v if typeof(v) == TYPE_INT else 0
+
+func check_unlock_conditions() -> Array:
+	var newly: Array = []
+	var HR = load("res://resources/heroes/hero_registry.gd")
+	for hid in HR.all_hero_ids():
+		if is_hero_unlocked(hid):
+			continue
+		var hero = HR.make_hero(hid)
+		if _evaluate_condition(hero.unlock_condition):
+			unlock_hero(hid)
+			newly.append(hid)
+			hero_unlocked.emit(hid)
+	return newly
+
+func _evaluate_condition(cond: String) -> bool:
+	if cond == "default" or cond == "":
+		return true
+	if cond == "clear_chapter_1":
+		return 1 in chapters_cleared
+	if cond == "clear_chapter_2":
+		return 2 in chapters_cleared
+	if cond.begins_with("flag:"):
+		return has_flag(cond.substr(5))
+	if ">=" in cond:
+		var parts := cond.split(">=")
+		if parts.size() == 2:
+			return get_flag_int(parts[0]) >= int(parts[1])
+	return false
 
 func to_dict() -> Dictionary:
 	return {
