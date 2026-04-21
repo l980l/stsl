@@ -6,6 +6,8 @@ const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
 const POISON_DMG_PER_STACK: int = 10
+const TOKEN_DMG_PER_STACK: int = 25
+const TOKEN_MAX_STACK: int = 6
 
 # 의존성 주입 — 프로덕션: BattleScene이 설정, 테스트: 직접 할당
 var team_mgr = null
@@ -99,6 +101,24 @@ func start_player_turn() -> void:
 		if ppt["turns_remaining"] <= 0:
 			_active_powers.erase("poison_per_turn")
 		active_powers_changed.emit()
+	# 병사 토큰 자동 공격: 생존 영웅의 토큰당 TOKEN_DMG_PER_STACK 피해를 랜덤 생존 적에게
+	if team_mgr:
+		for hero in team_mgr.heroes:
+			if not team_mgr.is_alive(hero.hero_id):
+				continue
+			var token_count: int = _hero_status.get(hero.hero_id, {}).get("tokens", 0)
+			if token_count <= 0:
+				continue
+			for _ti in range(token_count):
+				var alive_indices: Array = []
+				for ei in range(_enemies.size()):
+					if _enemy_alive[ei]:
+						alive_indices.append(ei)
+				if alive_indices.is_empty():
+					break
+				var pick: int = alive_indices[randi() % alive_indices.size()]
+				_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK)
+				_last_attacker[pick] = hero.hero_id
 	if deck_mgr:
 		deck_mgr.start_turn()
 	var _gm_pts = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
@@ -254,6 +274,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							condition_met = es.get(effect.status_type, 0) > 0
 					var dmg: int = effect.bonus_value if condition_met else effect.value
 					_deal_damage_to_enemy(target_enemy_index, dmg)
+			EffectRes.EffectType.SUMMON_TOKEN:
+				if not _hero_status.has(card.owner_id):
+					_hero_status[card.owner_id] = {}
+				var cur: int = _hero_status[card.owner_id].get("tokens", 0)
+				_hero_status[card.owner_id]["tokens"] = min(cur + effect.value, TOKEN_MAX_STACK)
+				status_applied.emit(card.owner_id, "tokens", effect.value)
 	_apply_synergy_bonus(card, target_enemy_index)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
@@ -292,6 +318,10 @@ func _deal_damage_to_hero(hero_id: String, amount: int) -> void:
 			_gm_hd.trigger_relics(RelicRes.TriggerType.ON_HERO_DAMAGED,
 				{"hero_id": hero_id, "amount": amount})
 	hero_damaged.emit(hero_id, amount)
+	# 영웅 사망 시 보유 토큰 전멸
+	if not team_mgr.is_alive(hero_id) and _hero_status.has(hero_id):
+		_hero_status[hero_id]["tokens"] = 0
+		status_applied.emit(hero_id, "tokens", 0)
 	_check_lose_condition()
 
 func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) -> void:
