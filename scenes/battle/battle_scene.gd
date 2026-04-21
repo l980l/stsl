@@ -484,7 +484,6 @@ func _refresh_token_tiles(hero_id: String) -> void:
 		# 병사 캐릭터 씬 (idle 애니메이션 포함)
 		var char_node = SoldierScene.instantiate()
 		char_node.position = Vector2(tile_x + TOKEN_TILE_W / 2.0, tile_y + TOKEN_TILE_H - 20)
-		char_node.mouse_filter = Control.MOUSE_FILTER_IGNORE if char_node.has_method("set_mouse_filter") else 0
 		add_child(char_node)
 		_token_tile_nodes[hero_id].append(char_node)
 
