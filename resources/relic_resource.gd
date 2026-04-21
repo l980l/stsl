@@ -24,6 +24,7 @@ enum EffectType {
 @export var value: int = 0
 @export var owner_hero_id: String = ""  # "" = 공용. 특정 id = 해당 캐릭터 전용
 @export var bonus_value: int = 0        # 전용 캐릭터 생존 시 value 대신 사용
+@export var status_type: String = ""    # APPLY_STATUS_ENEMY: 부여할 상태이상 ("poison", "weak", 등)
 @export var condition_value: int = 0    # ON_HERO_DAMAGED: 최소 피해량 조건
 @export var is_cursed: bool = false
 @export var penalty_trigger: TriggerType = TriggerType.PASSIVE
