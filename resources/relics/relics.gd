@@ -11,6 +11,7 @@ static func build_pool() -> Array:
 		_blood_oath(), _tacticians_map(), _iron_will(), _ancient_shield(),
 		_ankh_of_life(), _eye_of_horus(), _scarab_talisman(),
 		_rune_of_fate(), _mjolnir_shard(), _idun_apple(),
+		_underworld_talisman(), _dokkaebi_hammer_shard(), _samtaegeuk_charm(),
 	]
 
 static func _burning_blood() -> Resource:
@@ -182,3 +183,23 @@ static func _idun_apple() -> Resource:
 	r.description = "전투 승리 시 팀 전체 HP +15"
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.HEAL; r.value = 15; return r
+
+# ──── 챕터 2 렐릭 (한국 신화) ────
+
+static func _underworld_talisman() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "저승 부적"
+	r.description = "전투 시작 시 에너지 +1"
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.ENERGY; r.value = 1; return r
+
+static func _dokkaebi_hammer_shard() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "도깨비 방망이 파편"
+	r.description = "전투 승리 시 팀 사기 +3"
+	r.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r.effect_type = RelicRes.EffectType.GAIN_MORALE; r.value = 3; return r
+
+static func _samtaegeuk_charm() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "삼태극 부적"
+	r.description = "영웅이 피해를 받을 때 방어도 +10"
+	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
+	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 10; return r

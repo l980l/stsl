@@ -57,6 +57,10 @@ func run_all() -> Dictionary:
 	test_greek_act3_shape()
 	test_egyptian_act3_shape()
 	test_mythology_randomization_structure()
+	test_korean_normals_shape()
+	test_korean_act1_shape()
+	test_korean_act2_shape()
+	test_korean_act3_shape()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -577,3 +581,61 @@ func test_mythology_randomization_structure() -> void:
 	for myth in gm.act_mythologies:
 		for i in range(3):
 			_assert(reg[myth]["acts"][i] != null, myth + " act" + str(i+1) + " null 없음")
+
+func test_korean_normals_shape() -> void:
+	print("[TestEnemies] test_korean_normals_shape")
+	var M = load("res://resources/enemies/korean/korean_normals.gd")
+	var scene: PackedScene = load("res://characters/summons/soldier/soldier.tscn")
+	var encs: Array = M.encounters()
+	_assert(encs.size() >= 5, "한국 인카운터 5조합 이상")
+	var e1: Resource = M.death_reaper(scene)
+	_assert(e1.max_hp == 320, "저승사자 HP 320")
+	_assert(e1.mythology == "korean", "저승사자 mythology=korean")
+	_assert(e1.intent_pattern.size() == 3, "저승사자 인텐트 3개")
+	var e2: Resource = M.bulgasari(scene)
+	_assert(e2.max_hp == 900, "불가사리 HP 900")
+	_assert(e2.intent_pattern.size() == 3, "불가사리 인텐트 3개")
+	var e3: Resource = M.three_legged_crow(scene)
+	_assert(e3.max_hp == 280, "삼족오 HP 280")
+
+func test_korean_act1_shape() -> void:
+	print("[TestEnemies] test_korean_act1_shape")
+	var M = load("res://resources/enemies/korean/korean_act1.gd")
+	_assert(M.elites().size() == 3, "korean_act1 엘리트 3종")
+	_assert(M.boss() == "dangun", "korean_act1 보스는 dangun")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.dangun(scene)
+	_assert(b.max_hp == 4500, "단군 HP 4500")
+	_assert(b.phase_thresholds.size() == 2, "단군 3페이즈")
+	_assert(b.mythology == "korean", "단군 mythology=korean")
+	_assert(b.charm_resistance == 2, "단군 charm_resistance=2")
+	var haemosu = M.haemosu(scene)
+	_assert(haemosu.max_hp == 1900, "해모수 엘리트 HP 1900")
+	_assert(haemosu.charm_resistance == 1, "해모수 charm_resistance=1")
+
+func test_korean_act2_shape() -> void:
+	print("[TestEnemies] test_korean_act2_shape")
+	var M = load("res://resources/enemies/korean/korean_act2.gd")
+	_assert(M.elites().size() == 3, "korean_act2 엘리트 3종")
+	_assert(M.boss() == "samsin_grandma", "korean_act2 보스는 samsin_grandma")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.samsin_grandma(scene)
+	_assert(b.max_hp == 4800, "삼신할미 HP 4800")
+	_assert(b.phase_thresholds.size() == 2, "삼신할미 3페이즈")
+	_assert(b.mythology == "korean", "삼신할미 mythology=korean")
+	_assert(b.charm_resistance == 2, "삼신할미 charm_resistance=2")
+	var dongmyeong = M.dongmyeong(scene)
+	_assert(dongmyeong.max_hp == 1900, "동명성왕 엘리트 HP 1900")
+	_assert(dongmyeong.charm_resistance == 1, "동명성왕 charm_resistance=1")
+
+func test_korean_act3_shape() -> void:
+	print("[TestEnemies] test_korean_act3_shape")
+	var M = load("res://resources/enemies/korean/korean_act3.gd")
+	_assert(M.elites().size() == 3, "korean_act3 엘리트 3종")
+	_assert(M.boss() == "gusamseung_halmang", "korean_act3 보스는 gusamseung_halmang")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.gusamseung_halmang(scene)
+	_assert(b.max_hp == 4800, "구삼승할망 HP 4800")
+	_assert(b.phase_thresholds.size() == 2, "구삼승할망 3페이즈")
+	_assert(b.mythology == "korean", "구삼승할망 mythology=korean")
+	_assert(b.charm_resistance == 2, "구삼승할망 charm_resistance=2")

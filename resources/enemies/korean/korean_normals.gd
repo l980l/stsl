@@ -1,5 +1,102 @@
 # resources/enemies/korean/korean_normals.gd
-# 한국 신화 — 일반 적 (Milestone 4-2에서 구현 예정)
+const EnemyRes  = preload("res://resources/enemy_resource.gd")
+const IntentRes = preload("res://resources/intent_resource.gd")
+
+static func death_reaper(scene: PackedScene) -> Resource:
+	var e := EnemyRes.new()
+	e.enemy_name = "저승사자"; e.max_hp = 320; e.character_scene = scene
+	e.mythology = "korean"
+	var i1 := IntentRes.new()
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.LOWEST_HP
+	var i2 := IntentRes.new()
+	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "weak"
+	i2.target = IntentRes.TargetType.RANDOM
+	var i3 := IntentRes.new()
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.LOWEST_HP
+	e.intent_pattern = [i1, i2, i3]
+	return e
+
+static func cheoyong(scene: PackedScene) -> Resource:
+	var e := EnemyRes.new()
+	e.enemy_name = "처용"; e.max_hp = 450; e.character_scene = scene
+	e.mythology = "korean"
+	var i1 := IntentRes.new()
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 40; i1.status_type = "block"
+	var i2 := IntentRes.new()
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM
+	var i3 := IntentRes.new()
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.RANDOM
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 20; i4.status_type = "block"
+	e.intent_pattern = [i1, i2, i3, i4]
+	return e
+
+static func dokkaebi(scene: PackedScene) -> Resource:
+	var e := EnemyRes.new()
+	e.enemy_name = "도깨비"; e.max_hp = 380; e.character_scene = scene
+	e.mythology = "korean"
+	var i1 := IntentRes.new()
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
+	var i2 := IntentRes.new()
+	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "vulnerable"
+	i2.target = IntentRes.TargetType.RANDOM
+	var i3 := IntentRes.new()
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM
+	e.intent_pattern = [i1, i2, i3]
+	return e
+
+static func three_legged_crow(scene: PackedScene) -> Resource:
+	var e := EnemyRes.new()
+	e.enemy_name = "삼족오"; e.max_hp = 280; e.character_scene = scene
+	e.mythology = "korean"
+	var i1 := IntentRes.new()
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
+	var i2 := IntentRes.new()
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 60; i2.target = IntentRes.TargetType.ALL
+	e.intent_pattern = [i1, i2]
+	return e
+
+static func gumiho(scene: PackedScene) -> Resource:
+	var e := EnemyRes.new()
+	e.enemy_name = "구미호"; e.max_hp = 350; e.character_scene = scene
+	e.mythology = "korean"
+	var i1 := IntentRes.new()
+	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "vulnerable"
+	i1.target = IntentRes.TargetType.RANDOM
+	var i2 := IntentRes.new()
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM
+	var i3 := IntentRes.new()
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "weak"
+	i3.target = IntentRes.TargetType.RANDOM
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 60; i4.target = IntentRes.TargetType.RANDOM
+	e.intent_pattern = [i1, i2, i3, i4]
+	return e
+
+static func bulgasari(scene: PackedScene) -> Resource:
+	var e := EnemyRes.new()
+	e.enemy_name = "불가사리"; e.max_hp = 900; e.character_scene = scene
+	e.mythology = "korean"
+	var i1 := IntentRes.new()
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
+	var i2 := IntentRes.new()
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM
+	var i3 := IntentRes.new()
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.RANDOM
+	e.intent_pattern = [i1, i2, i3]
+	return e
 
 static func encounters() -> Array:
-	return []
+	return [
+		["death_reaper"],
+		["death_reaper", "death_reaper"],
+		["cheoyong"],
+		["death_reaper", "cheoyong"],
+		["dokkaebi", "dokkaebi"],
+		["three_legged_crow", "three_legged_crow"],
+		["gumiho"],
+		["gumiho", "dokkaebi"],
+		["bulgasari"],
+		["death_reaper", "three_legged_crow"],
+		["dokkaebi", "dokkaebi", "three_legged_crow"],
+	]
