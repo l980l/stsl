@@ -20,8 +20,10 @@ enum EffectType {
 	FORMATION_BLOCK, # 생존 영웅 수 × value BLOCK
 	COST_NEXT,       # 이번 턴 다음 카드 비용 -value
 	CONDITIONAL_DMG, # 조건 충족 시 bonus_value, 아니면 value 피해. status_type=조건키
-	REVIVE,          # 사망한 아군 1명을 max_hp의 value% HP로 부활 (잔다르크)
-	SACRIFICE_HP,    # 시전자 HP value만큼 즉시 소모 (방어도 무시). 순교 카드
+	REVIVE,              # 사망한 아군 1명을 max_hp의 value% HP로 부활 (잔다르크)
+	SACRIFICE_HP,        # 시전자 HP value만큼 즉시 소모 (방어도 무시). 순교 카드
+	COST_ZERO_TURN,      # 이번 턴 남은 카드 비용 전부 0 (칭기즈칸 대칸의 명령)
+	BLOCK_PER_CARDS_PLAYED, # 이번 턴 카드 사용 횟수 × value BLOCK (칭기즈칸 만리 원정)
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
@@ -31,11 +33,13 @@ enum EffectType {
 @export var bonus_value: int = 0            # 조건부/추가 효과에 사용
 @export var base_value: int = 0             # 0강 기준값. 강화 공식의 베이스.
 @export var base_bonus_value: int = 0       # bonus_value의 0강 기준값.
+@export var hit_count: int = 1              # DAMAGE 히트 횟수 (이도류, 징기스의 분노)
 
 func display_text() -> String:
 	match effect_type:
 		EffectType.DAMAGE:
-			return "피해 %d%s" % [value, " (전체)" if target == "ALL" else ""]
+			var hit_str: String = " ×%d" % hit_count if hit_count > 1 else ""
+			return "피해 %d%s%s" % [value, " (전체)" if target == "ALL" else "", hit_str]
 		EffectType.BLOCK:
 			return "방어 %d" % value
 		EffectType.BLOCK_ALL:
@@ -60,6 +64,8 @@ func display_text() -> String:
 		EffectType.CONDITIONAL_DMG: return "%d/%d(%s)" % [bonus_value, value, status_type]
 		EffectType.SUMMON_TOKEN:   return "병사 소환 %d" % value
 		EffectType.CHARM:          return "매혹 %d" % value
-		EffectType.REVIVE:         return "부활 %d%%" % value
-		EffectType.SACRIFICE_HP:   return "자기 HP -%d" % value
+		EffectType.REVIVE:              return "부활 %d%%" % value
+		EffectType.SACRIFICE_HP:        return "자기 HP -%d" % value
+		EffectType.COST_ZERO_TURN:      return "이번 턴 코스트 0"
+		EffectType.BLOCK_PER_CARDS_PLAYED: return "카드수×%d 방어" % value
 	return ""

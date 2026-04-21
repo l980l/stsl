@@ -14,6 +14,8 @@ static func build_pool() -> Array:
 		_underworld_talisman(), _dokkaebi_hammer_shard(), _samtaegeuk_charm(),
 		# 잔다르크 전용 렐릭
 		_flag_of_orleans(), _saints_tears(),
+		# 칭기즈칸 전용 렐릭
+		_thousand_horses(), _conquerors_whip(),
 	]
 
 static func _burning_blood() -> Resource:
@@ -221,3 +223,19 @@ static func _saints_tears() -> Resource:
 	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
 	r.effect_type = RelicRes.EffectType.HEAL
 	r.owner_hero_id = "joan_of_arc"; r.value = 30; r.bonus_value = 60; return r
+
+# ──── 칭기즈칸 전용 렐릭 ────
+
+static func _thousand_horses() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "천군만마"
+	r.description = "전투 시작 시 팀 전체 방어도 +30"
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.BLOCK
+	r.owner_hero_id = "genghis_khan"; r.value = 30; return r
+
+static func _conquerors_whip() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "정복자의 채찍"
+	r.description = "전투 승리 시 카드 1장 드로우"
+	r.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r.effect_type = RelicRes.EffectType.DRAW
+	r.owner_hero_id = "genghis_khan"; r.value = 1; return r

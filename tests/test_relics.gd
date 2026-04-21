@@ -85,7 +85,7 @@ func test_relic_pool_size() -> void:
 	print("[TestRelics] test_relic_pool_size")
 	var RelicsGd = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicsGd.build_pool()
-	_assert(pool.size() == 30, "릴릭 풀 30종")
+	_assert(pool.size() == 32, "릴릭 풀 32종")
 
 func test_trigger_type_values() -> void:
 	print("[TestRelics] test_trigger_type_values")
