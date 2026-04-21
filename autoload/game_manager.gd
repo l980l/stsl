@@ -2,6 +2,7 @@
 class_name GameManagerClass
 extends Node
 
+const _HeroRegistry   = preload("res://resources/heroes/hero_registry.gd")
 const _NapoleonCards  = preload("res://resources/cards/cards_napoleon.gd")
 const _CleopatraCards = preload("res://resources/cards/cards_cleopatra.gd")
 const _YiSunSinCards  = preload("res://resources/cards/cards_yi_sun_sin.gd")
@@ -58,6 +59,8 @@ var pending_event: Resource = null  # 현재 이벤트 데이터 (EventResource)
 var card_rewards_pick_count: int = 1  # 카드픽 화면에서 선택 가능한 카드 수
 var pending_boss_upgrade: bool = false  # 보스 후 카드 강화 대기 여부
 var pending_boss_recruit: bool = false  # 보스 후 영웅 영입 대기 여부
+var _last_boss_enemy_id: String = ""    # 직전 보스 enemy_id (해금 훅용)
+var _last_elite_solo: bool = false      # 직전 엘리트 전투가 1:1 이었는지 (해금 훅용)
 # ─────────────────────────────────────────────────────
 
 signal state_changed(new_state: GameState)
@@ -163,23 +166,7 @@ func start_run(initial_hero_id: String = "napoleon", chapter: int = 1) -> void:
 	run_started.emit()
 
 func _make_hero_by_id(hero_id: String) -> Resource:
-	var HeroRes = load("res://resources/hero_resource.gd")
-	var hero: Resource = HeroRes.new()
-	hero.hero_id = hero_id
-	match hero_id:
-		"napoleon":
-			hero.hero_name = "나폴레옹"
-			hero.max_hp = 1000
-			hero.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
-		"cleopatra":
-			hero.hero_name = "클레오파트라"
-			hero.max_hp = 1000
-			hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
-		"yi_sun_sin":
-			hero.hero_name = "이순신"
-			hero.max_hp = 1000
-			hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
-	return hero
+	return _HeroRegistry.make_hero(hero_id)
 
 func enter_node(node_id: int) -> void:
 	if node_id not in available_node_ids:
@@ -196,6 +183,11 @@ func enter_node(node_id: int) -> void:
 		MapNodeRes.RoomType.ELITE, \
 		MapNodeRes.RoomType.BOSS:
 			pending_enemies = _make_enemies_for_node(node)
+			_last_elite_solo = (node.room_type == MapNodeRes.RoomType.ELITE and pending_enemies.size() == 1)
+			if node.room_type == MapNodeRes.RoomType.BOSS and pending_enemies.size() > 0:
+				_last_boss_enemy_id = pending_enemies[0].enemy_id
+			else:
+				_last_boss_enemy_id = ""
 			change_state(GameState.BATTLE)
 			_request_scene("res://scenes/battle/battle_scene.tscn")
 		MapNodeRes.RoomType.REST:
@@ -219,16 +211,25 @@ func complete_battle(won: bool) -> void:
 		if current_node_id >= 0 and current_node_id < run_map.size():
 			var node: Resource = run_map[current_node_id]
 			var MapNodeRes = load("res://resources/map_node_resource.gd")
+			var pm = get_node_or_null("/root/ProgressManager")
 			match node.room_type:
 				MapNodeRes.RoomType.ELITE:
 					card_rewards_pick_count = 2
 					add_gold(randi_range(20, 25))
+					if pm:
+						pm.increment_flag("elite_kills_total")
+						if _last_elite_solo:
+							pm.increment_flag("elite_solo_kills")
+						pm.check_unlock_conditions()
 				MapNodeRes.RoomType.BOSS:
 					card_rewards_pick_count = 2
 					add_gold(40)
 					var relic := get_random_relic()
 					if relic:
 						add_relic(relic)
+					if pm and _last_boss_enemy_id != "":
+						pm.set_flag("kill_boss:" + _last_boss_enemy_id)
+						pm.check_unlock_conditions()
 				_:
 					card_rewards_pick_count = 1
 					add_gold(randi_range(10, 15))
@@ -342,6 +343,7 @@ func _end_run_won() -> void:
 	var _pm = get_node_or_null("/root/ProgressManager")
 	if _pm:
 		_pm.mark_chapter_cleared(current_chapter)
+		_pm.check_unlock_conditions()
 	change_state(GameState.GAME_OVER)
 	_request_scene("res://scenes/game_over/game_over_scene.tscn")
 
@@ -557,30 +559,15 @@ func _recruit_hero_pool() -> Array:
 	var existing := []
 	for h in tm.heroes:
 		existing.append(h.hero_id)
+	var pm = get_node_or_null("/root/ProgressManager")
 	var pool := []
-	if "cleopatra" not in existing:
-		pool.append(_make_cleopatra_hero())
-	if "yi_sun_sin" not in existing:
-		pool.append(_make_yi_sun_sin_hero())
+	for hid in _HeroRegistry.all_hero_ids():
+		if hid in existing:
+			continue
+		if pm and not pm.is_hero_unlocked(hid):
+			continue
+		pool.append(_HeroRegistry.make_hero(hid))
 	return pool
-
-func _make_cleopatra_hero() -> Resource:
-	var HeroRes = load("res://resources/hero_resource.gd")
-	var hero: Resource = HeroRes.new()
-	hero.hero_id = "cleopatra"
-	hero.hero_name = "클레오파트라"
-	hero.max_hp = 1000
-	hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
-	return hero
-
-func _make_yi_sun_sin_hero() -> Resource:
-	var HeroRes = load("res://resources/hero_resource.gd")
-	var hero: Resource = HeroRes.new()
-	hero.hero_id = "yi_sun_sin"
-	hero.hero_name = "이순신"
-	hero.max_hp = 1000
-	hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
-	return hero
 
 func _add_initial_deck_for(hero: Resource) -> void:
 	var dm := _get_dm()

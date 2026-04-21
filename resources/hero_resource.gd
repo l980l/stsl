@@ -9,3 +9,5 @@ extends Resource
 @export var card_pool: Array = []            # CardResource 배열
 @export var character_scene: PackedScene     # 캐릭터 애니메이션 씬 (AnimationPlayer 포함)
 @export var portrait: Texture2D              # UI용 초상화 (정적 이미지)
+@export var unlock_condition: String = "default"  # 해금 조건 DSL
+@export var unlock_description: String = ""       # 잠금 시 UI 표시 설명
