@@ -31,6 +31,7 @@ func run_all() -> Dictionary:
 	test_cursed_relics_in_pool()
 	test_hero_relics_second_set()
 	test_act2_relics_exist()
+	test_korean_relics_exist()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -84,7 +85,7 @@ func test_relic_pool_size() -> void:
 	print("[TestRelics] test_relic_pool_size")
 	var RelicsGd = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicsGd.build_pool()
-	_assert(pool.size() == 25, "릴릭 풀 25종")
+	_assert(pool.size() == 28, "릴릭 풀 28종")
 
 func test_trigger_type_values() -> void:
 	print("[TestRelics] test_trigger_type_values")
@@ -240,3 +241,17 @@ func test_act2_relics_exist() -> void:
 	for r in pool:
 		if r.relic_name == "호루스의 눈": eye = r
 	_assert(eye != null and eye.owner_hero_id == "cleopatra", "호루스의 눈 — 클레오파트라 전용")
+
+func test_korean_relics_exist() -> void:
+	print("[TestRelics] test_korean_relics_exist")
+	var RelicsGd = load("res://resources/relics/relics.gd")
+	var pool: Array = RelicsGd.build_pool()
+	var names := pool.map(func(r): return r.relic_name)
+	_assert("저승 부적" in names, "저승 부적 존재")
+	_assert("도깨비 방망이 파편" in names, "도깨비 방망이 파편 존재")
+	_assert("삼태극 부적" in names, "삼태극 부적 존재")
+	var RelicRes = load("res://resources/relic_resource.gd")
+	var talisman = pool.filter(func(r): return r.relic_name == "저승 부적")[0]
+	_assert(talisman.trigger == RelicRes.TriggerType.BATTLE_START, "저승 부적 트리거=BATTLE_START")
+	_assert(talisman.effect_type == RelicRes.EffectType.ENERGY, "저승 부적 효과=ENERGY")
+	_assert(talisman.value == 1, "저승 부적 value=1")
