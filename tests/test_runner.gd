@@ -12,6 +12,7 @@ var TestEvent = preload("res://tests/test_event.gd")
 var TestHeroes = preload("res://tests/test_heroes.gd")
 var TestRelics = preload("res://tests/test_relics.gd")
 var TestSave = preload("res://tests/test_save.gd")
+var TestProgressManager = preload("res://tests/test_progress_manager.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -28,6 +29,7 @@ func _init() -> void:
 		TestHeroes.new(),
 		TestRelics.new(),
 		TestSave.new(),
+		TestProgressManager.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()
