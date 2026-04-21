@@ -60,7 +60,8 @@ func _make_chapter_card(chapter: Dictionary, idx: int) -> void:
 	desc_label.add_theme_font_size_override("font_size", 22)
 	add_child(desc_label)
 
-	var unlocked := ProgressManager.is_chapter_unlocked(chapter["id"])
+	var _pm = Engine.get_singleton("ProgressManager")
+	var unlocked: bool = _pm.is_chapter_unlocked(int(chapter["id"])) if _pm else true
 	var btn := Button.new()
 	btn.text = ("챕터 시작" if unlocked else "잠금")
 	btn.disabled = not unlocked
