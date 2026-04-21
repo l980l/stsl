@@ -20,6 +20,8 @@ enum EffectType {
 	FORMATION_BLOCK, # 생존 영웅 수 × value BLOCK
 	COST_NEXT,       # 이번 턴 다음 카드 비용 -value
 	CONDITIONAL_DMG, # 조건 충족 시 bonus_value, 아니면 value 피해. status_type=조건키
+	REVIVE,          # 사망한 아군 1명을 max_hp의 value% HP로 부활 (잔다르크)
+	SACRIFICE_HP,    # 시전자 HP value만큼 즉시 소모 (방어도 무시). 순교 카드
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
@@ -58,4 +60,6 @@ func display_text() -> String:
 		EffectType.CONDITIONAL_DMG: return "%d/%d(%s)" % [bonus_value, value, status_type]
 		EffectType.SUMMON_TOKEN:   return "병사 소환 %d" % value
 		EffectType.CHARM:          return "매혹 %d" % value
+		EffectType.REVIVE:         return "부활 %d%%" % value
+		EffectType.SACRIFICE_HP:   return "자기 HP -%d" % value
 	return ""

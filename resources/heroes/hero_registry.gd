@@ -5,7 +5,7 @@ class_name HeroRegistry
 extends RefCounted
 
 static func all_hero_ids() -> Array:
-	return ["napoleon", "cleopatra", "yi_sun_sin"]
+	return ["napoleon", "cleopatra", "yi_sun_sin", "joan_of_arc"]
 
 static func make_hero(hero_id: String) -> Resource:
 	var HeroRes = load("res://resources/hero_resource.gd")
@@ -33,6 +33,13 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
 			hero.unlock_condition = "default"
 			hero.unlock_description = ""
+		"joan_of_arc":
+			hero.hero_name = "잔다르크"
+			hero.historical_figure = "잔 다르크"
+			hero.max_hp = 1000
+			hero.character_scene = load("res://characters/heroes/joan_of_arc/joan_of_arc.tscn")
+			hero.unlock_condition = "clear_chapter_1"
+			hero.unlock_description = "챕터 1 클리어 후 해금"
 	return hero
 
 static func get_display_info(hero_id: String) -> Dictionary:
@@ -57,5 +64,12 @@ static func get_display_info(hero_id: String) -> Dictionary:
 				"hp": 1000,
 				"desc": "포지션: 방어형 역공\n고유 메카닉: 진형(Formation)\n아키타입: 거북선(Turtle)\n\n스타터: 방패×2 + 역공×2",
 				"unlock_description": "",
+			}
+		"joan_of_arc":
+			return {
+				"name": "잔다르크",
+				"hp": 1000,
+				"desc": "포지션: 서포트/생존형\n고유 메카닉: 부활(Revive)·순교\n아키타입: 신성(Holy)\n\n스타터: 스트라이크×3 + 디펜드×2",
+				"unlock_description": "챕터 1 클리어 후 해금",
 			}
 	return {}
