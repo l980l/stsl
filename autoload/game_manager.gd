@@ -6,6 +6,7 @@ const _HeroRegistry   = preload("res://resources/heroes/hero_registry.gd")
 const _NapoleonCards  = preload("res://resources/cards/cards_napoleon.gd")
 const _CleopatraCards = preload("res://resources/cards/cards_cleopatra.gd")
 const _YiSunSinCards  = preload("res://resources/cards/cards_yi_sun_sin.gd")
+const _JoanCards      = preload("res://resources/cards/cards_joan_of_arc.gd")
 const _GreekNormals    = preload("res://resources/enemies/greek/greek_normals.gd")
 const _GreekAct1       = preload("res://resources/enemies/greek/greek_act1.gd")
 const _GreekAct2       = preload("res://resources/enemies/greek/greek_act2.gd")
@@ -544,9 +545,10 @@ func _generate_card_rewards() -> Array:
 	var pool: Array = []
 	for hero in tm.heroes:
 		match hero.hero_id:
-			"napoleon":   pool.append_array(_napoleon_card_pool())
-			"cleopatra":  pool.append_array(_cleopatra_card_pool())
-			"yi_sun_sin": pool.append_array(_yi_sun_sin_card_pool())
+			"napoleon":    pool.append_array(_napoleon_card_pool())
+			"cleopatra":   pool.append_array(_cleopatra_card_pool())
+			"yi_sun_sin":  pool.append_array(_yi_sun_sin_card_pool())
+			"joan_of_arc": pool.append_array(_joan_of_arc_card_pool())
 	pool.shuffle()
 	return pool.slice(0, min(3, pool.size()))
 
@@ -575,9 +577,10 @@ func _add_initial_deck_for(hero: Resource) -> void:
 		return
 	var cards: Array = []
 	match hero.hero_id:
-		"napoleon":   cards = _NapoleonCards.starter_deck()
-		"cleopatra":  cards = _CleopatraCards.starter_deck()
-		"yi_sun_sin": cards = _YiSunSinCards.starter_deck()
+		"napoleon":    cards = _NapoleonCards.starter_deck()
+		"cleopatra":   cards = _CleopatraCards.starter_deck()
+		"yi_sun_sin":  cards = _YiSunSinCards.starter_deck()
+		"joan_of_arc": cards = _JoanCards.starter_deck()
 	for card in cards:
 		dm.add_card_to_deck(card)
 
@@ -589,6 +592,9 @@ func _cleopatra_card_pool() -> Array:
 
 func _yi_sun_sin_card_pool() -> Array:
 	return _YiSunSinCards.pool()
+
+func _joan_of_arc_card_pool() -> Array:
+	return _JoanCards.pool()
 
 func _get_random_event() -> Resource:
 	var pool := _build_event_pool()

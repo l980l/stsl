@@ -18,12 +18,15 @@ func run_all() -> Dictionary:
 	test_napoleon_card_pool_size()
 	test_cleopatra_card_pool_size()
 	test_yi_sun_sin_card_pool_size()
+	test_joan_of_arc_card_pool_size()
 	test_gain_morale_effect()
 	test_consume_morale_insufficient()
 	test_consume_morale_sufficient()
 	test_poison_burst_damages_and_clears()
 	test_counter_block_damage()
 	test_block_all_covers_team()
+	test_revive_effect_revives_dead_hero()
+	test_sacrifice_hp_reduces_caster_hp()
 	test_recruit_hero_pool_napoleon_only()
 	test_recruit_hero_pool_full_party()
 	test_add_initial_deck_for_cleopatra()
@@ -89,6 +92,11 @@ func test_yi_sun_sin_card_pool_size() -> void:
 	print("[TestHeroes] test_yi_sun_sin_card_pool_size")
 	var gm = _load_gm()
 	_assert(gm._yi_sun_sin_card_pool().size() == 40, "이순신 카드 풀 40장")
+
+func test_joan_of_arc_card_pool_size() -> void:
+	print("[TestHeroes] test_joan_of_arc_card_pool_size")
+	var gm = _load_gm()
+	_assert(gm._joan_of_arc_card_pool().size() == 13, "잔다르크 카드 풀 13장")
 
 # ──────────────────────────────────────────────
 # BattleManager 신규 효과 테스트
@@ -171,6 +179,38 @@ func test_block_all_covers_team() -> void:
 	bm._apply_card_effects(_make_card("yi_sun_sin", [eff]), 0)
 	_assert(bm.get_hero_block("napoleon") == 5, "BLOCK_ALL — 나폴레옹 방어 5")
 	_assert(bm.get_hero_block("yi_sun_sin") == 5, "BLOCK_ALL — 이순신 방어 5")
+
+func test_revive_effect_revives_dead_hero() -> void:
+	print("[TestHeroes] test_revive_effect_revives_dead_hero")
+	var bm := _make_bm()
+	var joan := _make_hero("joan_of_arc", 1000)
+	var ally := _make_hero("napoleon", 1000)
+	bm.team_mgr.add_hero(joan)
+	bm.team_mgr.add_hero(ally)
+	bm.setup_battle([_make_enemy(30)])
+	# 나폴레옹 사망 처리
+	bm.team_mgr.take_damage("napoleon", 1000)
+	_assert(not bm.team_mgr.is_alive("napoleon"), "나폴레옹 사망 전제")
+	# REVIVE 25% 카드 사용
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.REVIVE
+	eff.value = 25
+	bm._apply_card_effects(_make_card("joan_of_arc", [eff]), 0)
+	_assert(bm.team_mgr.is_alive("napoleon"), "REVIVE 후 나폴레옹 생존")
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 250, "REVIVE 25% → HP 250")
+
+func test_sacrifice_hp_reduces_caster_hp() -> void:
+	print("[TestHeroes] test_sacrifice_hp_reduces_caster_hp")
+	var bm := _make_bm()
+	var joan := _make_hero("joan_of_arc", 1000)
+	bm.team_mgr.add_hero(joan)
+	bm.setup_battle([_make_enemy(30)])
+	_assert(bm.team_mgr.get_current_hp("joan_of_arc") == 1000, "초기 HP 1000")
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.SACRIFICE_HP
+	eff.value = 80
+	bm._apply_card_effects(_make_card("joan_of_arc", [eff]), 0)
+	_assert(bm.team_mgr.get_current_hp("joan_of_arc") == 920, "SACRIFICE_HP 80 후 HP 920")
 
 # ──────────────────────────────────────────────
 # 영입 풀 테스트 (로직 인라인)
