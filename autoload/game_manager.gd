@@ -431,6 +431,9 @@ func _get_mythology_registry() -> Dictionary:
 		"greek":    {"normals": _GreekNormals,    "acts": [_GreekAct1,    _GreekAct2,    _GreekAct3]},
 		"egyptian": {"normals": _EgyptianNormals, "acts": [_EgyptianAct1, _EgyptianAct2, _EgyptianAct3]},
 		"norse":    {"normals": _NorseNormals,    "acts": [_NorseAct1,    _NorseAct2,    _NorseAct3]},
+		"korean":   {"normals": _KoreanNormals,   "acts": [_KoreanAct1,   _KoreanAct2,   _KoreanAct3]},
+		"chinese":  {"normals": _ChineseNormals,  "acts": [_ChineseAct1,  _ChineseAct2,  _ChineseAct3]},
+		"japanese": {"normals": _JapaneseNormals, "acts": [_JapaneseAct1, _JapaneseAct2, _JapaneseAct3]},
 	}
 
 func _scene_for(_myth: String, _fn_name: String) -> PackedScene:
