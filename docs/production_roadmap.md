@@ -259,18 +259,18 @@
   - 챕터 1: `["greek", "egyptian", "norse"]`
   - 챕터 2: `["korean", "chinese", "japanese"]`
 
-### 4-3. 영웅 해금 시스템
-> `hero_select_scene.gd`는 현재 하드코딩된 3인 목록 사용. 해금 필터링 필요.
-> **진행 상태:** `ProgressManager`에 `unlock_hero()`/`is_hero_unlocked()`/`unlocked_heroes` API 마련됨. hero_resource·씬 연결만 남음.
-> **순서 결정:** M5(추가 영웅 3명) 구현 후 착수 — 해금 대상이 충분해야 해금 시스템의 실효성이 생김.
+### 4-3. 영웅 해금 시스템 ✅ 완료 (PR #53)
 
-- 🔲 `hero_resource.gd`에 해금 조건 필드 추가:
-  - `unlock_condition: String` (예: `"kill_hydra"`, `"clear_chapter_1"`, `"default"`)
-  - `unlock_description: String` (UI 표시용 조건 설명)
-- 🔲 `progress_manager.gd`에 `check_unlock_conditions()` — 전투/이벤트 결과 후 조건 확인 및 신규 해금 처리
-- 🔲 `hero_select_scene.gd` 수정 — `progress_manager.unlocked_heroes`로 표시 목록 필터링. 잠금 영웅은 조건 설명과 함께 비활성 표시
-- 🔲 영웅 영입 씬 수정 — 랜덤 3명을 해금 풀 전체에서 추출 (현재 팀에 없는 영웅 중)
-- 🔲 해금 알림 UI (신규 영웅 해금 시 팝업)
+- ✅ `hero_resource.gd`에 해금 조건 필드 추가: `unlock_condition` / `unlock_description`
+- ✅ `resources/heroes/hero_registry.gd` 신설 — 영웅 중앙 레지스트리 (기본 3명). M5 영웅 구현 시 이 파일에만 분기 추가
+- ✅ `progress_manager.gd`에 `check_unlock_conditions()` + `increment_flag()` + `hero_unlocked` 시그널
+  - 조건 DSL: `default` / `clear_chapter_N` / `flag:<key>` / `<counter>>=<n>`
+  - 훅: BOSS 처치(`kill_boss:<enemy_id>`) / ELITE 처치(`elite_kills_total`, `elite_solo_kills`) / 챕터 클리어
+- ✅ `hero_select_scene.gd` — 레지스트리 기반 동적 생성 + 해금 필터링 (잠금 영웅 비활성 + unlock_description 표시)
+- ✅ `_recruit_hero_pool()` — 해금 풀 전체에서 추출 (하드코딩 제거)
+- ✅ 해금 알림 토스트 (`scenes/ui/hero_unlock_toast.tscn`) — 승리 화면에서 인스턴스화, hero_unlocked 시그널 구독 후 3초 표시
+- 🔲 M5 영웅 코드 구현 시 `HeroRegistry.make_hero()`에 분기 추가 + `unlock_condition` 설정:
+  - 잔다르크: `"clear_chapter_1"`, 칭기즈칸: `"flag:kill_boss:oshiris"`, 무사시: `"elite_solo_kills>=5"`
 
 ### 4-4. 기본 해금 조건 정의 (초기 3인 + 향후 확장)
 

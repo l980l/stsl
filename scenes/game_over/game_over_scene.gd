@@ -1,8 +1,13 @@
 # scenes/game_over/game_over_scene.gd
 extends Node2D
 
+const _ToastScene = preload("res://scenes/ui/hero_unlock_toast.tscn")
+
 func _ready() -> void:
 	_build_ui()
+	if GameManager.run_won:
+		var toast = _ToastScene.instantiate()
+		add_child(toast)
 
 func _build_ui() -> void:
 	var is_win: bool = GameManager.run_won
