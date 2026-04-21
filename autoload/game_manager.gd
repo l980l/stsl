@@ -5,8 +5,15 @@ extends Node
 const _NapoleonCards  = preload("res://resources/cards/cards_napoleon.gd")
 const _CleopatraCards = preload("res://resources/cards/cards_cleopatra.gd")
 const _YiSunSinCards  = preload("res://resources/cards/cards_yi_sun_sin.gd")
-const _EnemiesAct1    = preload("res://resources/enemies/enemies_act1.gd")
-const _EnemiesAct2    = preload("res://resources/enemies/enemies_act2.gd")
+const _GreekNormals    = preload("res://resources/enemies/greek/greek_normals.gd")
+const _GreekAct1       = preload("res://resources/enemies/greek/greek_act1.gd")
+const _GreekAct2       = preload("res://resources/enemies/greek/greek_act2.gd")
+const _EgyptianNormals = preload("res://resources/enemies/egyptian/egyptian_normals.gd")
+const _EgyptianAct1    = preload("res://resources/enemies/egyptian/egyptian_act1.gd")
+const _EgyptianAct2    = preload("res://resources/enemies/egyptian/egyptian_act2.gd")
+const _NorseNormals    = preload("res://resources/enemies/norse/norse_normals.gd")
+const _NorseAct1       = preload("res://resources/enemies/norse/norse_act1.gd")
+const _NorseAct2       = preload("res://resources/enemies/norse/norse_act2.gd")
 const _RelicData      = preload("res://resources/relics/relics.gd")
 const _EventsAct1     = preload("res://resources/events/events_act1.gd")
 const _EventsAct2     = preload("res://resources/events/events_act2.gd")
@@ -20,6 +27,7 @@ var current_act: int = 1
 var gold: int = 0
 var relics: Array = []
 var run_won: bool = false
+var act_mythologies: Array[String] = []
 
 # ── Plan 04: 런 스테이트 ──────────────────────────────
 var run_map: Array = []             # Array[MapNodeResource]
@@ -105,6 +113,7 @@ func reset() -> void:
 	card_rewards_pick_count = 1
 	pending_boss_upgrade = false
 	pending_boss_recruit = false
+	act_mythologies = ["greek", "egyptian"]
 
 # ── Plan 04: 런 관리 ──────────────────────────────────
 
@@ -391,26 +400,31 @@ func _heal_all_heroes(amount: int) -> void:
 	for hero in tm.heroes:
 		tm.heal(hero.hero_id, amount)
 
-func _satyr_scene() -> PackedScene:
+func _get_mythology_registry() -> Dictionary:
+	return {
+		"greek":    {"normals": _GreekNormals,    "acts": [_GreekAct1,    _GreekAct2]},
+		"egyptian": {"normals": _EgyptianNormals, "acts": [_EgyptianAct1, _EgyptianAct2]},
+		"norse":    {"normals": _NorseNormals,    "acts": [_NorseAct1,    _NorseAct2]},
+	}
+
+func _scene_for(_myth: String, _fn_name: String) -> PackedScene:
 	return load("res://characters/enemies/satyr/satyr.tscn")
 
 func _make_normal_enemies() -> Array:
-	var scene := _satyr_scene()
-	if current_act == 2:
-		match randi() % 6:
-			0: return [_EnemiesAct2.sand_scout(scene)]
-			1: return [_EnemiesAct2.desert_scorpion(scene)]
-			2: return [_EnemiesAct2.mummy_warrior(scene)]
-			3: return [_EnemiesAct2.sphinx_cub(scene)]
-			4: return [_EnemiesAct2.sand_ifrit(scene)]
-			_: return [_EnemiesAct2.ka_spirit(scene)]
-	match randi() % 6:
-		0: return [_EnemiesAct1.satyr(scene)]
-		1: return [_EnemiesAct1.harpy(scene)]
-		2: return [_EnemiesAct1.cyclops(scene)]
-		3: return [_EnemiesAct1.snake(scene)]
-		4: return [_EnemiesAct1.cerberus(scene)]
-		_: return [_EnemiesAct1.myrmidon(scene)]
+	var myth: String = act_mythologies[current_act - 1]
+	var reg: Dictionary = _get_mythology_registry()
+	var normals_mod = reg[myth]["normals"]
+	var encounters: Array = normals_mod.encounters()
+	if encounters.is_empty():
+		push_warning("신화 %s 에 일반 인카운터가 없음" % myth)
+		return []
+	var encounter: Array = encounters.pick_random()
+	var result: Array = []
+	for fn_name in encounter:
+		var scene: PackedScene = _scene_for(myth, fn_name)
+		var enemy: Resource = normals_mod.call(fn_name, scene)
+		result.append(enemy)
+	return result
 
 const _ACT_HP_MULT: Dictionary = {1: 1.0, 2: 1.3}
 const _ACT_DMG_MULT: Dictionary = {1: 1.0, 2: 1.2}
@@ -445,22 +459,27 @@ func _make_enemies_for_node(node: Resource) -> Array:
 	return enemies
 
 func _make_elite_enemies() -> Array:
-	var scene := _satyr_scene()
-	if current_act == 2:
-		match randi() % 3:
-			0: return [_EnemiesAct2.apep_snake(scene)]
-			1: return [_EnemiesAct2.seth_hound(scene)]
-			_: return [_EnemiesAct2.ba_bird(scene)]
-	match randi() % 4:
-		0: return [_EnemiesAct1.minotaur(scene)]
-		1: return [_EnemiesAct1.medusa(scene)]
-		2: return [_EnemiesAct1.gorgon(scene)]
-		_: return [_EnemiesAct1.scylla(scene)]
+	var myth: String = act_mythologies[current_act - 1]
+	var reg: Dictionary = _get_mythology_registry()
+	var act_mod = reg[myth]["acts"][current_act - 1]
+	var elites: Array = act_mod.elites()
+	if elites.is_empty():
+		push_warning("신화 %s Act %d 엘리트 없음 — 일반 전투로 대체" % [myth, current_act])
+		return _make_normal_enemies()
+	var fn_name: String = elites.pick_random()
+	var scene: PackedScene = _scene_for(myth, fn_name)
+	return [act_mod.call(fn_name, scene)]
 
 func _make_boss_enemies() -> Array:
-	if current_act == 2:
-		return [_EnemiesAct2.osiris(_satyr_scene())]
-	return [_EnemiesAct1.hydra(_satyr_scene())]
+	var myth: String = act_mythologies[current_act - 1]
+	var reg: Dictionary = _get_mythology_registry()
+	var act_mod = reg[myth]["acts"][current_act - 1]
+	var fn_name: String = act_mod.boss()
+	if fn_name == "":
+		push_error("신화 %s Act %d 보스 없음" % [myth, current_act])
+		return []
+	var scene: PackedScene = _scene_for(myth, fn_name)
+	return [act_mod.call(fn_name, scene)]
 
 func _generate_card_rewards() -> Array:
 	var tm := _get_tm()

@@ -40,6 +40,7 @@ func _assert(cond: bool, msg: String) -> void:
 
 func _make_gm() -> GameManagerClass:
 	var gm := GameManagerClass.new()
+	gm.act_mythologies = ["greek", "egyptian"]
 	gm.run_map = MapGen.generate()
 	gm.available_node_ids = [0, 1, 2]
 	gm.current_node_id = -1
@@ -233,14 +234,14 @@ func test_act_transition() -> void:
 func test_act_difficulty() -> void:
 	print("[TestGameManager] test_act_difficulty")
 	var gm := _make_gm()
-	var EnemiesAct1 = preload("res://resources/enemies/enemies_act1.gd")
-	var scene := gm._satyr_scene()
+	var GreekNormals = preload("res://resources/enemies/greek/greek_normals.gd")
+	var scene := load("res://characters/enemies/satyr/satyr.tscn") as PackedScene
 
-	var e1: Resource = EnemiesAct1.satyr(scene)
+	var e1: Resource = GreekNormals.satyr(scene)
 	gm._apply_act_difficulty([e1], 1)
 	var hp1: int = e1.max_hp
 
-	var e2: Resource = EnemiesAct1.satyr(scene)
+	var e2: Resource = GreekNormals.satyr(scene)
 	gm._apply_act_difficulty([e2], 2)
 	var hp2: int = e2.max_hp
 
