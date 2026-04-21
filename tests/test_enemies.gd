@@ -60,6 +60,7 @@ func run_all() -> Dictionary:
 	test_korean_normals_shape()
 	test_korean_act1_shape()
 	test_korean_act2_shape()
+	test_korean_act3_shape()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -626,3 +627,15 @@ func test_korean_act2_shape() -> void:
 	var dongmyeong = M.dongmyeong(scene)
 	_assert(dongmyeong.max_hp == 1900, "동명성왕 엘리트 HP 1900")
 	_assert(dongmyeong.charm_resistance == 1, "동명성왕 charm_resistance=1")
+
+func test_korean_act3_shape() -> void:
+	print("[TestEnemies] test_korean_act3_shape")
+	var M = load("res://resources/enemies/korean/korean_act3.gd")
+	_assert(M.elites().size() == 3, "korean_act3 엘리트 3종")
+	_assert(M.boss() == "gusamseung_halmang", "korean_act3 보스는 gusamseung_halmang")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.gusamseung_halmang(scene)
+	_assert(b.max_hp == 4800, "구삼승할망 HP 4800")
+	_assert(b.phase_thresholds.size() == 2, "구삼승할망 3페이즈")
+	_assert(b.mythology == "korean", "구삼승할망 mythology=korean")
+	_assert(b.charm_resistance == 2, "구삼승할망 charm_resistance=2")
