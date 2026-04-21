@@ -25,6 +25,9 @@ func run_all() -> Dictionary:
 	test_act2_mummy_curse_gamble()
 	test_act2_oasis_three_choices()
 	test_act2_no_greek_names()
+	test_korean_event_pool_size()
+	test_korean_death_reaper_event()
+	test_korean_samsin_blessing_uses_max_hp()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -333,3 +336,35 @@ func test_act2_no_greek_names() -> void:
 			if name in e.event_name:
 				has_greek = true
 	_assert(not has_greek, "Act2 풀에 그리스 고유 이름 없음")
+
+func test_korean_event_pool_size() -> void:
+	print("[TestEvent] test_korean_event_pool_size")
+	var KoreanEvents = load("res://resources/events/events_korean.gd")
+	var pool: Array = KoreanEvents.build_pool()
+	_assert(pool.size() == 10, "한국 이벤트 풀 10종")
+
+func test_korean_death_reaper_event() -> void:
+	print("[TestEvent] test_korean_death_reaper_event")
+	var KoreanEvents = load("res://resources/events/events_korean.gd")
+	var pool: Array = KoreanEvents.build_pool()
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var found := false
+	for e in pool:
+		if e.event_name == "저승사자의 방문":
+			found = true
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.GOLD, "선택A: GOLD")
+			_assert(e.choices[0].value == 70, "GOLD +70")
+			_assert(e.choices[0].cost_hp == 40, "HP -40")
+	_assert(found, "저승사자의 방문 이벤트 존재")
+
+func test_korean_samsin_blessing_uses_max_hp() -> void:
+	print("[TestEvent] test_korean_samsin_blessing_uses_max_hp")
+	var KoreanEvents = load("res://resources/events/events_korean.gd")
+	var pool: Array = KoreanEvents.build_pool()
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var found := false
+	for e in pool:
+		if e.event_name == "삼신할머니의 축복":
+			found = true
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.HEAL, "선택A: HEAL")
+	_assert(found, "삼신할머니의 축복 이벤트 존재")
