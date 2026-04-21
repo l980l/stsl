@@ -12,6 +12,7 @@ func run_all() -> Dictionary:
 	test_make_hero_has_unlock_fields_default()
 	test_make_hero_joan_of_arc()
 	test_make_hero_genghis_khan()
+	test_make_hero_musashi()
 	test_get_display_info_returns_required_keys()
 	return {"passed": passed, "failed": failed}
 
@@ -26,12 +27,13 @@ func _assert(cond: bool, msg: String) -> void:
 func test_all_hero_ids_returns_default_three() -> void:
 	print("[TestHeroRegistry] test_all_hero_ids_returns_default_three")
 	var ids = HR.all_hero_ids()
-	_assert(ids.size() == 5, "영웅 5명 등록")
+	_assert(ids.size() == 6, "영웅 6명 등록")
 	_assert("napoleon" in ids, "나폴레옹 포함")
 	_assert("cleopatra" in ids, "클레오파트라 포함")
 	_assert("yi_sun_sin" in ids, "이순신 포함")
 	_assert("joan_of_arc" in ids, "잔다르크 포함")
 	_assert("genghis_khan" in ids, "칭기즈칸 포함")
+	_assert("musashi" in ids, "무사시 포함")
 
 func test_make_hero_has_unlock_fields_default() -> void:
 	print("[TestHeroRegistry] test_make_hero_has_unlock_fields_default")
@@ -60,6 +62,15 @@ func test_make_hero_genghis_khan() -> void:
 	_assert(hero.hero_id == "genghis_khan", "hero_id=genghis_khan")
 	_assert(hero.max_hp == 1000, "max_hp=1000")
 	_assert(hero.unlock_condition == "flag:kill_boss:oshiris", "unlock_condition=flag:kill_boss:oshiris")
+	_assert(hero.unlock_description != "", "unlock_description 비어있지 않음")
+
+func test_make_hero_musashi() -> void:
+	print("[TestHeroRegistry] test_make_hero_musashi")
+	var hero = HR.make_hero("musashi")
+	_assert(hero != null, "무사시 make_hero 반환값 있음")
+	_assert(hero.hero_id == "musashi", "hero_id=musashi")
+	_assert(hero.max_hp == 1000, "max_hp=1000")
+	_assert(hero.unlock_condition == "elite_solo_kills>=5", "unlock_condition=elite_solo_kills>=5")
 	_assert(hero.unlock_description != "", "unlock_description 비어있지 않음")
 
 func test_get_display_info_returns_required_keys() -> void:

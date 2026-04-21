@@ -16,6 +16,8 @@ static func build_pool() -> Array:
 		_flag_of_orleans(), _saints_tears(),
 		# 칭기즈칸 전용 렐릭
 		_thousand_horses(), _conquerors_whip(),
+		# 무사시 전용 렐릭
+		_niten_ichi_ryu(), _gorin_sho_relic(),
 	]
 
 static func _burning_blood() -> Resource:
@@ -239,3 +241,19 @@ static func _conquerors_whip() -> Resource:
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.DRAW
 	r.owner_hero_id = "genghis_khan"; r.value = 1; return r
+
+# ──── 무사시 전용 렐릭 ────
+
+static func _niten_ichi_ryu() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "니텐이치류"
+	r.description = "전투 시작 시 에너지 +1 (무사시 전용)"
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.ENERGY
+	r.owner_hero_id = "musashi"; r.value = 1; return r
+
+static func _gorin_sho_relic() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "오륜서"
+	r.description = "플레이어 턴 시작 시 카드 1장 추가 드로우 (무사시 전용)"
+	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r.effect_type = RelicRes.EffectType.DRAW
+	r.owner_hero_id = "musashi"; r.value = 1; return r
