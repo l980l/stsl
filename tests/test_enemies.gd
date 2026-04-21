@@ -48,6 +48,7 @@ func run_all() -> Dictionary:
 	test_norse_encounters_shape()
 	test_norse_act3_boss_name()
 	test_norse_act3_elites()
+	test_act3_event_pool_shape()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -440,3 +441,13 @@ func test_norse_act3_elites() -> void:
 	for e in elite_enemies:
 		_assert(e.max_hp >= 1800, "HP >= 1800")
 		_assert(e.mythology == "norse", "mythology = norse")
+
+func test_act3_event_pool_shape() -> void:
+	print("[TestEnemies] test_act3_event_pool_shape")
+	var EventsAct3 = load("res://resources/events/events_act3.gd")
+	var pool: Array = EventsAct3.build_pool()
+	assert(pool.size() == 10, "Act 3 이벤트는 10종이어야 함")
+	for ev in pool:
+		assert(ev.event_name != "", "이벤트 이름 비어있으면 안 됨")
+		assert(ev.choices.size() >= 2, "선택지 최소 2개")
+	passed += 1

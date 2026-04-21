@@ -18,6 +18,7 @@ const _NorseAct3       = preload("res://resources/enemies/norse/norse_act3.gd")
 const _RelicData      = preload("res://resources/relics/relics.gd")
 const _EventsAct1     = preload("res://resources/events/events_act1.gd")
 const _EventsAct2     = preload("res://resources/events/events_act2.gd")
+const _EventsAct3     = preload("res://resources/events/events_act3.gd")
 
 enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGRADE, HERO_RECRUIT }
 
@@ -563,7 +564,7 @@ func _get_random_event() -> Resource:
 func _build_event_pool() -> Array:
 	match current_act:
 		2: return _EventsAct2.build_pool()
-		3: return _EventsAct2.build_pool()
+		3: return _EventsAct3.build_pool()
 	return _EventsAct1.build_pool()
 
 func to_dict() -> Dictionary:
