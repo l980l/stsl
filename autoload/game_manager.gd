@@ -338,6 +338,9 @@ func _end_run_won() -> void:
 	var _sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
 	if _sm:
 		_sm.clear_save()
+	var _pm = Engine.get_singleton("ProgressManager") if Engine.has_singleton("ProgressManager") else null
+	if _pm:
+		_pm.mark_chapter_cleared(current_chapter)
 	change_state(GameState.GAME_OVER)
 	_request_scene("res://scenes/game_over/game_over_scene.tscn")
 
