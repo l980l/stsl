@@ -14,6 +14,7 @@ const _EgyptianAct2    = preload("res://resources/enemies/egyptian/egyptian_act2
 const _NorseNormals    = preload("res://resources/enemies/norse/norse_normals.gd")
 const _NorseAct1       = preload("res://resources/enemies/norse/norse_act1.gd")
 const _NorseAct2       = preload("res://resources/enemies/norse/norse_act2.gd")
+const _NorseAct3       = preload("res://resources/enemies/norse/norse_act3.gd")
 const _RelicData      = preload("res://resources/relics/relics.gd")
 const _EventsAct1     = preload("res://resources/events/events_act1.gd")
 const _EventsAct2     = preload("res://resources/events/events_act2.gd")
@@ -22,7 +23,7 @@ enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGR
 
 var current_state: GameState = GameState.MAP
 var current_floor: int = 0
-const MAX_ACTS: int = 2
+const MAX_ACTS: int = 3
 var current_act: int = 1
 var gold: int = 0
 var relics: Array = []
@@ -113,7 +114,7 @@ func reset() -> void:
 	card_rewards_pick_count = 1
 	pending_boss_upgrade = false
 	pending_boss_recruit = false
-	act_mythologies = ["greek", "egyptian"]
+	act_mythologies = ["greek", "egyptian", "norse"]
 
 # ── Plan 04: 런 관리 ──────────────────────────────────
 
@@ -402,9 +403,9 @@ func _heal_all_heroes(amount: int) -> void:
 
 func _get_mythology_registry() -> Dictionary:
 	return {
-		"greek":    {"normals": _GreekNormals,    "acts": [_GreekAct1,    _GreekAct2]},
-		"egyptian": {"normals": _EgyptianNormals, "acts": [_EgyptianAct1, _EgyptianAct2]},
-		"norse":    {"normals": _NorseNormals,    "acts": [_NorseAct1,    _NorseAct2]},
+		"greek":    {"normals": _GreekNormals,    "acts": [_GreekAct1,    _GreekAct2,    null]},
+		"egyptian": {"normals": _EgyptianNormals, "acts": [_EgyptianAct1, _EgyptianAct2, null]},
+		"norse":    {"normals": _NorseNormals,    "acts": [_NorseAct1,    _NorseAct2,    _NorseAct3]},
 	}
 
 func _scene_for(_myth: String, _fn_name: String) -> PackedScene:
@@ -426,8 +427,8 @@ func _make_normal_enemies() -> Array:
 		result.append(enemy)
 	return result
 
-const _ACT_HP_MULT: Dictionary = {1: 1.0, 2: 1.3}
-const _ACT_DMG_MULT: Dictionary = {1: 1.0, 2: 1.2}
+const _ACT_HP_MULT: Dictionary = {1: 1.0, 2: 1.3, 3: 1.6}
+const _ACT_DMG_MULT: Dictionary = {1: 1.0, 2: 1.2, 3: 1.4}
 
 func _apply_act_difficulty(enemies: Array, act: int) -> void:
 	var hp_m: float = _ACT_HP_MULT.get(act, 1.0)
@@ -462,6 +463,10 @@ func _make_elite_enemies() -> Array:
 	var myth: String = act_mythologies[current_act - 1]
 	var reg: Dictionary = _get_mythology_registry()
 	var act_mod = reg[myth]["acts"][current_act - 1]
+	# act_mod이 null이면 해당 신화에 Act 데이터 없음 — 일반 전투로 대체
+	if act_mod == null:
+		push_warning("신화 %s Act %d 모듈 없음 — 일반 전투로 대체" % [myth, current_act])
+		return _make_normal_enemies()
 	var elites: Array = act_mod.elites()
 	if elites.is_empty():
 		push_warning("신화 %s Act %d 엘리트 없음 — 일반 전투로 대체" % [myth, current_act])
@@ -474,6 +479,10 @@ func _make_boss_enemies() -> Array:
 	var myth: String = act_mythologies[current_act - 1]
 	var reg: Dictionary = _get_mythology_registry()
 	var act_mod = reg[myth]["acts"][current_act - 1]
+	# act_mod이 null이면 해당 신화에 Act 데이터 없음
+	if act_mod == null:
+		push_error("신화 %s Act %d 보스 모듈 없음" % [myth, current_act])
+		return []
 	var fn_name: String = act_mod.boss()
 	if fn_name == "":
 		push_error("신화 %s Act %d 보스 없음" % [myth, current_act])
@@ -552,8 +561,9 @@ func _get_random_event() -> Resource:
 	return pool[randi() % pool.size()]
 
 func _build_event_pool() -> Array:
-	if current_act == 2:
-		return _EventsAct2.build_pool()
+	match current_act:
+		2: return _EventsAct2.build_pool()
+		3: return _EventsAct2.build_pool()
 	return _EventsAct1.build_pool()
 
 func to_dict() -> Dictionary:

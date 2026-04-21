@@ -8,6 +8,8 @@ const GreekAct1     = preload("res://resources/enemies/greek/greek_act1.gd")
 const EgyptianNormals = preload("res://resources/enemies/egyptian/egyptian_normals.gd")
 const EgyptianAct2    = preload("res://resources/enemies/egyptian/egyptian_act2.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const NorseNormals = preload("res://resources/enemies/norse/norse_normals.gd")
+const NorseAct3    = preload("res://resources/enemies/norse/norse_act3.gd")
 
 var passed: int = 0
 var failed: int = 0
@@ -42,6 +44,10 @@ func run_all() -> Dictionary:
 	test_greek_normals_encounters()
 	test_egyptian_normals_encounters()
 	test_normal_enemy_multi_encounter()
+	test_norse_normals_shape()
+	test_norse_encounters_shape()
+	test_norse_act3_boss_name()
+	test_norse_act3_elites()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -391,3 +397,46 @@ func test_normal_enemy_multi_encounter() -> void:
 		if enemies.size() >= 2:
 			saw_multi = true
 	_assert(saw_multi, "30회 중 다수 인카운터 최소 1회")
+
+func test_norse_normals_shape() -> void:
+	print("[TestEnemies] test_norse_normals_shape")
+	var scene := _make_dummy_scene()
+	var enemies := [
+		NorseNormals.draugr(scene), NorseNormals.urdr_spider(scene),
+		NorseNormals.jotun_soldier(scene), NorseNormals.volva_witch(scene),
+		NorseNormals.hrimfaxi_rider(scene), NorseNormals.garlarr_snake(scene),
+	]
+	for e in enemies:
+		_assert(e.enemy_name != "", "이름 비어있지 않음")
+		_assert(e.max_hp > 0, "HP > 0")
+		_assert(e.mythology == "norse", "mythology = norse")
+
+func test_norse_encounters_shape() -> void:
+	print("[TestEnemies] test_norse_encounters_shape")
+	var enc: Array = NorseNormals.encounters()
+	_assert(enc.size() >= 3, "북유럽 인카운터 조합 3개 이상")
+	for combo in enc:
+		_assert(combo.size() >= 1, "인카운터 적 1마리 이상")
+		_assert(combo.size() <= 6, "인카운터 적 6마리 이하")
+
+func test_norse_act3_boss_name() -> void:
+	print("[TestEnemies] test_norse_act3_boss_name")
+	var e := NorseAct3.jormungandr(_make_dummy_scene())
+	_assert(e.enemy_name == "요르문간드르", "보스 이름 요르문간드르")
+	_assert(e.max_hp == 5000, "보스 HP 5000")
+	_assert(e.phase_thresholds.size() == 2, "보스 페이즈 임계값 2개 (3페이즈)")
+	_assert(e.phase_patterns.size() == 3, "보스 페이즈 패턴 3개")
+
+func test_norse_act3_elites() -> void:
+	print("[TestEnemies] test_norse_act3_elites")
+	var elites: Array = NorseAct3.elites()
+	_assert(elites.size() == 3, "엘리트 3종")
+	var scene := _make_dummy_scene()
+	var elite_enemies := [
+		NorseAct3.fenrir_cub(scene),
+		NorseAct3.valkyrie(scene),
+		NorseAct3.jormungandr_shard(scene),
+	]
+	for e in elite_enemies:
+		_assert(e.max_hp >= 1800, "HP >= 1800")
+		_assert(e.mythology == "norse", "mythology = norse")
