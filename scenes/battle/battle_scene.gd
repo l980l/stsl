@@ -182,7 +182,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 func _enemy_slot_pos(index: int, total: int) -> Vector2:
 	if total <= 3:
 		return Vector2(ENEMY_X, 80 + index * (SLOT_H + SLOT_GAP))
-	var row: int = index / 2
+	var row: int = int(index / 2)
 	var col: int = index % 2
 	return Vector2(ENEMY_X + col * (SLOT_W + ENEMY_COL_GAP), 80 + row * (SLOT_H + SLOT_GAP))
 
@@ -464,7 +464,7 @@ func _refresh_token_tiles(hero_id: String) -> void:
 
 	for t in range(min(token_count, max_tokens)):
 		var col: int = t % TOKEN_COLS
-		var row: int = t / TOKEN_COLS
+		var row: int = int(t / TOKEN_COLS)
 		var tile_x: int = TOKEN_AREA_X + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
 		var tile_y: int = base_y + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
 
