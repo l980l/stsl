@@ -3,6 +3,7 @@ extends Node2D
 
 const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
 
 const WINDOW_W := 1920
 const WINDOW_H := 1080
@@ -18,8 +19,8 @@ const SLOT_GAP := 20
 const MAX_ENEMY_COUNT := 6
 const TOKEN_COLS := 6
 const TOKEN_ROWS := 2
-const TOKEN_TILE_W := 38
-const TOKEN_TILE_H := 50
+const TOKEN_TILE_W := 111
+const TOKEN_TILE_H := 138
 const TOKEN_TILE_GAP := 4
 const TOKEN_AREA_X := 270
 
@@ -51,6 +52,8 @@ var _synergy_lbl: Label = null
 var _ppt_label: Label = null
 var _debug_badge: Label = null
 var _debug_hp_target_mode: bool = false
+var _debug_grid_visible: bool = false
+var _debug_grid_nodes: Array = []
 
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
@@ -182,7 +185,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 func _enemy_slot_pos(index: int, total: int) -> Vector2:
 	if total <= 3:
 		return Vector2(ENEMY_X, 80 + index * (SLOT_H + SLOT_GAP))
-	var row: int = index / 2
+	var row: int = int(index / 2.0)
 	var col: int = index % 2
 	return Vector2(ENEMY_X + col * (SLOT_W + ENEMY_COL_GAP), 80 + row * (SLOT_H + SLOT_GAP))
 
@@ -463,13 +466,14 @@ func _refresh_token_tiles(hero_id: String) -> void:
 	var max_tokens: int = TOKEN_COLS * TOKEN_ROWS
 
 	for t in range(min(token_count, max_tokens)):
-		var col: int = t % TOKEN_COLS
-		var row: int = t / TOKEN_COLS
+		var col: int = int(t / float(TOKEN_ROWS))
+		var row: int = t % TOKEN_ROWS
 		var tile_x: int = TOKEN_AREA_X + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
 		var tile_y: int = base_y + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
 
+		# 셀 배경
 		var bg := ColorRect.new()
-		bg.color = Color(0.55, 0.55, 0.25)
+		bg.color = Color(0.18, 0.16, 0.10)
 		bg.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
 		bg.position = Vector2(tile_x, tile_y)
 		bg.tooltip_text = "다음 턴 시작 시 상대를 공격합니다"
@@ -477,11 +481,18 @@ func _refresh_token_tiles(hero_id: String) -> void:
 		add_child(bg)
 		_token_tile_nodes[hero_id].append(bg)
 
+		# 병사 캐릭터 씬 (idle 애니메이션 포함)
+		var char_node = SoldierScene.instantiate()
+		char_node.position = Vector2(tile_x + (TOKEN_TILE_W - 40) / 2.0, tile_y + TOKEN_TILE_H - 20 - 50)
+		add_child(char_node)
+		_token_tile_nodes[hero_id].append(char_node)
+
+		# 이름 라벨 (하단)
 		var lbl := Label.new()
 		lbl.text = "병사"
 		lbl.add_theme_font_size_override("font_size", 11)
-		lbl.position = Vector2(tile_x, tile_y + int((TOKEN_TILE_H - 14) / 2.0))
-		lbl.size = Vector2(TOKEN_TILE_W, 14)
+		lbl.position = Vector2(tile_x, tile_y + TOKEN_TILE_H - 18)
+		lbl.size = Vector2(TOKEN_TILE_W, 16)
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(lbl)
@@ -669,7 +680,8 @@ func _spawn_damage_popup(world_pos: Vector2, amount: int, fully_blocked: bool) -
 		lbl.text = str(amount)
 		lbl.modulate = Color(1.0, 0.2, 0.2)
 	lbl.add_theme_font_size_override("font_size", 28)
-	lbl.position = world_pos
+	var offset := Vector2(randf_range(-30.0, 30.0), randf_range(-20.0, 20.0))
+	lbl.position = world_pos + offset
 	lbl.z_index = 20
 	add_child(lbl)
 	var tw := create_tween()
@@ -844,6 +856,8 @@ func _refresh_debug_badge() -> void:
 		parts.append("INV")
 	if DeckManager.debug_unlimited_energy:
 		parts.append("E∞")
+	if _debug_grid_visible:
+		parts.append("GRID")
 	if parts.is_empty():
 		_debug_badge.visible = false
 	else:
@@ -896,6 +910,65 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				_message_label.text = "[DEBUG] 적을 클릭해 HP를 설정하세요 (다시 Shift+H 취소)"
 			else:
 				_message_label.text = ""
+		elif event.keycode == KEY_G and event.shift_pressed:
+			_debug_grid_visible = not _debug_grid_visible
+			_refresh_debug_grid()
+			_refresh_debug_badge()
+
+func _refresh_debug_grid() -> void:
+	for node in _debug_grid_nodes:
+		node.queue_free()
+	_debug_grid_nodes.clear()
+	if not _debug_grid_visible:
+		return
+
+	# 영웅 슬롯 외곽선 (파란색)
+	for i in range(_hero_nodes.size()):
+		var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
+		for border in _make_border_rects(HERO_X, slot_y, SLOT_W, SLOT_H, Color(0.3, 0.6, 1.0, 0.8)):
+			add_child(border)
+			_debug_grid_nodes.append(border)
+
+	# 소환물 그리드 (노란색)
+	for i in range(3):
+		var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
+		var grid_h: int = TOKEN_ROWS * TOKEN_TILE_H + (TOKEN_ROWS - 1) * TOKEN_TILE_GAP
+		var base_y: int = slot_y + int((SLOT_H - grid_h) / 2.0)
+		for r in range(TOKEN_ROWS):
+			for c in range(TOKEN_COLS):
+				var cx: int = TOKEN_AREA_X + c * (TOKEN_TILE_W + TOKEN_TILE_GAP)
+				var cy: int = base_y + r * (TOKEN_TILE_H + TOKEN_TILE_GAP)
+				var cell := ColorRect.new()
+				cell.color = Color(0.8, 0.8, 0.2, 0.12)
+				cell.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
+				cell.position = Vector2(cx, cy)
+				cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				add_child(cell)
+				_debug_grid_nodes.append(cell)
+				for border in _make_border_rects(cx, cy, TOKEN_TILE_W, TOKEN_TILE_H, Color(0.9, 0.9, 0.3, 0.6)):
+					add_child(border)
+					_debug_grid_nodes.append(border)
+
+	# 적 슬롯 외곽선 (빨간색)
+	var total: int = _enemy_nodes.size()
+	for i in range(total):
+		var pos: Vector2 = _enemy_slot_pos(i, total)
+		for border in _make_border_rects(int(pos.x), int(pos.y), SLOT_W, SLOT_H, Color(1.0, 0.3, 0.3, 0.8)):
+			add_child(border)
+			_debug_grid_nodes.append(border)
+
+func _make_border_rects(x: int, y: int, w: int, h: int, color: Color) -> Array:
+	var rects: Array = []
+	var thickness: int = 1
+	for data in [[x, y, w, thickness], [x, y+h-thickness, w, thickness],
+				  [x, y, thickness, h], [x+w-thickness, y, thickness, h]]:
+		var r := ColorRect.new()
+		r.color = color
+		r.position = Vector2(data[0], data[1])
+		r.size = Vector2(data[2], data[3])
+		r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		rects.append(r)
+	return rects
 
 func _card_target_type(card: Resource) -> String:
 	# "enemy" / "ally" / "none"
