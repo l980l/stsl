@@ -58,6 +58,7 @@ func run_all() -> Dictionary:
 	test_egyptian_act3_shape()
 	test_mythology_randomization_structure()
 	test_korean_normals_shape()
+	test_korean_act1_shape()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -594,3 +595,18 @@ func test_korean_normals_shape() -> void:
 	_assert(e2.intent_pattern.size() == 3, "불가사리 인텐트 3개")
 	var e3: Resource = M.three_legged_crow(scene)
 	_assert(e3.max_hp == 280, "삼족오 HP 280")
+
+func test_korean_act1_shape() -> void:
+	print("[TestEnemies] test_korean_act1_shape")
+	var M = load("res://resources/enemies/korean/korean_act1.gd")
+	_assert(M.elites().size() == 3, "korean_act1 엘리트 3종")
+	_assert(M.boss() == "dangun", "korean_act1 보스는 dangun")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b := M.dangun(scene)
+	_assert(b.max_hp == 4500, "단군 HP 4500")
+	_assert(b.phase_thresholds.size() == 2, "단군 3페이즈")
+	_assert(b.mythology == "korean", "단군 mythology=korean")
+	_assert(b.charm_resistance == 2, "단군 charm_resistance=2")
+	var haemosu := M.haemosu(scene)
+	_assert(haemosu.max_hp == 1900, "해모수 엘리트 HP 1900")
+	_assert(haemosu.charm_resistance == 1, "해모수 charm_resistance=1")
