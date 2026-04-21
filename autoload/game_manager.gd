@@ -538,6 +538,8 @@ func _recruit_hero_pool() -> Array:
 	var tm := _get_tm()
 	if tm == null:
 		return []
+	if tm.heroes.size() >= 3:
+		return []
 	var existing := []
 	for h in tm.heroes:
 		existing.append(h.hero_id)
