@@ -56,6 +56,7 @@ func run_all() -> Dictionary:
 	test_norse_act2_shape()
 	test_greek_act3_shape()
 	test_egyptian_act3_shape()
+	test_mythology_randomization_structure()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -561,3 +562,18 @@ func test_egyptian_act3_shape() -> void:
 	_assert(b.max_hp == 5000, "라-호라크티 HP 5000")
 	_assert(b.phase_thresholds.size() == 2, "라-호라크티 3페이즈")
 	_assert(b.mythology == "egyptian", "라-호라크티 mythology=egyptian")
+
+func test_mythology_randomization_structure() -> void:
+	print("[TestEnemies] test_mythology_randomization_structure")
+	# mythology 목록이 항상 3종 포함 + 중복 없음을 확인
+	var gm := GameManagerClass.new()
+	gm.reset()
+	_assert(gm.act_mythologies.size() == 3, "act_mythologies 항상 3개")
+	_assert(gm.act_mythologies.has("greek"), "그리스 포함")
+	_assert(gm.act_mythologies.has("egyptian"), "이집트 포함")
+	_assert(gm.act_mythologies.has("norse"), "북유럽 포함")
+	# 모든 mythology×act 조합에 null 없음 확인
+	var reg: Dictionary = gm._get_mythology_registry()
+	for myth in gm.act_mythologies:
+		for i in range(3):
+			_assert(reg[myth]["acts"][i] != null, myth + " act" + str(i+1) + " null 없음")

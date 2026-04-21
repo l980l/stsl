@@ -118,6 +118,7 @@ func reset() -> void:
 	pending_boss_upgrade = false
 	pending_boss_recruit = false
 	act_mythologies = ["greek", "egyptian", "norse"]
+	act_mythologies.shuffle()
 
 # ── Plan 04: 런 관리 ──────────────────────────────────
 
