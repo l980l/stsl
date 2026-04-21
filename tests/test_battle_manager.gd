@@ -51,6 +51,8 @@ func run_all() -> Dictionary:
 	test_hero_status_decrements_on_player_turn()
 	test_synergy_joan_napoleon_heal_all()
 	test_synergy_joan_napoleon_not_present()
+	test_synergy_genghis_cleopatra_dmg_all()
+	test_synergy_genghis_cleopatra_not_present()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -723,3 +725,44 @@ func test_synergy_joan_napoleon_not_present() -> void:
 	bm.play_card(card, -1)
 	_assert(bm._hero_status.get("napoleon", {}).get("morale", 0) == 0,
 		"성전: 나폴레옹 없으면 morale 미부여")
+
+func test_synergy_genghis_cleopatra_dmg_all() -> void:
+	print("[TestBattleManager] test_synergy_genghis_cleopatra_dmg_all")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 1000))
+	bm.setup_battle([_make_enemy(500, []), _make_enemy(500, [])])
+	bm.start_player_turn()
+	var card := CardRes.new()
+	card.card_name = "기마돌격_테스트"
+	card.owner_id = "genghis_khan"
+	card.cost = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE
+	eff.value = 50; eff.base_value = 50; eff.target = "ALL"
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+	bm.play_card(card, -1)
+	_assert(bm.get_enemy_status(0).get("poison_dmg", 0) == 2,
+		"약탈과 독: 칭기즈칸 DMG ALL → 적 0 poison_dmg +2")
+	_assert(bm.get_enemy_status(1).get("poison_dmg", 0) == 2,
+		"약탈과 독: 칭기즈칸 DMG ALL → 적 1 poison_dmg +2")
+
+func test_synergy_genghis_cleopatra_not_present() -> void:
+	print("[TestBattleManager] test_synergy_genghis_cleopatra_not_present")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.setup_battle([_make_enemy(500, [])])
+	bm.start_player_turn()
+	var card := CardRes.new()
+	card.card_name = "기마돌격_클레오없음"
+	card.owner_id = "genghis_khan"
+	card.cost = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE
+	eff.value = 50; eff.base_value = 50; eff.target = "ALL"
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+	bm.play_card(card, -1)
+	_assert(bm.get_enemy_status(0).get("poison", 0) == 0,
+		"약탈과 독: 클레오파트라 없으면 poison 미부여")

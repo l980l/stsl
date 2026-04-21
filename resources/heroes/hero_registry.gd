@@ -5,7 +5,7 @@ class_name HeroRegistry
 extends RefCounted
 
 static func all_hero_ids() -> Array:
-	return ["napoleon", "cleopatra", "yi_sun_sin", "joan_of_arc"]
+	return ["napoleon", "cleopatra", "yi_sun_sin", "joan_of_arc", "genghis_khan"]
 
 static func make_hero(hero_id: String) -> Resource:
 	var HeroRes = load("res://resources/hero_resource.gd")
@@ -40,6 +40,13 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.character_scene = load("res://characters/heroes/joan_of_arc/joan_of_arc.tscn")
 			hero.unlock_condition = "clear_chapter_1"
 			hero.unlock_description = "챕터 1 클리어 후 해금"
+		"genghis_khan":
+			hero.hero_name = "칭기즈칸"
+			hero.historical_figure = "칭기즈 칸"
+			hero.max_hp = 1000
+			hero.character_scene = load("res://characters/heroes/genghis_khan/genghis_khan.tscn")
+			hero.unlock_condition = "flag:kill_boss:oshiris"
+			hero.unlock_description = "오시리스 처치 후 해금"
 	return hero
 
 static func get_display_info(hero_id: String) -> Dictionary:
@@ -71,5 +78,12 @@ static func get_display_info(hero_id: String) -> Dictionary:
 				"hp": 1000,
 				"desc": "포지션: 서포트/생존형\n고유 메카닉: 부활(Revive)·순교\n아키타입: 신성(Holy)\n\n스타터: 스트라이크×3 + 디펜드×2",
 				"unlock_description": "챕터 1 클리어 후 해금",
+			}
+		"genghis_khan":
+			return {
+				"name": "칭기즈칸",
+				"hp": 1000,
+				"desc": "포지션: 기동형 정복자\n고유 메카닉: 몽골 기병(DMG ALL)\n아키타입: 기동(0~1코) / 약탈\n\n스타터: 스트라이크×3 + 디펜드×2",
+				"unlock_description": "오시리스 처치 후 해금",
 			}
 	return {}

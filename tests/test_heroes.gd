@@ -19,6 +19,10 @@ func run_all() -> Dictionary:
 	test_cleopatra_card_pool_size()
 	test_yi_sun_sin_card_pool_size()
 	test_joan_of_arc_card_pool_size()
+	test_genghis_khan_card_pool_size()
+	test_hit_count_damage_multi_hit()
+	test_cost_zero_turn_allows_free_play()
+	test_block_per_cards_played_scales()
 	test_gain_morale_effect()
 	test_consume_morale_insufficient()
 	test_consume_morale_sufficient()
@@ -97,6 +101,50 @@ func test_joan_of_arc_card_pool_size() -> void:
 	print("[TestHeroes] test_joan_of_arc_card_pool_size")
 	var gm = _load_gm()
 	_assert(gm._joan_of_arc_card_pool().size() == 13, "잔다르크 카드 풀 13장")
+
+func test_genghis_khan_card_pool_size() -> void:
+	print("[TestHeroes] test_genghis_khan_card_pool_size")
+	var gm = _load_gm()
+	_assert(gm._genghis_khan_card_pool().size() == 13, "칭기즈칸 카드 풀 13장")
+
+func test_hit_count_damage_multi_hit() -> void:
+	print("[TestHeroes] test_hit_count_damage_multi_hit")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.setup_battle([_make_enemy(1000)])
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE
+	eff.value = 60; eff.base_value = 60; eff.target = "SINGLE"; eff.hit_count = 2
+	bm._apply_card_effects(_make_card("genghis_khan", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 880, "60×2 = 120 피해 → 적 HP 880")
+
+func test_cost_zero_turn_allows_free_play() -> void:
+	print("[TestHeroes] test_cost_zero_turn_allows_free_play")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.setup_battle([_make_enemy(1000)])
+	bm.deck_mgr.current_energy = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.COST_ZERO_TURN
+	bm._apply_card_effects(_make_card("genghis_khan", [eff]), 0)
+	_assert(bm.deck_mgr.pending_all_cost_zero == true, "COST_ZERO_TURN 후 pending_all_cost_zero=true")
+	var card := CardRes.new()
+	card.cost = 3; card.owner_id = "genghis_khan"
+	card.effects = []
+	bm.deck_mgr.hand.append(card)
+	_assert(bm.deck_mgr.can_play(card), "cost 3 카드도 에너지 0에서 플레이 가능")
+
+func test_block_per_cards_played_scales() -> void:
+	print("[TestHeroes] test_block_per_cards_played_scales")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.setup_battle([_make_enemy(1000)])
+	bm._cards_played_this_turn = 3
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED
+	eff.value = 30; eff.base_value = 30
+	bm._apply_card_effects(_make_card("genghis_khan", [eff]), 0)
+	_assert(bm._hero_block.get("genghis_khan", 0) == 90, "카드 3장×30=90 방어도")
 
 # ──────────────────────────────────────────────
 # BattleManager 신규 효과 테스트
