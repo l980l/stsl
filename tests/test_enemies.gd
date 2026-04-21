@@ -57,6 +57,7 @@ func run_all() -> Dictionary:
 	test_greek_act3_shape()
 	test_egyptian_act3_shape()
 	test_mythology_randomization_structure()
+	test_korean_normals_shape()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -577,3 +578,19 @@ func test_mythology_randomization_structure() -> void:
 	for myth in gm.act_mythologies:
 		for i in range(3):
 			_assert(reg[myth]["acts"][i] != null, myth + " act" + str(i+1) + " null 없음")
+
+func test_korean_normals_shape() -> void:
+	print("[TestEnemies] test_korean_normals_shape")
+	var M = load("res://resources/enemies/korean/korean_normals.gd")
+	var scene: PackedScene = load("res://characters/summons/soldier/soldier.tscn")
+	var encs: Array = M.encounters()
+	_assert(encs.size() >= 5, "한국 인카운터 5조합 이상")
+	var e1: Resource = M.death_reaper(scene)
+	_assert(e1.max_hp == 320, "저승사자 HP 320")
+	_assert(e1.mythology == "korean", "저승사자 mythology=korean")
+	_assert(e1.intent_pattern.size() == 3, "저승사자 인텐트 3개")
+	var e2: Resource = M.bulgasari(scene)
+	_assert(e2.max_hp == 900, "불가사리 HP 900")
+	_assert(e2.intent_pattern.size() == 3, "불가사리 인텐트 3개")
+	var e3: Resource = M.three_legged_crow(scene)
+	_assert(e3.max_hp == 280, "삼족오 HP 280")
