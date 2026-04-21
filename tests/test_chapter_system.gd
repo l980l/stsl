@@ -11,6 +11,7 @@ func run_all() -> Dictionary:
 	test_chapter_pool_dispatch()
 	test_reset_uses_current_chapter_pool()
 	test_start_run_sets_chapter()
+	test_chapter2_pool_filters_empty_stubs()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -28,8 +29,10 @@ func test_chapter_pool_dispatch() -> void:
 	var pool2 = gm._get_chapter_mythology_pool(2)
 	_assert("greek" in pool1 and "egyptian" in pool1 and "norse" in pool1, "챕터 1 풀 = 그리스/이집트/북유럽")
 	_assert(pool1.size() == 3, "챕터 1 풀 크기 3")
-	_assert("korean" in pool2 and "chinese" in pool2 and "japanese" in pool2, "챕터 2 풀 = 한국/중국/일본")
+	# 챕터 2 풀: 구현된 신화만 포함 (빈 스텁은 자동 필터)
 	_assert(pool2.size() == 3, "챕터 2 풀 크기 3")
+	for myth in pool2:
+		_assert(myth in ["korean", "chinese", "japanese"], "챕터 2 풀 원소는 아시아 신화: " + myth)
 
 func test_reset_uses_current_chapter_pool() -> void:
 	print("[TestChapterSystem] test_reset_uses_current_chapter_pool")
@@ -37,7 +40,7 @@ func test_reset_uses_current_chapter_pool() -> void:
 	gm.current_chapter = 2
 	gm.reset()
 	for myth in gm.act_mythologies:
-		_assert(myth in ["korean", "chinese", "japanese"], "reset 후 act_mythologies 원소는 챕터 2 신화: " + myth)
+		_assert(myth in ["korean", "chinese", "japanese"], "reset 후 act_mythologies 원소는 아시아 신화: " + myth)
 	_assert(gm.act_mythologies.size() == 3, "act_mythologies 크기 3")
 
 func test_start_run_sets_chapter() -> void:
@@ -48,3 +51,11 @@ func test_start_run_sets_chapter() -> void:
 	gm.current_chapter = 2
 	gm.reset()
 	_assert(gm.current_chapter == 2, "current_chapter는 reset 후에도 유지")
+
+func test_chapter2_pool_filters_empty_stubs() -> void:
+	print("[TestChapterSystem] test_chapter2_pool_filters_empty_stubs")
+	var gm = GameManagerClass.new()
+	var pool := gm._get_chapter_mythology_pool(2)
+	_assert(pool.size() == 3, "챕터2 풀은 항상 3개")
+	for myth in pool:
+		_assert(myth == "korean", "빈 스텁 필터 시 한국만 남아야 함: " + myth)

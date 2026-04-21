@@ -425,9 +425,22 @@ func _heal_all_heroes(amount: int) -> void:
 		tm.heal(hero.hero_id, amount)
 
 func _get_chapter_mythology_pool(chapter: int) -> Array[String]:
-	match chapter:
-		1: return ["greek", "egyptian", "norse"]
-		2: return ["korean", "chinese", "japanese"]
+	if chapter == 1:
+		return ["greek", "egyptian", "norse"]
+	if chapter == 2:
+		var available: Array[String] = []
+		if _KoreanAct1.elites().size() > 0:
+			available.append("korean")
+		if _ChineseAct1.elites().size() > 0:
+			available.append("chinese")
+		if _JapaneseAct1.elites().size() > 0:
+			available.append("japanese")
+		if available.is_empty():
+			available = ["korean"]
+		var pool: Array[String] = []
+		for i in range(3):
+			pool.append(available[i % available.size()])
+		return pool
 	return ["greek", "egyptian", "norse"]
 
 func _get_mythology_registry() -> Dictionary:
