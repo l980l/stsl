@@ -46,7 +46,8 @@ var _debug_hp_target_mode: bool = false
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
 	"morale": "★", "charm": "♥", "strength": "↑",
-	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜"
+	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜",
+	"tokens": "⚔"
 }
 const STATUS_TOOLTIP := {
 	"poison_dmg": "독: 매 턴 N×10 피해. 지속 3턴, 중첩 시 데미지 누적+지속 갱신",
@@ -57,7 +58,8 @@ const STATUS_TOOLTIP := {
 	"strength": "강화: 피해 +N",
 	"taunt": "도발: 이 대상이 우선 공격 받음",
 	"counter_block": "반격 방어: 피해 = 현재 방어도 기반",
-	"charm_resistance": "매혹 저항 N: 매혹 (3+N)스택이 되어야 반함"
+	"charm_resistance": "매혹 저항 N: 매혹 (3+N)스택이 되어야 반함",
+	"tokens": "병사 토큰 N: 매 턴 시작 시 토큰당 25 피해를 랜덤 적에게 자동 공격"
 }
 
 func _ready() -> void:

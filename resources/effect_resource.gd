@@ -56,6 +56,6 @@ func display_text() -> String:
 		EffectType.COUNTER_BLOCK:  return "방어도×%d%%" % value
 		EffectType.COST_NEXT:      return "다음 비용 -%d" % value
 		EffectType.CONDITIONAL_DMG: return "%d/%d(%s)" % [bonus_value, value, status_type]
-		EffectType.SUMMON_TOKEN:   return "병사 소환"
+		EffectType.SUMMON_TOKEN:   return "병사 소환 %d" % value
 		EffectType.CHARM:          return "매혹 %d" % value
 	return ""
