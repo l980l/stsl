@@ -14,6 +14,8 @@ static func build_pool() -> Array:
 		_underworld_talisman(), _dokkaebi_hammer_shard(), _samtaegeuk_charm(),
 		# 중국 신화 렐릭
 		_dragon_scale(), _eight_immortals_charm(), _queen_mother_peach_relic(),
+		# 일본 신화 렐릭
+		_ghost_talisman(), _tengu_feather(), _orochi_scale(),
 		# 잔다르크 전용 렐릭
 		_flag_of_orleans(), _saints_tears(),
 		# 칭기즈칸 전용 렐릭
@@ -231,6 +233,28 @@ static func _queen_mother_peach_relic() -> Resource:
 	r.description = "전투 승리 시 팀 최대 HP +10"
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.MAX_HP; r.value = 10; return r
+
+# ──── 챕터 2 렐릭 (일본 신화) ────
+
+static func _ghost_talisman() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "귀신 부적"
+	r.description = "플레이어 턴 종료 시 무작위 적에게 독 2 부여"
+	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
+	r.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
+	r.status_type = "poison"; r.value = 2; return r
+
+static func _tengu_feather() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "텐구의 깃털"
+	r.description = "전투 시작 시 카드 1장 추가 드로우"
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.DRAW; r.value = 1; return r
+
+static func _orochi_scale() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "오로치의 비늘"
+	r.description = "영웅이 피해를 받을 때 무작위 적에게 약화 1 부여"
+	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
+	r.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
+	r.status_type = "weak"; r.value = 1; return r
 
 # ──── 잔다르크 전용 렐릭 ────
 

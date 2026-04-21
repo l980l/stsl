@@ -30,6 +30,8 @@ func run_all() -> Dictionary:
 	test_korean_samsin_blessing_uses_max_hp()
 	test_chinese_event_pool_size()
 	test_chinese_queen_mother_peach_event()
+	test_japanese_event_pool_size()
+	test_japanese_ise_shrine_event()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -390,3 +392,23 @@ func test_chinese_queen_mother_peach_event() -> void:
 			_assert(e.choices[0].value == 40, "HEAL +40")
 			_assert(e.choices[1].effect_type == ChoiceRes.EffectType.NONE, "선택B: NONE")
 	_assert(found, "서왕모의 복숭아나무 이벤트 존재")
+
+func test_japanese_event_pool_size() -> void:
+	print("[TestEvent] test_japanese_event_pool_size")
+	var JapaneseEvents = load("res://resources/events/events_japanese.gd")
+	var pool: Array = JapaneseEvents.build_pool()
+	_assert(pool.size() == 10, "일본 이벤트 풀 10종")
+
+func test_japanese_ise_shrine_event() -> void:
+	print("[TestEvent] test_japanese_ise_shrine_event")
+	var JapaneseEvents = load("res://resources/events/events_japanese.gd")
+	var pool: Array = JapaneseEvents.build_pool()
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var found := false
+	for e in pool:
+		if e.event_name == "이세 신궁의 축복":
+			found = true
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.HEAL, "선택A: HEAL")
+			_assert(e.choices[0].value == 50, "HEAL +50")
+			_assert(e.choices[0].cost_gold == 30, "골드 -30")
+	_assert(found, "이세 신궁의 축복 이벤트 존재")

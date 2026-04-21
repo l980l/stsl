@@ -12,6 +12,7 @@ func run_all() -> Dictionary:
 	test_reset_uses_current_chapter_pool()
 	test_start_run_sets_chapter()
 	test_chapter2_pool_filters_empty_stubs()
+	test_chapter2_has_all_three_mythologies()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -58,4 +59,16 @@ func test_chapter2_pool_filters_empty_stubs() -> void:
 	var pool := gm._get_chapter_mythology_pool(2)
 	_assert(pool.size() == 3, "챕터2 풀은 항상 3개")
 	for myth in pool:
-		_assert(myth in ["korean", "chinese"], "챕터2 풀 — 한국 또는 중국 신화: " + myth)
+		_assert(myth in ["korean", "chinese", "japanese"], "챕터2 풀 — 한·중·일 신화: " + myth)
+
+func test_chapter2_has_all_three_mythologies() -> void:
+	print("[TestChapterSystem] test_chapter2_has_all_three_mythologies")
+	var seen: Dictionary = {}
+	for _i in range(100):
+		var gm = GameManagerClass.new()
+		var pool := gm._get_chapter_mythology_pool(2)
+		for myth in pool:
+			seen[myth] = true
+	_assert("korean" in seen, "한국 신화 챕터2 풀에 포함")
+	_assert("chinese" in seen, "중국 신화 챕터2 풀에 포함")
+	_assert("japanese" in seen, "일본 신화 챕터2 풀에 포함")
