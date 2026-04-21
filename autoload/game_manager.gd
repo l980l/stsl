@@ -26,6 +26,7 @@ const _EventsAct1     = preload("res://resources/events/events_act1.gd")
 const _EventsAct2     = preload("res://resources/events/events_act2.gd")
 const _EventsAct3     = preload("res://resources/events/events_act3.gd")
 const _EventsKorean   = preload("res://resources/events/events_korean.gd")
+const _EventsChinese  = preload("res://resources/events/events_chinese.gd")
 const _KoreanNormals   = preload("res://resources/enemies/korean/korean_normals.gd")
 const _KoreanAct1      = preload("res://resources/enemies/korean/korean_act1.gd")
 const _KoreanAct2      = preload("res://resources/enemies/korean/korean_act2.gd")
@@ -626,6 +627,7 @@ func _build_event_pool() -> Array:
 	var myth: String = act_mythologies[current_act - 1]
 	match myth:
 		"korean": return _EventsKorean.build_pool()
+		"chinese": return _EventsChinese.build_pool()
 	match current_act:
 		2: return _EventsAct2.build_pool()
 		3: return _EventsAct3.build_pool()

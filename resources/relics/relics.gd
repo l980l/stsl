@@ -12,6 +12,8 @@ static func build_pool() -> Array:
 		_ankh_of_life(), _eye_of_horus(), _scarab_talisman(),
 		_rune_of_fate(), _mjolnir_shard(), _idun_apple(),
 		_underworld_talisman(), _dokkaebi_hammer_shard(), _samtaegeuk_charm(),
+		# 중국 신화 렐릭
+		_dragon_scale(), _eight_immortals_charm(), _queen_mother_peach_relic(),
 		# 잔다르크 전용 렐릭
 		_flag_of_orleans(), _saints_tears(),
 		# 칭기즈칸 전용 렐릭
@@ -209,6 +211,26 @@ static func _samtaegeuk_charm() -> Resource:
 	r.description = "영웅이 피해를 받을 때 방어도 +10"
 	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
 	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 10; return r
+
+# ──── 챕터 2 렐릭 (중국 신화) ────
+
+static func _dragon_scale() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "용의 비늘"
+	r.description = "전투 시작 시 다음 카드 코스트 -1"
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.COST_REDUCTION; r.value = 1; return r
+
+static func _eight_immortals_charm() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "팔선의 부적"
+	r.description = "플레이어 턴 종료 시 팀 전체 HP +15"
+	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
+	r.effect_type = RelicRes.EffectType.HEAL; r.value = 15; return r
+
+static func _queen_mother_peach_relic() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "서왕모의 복숭아"
+	r.description = "전투 승리 시 팀 최대 HP +10"
+	r.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r.effect_type = RelicRes.EffectType.MAX_HP; r.value = 10; return r
 
 # ──── 잔다르크 전용 렐릭 ────
 

@@ -32,6 +32,7 @@ func run_all() -> Dictionary:
 	test_hero_relics_second_set()
 	test_act2_relics_exist()
 	test_korean_relics_exist()
+	test_chinese_relics_exist()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -85,7 +86,7 @@ func test_relic_pool_size() -> void:
 	print("[TestRelics] test_relic_pool_size")
 	var RelicsGd = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicsGd.build_pool()
-	_assert(pool.size() == 34, "릴릭 풀 34종")
+	_assert(pool.size() == 37, "릴릭 풀 37종")
 
 func test_trigger_type_values() -> void:
 	print("[TestRelics] test_trigger_type_values")
@@ -255,3 +256,18 @@ func test_korean_relics_exist() -> void:
 	_assert(talisman.trigger == RelicRes.TriggerType.BATTLE_START, "저승 부적 트리거=BATTLE_START")
 	_assert(talisman.effect_type == RelicRes.EffectType.ENERGY, "저승 부적 효과=ENERGY")
 	_assert(talisman.value == 1, "저승 부적 value=1")
+
+func test_chinese_relics_exist() -> void:
+	print("[TestRelics] test_chinese_relics_exist")
+	var RelicsGd = load("res://resources/relics/relics.gd")
+	var pool: Array = RelicsGd.build_pool()
+	_assert(pool.size() == 37, "릴릭 풀 37종")
+	var names := pool.map(func(r): return r.relic_name)
+	_assert("용의 비늘" in names, "용의 비늘 존재")
+	_assert("팔선의 부적" in names, "팔선의 부적 존재")
+	_assert("서왕모의 복숭아" in names, "서왕모의 복숭아 존재")
+	var RelicRes2 = load("res://resources/relic_resource.gd")
+	var scale = pool.filter(func(r): return r.relic_name == "용의 비늘")[0]
+	_assert(scale.trigger == RelicRes2.TriggerType.BATTLE_START, "용의 비늘 트리거=BATTLE_START")
+	_assert(scale.effect_type == RelicRes2.EffectType.COST_REDUCTION, "용의 비늘 효과=COST_REDUCTION")
+	_assert(scale.value == 1, "용의 비늘 value=1")
