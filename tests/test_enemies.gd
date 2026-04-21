@@ -84,8 +84,8 @@ func test_cyclops_first_intent_is_buff() -> void:
 	var gm := _make_gm()
 	var cyclops: Resource = GreekNormals.cyclops(_make_dummy_scene())
 	_assert(cyclops.intent_pattern.size() == 2, "사이클롭스 패턴 2개")
-	_assert(cyclops.intent_pattern[0].action_type == IntentRes.ActionType.BUFF,
-		"사이클롭스 첫 행동 = BUFF(준비)")
+	_assert(cyclops.intent_pattern[0].action_type == IntentRes.ActionType.PREPARE,
+		"사이클롭스 첫 행동 = PREPARE(준비)")
 	_assert(cyclops.intent_pattern[1].value == 200, "사이클롭스 강타 = 200")
 
 func test_snake_pattern_length() -> void:
