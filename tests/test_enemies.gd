@@ -3,8 +3,10 @@ class_name TestEnemies
 extends RefCounted
 
 const GameManagerClass = preload("res://autoload/game_manager.gd")
-const EnemiesAct1 = preload("res://resources/enemies/enemies_act1.gd")
-const EnemiesAct2 = preload("res://resources/enemies/enemies_act2.gd")
+const GreekNormals  = preload("res://resources/enemies/greek/greek_normals.gd")
+const GreekAct1     = preload("res://resources/enemies/greek/greek_act1.gd")
+const EgyptianNormals = preload("res://resources/enemies/egyptian/egyptian_normals.gd")
+const EgyptianAct2    = preload("res://resources/enemies/egyptian/egyptian_act2.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
 var passed: int = 0
@@ -37,6 +39,9 @@ func run_all() -> Dictionary:
 	test_act2_osiris_structure()
 	test_act2_osiris_phase_transition_heals()
 	test_act2_gm_act_switch()
+	test_greek_normals_encounters()
+	test_egyptian_normals_encounters()
+	test_normal_enemy_multi_encounter()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -49,6 +54,7 @@ func _assert(cond: bool, msg: String) -> void:
 
 func _make_gm() -> GameManagerClass:
 	var gm := GameManagerClass.new()
+	gm.act_mythologies = ["greek", "egyptian"]
 	gm.run_map = preload("res://autoload/map_generator.gd").generate()
 	gm.available_node_ids = [0, 1, 2]
 	gm.current_node_id = -1
@@ -68,7 +74,7 @@ func test_normal_enemy_variety() -> void:
 func test_harpy_pattern_length() -> void:
 	print("[TestEnemies] test_harpy_pattern_length")
 	var gm := _make_gm()
-	var harpy: Resource = EnemiesAct1.harpy(gm._satyr_scene())
+	var harpy: Resource = GreekNormals.harpy(_make_dummy_scene())
 	_assert(harpy.intent_pattern.size() == 5, "하르피아 패턴 5개")
 	_assert(harpy.enemy_name == "하르피아", "하르피아 이름")
 	_assert(harpy.max_hp == 280, "하르피아 HP = 280")
@@ -76,7 +82,7 @@ func test_harpy_pattern_length() -> void:
 func test_cyclops_first_intent_is_buff() -> void:
 	print("[TestEnemies] test_cyclops_first_intent_is_buff")
 	var gm := _make_gm()
-	var cyclops: Resource = EnemiesAct1.cyclops(gm._satyr_scene())
+	var cyclops: Resource = GreekNormals.cyclops(_make_dummy_scene())
 	_assert(cyclops.intent_pattern.size() == 2, "사이클롭스 패턴 2개")
 	_assert(cyclops.intent_pattern[0].action_type == IntentRes.ActionType.BUFF,
 		"사이클롭스 첫 행동 = BUFF(준비)")
@@ -85,7 +91,7 @@ func test_cyclops_first_intent_is_buff() -> void:
 func test_snake_pattern_length() -> void:
 	print("[TestEnemies] test_snake_pattern_length")
 	var gm := _make_gm()
-	var snake: Resource = EnemiesAct1.snake(gm._satyr_scene())
+	var snake: Resource = GreekNormals.snake(_make_dummy_scene())
 	_assert(snake.intent_pattern.size() == 2, "메두사의 뱀 패턴 2개")
 	_assert(snake.enemy_name == "메두사의 뱀", "메두사의 뱀 이름")
 	_assert(snake.intent_pattern[1].status_type == "vulnerable", "메두사의 뱀 DEBUFF = vulnerable")
@@ -100,14 +106,14 @@ func test_elite_enemy_hp() -> void:
 func test_minotaur_pattern() -> void:
 	print("[TestEnemies] test_minotaur_pattern")
 	var gm := _make_gm()
-	var m: Resource = EnemiesAct1.minotaur(gm._satyr_scene())
+	var m: Resource = GreekAct1.minotaur(_make_dummy_scene())
 	_assert(m.intent_pattern.size() == 3, "미노타우로스 패턴 3개")
 	_assert(m.intent_pattern[2].value == 260, "미노타우로스 세 번째 공격 260")
 
 func test_medusa_pattern_and_status_type() -> void:
 	print("[TestEnemies] test_medusa_pattern_and_status_type")
 	var gm := _make_gm()
-	var med: Resource = EnemiesAct1.medusa(gm._satyr_scene())
+	var med: Resource = GreekAct1.medusa(_make_dummy_scene())
 	_assert(med.intent_pattern.size() == 4, "메두사 패턴 4개")
 	_assert(med.intent_pattern[1].status_type == "weak", "메두사 2번째 = weak")
 	_assert(med.intent_pattern[2].status_type == "vulnerable", "메두사 3번째 = vulnerable")
@@ -116,7 +122,7 @@ func test_medusa_pattern_and_status_type() -> void:
 func test_scylla_pattern() -> void:
 	print("[TestEnemies] test_scylla_pattern")
 	var gm := _make_gm()
-	var s: Resource = EnemiesAct1.scylla(gm._satyr_scene())
+	var s: Resource = GreekAct1.scylla(_make_dummy_scene())
 	_assert(s.enemy_name == "스킬라", "스킬라 이름")
 	_assert(s.max_hp == 1900, "스킬라 HP = 1900")
 	_assert(s.phase_thresholds.size() == 1, "스킬라 페이즈 임계값 1개")
@@ -233,18 +239,18 @@ func _make_bm_with_hero() -> Node:
 
 func test_act2_boss_name() -> void:
 	print("[TestEnemies] test_act2_boss_name")
-	var e := EnemiesAct2.osiris(_make_dummy_scene())
+	var e := EgyptianAct2.osiris(_make_dummy_scene())
 	_assert(e.enemy_name == "오시리스", "Act2 보스 이름 오시리스")
 
 func test_act2_boss_phase_heal_ratios() -> void:
 	print("[TestEnemies] test_act2_boss_phase_heal_ratios")
-	var e := EnemiesAct2.osiris(_make_dummy_scene())
+	var e := EgyptianAct2.osiris(_make_dummy_scene())
 	_assert(e.phase_heal_ratios.size() == 1, "phase_heal_ratios 1개")
 	_assert(e.phase_heal_ratios[0] == 0.6, "부활 비율 60%")
 
 func test_act2_normal_sand_scout() -> void:
 	print("[TestEnemies] test_act2_normal_sand_scout")
-	var e := EnemiesAct2.sand_scout(_make_dummy_scene())
+	var e := EgyptianNormals.sand_scout(_make_dummy_scene())
 	_assert(e.enemy_name == "사막 척후병", "이름 확인")
 	_assert(e.max_hp == 380, "HP 380")
 	_assert(e.intent_pattern.size() == 3, "인텐트 3개")
@@ -255,7 +261,7 @@ func test_act2_normal_sand_scout() -> void:
 
 func test_act2_normal_desert_scorpion() -> void:
 	print("[TestEnemies] test_act2_normal_desert_scorpion")
-	var e := EnemiesAct2.desert_scorpion(_make_dummy_scene())
+	var e := EgyptianNormals.desert_scorpion(_make_dummy_scene())
 	_assert(e.max_hp == 420, "HP 420")
 	var has_poison := false
 	for i in e.intent_pattern:
@@ -265,12 +271,12 @@ func test_act2_normal_desert_scorpion() -> void:
 
 func test_act2_normal_mummy_warrior() -> void:
 	print("[TestEnemies] test_act2_normal_mummy_warrior")
-	var e := EnemiesAct2.mummy_warrior(_make_dummy_scene())
+	var e := EgyptianNormals.mummy_warrior(_make_dummy_scene())
 	_assert(e.max_hp == 600, "HP 600 (가장 높은 일반 적)")
 
 func test_act2_normal_sphinx_cub() -> void:
 	print("[TestEnemies] test_act2_normal_sphinx_cub")
-	var e := EnemiesAct2.sphinx_cub(_make_dummy_scene())
+	var e := EgyptianNormals.sphinx_cub(_make_dummy_scene())
 	_assert(e.max_hp == 350, "HP 350")
 	var has_special := false
 	for i in e.intent_pattern:
@@ -279,7 +285,7 @@ func test_act2_normal_sphinx_cub() -> void:
 
 func test_act2_normal_sand_ifrit() -> void:
 	print("[TestEnemies] test_act2_normal_sand_ifrit")
-	var e := EnemiesAct2.sand_ifrit(_make_dummy_scene())
+	var e := EgyptianNormals.sand_ifrit(_make_dummy_scene())
 	_assert(e.intent_pattern.size() == 2, "인텐트 2개 (준비+강타)")
 	_assert(e.intent_pattern[0].action_type == IntentRes.ActionType.BUFF, "첫 턴 BUFF(준비)")
 	_assert(e.intent_pattern[1].target == IntentRes.TargetType.ALL, "강타 ALL 타겟")
@@ -287,7 +293,7 @@ func test_act2_normal_sand_ifrit() -> void:
 
 func test_act2_normal_ka_spirit() -> void:
 	print("[TestEnemies] test_act2_normal_ka_spirit")
-	var e := EnemiesAct2.ka_spirit(_make_dummy_scene())
+	var e := EgyptianNormals.ka_spirit(_make_dummy_scene())
 	var has_weak := false; var has_vuln := false
 	for i in e.intent_pattern:
 		if i.action_type == IntentRes.ActionType.DEBUFF:
@@ -297,7 +303,7 @@ func test_act2_normal_ka_spirit() -> void:
 
 func test_act2_elite_apep_snake() -> void:
 	print("[TestEnemies] test_act2_elite_apep_snake")
-	var e := EnemiesAct2.apep_snake(_make_dummy_scene())
+	var e := EgyptianAct2.apep_snake(_make_dummy_scene())
 	_assert(e.max_hp == 1600, "HP 1600")
 	var has_poison := false
 	for i in e.intent_pattern:
@@ -307,7 +313,7 @@ func test_act2_elite_apep_snake() -> void:
 
 func test_act2_elite_seth_hound() -> void:
 	print("[TestEnemies] test_act2_elite_seth_hound")
-	var e := EnemiesAct2.seth_hound(_make_dummy_scene())
+	var e := EgyptianAct2.seth_hound(_make_dummy_scene())
 	_assert(e.max_hp == 1800, "HP 1800 (최고 엘리트)")
 	var last_intent: Resource = e.intent_pattern[e.intent_pattern.size() - 1]
 	_assert(last_intent.target == IntentRes.TargetType.LOWEST_HP, "마지막 인텐트 LOWEST_HP")
@@ -315,7 +321,7 @@ func test_act2_elite_seth_hound() -> void:
 
 func test_act2_elite_ba_bird() -> void:
 	print("[TestEnemies] test_act2_elite_ba_bird")
-	var e := EnemiesAct2.ba_bird(_make_dummy_scene())
+	var e := EgyptianAct2.ba_bird(_make_dummy_scene())
 	_assert(e.max_hp == 1500, "HP 1500")
 	var has_special := false
 	for i in e.intent_pattern:
@@ -324,7 +330,7 @@ func test_act2_elite_ba_bird() -> void:
 
 func test_act2_osiris_structure() -> void:
 	print("[TestEnemies] test_act2_osiris_structure")
-	var e := EnemiesAct2.osiris(_make_dummy_scene())
+	var e := EgyptianAct2.osiris(_make_dummy_scene())
 	_assert(e.max_hp == 3000, "HP 3000")
 	_assert(e.phase_thresholds.size() == 1, "phase_thresholds 1개")
 	_assert(e.phase_thresholds[0] == 0.5, "전환 50%")
@@ -338,7 +344,7 @@ func test_act2_osiris_structure() -> void:
 func test_act2_osiris_phase_transition_heals() -> void:
 	print("[TestEnemies] test_act2_osiris_phase_transition_heals")
 	var bm := _make_bm_with_hero()
-	var enemy := EnemiesAct2.osiris(_make_dummy_scene())
+	var enemy := EgyptianAct2.osiris(_make_dummy_scene())
 	bm.setup_battle([enemy])
 	bm._enemy_hp[0] = int(enemy.max_hp * 0.49)
 	bm._check_phase_transition(0)
@@ -350,9 +356,38 @@ func test_act2_osiris_phase_transition_heals() -> void:
 func test_act2_gm_act_switch() -> void:
 	print("[TestEnemies] test_act2_gm_act_switch")
 	var gm := GameManagerClass.new()
+	gm.act_mythologies = ["greek", "egyptian"]
 	gm.current_act = 1
 	var boss_act1 := gm._make_boss_enemies()
 	_assert(boss_act1[0].enemy_name == "히드라", "Act1 보스: 히드라")
 	gm.current_act = 2
 	var boss_act2 := gm._make_boss_enemies()
 	_assert(boss_act2[0].enemy_name == "오시리스", "Act2 보스: 오시리스")
+
+func test_greek_normals_encounters() -> void:
+	print("[TestEnemies] test_greek_normals_encounters")
+	var enc: Array = GreekNormals.encounters()
+	_assert(enc.size() >= 3, "그리스 인카운터 조합 3개 이상")
+	for combo in enc:
+		_assert(combo.size() >= 1, "인카운터 적 1마리 이상")
+		_assert(combo.size() <= 6, "인카운터 적 6마리 이하")
+
+func test_egyptian_normals_encounters() -> void:
+	print("[TestEnemies] test_egyptian_normals_encounters")
+	var enc: Array = EgyptianNormals.encounters()
+	_assert(enc.size() >= 3, "이집트 인카운터 조합 3개 이상")
+	for combo in enc:
+		_assert(combo.size() >= 1, "인카운터 적 1마리 이상")
+		_assert(combo.size() <= 6, "인카운터 적 6마리 이하")
+
+func test_normal_enemy_multi_encounter() -> void:
+	print("[TestEnemies] test_normal_enemy_multi_encounter")
+	var gm := _make_gm()
+	gm.act_mythologies = ["greek", "egyptian"]
+	var saw_multi := false
+	for _i in range(30):
+		var enemies := gm._make_normal_enemies()
+		_assert(enemies.size() >= 1, "인카운터 적 1마리 이상")
+		if enemies.size() >= 2:
+			saw_multi = true
+	_assert(saw_multi, "30회 중 다수 인카운터 최소 1회")
