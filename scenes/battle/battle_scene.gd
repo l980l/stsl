@@ -3,6 +3,7 @@ extends Node2D
 
 const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
 
 const WINDOW_W := 1920
 const WINDOW_H := 1080
@@ -465,13 +466,14 @@ func _refresh_token_tiles(hero_id: String) -> void:
 	var max_tokens: int = TOKEN_COLS * TOKEN_ROWS
 
 	for t in range(min(token_count, max_tokens)):
-		var col: int = t % TOKEN_COLS
-		var row: int = int(t / float(TOKEN_COLS))
+		var col: int = int(t / float(TOKEN_ROWS))
+		var row: int = t % TOKEN_ROWS
 		var tile_x: int = TOKEN_AREA_X + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
 		var tile_y: int = base_y + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
 
+		# 셀 배경
 		var bg := ColorRect.new()
-		bg.color = Color(0.55, 0.55, 0.25)
+		bg.color = Color(0.18, 0.16, 0.10)
 		bg.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
 		bg.position = Vector2(tile_x, tile_y)
 		bg.tooltip_text = "다음 턴 시작 시 상대를 공격합니다"
@@ -479,6 +481,14 @@ func _refresh_token_tiles(hero_id: String) -> void:
 		add_child(bg)
 		_token_tile_nodes[hero_id].append(bg)
 
+		# 병사 캐릭터 씬 (idle 애니메이션 포함)
+		var char_node = SoldierScene.instantiate()
+		char_node.position = Vector2(tile_x + TOKEN_TILE_W / 2.0, tile_y + TOKEN_TILE_H - 20)
+		char_node.mouse_filter = Control.MOUSE_FILTER_IGNORE if char_node.has_method("set_mouse_filter") else 0
+		add_child(char_node)
+		_token_tile_nodes[hero_id].append(char_node)
+
+		# 이름 라벨 (하단)
 		var lbl := Label.new()
 		lbl.text = "병사"
 		lbl.add_theme_font_size_override("font_size", 11)
