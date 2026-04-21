@@ -89,9 +89,10 @@ func from_dict(data: Dictionary) -> void:
 
 func _get_hero_scene(hero_id: String) -> PackedScene:
 	match hero_id:
-		"napoleon": return load("res://characters/heroes/napoleon/napoleon.tscn")
-		"cleopatra": return load("res://characters/heroes/cleopatra/cleopatra.tscn")
-		"yi_sun_sin": return load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
+		"napoleon":    return load("res://characters/heroes/napoleon/napoleon.tscn")
+		"cleopatra":   return load("res://characters/heroes/cleopatra/cleopatra.tscn")
+		"yi_sun_sin":  return load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
+		"joan_of_arc": return load("res://characters/heroes/joan_of_arc/joan_of_arc.tscn")
 	return null
 
 func increase_max_hp(hero_id: String, amount: int) -> void:

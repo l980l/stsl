@@ -12,6 +12,8 @@ static func build_pool() -> Array:
 		_ankh_of_life(), _eye_of_horus(), _scarab_talisman(),
 		_rune_of_fate(), _mjolnir_shard(), _idun_apple(),
 		_underworld_talisman(), _dokkaebi_hammer_shard(), _samtaegeuk_charm(),
+		# 잔다르크 전용 렐릭
+		_flag_of_orleans(), _saints_tears(),
 	]
 
 static func _burning_blood() -> Resource:
@@ -203,3 +205,19 @@ static func _samtaegeuk_charm() -> Resource:
 	r.description = "영웅이 피해를 받을 때 방어도 +10"
 	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
 	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 10; return r
+
+# ──── 잔다르크 전용 렐릭 ────
+
+static func _flag_of_orleans() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "오를레앙 깃발"
+	r.description = "플레이어 턴 시작 시 HP +20 (잔다르크 생존 시 +40)"
+	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r.effect_type = RelicRes.EffectType.HEAL
+	r.owner_hero_id = "joan_of_arc"; r.value = 20; r.bonus_value = 40; return r
+
+static func _saints_tears() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "성녀의 눈물"
+	r.description = "영웅이 피해를 받을 때 팀 전체 HP +30 (잔다르크 생존 시 +60)"
+	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
+	r.effect_type = RelicRes.EffectType.HEAL
+	r.owner_hero_id = "joan_of_arc"; r.value = 30; r.bonus_value = 60; return r
