@@ -7,13 +7,21 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 const WINDOW_W := 1920
 const WINDOW_H := 1080
 const HERO_X := 20
-const ENEMY_X := 1520
-const SLOT_W := 360
+const ENEMY_X := 1440
+const ENEMY_COL_GAP := 20
+const SLOT_W := 240
 const SLOT_H := 280
 const BOTTOM_Y := 840
 const CARD_W := 110
 const CARD_H := 160
 const SLOT_GAP := 20
+const MAX_ENEMY_COUNT := 6
+const TOKEN_COLS := 6
+const TOKEN_ROWS := 2
+const TOKEN_TILE_W := 38
+const TOKEN_TILE_H := 50
+const TOKEN_TILE_GAP := 4
+const TOKEN_AREA_X := 270
 
 # UI 참조 (Dictionary 배열)
 # hero entry: {panel, name_lbl, hp_lbl, block_lbl, hero_id}
@@ -38,6 +46,7 @@ const DRAG_THRESHOLD := 10.0
 
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
+var _token_tile_nodes: Dictionary = {}
 var _synergy_lbl: Label = null
 var _ppt_label: Label = null
 var _debug_badge: Label = null
@@ -46,8 +55,7 @@ var _debug_hp_target_mode: bool = false
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
 	"morale": "★", "charm": "♥", "strength": "↑",
-	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜",
-	"tokens": "⚔"
+	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜"
 }
 const STATUS_TOOLTIP := {
 	"poison_dmg": "독: 매 턴 N×10 피해. 지속 3턴, 중첩 시 데미지 누적+지속 갱신",
@@ -58,8 +66,7 @@ const STATUS_TOOLTIP := {
 	"strength": "강화: 피해 +N",
 	"taunt": "도발: 이 대상이 우선 공격 받음",
 	"counter_block": "반격 방어: 피해 = 현재 방어도 기반",
-	"charm_resistance": "매혹 저항 N: 매혹 (3+N)스택이 되어야 반함",
-	"tokens": "병사 토큰 N: 매 턴 시작 시 토큰당 25 피해를 랜덤 적에게 자동 공격"
+	"charm_resistance": "매혹 저항 N: 매혹 (3+N)스택이 되어야 반함"
 }
 
 func _ready() -> void:
@@ -129,7 +136,7 @@ func _build_ui() -> void:
 	# 시너지 HUD
 	_synergy_lbl = Label.new()
 	_synergy_lbl.position = Vector2(20, 750)
-	_synergy_lbl.size = Vector2(360, 80)
+	_synergy_lbl.size = Vector2(240, 80)
 	_synergy_lbl.add_theme_font_size_override("font_size", 13)
 	_synergy_lbl.modulate = Color(1.0, 0.0, 1.0)
 	_synergy_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -144,14 +151,10 @@ func _build_ui() -> void:
 	_ppt_label.visible = false
 	add_child(_ppt_label)
 
-	# 영웅 슬롯 3개 (초기 숨김)
+	# 영웅 슬롯 3개 고정 (초기 숨김)
 	for i in range(3):
 		_hero_nodes.append(_make_hero_slot(i))
-		_enemy_char_nodes.append(null)  # 적 캐릭터 노드 예약
-
-	# 적 슬롯 3개 (초기 숨김)
-	for i in range(3):
-		_enemy_nodes.append(_make_enemy_slot(i))
+	# 적 슬롯은 _setup_enemies()에서 동적 생성
 
 func _make_hero_slot(index: int) -> Dictionary:
 	var y := 80 + index * (SLOT_H + SLOT_GAP)
@@ -176,23 +179,29 @@ func _make_hero_slot(index: int) -> Dictionary:
 			 "hp_lbl": hp_lbl, "block_lbl": block_lbl,
 			 "hero_id": "", "status_box": status_box }
 
-func _make_enemy_slot(index: int) -> Dictionary:
-	var y := 80 + index * (SLOT_H + SLOT_GAP)
+func _enemy_slot_pos(index: int, total: int) -> Vector2:
+	if total <= 3:
+		return Vector2(ENEMY_X, 80 + index * (SLOT_H + SLOT_GAP))
+	var row: int = index / 2
+	var col: int = index % 2
+	return Vector2(ENEMY_X + col * (SLOT_W + ENEMY_COL_GAP), 80 + row * (SLOT_H + SLOT_GAP))
+
+func _make_enemy_slot(index: int, total: int) -> Dictionary:
+	var pos: Vector2 = _enemy_slot_pos(index, total)
 	var panel := ColorRect.new()
 	panel.color = Color(0.18, 0.10, 0.10)
-	panel.position = Vector2(ENEMY_X, y)
+	panel.position = pos
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
 	add_child(panel)
 
-	var intent_lbl := _make_label(Vector2(ENEMY_X + 10, y + 8), Vector2(SLOT_W - 20, 30), 20)
+	var intent_lbl := _make_label(Vector2(pos.x + 10, pos.y + 8), Vector2(SLOT_W - 20, 30), 20)
 	intent_lbl.modulate = Color(1.0, 0.8, 0.2)
 	intent_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
-	# 클릭 버튼 — 패널 전체를 커버 (텍스트 없음, flat)
 	var btn := Button.new()
 	btn.flat = true
-	btn.position = Vector2(ENEMY_X, y)
+	btn.position = pos
 	btn.size = Vector2(SLOT_W, SLOT_H)
 	btn.text = ""
 	btn.visible = false
@@ -200,13 +209,13 @@ func _make_enemy_slot(index: int) -> Dictionary:
 	btn.pressed.connect(func(): _on_enemy_pressed(captured_index))
 	add_child(btn)
 
-	var name_lbl  := _make_label(Vector2(ENEMY_X + 10, y + 204), Vector2(SLOT_W - 20, 26), 16)
-	var hp_lbl    := _make_label(Vector2(ENEMY_X + 10, y + 230), Vector2(SLOT_W - 20, 24), 14)
-	var block_lbl := _make_label(Vector2(ENEMY_X + 10, y + 254), Vector2(SLOT_W - 20, 22), 13)
+	var name_lbl  := _make_label(Vector2(pos.x + 10, pos.y + 204), Vector2(SLOT_W - 20, 26), 16)
+	var hp_lbl    := _make_label(Vector2(pos.x + 10, pos.y + 230), Vector2(SLOT_W - 20, 24), 14)
+	var block_lbl := _make_label(Vector2(pos.x + 10, pos.y + 254), Vector2(SLOT_W - 20, 22), 13)
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 
 	var status_box := HBoxContainer.new()
-	status_box.position = Vector2(ENEMY_X + 4, y + SLOT_H - 22)
+	status_box.position = Vector2(pos.x + 4, pos.y + SLOT_H - 22)
 	status_box.size = Vector2(SLOT_W - 8, 20)
 	add_child(status_box)
 
@@ -340,6 +349,11 @@ func _setup_heroes() -> void:
 	for entry in _hero_nodes:
 		entry["panel"].visible = false
 		entry["hero_id"] = ""
+	# 기존 병사 타일 정리
+	for tiles in _token_tile_nodes.values():
+		for tile in tiles:
+			tile.queue_free()
+	_token_tile_nodes.clear()
 
 	var heroes := TeamManager.heroes
 	for i in range(min(heroes.size(), 3)):
@@ -349,10 +363,9 @@ func _setup_heroes() -> void:
 		entry["hero_id"] = hero.hero_id
 		entry["name_lbl"].text = hero.get("hero_name") if hero.get("hero_name") != null else hero.hero_id
 
-		# 캐릭터 씬 인스턴스화
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
-			char_node.position = Vector2(HERO_X + 170, 80 + i * (SLOT_H + SLOT_GAP) + 120)
+			char_node.position = Vector2(HERO_X + 110, 80 + i * (SLOT_H + SLOT_GAP) + 120)
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
 
@@ -360,38 +373,46 @@ func _setup_heroes() -> void:
 		_update_hero_ui(hero.hero_id)
 
 func _setup_enemies() -> void:
-	# 기존 캐릭터 노드 정리
-	for i in range(_enemy_char_nodes.size()):
-		if _enemy_char_nodes[i] != null:
-			_enemy_char_nodes[i].queue_free()
-			_enemy_char_nodes[i] = null
+	# 기존 노드 전부 파괴
+	for char_node in _enemy_char_nodes:
+		if char_node != null:
+			char_node.queue_free()
+	_enemy_char_nodes.clear()
 	for entry in _enemy_nodes:
-		entry["panel"].visible = false
-		entry["btn"].visible = false
+		entry["panel"].queue_free()
+		entry["intent_lbl"].queue_free()
+		entry["btn"].queue_free()
+		entry["name_lbl"].queue_free()
+		entry["hp_lbl"].queue_free()
+		entry["block_lbl"].queue_free()
+		entry["status_box"].queue_free()
+	_enemy_nodes.clear()
+	_enemy_status_containers.clear()
 
-	var count := 0
-	while count < 3 and BattleManager.get_enemy(count) != null:
-		count += 1
+	var total: int = 0
+	while total < MAX_ENEMY_COUNT and BattleManager.get_enemy(total) != null:
+		total += 1
 
-	for i in range(count):
+	for i in range(total):
+		var entry: Dictionary = _make_enemy_slot(i, total)
+		_enemy_nodes.append(entry)
+		_enemy_char_nodes.append(null)
+		_enemy_status_containers.append(entry["status_box"])
+
 		var enemy: Resource = BattleManager.get_enemy(i)
-		var entry: Dictionary = _enemy_nodes[i]
 		entry["panel"].visible = true
 		entry["btn"].visible = true
 		entry["btn"].disabled = false
 		entry["name_lbl"].text = enemy.get("enemy_name") if enemy.get("enemy_name") != null else "적"
 
-		# 캐릭터 씬 인스턴스화 (좌우 반전: scale.x = -1)
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
-			char_node.position = Vector2(ENEMY_X + 190, 80 + i * (SLOT_H + SLOT_GAP) + 120)
-			char_node.scale = Vector2(-1, 1)  # 적은 왼쪽 향함
+			var pos: Vector2 = _enemy_slot_pos(i, total)
+			char_node.position = Vector2(pos.x + 110, pos.y + 120)
+			char_node.scale = Vector2(-1, 1)
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
 
-		if i >= _enemy_status_containers.size():
-			_enemy_status_containers.resize(i + 1)
-		_enemy_status_containers[i] = entry["status_box"]
 		_update_enemy_ui(i)
 
 func _update_hero_ui(hero_id: String) -> void:
@@ -412,7 +433,59 @@ func _update_hero_ui(hero_id: String) -> void:
 		if not TeamManager.is_alive(hero_id):
 			entry["panel"].modulate = Color(0.4, 0.4, 0.4)
 		_refresh_status_icons_hero(hero_id)
+		_refresh_token_tiles(hero_id)
 		return
+
+func _refresh_token_tiles(hero_id: String) -> void:
+	if _token_tile_nodes.has(hero_id):
+		for node in _token_tile_nodes[hero_id]:
+			node.queue_free()
+	_token_tile_nodes[hero_id] = []
+
+	if not TeamManager.is_alive(hero_id):
+		return
+
+	var token_count: int = BattleManager.get_hero_status(hero_id).get("tokens", 0)
+	if token_count <= 0:
+		return
+
+	var hero_idx: int = -1
+	for i in range(_hero_nodes.size()):
+		if _hero_nodes[i]["hero_id"] == hero_id:
+			hero_idx = i
+			break
+	if hero_idx < 0:
+		return
+
+	var slot_y: int = 80 + hero_idx * (SLOT_H + SLOT_GAP)
+	var grid_h: int = TOKEN_ROWS * TOKEN_TILE_H + (TOKEN_ROWS - 1) * TOKEN_TILE_GAP
+	var base_y: int = slot_y + int((SLOT_H - grid_h) / 2.0)
+	var max_tokens: int = TOKEN_COLS * TOKEN_ROWS
+
+	for t in range(min(token_count, max_tokens)):
+		var col: int = t % TOKEN_COLS
+		var row: int = t / TOKEN_COLS
+		var tile_x: int = TOKEN_AREA_X + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
+		var tile_y: int = base_y + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
+
+		var bg := ColorRect.new()
+		bg.color = Color(0.55, 0.55, 0.25)
+		bg.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
+		bg.position = Vector2(tile_x, tile_y)
+		bg.tooltip_text = "다음 턴 시작 시 상대를 공격합니다"
+		bg.mouse_filter = Control.MOUSE_FILTER_STOP
+		add_child(bg)
+		_token_tile_nodes[hero_id].append(bg)
+
+		var lbl := Label.new()
+		lbl.text = "병사"
+		lbl.add_theme_font_size_override("font_size", 11)
+		lbl.position = Vector2(tile_x, tile_y + int((TOKEN_TILE_H - 14) / 2.0))
+		lbl.size = Vector2(TOKEN_TILE_W, 14)
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(lbl)
+		_token_tile_nodes[hero_id].append(lbl)
 
 func _update_enemy_ui(index: int) -> void:
 	var entry: Dictionary = _enemy_nodes[index]
@@ -712,7 +785,7 @@ func _refresh_status_icons_hero(hero_id: String) -> void:
 		child.queue_free()
 	var status: Dictionary = BattleManager.get_hero_status(hero_id)
 	for key in status:
-		if key == "poison_dur":
+		if key == "poison_dur" or key == "tokens":
 			continue
 		var val: int = status[key]
 		if val <= 0:
