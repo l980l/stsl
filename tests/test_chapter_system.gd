@@ -58,4 +58,4 @@ func test_chapter2_pool_filters_empty_stubs() -> void:
 	var pool := gm._get_chapter_mythology_pool(2)
 	_assert(pool.size() == 3, "챕터2 풀은 항상 3개")
 	for myth in pool:
-		_assert(myth == "korean", "빈 스텁 필터 시 한국만 남아야 함: " + myth)
+		_assert(myth in ["korean", "chinese"], "챕터2 풀 — 한국 또는 중국 신화: " + myth)

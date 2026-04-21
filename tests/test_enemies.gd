@@ -61,6 +61,10 @@ func run_all() -> Dictionary:
 	test_korean_act1_shape()
 	test_korean_act2_shape()
 	test_korean_act3_shape()
+	test_chinese_normals_shape()
+	test_chinese_act1_shape()
+	test_chinese_act2_shape()
+	test_chinese_act3_shape()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -458,8 +462,7 @@ func test_relic_pool_count() -> void:
 	print("[TestEnemies] test_relic_pool_count")
 	var RelicData = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicData.build_pool()
-	assert(pool.size() == 25, "렐릭 풀 25종이어야 함 (기존 22 + Act 3 3종)")
-	_assert(pool.size() == 25, "렐릭 풀 25종 (기존 22 + Act 3 3종)")
+	_assert(pool.size() == 37, "릴릭 풀 37종 (기존 34 + 중국 3종)")
 
 func test_act3_event_pool_shape() -> void:
 	print("[TestEnemies] test_act3_event_pool_shape")
@@ -639,3 +642,55 @@ func test_korean_act3_shape() -> void:
 	_assert(b.phase_thresholds.size() == 2, "구삼승할망 3페이즈")
 	_assert(b.mythology == "korean", "구삼승할망 mythology=korean")
 	_assert(b.charm_resistance == 2, "구삼승할망 charm_resistance=2")
+
+func test_chinese_normals_shape() -> void:
+	print("[TestEnemies] test_chinese_normals_shape")
+	var M = load("res://resources/enemies/chinese/chinese_normals.gd")
+	var scene: PackedScene = load("res://characters/summons/soldier/soldier.tscn")
+	var encs: Array = M.encounters()
+	_assert(encs.size() >= 5, "중국 인카운터 5조합 이상")
+	var e1: Resource = M.yaksha(scene)
+	_assert(e1.max_hp == 340, "야차 HP 340")
+	_assert(e1.mythology == "chinese", "야차 mythology=chinese")
+	_assert(e1.intent_pattern.size() == 3, "야차 인텐트 3개")
+	var e2: Resource = M.azure_dragon_guard(scene)
+	_assert(e2.max_hp == 520, "청룡 수호병 HP 520")
+
+func test_chinese_act1_shape() -> void:
+	print("[TestEnemies] test_chinese_act1_shape")
+	var M = load("res://resources/enemies/chinese/chinese_act1.gd")
+	_assert(M.elites().size() == 3, "chinese_act1 엘리트 3종")
+	_assert(M.boss() == "chiyou", "chinese_act1 보스는 chiyou")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.chiyou(scene)
+	_assert(b.max_hp == 4500, "치우 HP 4500")
+	_assert(b.phase_thresholds.size() == 2, "치우 3페이즈")
+	_assert(b.mythology == "chinese", "치우 mythology=chinese")
+	_assert(b.charm_resistance == 2, "치우 charm_resistance=2")
+	var elite = M.golden_horn_king(scene)
+	_assert(elite.max_hp == 1600, "금각 대왕 HP 1600")
+	_assert(elite.charm_resistance == 1, "금각 대왕 charm_resistance=1")
+
+func test_chinese_act2_shape() -> void:
+	print("[TestEnemies] test_chinese_act2_shape")
+	var M = load("res://resources/enemies/chinese/chinese_act2.gd")
+	_assert(M.elites().size() == 3, "chinese_act2 엘리트 3종")
+	_assert(M.boss() == "erlang_shen", "chinese_act2 보스는 erlang_shen")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.erlang_shen(scene)
+	_assert(b.max_hp == 4800, "이랑신 HP 4800")
+	_assert(b.phase_thresholds.size() == 2, "이랑신 3페이즈")
+	_assert(b.mythology == "chinese", "이랑신 mythology=chinese")
+	_assert(b.charm_resistance == 2, "이랑신 charm_resistance=2")
+
+func test_chinese_act3_shape() -> void:
+	print("[TestEnemies] test_chinese_act3_shape")
+	var M = load("res://resources/enemies/chinese/chinese_act3.gd")
+	_assert(M.elites().size() == 3, "chinese_act3 엘리트 3종")
+	_assert(M.boss() == "jade_emperor", "chinese_act3 보스는 jade_emperor")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.jade_emperor(scene)
+	_assert(b.max_hp == 4800, "옥황상제 HP 4800")
+	_assert(b.phase_thresholds.size() == 2, "옥황상제 3페이즈")
+	_assert(b.mythology == "chinese", "옥황상제 mythology=chinese")
+	_assert(b.charm_resistance == 2, "옥황상제 charm_resistance=2")
