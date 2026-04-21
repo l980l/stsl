@@ -203,7 +203,8 @@ func test_poison_tick_enemy() -> void:
 	bm._enemy_status[0]["poison_dmg"] = 3
 	bm._enemy_status[0]["poison_dur"] = 3
 
-	bm._execute_enemy_turn()
+	# 적 독은 내 사후턴에 틱 → _phase_player_post 직접 호출
+	bm._phase_player_post()
 	_assert(bm.get_enemy_hp(0) == 170, "독 3dmg 틱 → 3×10=30 피해 → HP 200 → 170")
 	_assert(bm._enemy_status[0].get("poison_dur", -1) == 2, "독 지속 3 → 2")
 
@@ -215,7 +216,8 @@ func test_poison_tick_hero() -> void:
 	bm._hero_status["napoleon"] = {"poison_dmg": 4, "poison_dur": 3}
 	bm.is_battle_active = true
 
-	bm.start_player_turn()
+	# 영웅 독은 적 사후턴에 틱 → _phase_enemy_post 직접 호출
+	bm._phase_enemy_post()
 	_assert(bm.team_mgr.get_current_hp("napoleon") == 30, "독 4dmg 틱 → 4×10=40 피해 → HP 70 → 30")
 	_assert(bm._hero_status["napoleon"].get("poison_dur", -1) == 2, "독 지속 3 → 2")
 

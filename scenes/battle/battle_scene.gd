@@ -261,6 +261,7 @@ func _connect_signals() -> void:
 
 func _start_battle() -> void:
 	if not GameManager.pending_enemies.is_empty():
+		BattleManager.turn_interval = 0.2
 		BattleManager.setup_battle(GameManager.pending_enemies)
 		_setup_heroes()
 		_setup_enemies()
@@ -321,6 +322,7 @@ func _start_test_battle() -> void:
 	intent.target = IntentResClass.TargetType.RANDOM
 	satyr.intent_pattern = [intent]
 
+	BattleManager.turn_interval = 0.2
 	BattleManager.setup_battle([satyr])
 	_setup_heroes()
 	_setup_enemies()
