@@ -483,7 +483,7 @@ func _refresh_token_tiles(hero_id: String) -> void:
 
 		# 병사 캐릭터 씬 (idle 애니메이션 포함)
 		var char_node = SoldierScene.instantiate()
-		char_node.position = Vector2(tile_x + TOKEN_TILE_W / 2.0, tile_y + TOKEN_TILE_H - 20)
+		char_node.position = Vector2(tile_x + (TOKEN_TILE_W - 40) / 2.0, tile_y + TOKEN_TILE_H - 20 - 50)
 		add_child(char_node)
 		_token_tile_nodes[hero_id].append(char_node)
 
@@ -856,6 +856,8 @@ func _refresh_debug_badge() -> void:
 		parts.append("INV")
 	if DeckManager.debug_unlimited_energy:
 		parts.append("E∞")
+	if _debug_grid_visible:
+		parts.append("GRID")
 	if parts.is_empty():
 		_debug_badge.visible = false
 	else:
@@ -911,6 +913,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		elif event.keycode == KEY_G and event.shift_pressed:
 			_debug_grid_visible = not _debug_grid_visible
 			_refresh_debug_grid()
+			_refresh_debug_badge()
 
 func _refresh_debug_grid() -> void:
 	for node in _debug_grid_nodes:
@@ -918,6 +921,15 @@ func _refresh_debug_grid() -> void:
 	_debug_grid_nodes.clear()
 	if not _debug_grid_visible:
 		return
+
+	# 영웅 슬롯 외곽선 (파란색)
+	for i in range(_hero_nodes.size()):
+		var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
+		for border in _make_border_rects(HERO_X, slot_y, SLOT_W, SLOT_H, Color(0.3, 0.6, 1.0, 0.8)):
+			add_child(border)
+			_debug_grid_nodes.append(border)
+
+	# 소환물 그리드 (노란색)
 	for i in range(3):
 		var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
 		var grid_h: int = TOKEN_ROWS * TOKEN_TILE_H + (TOKEN_ROWS - 1) * TOKEN_TILE_GAP
@@ -933,10 +945,17 @@ func _refresh_debug_grid() -> void:
 				cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
 				add_child(cell)
 				_debug_grid_nodes.append(cell)
-				# 테두리 (상/하/좌/우 1px 라인)
 				for border in _make_border_rects(cx, cy, TOKEN_TILE_W, TOKEN_TILE_H, Color(0.9, 0.9, 0.3, 0.6)):
 					add_child(border)
 					_debug_grid_nodes.append(border)
+
+	# 적 슬롯 외곽선 (빨간색)
+	var total: int = _enemy_nodes.size()
+	for i in range(total):
+		var pos: Vector2 = _enemy_slot_pos(i, total)
+		for border in _make_border_rects(int(pos.x), int(pos.y), SLOT_W, SLOT_H, Color(1.0, 0.3, 0.3, 0.8)):
+			add_child(border)
+			_debug_grid_nodes.append(border)
 
 func _make_border_rects(x: int, y: int, w: int, h: int, color: Color) -> Array:
 	var rects: Array = []
