@@ -37,6 +37,9 @@ var _hero_status: Dictionary = {}
 # 지속 효과 (POWER 카드): { "poison_per_turn": { "owner": "cleopatra", "value": 1 }, ... }
 var _active_powers: Dictionary = {}
 
+# 이번 플레이어 턴 카드 사용 횟수 (만리 원정용)
+var _cards_played_this_turn: int = 0
+
 signal battle_started()
 signal battle_won()
 signal battle_lost()
@@ -114,6 +117,7 @@ func _phase_player_pre() -> bool:
 
 func _phase_player_main() -> void:
 	is_player_turn = true
+	_cards_played_this_turn = 0
 	if team_mgr:
 		for hero in team_mgr.heroes:
 			_hero_block[hero.hero_id] = 0
@@ -158,6 +162,7 @@ func play_card(card: Resource, target_enemy_index: int, target_hero_id: String =
 		return false
 	if deck_mgr == null or not deck_mgr.play_card(card):
 		return false
+	_cards_played_this_turn += 1
 	_apply_card_effects(card, target_enemy_index, target_hero_id)
 	return true
 
@@ -189,15 +194,16 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
 				if owner_status.get("weak", 0) > 0:
 					dmg = int(dmg * 0.75)
-				if effect.target == "ALL":
-					for i in range(_enemies.size()):
-						if _enemy_alive[i]:
-							_deal_damage_to_enemy(i, dmg)
-							_last_attacker[i] = card.owner_id
-				else:
-					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-						_deal_damage_to_enemy(target_enemy_index, dmg)
-						_last_attacker[target_enemy_index] = card.owner_id
+				for _hit in range(effect.hit_count):
+					if effect.target == "ALL":
+						for i in range(_enemies.size()):
+							if _enemy_alive[i]:
+								_deal_damage_to_enemy(i, dmg)
+								_last_attacker[i] = card.owner_id
+					else:
+						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+							_deal_damage_to_enemy(target_enemy_index, dmg)
+							_last_attacker[target_enemy_index] = card.owner_id
 			EffectRes.EffectType.BLOCK:
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + effect.value
 			EffectRes.EffectType.APPLY_STATUS:
@@ -321,6 +327,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.SACRIFICE_HP:
 				if team_mgr:
 					team_mgr.take_damage(card.owner_id, effect.value)
+			EffectRes.EffectType.COST_ZERO_TURN:
+				if deck_mgr:
+					deck_mgr.pending_all_cost_zero = true
+			EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED:
+				var block_amount: int = _cards_played_this_turn * effect.value
+				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + block_amount
 	_apply_synergy_bonus(card, target_enemy_index)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
@@ -701,6 +713,11 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 						if _enemy_status[target_enemy_index].get("poison_dmg", 0) > 0:
 							_deal_damage_to_enemy(target_enemy_index, 4)
+				# 약탈과 독 (칭기즈칸 × 클레오파트라): 전체 공격 시 모든 적에 독 +2
+				if card_owner == "genghis_khan" and effect.target == "ALL" and team_mgr.is_alive("cleopatra"):
+					for ei in range(_enemies.size()):
+						if _enemy_alive[ei]:
+							_apply_status_to_enemy(ei, "poison", 2)
 			EffectRes.EffectType.HEAL_ALL:
 				# 성전 (잔다르크 × 나폴레옹): HEAL_ALL 시 나폴레옹 MORALE +2
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("napoleon"):
@@ -719,6 +736,7 @@ func get_active_synergies() -> Array:
 	var y: bool = team_mgr.is_alive("yi_sun_sin")
 	var c: bool = team_mgr.is_alive("cleopatra")
 	var j: bool = team_mgr.is_alive("joan_of_arc")
+	var g: bool = team_mgr.is_alive("genghis_khan")
 	if n and y:
 		synergies.append("철벽 진군 (나폴레옹×이순신)")
 	if y and c:
@@ -727,6 +745,8 @@ func get_active_synergies() -> Array:
 		synergies.append("혼란의 돌격 (나폴레옹×클레오파트라)")
 	if j and n:
 		synergies.append("성전 (잔다르크×나폴레옹)")
+	if g and c:
+		synergies.append("약탈과 독 (칭기즈칸×클레오파트라)")
 	return synergies
 
 
@@ -747,6 +767,9 @@ func has_synergy_bonus(card: Resource) -> bool:
 					return true
 			EffectRes.EffectType.HEAL_ALL:
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("napoleon"):
+					return true
+			EffectRes.EffectType.DAMAGE:
+				if card_owner == "genghis_khan" and effect.target == "ALL" and team_mgr.is_alive("cleopatra"):
 					return true
 	return false
 
