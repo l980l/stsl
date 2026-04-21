@@ -332,10 +332,13 @@ GDD 기준 MVP 3인 이후 확장 영웅.
   - *중국 대표 영웅은 M5 미배정. 향후 7·8번째 영웅 확장 시 후보.*
 - ✅ 영웅당 카드 15장(v1), 전용 렐릭 2종 개요, 크로스 시너지 MVP 3쌍 정의
 - 🔲 v1 → v2 확장 (영웅당 40장) — 구현 단계 전 별도 계획
-- 🔲 코드 구현: CardResource 팩토리, 신규 조건 키 (enemy_count / hand_size), EffectType 추가
-  - **REVIVE** (잔다르크 기적의 부활): 사망 아군 HP% 복원. `effect_resource.gd` enum 추가 필요
-  - ON_KILL_REWARD: v1은 렐릭으로 대체, v2 재검토
-- 🔲 영웅 선택 화면·스프라이트·사운드 (M4-3 해금 시스템과 연동)
+- ✅ 코드 구현 완료 (PR #54 잔다르크, PR #55 칭기즈칸, PR #56 무사시)
+  - REVIVE / SACRIFICE_HP / COST_ZERO_TURN / BLOCK_PER_CARDS_PLAYED / hit_count 다중 히트
+  - CONDITIONAL_DMG 조건키: enemy_count_1 / hand_size_0
+  - 크로스 시너지 6쌍 (철벽 진군·독침 반격·혼란의 돌격·성전·약탈과 독·검사의 약속)
+  - 전용 렐릭 6종 (영웅당 2종), 841 테스트 통과
+- 🔲 v1 → v2 확장 (영웅당 40장) — 구현 단계 전 별도 계획
+- 🔲 영웅 선택 화면·스프라이트·사운드 (Milestone 7 UI 폴리시 단계)
 
 ---
 
