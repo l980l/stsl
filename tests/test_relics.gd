@@ -33,6 +33,7 @@ func run_all() -> Dictionary:
 	test_act2_relics_exist()
 	test_korean_relics_exist()
 	test_chinese_relics_exist()
+	test_japanese_relics_exist()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -86,7 +87,7 @@ func test_relic_pool_size() -> void:
 	print("[TestRelics] test_relic_pool_size")
 	var RelicsGd = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicsGd.build_pool()
-	_assert(pool.size() == 37, "릴릭 풀 37종")
+	_assert(pool.size() == 40, "릴릭 풀 40종")
 
 func test_trigger_type_values() -> void:
 	print("[TestRelics] test_trigger_type_values")
@@ -261,7 +262,7 @@ func test_chinese_relics_exist() -> void:
 	print("[TestRelics] test_chinese_relics_exist")
 	var RelicsGd = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicsGd.build_pool()
-	_assert(pool.size() == 37, "릴릭 풀 37종")
+	_assert(pool.size() == 40, "릴릭 풀 40종")
 	var names := pool.map(func(r): return r.relic_name)
 	_assert("용의 비늘" in names, "용의 비늘 존재")
 	_assert("팔선의 부적" in names, "팔선의 부적 존재")
@@ -271,3 +272,18 @@ func test_chinese_relics_exist() -> void:
 	_assert(scale.trigger == RelicRes2.TriggerType.BATTLE_START, "용의 비늘 트리거=BATTLE_START")
 	_assert(scale.effect_type == RelicRes2.EffectType.COST_REDUCTION, "용의 비늘 효과=COST_REDUCTION")
 	_assert(scale.value == 1, "용의 비늘 value=1")
+
+func test_japanese_relics_exist() -> void:
+	print("[TestRelics] test_japanese_relics_exist")
+	var RelicsGd = load("res://resources/relics/relics.gd")
+	var pool: Array = RelicsGd.build_pool()
+	_assert(pool.size() == 40, "릴릭 풀 40종")
+	var names := pool.map(func(r): return r.relic_name)
+	_assert("귀신 부적" in names, "귀신 부적 존재")
+	_assert("텐구의 깃털" in names, "텐구의 깃털 존재")
+	_assert("오로치의 비늘" in names, "오로치의 비늘 존재")
+	var RelicRes2 = load("res://resources/relic_resource.gd")
+	var feather = pool.filter(func(r): return r.relic_name == "텐구의 깃털")[0]
+	_assert(feather.trigger == RelicRes2.TriggerType.BATTLE_START, "텐구의 깃털 트리거=BATTLE_START")
+	_assert(feather.effect_type == RelicRes2.EffectType.DRAW, "텐구의 깃털 효과=DRAW")
+	_assert(feather.value == 1, "텐구의 깃털 value=1")

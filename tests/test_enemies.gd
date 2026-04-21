@@ -65,6 +65,10 @@ func run_all() -> Dictionary:
 	test_chinese_act1_shape()
 	test_chinese_act2_shape()
 	test_chinese_act3_shape()
+	test_japanese_normals_shape()
+	test_japanese_act1_shape()
+	test_japanese_act2_shape()
+	test_japanese_act3_shape()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -462,7 +466,7 @@ func test_relic_pool_count() -> void:
 	print("[TestEnemies] test_relic_pool_count")
 	var RelicData = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicData.build_pool()
-	_assert(pool.size() == 37, "릴릭 풀 37종 (기존 34 + 중국 3종)")
+	_assert(pool.size() == 40, "릴릭 풀 40종 (기존 37 + 일본 3종)")
 
 func test_act3_event_pool_shape() -> void:
 	print("[TestEnemies] test_act3_event_pool_shape")
@@ -694,3 +698,55 @@ func test_chinese_act3_shape() -> void:
 	_assert(b.phase_thresholds.size() == 2, "옥황상제 3페이즈")
 	_assert(b.mythology == "chinese", "옥황상제 mythology=chinese")
 	_assert(b.charm_resistance == 2, "옥황상제 charm_resistance=2")
+
+func test_japanese_normals_shape() -> void:
+	print("[TestEnemies] test_japanese_normals_shape")
+	var M = load("res://resources/enemies/japanese/japanese_normals.gd")
+	var scene: PackedScene = load("res://characters/summons/soldier/soldier.tscn")
+	var encs: Array = M.encounters()
+	_assert(encs.size() >= 5, "일본 인카운터 5조합 이상")
+	var e1: Resource = M.oni(scene)
+	_assert(e1.max_hp == 420, "오니 HP 420")
+	_assert(e1.mythology == "japanese", "오니 mythology=japanese")
+	_assert(e1.intent_pattern.size() == 3, "오니 인텐트 3개")
+	var e2: Resource = M.ronin_ghost(scene)
+	_assert(e2.max_hp == 450, "로닌 망령 HP 450")
+
+func test_japanese_act1_shape() -> void:
+	print("[TestEnemies] test_japanese_act1_shape")
+	var M = load("res://resources/enemies/japanese/japanese_act1.gd")
+	_assert(M.elites().size() == 3, "japanese_act1 엘리트 3종")
+	_assert(M.boss() == "raijin", "japanese_act1 보스는 raijin")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.raijin(scene)
+	_assert(b.max_hp == 4500, "라이덴 HP 4500")
+	_assert(b.phase_thresholds.size() == 2, "라이덴 3페이즈")
+	_assert(b.mythology == "japanese", "라이덴 mythology=japanese")
+	_assert(b.charm_resistance == 2, "라이덴 charm_resistance=2")
+	var elite = M.oni_general(scene)
+	_assert(elite.max_hp == 1600, "오니 장군 HP 1600")
+	_assert(elite.charm_resistance == 1, "오니 장군 charm_resistance=1")
+
+func test_japanese_act2_shape() -> void:
+	print("[TestEnemies] test_japanese_act2_shape")
+	var M = load("res://resources/enemies/japanese/japanese_act2.gd")
+	_assert(M.elites().size() == 3, "japanese_act2 엘리트 3종")
+	_assert(M.boss() == "shuten_doji", "japanese_act2 보스는 shuten_doji")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.shuten_doji(scene)
+	_assert(b.max_hp == 4800, "슈텐도지 HP 4800")
+	_assert(b.phase_thresholds.size() == 2, "슈텐도지 3페이즈")
+	_assert(b.mythology == "japanese", "슈텐도지 mythology=japanese")
+	_assert(b.charm_resistance == 2, "슈텐도지 charm_resistance=2")
+
+func test_japanese_act3_shape() -> void:
+	print("[TestEnemies] test_japanese_act3_shape")
+	var M = load("res://resources/enemies/japanese/japanese_act3.gd")
+	_assert(M.elites().size() == 3, "japanese_act3 엘리트 3종")
+	_assert(M.boss() == "yamata_no_orochi", "japanese_act3 보스는 yamata_no_orochi")
+	var scene = load("res://characters/summons/soldier/soldier.tscn")
+	var b = M.yamata_no_orochi(scene)
+	_assert(b.max_hp == 4800, "야마타노오로치 HP 4800")
+	_assert(b.phase_thresholds.size() == 2, "야마타노오로치 3페이즈")
+	_assert(b.mythology == "japanese", "야마타노오로치 mythology=japanese")
+	_assert(b.charm_resistance == 2, "야마타노오로치 charm_resistance=2")
