@@ -326,11 +326,16 @@
 
 GDD 기준 MVP 3인 이후 확장 영웅.
 
-- 🔲 영웅 4: 잔 다르크 — 신성 메카닉, 팀 부활 특화
-- 🔲 영웅 5: 칭기즈칸 — 기동(Rush) 메카닉, 다수 약공격
-- 🔲 영웅 6: 미야모토 무사시 — 이도류(쌍공격), 결투(단일 적 집중·카운터), 무심(핸드 0 시 강화)
+- ✅ 영웅 4: 잔 다르크 — 신성(HEAL_ALL·정화)/부활(REVIVE)/순교(HP소모→팀이득) `docs/game_design/cards_joan_of_arc_v1.md`
+- ✅ 영웅 5: 칭기즈칸 — 기동(Rush·다수 저코스트)/몽골 기병(DMG ALL)/약탈(처치 보상) `docs/game_design/cards_genghis_khan_v1.md`
+- ✅ 영웅 6: 미야모토 무사시 — 이도류(DMG×2)/결투(enemy_count==1)/무심(hand_size==0) `docs/game_design/cards_musashi_v1.md`
   - *중국 대표 영웅은 M5 미배정. 향후 7·8번째 영웅 확장 시 후보.*
-- 🔲 영웅당 카드 15장, 전용 렐릭 2종, 크로스 시너지 정의
+- ✅ 영웅당 카드 15장(v1), 전용 렐릭 2종 개요, 크로스 시너지 MVP 3쌍 정의
+- 🔲 v1 → v2 확장 (영웅당 40장) — 구현 단계 전 별도 계획
+- 🔲 코드 구현: CardResource 팩토리, 신규 조건 키 (enemy_count / hand_size), EffectType 추가
+  - **REVIVE** (잔다르크 기적의 부활): 사망 아군 HP% 복원. `effect_resource.gd` enum 추가 필요
+  - ON_KILL_REWARD: v1은 렐릭으로 대체, v2 재검토
+- 🔲 영웅 선택 화면·스프라이트·사운드 (M4-3 해금 시스템과 연동)
 
 ---
 
