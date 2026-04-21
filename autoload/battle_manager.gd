@@ -12,6 +12,7 @@ const TOKEN_MAX_STACK: int = 6
 # 의존성 주입 — 프로덕션: BattleScene이 설정, 테스트: 직접 할당
 var team_mgr = null
 var deck_mgr = null
+var turn_interval: float = 0.0  # BattleScene이 0.2로 설정, 테스트는 기본 0.0 (await 스킵)
 
 # 배틀 상태
 var is_battle_active: bool = false
@@ -81,11 +82,41 @@ func setup_battle(enemies: Array) -> void:
 func start_player_turn() -> void:
 	if not is_battle_active:
 		return
+	var pre_did: bool = _phase_player_pre()
+	if pre_did and turn_interval > 0.0:
+		await get_tree().create_timer(turn_interval).timeout
+	if not is_battle_active:
+		return
+	_phase_player_main()
+
+func _phase_player_pre() -> bool:
+	if team_mgr == null:
+		return false
+	var did_work: bool = false
+	for hero in team_mgr.heroes:
+		if not team_mgr.is_alive(hero.hero_id):
+			continue
+		var token_count: int = _hero_status.get(hero.hero_id, {}).get("tokens", 0)
+		if token_count <= 0:
+			continue
+		for _ti in range(token_count):
+			var alive_indices: Array = []
+			for ei in range(_enemies.size()):
+				if _enemy_alive[ei]:
+					alive_indices.append(ei)
+			if alive_indices.is_empty():
+				break
+			var pick: int = alive_indices[randi() % alive_indices.size()]
+			_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK)
+			_last_attacker[pick] = hero.hero_id
+			did_work = true
+	return did_work
+
+func _phase_player_main() -> void:
 	is_player_turn = true
 	if team_mgr:
 		for hero in team_mgr.heroes:
 			_hero_block[hero.hero_id] = 0
-			_tick_hero_poison(hero.hero_id)
 			for stype: String in ["weak", "vulnerable"]:
 				var cur: int = _hero_status.get(hero.hero_id, {}).get(stype, 0)
 				if cur > 0:
@@ -101,24 +132,6 @@ func start_player_turn() -> void:
 		if ppt["turns_remaining"] <= 0:
 			_active_powers.erase("poison_per_turn")
 		active_powers_changed.emit()
-	# 병사 토큰 자동 공격: 생존 영웅의 토큰당 TOKEN_DMG_PER_STACK 피해를 랜덤 생존 적에게
-	if team_mgr:
-		for hero in team_mgr.heroes:
-			if not team_mgr.is_alive(hero.hero_id):
-				continue
-			var token_count: int = _hero_status.get(hero.hero_id, {}).get("tokens", 0)
-			if token_count <= 0:
-				continue
-			for _ti in range(token_count):
-				var alive_indices: Array = []
-				for ei in range(_enemies.size()):
-					if _enemy_alive[ei]:
-						alive_indices.append(ei)
-				if alive_indices.is_empty():
-					break
-				var pick: int = alive_indices[randi() % alive_indices.size()]
-				_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK)
-				_last_attacker[pick] = hero.hero_id
 	if deck_mgr:
 		deck_mgr.start_turn()
 	var _gm_pts = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
@@ -126,6 +139,19 @@ func start_player_turn() -> void:
 		var RelicRes = load("res://resources/relic_resource.gd")
 		_gm_pts.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START)
 	player_turn_started.emit()
+
+func _phase_player_post() -> bool:
+	var did_work: bool = false
+	for i in range(_enemies.size()):
+		if not _enemy_alive[i]:
+			continue
+		var dmg: int = _enemy_status[i].get("poison_dmg", 0)
+		var dur: int = _enemy_status[i].get("poison_dur", 0)
+		if dmg > 0 and dur > 0:
+			_tick_enemy_poison(i)
+			did_work = true
+	_check_win_condition()
+	return did_work
 
 func play_card(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> bool:
 	if not is_player_turn or not is_battle_active:
@@ -145,6 +171,11 @@ func end_player_turn() -> void:
 		_gm_pte.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_END)
 	if deck_mgr:
 		deck_mgr.discard_hand()
+	var post_did: bool = _phase_player_post()
+	if post_did and turn_interval > 0.0:
+		await get_tree().create_timer(turn_interval).timeout
+	if not is_battle_active:
+		return
 	_execute_enemy_turn()
 
 func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> void:
@@ -388,24 +419,46 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 		_check_win_condition()
 
 func _execute_enemy_turn() -> void:
+	if not is_battle_active:
+		return
+	var pre_did: bool = _phase_enemy_pre()
+	if pre_did and turn_interval > 0.0:
+		await get_tree().create_timer(turn_interval).timeout
+	if not is_battle_active:
+		return
+	await _phase_enemy_main()
+	if not is_battle_active:
+		return
+	if turn_interval > 0.0:
+		await get_tree().create_timer(turn_interval).timeout
+	var post_did: bool = _phase_enemy_post()
+	if post_did and turn_interval > 0.0:
+		await get_tree().create_timer(turn_interval).timeout
+	if not is_battle_active:
+		return
+	start_player_turn()
+
+func _phase_enemy_pre() -> bool:
+	return false
+
+func _phase_enemy_main() -> void:
 	enemy_turn_started.emit()
+	var first: bool = true
 	for i in range(_enemies.size()):
 		if not _enemy_alive[i]:
 			continue
+		if not first and turn_interval > 0.0:
+			await get_tree().create_timer(turn_interval).timeout
+		first = false
 		_enemy_block[i] = 0
-		_tick_enemy_poison(i)
-		if not _enemy_alive[i]:
-			continue
 		for stype: String in ["weak", "vulnerable"]:
 			if _enemy_status[i].get(stype, 0) > 0:
 				_enemy_status[i][stype] -= 1
-		# 매혹(charm) 스택이 임계값(3 + 저항) 이상이면 홀림(enthrall)으로 전환
 		var charm: int = _enemy_status[i].get("charm", 0)
 		var charm_threshold: int = 3 + _enemy_status[i].get("charm_resistance", 0)
 		if charm >= charm_threshold:
 			_enemy_status[i]["charm"] = 0
 			_enemy_status[i]["enthrall"] = _enemy_status[i].get("enthrall", 0) + 1
-		# 홀림(enthrall): 자신을 제외한 다른 몬스터를 랜덤 공격
 		var enthrall: int = _enemy_status[i].get("enthrall", 0)
 		if enthrall > 0:
 			_enemy_status[i]["enthrall"] = enthrall - 1
@@ -430,8 +483,20 @@ func _execute_enemy_turn() -> void:
 		_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
 	_check_win_condition()
 	_check_lose_condition()
-	if is_battle_active:
-		start_player_turn()
+
+func _phase_enemy_post() -> bool:
+	if team_mgr == null:
+		return false
+	var did_work: bool = false
+	for hero in team_mgr.heroes:
+		if not team_mgr.is_alive(hero.hero_id):
+			continue
+		var dmg: int = _hero_status.get(hero.hero_id, {}).get("poison_dmg", 0)
+		var dur: int = _hero_status.get(hero.hero_id, {}).get("poison_dur", 0)
+		if dmg > 0 and dur > 0:
+			_tick_hero_poison(hero.hero_id)
+			did_work = true
+	return did_work
 
 func _execute_intent(enemy_index: int, intent: Resource) -> void:
 	match intent.action_type:
