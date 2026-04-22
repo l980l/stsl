@@ -81,6 +81,7 @@ static func _shield() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "idle"
+	c.archetype = "거북선"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK; e.value = 80; e.base_value = 80
 	c.effects = [e]; return c
@@ -91,6 +92,7 @@ static func _counter_strike() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "attack"
+	c.archetype = "거북선"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.BLOCK; e1.value = 30; e1.base_value = 30
 	var e2 := EffRes.new()
@@ -108,6 +110,7 @@ static func _turtle_ship_charge() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "attack"
+	c.archetype = "거북선"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DAMAGE; e1.value = 120; e1.base_value = 120; e1.target = "SINGLE"
 	var e2 := EffRes.new()
@@ -121,6 +124,7 @@ static func _counter() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "attack"
+	c.archetype = "거북선"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.COUNTER_BLOCK; e.value = 100; e.base_value = 100; e.target = "SINGLE"
 	c.effects = [e]; return c
@@ -132,6 +136,7 @@ static func _iron_armor() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "idle"
+	c.archetype = "거북선"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK; e.value = 150; e.base_value = 150
 	c.effects = [e]; return c
@@ -143,6 +148,7 @@ static func _turtle_shield() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "idle"
+	c.archetype = "거북선"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK; e.value = 80; e.base_value = 80
 	c.effects = [e]; return c
@@ -154,6 +160,7 @@ static func _crane_wing() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK_ALL; e.value = 80; e.base_value = 80
 	c.effects = [e]; return c
@@ -165,6 +172,7 @@ static func _formation_boost() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 40; e.base_value = 40
 	c.effects = [e]; return c
@@ -176,6 +184,7 @@ static func _naval_training() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.BLOCK; e1.value = 50; e1.base_value = 50
 	var e2 := EffRes.new()
@@ -189,6 +198,7 @@ static func _hansan_victory() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY
 	c.play_animation = "attack"
+	c.archetype = "학익진"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DAMAGE; e1.value = 100; e1.base_value = 100; e1.target = "ALL"
 	var e2 := EffRes.new()
@@ -202,6 +212,7 @@ static func _strict_training() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DRAW; e1.value = 2; e1.base_value = 2
 	var e2 := EffRes.new()
@@ -215,6 +226,7 @@ static func _last_stand() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "idle"
+	c.archetype = "필사즉생"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.HEAL; e1.value = -80; e1.base_value = -80; e1.target = "SELF"
 	var e2 := EffRes.new()
@@ -228,6 +240,7 @@ static func _death_or_glory() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY
 	c.play_animation = "attack"
+	c.archetype = "필사즉생"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 100; e.base_value = 100
@@ -242,6 +255,7 @@ static func _indomitable() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "idle"
+	c.archetype = "필사즉생"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.HEAL_ALL; e.value = 100; e.base_value = 100
 	c.effects = [e]; return c
@@ -253,6 +267,7 @@ static func _naval_maneuver() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "idle"
+	c.archetype = "거북선"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK; e.value = 30; e.base_value = 30
 	c.effects = [e]; return c
@@ -264,6 +279,7 @@ static func _noryang_battle() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.DIVINE
 	c.play_animation = "attack"
+	c.archetype = "거북선"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 250; e.base_value = 250; e.target = "SINGLE"
@@ -277,6 +293,7 @@ static func _crane_wing_complete() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.DIVINE
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.BLOCK_ALL; e1.value = 100; e1.base_value = 100
 	var e2 := EffRes.new()
@@ -295,6 +312,7 @@ static func _armor_upgrade() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "idle"
+	c.archetype = "거북선"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK; e.value = 80; e.base_value = 80
 	c.effects = [e]; return c
@@ -306,6 +324,7 @@ static func _consecutive_defense() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "idle"
+	c.archetype = "거북선"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.BLOCK; e1.value = 60; e1.base_value = 60
 	var e2 := EffRes.new()
@@ -320,6 +339,7 @@ static func _iron_wall() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "idle"
+	c.archetype = "거북선"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 130; e.base_value = 130
@@ -335,6 +355,7 @@ static func _charge_stance() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "attack"
+	c.archetype = "거북선"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DAMAGE; e1.value = 100; e1.base_value = 100; e1.target = "SINGLE"
 	var e2 := EffRes.new()
@@ -350,6 +371,7 @@ static func _cannon_fire() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "attack"
+	c.archetype = "거북선"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DAMAGE; e1.value = 110; e1.base_value = 110; e1.target = "SINGLE"
 	var e2 := EffRes.new()
@@ -363,6 +385,7 @@ static func _shield_guard() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "idle"
+	c.archetype = "거북선"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK; e.value = 30; e.base_value = 30
 	c.effects = [e]; return c
@@ -375,6 +398,7 @@ static func _counter_stance() -> Resource:
 	c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "idle"
+	c.archetype = "거북선"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.COUNTER_BLOCK
 	e.value = 20; e.base_value = 20
@@ -388,6 +412,7 @@ static func _fleet_rally() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "idle"
+	c.archetype = "거북선"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.BLOCK; e1.value = 120; e1.base_value = 120
 	var e2 := EffRes.new()
@@ -401,6 +426,7 @@ static func _morale_boost() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.BLOCK_ALL; e1.value = 50; e1.base_value = 50
 	var e2 := EffRes.new()
@@ -414,6 +440,7 @@ static func _discipline() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 30; e.base_value = 30
 	c.effects = [e]; return c
@@ -426,6 +453,7 @@ static func _hold_formation() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.BLOCK_ALL; e1.value = 90; e1.base_value = 90
 	var e2 := EffRes.new()
@@ -440,6 +468,7 @@ static func _regroup() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.HEAL_ALL; e1.value = 60; e1.base_value = 60
 	var e2 := EffRes.new()
@@ -453,6 +482,7 @@ static func _fleet_command() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.FORMATION_BLOCK; e1.value = 50; e1.base_value = 50
 	var e2 := EffRes.new()
@@ -466,6 +496,7 @@ static func _volley_fire() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "attack"
+	c.archetype = "학익진"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DAMAGE; e1.value = 80; e1.base_value = 80; e1.target = "ALL"
 	var e2 := EffRes.new()
@@ -479,6 +510,7 @@ static func _command_instinct() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.FORMATION_BLOCK; e1.value = 60; e1.base_value = 60
 	var e2 := EffRes.new()
@@ -494,6 +526,7 @@ static func _formation_bond() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "idle"
+	c.archetype = "학익진"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 20; e.base_value = 20
 	c.effects = [e]; return c
@@ -505,6 +538,7 @@ static func _decisive_strike() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "attack"
+	c.archetype = "필사즉생"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 80; e.base_value = 80
@@ -519,6 +553,7 @@ static func _all_in() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "attack"
+	c.archetype = "필사즉생"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.HEAL; e1.value = -60; e1.base_value = -60; e1.target = "SELF"
 	var e2 := EffRes.new()
@@ -532,6 +567,7 @@ static func _miraculous_recovery() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "idle"
+	c.archetype = "필사즉생"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.HEAL; e.value = 100; e.base_value = 100; e.target = "SELF"
 	c.effects = [e]; return c
@@ -544,6 +580,7 @@ static func _crisis_breakthrough() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "attack"
+	c.archetype = "필사즉생"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 120; e.base_value = 120
@@ -558,6 +595,7 @@ static func _death_charge() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "attack"
+	c.archetype = "필사즉생"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.HEAL; e1.value = -50; e1.base_value = -50; e1.target = "SELF"
 	var e2 := EffRes.new()
@@ -574,6 +612,7 @@ static func _bloody_battle() -> Resource:
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "attack"
+	c.archetype = "필사즉생"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e1.value = 70; e1.base_value = 70
@@ -591,6 +630,7 @@ static func _war_drum() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON
 	c.play_animation = "idle"
+	c.archetype = "필사즉생"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.HEAL; e1.value = -40; e1.base_value = -40; e1.target = "SELF"
 	var e2 := EffRes.new()
@@ -607,6 +647,7 @@ static func _warriors_resolve() -> Resource:
 	c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE
 	c.play_animation = "idle"
+	c.archetype = "필사즉생"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 20; e.base_value = 20
@@ -621,6 +662,7 @@ static func _phoenix() -> Resource:
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY
 	c.play_animation = "idle"
+	c.archetype = "필사즉생"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.HEAL; e1.value = 150; e1.base_value = 150; e1.target = "SELF"
 	var e2 := EffRes.new()
