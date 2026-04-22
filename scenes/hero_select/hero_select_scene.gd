@@ -74,7 +74,7 @@ func _build_ui() -> void:
 		var is_locked: bool = (not is_recruit) and pm != null and not pm.is_hero_unlocked(hid)
 
 		# 툴팁: 설명 + 잠금 조건
-		var tooltip := info.get("desc", "")
+		var tooltip: String = info.get("desc", "")
 		if is_locked:
 			var unlock_desc: String = info.get("unlock_description", "")
 			tooltip += "\n\n🔒 " + (unlock_desc if unlock_desc != "" else "해금 조건 미달성")
