@@ -129,18 +129,18 @@ func _build_ui() -> void:
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
 	add_child(_end_turn_btn)
 
-	# 릴릭 표시
-	_relic_container = HBoxContainer.new()
-	_relic_container.position = Vector2(200, 8)
-	_relic_container.size = Vector2(1500, 36)
-	add_child(_relic_container)
-	_refresh_relics()
+	# 상단 바 — 시너지 → 렐릭 순서, 넘치면 자동 줄바꿈
+	var top_bar := FlowContainer.new()
+	top_bar.position = Vector2(20, 4)
+	top_bar.size = Vector2(1880, 72)
+	add_child(top_bar)
 
-	# 시너지 HUD — 좌상단 렐릭 왼쪽에 가로 배치
 	_synergy_box = HBoxContainer.new()
-	_synergy_box.position = Vector2(20, 8)
-	_synergy_box.size = Vector2(170, 36)
-	add_child(_synergy_box)
+	top_bar.add_child(_synergy_box)
+
+	_relic_container = HBoxContainer.new()
+	top_bar.add_child(_relic_container)
+	_refresh_relics()
 
 	_ppt_label = Label.new()
 	_ppt_label.position = Vector2(20, 840)
