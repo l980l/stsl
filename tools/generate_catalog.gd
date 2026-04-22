@@ -8,7 +8,8 @@ const OUT_DIR := "res://docs/catalog/"
 const NapoleonCards  = preload("res://resources/cards/cards_napoleon.gd")
 const CleopatraCards = preload("res://resources/cards/cards_cleopatra.gd")
 const YiSunSinCards  = preload("res://resources/cards/cards_yi_sun_sin.gd")
-const EnemiesAct1    = preload("res://resources/enemies/enemies_act1.gd")
+const GreekNormals   = preload("res://resources/enemies/greek/greek_normals.gd")
+const GreekAct1      = preload("res://resources/enemies/greek/greek_act1.gd")
 const RelicsGd       = preload("res://resources/relics/relics.gd")
 const EventsAct1     = preload("res://resources/events/events_act1.gd")
 
@@ -308,9 +309,9 @@ func _generate_enemies() -> void:
 	md += "### 일반 적\n\n"
 
 	var normals_act1: Array = [
-		EnemiesAct1.satyr(null), EnemiesAct1.harpy(null),
-		EnemiesAct1.cyclops(null), EnemiesAct1.snake(null),
-		EnemiesAct1.cerberus(null), EnemiesAct1.myrmidon(null),
+		GreekNormals.satyr(null), GreekNormals.harpy(null),
+		GreekNormals.cyclops(null), GreekNormals.snake(null),
+		GreekNormals.cerberus(null), GreekNormals.myrmidon(null),
 	]
 	for enemy in normals_act1:
 		md += _enemy_section_md(enemy, 1, "normal")
@@ -318,15 +319,15 @@ func _generate_enemies() -> void:
 
 	md += "### 엘리트\n\n"
 	var elites_act1: Array = [
-		EnemiesAct1.minotaur(null), EnemiesAct1.medusa(null),
-		EnemiesAct1.gorgon(null), EnemiesAct1.scylla(null),
+		GreekAct1.minotaur(null), GreekAct1.medusa(null),
+		GreekAct1.gorgon(null), GreekAct1.scylla(null),
 	]
 	for enemy in elites_act1:
 		md += _enemy_section_md(enemy, 1, "elite")
 		csv_rows.append_array(_enemy_csv_rows(enemy, 1, "elite"))
 
 	md += "### 보스\n\n"
-	var boss_act1: Resource = EnemiesAct1.hydra(null)
+	var boss_act1: Resource = GreekAct1.hydra(null)
 	md += _enemy_section_md(boss_act1, 1, "boss")
 	csv_rows.append_array(_enemy_csv_rows(boss_act1, 1, "boss"))
 
