@@ -22,6 +22,7 @@ enum Rarity {
 @export var description: String = ""
 @export var art: Texture2D
 @export var play_animation: String = ""
+@export var archetype: String = ""
 
 func max_upgrade_level() -> int:
 	match rarity:

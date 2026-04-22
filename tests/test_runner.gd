@@ -15,6 +15,8 @@ var TestSave = preload("res://tests/test_save.gd")
 var TestProgressManager = preload("res://tests/test_progress_manager.gd")
 var TestChapterSystem = preload("res://tests/test_chapter_system.gd")
 var TestHeroRegistry = preload("res://tests/test_hero_registry.gd")
+var TestCardEffectsEngine = preload("res://tests/test_card_effects_engine.gd")
+var TestCardPoolDistribution = preload("res://tests/test_card_pool_distribution.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -34,6 +36,8 @@ func _init() -> void:
 		TestProgressManager.new(),
 		TestChapterSystem.new(),
 		TestHeroRegistry.new(),
+		TestCardEffectsEngine.new(),
+		TestCardPoolDistribution.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()
