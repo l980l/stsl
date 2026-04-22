@@ -289,23 +289,27 @@ func _make_label(pos: Vector2, sz: Vector2, font_size: int) -> Label:
 	add_child(lbl)
 	return lbl
 
-func _make_hp_bar(pos: Vector2, width: float) -> TextureProgressBar:
-	var bar := TextureProgressBar.new()
-	bar.position = pos
-	bar.custom_minimum_size = Vector2.ZERO
-	bar.size = Vector2(width, 7)
-	var img := Image.create(1, 1, false, Image.FORMAT_RGBA8)
-	img.fill(Color.WHITE)
-	var tex := ImageTexture.create_from_image(img)
-	bar.texture_under = tex
-	bar.texture_progress = tex
-	bar.tint_under = Color(0.15, 0.15, 0.15)
-	bar.tint_progress = Color(0.8, 0.15, 0.15)
-	bar.min_value = 0.0
-	bar.max_value = 100.0
-	bar.value = 100.0
-	add_child(bar)
-	return bar
+func _make_hp_bar(pos: Vector2, width: float) -> Control:
+	var wrapper := Control.new()
+	wrapper.position = pos
+	wrapper.size = Vector2(width, 12)
+	wrapper.custom_minimum_size = Vector2.ZERO
+
+	var bg := ColorRect.new()
+	bg.position = Vector2.ZERO
+	bg.size = Vector2(width, 12)
+	bg.color = Color(0.15, 0.15, 0.15)
+	wrapper.add_child(bg)
+
+	var fill := ColorRect.new()
+	fill.name = "Fill"
+	fill.position = Vector2.ZERO
+	fill.size = Vector2(width, 12)
+	fill.color = Color(0.8, 0.15, 0.15)
+	wrapper.add_child(fill)
+
+	add_child(wrapper)
+	return wrapper
 
 # ─────────────────────────────────────────────
 # 시그널 연결 (스텁 — Task 3~5에서 채움)
@@ -503,8 +507,9 @@ func _update_hero_ui(hero_id: String) -> void:
 		var block: int = BattleManager.get_hero_block(hero_id)
 		var status: Dictionary = BattleManager.get_hero_status(hero_id)
 		var morale: int = status.get("morale", 0)
-		entry["hp_bar"].max_value = hero.max_hp
-		entry["hp_bar"].value = cur_hp
+		var _bar: Control = entry["hp_bar"]
+		var _ratio: float = float(cur_hp) / float(hero.max_hp) if hero.max_hp > 0 else 0.0
+		_bar.get_node("Fill").size.x = _bar.size.x * _ratio
 		entry["hp_lbl"].text = "%d / %d" % [cur_hp, hero.max_hp]
 		var block_str: String = "🛡%d " % block if block > 0 else ""
 		var morale_str: String = "★%d" % morale if morale > 0 else ""
@@ -581,8 +586,9 @@ func _update_enemy_ui(index: int) -> void:
 		return
 	var cur_hp: int = BattleManager.get_enemy_hp(index)
 	var block: int = BattleManager.get_enemy_block(index)
-	entry["hp_bar"].max_value = enemy.max_hp
-	entry["hp_bar"].value = cur_hp
+	var _bar: Control = entry["hp_bar"]
+	var _ratio: float = float(cur_hp) / float(enemy.max_hp) if enemy.max_hp > 0 else 0.0
+	_bar.get_node("Fill").size.x = _bar.size.x * _ratio
 	entry["hp_lbl"].text = "%d / %d" % [cur_hp, enemy.max_hp]
 	entry["block_lbl"].text = "🛡%d" % block if block > 0 else ""
 
