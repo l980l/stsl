@@ -238,7 +238,17 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					deck_mgr.energy_changed.emit(deck_mgr.current_energy)
 			EffectRes.EffectType.HEAL:
 				if team_mgr:
-					var heal_id: String = target_hero_id if target_hero_id != "" else card.owner_id
+					var heal_id: String
+					if effect.target == "LOWEST_HP":
+						var min_ratio: float = 2.0
+						heal_id = card.owner_id
+						for hero in team_mgr.get_living_heroes():
+							var ratio: float = float(team_mgr.get_current_hp(hero.hero_id)) / float(max(1, hero.max_hp))
+							if ratio < min_ratio:
+								min_ratio = ratio
+								heal_id = hero.hero_id
+					else:
+						heal_id = target_hero_id if target_hero_id != "" else card.owner_id
 					team_mgr.heal(heal_id, effect.value)
 			EffectRes.EffectType.GAIN_MORALE:
 				if not _hero_status.has(card.owner_id):
@@ -288,8 +298,15 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						_hero_block[hero.hero_id] = _hero_block.get(hero.hero_id, 0) + effect.value
 			EffectRes.EffectType.HEAL_ALL:
 				if team_mgr:
+					var heal_amt: int = effect.value
+					if effect.status_type == "dead_ally_count":
+						var dead_count: int = 0
+						for hero in team_mgr.heroes:
+							if not team_mgr.is_alive(hero.hero_id):
+								dead_count += 1
+						heal_amt = effect.value * dead_count
 					for hero in team_mgr.heroes:
-						team_mgr.heal(hero.hero_id, effect.value)
+						team_mgr.heal(hero.hero_id, heal_amt)
 			EffectRes.EffectType.FORMATION_BLOCK:
 				if team_mgr:
 					var count: int = team_mgr.get_living_heroes().size()
@@ -759,6 +776,12 @@ func _evaluate_condition(cond: String, _card: Resource) -> bool:
 						var ratio: float = float(team_mgr.get_current_hp(h.hero_id)) / float(h.max_hp)
 						if ratio <= 0.30:
 							return true
+			return false
+		"dead_ally_any":
+			if team_mgr:
+				for hero in team_mgr.heroes:
+					if not team_mgr.is_alive(hero.hero_id):
+						return true
 			return false
 	return false  # 알 수 없는 조건 키는 조건 불충족으로 처리
 
