@@ -330,9 +330,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							"hand_size_0":
 								condition_met = deck_mgr != null and deck_mgr.hand.size() == 0
 							"enemy_hp_below_30":
-								condition_met = float(_enemy_hp[target_enemy_index]) / float(_enemies[target_enemy_index].max_hp) <= 0.30
+								var _max_hp_30: int = _enemies[target_enemy_index].max_hp
+								condition_met = _max_hp_30 > 0 and float(_enemy_hp[target_enemy_index]) / float(_max_hp_30) <= 0.30
 							"enemy_hp_below_50":
-								condition_met = float(_enemy_hp[target_enemy_index]) / float(_enemies[target_enemy_index].max_hp) <= 0.50
+								var _max_hp_50: int = _enemies[target_enemy_index].max_hp
+								condition_met = _max_hp_50 > 0 and float(_enemy_hp[target_enemy_index]) / float(_max_hp_50) <= 0.50
 							"team_hp_below_30":
 								var below_30: bool = false
 								if team_mgr:
@@ -755,7 +757,7 @@ func _evaluate_condition(cond: String, _card: Resource) -> bool:
 						if ratio <= 0.30:
 							return true
 			return false
-	return true  # 알 수 없는 조건은 true (안전 폴백)
+	return false  # 알 수 없는 조건 키는 조건 불충족으로 처리
 
 func _get_active_pattern(enemy_index: int) -> Array:
 	var enemy: Resource = _enemies[enemy_index]
