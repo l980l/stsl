@@ -123,7 +123,7 @@ func _open_relic_add_dialog() -> void:
 		var owned: bool = GameManager.has_relic(r.relic_name)
 		var color := Color(0.55, 0.55, 0.55) if owned else Color.WHITE
 		var suffix := "  (보유중)" if owned else ""
-		opts.append(["%s%s" % [r.relic_name, suffix], r, color])
+		opts.append(["%s%s  —  %s" % [r.relic_name, suffix, r.description], r, color])
 	_make_checkbox_dialog("렐릭 추가", opts, "획득", func(picked: Array):
 		for r in picked:
 			GameManager.add_relic(r)
@@ -143,7 +143,7 @@ func _open_relic_remove_dialog() -> void:
 		return
 	var opts: Array = []
 	for r in GameManager.relics:
-		opts.append([r.relic_name, r, Color.WHITE])
+		opts.append(["%s  —  %s" % [r.relic_name, r.description], r, Color.WHITE])
 	_make_checkbox_dialog("렐릭 제거", opts, "제거", func(picked: Array):
 		for r in picked:
 			GameManager.relics.erase(r)
