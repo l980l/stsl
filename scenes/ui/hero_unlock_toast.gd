@@ -14,7 +14,7 @@ func _ready() -> void:
 
 func _on_hero_unlocked(hero_id: String) -> void:
 	var info: Dictionary = _HR.get_display_info(hero_id)
-	var hero_name: String = info.get("name", hero_id)
+	var hero_name: String = info.get("name", hero_id) as String
 	_label.text = "새 영웅 해금: %s" % hero_name
 	visible = true
 	await get_tree().create_timer(DISPLAY_SECONDS).timeout

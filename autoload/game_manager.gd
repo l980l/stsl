@@ -378,6 +378,7 @@ func upgrade_card(card: Resource) -> void:
 		EffRes.EffectType.POISON_BURST,
 		EffRes.EffectType.CONSUME_MORALE,
 		EffRes.EffectType.CONDITIONAL_DMG,
+		EffRes.EffectType.PER_DRAW_DMG,
 	]
 
 	var INT_TYPES = [
@@ -388,6 +389,7 @@ func upgrade_card(card: Resource) -> void:
 		EffRes.EffectType.CHARM,
 		EffRes.EffectType.COST_NEXT,
 		EffRes.EffectType.SUMMON_TOKEN,
+		EffRes.EffectType.ON_KILL_DRAW,
 	]
 
 	for effect in card.effects:

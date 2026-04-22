@@ -41,6 +41,7 @@ static func _venom_needle() -> Resource:
 	c.card_name = "독침"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
+	c.archetype = "독살"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
@@ -55,6 +56,7 @@ static func _royal_guard() -> Resource:
 	c.card_name = "왕실 방어"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
+	c.archetype = "저주"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 80; e.base_value = 80
@@ -70,6 +72,7 @@ static func _poison_seed() -> Resource:
 	c.card_name = "독의 씨앗"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
+	c.archetype = "독살"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
@@ -84,6 +87,7 @@ static func _isis_blessing() -> Resource:
 	c.card_name = "이시스의 가호"; c.owner_id = "cleopatra"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
+	c.archetype = "조종"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW
 	ea.value = 1; ea.base_value = 1
@@ -98,6 +102,7 @@ static func _asp_fang() -> Resource:
 	c.card_name = "아스프의 독니"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
+	c.archetype = "독살"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "poison"; e.value = 8; e.base_value = 8; e.target = "SINGLE"
@@ -109,6 +114,7 @@ static func _desert_poison_dance() -> Resource:
 	c.card_name = "사막의 독무"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
+	c.archetype = "독살"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 60; ea.base_value = 60; ea.target = "ALL"
@@ -123,6 +129,7 @@ static func _cursed_gaze() -> Resource:
 	c.card_name = "저주의 시선"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "저주"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
 	ea.status_type = "weak"; ea.value = 2; ea.base_value = 2; ea.target = "SINGLE"
@@ -137,6 +144,7 @@ static func _temptation() -> Resource:
 	c.card_name = "유혹"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "조종"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CHARM
 	e.value = 1; e.base_value = 1; e.target = "SINGLE"
@@ -148,6 +156,7 @@ static func _nile_mist() -> Resource:
 	c.card_name = "나일의 안개"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.archetype = "독살"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "poison"; e.value = 5; e.base_value = 5; e.target = "ALL"
@@ -159,6 +168,7 @@ static func _serpent_grasp() -> Resource:
 	c.card_name = "독사의 마수"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.archetype = "독살"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 80; e.base_value = 80
@@ -172,6 +182,7 @@ static func _pharaoh_poison() -> Resource:
 	c.card_name = "파라오의 독"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.archetype = "저주"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 120; ea.base_value = 120; ea.target = "SINGLE"
@@ -189,6 +200,7 @@ static func _ramesses_shield() -> Resource:
 	c.card_name = "람세스의 방패"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "저주"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 130; e.base_value = 130
@@ -200,6 +212,7 @@ static func _nile_fury() -> Resource:
 	c.card_name = "나일의 분노"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
+	c.archetype = "독살"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.POISON_BURST
 	e.value = 300; e.base_value = 300; e.target = "SINGLE"
@@ -211,6 +224,7 @@ static func _pharaoh_decree() -> Resource:
 	c.card_name = "파라오의 명"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
+	c.archetype = "조종"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
 	ea.value = 110; ea.base_value = 110
@@ -225,6 +239,7 @@ static func _cleopatras_kiss() -> Resource:
 	c.card_name = "클레오파트라의 입맞춤"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "idle"
+	c.archetype = "조종"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.CHARM
 	e1.value = 1; e1.base_value = 1; e1.target = "ALL"
@@ -243,6 +258,7 @@ static func _poison_fog_spray() -> Resource:
 	c.card_name = "독안개 살포"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
+	c.archetype = "독살"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 60; ea.base_value = 60; ea.target = "SINGLE"
@@ -257,6 +273,7 @@ static func _wax_trap() -> Resource:
 	c.card_name = "밀납의 덫"; c.owner_id = "cleopatra"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
+	c.archetype = "조종"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.COST_NEXT
 	e.value = 1; e.base_value = 1
@@ -268,6 +285,7 @@ static func _sandstorm() -> Resource:
 	c.card_name = "모래 폭풍"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
+	c.archetype = "저주"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "weak"; e.value = 1; e.base_value = 1; e.target = "ALL"
@@ -279,6 +297,7 @@ static func _nile_blessing() -> Resource:
 	c.card_name = "나일의 축복"; c.owner_id = "cleopatra"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
+	c.archetype = "조종"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DRAW
 	e.value = 2; e.base_value = 2
@@ -290,6 +309,7 @@ static func _snake_gaze() -> Resource:
 	c.card_name = "뱀의 눈빛"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
+	c.archetype = "저주"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "vulnerable"; e.value = 2; e.base_value = 2; e.target = "SINGLE"
@@ -301,6 +321,7 @@ static func _double_fang() -> Resource:
 	c.card_name = "이중 독니"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
+	c.archetype = "독살"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
@@ -315,6 +336,7 @@ static func _tempting_eye() -> Resource:
 	c.card_name = "유혹의 눈길"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "조종"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CHARM
 	ea.value = 1; ea.base_value = 1; ea.target = "SINGLE"
@@ -329,6 +351,7 @@ static func _poison_feast() -> Resource:
 	c.card_name = "독의 향연"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
+	c.archetype = "독살"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
@@ -343,6 +366,7 @@ static func _pharaoh_curse() -> Resource:
 	c.card_name = "파라오의 저주"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "저주"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
 	ea.status_type = "weak"; ea.value = 2; ea.base_value = 2; ea.target = "SINGLE"
@@ -357,6 +381,7 @@ static func _nile_flow() -> Resource:
 	c.card_name = "나일의 흐름"; c.owner_id = "cleopatra"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "조종"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.ENERGY
 	ea.value = 1; ea.base_value = 1
@@ -371,6 +396,7 @@ static func _snake_poison_dance() -> Resource:
 	c.card_name = "뱀의 독무"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
+	c.archetype = "독살"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "poison"; e.value = 6; e.base_value = 6; e.target = "ALL"
@@ -382,6 +408,7 @@ static func _charming_language() -> Resource:
 	c.card_name = "매혹의 언어"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "조종"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CHARM
 	ea.value = 1; ea.base_value = 1; ea.target = "SINGLE"
@@ -396,6 +423,7 @@ static func _desert_recipe() -> Resource:
 	c.card_name = "사막의 약법"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "저주"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
 	ea.status_type = "vulnerable"; ea.value = 2; ea.base_value = 2; ea.target = "SINGLE"
@@ -410,6 +438,7 @@ static func _poison_judgment() -> Resource:
 	c.card_name = "독의 심판"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
+	c.archetype = "독살"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 70; e.base_value = 70
@@ -423,6 +452,7 @@ static func _isis_fury() -> Resource:
 	c.card_name = "이시스의 분노"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.archetype = "저주"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 130; ea.base_value = 130; ea.target = "SINGLE"
@@ -440,6 +470,7 @@ static func _poison_ritual() -> Resource:
 	c.card_name = "독살의 의식"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "독살"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.APPLY_STATUS
 	e1.status_type = "poison"; e1.value = 4; e1.base_value = 4; e1.target = "ALL"
@@ -456,6 +487,7 @@ static func _queens_embrace() -> Resource:
 	c.card_name = "여왕의 포옹"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "조종"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CHARM
 	ea.value = 1; ea.base_value = 1; ea.target = "ALL"
@@ -470,6 +502,7 @@ static func _curse_brand() -> Resource:
 	c.card_name = "저주의 낙인"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "저주"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
 	ea.status_type = "weak"; ea.value = 3; ea.base_value = 3; ea.target = "SINGLE"
@@ -487,6 +520,7 @@ static func _nile_doom() -> Resource:
 	c.card_name = "나일의 파멸"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.archetype = "독살"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 100; e.base_value = 100
@@ -500,6 +534,7 @@ static func _charming_assault() -> Resource:
 	c.card_name = "매혹의 강습"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.archetype = "조종"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CHARM
 	ea.value = 1; ea.base_value = 1; ea.target = "SINGLE"
@@ -514,6 +549,7 @@ static func _pharaoh_fury() -> Resource:
 	c.card_name = "파라오의 분노"; c.owner_id = "cleopatra"
 	c.cost = 3; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.archetype = "저주"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 150; ea.base_value = 150; ea.target = "ALL"
@@ -528,6 +564,7 @@ static func _curse_crossroads() -> Resource:
 	c.card_name = "저주의 교차로"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "저주"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
 	ea.status_type = "weak"; ea.value = 2; ea.base_value = 2; ea.target = "ALL"
@@ -545,6 +582,7 @@ static func _poison_throne() -> Resource:
 	c.card_name = "독의 왕좌"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
+	c.archetype = "독살"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "poison_per_turn"  # battle_manager 턴 시작 시 처리
@@ -557,6 +595,7 @@ static func _isis_judgment() -> Resource:
 	c.card_name = "이시스의 심판"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
+	c.archetype = "저주"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 0; e.base_value = 0
@@ -570,6 +609,7 @@ static func _sekhmet_curse() -> Resource:
 	c.card_name = "세케메트의 저주"; c.owner_id = "cleopatra"
 	c.cost = 3; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "idle"
+	c.archetype = "저주"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.APPLY_STATUS
 	e1.status_type = "weak"; e1.value = 3; e1.base_value = 3; e1.target = "ALL"
