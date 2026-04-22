@@ -24,6 +24,9 @@ enum EffectType {
 	SACRIFICE_HP,        # 시전자 HP value만큼 즉시 소모 (방어도 무시). 순교 카드
 	COST_ZERO_TURN,      # 이번 턴 남은 카드 비용 전부 0 (칭기즈칸 대칸의 명령)
 	BLOCK_PER_CARDS_PLAYED, # 이번 턴 카드 사용 횟수 × value BLOCK (칭기즈칸 만리 원정)
+	ON_KILL_DRAW,    # 적 처치 시 DRAW n (칭기즈칸 붉은 지평선)
+	PURGE_STATUS,    # 아군 디버프(POISON/WEAK/VULNERABLE) 제거. target=SINGLE/ALL
+	PER_DRAW_DMG,    # 이번 턴 드로우 카드 수 × value 데미지 (칭기즈칸 사막 기마)
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
@@ -34,6 +37,7 @@ enum EffectType {
 @export var base_value: int = 0             # 0강 기준값. 강화 공식의 베이스.
 @export var base_bonus_value: int = 0       # bonus_value의 0강 기준값.
 @export var hit_count: int = 1              # DAMAGE 히트 횟수 (이도류, 징기스의 분노)
+@export var condition: String = ""  # 빈 문자열=무조건 발동. "hand_size_0"등 조건 키 설정 시 조건 불충족이면 이 효과 스킵
 
 func display_text() -> String:
 	match effect_type:
@@ -68,4 +72,7 @@ func display_text() -> String:
 		EffectType.SACRIFICE_HP:        return "자기 HP -%d" % value
 		EffectType.COST_ZERO_TURN:      return "이번 턴 코스트 0"
 		EffectType.BLOCK_PER_CARDS_PLAYED: return "카드수×%d 방어" % value
+		EffectType.ON_KILL_DRAW:        return "처치시 드로우 %d" % value
+		EffectType.PURGE_STATUS:        return "디버프 제거"
+		EffectType.PER_DRAW_DMG:        return "드로우수×%d 피해" % value
 	return ""
