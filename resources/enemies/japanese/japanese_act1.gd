@@ -5,7 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func oni_general(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "오니 장군"; e.max_hp = 1600; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.oni_general"); e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
@@ -22,7 +22,7 @@ static func oni_general(scene: PackedScene) -> Resource:
 
 static func yamamba(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "야마우바"; e.max_hp = 1700; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.yamamba"); e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"
@@ -40,7 +40,7 @@ static func yamamba(scene: PackedScene) -> Resource:
 
 static func invincible_ronin(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "로닌 무적"; e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.invincible_ronin"); e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 3; i1.status_type = "strength"
@@ -56,7 +56,7 @@ static func invincible_ronin(scene: PackedScene) -> Resource:
 
 static func raijin(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "라이덴"; e.max_hp = 4500; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.raijin"); e.max_hp = 4500; e.character_scene = scene
 	e.mythology = "japanese"
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 뇌고

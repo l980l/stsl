@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func sand_scout(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "사막 척후병"; e.max_hp = 380; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.egyptian.sand_scout"); e.max_hp = 380; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM
@@ -20,7 +20,7 @@ static func sand_scout(scene: PackedScene) -> Resource:
 
 static func desert_scorpion(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "사막 전갈"; e.max_hp = 420; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.egyptian.desert_scorpion"); e.max_hp = 420; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM
@@ -33,7 +33,7 @@ static func desert_scorpion(scene: PackedScene) -> Resource:
 
 static func mummy_warrior(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "미라 전사"; e.max_hp = 600; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.egyptian.mummy_warrior"); e.max_hp = 600; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 110; i1.target = IntentRes.TargetType.RANDOM
@@ -46,7 +46,7 @@ static func mummy_warrior(scene: PackedScene) -> Resource:
 
 static func sphinx_cub(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "스핑크스 새끼"; e.max_hp = 350; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.egyptian.sphinx_cub"); e.max_hp = 350; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 80; i1.target = IntentRes.TargetType.RANDOM
@@ -63,7 +63,7 @@ static func sphinx_cub(scene: PackedScene) -> Resource:
 
 static func sand_ifrit(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "모래 이프리트"; e.max_hp = 450; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.egyptian.sand_ifrit"); e.max_hp = 450; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"; i1.condition = "준비"
@@ -74,7 +74,7 @@ static func sand_ifrit(scene: PackedScene) -> Resource:
 
 static func ka_spirit(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "카 영혼"; e.max_hp = 320; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.egyptian.ka_spirit"); e.max_hp = 320; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 55; i1.target = IntentRes.TargetType.RANDOM

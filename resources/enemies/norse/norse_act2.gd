@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func troll_warrior(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "트롤 전사"; e.max_hp = 2050; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.norse.troll_warrior"); e.max_hp = 2050; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 160; i1.target = IntentRes.TargetType.RANDOM
@@ -22,7 +22,7 @@ static func troll_warrior(scene: PackedScene) -> Resource:
 
 static func norn(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "운명의 여신 노른"; e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.norse.norn"); e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"
@@ -39,7 +39,7 @@ static func norn(scene: PackedScene) -> Resource:
 
 static func vanir_elf(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "바나헤임 엘프"; e.max_hp = 1850; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.norse.vanir_elf"); e.max_hp = 1850; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.5]
 	var p0i1 := IntentRes.new()
@@ -61,7 +61,7 @@ static func vanir_elf(scene: PackedScene) -> Resource:
 
 static func surtr(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "수르트"; e.max_hp = 4800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.norse.surtr"); e.max_hp = 4800; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.65, 0.3]
 	# 페이즈0

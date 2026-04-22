@@ -60,17 +60,6 @@ const STATUS_EMOJI := {
 	"morale": "★", "charm": "♥", "strength": "↑",
 	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜"
 }
-const STATUS_TOOLTIP := {
-	"poison_dmg": "독: 매 턴 N×10 피해. 지속 3턴, 중첩 시 데미지 누적+지속 갱신",
-	"weak": "약화: 공격 피해 25% 감소. 매 턴 1 감소",
-	"vulnerable": "취약: 받는 피해 50% 증가. 매 턴 1 감소",
-	"morale": "사기: CONSUME_MORALE 카드로 추가 피해 제공",
-	"charm": "매혹: 다음 행동 아군에게 적용",
-	"strength": "강화: 피해 +N",
-	"taunt": "도발: 이 대상이 우선 공격 받음",
-	"counter_block": "반격 방어: 피해 = 현재 방어도 기반",
-	"charm_resistance": "매혹 저항 N: 매혹 (3+N)스택이 되어야 반함"
-}
 
 func _ready() -> void:
 	_build_ui()
@@ -124,7 +113,7 @@ func _build_ui() -> void:
 	_end_turn_btn = Button.new()
 	_end_turn_btn.position = Vector2(WINDOW_W - 220, BOTTOM_Y + 16)
 	_end_turn_btn.size = Vector2(200, 60)
-	_end_turn_btn.text = "턴 종료"
+	_end_turn_btn.text = tr("battle.btn_end_turn")
 	_end_turn_btn.add_theme_font_size_override("font_size", 22)
 	_end_turn_btn.disabled = true
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
@@ -559,7 +548,7 @@ func _refresh_token_tiles(hero_id: String) -> void:
 		bg.color = Color(0.18, 0.16, 0.10)
 		bg.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
 		bg.position = Vector2(tile_x, tile_y)
-		bg.tooltip_text = "다음 턴 시작 시 상대를 공격합니다"
+		bg.tooltip_text = tr("battle.token_tooltip")
 		bg.mouse_filter = Control.MOUSE_FILTER_STOP
 		add_child(bg)
 		_token_tile_nodes[hero_id].append(bg)
@@ -572,7 +561,7 @@ func _refresh_token_tiles(hero_id: String) -> void:
 
 		# 이름 라벨 (하단)
 		var lbl := Label.new()
-		lbl.text = "병사"
+		lbl.text = tr("battle.token_soldier")
 		lbl.add_theme_font_size_override("font_size", 11)
 		lbl.position = Vector2(tile_x, tile_y + TOKEN_TILE_H - 18)
 		lbl.size = Vector2(TOKEN_TILE_W, 16)
@@ -705,7 +694,7 @@ func _on_end_turn_pressed() -> void:
 
 func _on_player_turn_started() -> void:
 	_end_turn_btn.disabled = false
-	_message_label.text = "플레이어 턴"
+	_message_label.text = tr("battle.msg_player_turn")
 	_energy_label.text = "⚡ %d / %d" % [DeckManager.current_energy, DeckManager.MAX_ENERGY]
 	# 영웅 블록 UI 갱신 (start_player_turn이 블록 초기화했으므로)
 	for entry in _hero_nodes:
@@ -725,7 +714,7 @@ func _on_player_turn_started() -> void:
 func _on_enemy_turn_started() -> void:
 	_end_turn_btn.disabled = true
 	_selected_card = null
-	_message_label.text = "적 턴..."
+	_message_label.text = tr("battle.msg_enemy_turn")
 	# 적 클릭 버튼 비활성
 	for entry in _enemy_nodes:
 		if entry["panel"].visible and not entry["btn"].disabled:
@@ -759,7 +748,7 @@ func _refresh_all_hero_ui() -> void:
 func _spawn_damage_popup(world_pos: Vector2, amount: int, fully_blocked: bool) -> void:
 	var lbl := Label.new()
 	if fully_blocked:
-		lbl.text = "BLOCK"
+		lbl.text = tr("battle.popup_block")
 		lbl.modulate = Color(0.4, 0.8, 1.0)
 	else:
 		lbl.text = str(amount)
@@ -842,7 +831,7 @@ func _on_hero_died(hero_id: String) -> void:
 			ap.play("death")
 
 func _on_battle_won() -> void:
-	_message_label.text = "🏆 승리!"
+	_message_label.text = tr("battle.msg_victory")
 	_end_turn_btn.disabled = true
 	_selected_card = null
 	for entry in _enemy_nodes:
@@ -850,7 +839,7 @@ func _on_battle_won() -> void:
 	GameManager.complete_battle(true)
 
 func _on_battle_lost() -> void:
-	_message_label.text = "💀 패배..."
+	_message_label.text = tr("battle.msg_defeat")
 	_end_turn_btn.disabled = true
 	_selected_card = null
 	for entry in _enemy_nodes:
@@ -866,10 +855,10 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Label:
 	if key == "poison_dmg":
 		var dur: int = status.get("poison_dur", 0)
 		lbl.text = "☠%d/%d" % [val * 10, dur]
-		lbl.tooltip_text = STATUS_TOOLTIP.get("poison_dmg", "독").replace("N", str(val))
+		lbl.tooltip_text = tr("status.%s.desc" % key) % val
 	else:
 		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
-		lbl.tooltip_text = STATUS_TOOLTIP.get(key, key).replace("N", str(val))
+		lbl.tooltip_text = tr("status.%s.desc" % key) % val
 	lbl.add_theme_font_size_override("font_size", 12)
 	lbl.custom_minimum_size = Vector2(0, 18)
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -960,8 +949,8 @@ func _refresh_synergy_hud() -> void:
 		child.queue_free()
 	for s in BattleManager.get_active_synergies():
 		var lbl := Label.new()
-		lbl.text = "[%s]" % s["name"]
-		lbl.tooltip_text = s["desc"]
+		lbl.text = "[%s]" % tr(s["name_key"])
+		lbl.tooltip_text = tr(s["desc_key"])
 		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 		lbl.add_theme_font_size_override("font_size", 13)
 		lbl.modulate = Color(1.0, 0.0, 1.0)
@@ -1101,17 +1090,17 @@ func _start_drag(card: Resource) -> void:
 	add_child(_drag_preview)
 	match _card_target_type(card):
 		"enemy":
-			_message_label.text = "적을 선택하세요 ▶"
+			_message_label.text = tr("battle.drag_enemy")
 			for i in range(_enemy_nodes.size()):
 				if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
 					_enemy_nodes[i]["panel"].color = Color(0.35, 0.12, 0.12)
 		"ally":
-			_message_label.text = "아군을 선택하세요 ▶"
+			_message_label.text = tr("battle.drag_ally")
 			for entry in _hero_nodes:
 				if entry["panel"].visible:
 					entry["panel"].color = Color(0.12, 0.25, 0.12)
 		"none":
-			_message_label.text = "놓아서 사용 ▶"
+			_message_label.text = tr("battle.drag_release")
 
 func _finish_drag(drop_pos: Vector2) -> void:
 	if drop_pos.y >= BOTTOM_Y:

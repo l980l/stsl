@@ -5,7 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func red_boy(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "홍해아"; e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.red_boy"); e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
@@ -19,7 +19,7 @@ static func red_boy(scene: PackedScene) -> Resource:
 
 static func nine_dragon_general(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "구룡 차장"; e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.nine_dragon_general"); e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
@@ -37,7 +37,7 @@ static func nine_dragon_general(scene: PackedScene) -> Resource:
 
 static func heavenly_hound_brothers(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "천구 형제"; e.max_hp = 1700; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.heavenly_hound_brothers"); e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 130; i1.target = IntentRes.TargetType.RANDOM
@@ -60,7 +60,7 @@ static func heavenly_hound_brothers(scene: PackedScene) -> Resource:
 
 static func erlang_shen(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "이랑신"; e.max_hp = 4800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.erlang_shen"); e.max_hp = 4800; e.character_scene = scene
 	e.mythology = "chinese"
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 지휘

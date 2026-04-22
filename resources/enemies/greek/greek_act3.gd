@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func ares_hound(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "아레스의 사냥개"; e.max_hp = 2100; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.greek.ares_hound"); e.max_hp = 2100; e.character_scene = scene
 	e.mythology = "greek"
 	# 4턴 순환: ATK RANDOM / ATK RANDOM / BUFF strength / ATK ALL
 	var i1 := IntentRes.new()
@@ -23,7 +23,7 @@ static func ares_hound(scene: PackedScene) -> Resource:
 
 static func poseidon_apostle(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "포세이돈 사도"; e.max_hp = 1950; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.greek.poseidon_apostle"); e.max_hp = 1950; e.character_scene = scene
 	e.mythology = "greek"
 	# 4턴 순환: DEBUFF weak ALL / ATK RANDOM / ATK RANDOM / DEBUFF vulnerable ALL
 	var i1 := IntentRes.new()
@@ -41,7 +41,7 @@ static func poseidon_apostle(scene: PackedScene) -> Resource:
 
 static func hephaestus_automaton(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "헤파이스토스 자동기계"; e.max_hp = 2200; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.greek.hephaestus_automaton"); e.max_hp = 2200; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.5]
 	# 페이즈0: BUFF block / ATK RANDOM / ATK RANDOM
@@ -66,7 +66,7 @@ static func hephaestus_automaton(scene: PackedScene) -> Resource:
 
 static func kronos(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "크로노스"; e.max_hp = 5200; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.greek.kronos"); e.max_hp = 5200; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.65, 0.3]
 	e.charm_resistance = 2
