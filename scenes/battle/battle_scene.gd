@@ -170,7 +170,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 
 	# UI 상단 배치, 스프라이트는 그 뒤에 렌더 (z_index=1 for UI)
 	var bar_w: float = 211.0
-	var bar_h: float = 12.0
+	var _bar_h: float = 12.0
 	var bar_x: float = HERO_X + (SLOT_W - bar_w) / 2.0
 
 	var name_lbl := _make_label(Vector2(bar_x, y + 4), Vector2(bar_w, 22), 16)
@@ -223,7 +223,7 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	add_child(panel)
 
 	var bar_w: float = 211.0
-	var bar_h: float = 12.0
+	var _bar_h: float = 12.0
 	var bar_x: float = pos.x + (SLOT_W - bar_w) / 2.0
 
 	var intent_lbl := _make_label(Vector2(pos.x, pos.y + 4), Vector2(SLOT_W, 22), 18)
