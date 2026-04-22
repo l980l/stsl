@@ -180,10 +180,12 @@ func _open_event_enter_dialog() -> void:
 		seen[ev.event_name] = true
 		var is_avail: bool = ev.event_name in available_names
 		var color := Color.WHITE if is_avail else Color(0.5, 0.5, 0.5)
+		var desc: String = ev.get("description") if ev.get("description") != null else ""
+		var label: String = "%s  —  %s" % [ev.event_name, desc] if desc != "" else ev.event_name
 		if is_avail:
-			available_opts.append([ev.event_name, ev, true, color])
+			available_opts.append([label, ev, true, color])
 		else:
-			unavailable_opts.append([ev.event_name, ev, false, color])
+			unavailable_opts.append([label, ev, false, color])
 
 	_make_radio_dialog("이벤트 씬 입장", available_opts + unavailable_opts, "입장", func(ev: Resource):
 		GameManager.pending_event = ev
@@ -251,10 +253,10 @@ func _make_radio_dialog(title: String, options: Array, confirm_text: String, on_
 	dlg.title = title
 	dlg.get_ok_button().text = confirm_text
 	dlg.add_cancel_button("닫기")
-	dlg.min_size = Vector2i(600, 560)
+	dlg.min_size = Vector2i(900, 560)
 
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(560, 480)
+	scroll.custom_minimum_size = Vector2(860, 480)
 	var vbox := VBoxContainer.new()
 	scroll.add_child(vbox)
 
