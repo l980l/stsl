@@ -12,6 +12,8 @@ func run_all() -> Dictionary:
 	test_cleopatra_rarity_distribution()
 	test_joan_rarity_distribution()
 	test_joan_archetype_distribution()
+	test_genghis_rarity_distribution()
+	test_genghis_archetype_distribution()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -114,3 +116,30 @@ func test_joan_archetype_distribution() -> void:
 	_assert(archetypes["신성"] == 12, "잔다르크 신성 12장 (실제: %d)" % archetypes["신성"])
 	_assert(archetypes["부활"] == 13, "잔다르크 부활 13장 (실제: %d)" % archetypes["부활"])
 	_assert(archetypes["순교"] == 13, "잔다르크 순교 13장 (실제: %d)" % archetypes["순교"])
+
+func test_genghis_rarity_distribution() -> void:
+	print("[TestCardPoolDistribution] test_genghis_rarity_distribution")
+	var GhisCards = load("res://resources/cards/cards_genghis_khan.gd")
+	var pool: Array = GhisCards.pool()
+	_assert(pool.size() == 38, "칭기즈칸 풀 38장")
+	var counts: Dictionary = _count_rarities(pool)
+	# starter_deck(strike/defend) 제외 — COMMON 8장
+	_assert(counts["COMMON"] == 8, "칭기즈칸 COMMON 8장 (실제: %d)" % counts["COMMON"])
+	_assert(counts["UNCOMMON"] == 13, "칭기즈칸 UNCOMMON 13장 (실제: %d)" % counts["UNCOMMON"])
+	_assert(counts["RARE"] == 14, "칭기즈칸 RARE 14장 (실제: %d)" % counts["RARE"])
+	_assert(counts["LEGENDARY"] == 2, "칭기즈칸 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
+	_assert(counts["DIVINE"] == 1, "칭기즈칸 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
+
+func test_genghis_archetype_distribution() -> void:
+	print("[TestCardPoolDistribution] test_genghis_archetype_distribution")
+	var GhisCards = load("res://resources/cards/cards_genghis_khan.gd")
+	var pool: Array = GhisCards.pool()
+	var archetypes := {"기동": 0, "몽골 기병": 0, "약탈": 0}
+	for c in pool:
+		var a: String = c.get("archetype") if c.get("archetype") != null else ""
+		if a in archetypes:
+			archetypes[a] += 1
+	# starter_deck 제외: 기동 11, 몽골 기병 15, 약탈 12
+	_assert(archetypes["기동"] == 11, "칭기즈칸 기동 11장 (실제: %d)" % archetypes["기동"])
+	_assert(archetypes["몽골 기병"] == 15, "칭기즈칸 몽골 기병 15장 (실제: %d)" % archetypes["몽골 기병"])
+	_assert(archetypes["약탈"] == 12, "칭기즈칸 약탈 12장 (실제: %d)" % archetypes["약탈"])
