@@ -871,6 +871,7 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Label:
 	lbl.add_theme_font_size_override("font_size", 12)
 	lbl.custom_minimum_size = Vector2(0, 18)
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 	return lbl
 
