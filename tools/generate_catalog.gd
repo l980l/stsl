@@ -5,13 +5,45 @@ extends SceneTree
 
 const OUT_DIR := "res://docs/catalog/"
 
-const NapoleonCards  = preload("res://resources/cards/cards_napoleon.gd")
-const CleopatraCards = preload("res://resources/cards/cards_cleopatra.gd")
-const YiSunSinCards  = preload("res://resources/cards/cards_yi_sun_sin.gd")
-const GreekNormals   = preload("res://resources/enemies/greek/greek_normals.gd")
-const GreekAct1      = preload("res://resources/enemies/greek/greek_act1.gd")
-const RelicsGd       = preload("res://resources/relics/relics.gd")
-const EventsAct1     = preload("res://resources/events/events_act1.gd")
+const NapoleonCards   = preload("res://resources/cards/cards_napoleon.gd")
+const CleopatraCards  = preload("res://resources/cards/cards_cleopatra.gd")
+const YiSunSinCards   = preload("res://resources/cards/cards_yi_sun_sin.gd")
+const JoanCards       = preload("res://resources/cards/cards_joan_of_arc.gd")
+const GenghisCards    = preload("res://resources/cards/cards_genghis_khan.gd")
+const MusashiCards    = preload("res://resources/cards/cards_musashi.gd")
+
+const GreekNormals    = preload("res://resources/enemies/greek/greek_normals.gd")
+const GreekAct1       = preload("res://resources/enemies/greek/greek_act1.gd")
+const GreekAct2       = preload("res://resources/enemies/greek/greek_act2.gd")
+const GreekAct3       = preload("res://resources/enemies/greek/greek_act3.gd")
+const NorseNormals    = preload("res://resources/enemies/norse/norse_normals.gd")
+const NorseAct1       = preload("res://resources/enemies/norse/norse_act1.gd")
+const NorseAct2       = preload("res://resources/enemies/norse/norse_act2.gd")
+const NorseAct3       = preload("res://resources/enemies/norse/norse_act3.gd")
+const EgyptNormals    = preload("res://resources/enemies/egyptian/egyptian_normals.gd")
+const EgyptAct1       = preload("res://resources/enemies/egyptian/egyptian_act1.gd")
+const EgyptAct2       = preload("res://resources/enemies/egyptian/egyptian_act2.gd")
+const EgyptAct3       = preload("res://resources/enemies/egyptian/egyptian_act3.gd")
+const KoreanNormals   = preload("res://resources/enemies/korean/korean_normals.gd")
+const KoreanAct1      = preload("res://resources/enemies/korean/korean_act1.gd")
+const KoreanAct2      = preload("res://resources/enemies/korean/korean_act2.gd")
+const KoreanAct3      = preload("res://resources/enemies/korean/korean_act3.gd")
+const ChineseNormals  = preload("res://resources/enemies/chinese/chinese_normals.gd")
+const ChineseAct1     = preload("res://resources/enemies/chinese/chinese_act1.gd")
+const ChineseAct2     = preload("res://resources/enemies/chinese/chinese_act2.gd")
+const ChineseAct3     = preload("res://resources/enemies/chinese/chinese_act3.gd")
+const JapaneseNormals = preload("res://resources/enemies/japanese/japanese_normals.gd")
+const JapaneseAct1    = preload("res://resources/enemies/japanese/japanese_act1.gd")
+const JapaneseAct2    = preload("res://resources/enemies/japanese/japanese_act2.gd")
+const JapaneseAct3    = preload("res://resources/enemies/japanese/japanese_act3.gd")
+
+const RelicsGd        = preload("res://resources/relics/relics.gd")
+const EventsAct1      = preload("res://resources/events/events_act1.gd")
+const EventsAct2      = preload("res://resources/events/events_act2.gd")
+const EventsAct3      = preload("res://resources/events/events_act3.gd")
+const EventsKorean    = preload("res://resources/events/events_korean.gd")
+const EventsJapanese  = preload("res://resources/events/events_japanese.gd")
+const EventsChinese   = preload("res://resources/events/events_chinese.gd")
 
 const CardRes  = preload("res://resources/card_resource.gd")
 const EffRes   = preload("res://resources/effect_resource.gd")
@@ -186,9 +218,12 @@ func _write_csv(rel_path: String, rows: Array) -> void:
 
 func _generate_cards() -> void:
 	var heroes: Array = [
-		{ "id": "napoleon",  "name": "나폴레옹 (Napoleon)",  "cls": NapoleonCards },
-		{ "id": "cleopatra", "name": "클레오파트라 (Cleopatra)", "cls": CleopatraCards },
-		{ "id": "yi_sun_sin","name": "이순신 (Yi Sun-sin)",   "cls": YiSunSinCards },
+		{ "id": "napoleon",     "name": "나폴레옹 (Napoleon)",       "cls": NapoleonCards  },
+		{ "id": "cleopatra",    "name": "클레오파트라 (Cleopatra)",    "cls": CleopatraCards },
+		{ "id": "yi_sun_sin",   "name": "이순신 (Yi Sun-sin)",        "cls": YiSunSinCards  },
+		{ "id": "joan_of_arc",  "name": "잔 다르크 (Joan of Arc)",    "cls": JoanCards      },
+		{ "id": "genghis_khan", "name": "칭기즈칸 (Genghis Khan)",   "cls": GenghisCards   },
+		{ "id": "musashi",      "name": "미야모토 무사시 (Musashi)",   "cls": MusashiCards   },
 	]
 
 	var md: String = "# 카드 도감 (자동 생성)\n\n"
@@ -298,40 +333,107 @@ func _enemy_csv_rows(enemy: Resource, act: int, category: String) -> Array:
 					intent.status_type, intent.condition])
 	return rows
 
+func _gen_mythology(md: String, csv_rows: Array, act_num: int, title: String,
+		normals: Array, elites1: Array, boss1: Resource,
+		elites2: Array, boss2: Resource, elites3: Array, boss3: Resource) -> String:
+	md += "## %s\n\n" % title
+	md += "### 일반 적\n\n"
+	for e in normals:
+		md += _enemy_section_md(e, act_num, "normal")
+		csv_rows.append_array(_enemy_csv_rows(e, act_num, "normal"))
+	md += "### Act 1 엘리트\n\n"
+	for e in elites1:
+		md += _enemy_section_md(e, act_num, "elite")
+		csv_rows.append_array(_enemy_csv_rows(e, act_num, "elite"))
+	md += "### Act 1 보스\n\n"
+	md += _enemy_section_md(boss1, act_num, "boss")
+	csv_rows.append_array(_enemy_csv_rows(boss1, act_num, "boss"))
+	md += "### Act 2 엘리트\n\n"
+	for e in elites2:
+		md += _enemy_section_md(e, act_num + 1, "elite")
+		csv_rows.append_array(_enemy_csv_rows(e, act_num + 1, "elite"))
+	md += "### Act 2 보스\n\n"
+	md += _enemy_section_md(boss2, act_num + 1, "boss")
+	csv_rows.append_array(_enemy_csv_rows(boss2, act_num + 1, "boss"))
+	md += "### Act 3 엘리트\n\n"
+	for e in elites3:
+		md += _enemy_section_md(e, act_num + 2, "elite")
+		csv_rows.append_array(_enemy_csv_rows(e, act_num + 2, "elite"))
+	md += "### Act 3 보스\n\n"
+	md += _enemy_section_md(boss3, act_num + 2, "boss")
+	csv_rows.append_array(_enemy_csv_rows(boss3, act_num + 2, "boss"))
+	return md
+
 func _generate_enemies() -> void:
 	var md: String = "# 적 도감 (자동 생성)\n\n"
 	md += "> 이 파일은 `tools/generate_catalog.gd`로 자동 생성됩니다. 직접 수정 금지.\n\n"
-
 	var csv_rows: Array = [["Act", "분류", "이름", "HP", "페이즈", "턴", "액션", "값", "타겟", "상태", "조건"]]
 
-	# Act1 적 (scene=null: 도감용이므로 씬 불필요)
-	md += "## Act 1 (그리스 신화)\n\n"
-	md += "### 일반 적\n\n"
+	# 그리스 신화
+	md = _gen_mythology(md, csv_rows, 1, "그리스 신화 (Greek)",
+		[GreekNormals.satyr(null), GreekNormals.harpy(null), GreekNormals.cyclops(null),
+		 GreekNormals.snake(null), GreekNormals.cerberus(null), GreekNormals.myrmidon(null)],
+		[GreekAct1.minotaur(null), GreekAct1.medusa(null), GreekAct1.gorgon(null), GreekAct1.scylla(null)],
+		GreekAct1.hydra(null),
+		[GreekAct2.cerberus(null), GreekAct2.charon(null), GreekAct2.erinyes(null)],
+		GreekAct2.hades(null),
+		[GreekAct3.ares_hound(null), GreekAct3.poseidon_apostle(null), GreekAct3.hephaestus_automaton(null)],
+		GreekAct3.kronos(null))
 
-	var normals_act1: Array = [
-		GreekNormals.satyr(null), GreekNormals.harpy(null),
-		GreekNormals.cyclops(null), GreekNormals.snake(null),
-		GreekNormals.cerberus(null), GreekNormals.myrmidon(null),
-	]
-	for enemy in normals_act1:
-		md += _enemy_section_md(enemy, 1, "normal")
-		csv_rows.append_array(_enemy_csv_rows(enemy, 1, "normal"))
+	# 북유럽 신화
+	md = _gen_mythology(md, csv_rows, 1, "북유럽 신화 (Norse)",
+		[NorseNormals.draugr(null), NorseNormals.urdr_spider(null), NorseNormals.jotun_soldier(null),
+		 NorseNormals.volva_witch(null), NorseNormals.hrimfaxi_rider(null), NorseNormals.garlarr_snake(null)],
+		[NorseAct1.nidhogg_larva(null), NorseAct1.skoll(null), NorseAct1.hrimthurs_scout(null)],
+		NorseAct1.fjorgynn(null),
+		[NorseAct2.troll_warrior(null), NorseAct2.norn(null), NorseAct2.vanir_elf(null)],
+		NorseAct2.surtr(null),
+		[NorseAct3.fenrir_cub(null), NorseAct3.valkyrie(null), NorseAct3.jormungandr_shard(null)],
+		NorseAct3.jormungandr(null))
 
-	md += "### 엘리트\n\n"
-	var elites_act1: Array = [
-		GreekAct1.minotaur(null), GreekAct1.medusa(null),
-		GreekAct1.gorgon(null), GreekAct1.scylla(null),
-	]
-	for enemy in elites_act1:
-		md += _enemy_section_md(enemy, 1, "elite")
-		csv_rows.append_array(_enemy_csv_rows(enemy, 1, "elite"))
+	# 이집트 신화
+	md = _gen_mythology(md, csv_rows, 1, "이집트 신화 (Egyptian)",
+		[EgyptNormals.sand_scout(null), EgyptNormals.desert_scorpion(null), EgyptNormals.mummy_warrior(null),
+		 EgyptNormals.sphinx_cub(null), EgyptNormals.sand_ifrit(null), EgyptNormals.ka_spirit(null)],
+		[EgyptAct1.jackal_warrior(null), EgyptAct1.scarab_queen(null), EgyptAct1.obelisk_guardian(null)],
+		EgyptAct1.sekhmet(null),
+		[EgyptAct2.apep_snake(null), EgyptAct2.seth_hound(null), EgyptAct2.ba_bird(null)],
+		EgyptAct2.osiris(null),
+		[EgyptAct3.apophis_serpent(null), EgyptAct3.set_tempest(null), EgyptAct3.isis_phantom(null)],
+		EgyptAct3.ra_horakhty(null))
 
-	md += "### 보스\n\n"
-	var boss_act1: Resource = GreekAct1.hydra(null)
-	md += _enemy_section_md(boss_act1, 1, "boss")
-	csv_rows.append_array(_enemy_csv_rows(boss_act1, 1, "boss"))
+	# 한국 신화
+	md = _gen_mythology(md, csv_rows, 1, "한국 신화 (Korean)",
+		[KoreanNormals.death_reaper(null), KoreanNormals.cheoyong(null), KoreanNormals.dokkaebi(null),
+		 KoreanNormals.three_legged_crow(null), KoreanNormals.gumiho(null), KoreanNormals.bulgasari(null)],
+		[KoreanAct1.haechi(null), KoreanAct1.jangseung(null), KoreanAct1.haemosu(null)],
+		KoreanAct1.dangun(null),
+		[KoreanAct2.dokkaebi_chief(null), KoreanAct2.sea_dragon_general(null), KoreanAct2.dongmyeong(null)],
+		KoreanAct2.samsin_grandma(null),
+		[KoreanAct3.underworld_judge(null), KoreanAct3.gat_spirit(null), KoreanAct3.cheoyong_god(null)],
+		KoreanAct3.gusamseung_halmang(null))
 
-	md += "## Act 2\n\n_Act 2 콘텐츠는 feat/act2-egypt 브랜치에서 추가 예정._\n\n"
+	# 중국 신화
+	md = _gen_mythology(md, csv_rows, 1, "중국 신화 (Chinese)",
+		[ChineseNormals.yaksha(null), ChineseNormals.nezha_soldier(null), ChineseNormals.heavenly_king_soldier(null),
+		 ChineseNormals.shanhaijing_beast(null), ChineseNormals.immortal_trainee(null), ChineseNormals.azure_dragon_guard(null)],
+		[ChineseAct1.golden_horn_king(null), ChineseAct1.silver_horn_king(null), ChineseAct1.black_wind_demon(null)],
+		ChineseAct1.chiyou(null),
+		[ChineseAct2.red_boy(null), ChineseAct2.nine_dragon_general(null), ChineseAct2.heavenly_hound_brothers(null)],
+		ChineseAct2.erlang_shen(null),
+		[ChineseAct3.white_tiger_general(null), ChineseAct3.vermilion_bird_general(null), ChineseAct3.black_tortoise_general(null)],
+		ChineseAct3.pangu(null))
+
+	# 일본 신화
+	md = _gen_mythology(md, csv_rows, 1, "일본 신화 (Japanese)",
+		[JapaneseNormals.oni(null), JapaneseNormals.tengu(null), JapaneseNormals.yuki_onna(null),
+		 JapaneseNormals.kappa(null), JapaneseNormals.shuten_minion(null), JapaneseNormals.ronin_ghost(null)],
+		[JapaneseAct1.oni_general(null), JapaneseAct1.yamamba(null), JapaneseAct1.invincible_ronin(null)],
+		JapaneseAct1.raijin(null),
+		[JapaneseAct2.chaos_tengu(null), JapaneseAct2.yasha(null), JapaneseAct2.nureriyon(null)],
+		JapaneseAct2.shuten_doji(null),
+		[JapaneseAct3.iwato_guardian(null), JapaneseAct3.susanoo_blade(null), JapaneseAct3.blizzard_queen(null)],
+		JapaneseAct3.yamata_no_orochi(null))
 
 	_write_text("enemies.md", md)
 	_write_csv("enemies.csv", csv_rows)
@@ -388,30 +490,38 @@ func _generate_events() -> void:
 
 	var csv_rows: Array = [["Act", "이벤트명", "설명", "선택지번호", "선택지이름", "효과타입", "값", "골드비용", "HP비용"]]
 
-	var pool1: Array = EventsAct1.build_pool()
-	md += "## Act 1 (%d종)\n\n" % pool1.size()
-	for event in pool1:
-		md += "### %s\n" % event.event_name
-		if event.description != "":
-			md += "> %s\n\n" % event.description
-		for ci in range(event.choices.size()):
-			var choice: Resource = event.choices[ci]
-			var cost_str: String = ""
-			if choice.cost_gold > 0:
-				cost_str += " (골드 -%d)" % choice.cost_gold
-			if choice.cost_hp > 0:
-				cost_str += " (HP -%d)" % choice.cost_hp
-			var val_str: String = ""
-			if choice.value > 0:
-				val_str = " → %s %d" % [_choice_effect_name(choice.effect_type), choice.value]
-			elif choice.effect_type != ChoiceRes.EffectType.NONE:
-				val_str = " → %s" % _choice_effect_name(choice.effect_type)
-			md += "- **%s**%s%s\n" % [choice.label, cost_str, val_str]
-			csv_rows.append([1, event.event_name, event.description, ci + 1, choice.label,
-				_choice_effect_name(choice.effect_type), choice.value, choice.cost_gold, choice.cost_hp])
-		md += "\n"
-
-	md += "## Act 2\n\n_Act 2 이벤트는 feat/act2-egypt 브랜치에서 추가 예정._\n\n"
+	var event_sets: Array = [
+		{ "label": "Act 1 (공용)", "act": 1, "pool": EventsAct1.build_pool() },
+		{ "label": "Act 2 (공용)", "act": 2, "pool": EventsAct2.build_pool() },
+		{ "label": "Act 3 (공용)", "act": 3, "pool": EventsAct3.build_pool() },
+		{ "label": "한국 신화",    "act": 1, "pool": EventsKorean.build_pool() },
+		{ "label": "일본 신화",    "act": 1, "pool": EventsJapanese.build_pool() },
+		{ "label": "중국 신화",    "act": 1, "pool": EventsChinese.build_pool() },
+	]
+	for eset in event_sets:
+		var pool: Array = eset["pool"]
+		var act_num: int = eset["act"]
+		md += "## %s (%d종)\n\n" % [eset["label"], pool.size()]
+		for event in pool:
+			md += "### %s\n" % event.event_name
+			if event.description != "":
+				md += "> %s\n\n" % event.description
+			for ci in range(event.choices.size()):
+				var choice: Resource = event.choices[ci]
+				var cost_str: String = ""
+				if choice.cost_gold > 0:
+					cost_str += " (골드 -%d)" % choice.cost_gold
+				if choice.cost_hp > 0:
+					cost_str += " (HP -%d)" % choice.cost_hp
+				var val_str: String = ""
+				if choice.value > 0:
+					val_str = " → %s %d" % [_choice_effect_name(choice.effect_type), choice.value]
+				elif choice.effect_type != ChoiceRes.EffectType.NONE:
+					val_str = " → %s" % _choice_effect_name(choice.effect_type)
+				md += "- **%s**%s%s\n" % [choice.label, cost_str, val_str]
+				csv_rows.append([act_num, event.event_name, event.description, ci + 1, choice.label,
+					_choice_effect_name(choice.effect_type), choice.value, choice.cost_gold, choice.cost_hp])
+			md += "\n"
 
 	_write_text("events.md", md)
 	_write_csv("events.csv", csv_rows)
@@ -428,8 +538,8 @@ func _write_readme() -> void:
 	md += "## 수정 금지\n\n이 폴더의 `.md`/`.csv` 파일은 자동 생성됩니다. 직접 수정하지 마세요.\n"
 	md += "내용을 바꾸려면 원본(`resources/cards/`, `resources/enemies/`, `resources/events/`, `resources/relics/`)을 수정한 뒤 재생성하세요.\n\n"
 	md += "## 파일 구성\n\n"
-	md += "- `cards.md` / `cards.csv` — 영웅별 카드 (나폴레옹/클레오파트라/이순신), 강화 0/1/2강\n"
-	md += "- `enemies.md` / `enemies.csv` — Act별 적 (일반/엘리트/보스), 인텐트 전수\n"
+	md += "- `cards.md` / `cards.csv` — 영웅별 카드 (나폴레옹/클레오파트라/이순신/잔다르크/칭기즈칸/무사시), 강화 0/1/2강\n"
+	md += "- `enemies.md` / `enemies.csv` — 신화별 적 (그리스/북유럽/이집트/한국/중국/일본, 일반/엘리트/보스), 인텐트 전수\n"
 	md += "- `relics.md` / `relics.csv` — 공용 렐릭 풀, 저주 penalty 포함\n"
 	md += "- `events.md` / `events.csv` — Act별 이벤트, 선택지 전수\n"
 	_write_text("README.md", md)
