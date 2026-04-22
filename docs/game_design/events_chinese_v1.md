@@ -115,15 +115,15 @@
 
 ---
 
-### 8. 옥황상제의 사자
+### 8. 반고의 파편
 
-> 황금 갑옷을 입은 천사(天使)가 하늘에서 내려온다. "황제 폐하의 명으로 당신들의 투쟁에 개입하겠다."
+> 고요한 들판에 거대한 빛 조각이 떨어져 있다. 태초의 거신 반고의 몸 일부 — 만물의 일부가 당신을 돕기 위해 화신했다.
 
 **선택지**:
 | 레이블 | 효과 | 비용 |
 |---|---|---|
-| 사자의 도움을 받는다 | ADD_HERO | NONE |
-| 일의 귀찮음을 피한다 | GOLD +50 | NONE |
+| 파편의 도움을 받는다 | ADD_HERO | NONE |
+| 조용히 놓아둔다 | GOLD +50 | NONE |
 
 **기획 의도**: 영웅 영입 or 골드 선택. 팀이 가득 차 있으면 자동으로 골드만 선택 가능. 팀 구성 전략과 연계.
 
@@ -161,7 +161,7 @@
 ## 구현 메모
 
 - **함수명 제안** (`events_chinese.gd`):
-  - `_queen_mother_peach()`, `_monkey_king_challenge()`, `_tang_monk_scripture()`, `_eight_immortals_feast()`, `_celestial_market()`, `_dragon_king_invitation()`, `_lu_dongbin_sword()`, `_jade_emperor_envoy()`, `_shennong_herbs()`, `_phoenix_rebirth()`
+  - `_queen_mother_peach()`, `_monkey_king_challenge()`, `_tang_monk_scripture()`, `_eight_immortals_feast()`, `_celestial_market()`, `_dragon_king_invitation()`, `_lu_dongbin_sword()`, `_pangu_fragment()`, `_shennong_herbs()`, `_phoenix_rebirth()`
 - **50/50 랜덤 이벤트** ("손오공의 도전"): 한국 "산신령 내기"와 동일 구현 방식. 불가 시 GOLD +70 단순화.
 - **이중 효과 선택지** ("구미호의 유혹" 유사 이슈 없음 — 이번 목록은 단일 효과만 사용).
-- **ADD_HERO 필터링**: "옥황상제의 사자" 이벤트는 팀 정원 3명이면 게임매니저에서 자동 필터링됨 (기존 구현).
+- **ADD_HERO 필터링**: "반고의 파편" 이벤트는 팀 정원 3명이면 게임매니저에서 자동 필터링됨 (기존 구현).
