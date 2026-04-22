@@ -14,6 +14,8 @@ func run_all() -> Dictionary:
 	test_joan_archetype_distribution()
 	test_genghis_rarity_distribution()
 	test_genghis_archetype_distribution()
+	test_musashi_rarity_distribution()
+	test_musashi_archetype_distribution()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -143,3 +145,30 @@ func test_genghis_archetype_distribution() -> void:
 	_assert(archetypes["기동"] == 11, "칭기즈칸 기동 11장 (실제: %d)" % archetypes["기동"])
 	_assert(archetypes["몽골 기병"] == 15, "칭기즈칸 몽골 기병 15장 (실제: %d)" % archetypes["몽골 기병"])
 	_assert(archetypes["약탈"] == 12, "칭기즈칸 약탈 12장 (실제: %d)" % archetypes["약탈"])
+
+func test_musashi_rarity_distribution() -> void:
+	print("[TestCardPoolDistribution] test_musashi_rarity_distribution")
+	var MusaCards = load("res://resources/cards/cards_musashi.gd")
+	var pool: Array = MusaCards.pool()
+	_assert(pool.size() == 38, "무사시 풀 38장")
+	var counts: Dictionary = _count_rarities(pool)
+	# starter_deck(strike/defend) 제외 — COMMON 8장
+	_assert(counts["COMMON"] == 8, "무사시 COMMON 8장 (실제: %d)" % counts["COMMON"])
+	_assert(counts["UNCOMMON"] == 13, "무사시 UNCOMMON 13장 (실제: %d)" % counts["UNCOMMON"])
+	_assert(counts["RARE"] == 14, "무사시 RARE 14장 (실제: %d)" % counts["RARE"])
+	_assert(counts["LEGENDARY"] == 2, "무사시 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
+	_assert(counts["DIVINE"] == 1, "무사시 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
+
+func test_musashi_archetype_distribution() -> void:
+	print("[TestCardPoolDistribution] test_musashi_archetype_distribution")
+	var MusaCards = load("res://resources/cards/cards_musashi.gd")
+	var pool: Array = MusaCards.pool()
+	var archetypes := {"이도류": 0, "결투": 0, "무심": 0}
+	for c in pool:
+		var a: String = c.get("archetype") if c.get("archetype") != null else ""
+		if a in archetypes:
+			archetypes[a] += 1
+	# starter_deck 제외: 이도류 12, 결투 12, 무심 14
+	_assert(archetypes["이도류"] == 12, "무사시 이도류 12장 (실제: %d)" % archetypes["이도류"])
+	_assert(archetypes["결투"] == 12, "무사시 결투 12장 (실제: %d)" % archetypes["결투"])
+	_assert(archetypes["무심"] == 14, "무사시 무심 14장 (실제: %d)" % archetypes["무심"])

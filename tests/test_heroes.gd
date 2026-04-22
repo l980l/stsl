@@ -113,7 +113,7 @@ func test_genghis_khan_card_pool_size() -> void:
 func test_musashi_card_pool_size() -> void:
 	print("[TestHeroes] test_musashi_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._musashi_card_pool().size() == 13, "무사시 카드 풀 13장")
+	_assert(gm._musashi_card_pool().size() == 38, "무사시 카드 풀 38장")
 
 func test_hit_count_damage_multi_hit() -> void:
 	print("[TestHeroes] test_hit_count_damage_multi_hit")
