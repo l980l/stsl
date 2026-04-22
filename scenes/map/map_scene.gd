@@ -28,9 +28,9 @@ func _build_ui() -> void:
 
 	# 제목
 	var title := Label.new()
-	title.text = "탐험 맵"
-	title.position = Vector2(860, 20)
-	title.size = Vector2(200, 50)
+	title.text = "Act %d  —  탐험 맵" % GameManager.current_act
+	title.position = Vector2(760, 20)
+	title.size = Vector2(400, 50)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 30)
 	add_child(title)
