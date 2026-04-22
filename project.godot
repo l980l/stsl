@@ -27,20 +27,20 @@ ProgressManager="*res://autoload/progress_manager.gd"
 DebugManager="*res://autoload/debug_manager.gd"
 LocaleManager="*res://autoload/locale_manager.gd"
 
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+
 [gui]
 
 theme/custom="res://resources/theme/global_theme.tres"
 
 [internationalization]
 
+locale/translations=PackedStringArray("res://resources/translations/strings.ko.translation", "res://resources/translations/strings.en.translation", "res://resources/translations/strings.fr.translation", "res://resources/translations/strings.it.translation", "res://resources/translations/strings.es.translation", "res://resources/translations/strings.ja.translation", "res://resources/translations/strings.el.translation", "res://resources/translations/strings.zh.translation")
 locale/fallback="ko"
-locale/translations=PackedStringArray("res://resources/translations/strings.csv")
-
-[display]
-
-window/size/viewport_width=1920
-window/size/viewport_height=1080
-window/stretch/mode="canvas_items"
 
 [physics]
 

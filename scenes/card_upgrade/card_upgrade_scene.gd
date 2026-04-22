@@ -31,12 +31,13 @@ func _build_ui(upgradeable: Array) -> void:
 	add_child(bg)
 
 	var title := Label.new()
-	title.text = "강화할 카드를 선택하세요"
+	title.text = tr("ui.card_upgrade.title")
 	title.position = Vector2(560, 30)
-	title.size = Vector2(800, 60)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 32)
 	add_child(title)
+	title.size = Vector2(800, 60)
+	LabelUtils.fit_text(title, 32, 18)
 
 	var scroll_w: int = COLS * (CARD_W + 20) - 20  # 940
 	var scroll := ScrollContainer.new()
@@ -62,11 +63,12 @@ func _build_ui(upgradeable: Array) -> void:
 
 	var skip_btn := Button.new()
 	skip_btn.position = Vector2(880, 1000)
-	skip_btn.size = Vector2(160, 50)
-	skip_btn.text = "건너뛰기"
+	skip_btn.text = tr("ui.card_upgrade.btn_skip")
 	skip_btn.add_theme_font_size_override("font_size", 18)
 	skip_btn.pressed.connect(GameManager.complete_card_upgrade)
 	add_child(skip_btn)
+	skip_btn.size = Vector2(160, 50)
+	LabelUtils.fit_text(skip_btn, 18, 12)
 
 func _on_card_selected(card: Resource) -> void:
 	GameManager.upgrade_card(card)

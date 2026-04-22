@@ -34,11 +34,12 @@ func _build_ui() -> void:
 
 	# 타이틀
 	var title := Label.new()
-	title.text = "동료를 영입하세요" if is_recruit else "시작 영웅을 선택하세요"
+	title.text = tr("ui.hero_select.title_recruit") if is_recruit else tr("ui.hero_select.title_start")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 36)
 	title.custom_minimum_size = Vector2(0, 80)
 	root_vbox.add_child(title)
+	LabelUtils.fit_text(title, 36, 22)
 
 	# 스크롤 컨테이너 (세로 스크롤, 가로 고정)
 	var scroll := ScrollContainer.new()
@@ -116,10 +117,10 @@ func _build_ui() -> void:
 		btn.custom_minimum_size = Vector2(0, 55)
 		btn.add_theme_font_size_override("font_size", 18)
 		if already_owned:
-			btn.text = "이미 보유 중"
+			btn.text = tr("ui.hero_select.already_owned")
 			btn.disabled = true
 		elif is_locked:
-			btn.text = "🔒 잠금"
+			btn.text = tr("ui.hero_select.locked")
 			btn.disabled = true
 		elif is_recruit:
 			btn.text = (info.get("name", hid) as String) + " 영입"

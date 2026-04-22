@@ -26,7 +26,7 @@ func _build_ui() -> void:
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
-	# 제목
+	# 제목 (동적 포맷 — 번역 스코프 아웃)
 	var title := Label.new()
 	title.text = "Act %d" % GameManager.current_act
 	title.position = Vector2(860, 20)
@@ -35,7 +35,7 @@ func _build_ui() -> void:
 	title.add_theme_font_size_override("font_size", 30)
 	add_child(title)
 
-	# 층 정보
+	# 층 정보 (동적 포맷 — 번역 스코프 아웃)
 	_floor_label = Label.new()
 	_floor_label.position = Vector2(50, 520)
 	_floor_label.size = Vector2(300, 40)
@@ -51,12 +51,13 @@ func _build_ui() -> void:
 
 	# 덱 보기 버튼
 	var deck_btn := Button.new()
-	deck_btn.text = "덱 보기"
+	deck_btn.text = tr("ui.map.btn_deck")
 	deck_btn.position = Vector2(50, 570)
-	deck_btn.size = Vector2(160, 40)
 	deck_btn.add_theme_font_size_override("font_size", 16)
 	deck_btn.pressed.connect(_show_deck_viewer)
 	add_child(deck_btn)
+	deck_btn.size = Vector2(160, 40)
+	LabelUtils.fit_text(deck_btn, 16, 12)
 
 	# 연결선 먼저 그리기 (버튼 뒤에)
 	_draw_connections()
@@ -87,6 +88,7 @@ func _create_node_button(node: Resource) -> void:
 	btn.pressed.connect(func(): GameManager.enter_node(captured_id))
 	add_child(btn)
 	_node_buttons[node.node_id] = btn
+	LabelUtils.fit_text(btn, 13, 10)
 
 func _refresh_map() -> void:
 	for node_id in _node_buttons:
@@ -131,11 +133,11 @@ func _refresh_relics() -> void:
 
 func _room_type_text(room_type: int) -> String:
 	match room_type:
-		MapNodeRes.RoomType.BATTLE: return "⚔ 전투"
-		MapNodeRes.RoomType.ELITE: return "💀 엘리트"
-		MapNodeRes.RoomType.REST: return "🔥 휴식"
-		MapNodeRes.RoomType.SHOP: return "🏪 상점"
-		MapNodeRes.RoomType.BOSS: return "👑 보스"
+		MapNodeRes.RoomType.BATTLE: return tr("ui.map.room_battle")
+		MapNodeRes.RoomType.ELITE: return tr("ui.map.room_elite")
+		MapNodeRes.RoomType.REST: return tr("ui.map.room_rest")
+		MapNodeRes.RoomType.SHOP: return tr("ui.map.room_shop")
+		MapNodeRes.RoomType.BOSS: return tr("ui.map.room_boss")
 		_: return "?"
 
 func _show_deck_viewer() -> void:
@@ -196,12 +198,13 @@ func _show_deck_viewer() -> void:
 		vbox.add_child(lbl)
 
 	var close_btn := Button.new()
-	close_btn.text = "닫기"
+	close_btn.text = tr("ui.map.btn_close")
 	close_btn.position = Vector2(880, 960)
-	close_btn.size = Vector2(160, 45)
 	close_btn.add_theme_font_size_override("font_size", 18)
 	close_btn.pressed.connect(_hide_deck_viewer)
 	_deck_overlay.add_child(close_btn)
+	close_btn.size = Vector2(160, 45)
+	LabelUtils.fit_text(close_btn, 18, 12)
 
 func _hide_deck_viewer() -> void:
 	if _deck_overlay:

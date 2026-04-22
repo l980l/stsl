@@ -23,12 +23,13 @@ func _build_ui() -> void:
 	add_child(bg)
 
 	_title_label = Label.new()
-	_title_label.text = "카드를 선택하세요 (%d/%d)" % [_picked_count, _pick_max]
+	_title_label.text = tr("ui.card_pick.title") % [_picked_count, _pick_max]
 	_title_label.position = Vector2(660, 100)
-	_title_label.size = Vector2(600, 60)
 	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title_label.add_theme_font_size_override("font_size", 32)
 	add_child(_title_label)
+	_title_label.size = Vector2(600, 60)
+	LabelUtils.fit_text(_title_label, 32, 18)
 
 	var total_w: float = GameManager.card_rewards.size() * (CARD_W + 20) - 20
 	var start_x: float = (1920.0 - total_w) / 2.0
@@ -50,17 +51,18 @@ func _build_ui() -> void:
 
 	var skip_btn := Button.new()
 	skip_btn.position = Vector2(880, 680)
-	skip_btn.size = Vector2(160, 50)
-	skip_btn.text = "건너뛰기"
+	skip_btn.text = tr("ui.card_pick.btn_skip")
 	skip_btn.add_theme_font_size_override("font_size", 18)
 	skip_btn.pressed.connect(_on_skip)
 	add_child(skip_btn)
+	skip_btn.size = Vector2(160, 50)
+	LabelUtils.fit_text(skip_btn, 18, 12)
 
 func _on_card_selected(card: Resource, btn: Button) -> void:
 	DeckManager.add_card_to_deck(card)
 	btn.disabled = true
 	_picked_count += 1
-	_title_label.text = "카드를 선택하세요 (%d/%d)" % [_picked_count, _pick_max]
+	_title_label.text = tr("ui.card_pick.title") % [_picked_count, _pick_max]
 	if _picked_count >= _pick_max:
 		GameManager.complete_card_pick()
 

@@ -1,12 +1,50 @@
-keys,ko,en,fr,it,es,ar,ja,el,zh
-ui.main_menu.title,STSL,,,,,,,,
-ui.main_menu.new_game,새 게임,New Game,,,,,,,
-ui.main_menu.continue,이어하기,Continue,,,,,,,
-ui.main_menu.language_label,언어,Language,,,,,,,
-status.weak.name,약화,Weak,,,,,,,
-status.vulnerable.name,취약,Vulnerable,,,,,,,
-status.poison.name,독,Poison,,,,,,,
-status.strength.name,강화,Strength,,,,,,,
-status.charm.name,매혹,Charm,,,,,,,
-status.taunt.name,도발,Taunt,,,,,,,
-status.morale.name,사기,Morale,,,,,,,
+﻿keys,ko,en,fr,it,es,ja,el,zh
+ui.main_menu.title,STSL,STSL,STSL,STSL,STSL,STSL,STSL,STSL
+ui.main_menu.new_game,새 게임,New Game,Nouvelle Partie,Nuova Partita,Nueva Partida,新しいゲーム,Νέο Παιχνίδι,新游戏
+ui.main_menu.continue,이어하기,Continue,Continuer,Continua,Continuar,続ける,Συνέχεια,继续
+ui.main_menu.language_label,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言
+ui.chapter_select.title,챕터 선택,Select Chapter,Choisir un Chapitre,Seleziona Capitolo,Seleccionar Capítulo,チャプター選択,Επιλογή Κεφαλαίου,选择章节
+ui.chapter_select.back,뒤로,Back,Retour,Indietro,Volver,戻る,Πίσω,返回
+ui.chapter_select.start,챕터 시작,Start Chapter,Commencer,Inizia Capitolo,Iniciar Capítulo,チャプター開始,Έναρξη Κεφαλαίου,开始章节
+ui.chapter_select.locked,잠금,Locked,Verrouillé,Bloccato,Bloqueado,ロック中,Κλειδωμένο,已锁定
+ui.chapter_select.unlock_hint,이전 챕터를 클리어하면 해금됩니다.,Clear the previous chapter to unlock.,Terminez le chapitre précédent pour déverrouiller.,Completa il capitolo precedente per sbloccare.,Completa el capítulo anterior para desbloquear.,前のチャプターをクリアして解放してください。,Ολοκληρώστε το προηγούμενο κεφάλαιο για να ξεκλειδώσετε.,通关前一章节即可解锁。
+"ui.chapter_select.chapter1.name","챕터 1 — 지중해, 북방 신화","Chapter 1 — Mediterranean & Nordic Myths","Chapitre 1 — Mythes Méditerranéens & Nordiques","Capitolo 1 — Miti Mediterranei e Nordici","Capítulo 1 — Mitos Mediterráneos y Nórdicos","チャプター1 — 地中海・北欧神話","Κεφάλαιο 1 — Μεσογειακοί & Βορειακοί Μύθοι","第1章 — 地中海·北欧神话"
+"ui.chapter_select.chapter1.desc","그리스, 이집트, 북유럽 신화의 적이 각 Act에 랜덤 배정됩니다.","Enemies from Greek, Egyptian, and Norse mythology are randomly assigned to each Act.","Les ennemis des mythologies grecque, égyptienne et nordique sont assignés aléatoirement à chaque Acte.","I nemici delle mitologie greca, egizia e norrena sono assegnati casualmente a ogni Atto.","Los enemigos de las mitologías griega, egipcia y nórdica se asignan aleatoriamente a cada Acto.","ギリシャ・エジプト・北欧神話の敵が各アクトにランダム配置されます。","Εχθροί από την ελληνική, αιγυπτιακή και σκανδιναβική μυθολογία ανατίθενται τυχαία σε κάθε Πράξη.","希腊、埃及和北欧神话的敌人将随机分配到每个幕次。"
+"ui.chapter_select.chapter2.name","챕터 2 — 동아시아 신화","Chapter 2 — East Asian Myths","Chapitre 2 — Mythes d'Asie de l'Est","Capitolo 2 — Miti dell'Asia Orientale","Capítulo 2 — Mitos del Este Asiático","チャプター2 — 東アジア神話","Κεφάλαιο 2 — Μύθοι Ανατολικής Ασίας","第2章 — 东亚神话"
+"ui.chapter_select.chapter2.desc","한국, 중국, 일본 신화의 적이 각 Act에 랜덤 배정됩니다.","Enemies from Korean, Chinese, and Japanese mythology are randomly assigned to each Act.","Les ennemis des mythologies coréenne, chinoise et japonaise sont assignés aléatoirement à chaque Acte.","I nemici delle mitologie coreana, cinese e giapponese sono assegnati casualmente a ogni Atto.","Los enemigos de las mitologías coreana, china y japonesa se asignan aleatoriamente a cada Acto.","韓国・中国・日本神話の敵が各アクトにランダム配置されます。","Εχθροί από την κορεατική, κινεζική και ιαπωνική μυθολογία ανατίθενται τυχαία σε κάθε Πράξη.","韩国、中国和日本神话的敌人将随机分配到每个幕次。"
+status.weak.name,약화,Weak,Faible,Debole,Débil,弱体化,Αδύναμος,虚弱
+status.vulnerable.name,취약,Vulnerable,Vulnérable,Vulnerabile,Vulnerable,脆弱,Ευάλωτος,易伤
+status.poison.name,독,Poison,Poison,Veleno,Veneno,毒,Δηλητήριο,毒
+status.strength.name,강화,Strength,Force,Forza,Fuerza,強化,Δύναμη,强化
+status.charm.name,매혹,Charm,Charme,Fascino,Encanto,魅了,Γοητεία,魅惑
+status.taunt.name,도발,Taunt,Provocation,Provocazione,Provocación,挑発,Πρόκληση,嘲讽
+status.morale.name,사기,Morale,Moral,Morale,Moral,士気,Ηθικό,士气
+ui.hero_select.title_start,시작 영웅 선택,,,,,,,
+ui.hero_select.title_recruit,영웅 영입,,,,,,,
+ui.hero_select.already_owned,이미 보유,,,,,,,
+ui.hero_select.locked,잠김,,,,,,,
+ui.map.btn_deck,덱 보기,,,,,,,
+ui.map.btn_close,닫기,,,,,,,
+ui.map.room_battle,전투,,,,,,,
+ui.map.room_elite,정예,,,,,,,
+ui.map.room_rest,휴식,,,,,,,
+ui.map.room_shop,상점,,,,,,,
+ui.map.room_boss,보스,,,,,,,
+ui.shop.title,상점,,,,,,,
+ui.shop.relic_empty,릴릭 없음,,,,,,,
+ui.shop.sec_service,기타 서비스,,,,,,,
+ui.shop.btn_exit,나가기,,,,,,,
+ui.shop.btn_purchased,구매 완료,,,,,,,
+ui.shop.btn_removed,제거 완료,,,,,,,
+ui.rest.title,휴식,,,,,,,
+ui.rest.btn_heal,회복,,,,,,,
+ui.rest.btn_upgrade,카드 강화,,,,,,,
+ui.rest.btn_leave,떠나기,,,,,,,
+ui.card_pick.title,카드를 선택하세요 (%d/%d),,,,,,,
+ui.card_pick.btn_skip,건너뛰기,,,,,,,
+ui.card_upgrade.title,카드 강화,,,,,,,
+ui.card_upgrade.btn_skip,건너뛰기,,,,,,,
+ui.game_over.victory,승리!,,,,,,,
+ui.game_over.defeat,패배...,,,,,,,
+ui.game_over.btn_main_menu,메인 메뉴,,,,,,,
+ui.hero_unlock.message,새 영웅 해금: %s,,,,,,,

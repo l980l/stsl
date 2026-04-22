@@ -11,12 +11,13 @@ func _build_ui() -> void:
 	add_child(bg)
 
 	var title := Label.new()
-	title.text = "휴식 장소"
+	title.text = tr("ui.rest.title")
 	title.position = Vector2(760, 100)
-	title.size = Vector2(400, 60)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 36)
 	add_child(title)
+	title.size = Vector2(400, 60)
+	LabelUtils.fit_text(title, 36, 22)
 
 	# 영웅 HP 표시
 	var tm := _get_tm()
@@ -33,28 +34,31 @@ func _build_ui() -> void:
 			add_child(lbl)
 
 	var heal_btn := Button.new()
-	heal_btn.text = "체력 회복 (최대 HP의 30%)"
+	heal_btn.text = tr("ui.rest.btn_heal")
 	heal_btn.position = Vector2(760, 480)
-	heal_btn.size = Vector2(400, 55)
 	heal_btn.add_theme_font_size_override("font_size", 20)
 	heal_btn.pressed.connect(_on_heal_pressed)
 	add_child(heal_btn)
+	heal_btn.size = Vector2(400, 55)
+	LabelUtils.fit_text(heal_btn, 20, 12)
 
 	var upgrade_btn := Button.new()
-	upgrade_btn.text = "카드 강화"
+	upgrade_btn.text = tr("ui.rest.btn_upgrade")
 	upgrade_btn.position = Vector2(760, 545)
-	upgrade_btn.size = Vector2(400, 55)
 	upgrade_btn.add_theme_font_size_override("font_size", 20)
 	upgrade_btn.pressed.connect(_on_upgrade_pressed)
 	add_child(upgrade_btn)
+	upgrade_btn.size = Vector2(400, 55)
+	LabelUtils.fit_text(upgrade_btn, 20, 12)
 
 	var leave_btn := Button.new()
-	leave_btn.text = "떠나기"
+	leave_btn.text = tr("ui.rest.btn_leave")
 	leave_btn.position = Vector2(760, 610)
-	leave_btn.size = Vector2(400, 55)
 	leave_btn.add_theme_font_size_override("font_size", 20)
 	leave_btn.pressed.connect(_on_leave_pressed)
 	add_child(leave_btn)
+	leave_btn.size = Vector2(400, 55)
+	LabelUtils.fit_text(leave_btn, 20, 12)
 
 func _get_tm() -> Object:
 	if Engine.has_singleton("TeamManager"):

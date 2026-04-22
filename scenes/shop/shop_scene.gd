@@ -17,13 +17,14 @@ func _build_ui() -> void:
 	add_child(bg)
 
 	var title := Label.new()
-	title.text = "상점"
+	title.text = tr("ui.shop.title")
 	title.position = Vector2(860, 20)
-	title.size = Vector2(200, 50)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 32)
 	title.modulate = Color(1.0, 0.85, 0.3)
 	add_child(title)
+	title.size = Vector2(200, 50)
+	LabelUtils.fit_text(title, 32, 18)
 
 	var gold_lbl := Label.new()
 	gold_lbl.name = "GoldLabel"
@@ -38,12 +39,13 @@ func _build_ui() -> void:
 	_build_service_section()
 
 	var exit_btn := Button.new()
-	exit_btn.text = "나가기"
+	exit_btn.text = tr("ui.shop.btn_exit")
 	exit_btn.position = Vector2(860, 980)
-	exit_btn.size = Vector2(200, 50)
 	exit_btn.add_theme_font_size_override("font_size", 20)
 	exit_btn.pressed.connect(_on_exit)
 	add_child(exit_btn)
+	exit_btn.size = Vector2(200, 50)
+	LabelUtils.fit_text(exit_btn, 20, 12)
 
 func _build_card_section() -> void:
 	var sec_lbl := Label.new()
@@ -136,21 +138,23 @@ func _build_relic_section() -> void:
 		add_child(_relic_btn)
 	else:
 		var empty_lbl := Label.new()
-		empty_lbl.text = "재고 없음"
+		empty_lbl.text = tr("ui.shop.relic_empty")
 		empty_lbl.position = Vector2(1110, 205)
-		empty_lbl.size = Vector2(580, 40)
 		empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		empty_lbl.add_theme_font_size_override("font_size", 16)
 		empty_lbl.modulate = Color(0.5, 0.5, 0.5)
 		add_child(empty_lbl)
+		empty_lbl.size = Vector2(580, 40)
+		LabelUtils.fit_text(empty_lbl, 16, 12)
 
 func _build_service_section() -> void:
 	var sec_lbl := Label.new()
-	sec_lbl.text = "서비스"
+	sec_lbl.text = tr("ui.shop.sec_service")
 	sec_lbl.position = Vector2(100, 400)
-	sec_lbl.size = Vector2(200, 40)
 	sec_lbl.add_theme_font_size_override("font_size", 18)
 	add_child(sec_lbl)
+	sec_lbl.size = Vector2(200, 40)
+	LabelUtils.fit_text(sec_lbl, 18, 12)
 
 	var heal_btn := Button.new()
 	var heal_price: int = _inventory.get("heal_price", 30)
@@ -176,7 +180,7 @@ func _on_buy_card(card: Resource, btn: Button, price: int) -> void:
 		return
 	DeckManager.add_card_to_deck(card)
 	btn.disabled = true
-	btn.text = "구매 완료"
+	btn.text = tr("ui.shop.btn_purchased")
 	_refresh_gold_label()
 
 func _on_buy_relic(relic: Resource, price: int) -> void:
@@ -185,7 +189,7 @@ func _on_buy_relic(relic: Resource, price: int) -> void:
 	GameManager.add_relic(relic)
 	if _relic_btn:
 		_relic_btn.disabled = true
-		_relic_btn.text = "구매 완료"
+		_relic_btn.text = tr("ui.shop.btn_purchased")
 	_refresh_gold_label()
 
 func _on_heal(amount: int, price: int) -> void:
@@ -239,7 +243,7 @@ func _on_remove_card(card: Resource, remove_btn: Button, price: int) -> void:
 		return
 	DeckManager.remove_from_deck(card)
 	remove_btn.disabled = true
-	remove_btn.text = "카드 제거 완료"
+	remove_btn.text = tr("ui.shop.btn_removed")
 	if _remove_panel:
 		_remove_panel.queue_free()
 		_remove_panel = null
