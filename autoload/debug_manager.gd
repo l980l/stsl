@@ -61,7 +61,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			var opts: Array = []
 			for card in DeckManager.get_full_deck():
 				var suffix := " +%d" % card.upgrade_level if card.upgrade_level > 0 else ""
-				opts.append(["%s%s (코%d)  |  %s" % [card.card_name, suffix, card.cost, _effect_summary(card)], card, _rarity_color(card.rarity)])
+				opts.append(["[%s] %s%s (코%d)  |  %s" % [card.owner_id, card.card_name, suffix, card.cost, _effect_summary(card)], card, _rarity_color(card.rarity)])
+			_sort_card_opts(opts)
 			_make_checkbox_dialog("덱 편집 — 제거할 카드", opts, "제거", func(picked: Array):
 				for card in picked:
 					if not DeckManager.remove_from_deck(card):
@@ -75,7 +76,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				if not card.can_upgrade():
 					continue
 				var suffix := " +%d → +%d" % [card.upgrade_level, card.upgrade_level + 1]
-				opts.append(["%s%s (코%d)  |  %s" % [card.card_name, suffix, card.cost, _effect_summary(card)], card, _rarity_color(card.rarity)])
+				opts.append(["[%s] %s%s (코%d)  |  %s" % [card.owner_id, card.card_name, suffix, card.cost, _effect_summary(card)], card, _rarity_color(card.rarity)])
+			_sort_card_opts(opts)
 			_make_checkbox_dialog("카드 강화", opts, "강화", func(picked: Array):
 				for card in picked:
 					GameManager.upgrade_card(card)
@@ -307,7 +309,17 @@ func _collect_party_card_pools() -> Array:
 			var fx := _effect_summary(card)
 			var label := "[%s] %s  C%d  |  %s" % [hero.hero_id, card.card_name, card.cost, fx]
 			results.append([label, card, _rarity_color(card.rarity)])
-	return results
+	return _sort_card_opts(results)
+
+func _sort_card_opts(opts: Array) -> Array:
+	opts.sort_custom(func(a, b):
+		var a_owner: String = a[1].owner_id if a[1] != null else ""
+		var b_owner: String = b[1].owner_id if b[1] != null else ""
+		if a_owner != b_owner:
+			return a_owner < b_owner
+		return a[1].rarity < b[1].rarity
+	)
+	return opts
 
 func _effect_summary(card: Resource) -> String:
 	var parts: Array = []
