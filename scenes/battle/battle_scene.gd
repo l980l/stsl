@@ -170,7 +170,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 
 	# UI 상단 배치, 스프라이트는 그 뒤에 렌더 (z_index=1 for UI)
 	var bar_w: float = 211.0
-	var bar_h: float = 18.0
+	var bar_h: float = 13.0
 	var bar_x: float = HERO_X + (SLOT_W - bar_w) / 2.0
 
 	var name_lbl := _make_label(Vector2(bar_x, y + 4), Vector2(bar_w, 22), 16)
@@ -292,7 +292,7 @@ func _make_label(pos: Vector2, sz: Vector2, font_size: int) -> Label:
 func _make_hp_bar(pos: Vector2, width: float) -> ProgressBar:
 	var bar := ProgressBar.new()
 	bar.position = pos
-	bar.size = Vector2(width, 18)
+	bar.size = Vector2(width, 13)
 	bar.show_percentage = false
 	var fill := StyleBoxFlat.new()
 	fill.bg_color = Color(0.8, 0.15, 0.15)
@@ -436,7 +436,7 @@ func _setup_heroes() -> void:
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
 			var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
-			char_node.position = Vector2(HERO_X + SLOT_W / 2.0, slot_y + SLOT_H)
+			char_node.position = Vector2(HERO_X + SLOT_W / 2.0, slot_y + 200)
 			char_node.scale = Vector2(1.44, 2.4)
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
@@ -481,7 +481,7 @@ func _setup_enemies() -> void:
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
 			var slot_pos: Vector2 = _enemy_slot_pos(i, total)
-			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + SLOT_H)
+			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 200)
 			char_node.scale = Vector2(-1.44, 2.4)
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
