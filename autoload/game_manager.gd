@@ -190,7 +190,7 @@ func enter_node(node_id: int) -> void:
 			pending_enemies = _make_enemies_for_node(node)
 			_last_elite_solo = (node.room_type == MapNodeRes.RoomType.ELITE and pending_enemies.size() == 1)
 			if node.room_type == MapNodeRes.RoomType.BOSS and pending_enemies.size() > 0:
-				_last_boss_enemy_id = pending_enemies[0].enemy_id
+				_last_boss_enemy_id = pending_enemies[0].enemy_name
 			else:
 				_last_boss_enemy_id = ""
 			change_state(GameState.BATTLE)
