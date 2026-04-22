@@ -1,7 +1,7 @@
 # autoload/debug_manager.gd
 extends Node
 
-const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 승리\n[Shift+I]  무적 토글 (영웅 피해 차단)\n[Shift+E]  무한 코스트 토글\n[Shift+D]  카드 1장 드로우\n[Shift+H]  적 HP 설정 → 적 클릭\n[Shift+G]  그리드 토글\n── 전체 공통 ──\n[Shift+W]  현재 챕터 즉시 클리어\n[Shift+F]  현재 Act 클리어 → 다음 Act 진입\n[Shift+A]  카드 추가 창\n[Shift+R]  덱 편집기 (카드 제거)\n[Shift+U]  카드 강화\n[Shift+N]  영웅 즉시 해금 창\n[Shift+L]  렐릭 추가 창\n[Shift+X]  렐릭 제거 창\n[Shift+V]  이벤트 씬 입장\n[Shift+C]  목록 고정/해제"
+const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 승리\n[Shift+I]  무적 토글 (영웅 피해 차단)\n[Shift+E]  무한 코스트 토글\n[Shift+D]  카드 1장 드로우\n[Shift+H]  적 HP 설정 → 적 클릭\n[Shift+G]  그리드 토글\n── 전체 공통 ──\n[Shift+W]  현재 챕터 즉시 클리어\n[Shift+F]  현재 Act 클리어 → 다음 Act 진입\n[Shift+P]  파티에 영웅 추가\n[Shift+A]  카드 추가 창\n[Shift+R]  덱 편집기 (카드 제거)\n[Shift+U]  카드 강화\n[Shift+N]  영웅 즉시 해금 창\n[Shift+L]  렐릭 추가 창\n[Shift+X]  렐릭 제거 창\n[Shift+V]  이벤트 씬 입장\n[Shift+C]  목록 고정/해제"
 
 var _pinned_label: Label = null
 
@@ -91,6 +91,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				if not picked.is_empty():
 					DeckManager.hand_changed.emit()
 			)
+		KEY_P:
+			_open_hero_add_dialog()
 		KEY_N:
 			_open_hero_unlock_dialog()
 		KEY_L:
@@ -99,6 +101,34 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_open_relic_remove_dialog()
 		KEY_V:
 			_open_event_enter_dialog()
+
+# ── 영웅 파티 추가 ──────────────────────────────────
+
+func _open_hero_add_dialog() -> void:
+	var HR = load("res://resources/heroes/hero_registry.gd")
+	var tm = get_tree().root.get_node_or_null("TeamManager")
+	var current_ids: Dictionary = {}
+	if tm:
+		for h in tm.heroes:
+			current_ids[h.hero_id] = true
+	var opts: Array = []
+	for hid in HR.all_hero_ids():
+		var info: Dictionary = HR.get_display_info(hid)
+		var in_party: bool = hid in current_ids
+		var color := Color(0.55, 0.55, 0.55) if in_party else Color.WHITE
+		var status := "  (파티 중)" if in_party else ""
+		opts.append(["%s  [%s]%s" % [info.get("name", hid), hid, status], hid, color])
+	_make_checkbox_dialog("파티에 영웅 추가", opts, "추가", func(picked: Array):
+		for hid in picked:
+			if hid in current_ids:
+				continue
+			var hero: Resource = GameManager._make_hero_by_id(hid)
+			if hero == null:
+				continue
+			if tm:
+				tm.add_hero(hero)
+			GameManager._add_initial_deck_for(hero)
+	)
 
 # ── 영웅 해금 ───────────────────────────────────────
 
