@@ -1,5 +1,5 @@
 # resources/enemies/chinese/chinese_act3.gd
-# 중국 신화 Act 3 — 엘리트 3종(백호·주작·현무 신장) + 보스(옥황상제)
+# 중국 신화 Act 3 — 엘리트 3종(백호·주작·현무 신장) + 보스(반고)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
@@ -55,12 +55,12 @@ static func black_tortoise_general(scene: PackedScene) -> Resource:
 	e.charm_resistance = 1
 	return e
 
-static func jade_emperor(scene: PackedScene) -> Resource:
+static func pangu(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "옥황상제"; e.max_hp = 4800; e.character_scene = scene
+	e.enemy_name = "반고"; e.max_hp = 4800; e.character_scene = scene
 	e.mythology = "chinese"
 	e.phase_thresholds = [0.66, 0.33]
-	# Phase 0 — 천제 어좌
+	# Phase 0 — 혼돈
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.BUFF; p0i1.value = 50; p0i1.status_type = "block"
 	var p0i2 := IntentRes.new()
@@ -72,7 +72,7 @@ static func jade_emperor(scene: PackedScene) -> Resource:
 	var p0i5 := IntentRes.new()
 	p0i5.action_type = IntentRes.ActionType.DEBUFF; p0i5.value = 2; p0i5.status_type = "vulnerable"
 	p0i5.target = IntentRes.TargetType.RANDOM
-	# Phase 1 — 옥황 분노
+	# Phase 1 — 천지개벽
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 220; p1i1.target = IntentRes.TargetType.RANDOM
 	var p1i2 := IntentRes.new()
@@ -87,7 +87,7 @@ static func jade_emperor(scene: PackedScene) -> Resource:
 	p1i5.target = IntentRes.TargetType.ALL
 	var p1i6 := IntentRes.new()
 	p1i6.action_type = IntentRes.ActionType.BUFF; p1i6.value = 2; p1i6.status_type = "strength"
-	# Phase 2 — 사신 강림
+	# Phase 2 — 만물 창조
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 160; p2i1.target = IntentRes.TargetType.RANDOM
 	var p2i2 := IntentRes.new()
@@ -116,4 +116,4 @@ static func elites() -> Array:
 	return ["white_tiger_general", "vermilion_bird_general", "black_tortoise_general"]
 
 static func boss() -> String:
-	return "jade_emperor"
+	return "pangu"

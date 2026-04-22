@@ -7,7 +7,7 @@ static func build_pool() -> Array:
 	return [
 		_queen_mother_peach(), _monkey_king_challenge(), _tang_monk_scripture(),
 		_eight_immortals_feast(), _celestial_market(), _dragon_king_invitation(),
-		_lu_dongbin_sword(), _jade_emperor_envoy(), _shennong_herbs(),
+		_lu_dongbin_sword(), _pangu_fragment(), _shennong_herbs(),
 		_phoenix_rebirth(),
 	]
 
@@ -87,13 +87,13 @@ static func _lu_dongbin_sword() -> Resource:
 	cb.effect_type = ChoiceRes.EffectType.NONE
 	e.choices = [ca, cb]; return e
 
-static func _jade_emperor_envoy() -> Resource:
+static func _pangu_fragment() -> Resource:
 	var e: Resource = EventRes.new()
-	e.event_name = "옥황상제의 사자"
-	e.description = "황금 갑옷의 천사가 하늘에서 내려온다. '황제 폐하의 명으로 당신들을 돕겠습니다.'"
-	var ca: Resource = ChoiceRes.new(); ca.label = "사자의 도움을 받는다"
+	e.event_name = "반고의 파편"
+	e.description = "고요한 들판에 거대한 빛 조각이 떨어져 있다. 태초의 거신 반고의 몸 일부 — 만물의 일부가 당신을 돕기 위해 화신했다."
+	var ca: Resource = ChoiceRes.new(); ca.label = "파편의 도움을 받는다"
 	ca.effect_type = ChoiceRes.EffectType.ADD_HERO
-	var cb: Resource = ChoiceRes.new(); cb.label = "일의 귀찮음을 피한다"
+	var cb: Resource = ChoiceRes.new(); cb.label = "조용히 놓아둔다"
 	cb.effect_type = ChoiceRes.EffectType.GOLD; cb.value = 50
 	e.choices = [ca, cb]; return e
 

@@ -326,15 +326,15 @@
 
 ---
 
-### 보스: 옥황상제(玉皇上帝) — 하늘의 황제
+### 보스: 반고(盤古) — 태초의 거신
 
 - **HP**: 4800 / **페이즈**: 3 (Phase 0→1: 66% / Phase 1→2: 33%)
-- **핵심 메카닉**: 도교 최고신. "계급" 테마의 정점. Phase 3에서 사신(四神) 전군 소환 인텐트(연속 다중 공격으로 표현). 중국 신화 최종 보스.
+- **핵심 메카닉**: 중국 창세 신화의 거신. 혼돈에서 천지를 가른 태초의 존재. Phase 진행에 따라 창세 서사(혼돈→천지개벽→만물 창조)가 전개됨. 중국 신화 최종 보스.
 - `charm_resistance = 2`, `phase_thresholds = [0.66, 0.33]`
 
 ---
 
-**Phase 0 — 천제 어좌 (100%~66%)**
+**Phase 0 — 혼돈(混沌) (100%~66%)**
 3턴 순환:
 - 1턴: BUFF "block +50" + BUFF "strength +1"
 - 2턴: ATTACK 190 (RANDOM)
@@ -342,8 +342,8 @@
 
 ---
 
-**Phase 1 — 옥황 분노 (66%~33%)**
-전환 시: BUFF "strength +2" 즉발 + 방어도 완전 제거*(분노의 용포 개방)*
+**Phase 1 — 천지개벽(天地開闢) (66%~33%)**
+전환 시: BUFF "strength +2" 즉발 *(도끼를 휘둘러 혼돈을 가름)*
 3턴 순환:
 - 1턴: ATTACK 220 (RANDOM) + DEBUFF "vulnerable" 2스택 (ALL)
 - 2턴: ATTACK 190 (ALL)
@@ -351,15 +351,15 @@
 
 ---
 
-**Phase 2 — 사신 강림 (33%~0%)**
-전환 시: BUFF "strength +3" 즉발 *(사신 전원 소환: 연속 사중 공격으로 표현)*
+**Phase 2 — 만물 창조(萬物化身) (33%~0%)**
+전환 시: BUFF "strength +3" 즉발 *(거신의 몸이 만물로 화함: 눈→해·달, 숨→바람, 피→강)*
 2턴 순환:
-- 1턴: ATTACK 160 (RANDOM) → ATTACK 160 (RANDOM) → ATTACK 160 (RANDOM) → ATTACK 160 (RANDOM) *(사신 4회 연속)*
+- 1턴: ATTACK 160 (RANDOM) → ATTACK 160 (RANDOM) → ATTACK 160 (RANDOM) → ATTACK 160 (RANDOM) *(오행 분출 4회 연속)*
 - 2턴: ATTACK 220 (ALL) + DEBUFF "vulnerable" 3스택 (ALL) + BUFF "strength +2"
 
 ---
 
-**밸런스 메모**: Phase 2 사신 4회 연속 160 = 640 단일 총 피해(strength 적용 전). 분산 히트이므로 BLOCK이 4번 소모됨 주의. 구현 시 각 히트가 독립적 BLOCK 소모인지 확인. 전략: Phase 1 진입 전 속공 처치가 이상적.
+**밸런스 메모**: Phase 2 오행 4회 연속 160 = 640 단일 총 피해(strength 적용 전). 분산 히트이므로 BLOCK이 4번 소모됨 주의. 구현 시 각 히트가 독립적 BLOCK 소모인지 확인. 전략: Phase 1 진입 전 속공 처치가 이상적.
 
 ---
 
@@ -370,7 +370,7 @@
 - **함수명 제안** (chinese_normals.gd):
   - `yaksha()`, `nezha_soldier()`, `heavenly_king_soldier()`, `shanhaijing_beast()`, `immortal_trainee()`, `azure_dragon_guard()`
 - **Act 보스 함수명**:
-  - act1: `chiyou()` / act2: `erlang_shen()` / act3: `jade_emperor()`
+  - act1: `chiyou()` / act2: `erlang_shen()` / act3: `pangu()`
 - **엘리트 함수명**:
   - act1: `golden_horn_king()`, `silver_horn_king()`, `black_wind_demon()`
   - act2: `red_boy()`, `nine_dragon_general()`, `heavenly_hound_brothers()`
