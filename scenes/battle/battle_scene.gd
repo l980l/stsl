@@ -48,7 +48,7 @@ const DRAG_THRESHOLD := 10.0
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _token_tile_nodes: Dictionary = {}
-var _synergy_lbl: Label = null
+var _synergy_box: VBoxContainer = null
 var _ppt_label: Label = null
 var _debug_badge: Label = null
 var _debug_hp_target_mode: bool = false
@@ -137,13 +137,10 @@ func _build_ui() -> void:
 	_refresh_relics()
 
 	# 시너지 HUD
-	_synergy_lbl = Label.new()
-	_synergy_lbl.position = Vector2(20, 750)
-	_synergy_lbl.size = Vector2(240, 80)
-	_synergy_lbl.add_theme_font_size_override("font_size", 13)
-	_synergy_lbl.modulate = Color(1.0, 0.0, 1.0)
-	_synergy_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	add_child(_synergy_lbl)
+	_synergy_box = VBoxContainer.new()
+	_synergy_box.position = Vector2(20, 750)
+	_synergy_box.size = Vector2(240, 80)
+	add_child(_synergy_box)
 
 	_ppt_label = Label.new()
 	_ppt_label.position = Vector2(20, 840)
@@ -234,6 +231,8 @@ func _refresh_relics() -> void:
 	for relic in GameManager.relics:
 		var lbl := Label.new()
 		lbl.text = "[%s]" % relic.relic_name
+		lbl.tooltip_text = relic.description
+		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 		lbl.add_theme_font_size_override("font_size", 13)
 		lbl.modulate = Color(1.0, 0.85, 0.3)
 		_relic_container.add_child(lbl)
@@ -866,10 +865,19 @@ func _refresh_debug_badge() -> void:
 
 
 func _refresh_synergy_hud() -> void:
-	if _synergy_lbl == null:
+	if _synergy_box == null:
 		return
-	var synergies: Array = BattleManager.get_active_synergies()
-	_synergy_lbl.text = "\n".join(synergies) if synergies.size() > 0 else ""
+	for child in _synergy_box.get_children():
+		child.queue_free()
+	for s in BattleManager.get_active_synergies():
+		var lbl := Label.new()
+		lbl.text = s["name"]
+		lbl.tooltip_text = s["desc"]
+		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+		lbl.add_theme_font_size_override("font_size", 13)
+		lbl.modulate = Color(1.0, 0.0, 1.0)
+		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_synergy_box.add_child(lbl)
 
 func _on_card_button_down(card: Resource) -> void:
 	if not BattleManager.is_player_turn or not DeckManager.can_play(card):

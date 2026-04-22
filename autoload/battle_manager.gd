@@ -238,7 +238,17 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					deck_mgr.energy_changed.emit(deck_mgr.current_energy)
 			EffectRes.EffectType.HEAL:
 				if team_mgr:
-					var heal_id: String = target_hero_id if target_hero_id != "" else card.owner_id
+					var heal_id: String
+					if effect.target == "LOWEST_HP":
+						var min_ratio: float = 2.0
+						heal_id = card.owner_id
+						for hero in team_mgr.get_living_heroes():
+							var ratio: float = float(team_mgr.get_current_hp(hero.hero_id)) / float(max(1, hero.max_hp))
+							if ratio < min_ratio:
+								min_ratio = ratio
+								heal_id = hero.hero_id
+					else:
+						heal_id = target_hero_id if target_hero_id != "" else card.owner_id
 					team_mgr.heal(heal_id, effect.value)
 			EffectRes.EffectType.GAIN_MORALE:
 				if not _hero_status.has(card.owner_id):
@@ -266,6 +276,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if card.owner_id == "napoleon" and team_mgr and team_mgr.is_alive("cleopatra"):
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 							_apply_status_to_enemy(target_enemy_index, "charm", 1)
+					# 황제의 무도 (나폴레옹×무사시): 소모 성공 시 무사시 방어도 +8
+					if card.owner_id == "napoleon" and team_mgr and team_mgr.is_alive("musashi"):
+						_hero_block["musashi"] = _hero_block.get("musashi", 0) + 8
 			EffectRes.EffectType.POISON_BURST:
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					var pdmg: int = _enemy_status[target_enemy_index].get("poison_dmg", 0)
@@ -285,8 +298,15 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						_hero_block[hero.hero_id] = _hero_block.get(hero.hero_id, 0) + effect.value
 			EffectRes.EffectType.HEAL_ALL:
 				if team_mgr:
+					var heal_amt: int = effect.value
+					if effect.status_type == "dead_ally_count":
+						var dead_count: int = 0
+						for hero in team_mgr.heroes:
+							if not team_mgr.is_alive(hero.hero_id):
+								dead_count += 1
+						heal_amt = effect.value * dead_count
 					for hero in team_mgr.heroes:
-						team_mgr.heal(hero.hero_id, effect.value)
+						team_mgr.heal(hero.hero_id, heal_amt)
 			EffectRes.EffectType.FORMATION_BLOCK:
 				if team_mgr:
 					var count: int = team_mgr.get_living_heroes().size()
@@ -757,6 +777,12 @@ func _evaluate_condition(cond: String, _card: Resource) -> bool:
 						if ratio <= 0.30:
 							return true
 			return false
+		"dead_ally_any":
+			if team_mgr:
+				for hero in team_mgr.heroes:
+					if not team_mgr.is_alive(hero.hero_id):
+						return true
+			return false
 	return false  # 알 수 없는 조건 키는 조건 불충족으로 처리
 
 func _get_active_pattern(enemy_index: int) -> Array:
@@ -793,30 +819,65 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 	for effect in card.effects:
 		match effect.effect_type:
 			EffectRes.EffectType.GAIN_MORALE:
+				# 철벽 진군 (나폴레옹×이순신)
 				if card_owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
 					_hero_block["yi_sun_sin"] = _hero_block.get("yi_sun_sin", 0) + 3
+				# 정복자의 기세 (나폴레옹×칭기즈칸)
+				if card_owner == "napoleon" and team_mgr.is_alive("genghis_khan"):
+					deck_mgr.draw_cards(1)
+			EffectRes.EffectType.REVIVE:
+				# 성녀의 방패 (잔다르크×이순신)
+				if card_owner == "joan_of_arc" and team_mgr.is_alive("yi_sun_sin"):
+					_hero_block["yi_sun_sin"] = _hero_block.get("yi_sun_sin", 0) + 20
+			EffectRes.EffectType.PURGE_STATUS:
+				# 성스러운 독 (잔다르크×클레오파트라)
+				if card_owner == "joan_of_arc" and team_mgr.is_alive("cleopatra"):
+					var _alive_ei: Array = []
+					for ei in range(_enemies.size()):
+						if _enemy_alive[ei]:
+							_alive_ei.append(ei)
+					if not _alive_ei.is_empty():
+						_apply_status_to_enemy(_alive_ei[randi() % _alive_ei.size()], "poison", 3)
+			EffectRes.EffectType.SACRIFICE_HP:
+				# 희생의 칼날 (잔다르크×무사시)
+				if card_owner == "joan_of_arc" and team_mgr.is_alive("musashi"):
+					_hero_block["musashi"] = _hero_block.get("musashi", 0) + 10
 			EffectRes.EffectType.DAMAGE:
+				# 독침 반격 (이순신×클레오파트라)
 				if card_owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
 					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 						if _enemy_status[target_enemy_index].get("poison_dmg", 0) > 0:
 							_deal_damage_to_enemy(target_enemy_index, 4)
-				# 약탈과 독 (칭기즈칸 × 클레오파트라): 전체 공격 시 모든 적에 독 +2
+				# 수륙 협공 (이순신×칭기즈칸): 전체 공격 시 드로우 +1
+				if card_owner == "yi_sun_sin" and effect.target == "ALL" and team_mgr.is_alive("genghis_khan"):
+					deck_mgr.draw_cards(1)
+				# 약탈과 독 (칭기즈칸×클레오파트라): 전체 공격 시 모든 적에 독 +2
 				if card_owner == "genghis_khan" and effect.target == "ALL" and team_mgr.is_alive("cleopatra"):
 					for ei in range(_enemies.size()):
 						if _enemy_alive[ei]:
 							_apply_status_to_enemy(ei, "poison", 2)
+				# 초원의 결투사 (칭기즈칸×무사시): 무사시 공격 시 칭기즈칸 방어도 +4
+				if card_owner == "musashi" and team_mgr.is_alive("genghis_khan"):
+					_hero_block["genghis_khan"] = _hero_block.get("genghis_khan", 0) + 4
+				# 독날 (클레오파트라×무사시): 무사시 공격 시 대상 독 +1
+				if card_owner == "musashi" and team_mgr.is_alive("cleopatra"):
+					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+						_apply_status_to_enemy(target_enemy_index, "poison", 1)
 			EffectRes.EffectType.CONDITIONAL_DMG:
-				# 검사의 약속 (무사시 × 이순신): enemy_count_1 조건 카드 시 이순신 BLOCK +15
+				# 검사의 약속 (무사시×이순신): enemy_count_1 조건 카드 시 이순신 BLOCK +15
 				if card_owner == "musashi" and effect.status_type == "enemy_count_1" and team_mgr.is_alive("yi_sun_sin"):
 					_hero_block["yi_sun_sin"] = _hero_block.get("yi_sun_sin", 0) + 15
 			EffectRes.EffectType.HEAL_ALL:
-				# 성전 (잔다르크 × 나폴레옹): HEAL_ALL 시 나폴레옹 MORALE +2
+				# 성전 (잔다르크×나폴레옹): HEAL_ALL 시 나폴레옹 MORALE +2
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("napoleon"):
 					if not _hero_status.has("napoleon"):
 						_hero_status["napoleon"] = {}
 					var new_morale: int = _hero_status["napoleon"].get("morale", 0) + 2
 					_hero_status["napoleon"]["morale"] = new_morale
 					morale_changed.emit("napoleon", new_morale)
+				# 신의 원정 (잔다르크×칭기즈칸): HEAL_ALL 시 드로우 +1
+				if card_owner == "joan_of_arc" and team_mgr.is_alive("genghis_khan"):
+					deck_mgr.draw_cards(1)
 
 
 func get_active_synergies() -> Array:
@@ -830,17 +891,35 @@ func get_active_synergies() -> Array:
 	var g: bool = team_mgr.is_alive("genghis_khan")
 	var m: bool = team_mgr.is_alive("musashi")
 	if n and y:
-		synergies.append("철벽 진군 (나폴레옹×이순신)")
+		synergies.append({"name": "철벽 진군 (나폴레옹×이순신)", "desc": "나폴레옹 사기 카드 사용 시 이순신 방어도 +3"})
 	if y and c:
-		synergies.append("독침 반격 (이순신×클레오파트라)")
+		synergies.append({"name": "독침 반격 (이순신×클레오파트라)", "desc": "이순신 공격 카드 사용 시 독 걸린 적에게 추가 피해 +4"})
 	if n and c:
-		synergies.append("혼란의 돌격 (나폴레옹×클레오파트라)")
+		synergies.append({"name": "혼란의 돌격 (나폴레옹×클레오파트라)", "desc": "나폴레옹 사기 소모 카드 성공 시 대상 매혹 +1"})
 	if j and n:
-		synergies.append("성전 (잔다르크×나폴레옹)")
+		synergies.append({"name": "성전 (잔다르크×나폴레옹)", "desc": "잔다르크 전체 회복 카드 사용 시 나폴레옹 사기 +2"})
 	if g and c:
-		synergies.append("약탈과 독 (칭기즈칸×클레오파트라)")
+		synergies.append({"name": "약탈과 독 (칭기즈칸×클레오파트라)", "desc": "칭기즈칸 전체 공격 카드 사용 시 적 전체 독 +2"})
 	if m and y:
-		synergies.append("검사의 약속 (무사시×이순신)")
+		synergies.append({"name": "검사의 약속 (무사시×이순신)", "desc": "무사시 일기토 카드 사용 시 이순신 방어도 +15"})
+	if j and y:
+		synergies.append({"name": "성녀의 방패 (잔다르크×이순신)", "desc": "잔다르크 부활 카드 사용 시 이순신 방어도 +20"})
+	if j and c:
+		synergies.append({"name": "성스러운 독 (잔다르크×클레오파트라)", "desc": "잔다르크 정화 카드 사용 시 무작위 적 독 +3"})
+	if j and g:
+		synergies.append({"name": "신의 원정 (잔다르크×칭기즈칸)", "desc": "잔다르크 전체 회복 카드 사용 시 카드 1장 드로우"})
+	if j and m:
+		synergies.append({"name": "희생의 칼날 (잔다르크×무사시)", "desc": "잔다르크 체력 희생 카드 사용 시 무사시 방어도 +10"})
+	if n and g:
+		synergies.append({"name": "정복자의 기세 (나폴레옹×칭기즈칸)", "desc": "나폴레옹 사기 카드 사용 시 카드 1장 드로우"})
+	if n and m:
+		synergies.append({"name": "황제의 무도 (나폴레옹×무사시)", "desc": "나폴레옹 사기 소모 카드 성공 시 무사시 방어도 +8"})
+	if y and g:
+		synergies.append({"name": "수륙 협공 (이순신×칭기즈칸)", "desc": "이순신 전체 공격 카드 사용 시 카드 1장 드로우"})
+	if g and m:
+		synergies.append({"name": "초원의 결투사 (칭기즈칸×무사시)", "desc": "무사시 공격 카드 사용 시 칭기즈칸 방어도 +4"})
+	if c and m:
+		synergies.append({"name": "독날 (클레오파트라×무사시)", "desc": "무사시 공격 카드 사용 시 대상에게 독 +1"})
 	return synergies
 
 
@@ -851,21 +930,34 @@ func has_synergy_bonus(card: Resource) -> bool:
 	for effect in card.effects:
 		match effect.effect_type:
 			EffectRes.EffectType.GAIN_MORALE:
-				if card_owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
+				if card_owner == "napoleon" and (team_mgr.is_alive("yi_sun_sin") or team_mgr.is_alive("genghis_khan")):
 					return true
 			EffectRes.EffectType.CONSUME_MORALE:
-				if card_owner == "napoleon" and team_mgr.is_alive("cleopatra"):
+				if card_owner == "napoleon" and (team_mgr.is_alive("cleopatra") or team_mgr.is_alive("musashi")):
+					return true
+			EffectRes.EffectType.REVIVE:
+				if card_owner == "joan_of_arc" and team_mgr.is_alive("yi_sun_sin"):
+					return true
+			EffectRes.EffectType.PURGE_STATUS:
+				if card_owner == "joan_of_arc" and team_mgr.is_alive("cleopatra"):
+					return true
+			EffectRes.EffectType.SACRIFICE_HP:
+				if card_owner == "joan_of_arc" and team_mgr.is_alive("musashi"):
 					return true
 			EffectRes.EffectType.DAMAGE:
 				if card_owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
 					return true
+				if card_owner == "yi_sun_sin" and effect.target == "ALL" and team_mgr.is_alive("genghis_khan"):
+					return true
 				if card_owner == "genghis_khan" and effect.target == "ALL" and team_mgr.is_alive("cleopatra"):
+					return true
+				if card_owner == "musashi" and (team_mgr.is_alive("genghis_khan") or team_mgr.is_alive("cleopatra")):
 					return true
 			EffectRes.EffectType.CONDITIONAL_DMG:
 				if card_owner == "musashi" and effect.status_type == "enemy_count_1" and team_mgr.is_alive("yi_sun_sin"):
 					return true
 			EffectRes.EffectType.HEAL_ALL:
-				if card_owner == "joan_of_arc" and team_mgr.is_alive("napoleon"):
+				if card_owner == "joan_of_arc" and (team_mgr.is_alive("napoleon") or team_mgr.is_alive("genghis_khan")):
 					return true
 	return false
 

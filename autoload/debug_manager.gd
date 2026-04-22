@@ -61,7 +61,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			var opts: Array = []
 			for card in DeckManager.get_full_deck():
 				var suffix := " +%d" % card.upgrade_level if card.upgrade_level > 0 else ""
-				opts.append(["%s%s (코%d)  |  %s" % [card.card_name, suffix, card.cost, _effect_summary(card)], card, _rarity_color(card.rarity)])
+				opts.append(["[%s] %s%s (코%d)  |  %s" % [card.owner_id, card.card_name, suffix, card.cost, _effect_summary(card)], card, _rarity_color(card.rarity)])
+			_sort_card_opts(opts)
 			_make_checkbox_dialog("덱 편집 — 제거할 카드", opts, "제거", func(picked: Array):
 				for card in picked:
 					if not DeckManager.remove_from_deck(card):
@@ -75,7 +76,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				if not card.can_upgrade():
 					continue
 				var suffix := " +%d → +%d" % [card.upgrade_level, card.upgrade_level + 1]
-				opts.append(["%s%s (코%d)  |  %s" % [card.card_name, suffix, card.cost, _effect_summary(card)], card, _rarity_color(card.rarity)])
+				opts.append(["[%s] %s%s (코%d)  |  %s" % [card.owner_id, card.card_name, suffix, card.cost, _effect_summary(card)], card, _rarity_color(card.rarity)])
+			_sort_card_opts(opts)
 			_make_checkbox_dialog("카드 강화", opts, "강화", func(picked: Array):
 				for card in picked:
 					GameManager.upgrade_card(card)
@@ -121,7 +123,7 @@ func _open_relic_add_dialog() -> void:
 		var owned: bool = GameManager.has_relic(r.relic_name)
 		var color := Color(0.55, 0.55, 0.55) if owned else Color.WHITE
 		var suffix := "  (보유중)" if owned else ""
-		opts.append(["%s%s" % [r.relic_name, suffix], r, color])
+		opts.append(["%s%s  —  %s" % [r.relic_name, suffix, r.description], r, color])
 	_make_checkbox_dialog("렐릭 추가", opts, "획득", func(picked: Array):
 		for r in picked:
 			GameManager.add_relic(r)
@@ -141,7 +143,7 @@ func _open_relic_remove_dialog() -> void:
 		return
 	var opts: Array = []
 	for r in GameManager.relics:
-		opts.append([r.relic_name, r, Color.WHITE])
+		opts.append(["%s  —  %s" % [r.relic_name, r.description], r, Color.WHITE])
 	_make_checkbox_dialog("렐릭 제거", opts, "제거", func(picked: Array):
 		for r in picked:
 			GameManager.relics.erase(r)
@@ -178,10 +180,12 @@ func _open_event_enter_dialog() -> void:
 		seen[ev.event_name] = true
 		var is_avail: bool = ev.event_name in available_names
 		var color := Color.WHITE if is_avail else Color(0.5, 0.5, 0.5)
+		var desc: String = ev.get("description") if ev.get("description") != null else ""
+		var label: String = "%s  —  %s" % [ev.event_name, desc] if desc != "" else ev.event_name
 		if is_avail:
-			available_opts.append([ev.event_name, ev, true, color])
+			available_opts.append([label, ev, true, color])
 		else:
-			unavailable_opts.append([ev.event_name, ev, false, color])
+			unavailable_opts.append([label, ev, false, color])
 
 	_make_radio_dialog("이벤트 씬 입장", available_opts + unavailable_opts, "입장", func(ev: Resource):
 		GameManager.pending_event = ev
@@ -249,10 +253,10 @@ func _make_radio_dialog(title: String, options: Array, confirm_text: String, on_
 	dlg.title = title
 	dlg.get_ok_button().text = confirm_text
 	dlg.add_cancel_button("닫기")
-	dlg.min_size = Vector2i(600, 560)
+	dlg.min_size = Vector2i(900, 560)
 
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(560, 480)
+	scroll.custom_minimum_size = Vector2(860, 480)
 	var vbox := VBoxContainer.new()
 	scroll.add_child(vbox)
 
@@ -307,7 +311,17 @@ func _collect_party_card_pools() -> Array:
 			var fx := _effect_summary(card)
 			var label := "[%s] %s  C%d  |  %s" % [hero.hero_id, card.card_name, card.cost, fx]
 			results.append([label, card, _rarity_color(card.rarity)])
-	return results
+	return _sort_card_opts(results)
+
+func _sort_card_opts(opts: Array) -> Array:
+	opts.sort_custom(func(a, b):
+		var a_owner: String = a[1].owner_id if a[1] != null else ""
+		var b_owner: String = b[1].owner_id if b[1] != null else ""
+		if a_owner != b_owner:
+			return a_owner < b_owner
+		return a[1].rarity < b[1].rarity
+	)
+	return opts
 
 func _effect_summary(card: Resource) -> String:
 	var parts: Array = []
