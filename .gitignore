@@ -28,3 +28,4 @@ docs/.obsidian/
 docs/catalog/*.csv
 docs/catalog/*.md
 !docs/catalog/README.md
+.worktrees/
