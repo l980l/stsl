@@ -39,6 +39,8 @@ var _active_powers: Dictionary = {}
 
 # 이번 플레이어 턴 카드 사용 횟수 (만리 원정용)
 var _cards_played_this_turn: int = 0
+var _cards_drawn_this_turn: int = 0
+var _kills_this_card: int = 0
 
 signal battle_started()
 signal battle_won()
@@ -118,6 +120,7 @@ func _phase_player_pre() -> bool:
 func _phase_player_main() -> void:
 	is_player_turn = true
 	_cards_played_this_turn = 0
+	_cards_drawn_this_turn = 0
 	if team_mgr:
 		for hero in team_mgr.heroes:
 			_hero_block[hero.hero_id] = 0
@@ -187,7 +190,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 	# 카드 소유 영웅이 사망 상태면 효과 없음
 	if team_mgr and not team_mgr.is_alive(card.owner_id):
 		return
+	_kills_this_card = 0
 	for effect in card.effects:
+		# condition 필드 평가 — 조건 불충족 시 이 효과 스킵
+		if effect.condition != "" and not _evaluate_condition(effect.condition, card):
+			continue
 		match effect.effect_type:
 			EffectRes.EffectType.DAMAGE:
 				var dmg: int = effect.value
@@ -224,6 +231,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.DRAW:
 				if deck_mgr:
 					deck_mgr.draw_cards(effect.value)
+					_cards_drawn_this_turn += effect.value
 			EffectRes.EffectType.ENERGY:
 				if deck_mgr:
 					deck_mgr.current_energy += effect.value
@@ -288,33 +296,57 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					deck_mgr.pending_cost_reduction += effect.value
 			EffectRes.EffectType.CONDITIONAL_DMG:
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-					var condition_met: bool
-					var es: Dictionary = _enemy_status[target_enemy_index]
-					match effect.status_type:
-						"morale":
-							condition_met = _hero_status.get(card.owner_id, {}).get("morale", 0) > 0
-						"has_poison":
-							condition_met = es.get("poison_dmg", 0) > 0
-						"has_poison_5":
-							condition_met = es.get("poison_dmg", 0) >= 5
-						"has_poison_10":
-							condition_met = es.get("poison_dmg", 0) >= 10
-						"has_debuffs_3":
-							var dc: int = 0
-							for dt: String in ["weak", "vulnerable"]:
-								if es.get(dt, 0) > 0:
+					if effect.status_type == "dead_ally_count":
+						# 사망 아군 수 × bonus_value + value 피해
+						var dead_count: int = 0
+						if team_mgr:
+							for h in team_mgr.heroes:
+								if not team_mgr.is_alive(h.hero_id):
+									dead_count += 1
+						var total_dmg: int = effect.value + effect.bonus_value * dead_count
+						_deal_damage_to_enemy(target_enemy_index, total_dmg)
+					else:
+						var condition_met: bool
+						var es: Dictionary = _enemy_status[target_enemy_index]
+						match effect.status_type:
+							"morale":
+								condition_met = _hero_status.get(card.owner_id, {}).get("morale", 0) > 0
+							"has_poison":
+								condition_met = es.get("poison_dmg", 0) > 0
+							"has_poison_5":
+								condition_met = es.get("poison_dmg", 0) >= 5
+							"has_poison_10":
+								condition_met = es.get("poison_dmg", 0) >= 10
+							"has_debuffs_3":
+								var dc: int = 0
+								for dt: String in ["weak", "vulnerable"]:
+									if es.get(dt, 0) > 0:
+										dc += 1
+								if es.get("poison_dmg", 0) > 0:
 									dc += 1
-							if es.get("poison_dmg", 0) > 0:
-								dc += 1
-							condition_met = dc >= 3
-						"enemy_count_1":
-							condition_met = _get_living_enemy_count() == 1
-						"hand_size_0":
-							condition_met = deck_mgr != null and deck_mgr.hand.size() == 0
-						_:
-							condition_met = es.get(effect.status_type, 0) > 0
-					var dmg: int = effect.bonus_value if condition_met else effect.value
-					_deal_damage_to_enemy(target_enemy_index, dmg)
+								condition_met = dc >= 3
+							"enemy_count_1":
+								condition_met = _get_living_enemy_count() == 1
+							"hand_size_0":
+								condition_met = deck_mgr != null and deck_mgr.hand.size() == 0
+							"enemy_hp_below_30":
+								condition_met = float(_enemy_hp[target_enemy_index]) / float(_enemies[target_enemy_index].max_hp) <= 0.30
+							"enemy_hp_below_50":
+								condition_met = float(_enemy_hp[target_enemy_index]) / float(_enemies[target_enemy_index].max_hp) <= 0.50
+							"team_hp_below_30":
+								var below_30: bool = false
+								if team_mgr:
+									for h in team_mgr.heroes:
+										if team_mgr.is_alive(h.hero_id):
+											var ratio: float = float(team_mgr.get_current_hp(h.hero_id)) / float(h.max_hp)
+											if ratio <= 0.30:
+												below_30 = true
+												break
+								condition_met = below_30
+							_:
+								condition_met = es.get(effect.status_type, 0) > 0
+						var dmg: int = effect.bonus_value if condition_met else effect.value
+						_deal_damage_to_enemy(target_enemy_index, dmg)
 			EffectRes.EffectType.SUMMON_TOKEN:
 				if not _hero_status.has(card.owner_id):
 					_hero_status[card.owner_id] = {}
@@ -337,6 +369,31 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED:
 				var block_amount: int = _cards_played_this_turn * effect.value
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + block_amount
+			EffectRes.EffectType.ON_KILL_DRAW:
+				# 이번 카드로 처치된 적 수만큼 드로우
+				if deck_mgr:
+					for _i in range(_kills_this_card):
+						deck_mgr.draw_cards(effect.value)
+						_cards_drawn_this_turn += effect.value
+			EffectRes.EffectType.PURGE_STATUS:
+				if team_mgr:
+					var heroes_to_purge: Array = []
+					if effect.target == "ALL":
+						heroes_to_purge = team_mgr.heroes
+					else:
+						for h in team_mgr.heroes:
+							if h.hero_id == card.owner_id:
+								heroes_to_purge = [h]
+								break
+					for h in heroes_to_purge:
+						if not _hero_status.has(h.hero_id):
+							continue
+						for debuff in ["weak", "vulnerable", "poison_dmg", "charm"]:
+							_hero_status[h.hero_id].erase(debuff)
+			EffectRes.EffectType.PER_DRAW_DMG:
+				if target_enemy_index >= 0 and _cards_drawn_this_turn > 0:
+					var dmg: int = _cards_drawn_this_turn * effect.value
+					_deal_damage_to_enemy(target_enemy_index, dmg)
 	_apply_synergy_bonus(card, target_enemy_index)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
@@ -351,6 +408,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
 	enemy_damaged.emit(enemy_index, amount)
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
+		_kills_this_card += 1
 		enemy_died.emit(enemy_index)
 	_check_phase_transition(enemy_index)
 	_check_win_condition()
@@ -682,6 +740,22 @@ func clear() -> void:
 	_last_attacker.clear()
 	is_battle_active = false
 	is_player_turn = false
+
+func _evaluate_condition(cond: String, _card: Resource) -> bool:
+	match cond:
+		"hand_size_0":
+			return deck_mgr != null and deck_mgr.hand.size() == 0
+		"enemy_count_1":
+			return _get_living_enemy_count() == 1
+		"team_hp_below_30":
+			if team_mgr:
+				for h in team_mgr.heroes:
+					if team_mgr.is_alive(h.hero_id):
+						var ratio: float = float(team_mgr.get_current_hp(h.hero_id)) / float(h.max_hp)
+						if ratio <= 0.30:
+							return true
+			return false
+	return true  # 알 수 없는 조건은 true (안전 폴백)
 
 func _get_active_pattern(enemy_index: int) -> Array:
 	var enemy: Resource = _enemies[enemy_index]
