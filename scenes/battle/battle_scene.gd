@@ -182,7 +182,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 	hp_bar.z_index = 1
 	hp_bar.visible = false
 
-	var hp_lbl := _make_label(Vector2(bar_x, y + 28), Vector2(bar_w, bar_h), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, y + 22), Vector2(bar_w, 24), 12)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hp_lbl.z_index = 1
@@ -247,7 +247,7 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 48), bar_w)
 	hp_bar.z_index = 1
 
-	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 48), Vector2(bar_w, bar_h), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 42), Vector2(bar_w, 24), 12)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hp_lbl.z_index = 1
