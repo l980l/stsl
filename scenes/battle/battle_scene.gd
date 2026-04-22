@@ -195,7 +195,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 	block_lbl.visible = false
 
 	var status_box := HBoxContainer.new()
-	status_box.position = Vector2(bar_x, y + 70)
+	status_box.position = Vector2(bar_x, y + 42)
 	status_box.size = Vector2(bar_w, 18)
 	status_box.z_index = 1
 	status_box.visible = false
@@ -258,7 +258,7 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	block_lbl.z_index = 1
 
 	var status_box := HBoxContainer.new()
-	status_box.position = Vector2(bar_x, pos.y + 88)
+	status_box.position = Vector2(bar_x, pos.y + 62)
 	status_box.size = Vector2(bar_w, 18)
 	status_box.z_index = 1
 	add_child(status_box)
