@@ -94,18 +94,21 @@ func _unhandled_key_input(event: InputEvent) -> void:
 # ── 영웅 해금 ───────────────────────────────────────
 
 func _open_hero_unlock_dialog() -> void:
+	var pm: ProgressManagerClass = get_node_or_null("/root/ProgressManager")
 	var HR = load("res://resources/heroes/hero_registry.gd")
 	var opts: Array = []
 	for hid in HR.all_hero_ids():
 		var info: Dictionary = HR.get_display_info(hid)
-		var locked: bool = not ProgressManager.is_hero_unlocked(hid)
+		var locked: bool = pm == null or not pm.is_hero_unlocked(hid)
 		var color := Color.WHITE if locked else Color(0.55, 0.55, 0.55)
 		var status := "잠금" if locked else "해금됨"
 		opts.append(["%s  [%s]  —  %s" % [info.get("name", hid), hid, status], hid, color])
 	_make_checkbox_dialog("영웅 즉시 해금", opts, "즉시 해금", func(picked: Array):
+		if pm == null:
+			return
 		for hid in picked:
-			if ProgressManager.unlock_hero(hid):
-				ProgressManager.hero_unlocked.emit(hid)
+			if pm.unlock_hero(hid):
+				pm.hero_unlocked.emit(hid)
 	, true)
 
 # ── 렐릭 추가 ───────────────────────────────────────
