@@ -754,17 +754,17 @@ func get_active_synergies() -> Array:
 	var g: bool = team_mgr.is_alive("genghis_khan")
 	var m: bool = team_mgr.is_alive("musashi")
 	if n and y:
-		synergies.append("철벽 진군 (나폴레옹×이순신)")
+		synergies.append({"name": "철벽 진군 (나폴레옹×이순신)", "desc": "나폴레옹 사기 카드 사용 시 이순신 방어도 +3"})
 	if y and c:
-		synergies.append("독침 반격 (이순신×클레오파트라)")
+		synergies.append({"name": "독침 반격 (이순신×클레오파트라)", "desc": "이순신 공격 카드 사용 시 독 걸린 적에게 추가 피해 +4"})
 	if n and c:
-		synergies.append("혼란의 돌격 (나폴레옹×클레오파트라)")
+		synergies.append({"name": "혼란의 돌격 (나폴레옹×클레오파트라)", "desc": "나폴레옹 사기 소모 카드 성공 시 대상 매혹 +1"})
 	if j and n:
-		synergies.append("성전 (잔다르크×나폴레옹)")
+		synergies.append({"name": "성전 (잔다르크×나폴레옹)", "desc": "잔다르크 전체 회복 카드 사용 시 나폴레옹 사기 +2"})
 	if g and c:
-		synergies.append("약탈과 독 (칭기즈칸×클레오파트라)")
+		synergies.append({"name": "약탈과 독 (칭기즈칸×클레오파트라)", "desc": "칭기즈칸 전체 공격 카드 사용 시 적 전체 독 +2"})
 	if m and y:
-		synergies.append("검사의 약속 (무사시×이순신)")
+		synergies.append({"name": "검사의 약속 (무사시×이순신)", "desc": "무사시 일기토 카드 사용 시 이순신 방어도 +15"})
 	return synergies
 
 
