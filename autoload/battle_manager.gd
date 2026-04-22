@@ -622,10 +622,10 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				if target_id != "":
 					_deal_damage_to_hero(target_id, dmg)
 		IntentRes.ActionType.BUFF:
-			if intent.status_type != "":
-				_apply_status_to_enemy(enemy_index, intent.status_type, intent.value)
-			else:
+			if intent.status_type == "block" or intent.status_type == "":
 				_enemy_block[enemy_index] += intent.value
+			else:
+				_apply_status_to_enemy(enemy_index, intent.status_type, intent.value)
 		IntentRes.ActionType.DEBUFF:
 			var stype: String = intent.status_type
 			if intent.target == IntentRes.TargetType.ALL:
