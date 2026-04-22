@@ -1,7 +1,11 @@
 # scenes/hero_select/hero_select_scene.gd
-extends Node2D
+extends Control
 
 const _HR = preload("res://resources/heroes/hero_registry.gd")
+
+const CARD_W := 290
+const CARD_H := 340
+const COLS := 3
 
 func _ready() -> void:
 	_build_ui()
@@ -17,92 +21,114 @@ func _build_ui() -> void:
 			for h in tm.heroes:
 				owned_ids.append(h.hero_id)
 
+	# 배경
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.1)
-	bg.size = Vector2(1920, 1080)
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 
+	# 루트 레이아웃
+	var root_vbox := VBoxContainer.new()
+	root_vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(root_vbox)
+
+	# 타이틀
 	var title := Label.new()
 	title.text = "동료를 영입하세요" if is_recruit else "시작 영웅을 선택하세요"
-	title.position = Vector2(660, 60)
-	title.size = Vector2(600, 60)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 36)
-	add_child(title)
+	title.custom_minimum_size = Vector2(0, 80)
+	root_vbox.add_child(title)
 
-	var hero_ids: Array = _HR.all_hero_ids()
-	const CARD_W := 440
-	const CARD_H := 480
-	const GAP_X := 60
-	const GAP_Y := 50
-	const COLS := 3
-	const ROW_START_Y := 130
+	# 스크롤 컨테이너 (세로 스크롤, 가로 고정)
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	root_vbox.add_child(scroll)
 
-	for i in range(hero_ids.size()):
-		var hid: String = hero_ids[i]
+	# 스크롤 내부: 여백 컨테이너
+	var margin := MarginContainer.new()
+	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	margin.add_theme_constant_override("margin_left", 60)
+	margin.add_theme_constant_override("margin_right", 60)
+	margin.add_theme_constant_override("margin_top", 30)
+	margin.add_theme_constant_override("margin_bottom", 30)
+	scroll.add_child(margin)
+
+	# 카드 그리드를 가로 중앙 정렬
+	var hbox := HBoxContainer.new()
+	hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	margin.add_child(hbox)
+
+	var grid := GridContainer.new()
+	grid.columns = COLS
+	grid.add_theme_constant_override("h_separation", 50)
+	grid.add_theme_constant_override("v_separation", 40)
+	hbox.add_child(grid)
+
+	# 카드 생성
+	for hid in _HR.all_hero_ids():
 		var info: Dictionary = _HR.get_display_info(hid)
-		var col: int = i % COLS
-		var row: int = i / COLS
-		var row_count: int = (hero_ids.size() + COLS - 1) / COLS
-		var cols_in_row: int = COLS if row < row_count - 1 else ((hero_ids.size() - 1) % COLS + 1)
-		var row_w: float = cols_in_row * CARD_W + (cols_in_row - 1) * GAP_X
-		var x: float = (1920.0 - row_w) / 2.0 + col * (CARD_W + GAP_X)
-		var y: float = ROW_START_Y + row * (CARD_H + GAP_Y)
-
 		var already_owned: bool = is_recruit and hid in owned_ids
 		var is_locked: bool = (not is_recruit) and pm != null and not pm.is_hero_unlocked(hid)
 
-		var panel_color := Color(0.05, 0.05, 0.08) if (already_owned or is_locked) else Color(0.1, 0.1, 0.2)
-		var panel := ColorRect.new()
-		panel.color = panel_color
-		panel.position = Vector2(x, y)
-		panel.size = Vector2(CARD_W, CARD_H)
-		add_child(panel)
+		# 툴팁: 설명 + 잠금 조건
+		var tooltip: String = info.get("desc", "")
+		if is_locked:
+			var unlock_desc: String = info.get("unlock_description", "")
+			tooltip += "\n\n🔒 " + (unlock_desc if unlock_desc != "" else "해금 조건 미달성")
 
+		# 카드 패널
+		var panel := PanelContainer.new()
+		panel.custom_minimum_size = Vector2(CARD_W, CARD_H)
+		panel.tooltip_text = tooltip
+		panel.mouse_filter = Control.MOUSE_FILTER_STOP
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color(0.05, 0.05, 0.08) if (already_owned or is_locked) else Color(0.1, 0.1, 0.2)
+		style.corner_radius_top_left = 6
+		style.corner_radius_top_right = 6
+		style.corner_radius_bottom_left = 6
+		style.corner_radius_bottom_right = 6
+		panel.add_theme_stylebox_override("panel", style)
+		grid.add_child(panel)
+
+		var card_vbox := VBoxContainer.new()
+		panel.add_child(card_vbox)
+
+		# 이름 + HP
 		var name_lbl := Label.new()
 		name_lbl.text = "%s\nHP %d" % [info.get("name", hid), info.get("hp", 0)]
-		name_lbl.position = Vector2(x + 10, y + 10)
-		name_lbl.size = Vector2(CARD_W - 20, 70)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_lbl.add_theme_font_size_override("font_size", 24)
-		add_child(name_lbl)
+		name_lbl.add_theme_font_size_override("font_size", 22)
+		name_lbl.custom_minimum_size = Vector2(0, 70)
+		card_vbox.add_child(name_lbl)
 
-		var desc_lbl := Label.new()
-		desc_lbl.text = info.get("desc", "")
-		desc_lbl.position = Vector2(x + 20, y + 90)
-		desc_lbl.size = Vector2(CARD_W - 40, 280)
-		desc_lbl.add_theme_font_size_override("font_size", 15)
-		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		add_child(desc_lbl)
+		# 일러스트 플레이스홀더
+		var illust := ColorRect.new()
+		illust.color = Color(0.06, 0.06, 0.12) if is_locked else Color(0.08, 0.08, 0.18)
+		illust.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		illust.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card_vbox.add_child(illust)
 
-		if is_locked:
-			var lock_lbl := Label.new()
-			var unlock_desc: String = info.get("unlock_description", "")
-			lock_lbl.text = "🔒 잠금\n" + (unlock_desc if unlock_desc != "" else "해금 조건 미달성")
-			lock_lbl.position = Vector2(x + 20, y + 380)
-			lock_lbl.size = Vector2(CARD_W - 40, 50)
-			lock_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			lock_lbl.add_theme_font_size_override("font_size", 14)
-			add_child(lock_lbl)
-
+		# 선택 버튼
 		var btn := Button.new()
+		btn.custom_minimum_size = Vector2(0, 55)
+		btn.add_theme_font_size_override("font_size", 18)
 		if already_owned:
 			btn.text = "이미 보유 중"
 			btn.disabled = true
 		elif is_locked:
-			btn.text = "잠금"
+			btn.text = "🔒 잠금"
 			btn.disabled = true
 		elif is_recruit:
 			btn.text = info.get("name", hid) + " 영입"
 		else:
 			btn.text = info.get("name", hid) + " 선택"
-		btn.position = Vector2(x + 60, y + 410)
-		btn.size = Vector2(CARD_W - 120, 55)
-		btn.add_theme_font_size_override("font_size", 20)
 		if not already_owned and not is_locked:
 			var captured_id: String = hid
 			btn.pressed.connect(func(): _on_hero_selected(captured_id))
-		add_child(btn)
+		card_vbox.add_child(btn)
 
 func _on_hero_selected(hero_id: String) -> void:
 	if GameManager.pending_boss_recruit:

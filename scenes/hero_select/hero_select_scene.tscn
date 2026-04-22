@@ -2,5 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/hero_select/hero_select_scene.gd" id="1"]
 
-[node name="HeroSelectScene" type="Node2D"]
+[node name="HeroSelectScene" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 script = ExtResource("1")
