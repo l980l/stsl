@@ -436,7 +436,7 @@ func _setup_heroes() -> void:
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
 			var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
-			char_node.position = Vector2(HERO_X + SLOT_W / 2.0, slot_y + 200)
+			char_node.position = Vector2(HERO_X + SLOT_W / 2.0, slot_y + 184)
 			char_node.scale = Vector2(1.44, 2.4)
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
@@ -481,7 +481,7 @@ func _setup_enemies() -> void:
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
 			var slot_pos: Vector2 = _enemy_slot_pos(i, total)
-			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 200)
+			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
 			char_node.scale = Vector2(-1.44, 2.4)
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
