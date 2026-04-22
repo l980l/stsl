@@ -182,9 +182,10 @@ func _make_hero_slot(index: int) -> Dictionary:
 	hp_bar.z_index = 1
 	hp_bar.visible = false
 
-	var hp_lbl := _make_label(Vector2(bar_x, y + 28), Vector2(bar_w, bar_h), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, y + 28), Vector2(bar_w, bar_h), 9)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hp_lbl.clip_contents = true
 	hp_lbl.z_index = 1
 	hp_lbl.visible = false
 
@@ -247,9 +248,10 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 48), bar_w)
 	hp_bar.z_index = 1
 
-	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 48), Vector2(bar_w, bar_h), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 48), Vector2(bar_w, bar_h), 9)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hp_lbl.clip_contents = true
 	hp_lbl.z_index = 1
 
 	var block_lbl := _make_label(Vector2(bar_x, pos.y + 70), Vector2(bar_w, 16), 11)
@@ -292,13 +294,22 @@ func _make_label(pos: Vector2, sz: Vector2, font_size: int) -> Label:
 func _make_hp_bar(pos: Vector2, width: float) -> ProgressBar:
 	var bar := ProgressBar.new()
 	bar.position = pos
+	bar.custom_minimum_size = Vector2.ZERO
 	bar.size = Vector2(width, 7)
 	bar.show_percentage = false
 	var fill := StyleBoxFlat.new()
 	fill.bg_color = Color(0.8, 0.15, 0.15)
+	fill.content_margin_top = 0
+	fill.content_margin_bottom = 0
+	fill.content_margin_left = 0
+	fill.content_margin_right = 0
 	bar.add_theme_stylebox_override("fill", fill)
 	var bg := StyleBoxFlat.new()
 	bg.bg_color = Color(0.15, 0.15, 0.15)
+	bg.content_margin_top = 0
+	bg.content_margin_bottom = 0
+	bg.content_margin_left = 0
+	bg.content_margin_right = 0
 	bar.add_theme_stylebox_override("background", bg)
 	add_child(bar)
 	return bar
