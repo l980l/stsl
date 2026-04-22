@@ -11,7 +11,7 @@ const HERO_X := 20
 const ENEMY_X := 1440
 const ENEMY_COL_GAP := 20
 const SLOT_W := 240
-const SLOT_H := 280
+const SLOT_H := 220
 const BOTTOM_Y := 840
 const CARD_W := 110
 const CARD_H := 160
@@ -48,7 +48,7 @@ const DRAG_THRESHOLD := 10.0
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _token_tile_nodes: Dictionary = {}
-var _synergy_box: VBoxContainer = null
+var _synergy_box: HBoxContainer = null
 var _ppt_label: Label = null
 var _debug_badge: Label = null
 var _debug_hp_target_mode: bool = false
@@ -129,18 +129,20 @@ func _build_ui() -> void:
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
 	add_child(_end_turn_btn)
 
-	# 릴릭 표시
-	_relic_container = HBoxContainer.new()
-	_relic_container.position = Vector2(200, 8)
-	_relic_container.size = Vector2(1500, 36)
-	add_child(_relic_container)
-	_refresh_relics()
+	# 상단 바 — 시너지 → 릴릭 순서, 넘치면 자동 줄바꿈
+	var top_bar := FlowContainer.new()
+	top_bar.position = Vector2(20, 4)
+	top_bar.size = Vector2(WINDOW_W - 40, 72)
+	add_child(top_bar)
 
-	# 시너지 HUD
-	_synergy_box = VBoxContainer.new()
-	_synergy_box.position = Vector2(20, 750)
-	_synergy_box.size = Vector2(240, 80)
-	add_child(_synergy_box)
+	_synergy_box = HBoxContainer.new()
+	_synergy_box.add_theme_constant_override("separation", 6)
+	top_bar.add_child(_synergy_box)
+
+	_relic_container = HBoxContainer.new()
+	_relic_container.add_theme_constant_override("separation", 6)
+	top_bar.add_child(_relic_container)
+	_refresh_relics()
 
 	_ppt_label = Label.new()
 	_ppt_label.position = Vector2(20, 840)
@@ -165,9 +167,9 @@ func _make_hero_slot(index: int) -> Dictionary:
 	panel.visible = false
 	add_child(panel)
 
-	var name_lbl := _make_label(Vector2(HERO_X + 10, y + 196), Vector2(SLOT_W - 20, 28), 18)
-	var hp_lbl   := _make_label(Vector2(HERO_X + 10, y + 226), Vector2(SLOT_W - 20, 24), 15)
-	var block_lbl := _make_label(Vector2(HERO_X + 10, y + 250), Vector2(SLOT_W - 20, 22), 14)
+	var name_lbl := _make_label(Vector2(HERO_X + 108, y + 30), Vector2(124, 30), 18)
+	var hp_lbl   := _make_label(Vector2(HERO_X + 108, y + 64), Vector2(124, 26), 15)
+	var block_lbl := _make_label(Vector2(HERO_X + 108, y + 94), Vector2(124, 24), 14)
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 
 	var status_box := HBoxContainer.new()
@@ -195,9 +197,8 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	panel.visible = false
 	add_child(panel)
 
-	var intent_lbl := _make_label(Vector2(pos.x + 10, pos.y + 8), Vector2(SLOT_W - 20, 30), 20)
+	var intent_lbl := _make_label(Vector2(pos.x + 10, pos.y + 8), Vector2(124, 30), 20)
 	intent_lbl.modulate = Color(1.0, 0.8, 0.2)
-	intent_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	var btn := Button.new()
 	btn.flat = true
@@ -209,9 +210,9 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	btn.pressed.connect(func(): _on_enemy_pressed(captured_index))
 	add_child(btn)
 
-	var name_lbl  := _make_label(Vector2(pos.x + 10, pos.y + 204), Vector2(SLOT_W - 20, 26), 16)
-	var hp_lbl    := _make_label(Vector2(pos.x + 10, pos.y + 230), Vector2(SLOT_W - 20, 24), 14)
-	var block_lbl := _make_label(Vector2(pos.x + 10, pos.y + 254), Vector2(SLOT_W - 20, 22), 13)
+	var name_lbl  := _make_label(Vector2(pos.x + 10, pos.y + 44), Vector2(124, 28), 16)
+	var hp_lbl    := _make_label(Vector2(pos.x + 10, pos.y + 76), Vector2(124, 26), 14)
+	var block_lbl := _make_label(Vector2(pos.x + 10, pos.y + 104), Vector2(124, 22), 13)
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 
 	var status_box := HBoxContainer.new()
@@ -367,7 +368,8 @@ func _setup_heroes() -> void:
 
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
-			char_node.position = Vector2(HERO_X + 110, 80 + i * (SLOT_H + SLOT_GAP) + 120)
+			char_node.position = Vector2(HERO_X + 54, 80 + i * (SLOT_H + SLOT_GAP) + 180)
+			char_node.scale = Vector2(1.2, 2.0)
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
 
@@ -409,9 +411,9 @@ func _setup_enemies() -> void:
 
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
-			var pos: Vector2 = _enemy_slot_pos(i, total)
-			char_node.position = Vector2(pos.x + 110, pos.y + 120)
-			char_node.scale = Vector2(-1, 1)
+			var slot_pos: Vector2 = _enemy_slot_pos(i, total)
+			char_node.position = Vector2(slot_pos.x + 186, slot_pos.y + 180)
+			char_node.scale = Vector2(-1.2, 2.0)
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
 
@@ -871,12 +873,11 @@ func _refresh_synergy_hud() -> void:
 		child.queue_free()
 	for s in BattleManager.get_active_synergies():
 		var lbl := Label.new()
-		lbl.text = s["name"]
+		lbl.text = "[%s]" % s["name"]
 		lbl.tooltip_text = s["desc"]
 		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 		lbl.add_theme_font_size_override("font_size", 13)
 		lbl.modulate = Color(1.0, 0.0, 1.0)
-		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_synergy_box.add_child(lbl)
 
 func _on_card_button_down(card: Resource) -> void:
