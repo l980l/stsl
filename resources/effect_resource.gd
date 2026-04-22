@@ -39,6 +39,15 @@ enum EffectType {
 @export var hit_count: int = 1              # DAMAGE 히트 횟수 (이도류, 징기스의 분노)
 @export var condition: String = ""  # 빈 문자열=무조건 발동. "hand_size_0"등 조건 키 설정 시 조건 불충족이면 이 효과 스킵
 
+const _STATUS_NAME_KEYS := {
+	"weak":       "status.weak.name",
+	"vulnerable": "status.vulnerable.name",
+	"morale":     "status.morale.name",
+	"charm":      "status.charm.name",
+	"strength":   "status.strength.name",
+	"taunt":      "status.taunt.name",
+}
+
 func display_text() -> String:
 	match effect_type:
 		EffectType.DAMAGE:
@@ -52,9 +61,9 @@ func display_text() -> String:
 			return "영웅수×%d 방어" % value
 		EffectType.APPLY_STATUS:
 			if status_type == "poison":
-				return "독 %d 데미지" % (value * 10)
-			var st_name: String = {"weak":"약화","vulnerable":"취약",
-				"morale":"사기","charm":"매혹","strength":"강화","taunt":"도발"}.get(status_type, status_type)
+				return "%s %d 데미지" % [tr("status.poison.name"), value * 10]
+			var st_key: String = _STATUS_NAME_KEYS.get(status_type, "")
+			var st_name: String = tr(st_key) if st_key else status_type
 			return "%s %d" % [st_name, value]
 		EffectType.DRAW:        return "드로우 %d" % value
 		EffectType.ENERGY:      return "에너지 +%d" % value

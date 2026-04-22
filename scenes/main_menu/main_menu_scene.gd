@@ -12,7 +12,8 @@ func _build_ui() -> void:
 	add_child(bg)
 
 	var title := Label.new()
-	title.text = "STSL"
+	title.text = "ui.main_menu.title"
+	title.auto_translate_mode = Control.AUTO_TRANSLATE_MODE_ALWAYS
 	title.position = Vector2(660, 200)
 	title.size = Vector2(600, 100)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -21,7 +22,8 @@ func _build_ui() -> void:
 	add_child(title)
 
 	var btn_new := Button.new()
-	btn_new.text = "새 게임"
+	btn_new.text = "ui.main_menu.new_game"
+	btn_new.auto_translate_mode = Control.AUTO_TRANSLATE_MODE_ALWAYS
 	btn_new.position = Vector2(810, 420)
 	btn_new.size = Vector2(300, 60)
 	btn_new.add_theme_font_size_override("font_size", 24)
@@ -30,12 +32,31 @@ func _build_ui() -> void:
 
 	if SaveManager.has_save():
 		var btn_cont := Button.new()
-		btn_cont.text = "이어하기"
+		btn_cont.text = "ui.main_menu.continue"
+		btn_cont.auto_translate_mode = Control.AUTO_TRANSLATE_MODE_ALWAYS
 		btn_cont.position = Vector2(810, 500)
 		btn_cont.size = Vector2(300, 60)
 		btn_cont.add_theme_font_size_override("font_size", 24)
 		btn_cont.pressed.connect(_on_continue)
 		add_child(btn_cont)
+
+	var lang_lbl := Label.new()
+	lang_lbl.text = "ui.main_menu.language_label"
+	lang_lbl.auto_translate_mode = Control.AUTO_TRANSLATE_MODE_ALWAYS
+	lang_lbl.position = Vector2(1600, 40)
+	lang_lbl.size = Vector2(80, 40)
+	lang_lbl.add_theme_font_size_override("font_size", 16)
+	add_child(lang_lbl)
+
+	var lang_opt := OptionButton.new()
+	lang_opt.position = Vector2(1690, 40)
+	lang_opt.size = Vector2(200, 40)
+	lang_opt.add_theme_font_size_override("font_size", 16)
+	for code in LocaleManager.LOCALES:
+		lang_opt.add_item(LocaleManager.get_display_name(code))
+	lang_opt.selected = LocaleManager.LOCALES.find(LocaleManager.current_locale)
+	lang_opt.item_selected.connect(func(idx: int): LocaleManager.set_locale(LocaleManager.LOCALES[idx]))
+	add_child(lang_opt)
 
 func _on_new_game() -> void:
 	SaveManager.clear_save()

@@ -1,0 +1,12 @@
+keys,ko,en,fr,it,es,ar,ja,el,zh
+ui.main_menu.title,STSL,,,,,,,,
+ui.main_menu.new_game,새 게임,New Game,,,,,,,
+ui.main_menu.continue,이어하기,Continue,,,,,,,
+ui.main_menu.language_label,언어,Language,,,,,,,
+status.weak.name,약화,Weak,,,,,,,
+status.vulnerable.name,취약,Vulnerable,,,,,,,
+status.poison.name,독,Poison,,,,,,,
+status.strength.name,강화,Strength,,,,,,,
+status.charm.name,매혹,Charm,,,,,,,
+status.taunt.name,도발,Taunt,,,,,,,
+status.morale.name,사기,Morale,,,,,,,
