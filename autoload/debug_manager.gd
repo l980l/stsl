@@ -111,6 +111,15 @@ func _open_hero_add_dialog() -> void:
 	if tm:
 		for h in tm.heroes:
 			current_ids[h.hero_id] = true
+	if current_ids.size() >= 3:
+		var dlg := AcceptDialog.new()
+		dlg.title = "파티 추가 불가"
+		dlg.dialog_text = "파티원이 이미 3명입니다."
+		dlg.confirmed.connect(func(): dlg.queue_free())
+		dlg.canceled.connect(func(): dlg.queue_free())
+		get_tree().root.add_child(dlg)
+		dlg.popup_centered()
+		return
 	var opts: Array = []
 	for hid in HR.all_hero_ids():
 		var info: Dictionary = HR.get_display_info(hid)
