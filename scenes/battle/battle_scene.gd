@@ -168,32 +168,36 @@ func _make_hero_slot(index: int) -> Dictionary:
 	panel.visible = false
 	add_child(panel)
 
-	# HP바 1.7× 크기(211×24), 슬롯 가로 중앙
+	# UI 상단 배치, 스프라이트는 그 뒤에 렌더 (z_index=1 for UI)
 	var bar_w: float = 211.0
-	var bar_h: float = 24.0
+	var bar_h: float = 18.0
 	var bar_x: float = HERO_X + (SLOT_W - bar_w) / 2.0
 
-	var name_lbl := _make_label(Vector2(bar_x, y + 178), Vector2(bar_w, 26), 18)
+	var name_lbl := _make_label(Vector2(bar_x, y + 4), Vector2(bar_w, 22), 16)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.z_index = 1
 	name_lbl.visible = false
 
-	var hp_bar := _make_hp_bar(Vector2(bar_x, y + 208), bar_w)
+	var hp_bar := _make_hp_bar(Vector2(bar_x, y + 28), bar_w)
+	hp_bar.z_index = 1
 	hp_bar.visible = false
 
-	# HP 텍스트 — bar와 동일 위치/크기, 가로·세로 중앙 정렬
-	var hp_lbl := _make_label(Vector2(bar_x, y + 208), Vector2(bar_w, bar_h), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, y + 28), Vector2(bar_w, bar_h), 12)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hp_lbl.z_index = 1
 	hp_lbl.visible = false
 
-	var block_lbl := _make_label(Vector2(bar_x, y + 236), Vector2(bar_w, 20), 13)
+	var block_lbl := _make_label(Vector2(bar_x, y + 50), Vector2(bar_w, 18), 12)
 	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
+	block_lbl.z_index = 1
 	block_lbl.visible = false
 
 	var status_box := HBoxContainer.new()
-	status_box.position = Vector2(bar_x, y + 258)
-	status_box.size = Vector2(bar_w, 20)
+	status_box.position = Vector2(bar_x, y + 70)
+	status_box.size = Vector2(bar_w, 18)
+	status_box.z_index = 1
 	status_box.visible = false
 	add_child(status_box)
 
@@ -218,12 +222,13 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	add_child(panel)
 
 	var bar_w: float = 211.0
-	var bar_h: float = 24.0
+	var bar_h: float = 18.0
 	var bar_x: float = pos.x + (SLOT_W - bar_w) / 2.0
 
-	var intent_lbl := _make_label(Vector2(pos.x, pos.y + 8), Vector2(SLOT_W, 30), 20)
+	var intent_lbl := _make_label(Vector2(pos.x, pos.y + 4), Vector2(SLOT_W, 22), 18)
 	intent_lbl.modulate = Color(1.0, 0.8, 0.2)
 	intent_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	intent_lbl.z_index = 1
 
 	var btn := Button.new()
 	btn.flat = true
@@ -235,22 +240,27 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	btn.pressed.connect(func(): _on_enemy_pressed(captured_index))
 	add_child(btn)
 
-	var name_lbl  := _make_label(Vector2(bar_x, pos.y + 178), Vector2(bar_w, 26), 16)
+	var name_lbl := _make_label(Vector2(bar_x, pos.y + 28), Vector2(bar_w, 18), 14)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.z_index = 1
 
-	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 208), bar_w)
+	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 48), bar_w)
+	hp_bar.z_index = 1
 
-	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 208), Vector2(bar_w, bar_h), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 48), Vector2(bar_w, bar_h), 12)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hp_lbl.z_index = 1
 
-	var block_lbl := _make_label(Vector2(bar_x, pos.y + 236), Vector2(bar_w, 20), 13)
+	var block_lbl := _make_label(Vector2(bar_x, pos.y + 70), Vector2(bar_w, 16), 11)
 	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
+	block_lbl.z_index = 1
 
 	var status_box := HBoxContainer.new()
-	status_box.position = Vector2(bar_x, pos.y + 258)
-	status_box.size = Vector2(bar_w, 20)
+	status_box.position = Vector2(bar_x, pos.y + 88)
+	status_box.size = Vector2(bar_w, 18)
+	status_box.z_index = 1
 	add_child(status_box)
 
 	return { "panel": panel, "intent_lbl": intent_lbl, "btn": btn,
@@ -282,7 +292,7 @@ func _make_label(pos: Vector2, sz: Vector2, font_size: int) -> Label:
 func _make_hp_bar(pos: Vector2, width: float) -> ProgressBar:
 	var bar := ProgressBar.new()
 	bar.position = pos
-	bar.size = Vector2(width, 24)
+	bar.size = Vector2(width, 18)
 	bar.show_percentage = false
 	var fill := StyleBoxFlat.new()
 	fill.bg_color = Color(0.8, 0.15, 0.15)
@@ -426,8 +436,8 @@ func _setup_heroes() -> void:
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
 			var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
-			char_node.position = Vector2(HERO_X + SLOT_W / 2.0, slot_y + 170)
-			char_node.scale = Vector2(1.2, 2.0)
+			char_node.position = Vector2(HERO_X + SLOT_W / 2.0, slot_y + SLOT_H)
+			char_node.scale = Vector2(1.44, 2.4)
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
 
@@ -471,8 +481,8 @@ func _setup_enemies() -> void:
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
 			var slot_pos: Vector2 = _enemy_slot_pos(i, total)
-			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 170)
-			char_node.scale = Vector2(-1.2, 2.0)
+			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + SLOT_H)
+			char_node.scale = Vector2(-1.44, 2.4)
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
 
