@@ -188,10 +188,11 @@ func _make_hero_slot(index: int) -> Dictionary:
 	hp_lbl.z_index = 1
 	hp_lbl.visible = false
 
-	var block_lbl := _make_label(Vector2(bar_x, y + 50), Vector2(bar_w, 18), 12)
-	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var block_lbl := _make_label(Vector2(bar_x, y + 22), Vector2(bar_w, 24), 12)
+	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	block_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
-	block_lbl.z_index = 1
+	block_lbl.z_index = 2
 	block_lbl.visible = false
 
 	var status_box := HBoxContainer.new()
@@ -252,10 +253,11 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hp_lbl.z_index = 1
 
-	var block_lbl := _make_label(Vector2(bar_x, pos.y + 70), Vector2(bar_w, 16), 11)
-	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var block_lbl := _make_label(Vector2(bar_x, pos.y + 42), Vector2(bar_w, 24), 12)
+	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	block_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
-	block_lbl.z_index = 1
+	block_lbl.z_index = 2
 
 	var status_box := HBoxContainer.new()
 	status_box.position = Vector2(bar_x, pos.y + 62)
