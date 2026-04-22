@@ -11,7 +11,7 @@ const HERO_X := 20
 const ENEMY_X := 1440
 const ENEMY_COL_GAP := 20
 const SLOT_W := 240
-const SLOT_H := 220
+const SLOT_H := 280
 const BOTTOM_Y := 840
 const CARD_W := 110
 const CARD_H := 160
@@ -113,9 +113,10 @@ func _build_ui() -> void:
 
 	# 에너지 레이블
 	_energy_label = Label.new()
-	_energy_label.position = Vector2(30, BOTTOM_Y + 16)
-	_energy_label.size = Vector2(160, 50)
-	_energy_label.add_theme_font_size_override("font_size", 26)
+	_energy_label.position = Vector2(WINDOW_W - 220, BOTTOM_Y - 34)
+	_energy_label.size = Vector2(200, 30)
+	_energy_label.add_theme_font_size_override("font_size", 22)
+	_energy_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_energy_label.text = "⚡ 0 / 3"
 	add_child(_energy_label)
 
@@ -168,8 +169,9 @@ func _make_hero_slot(index: int) -> Dictionary:
 	add_child(panel)
 
 	var name_lbl := _make_label(Vector2(HERO_X + 108, y + 30), Vector2(124, 30), 18)
-	var hp_lbl   := _make_label(Vector2(HERO_X + 108, y + 64), Vector2(124, 26), 15)
-	var block_lbl := _make_label(Vector2(HERO_X + 108, y + 94), Vector2(124, 24), 14)
+	var hp_bar   := _make_hp_bar(Vector2(HERO_X + 108, y + 66), 124)
+	var hp_lbl   := _make_label(Vector2(HERO_X + 108, y + 83), Vector2(124, 20), 12)
+	var block_lbl := _make_label(Vector2(HERO_X + 108, y + 106), Vector2(124, 24), 14)
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 
 	var status_box := HBoxContainer.new()
@@ -177,7 +179,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 	status_box.size = Vector2(SLOT_W - 8, 20)
 	add_child(status_box)
 
-	return { "panel": panel, "name_lbl": name_lbl,
+	return { "panel": panel, "name_lbl": name_lbl, "hp_bar": hp_bar,
 			 "hp_lbl": hp_lbl, "block_lbl": block_lbl,
 			 "hero_id": "", "status_box": status_box }
 
@@ -211,8 +213,9 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	add_child(btn)
 
 	var name_lbl  := _make_label(Vector2(pos.x + 10, pos.y + 44), Vector2(124, 28), 16)
-	var hp_lbl    := _make_label(Vector2(pos.x + 10, pos.y + 76), Vector2(124, 26), 14)
-	var block_lbl := _make_label(Vector2(pos.x + 10, pos.y + 104), Vector2(124, 22), 13)
+	var hp_bar    := _make_hp_bar(Vector2(pos.x + 10, pos.y + 78), 124)
+	var hp_lbl    := _make_label(Vector2(pos.x + 10, pos.y + 95), Vector2(124, 20), 12)
+	var block_lbl := _make_label(Vector2(pos.x + 10, pos.y + 118), Vector2(124, 22), 13)
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 
 	var status_box := HBoxContainer.new()
@@ -221,8 +224,8 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	add_child(status_box)
 
 	return { "panel": panel, "intent_lbl": intent_lbl, "btn": btn,
-			 "name_lbl": name_lbl, "hp_lbl": hp_lbl, "block_lbl": block_lbl,
-			 "status_box": status_box }
+			 "name_lbl": name_lbl, "hp_bar": hp_bar, "hp_lbl": hp_lbl,
+			 "block_lbl": block_lbl, "status_box": status_box }
 
 func _refresh_relics() -> void:
 	for child in _relic_container.get_children():
@@ -245,6 +248,20 @@ func _make_label(pos: Vector2, sz: Vector2, font_size: int) -> Label:
 	lbl.add_theme_font_size_override("font_size", font_size)
 	add_child(lbl)
 	return lbl
+
+func _make_hp_bar(pos: Vector2, width: float) -> ProgressBar:
+	var bar := ProgressBar.new()
+	bar.position = pos
+	bar.size = Vector2(width, 14)
+	bar.show_percentage = false
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = Color(0.8, 0.15, 0.15)
+	bar.add_theme_stylebox_override("fill", fill)
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0.15, 0.15, 0.15)
+	bar.add_theme_stylebox_override("background", bg)
+	add_child(bar)
+	return bar
 
 # ─────────────────────────────────────────────
 # 시그널 연결 (스텁 — Task 3~5에서 채움)
@@ -387,6 +404,7 @@ func _setup_enemies() -> void:
 		entry["intent_lbl"].queue_free()
 		entry["btn"].queue_free()
 		entry["name_lbl"].queue_free()
+		entry["hp_bar"].queue_free()
 		entry["hp_lbl"].queue_free()
 		entry["block_lbl"].queue_free()
 		entry["status_box"].queue_free()
@@ -428,12 +446,14 @@ func _update_hero_ui(hero_id: String) -> void:
 			return
 		var cur_hp: int = TeamManager.get_current_hp(hero_id)
 		var block: int = BattleManager.get_hero_block(hero_id)
-		var block_str: String = "  🛡%d" % block if block > 0 else ""
 		var status: Dictionary = BattleManager.get_hero_status(hero_id)
 		var morale: int = status.get("morale", 0)
-		var morale_str: String = "  ★%d" % morale if morale > 0 else ""
-		entry["hp_lbl"].text = "HP %d/%d%s%s" % [cur_hp, hero.max_hp, block_str, morale_str]
-		entry["block_lbl"].text = ""
+		entry["hp_bar"].max_value = hero.max_hp
+		entry["hp_bar"].value = cur_hp
+		entry["hp_lbl"].text = "%d / %d" % [cur_hp, hero.max_hp]
+		var block_str: String = "🛡%d " % block if block > 0 else ""
+		var morale_str: String = "★%d" % morale if morale > 0 else ""
+		entry["block_lbl"].text = block_str + morale_str
 		if not TeamManager.is_alive(hero_id):
 			entry["panel"].modulate = Color(0.4, 0.4, 0.4)
 		_refresh_status_icons_hero(hero_id)
@@ -506,9 +526,10 @@ func _update_enemy_ui(index: int) -> void:
 		return
 	var cur_hp: int = BattleManager.get_enemy_hp(index)
 	var block: int = BattleManager.get_enemy_block(index)
-	var block_str: String = "  🛡%d" % block if block > 0 else ""
-	entry["hp_lbl"].text = "HP %d/%d%s" % [cur_hp, enemy.max_hp, block_str]
-	entry["block_lbl"].text = ""
+	entry["hp_bar"].max_value = enemy.max_hp
+	entry["hp_bar"].value = cur_hp
+	entry["hp_lbl"].text = "%d / %d" % [cur_hp, enemy.max_hp]
+	entry["block_lbl"].text = "🛡%d" % block if block > 0 else ""
 
 	# 의도 표시
 	var intent: Resource = BattleManager.get_enemy_current_intent(index)
