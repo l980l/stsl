@@ -246,6 +246,23 @@ func _generate_cards() -> void:
 			starter_parts.append("%s ×%d" % [cname, starter_count[cname]])
 		md += "### 시작 덱\n- %s\n\n" % ", ".join(starter_parts)
 
+		# 시작 덱 카드도 CSV에 추가 (중복 제거)
+		var seen_starters: Dictionary = {}
+		for card in starter:
+			if card.card_name in seen_starters:
+				continue
+			seen_starters[card.card_name] = true
+			var max_lv: int = card.max_upgrade_level()
+			var eff0: String = _format_effects(card)
+			var eff1: String = "—" if max_lv < 1 else _format_effects(_apply_upgrade(card, 1))
+			var eff2: String = "—" if max_lv < 2 else _format_effects(_apply_upgrade(card, 2))
+			csv_rows.append([
+				hero["id"], card.card_name, card.cost,
+				_card_type_name(card.card_type),
+				_rarity_name(card.rarity),
+				max_lv, eff0, eff1 if max_lv >= 1 else "", eff2 if max_lv >= 2 else ""
+			])
+
 		# 카드 풀
 		var pool: Array = cls.pool()
 		md += "### 카드 풀 (%d종)\n\n" % pool.size()
