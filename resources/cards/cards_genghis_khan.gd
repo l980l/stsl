@@ -593,15 +593,15 @@ static func _great_steppe_siege() -> Resource:
 	eb.value = 3; eb.base_value = 3
 	c.effects = [ea, eb]; return c
 
-	# #41 초원의 군주 — RARE, cost 2, POWER, 약탈: 매 턴 드로우 +1
-	static func _steppe_lord() -> Resource:
-		var c := CardRes.new()
-		c.card_name = TranslationServer.translate("card.genghis_khan.steppe_lord.name"); c.owner_id = "genghis_khan"
-		c.cost = 2; c.card_type = CardRes.CardType.POWER
-		c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-		c.archetype = TranslationServer.translate("card.genghis_khan.steppe_lord.archetype")
-		var e := EffRes.new()
-		e.effect_type = EffRes.EffectType.APPLY_STATUS
-		e.status_type = "power.draw_per_turn"
-		e.value = 1; e.base_value = 1
-		c.effects = [e]; return c
+# #41 초원의 군주 — RARE, cost 2, POWER, 약탈: 매 턴 드로우 +1
+static func _steppe_lord() -> Resource:
+	var c := CardRes.new()
+	c.card_name = TranslationServer.translate("card.genghis_khan.steppe_lord.name"); c.owner_id = "genghis_khan"
+	c.cost = 2; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = TranslationServer.translate("card.genghis_khan.steppe_lord.archetype")
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.draw_per_turn"
+	e.value = 1; e.base_value = 1
+	c.effects = [e]; return c

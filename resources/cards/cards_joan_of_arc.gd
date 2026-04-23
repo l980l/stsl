@@ -617,15 +617,15 @@ static func _holy_war() -> Resource:
 	eb.value = 120; eb.base_value = 120
 	c.effects = [ea, eb]; return c
 
-	# #41 성가대 — RARE, cost 2, POWER, 신성: 매 턴 팀 전체 회복 +20
-	static func _choir() -> Resource:
-		var c := CardRes.new()
-		c.card_name = TranslationServer.translate("card.joan_of_arc.choir.name"); c.owner_id = "joan_of_arc"
-		c.cost = 2; c.card_type = CardRes.CardType.POWER
-		c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-		c.archetype = TranslationServer.translate("card.joan_of_arc.choir.archetype")
-		var e := EffRes.new()
-		e.effect_type = EffRes.EffectType.APPLY_STATUS
-		e.status_type = "power.heal_team_per_turn"
-		e.value = 20; e.base_value = 20
-		c.effects = [e]; return c
+# #41 성가대 — RARE, cost 2, POWER, 신성: 매 턴 팀 전체 회복 +20
+static func _choir() -> Resource:
+	var c := CardRes.new()
+	c.card_name = TranslationServer.translate("card.joan_of_arc.choir.name"); c.owner_id = "joan_of_arc"
+	c.cost = 2; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = TranslationServer.translate("card.joan_of_arc.choir.archetype")
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.heal_team_per_turn"
+	e.value = 20; e.base_value = 20
+	c.effects = [e]; return c
