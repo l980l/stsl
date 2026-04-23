@@ -7,9 +7,9 @@ extends RefCounted
 # - Label + autowrap 있음 → 세로 초과 시 축소 (줄바꿈 발생, width 고정)
 # - Label autowrap 없음 / Button / 기타 Control → 가로 초과 시 축소 (1줄 유지)
 static func fit_text(control: Control, max_px: int, min_px: int) -> void:
-	var tree := control.get_tree()
-	if tree == null:
+	if not control.is_inside_tree():
 		return
+	var tree := control.get_tree()
 	var fs := max_px
 	control.add_theme_font_size_override("font_size", fs)
 	await tree.process_frame
