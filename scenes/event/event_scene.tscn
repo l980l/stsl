@@ -1,4 +1,4 @@
-﻿[gd_scene load_steps=4 format=3 uid="uid://event_scene"]
+[gd_scene load_steps=4 format=3 uid="uid://event_scene"]
 
 [ext_resource type="Script" path="res://scenes/event/event_scene.gd" id="1_script"]
 
