@@ -1,7 +1,8 @@
 # resources/enemies/korean/korean_act3.gd
 # 한국 신화 — Act 3 엘리트 3종(저승 판관·갓신·처용신) + 보스(구삼승할망)
-const EnemyRes  = preload("res://resources/enemy_resource.gd")
-const IntentRes = preload("res://resources/intent_resource.gd")
+const EnemyRes   = preload("res://resources/enemy_resource.gd")
+const IntentRes  = preload("res://resources/intent_resource.gd")
+const CardResource = preload("res://resources/card_resource.gd")
 
 static func underworld_judge(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
@@ -21,6 +22,18 @@ static func underworld_judge(scene: PackedScene) -> Resource:
 	i5.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 1
+	# 카드 타입 카운터: 공격 카드 4장마다 HP 가장 낮은 영웅에게 50 즉결 데미지
+	var _jtrigger := IntentRes.new()
+	_jtrigger.action_type = IntentRes.ActionType.ATTACK
+	_jtrigger.value = 50
+	_jtrigger.target = IntentRes.TargetType.LOWEST_HP
+	_jtrigger.play_animation = "attack"
+	e.card_count_trigger = {
+		"card_type": CardResource.CardType.ATTACK,
+		"threshold": 4,
+		"intent": _jtrigger,
+		"repeat": true,
+	}
 	return e
 
 static func gat_spirit(scene: PackedScene) -> Resource:

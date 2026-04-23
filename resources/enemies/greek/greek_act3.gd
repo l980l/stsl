@@ -1,7 +1,8 @@
 # resources/enemies/greek/greek_act3.gd
 # 그리스 신화 — Act3 엘리트 3종 + 보스(크로노스)
-const EnemyRes  = preload("res://resources/enemy_resource.gd")
-const IntentRes = preload("res://resources/intent_resource.gd")
+const EnemyRes   = preload("res://resources/enemy_resource.gd")
+const IntentRes  = preload("res://resources/intent_resource.gd")
+const CardResource = preload("res://resources/card_resource.gd")
 
 # ──── 엘리트 3종 ────
 
@@ -103,6 +104,19 @@ static func kronos(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]
+	# 카드 타입 카운터: 기술 카드 5장마다 영웅 전체에 취약 +2 부여
+	var _ktrigger := IntentRes.new()
+	_ktrigger.action_type = IntentRes.ActionType.DEBUFF
+	_ktrigger.value = 2
+	_ktrigger.target = IntentRes.TargetType.ALL
+	_ktrigger.status_type = "vulnerable"
+	_ktrigger.play_animation = "buff"
+	e.card_count_trigger = {
+		"card_type": CardResource.CardType.SKILL,
+		"threshold": 5,
+		"intent": _ktrigger,
+		"repeat": true,
+	}
 	return e
 
 # ──── API ────
