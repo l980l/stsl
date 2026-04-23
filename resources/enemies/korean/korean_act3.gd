@@ -2,7 +2,6 @@
 # 한국 신화 — Act 3 엘리트 3종(저승 판관·갓신·처용신) + 보스(구삼승할망)
 const EnemyRes   = preload("res://resources/enemy_resource.gd")
 const IntentRes  = preload("res://resources/intent_resource.gd")
-const CardResource = preload("res://resources/card_resource.gd")
 
 static func underworld_judge(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
