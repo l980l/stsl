@@ -138,6 +138,8 @@ func _room_type_text(room_type: int) -> String:
 		MapNodeRes.RoomType.REST: return tr("ui.map.room_rest")
 		MapNodeRes.RoomType.SHOP: return tr("ui.map.room_shop")
 		MapNodeRes.RoomType.BOSS: return tr("ui.map.room_boss")
+		MapNodeRes.RoomType.EVENT: return tr("ui.map.room_event")
+		MapNodeRes.RoomType.SECRET: return tr("ui.map.room_type.secret")
 		_: return "?"
 
 func _show_deck_viewer() -> void:
