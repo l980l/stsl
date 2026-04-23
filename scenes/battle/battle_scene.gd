@@ -681,11 +681,9 @@ func _on_card_unhovered(_card: Resource) -> void:
 func _reposition_card_tooltip() -> void:
 	if _card_tooltip == null:
 		return
-	const W := 280.0
-	const H := 400.0
-	var mp := get_global_mouse_position()
-	var x := clamp(mp.x - W / 2.0, 0.0, 1920.0 - W)
-	var y := clamp(mp.y - H - 20.0, 0.0, 1080.0 - H)
+	var mp: Vector2 = get_global_mouse_position()
+	var x: float = clamp(mp.x - 140.0, 0.0, 1640.0)
+	var y: float = clamp(mp.y - 420.0, 0.0, 680.0)
 	_card_tooltip.position = Vector2(x, y)
 
 func _free_card_tooltip() -> void:
