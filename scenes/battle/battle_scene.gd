@@ -264,21 +264,9 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	status_box.z_index = 1
 	add_child(status_box)
 
-	var counter_lbl := Label.new()
-	counter_lbl.position = Vector2(pos.x + SLOT_W - 80, pos.y + 4)
-	counter_lbl.size = Vector2(78, 22)
-	counter_lbl.add_theme_font_size_override("font_size", 14)
-	counter_lbl.modulate = Color(1.0, 0.7, 0.4)
-	counter_lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-	counter_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	counter_lbl.visible = false
-	counter_lbl.z_index = 2
-	add_child(counter_lbl)
-
 	return { "panel": panel, "intent_lbl": intent_lbl, "btn": btn,
 			 "name_lbl": name_lbl, "hp_bar": hp_bar, "hp_lbl": hp_lbl,
-			 "block_lbl": block_lbl, "status_box": status_box,
-			 "counter_lbl": counter_lbl }
+			 "block_lbl": block_lbl, "status_box": status_box }
 
 func _refresh_relics() -> void:
 	for child in _relic_container.get_children():
@@ -482,7 +470,6 @@ func _setup_enemies() -> void:
 		entry["hp_lbl"].queue_free()
 		entry["block_lbl"].queue_free()
 		entry["status_box"].queue_free()
-		entry["counter_lbl"].queue_free()
 	_enemy_nodes.clear()
 	_enemy_status_containers.clear()
 
@@ -979,6 +966,26 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		if val <= 0:
 			continue
 		box.add_child(_make_status_label(key, val, status))
+	# 카드 카운터가 있으면 상태 아이콘 영역에 버프처럼 표시
+	var cinfo: Dictionary = BattleManager.get_enemy_counter(index)
+	if not cinfo.is_empty():
+		var ct: int = int(cinfo.get("card_type", -1))
+		var label_key: String = ""
+		match ct:
+			CardResource.CardType.ATTACK: label_key = "enemy.counter.attack.label"
+			CardResource.CardType.SKILL:  label_key = "enemy.counter.skill.label"
+			CardResource.CardType.POWER:  label_key = "enemy.counter.power.label"
+		if label_key != "":
+			var lbl := Label.new()
+			lbl.text = tr(label_key) % [cinfo["count"], cinfo["threshold"]]
+			lbl.tooltip_text = _counter_tooltip_text(cinfo)
+			lbl.add_theme_font_size_override("font_size", 12)
+			lbl.custom_minimum_size = Vector2(0, 18)
+			lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+			lbl.modulate = Color(1.0, 0.75, 0.3)
+			box.add_child(lbl)
 
 func _on_morale_changed(hero_id: String, _new_value: int) -> void:
 	_update_hero_ui(hero_id)
@@ -1274,26 +1281,7 @@ func _on_enemy_counter_changed(enemy_index: int) -> void:
 func _refresh_enemy_counter(enemy_index: int) -> void:
 	if enemy_index < 0 or enemy_index >= _enemy_nodes.size():
 		return
-	var slot: Dictionary = _enemy_nodes[enemy_index]
-	var lbl: Label = slot.get("counter_lbl")
-	if lbl == null:
-		return
-	var info: Dictionary = BattleManager.get_enemy_counter(enemy_index)
-	if info.is_empty():
-		lbl.visible = false
-		return
-	var ct: int = int(info.get("card_type", -1))
-	var key: String = ""
-	match ct:
-		CardResource.CardType.ATTACK: key = "enemy.counter.attack.label"
-		CardResource.CardType.SKILL:  key = "enemy.counter.skill.label"
-		CardResource.CardType.POWER:  key = "enemy.counter.power.label"
-		_:
-			lbl.visible = false
-			return
-	lbl.text = tr(key) % [info["count"], info["threshold"]]
-	lbl.tooltip_text = _counter_tooltip_text(info)
-	lbl.visible = true
+	_refresh_status_icons_enemy(enemy_index)
 
 func _counter_tooltip_text(info: Dictionary) -> String:
 	var tkey: String = info.get("tooltip_key", "")
