@@ -1,7 +1,7 @@
 # scenes/card_pick/card_pick_scene.gd
 extends Node2D
 
-const CardScene = preload("res://scenes/card/card_scene.tscn")
+const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 const CARD_W := 140
 const CARD_H := 200
 
@@ -36,7 +36,7 @@ func _build_ui() -> void:
 
 	for i in range(GameManager.card_rewards.size()):
 		var card: Resource = GameManager.card_rewards[i]
-		var node := CardScene.instantiate()
+		var node: CardScene = CARD_SCENE.instantiate()
 		node.position = Vector2(start_x + i * 160, 400)
 		node.setup(card, node.Mode.REWARD)
 		node.card_clicked.connect(func(c): _on_card_selected(c, node))

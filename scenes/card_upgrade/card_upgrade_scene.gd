@@ -1,7 +1,7 @@
 # scenes/card_upgrade/card_upgrade_scene.gd
 extends Node2D
 
-const CardScene = preload("res://scenes/card/card_scene.tscn")
+const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 const CARD_W := 140
 const CARD_H := 200
 const COLS := 6
@@ -54,7 +54,7 @@ func _build_ui(upgradeable: Array) -> void:
 	scroll.add_child(grid)
 
 	for card: Resource in upgradeable:
-		var node := CardScene.instantiate()
+		var node: CardScene = CARD_SCENE.instantiate()
 		node.setup(card, node.Mode.UPGRADE)
 		node.card_clicked.connect(func(c): _on_card_selected(c))
 		grid.add_child(node)
