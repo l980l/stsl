@@ -601,22 +601,22 @@ func _update_enemy_ui(index: int) -> void:
 	if intent != null:
 		match intent.action_type:
 			IntentRes.ActionType.ATTACK:
-				entry["intent_lbl"].text = "⚔ %d" % intent.value
+				entry["intent_lbl"].text = tr("battle.intent.attack") % intent.value
 			IntentRes.ActionType.BUFF:
 				match intent.status_type:
-					"strength": entry["intent_lbl"].text = "💪 강화 %d" % intent.value
-					_:          entry["intent_lbl"].text = "🛡 %d" % intent.value
+					"strength": entry["intent_lbl"].text = tr("battle.intent.buff.strength") % intent.value
+					_:          entry["intent_lbl"].text = tr("battle.intent.buff.block") % intent.value
 			IntentRes.ActionType.DEBUFF:
-				entry["intent_lbl"].text = "💀 약화"
+				entry["intent_lbl"].text = tr("battle.intent.debuff")
 			IntentRes.ActionType.PREPARE:
-				entry["intent_lbl"].text = "⏳ 준비"
+				entry["intent_lbl"].text = tr("battle.intent.prepare")
 			_:
 				entry["intent_lbl"].text = "?"
 
 	if not BattleManager.is_enemy_alive(index):
 		entry["panel"].modulate = Color(0.3, 0.3, 0.3)
 		entry["btn"].disabled = true
-		entry["intent_lbl"].text = "✝"
+		entry["intent_lbl"].text = tr("battle.intent.dead")
 
 	_refresh_status_icons_enemy(index)
 
