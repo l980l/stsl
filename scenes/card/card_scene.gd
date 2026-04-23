@@ -52,7 +52,7 @@ func _build_desc() -> String:
 	var lines: Array = []
 	for eff in _card.effects:
 		lines.append(eff.display_text())
-	return "\n".join(lines)
+	return ", ".join(lines)
 
 func _resolve_frame_texture(owner_id: String) -> Texture2D:
 	var hero_path := "%s%s_frame.png" % [FRAME_DIR, owner_id]
