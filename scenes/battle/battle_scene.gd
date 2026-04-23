@@ -3,6 +3,7 @@ extends Node2D
 
 const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const CardResource = preload("res://resources/card_resource.gd")
 const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 
@@ -250,9 +251,21 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	status_box.z_index = 1
 	add_child(status_box)
 
+	var counter_lbl := Label.new()
+	counter_lbl.position = Vector2(pos.x + SLOT_W - 80, pos.y + 4)
+	counter_lbl.size = Vector2(78, 22)
+	counter_lbl.add_theme_font_size_override("font_size", 14)
+	counter_lbl.modulate = Color(1.0, 0.7, 0.4)
+	counter_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	counter_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	counter_lbl.visible = false
+	counter_lbl.z_index = 2
+	add_child(counter_lbl)
+
 	return { "panel": panel, "intent_lbl": intent_lbl, "btn": btn,
 			 "name_lbl": name_lbl, "hp_bar": hp_bar, "hp_lbl": hp_lbl,
-			 "block_lbl": block_lbl, "status_box": status_box }
+			 "block_lbl": block_lbl, "status_box": status_box,
+			 "counter_lbl": counter_lbl }
 
 func _refresh_relics() -> void:
 	for child in _relic_container.get_children():
@@ -318,6 +331,7 @@ func _connect_signals() -> void:
 	BattleManager.status_applied.connect(_on_status_applied)
 	BattleManager.morale_changed.connect(_on_morale_changed)
 	BattleManager.active_powers_changed.connect(_on_active_powers_changed)
+	BattleManager.enemy_counter_changed.connect(_on_enemy_counter_changed)
 
 # ─────────────────────────────────────────────
 # 배틀 초기화
@@ -454,6 +468,7 @@ func _setup_enemies() -> void:
 		entry["hp_lbl"].queue_free()
 		entry["block_lbl"].queue_free()
 		entry["status_box"].queue_free()
+		entry["counter_lbl"].queue_free()
 	_enemy_nodes.clear()
 	_enemy_status_containers.clear()
 
@@ -482,6 +497,7 @@ func _setup_enemies() -> void:
 			_enemy_char_nodes[i] = char_node
 
 		_update_enemy_ui(i)
+		_refresh_enemy_counter(i)
 
 func _update_hero_ui(hero_id: String) -> void:
 	for entry in _hero_nodes:
@@ -1053,6 +1069,32 @@ func _refresh_debug_grid() -> void:
 		for border in _make_border_rects(int(pos.x), int(pos.y), SLOT_W, SLOT_H, Color(1.0, 0.3, 0.3, 0.8)):
 			add_child(border)
 			_debug_grid_nodes.append(border)
+
+func _on_enemy_counter_changed(enemy_index: int) -> void:
+	_refresh_enemy_counter(enemy_index)
+
+func _refresh_enemy_counter(enemy_index: int) -> void:
+	if enemy_index < 0 or enemy_index >= _enemy_nodes.size():
+		return
+	var slot: Dictionary = _enemy_nodes[enemy_index]
+	var lbl: Label = slot.get("counter_lbl")
+	if lbl == null:
+		return
+	var info: Dictionary = BattleManager.get_enemy_counter(enemy_index)
+	if info.is_empty():
+		lbl.visible = false
+		return
+	var ct: int = int(info.get("card_type", -1))
+	var key: String = ""
+	match ct:
+		CardResource.CardType.ATTACK: key = "enemy.counter.attack.label"
+		CardResource.CardType.SKILL:  key = "enemy.counter.skill.label"
+		CardResource.CardType.POWER:  key = "enemy.counter.power.label"
+		_:
+			lbl.visible = false
+			return
+	lbl.text = tr(key) % [info["count"], info["threshold"]]
+	lbl.visible = true
 
 func _make_border_rects(x: int, y: int, w: int, h: int, color: Color) -> Array:
 	var rects: Array = []
