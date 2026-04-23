@@ -4,7 +4,7 @@ extends Node2D
 const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
-const CardScene = preload("res://scenes/card/card_scene.tscn")
+const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 
 const WINDOW_W := 1920
 const WINDOW_H := 1080
@@ -627,7 +627,7 @@ func _refresh_hand() -> void:
 
 	for i in range(hand.size()):
 		var card: Resource = hand[i]
-		var node := CardScene.instantiate()
+		var node: CardScene = CARD_SCENE.instantiate()
 		node.position = Vector2(start_x + i * (card_w + gap), BOTTOM_Y)
 		node.setup(card, node.Mode.HAND)
 		node.set_disabled(not DeckManager.can_play(card))
@@ -666,7 +666,7 @@ func _on_card_hovered(card: Resource) -> void:
 	if _drag_card != null:
 		return
 	_free_card_tooltip()
-	var tooltip := CardScene.instantiate()
+	var tooltip: CardScene = CARD_SCENE.instantiate()
 	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tooltip.custom_minimum_size = Vector2(280, 400)
 	tooltip.z_index = 100
