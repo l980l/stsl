@@ -1145,7 +1145,7 @@ func _switch_deck_tab(tab: String) -> void:
 
 	if card_list.is_empty():
 		var empty_lbl := Label.new()
-		empty_lbl.text = "카드 없음"
+		empty_lbl.text = tr("ui.battle.deck_viewer.empty")
 		empty_lbl.add_theme_font_size_override("font_size", 18)
 		grid.add_child(empty_lbl)
 		return
