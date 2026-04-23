@@ -1,6 +1,6 @@
 # 카드 아트 애셋 목록
 
-총 **242장** (6영웅 × 40장, 이순신 42장)
+총 **245장** (나폴/클레오/잔/칭기즈/무사시 41장, 이순신 42장)
 
 카드 아트 파일 경로: `assets/art/cards/<hero_id>/<slug>.png`
 
@@ -152,7 +152,7 @@
 
 ---
 
-## 잔 다르크 (joan_of_arc) — 40장
+## 잔 다르크 (joan_of_arc) — 41장
 
 | 슬러그 | 카드명 | 코스트 | 타입 | 희귀도 | 효과 (0강) |
 |---|---|:---:|---|---|---|
@@ -193,13 +193,14 @@
 | purifying_sacrifice | 정화의 희생 | 1 | SKILL | RARE | 자기 HP -80 + 디버프 제거 + 전체 회복 60 |
 | saints_vow | 성녀의 맹약 | 2 | SKILL | RARE | 자기 HP -200 + 전체 회복 300 + 전체 방어 100 |
 | holy_war | 성전 | 1 | SKILL | RARE | 자기 HP -80 + 전체 회복 120 |
+| choir | 성가대 | 2 | POWER | RARE | 권능: 매 턴 전체 회복 +20 |
 | flag_of_orleans | 신국의 깃발 | 2 | SKILL | LEGENDARY | 전체 회복 100 + 전체 방어 80 |
 | joan_return | 잔 다르크의 귀환 | 2 | SKILL | LEGENDARY | 부활 50% + 전체 방어 80 + 드로우 1 |
 | saints_flame | 성녀의 화염 | 1 | ATTACK | DIVINE | 자기 HP -100 + 피해 250 (전체) |
 
 ---
 
-## 칭기즈칸 (genghis_khan) — 40장
+## 칭기즈칸 (genghis_khan) — 41장
 
 | 슬러그 | 카드명 | 코스트 | 타입 | 희귀도 | 효과 (0강) |
 |---|---|:---:|---|---|---|
@@ -240,13 +241,14 @@
 | thousand_mile_army | 천리 원정군 | 2 | ATTACK | RARE | 피해 70 (전체) ×2 |
 | steppe_terror | 대초원의 위협 | 1 | ATTACK | RARE | 피해 65 (전체) + 독 10 데미지 + 약화 1 |
 | war_tribute | 전쟁의 대가 | 2 | ATTACK | RARE | 피해 100 (전체) + 드로우 1 |
+| steppe_lord | 초원의 군주 | 2 | POWER | RARE | 권능: 매 턴 드로우 +1 |
 | great_steppe_siege | 대초원의 포위 | 2 | ATTACK | LEGENDARY | 피해 150 (전체) + 드로우 3 |
 | great_khans_command | 대칸의 명령 | 2 | SKILL | LEGENDARY | 드로우 3 + 이번 턴 코스트 0 |
 | genghis_fury | 징기스의 분노 | 1 | ATTACK | DIVINE | 피해 60 (전체) ×2 |
 
 ---
 
-## 미야모토 무사시 (musashi) — 40장
+## 미야모토 무사시 (musashi) — 41장
 
 | 슬러그 | 카드명 | 코스트 | 타입 | 희귀도 | 효과 (0강) |
 |---|---|:---:|---|---|---|
@@ -287,6 +289,7 @@
 | void_void | 허허실실 | 1 | SKILL | RARE | 회복 80 + 에너지 +1 + 드로우 1 |
 | clear_wind | 청풍명월 | 1 | ATTACK | RARE | 피해 250 (손패 0 아니면 120) + 독 20 데미지 |
 | undying | 불생불멸 | 2 | SKILL | RARE | 전체 방어 40 + 전체 방어 40 + 드로우 2 |
+| sword_enlightenment | 검의 깨달음 | 2 | POWER | RARE | 권능: 매 턴 BLOCK +30 |
 | five_rings_sword | 오륜의 검 | 2 | ATTACK | LEGENDARY | 피해 90 ×2 |
 | five_rings_realm | 오륜의 경지 | 2 | SKILL | LEGENDARY | 이번 턴 코스트 0 + 드로우 3 |
 | mushin_blade | 무심검(無心劍) | 0 | ATTACK | DIVINE | 피해 350 (손패 0 아니면 150) |
@@ -303,4 +306,4 @@
 
 ---
 
-*총 242장 | 생성일: 2026-04-23*
+*총 245장 | 갱신일: 2026-04-23 (Plan 26 — 신규 권능 3장 추가)*

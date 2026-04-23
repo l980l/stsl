@@ -34,7 +34,7 @@ var debug_hero_invincible: bool = false
 var _hero_block: Dictionary = {}
 var _hero_status: Dictionary = {}
 
-# 지속 효과 (POWER 카드): { "poison_per_turn": { "owner": "cleopatra", "value": 1 }, ... }
+# 지속 효과 (권능 카드): { "<key>": { "value": int, "owner_id": String, "params": Dictionary }, ... }
 var _active_powers: Dictionary = {}
 
 # 이번 플레이어 턴 카드 사용 횟수 (만리 원정용)
@@ -130,15 +130,7 @@ func _phase_player_main() -> void:
 					if not _hero_status.has(hero.hero_id):
 						_hero_status[hero.hero_id] = {}
 					_hero_status[hero.hero_id][stype] = cur - 1
-	if _active_powers.has("poison_per_turn"):
-		var ppt: Dictionary = _active_powers["poison_per_turn"]
-		for i in range(_enemies.size()):
-			if _enemy_alive[i]:
-				_apply_status_to_enemy(i, "poison", ppt["value"])
-		ppt["turns_remaining"] -= 1
-		if ppt["turns_remaining"] <= 0:
-			_active_powers.erase("poison_per_turn")
-		active_powers_changed.emit()
+	_trigger_active_powers("player_turn_start")
 	if deck_mgr:
 		deck_mgr.start_turn()
 	var _gm_pts = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
@@ -186,6 +178,47 @@ func end_player_turn() -> void:
 		return
 	_execute_enemy_turn()
 
+func _register_power(key: String, owner_id: String, value: int, params: Dictionary = {}) -> void:
+	var power_key: String = key + ":" + owner_id
+	_active_powers[power_key] = {
+		"value": value,
+		"owner_id": owner_id,
+		"params": params,
+	}
+	active_powers_changed.emit()
+
+func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
+	for power_key in _active_powers:
+		var power: Dictionary = _active_powers[power_key]
+		var key: String = power_key.split(":")[0] if ":" in power_key else power_key
+		var owner_id: String = power.get("owner_id", "")
+		var v: int = power.get("value", 0)
+		match key:
+			"power.poison_per_turn":
+				if phase == "player_turn_start":
+					for ei in range(_enemies.size()):
+						if _enemy_alive[ei]:
+							_apply_status_to_enemy(ei, "poison", v)
+			"power.block_per_turn":
+				if phase == "player_turn_start":
+					_hero_block[owner_id] = _hero_block.get(owner_id, 0) + v
+			"power.heal_team_per_turn":
+				if phase == "player_turn_start" and team_mgr:
+					for hero in team_mgr.heroes:
+						team_mgr.heal(hero.hero_id, v)
+			"power.draw_per_turn":
+				if phase == "player_turn_start" and deck_mgr:
+					deck_mgr.draw_cards(v)
+					_cards_drawn_this_turn += v
+			"power.counter_per_attack":
+				if phase == "enemy_attack":
+					var enemy_idx: int = ctx.get("enemy_index", -1)
+					var blk: int = _hero_block.get(owner_id, 0)
+					if enemy_idx >= 0 and blk > 0:
+						_deal_damage_to_enemy(enemy_idx, int(blk * v / 100.0))
+	if phase == "player_turn_start":
+		active_powers_changed.emit()
+
 func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> void:
 	# 카드 소유 영웅이 사망 상태면 효과 없음
 	if team_mgr and not team_mgr.is_alive(card.owner_id):
@@ -214,11 +247,8 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.BLOCK:
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + effect.value
 			EffectRes.EffectType.APPLY_STATUS:
-				if effect.status_type == "poison_per_turn":
-					var _existing: Dictionary = _active_powers.get("poison_per_turn", {})
-					var _cur_turns: int = _existing.get("turns_remaining", 0)
-					_active_powers["poison_per_turn"] = { "owner": card.owner_id, "value": effect.value, "turns_remaining": _cur_turns + 2 }
-					active_powers_changed.emit()
+				if effect.status_type.begins_with("power."):
+					_register_power(effect.status_type, card.owner_id, effect.value)
 				elif effect.target == "ALL":
 					for i in range(_enemies.size()):
 						if _enemy_alive[i]:
@@ -617,10 +647,12 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				if team_mgr:
 					for hero in team_mgr.get_living_heroes():
 						_deal_damage_to_hero(hero.hero_id, dmg)
+				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
 				var target_id: String = _pick_hero_target(intent.target, enemy_index)
 				if target_id != "":
 					_deal_damage_to_hero(target_id, dmg)
+				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": target_id})
 		IntentRes.ActionType.BUFF:
 			if intent.status_type == "block" or intent.status_type == "":
 				_enemy_block[enemy_index] += intent.value
@@ -748,6 +780,9 @@ func get_enemy_status(index: int) -> Dictionary:
 
 func get_active_power(key: String) -> Dictionary:
 	return _active_powers.get(key, {}).duplicate()
+
+func get_all_active_powers() -> Dictionary:
+	return _active_powers.duplicate()
 
 func clear() -> void:
 	_enemies.clear()

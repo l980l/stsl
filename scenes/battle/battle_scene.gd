@@ -48,7 +48,7 @@ var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _token_tile_nodes: Dictionary = {}
 var _synergy_box: HBoxContainer = null
-var _ppt_label: Label = null
+var _active_powers_box: VBoxContainer = null
 var _debug_badge: Label = null
 var _debug_hp_target_mode: bool = false
 var _debug_grid_visible: bool = false
@@ -133,14 +133,11 @@ func _build_ui() -> void:
 	top_bar.add_child(_relic_container)
 	_refresh_relics()
 
-	_ppt_label = Label.new()
-	_ppt_label.position = Vector2(20, 840)
-	_ppt_label.size = Vector2(300, 30)
-	_ppt_label.add_theme_font_size_override("font_size", 14)
-	_ppt_label.modulate = Color(0.4, 1.0, 0.4)
-	_ppt_label.mouse_filter = Control.MOUSE_FILTER_STOP
-	_ppt_label.visible = false
-	add_child(_ppt_label)
+	_active_powers_box = VBoxContainer.new()
+	_active_powers_box.position = Vector2(20, 800)
+	_active_powers_box.custom_minimum_size = Vector2(300, 0)
+	_active_powers_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_active_powers_box)
 
 	# 영웅 슬롯 3개 고정 (초기 숨김)
 	for i in range(3):
@@ -933,15 +930,23 @@ func _on_morale_changed(hero_id: String, _new_value: int) -> void:
 	_update_hero_ui(hero_id)
 
 func _on_active_powers_changed() -> void:
-	if _ppt_label == null:
+	if _active_powers_box == null:
 		return
-	var ppt: Dictionary = BattleManager.get_active_power("poison_per_turn")
-	if ppt.is_empty():
-		_ppt_label.visible = false
-	else:
-		_ppt_label.text = "🧪 독의 왕좌: +%d/턴 (%d턴)" % [ppt["value"], ppt["turns_remaining"]]
-		_ppt_label.tooltip_text = "매 플레이어 턴 시작 시 모든 적에게 독 +%d 적용.\n독의 왕좌를 다시 사용하지 않으면 %d턴 후 사라집니다." % [ppt["value"], ppt["turns_remaining"]]
-		_ppt_label.visible = true
+	for child in _active_powers_box.get_children():
+		child.queue_free()
+	var powers: Dictionary = BattleManager.get_all_active_powers()
+	for power_key in powers:
+		var power: Dictionary = powers[power_key]
+		var base_key: String = power_key.split(":")[0] if ":" in power_key else power_key
+		var label_key: String = base_key + ".label"
+		var v: int = power.get("value", 0)
+		var lbl := Label.new()
+		var fmt: String = tr(label_key)
+		lbl.text = fmt % v if fmt.contains("%") else fmt
+		lbl.add_theme_font_size_override("font_size", 14)
+		lbl.modulate = Color(0.7, 0.4, 0.9)
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_active_powers_box.add_child(lbl)
 
 func _on_status_applied(target: String, _status_type: String, _stacks: int) -> void:
 	if target.begins_with("enemy_"):

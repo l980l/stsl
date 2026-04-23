@@ -96,12 +96,12 @@ func test_joan_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_joan_rarity_distribution")
 	var JoanCards = load("res://resources/cards/cards_joan_of_arc.gd")
 	var pool: Array = JoanCards.pool()
-	_assert(pool.size() == 38, "잔다르크 풀 38장")
+	_assert(pool.size() == 39, "잔다르크 풀 39장")
 	var counts: Dictionary = _count_rarities(pool)
 	# starter_deck(strike/defend) 제외 — COMMON 8장
 	_assert(counts["COMMON"] == 8, "잔다르크 COMMON 8장 (실제: %d)" % counts["COMMON"])
 	_assert(counts["UNCOMMON"] == 13, "잔다르크 UNCOMMON 13장 (실제: %d)" % counts["UNCOMMON"])
-	_assert(counts["RARE"] == 14, "잔다르크 RARE 14장 (실제: %d)" % counts["RARE"])
+	_assert(counts["RARE"] == 15, "잔다르크 RARE 15장 (실제: %d)" % counts["RARE"])
 	_assert(counts["LEGENDARY"] == 2, "잔다르크 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
 	_assert(counts["DIVINE"] == 1, "잔다르크 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
 
@@ -123,12 +123,12 @@ func test_genghis_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_genghis_rarity_distribution")
 	var GhisCards = load("res://resources/cards/cards_genghis_khan.gd")
 	var pool: Array = GhisCards.pool()
-	_assert(pool.size() == 38, "칭기즈칸 풀 38장")
+	_assert(pool.size() == 39, "칭기즈칸 풀 39장")
 	var counts: Dictionary = _count_rarities(pool)
 	# starter_deck(strike/defend) 제외 — COMMON 8장
 	_assert(counts["COMMON"] == 8, "칭기즈칸 COMMON 8장 (실제: %d)" % counts["COMMON"])
 	_assert(counts["UNCOMMON"] == 13, "칭기즈칸 UNCOMMON 13장 (실제: %d)" % counts["UNCOMMON"])
-	_assert(counts["RARE"] == 14, "칭기즈칸 RARE 14장 (실제: %d)" % counts["RARE"])
+	_assert(counts["RARE"] == 15, "칭기즈칸 RARE 15장 (실제: %d)" % counts["RARE"])
 	_assert(counts["LEGENDARY"] == 2, "칭기즈칸 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
 	_assert(counts["DIVINE"] == 1, "칭기즈칸 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
 
@@ -150,12 +150,12 @@ func test_musashi_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_musashi_rarity_distribution")
 	var MusaCards = load("res://resources/cards/cards_musashi.gd")
 	var pool: Array = MusaCards.pool()
-	_assert(pool.size() == 38, "무사시 풀 38장")
+	_assert(pool.size() == 39, "무사시 풀 39장")
 	var counts: Dictionary = _count_rarities(pool)
 	# starter_deck(strike/defend) 제외 — COMMON 8장
 	_assert(counts["COMMON"] == 8, "무사시 COMMON 8장 (실제: %d)" % counts["COMMON"])
 	_assert(counts["UNCOMMON"] == 13, "무사시 UNCOMMON 13장 (실제: %d)" % counts["UNCOMMON"])
-	_assert(counts["RARE"] == 14, "무사시 RARE 14장 (실제: %d)" % counts["RARE"])
+	_assert(counts["RARE"] == 15, "무사시 RARE 15장 (실제: %d)" % counts["RARE"])
 	_assert(counts["LEGENDARY"] == 2, "무사시 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
 	_assert(counts["DIVINE"] == 1, "무사시 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
 

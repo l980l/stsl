@@ -103,17 +103,17 @@ func test_yi_sun_sin_card_pool_size() -> void:
 func test_joan_of_arc_card_pool_size() -> void:
 	print("[TestHeroes] test_joan_of_arc_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._joan_of_arc_card_pool().size() == 38, "잔다르크 카드 풀 38장")
+	_assert(gm._joan_of_arc_card_pool().size() == 39, "잔다르크 카드 풀 39장")
 
 func test_genghis_khan_card_pool_size() -> void:
 	print("[TestHeroes] test_genghis_khan_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._genghis_khan_card_pool().size() == 38, "칭기즈칸 카드 풀 38장")
+	_assert(gm._genghis_khan_card_pool().size() == 39, "칭기즈칸 카드 풀 39장")
 
 func test_musashi_card_pool_size() -> void:
 	print("[TestHeroes] test_musashi_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._musashi_card_pool().size() == 38, "무사시 카드 풀 38장")
+	_assert(gm._musashi_card_pool().size() == 39, "무사시 카드 풀 39장")
 
 func test_hit_count_damage_multi_hit() -> void:
 	print("[TestHeroes] test_hit_count_damage_multi_hit")

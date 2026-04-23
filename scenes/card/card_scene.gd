@@ -38,6 +38,15 @@ func refresh() -> void:
 	$Container/TitleLabel.text = _card.card_name
 	$Container/ArtRect.texture = _card.art
 	$Container/DescLabel.text = _build_desc()
+	$Container/TypeLabel.text = _type_display(_card.card_type)
+	$Container/TypeLabel.modulate = Color(0.7, 0.4, 0.9) if _card.card_type == CardResource.CardType.POWER else Color.WHITE
+
+func _type_display(t: int) -> String:
+	match t:
+		CardResource.CardType.ATTACK: return tr("card_type.attack.name")
+		CardResource.CardType.SKILL:  return tr("card_type.skill.name")
+		CardResource.CardType.POWER:  return tr("card_type.power.name")
+	return ""
 
 func _build_desc() -> String:
 	var lines: Array = []

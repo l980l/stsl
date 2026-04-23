@@ -577,7 +577,7 @@ static func _curse_crossroads() -> Resource:
 	c.effects = [ea, eb, ec]; return c
 
 static func _poison_throne() -> Resource:
-	# 독의 왕좌 — LEGENDARY, 2코, POWER, 독살: 매 턴 시작 시 모든 독 스택 +1
+	# 독의 왕좌 — LEGENDARY, 2코, POWER, 독살: 매 턴 시작 시 모든 독 스택 +1 (영구)
 	var c := CardRes.new()
 	c.card_name = TranslationServer.translate("card.cleopatra.poison_throne.name"); c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
@@ -585,8 +585,8 @@ static func _poison_throne() -> Resource:
 	c.archetype = TranslationServer.translate("card.cleopatra.poison_throne.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "poison_per_turn"  # battle_manager 턴 시작 시 처리
-	e.value = 1; e.base_value = 1; e.target = "ALL"
+	e.status_type = "power.poison_per_turn"
+	e.value = 1; e.base_value = 1
 	c.effects = [e]; return c
 
 static func _isis_judgment() -> Resource:
