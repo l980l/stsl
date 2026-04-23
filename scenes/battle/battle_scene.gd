@@ -122,10 +122,10 @@ func _build_ui() -> void:
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
 	add_child(_end_turn_btn)
 
-	# 덱 보기 버튼 (End Turn 왼쪽)
+	# 덱 보기 버튼 (End Turn 아래)
 	var deck_btn := Button.new()
-	deck_btn.position = Vector2(WINDOW_W - 350, BOTTOM_Y + 16)
-	deck_btn.size = Vector2(120, 60)
+	deck_btn.position = Vector2(WINDOW_W - 220, BOTTOM_Y + 84)
+	deck_btn.size = Vector2(200, 60)
 	deck_btn.text = tr("ui.battle.btn_deck_view")
 	deck_btn.add_theme_font_size_override("font_size", 18)
 	deck_btn.pressed.connect(_show_deck_viewer_in_battle)
@@ -698,7 +698,7 @@ func _on_card_hovered(card: Resource, card_node: CardScene) -> void:
 	tooltip.z_index = 100
 	tooltip.setup(card, tooltip.Mode.HAND)
 	add_child(tooltip)
-	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_set_mouse_ignore_recursive(tooltip)
 	_card_tooltip = tooltip
 	# 카드 정중앙 위쪽에 고정 (툴팁 350×500 기준)
 	var base: Vector2 = card_node.global_position
@@ -1105,14 +1105,15 @@ func _show_deck_viewer_in_battle() -> void:
 	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw") + " (%d)" % draw_cards.size(), draw_cards)
 	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
 
-	# 툴팁을 미리 한 번만 생성 — visible 토글로 깜빡임 방지
-	# mouse_filter는 반드시 add_child 이후에 설정 (_ready()가 STOP으로 덮어쓰기 때문)
 	var tip: CardScene = CARD_SCENE.instantiate()
 	tip.scale = Vector2(2.5, 2.5)
 	tip.z_index = 200
 	tip.visible = false
 	overlay.add_child(tip)
-	tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 루트만 IGNORE 하면 내부 Label/TextureRect(기본 STOP)가 이벤트를 가로채
+	# 원본 카드에 mouse_exited → 툴팁 hide → mouse_entered → 툴팁 show 깜빡임 발생
+	# 서브트리 전체를 IGNORE로 만들어 완전히 마우스 투과
+	_set_mouse_ignore_recursive(tip)
 	_deck_viewer_tooltip = tip
 
 	_deck_viewer = canvas
@@ -1182,6 +1183,12 @@ func _close_deck_viewer() -> void:
 		_deck_viewer_tooltip = null
 		_deck_viewer.queue_free()
 		_deck_viewer = null
+
+func _set_mouse_ignore_recursive(node: Node) -> void:
+	if node is Control:
+		(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for c in node.get_children():
+		_set_mouse_ignore_recursive(c)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if OS.is_debug_build() and event.pressed and not event.echo:
