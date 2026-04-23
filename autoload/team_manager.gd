@@ -73,7 +73,10 @@ func to_dict() -> Dictionary:
 			"max_hp": hero.max_hp,
 			"current_hp": get_current_hp(hero.hero_id),
 		})
-	return {"heroes": hero_data}
+	return {
+		"heroes": hero_data,
+		"hero_alive": _hero_alive.duplicate(),
+	}
 
 func from_dict(data: Dictionary) -> void:
 	clear()
@@ -86,6 +89,11 @@ func from_dict(data: Dictionary) -> void:
 		hero.character_scene = _get_hero_scene(hd["hero_id"])
 		add_hero(hero)
 		_hero_hp[hero.hero_id] = hd["current_hp"]
+	# save-compat: hero_alive 키 없으면 전원 true 기본
+	_hero_alive = data.get("hero_alive", {}).duplicate()
+	if _hero_alive.is_empty():
+		for hid in _hero_hp:
+			_hero_alive[hid] = true
 
 func _get_hero_scene(hero_id: String) -> PackedScene:
 	match hero_id:

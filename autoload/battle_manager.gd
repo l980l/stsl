@@ -69,6 +69,10 @@ func setup_battle(enemies: Array) -> void:
 	_last_attacker.clear()
 	_active_powers.clear()
 	_enemy_card_counters.clear()
+	# 부활 시그널 연결 (중복 방지)
+	if team_mgr != null:
+		if not team_mgr.hero_revived.is_connected(_on_hero_revived_clear_state):
+			team_mgr.hero_revived.connect(_on_hero_revived_clear_state)
 	for ei in range(_enemies.size()):
 		var trig = _enemies[ei].get("card_count_trigger")
 		if trig != null and trig is Dictionary and trig.size() > 0:
@@ -838,6 +842,11 @@ func clear() -> void:
 	_last_attacker.clear()
 	is_battle_active = false
 	is_player_turn = false
+
+func _on_hero_revived_clear_state(hero_id: String) -> void:
+	# 부활 시 블록·상태 초기화 (사망 전 독/출혈/블록 제거)
+	_hero_block[hero_id] = 0
+	_hero_status[hero_id] = {}
 
 func _evaluate_condition(cond: String, _card: Resource) -> bool:
 	match cond:

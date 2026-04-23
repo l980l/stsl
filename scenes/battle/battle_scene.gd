@@ -340,6 +340,7 @@ func _connect_signals() -> void:
 	BattleManager.battle_won.connect(_on_battle_won)
 	BattleManager.battle_lost.connect(_on_battle_lost)
 	TeamManager.hero_died.connect(_on_hero_died)
+	TeamManager.hero_revived.connect(_on_hero_revived)
 	BattleManager.status_applied.connect(_on_status_applied)
 	BattleManager.morale_changed.connect(_on_morale_changed)
 	BattleManager.active_powers_changed.connect(_on_active_powers_changed)
@@ -885,6 +886,21 @@ func _on_hero_died(hero_id: String) -> void:
 		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 		if ap.has_animation("death"):
 			ap.play("death")
+
+func _on_hero_revived(hero_id: String) -> void:
+	# 해당 영웅 슬롯을 다시 표시하고 HP/상태 갱신
+	for entry in _hero_nodes:
+		if entry["hero_id"] != hero_id:
+			continue
+		entry["panel"].visible = true
+		entry["panel"].modulate = Color(1.0, 1.0, 1.0)  # 사망 시 회색화 복원
+		entry["name_lbl"].visible = true
+		entry["hp_bar"].visible = true
+		entry["hp_lbl"].visible = true
+		entry["block_lbl"].visible = true
+		entry["status_box"].visible = true
+		_update_hero_ui(hero_id)
+		break
 
 func _on_battle_won() -> void:
 	_message_label.text = tr("battle.msg_victory")
