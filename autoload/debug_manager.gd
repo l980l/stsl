@@ -1,7 +1,7 @@
 # autoload/debug_manager.gd
 extends Node
 
-const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 승리\n[Shift+I]  무적 토글 (영웅 피해 차단)\n[Shift+E]  무한 코스트 토글\n[Shift+D]  카드 1장 드로우\n[Shift+H]  적 HP 설정 → 적 클릭\n[Shift+G]  그리드 토글\n── 전체 공통 ──\n[Shift+W]  현재 챕터 즉시 클리어\n[Shift+F]  현재 Act 클리어 → 다음 Act 진입\n[Shift+P]  파티에 영웅 추가\n[Shift+A]  카드 추가 창\n[Shift+R]  덱 편집기 (카드 제거)\n[Shift+U]  카드 강화\n[Shift+N]  영웅 즉시 해금 창\n[Shift+L]  렐릭 추가 창\n[Shift+X]  렐릭 제거 창\n[Shift+V]  이벤트 씬 입장\n[Shift+C]  목록 고정/해제"
+const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 승리\n[Shift+I]  무적 토글 (영웅 피해 차단)\n[Shift+E]  무한 코스트 토글\n[Shift+D]  카드 1장 드로우\n[Shift+H]  적 HP 설정 → 적 클릭\n[Shift+G]  그리드 토글\n── 전체 공통 ──\n[Shift+M]  몬스터 선택 전투\n[Shift+W]  현재 챕터 즉시 클리어\n[Shift+F]  현재 Act 클리어 → 다음 Act 진입\n[Shift+P]  파티에 영웅 추가\n[Shift+A]  카드 추가 창\n[Shift+R]  덱 편집기 (카드 제거)\n[Shift+U]  카드 강화\n[Shift+N]  영웅 즉시 해금 창\n[Shift+L]  렐릭 추가 창\n[Shift+X]  렐릭 제거 창\n[Shift+V]  이벤트 씬 입장\n[Shift+C]  목록 고정/해제"
 
 var _pinned_label: Label = null
 
@@ -99,6 +99,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_open_relic_add_dialog()
 		KEY_X:
 			_open_relic_remove_dialog()
+		KEY_M:
+			_open_monster_pick_dialog()
 		KEY_V:
 			_open_event_enter_dialog()
 
@@ -193,6 +195,52 @@ func _open_relic_remove_dialog() -> void:
 	_make_checkbox_dialog("렐릭 제거", opts, "제거", func(picked: Array):
 		for r in picked:
 			GameManager.relics.erase(r)
+	)
+
+# ── 몬스터 선택 전투 ────────────────────────────────
+
+func _open_monster_pick_dialog() -> void:
+	var dummy_scene: PackedScene = load("res://characters/enemies/satyr/satyr.tscn")
+	var registry: Dictionary = GameManager._get_mythology_registry()
+	var opts: Array = []
+
+	for myth in ["greek", "egyptian", "norse", "korean", "chinese", "japanese"]:
+		var entry: Dictionary = registry.get(myth, {})
+		if entry.is_empty():
+			continue
+
+		var normals_mod = entry["normals"]
+		var seen: Dictionary = {}
+		for encounter in normals_mod.encounters():
+			for fn: String in encounter:
+				if seen.has(fn):
+					continue
+				seen[fn] = true
+				var enemy: Resource = normals_mod.call(fn, dummy_scene)
+				opts.append(["[%s · 일반]  %s" % [myth, enemy.enemy_name],
+					{"module": normals_mod, "fn_name": fn}, true, Color.WHITE])
+
+		var acts: Array = entry["acts"]
+		for act_i in range(acts.size()):
+			var act_mod = acts[act_i]
+			if act_mod == null:
+				continue
+			if act_mod.has_method("elites"):
+				for fn: String in act_mod.elites():
+					var enemy: Resource = act_mod.call(fn, dummy_scene)
+					opts.append(["[%s · 엘리트 A%d]  %s" % [myth, act_i + 1, enemy.enemy_name],
+						{"module": act_mod, "fn_name": fn}, true, Color(0.9, 0.7, 0.3)])
+			if act_mod.has_method("boss"):
+				var fn: String = act_mod.boss()
+				if fn != "":
+					var enemy: Resource = act_mod.call(fn, dummy_scene)
+					opts.append(["[%s · 보스 A%d]  %s" % [myth, act_i + 1, enemy.enemy_name],
+						{"module": act_mod, "fn_name": fn}, true, Color(1.0, 0.4, 0.4)])
+
+	_make_radio_dialog("몬스터 선택 전투", opts, "전투 시작", func(payload: Dictionary):
+		var enemy: Resource = payload["module"].call(payload["fn_name"], dummy_scene)
+		GameManager.pending_enemies = [enemy]
+		GameManager._request_scene("res://scenes/battle/battle_scene.tscn")
 	)
 
 # ── 이벤트 씬 입장 ──────────────────────────────────

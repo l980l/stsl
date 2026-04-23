@@ -58,8 +58,6 @@ var _debug_grid_nodes: Array = []
 var _deck_viewer: CanvasLayer = null
 var _deck_viewer_tooltip: CardScene = null
 
-var _debug_enemy_picker: CanvasLayer = null
-var _debug_picker_selected: Dictionary = {}
 
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
@@ -1036,10 +1034,7 @@ func _refresh_synergy_hud() -> void:
 func _input(event: InputEvent) -> void:
 	# 드래그 처리는 card_scene 시그널(_on_card_drag_*)로 위임됨
 	if event is InputEventKey and event.keycode == KEY_ESCAPE and event.pressed:
-		if _debug_enemy_picker != null:
-			_debug_enemy_picker.queue_free()
-			_debug_enemy_picker = null
-		elif _deck_viewer != null:
+		if _deck_viewer != null:
 			_close_deck_viewer()
 
 # ─────────────────────────────────────────────
@@ -1190,146 +1185,6 @@ func _close_deck_viewer() -> void:
 		_deck_viewer.queue_free()
 		_deck_viewer = null
 
-# ─────────────────────────────────────────────
-# 디버그 — 몬스터 선택 전투 (Shift+M)
-# ─────────────────────────────────────────────
-
-func _toggle_debug_enemy_picker() -> void:
-	if _debug_enemy_picker != null:
-		_debug_enemy_picker.queue_free()
-		_debug_enemy_picker = null
-		return
-	_debug_picker_selected.clear()
-
-	var canvas := CanvasLayer.new()
-	canvas.layer = 20
-	add_child(canvas)
-
-	var overlay := Control.new()
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	canvas.add_child(overlay)
-
-	var bg := ColorRect.new()
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.color = Color(0.0, 0.0, 0.0, 0.82)
-	bg.gui_input.connect(func(ev: InputEvent) -> void:
-		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			if _debug_enemy_picker != null:
-				_debug_enemy_picker.queue_free()
-				_debug_enemy_picker = null
-	)
-	overlay.add_child(bg)
-
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(860, 720)
-	panel.position = Vector2((WINDOW_W - 860) / 2.0, (WINDOW_H - 720) / 2.0)
-	overlay.add_child(panel)
-
-	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 20)
-	margin.add_theme_constant_override("margin_right", 20)
-	margin.add_theme_constant_override("margin_top", 14)
-	margin.add_theme_constant_override("margin_bottom", 14)
-	panel.add_child(margin)
-
-	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 10)
-	margin.add_child(vbox)
-
-	var title_row := HBoxContainer.new()
-	vbox.add_child(title_row)
-	var title_lbl := Label.new()
-	title_lbl.text = "[DEBUG] 몬스터 선택 전투"
-	title_lbl.add_theme_font_size_override("font_size", 22)
-	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_row.add_child(title_lbl)
-	var close_btn := Button.new()
-	close_btn.text = "✕"
-	close_btn.pressed.connect(func() -> void:
-		if _debug_enemy_picker != null:
-			_debug_enemy_picker.queue_free()
-			_debug_enemy_picker = null
-	)
-	title_row.add_child(close_btn)
-
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vbox.add_child(scroll)
-
-	var list := VBoxContainer.new()
-	list.add_theme_constant_override("separation", 4)
-	scroll.add_child(list)
-
-	var dummy_scene: PackedScene = load("res://characters/enemies/satyr/satyr.tscn")
-	var btn_group := ButtonGroup.new()
-	var registry: Dictionary = GameManager._get_mythology_registry()
-
-	for myth in ["greek", "egyptian", "norse", "korean", "chinese", "japanese"]:
-		var entry: Dictionary = registry.get(myth, {})
-		if entry.is_empty():
-			continue
-
-		var sect := Label.new()
-		sect.text = " ── %s ──" % myth.to_upper()
-		sect.add_theme_font_size_override("font_size", 15)
-		sect.modulate = Color(1.0, 0.85, 0.3)
-		list.add_child(sect)
-
-		var normals_mod = entry["normals"]
-		var seen: Dictionary = {}
-		for encounter in normals_mod.encounters():
-			for fn: String in encounter:
-				if seen.has(fn):
-					continue
-				seen[fn] = true
-				var enemy: Resource = normals_mod.call(fn, dummy_scene)
-				_debug_add_enemy_btn(list, btn_group, enemy.enemy_name, "일반", normals_mod, fn)
-
-		var acts: Array = entry["acts"]
-		for act_i in range(acts.size()):
-			var act_mod = acts[act_i]
-			if act_mod == null:
-				continue
-			if act_mod.has_method("elites"):
-				for fn: String in act_mod.elites():
-					var enemy: Resource = act_mod.call(fn, dummy_scene)
-					_debug_add_enemy_btn(list, btn_group, enemy.enemy_name, "엘리트 A%d" % (act_i + 1), act_mod, fn)
-			if act_mod.has_method("boss"):
-				var fn: String = act_mod.boss()
-				if fn != "":
-					var enemy: Resource = act_mod.call(fn, dummy_scene)
-					_debug_add_enemy_btn(list, btn_group, enemy.enemy_name, "보스 A%d" % (act_i + 1), act_mod, fn)
-
-	var fight_btn := Button.new()
-	fight_btn.text = "전투 시작"
-	fight_btn.add_theme_font_size_override("font_size", 20)
-	fight_btn.pressed.connect(_debug_start_fight)
-	vbox.add_child(fight_btn)
-
-	_debug_enemy_picker = canvas
-
-func _debug_add_enemy_btn(list: VBoxContainer, group: ButtonGroup, display_name: String,
-		type_label: String, module: Object, fn_name: String) -> void:
-	var btn := Button.new()
-	btn.text = "[%s]  %s" % [type_label, display_name]
-	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	btn.toggle_mode = true
-	btn.button_group = group
-	btn.add_theme_font_size_override("font_size", 16)
-	btn.pressed.connect(func() -> void:
-		_debug_picker_selected = {"module": module, "fn_name": fn_name}
-	)
-	list.add_child(btn)
-
-func _debug_start_fight() -> void:
-	if _debug_picker_selected.is_empty():
-		return
-	var dummy_scene: PackedScene = load("res://characters/enemies/satyr/satyr.tscn")
-	var enemy: Resource = _debug_picker_selected["module"].call(
-		_debug_picker_selected["fn_name"], dummy_scene)
-	GameManager.pending_enemies = [enemy]
-	get_tree().change_scene_to_file("res://scenes/battle/battle_scene.tscn")
-
 func _set_mouse_ignore_recursive(node: Node) -> void:
 	if node is Control:
 		(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1358,8 +1213,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_debug_grid_visible = not _debug_grid_visible
 			_refresh_debug_grid()
 			_refresh_debug_badge()
-		elif event.keycode == KEY_M and event.shift_pressed:
-			_toggle_debug_enemy_picker()
 
 func _refresh_debug_grid() -> void:
 	for node in _debug_grid_nodes:
