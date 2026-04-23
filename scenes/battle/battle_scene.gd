@@ -1130,18 +1130,27 @@ func _add_deck_column(parent: HBoxContainer, overlay: Control, header: String, c
 		return
 
 	for card_res in cards:
+		var captured_res: Resource = card_res
+		var captured_overlay: Control = overlay
+
+		# 래퍼가 레이아웃 크기(91×130)를 결정하고 마우스 이벤트 전담
+		# 카드 자체는 IGNORE로 두어 자식 노드들의 이벤트 간섭 차단
+		var wrapper := Control.new()
+		wrapper.custom_minimum_size = Vector2(91, 130)
+		wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
+		grid.add_child(wrapper)
+
 		var card_node: CardScene = CARD_SCENE.instantiate()
-		card_node.mouse_filter = Control.MOUSE_FILTER_PASS
 		card_node.scale = Vector2(0.65, 0.65)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
-		var captured_res: Resource = card_res
-		var captured_node := card_node
-		var captured_overlay := overlay
-		card_node.card_hovered.connect(func(_c): _show_deck_tooltip(captured_res, captured_node, captured_overlay))
-		card_node.card_unhovered.connect(func(_c): _hide_deck_tooltip())
-		grid.add_child(card_node)
+		wrapper.add_child(card_node)
+		card_node.mouse_filter = Control.MOUSE_FILTER_IGNORE  # _ready() 이후 덮어씀
 
-func _show_deck_tooltip(card: Resource, card_node: CardScene, overlay: Control) -> void:
+		var captured_wrapper: Control = wrapper
+		wrapper.mouse_entered.connect(func(): _show_deck_tooltip(captured_res, captured_wrapper, captured_overlay))
+		wrapper.mouse_exited.connect(func(): _hide_deck_tooltip())
+
+func _show_deck_tooltip(card: Resource, node: Control, overlay: Control) -> void:
 	_hide_deck_tooltip()
 	var tip: CardScene = CARD_SCENE.instantiate()
 	tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1150,7 +1159,7 @@ func _show_deck_tooltip(card: Resource, card_node: CardScene, overlay: Control) 
 	tip.setup(card, CardScene.Mode.HAND)
 	overlay.add_child(tip)
 	_deck_viewer_tooltip = tip
-	var base := card_node.global_position
+	var base := node.global_position
 	var x: float = clamp(base.x + 45.0 - 175.0, 0.0, float(WINDOW_W - 350))
 	var y: float = clamp(base.y - 510.0, 20.0, float(WINDOW_H - 500))
 	tip.position = Vector2(x, y)
