@@ -55,6 +55,9 @@ var _debug_hp_target_mode: bool = false
 var _debug_grid_visible: bool = false
 var _debug_grid_nodes: Array = []
 
+var _deck_viewer: Control = null
+var _deck_viewer_tab: String = "draw"
+
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
 	"morale": "★", "charm": "♥", "strength": "↑",
@@ -118,6 +121,15 @@ func _build_ui() -> void:
 	_end_turn_btn.disabled = true
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
 	add_child(_end_turn_btn)
+
+	# 덱 보기 버튼 (End Turn 왼쪽)
+	var deck_btn := Button.new()
+	deck_btn.position = Vector2(WINDOW_W - 350, BOTTOM_Y + 16)
+	deck_btn.size = Vector2(120, 60)
+	deck_btn.text = tr("ui.battle.btn_deck_view")
+	deck_btn.add_theme_font_size_override("font_size", 18)
+	deck_btn.pressed.connect(_show_deck_viewer_in_battle)
+	add_child(deck_btn)
 
 	# 상단 바 — 시너지 → 릴릭 순서, 넘치면 자동 줄바꿈
 	var top_bar := FlowContainer.new()
@@ -1002,8 +1014,164 @@ func _refresh_synergy_hud() -> void:
 		lbl.modulate = Color(1.0, 0.0, 1.0)
 		_synergy_box.add_child(lbl)
 
-func _input(_event: InputEvent) -> void:
-	pass  # 드래그 처리는 card_scene 시그널(_on_card_drag_*)로 위임됨
+func _input(event: InputEvent) -> void:
+	# 드래그 처리는 card_scene 시그널(_on_card_drag_*)로 위임됨
+	if _deck_viewer != null and event is InputEventKey:
+		if event.keycode == KEY_ESCAPE and event.pressed:
+			_close_deck_viewer()
+
+# ─────────────────────────────────────────────
+# 덱뷰어 (전투 중)
+# ─────────────────────────────────────────────
+
+func _show_deck_viewer_in_battle() -> void:
+	# 이미 열려있으면 무시
+	if _deck_viewer != null:
+		return
+
+	# 반투명 풀스크린 배경 (CanvasLayer로 최상단 렌더)
+	var canvas := CanvasLayer.new()
+	canvas.layer = 10
+	add_child(canvas)
+
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	canvas.add_child(overlay)
+
+	# 반투명 배경 — 바깥 클릭으로 닫기
+	var bg_rect := ColorRect.new()
+	bg_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg_rect.color = Color(0.0, 0.0, 0.0, 0.72)
+	bg_rect.gui_input.connect(func(ev: InputEvent) -> void:
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			_close_deck_viewer()
+	)
+	overlay.add_child(bg_rect)
+
+	# 메인 패널
+	var panel := PanelContainer.new()
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.custom_minimum_size = Vector2(1400, 820)
+	panel.position = Vector2(260, 130)
+	overlay.add_child(panel)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 8)
+	panel.add_child(vbox)
+
+	# 제목 + X 버튼 행
+	var title_row := HBoxContainer.new()
+	vbox.add_child(title_row)
+
+	var title_lbl := Label.new()
+	title_lbl.text = tr("ui.battle.btn_deck_view")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_row.add_child(title_lbl)
+
+	var close_btn := Button.new()
+	close_btn.text = "✕"
+	close_btn.add_theme_font_size_override("font_size", 20)
+	close_btn.pressed.connect(_close_deck_viewer)
+	title_row.add_child(close_btn)
+
+	# 탭 버튼 행
+	var tab_row := HBoxContainer.new()
+	tab_row.add_theme_constant_override("separation", 6)
+	vbox.add_child(tab_row)
+
+	var tabs := ["draw", "hand", "discard", "exhaust"]
+	var tab_keys := {
+		"draw": "ui.battle.deck_viewer.draw",
+		"hand": "ui.battle.deck_viewer.hand",
+		"discard": "ui.battle.deck_viewer.discard",
+		"exhaust": "ui.battle.deck_viewer.exhaust",
+	}
+	for tab_id in tabs:
+		var tb := Button.new()
+		tb.text = tr(tab_keys[tab_id])
+		tb.add_theme_font_size_override("font_size", 18)
+		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tb.pressed.connect(_switch_deck_tab.bind(tab_id))
+		tab_row.add_child(tb)
+
+	# 카드 그리드 스크롤
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.custom_minimum_size = Vector2(0, 600)
+	vbox.add_child(scroll)
+
+	var grid := GridContainer.new()
+	grid.columns = 8
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 10)
+	grid.name = "CardGrid"
+	scroll.add_child(grid)
+
+	_deck_viewer = canvas
+	_deck_viewer_tab = "draw"
+	_switch_deck_tab("draw")
+
+func _switch_deck_tab(tab: String) -> void:
+	if _deck_viewer == null:
+		return
+	_deck_viewer_tab = tab
+
+	# CardGrid 노드 찾기
+	var grid: GridContainer = null
+	for child in _deck_viewer.get_children():
+		grid = _find_node_by_name(child, "CardGrid")
+		if grid != null:
+			break
+	if grid == null:
+		return
+
+	# 기존 카드 제거
+	for c in grid.get_children():
+		c.queue_free()
+
+	# 탭별 카드 목록 결정
+	var card_list: Array = []
+	match tab:
+		"draw":
+			card_list = DeckManager.draw_pile.duplicate()
+			card_list.shuffle()  # 실제 순서 노출 금지
+		"hand":
+			card_list = DeckManager.hand.duplicate()
+		"discard":
+			card_list = DeckManager.discard_pile.duplicate()
+		"exhaust":
+			card_list = DeckManager.exhaust_pile.duplicate()
+
+	if card_list.is_empty():
+		var empty_lbl := Label.new()
+		empty_lbl.text = "카드 없음"
+		empty_lbl.add_theme_font_size_override("font_size", 18)
+		grid.add_child(empty_lbl)
+		return
+
+	# CardScene 인스턴스화
+	for card_res in card_list:
+		var card_node: CardScene = CARD_SCENE.instantiate()
+		card_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card_node.scale = Vector2(2.5, 2.5)
+		# 카드 씬이 클릭/드래그 시그널 방출 억제 — REWARD 모드로 표시
+		card_node.setup(card_res, CardScene.Mode.REWARD)
+		grid.add_child(card_node)
+
+func _close_deck_viewer() -> void:
+	if _deck_viewer != null:
+		_deck_viewer.queue_free()
+		_deck_viewer = null
+
+func _find_node_by_name(node: Node, target_name: String) -> Node:
+	if node.name == target_name:
+		return node
+	for child in node.get_children():
+		var result := _find_node_by_name(child, target_name)
+		if result != null:
+			return result
+	return null
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if OS.is_debug_build() and event.pressed and not event.echo:
