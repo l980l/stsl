@@ -1135,9 +1135,9 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 	col.add_child(scroll)
 
 	var grid := GridContainer.new()
-	grid.columns = 4
-	grid.add_theme_constant_override("h_separation", 8)
-	grid.add_theme_constant_override("v_separation", 8)
+	grid.columns = 5
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 10)
 	scroll.add_child(grid)
 
 	if cards.is_empty():
