@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://event_scene"]
+[gd_scene load_steps=4 format=3 uid="uid://event_scene"]
 
 [ext_resource type="Script" path="res://scenes/event/event_scene.gd" id="1_script"]
 
@@ -30,3 +30,9 @@ theme_override_font_sizes/font_size = 20
 
 [node name="ChoicesContainer" type="HBoxContainer" parent="VBoxContainer"]
 alignment = 1
+
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_button.tscn" id="sb"]
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_overlay.tscn" id="so"]
+
+[node name="SettingsButton" parent="." instance=ExtResource("sb")]
+[node name="SettingsOverlay" parent="." instance=ExtResource("so")]
