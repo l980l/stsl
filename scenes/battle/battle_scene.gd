@@ -668,7 +668,7 @@ func _on_card_hovered(card: Resource) -> void:
 	_free_card_tooltip()
 	var tooltip: CardScene = CARD_SCENE.instantiate()
 	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tooltip.custom_minimum_size = Vector2(280, 400)
+	tooltip.scale = Vector2(2.5, 2.5)
 	tooltip.z_index = 100
 	tooltip.setup(card, tooltip.Mode.HAND)
 	add_child(tooltip)
@@ -682,8 +682,8 @@ func _reposition_card_tooltip() -> void:
 	if _card_tooltip == null:
 		return
 	var mp: Vector2 = get_global_mouse_position()
-	var x: float = clamp(mp.x - 140.0, 0.0, 1640.0)
-	var y: float = clamp(mp.y - 420.0, 0.0, 680.0)
+	var x: float = clamp(mp.x - 175.0, 0.0, 1570.0)
+	var y: float = clamp(mp.y - 520.0, 0.0, 580.0)
 	_card_tooltip.position = Vector2(x, y)
 
 func _free_card_tooltip() -> void:
