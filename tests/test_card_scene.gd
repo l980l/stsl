@@ -15,6 +15,9 @@ func run_all() -> Dictionary:
 	test_build_desc_empty_effects()
 	test_build_desc_with_effects()
 	test_set_disabled()
+	test_signals_defined()
+	test_drag_state_initial()
+	test_disabled_blocks_click()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -67,4 +70,27 @@ func test_set_disabled() -> void:
 	_assert(scene._disabled == true, "set_disabled(true) → _disabled == true")
 	scene.set_disabled(false)
 	_assert(scene._disabled == false, "set_disabled(false) → _disabled == false")
+	scene.free()
+
+func test_signals_defined() -> void:
+	print("[TestCardScene] test_signals_defined")
+	var scene = CardSceneScript.new()
+	_assert(scene.has_signal("card_clicked"), "card_clicked 시그널 정의됨")
+	_assert(scene.has_signal("card_drag_started"), "card_drag_started 시그널 정의됨")
+	_assert(scene.has_signal("card_drag_released"), "card_drag_released 시그널 정의됨")
+	_assert(scene.has_signal("card_hovered"), "card_hovered 시그널 정의됨")
+	scene.free()
+
+func test_drag_state_initial() -> void:
+	print("[TestCardScene] test_drag_state_initial")
+	var scene = CardSceneScript.new()
+	_assert(not scene._pressing, "초기 _pressing == false")
+	_assert(not scene._dragging, "초기 _dragging == false")
+	scene.free()
+
+func test_disabled_blocks_click() -> void:
+	print("[TestCardScene] test_disabled_blocks_click")
+	var scene = CardSceneScript.new()
+	scene.set_disabled(true)
+	_assert(scene._disabled, "disabled 상태 설정됨")
 	scene.free()
