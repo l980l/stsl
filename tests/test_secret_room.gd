@@ -101,6 +101,8 @@ func test_map_generator_no_secret_on_floor_1() -> void:
 
 # 5. _resolve_secret_room() 호출이 에러 없이 완료됨
 #    (SceneTree 없이도 크래시 없이 4가지 경로 중 하나를 실행)
+#    randi() 분기는 비결정적이므로 각 경로를 개별 단위 테스트로 검증
+#    완전한 통합 테스트는 수동 UI 검증으로 대체
 func test_secret_resolves_one_of_four() -> void:
 	print("[TestSecretRoom] test_secret_resolves_one_of_four")
 	var gm := GameManagerClass.new()

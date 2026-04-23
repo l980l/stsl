@@ -41,7 +41,7 @@ static func generate(act: int = 1) -> Array:  # -> Array[MapNodeResource]
 
 	return nodes
 
-static func _pick_room_type(floor_num: int, col: int, _act: int = 1) -> MapNodeRes.RoomType:
+static func _pick_room_type(floor_num: int, col: int, _act: int = 1) -> int:
 	# act 파라미터는 향후 액트별 레이아웃을 위해 예약됨. Phase A: 무시.
 	if floor_num == 3 and col == 1: return MapNodeRes.RoomType.REST
 	if floor_num == 3 and col == 2: return MapNodeRes.RoomType.SHOP
