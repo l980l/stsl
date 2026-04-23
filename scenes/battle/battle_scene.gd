@@ -635,7 +635,8 @@ func _refresh_hand() -> void:
 		node.card_drag_started.connect(_on_card_drag_started)
 		node.card_drag_moved.connect(_on_card_drag_moved)
 		node.card_drag_released.connect(_on_card_drag_released)
-		node.card_hovered.connect(_on_card_hovered)
+		var captured_node := node
+		node.card_hovered.connect(func(c: Resource): _on_card_hovered(c, captured_node))
 		node.card_unhovered.connect(_on_card_unhovered)
 		add_child(node)
 		_card_buttons.append(node)
@@ -662,7 +663,7 @@ func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 	if _drag_card != null:
 		_finish_drag(screen_pos)
 
-func _on_card_hovered(card: Resource) -> void:
+func _on_card_hovered(card: Resource, card_node: CardScene) -> void:
 	if _drag_card != null:
 		return
 	_free_card_tooltip()
@@ -673,18 +674,14 @@ func _on_card_hovered(card: Resource) -> void:
 	tooltip.setup(card, tooltip.Mode.HAND)
 	add_child(tooltip)
 	_card_tooltip = tooltip
-	_reposition_card_tooltip()
+	# 카드 정중앙 위쪽에 고정 (툴팁 350×500 기준)
+	var base: Vector2 = card_node.global_position
+	var x: float = clamp(base.x + 70.0 - 175.0, 0.0, 1570.0)
+	var y: float = clamp(base.y - 510.0, 0.0, 580.0)
+	tooltip.position = Vector2(x, y)
 
 func _on_card_unhovered(_card: Resource) -> void:
 	_free_card_tooltip()
-
-func _reposition_card_tooltip() -> void:
-	if _card_tooltip == null:
-		return
-	var mp: Vector2 = get_global_mouse_position()
-	var x: float = clamp(mp.x - 175.0, 0.0, 1570.0)
-	var y: float = clamp(mp.y - 520.0, 0.0, 580.0)
-	_card_tooltip.position = Vector2(x, y)
 
 func _free_card_tooltip() -> void:
 	if _card_tooltip != null:
