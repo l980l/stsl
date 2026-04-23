@@ -38,10 +38,10 @@ static func pool() -> Array:
 static func _strike() -> Resource:
 	# 스트라이크 — COMMON, 1코, ATTACK, 돌격: DMG 100
 	var c := CardRes.new()
-	c.card_name = "스트라이크"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.strike.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.strike.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
@@ -50,10 +50,10 @@ static func _strike() -> Resource:
 static func _defend() -> Resource:
 	# 디펜드 — COMMON, 1코, SKILL, 군단: BLOCK 80
 	var c := CardRes.new()
-	c.card_name = "디펜드"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.defend.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.defend.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 80; e.base_value = 80; e.target = "SELF"
@@ -66,10 +66,10 @@ static func _defend() -> Resource:
 static func _swift_advance() -> Resource:
 	# 신속 기동 — COMMON, 1코, ATTACK, 돌격: DMG 100 + MORALE+1
 	var c := CardRes.new()
-	c.card_name = "신속 기동"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.swift_advance.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.swift_advance.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
@@ -81,10 +81,10 @@ static func _swift_advance() -> Resource:
 static func _line_reform() -> Resource:
 	# 전열 재편 — COMMON, 0코, SKILL, 지휘: DRAW 1
 	var c := CardRes.new()
-	c.card_name = "전열 재편"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.line_reform.name"); c.owner_id = "napoleon"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.line_reform.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DRAW
 	e.value = 1; e.base_value = 1
@@ -93,10 +93,10 @@ static func _line_reform() -> Resource:
 static func _hussar_charge() -> Resource:
 	# 경기병 돌격 — UNCOMMON, 1코, ATTACK, 돌격: DMG 120 + MORALE+1
 	var c := CardRes.new()
-	c.card_name = "경기병 돌격"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.hussar_charge.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.hussar_charge.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 120; ea.base_value = 120; ea.target = "SINGLE"
@@ -108,10 +108,10 @@ static func _hussar_charge() -> Resource:
 static func _grand_armee_shield() -> Resource:
 	# 그랑다르메의 방패 — UNCOMMON, 1코, SKILL, 군단: BLOCK 110
 	var c := CardRes.new()
-	c.card_name = "그랑다르메의 방패"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.grand_armee_shield.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.grand_armee_shield.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 110; e.base_value = 110; e.target = "SELF"
@@ -120,10 +120,10 @@ static func _grand_armee_shield() -> Resource:
 static func _salvo() -> Resource:
 	# 살보 사격 — UNCOMMON, 1코, ATTACK, 돌격: DMG 100 + ENERGY+1
 	var c := CardRes.new()
-	c.card_name = "살보 사격"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.salvo.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.salvo.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
@@ -135,10 +135,10 @@ static func _salvo() -> Resource:
 static func _marshal_appointment() -> Resource:
 	# 원수 서임 — UNCOMMON, 1코, SKILL, 지휘: DRAW 2 + MORALE+1
 	var c := CardRes.new()
-	c.card_name = "원수 서임"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.marshal_appointment.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.marshal_appointment.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW
 	ea.value = 2; ea.base_value = 2
@@ -150,10 +150,10 @@ static func _marshal_appointment() -> Resource:
 static func _arcole_breakthrough() -> Resource:
 	# 아르콜레 돌파 — RARE, 1코, ATTACK, 돌격: DMG 100 + BLOCK 80
 	var c := CardRes.new()
-	c.card_name = "아르콜레 돌파"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.arcole_breakthrough.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.arcole_breakthrough.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
@@ -165,10 +165,10 @@ static func _arcole_breakthrough() -> Resource:
 static func _artillery_volley() -> Resource:
 	# 포병 일제사격 — RARE, 1코, ATTACK, 군단: DMG 80 ALL
 	var c := CardRes.new()
-	c.card_name = "포병 일제사격"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.artillery_volley.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.artillery_volley.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 80; e.base_value = 80; e.target = "ALL"
@@ -177,10 +177,10 @@ static func _artillery_volley() -> Resource:
 static func _jena_surprise() -> Resource:
 	# 예나의 기습 — RARE, 1코, ATTACK, 돌격: DMG 100 + POISON 3
 	var c := CardRes.new()
-	c.card_name = "예나의 기습"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.jena_surprise.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.jena_surprise.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
@@ -192,10 +192,10 @@ static func _jena_surprise() -> Resource:
 static func _borodino_bombardment() -> Resource:
 	# 보로디노 포격 — RARE, 2코, ATTACK, 군단: CONDITIONAL_DMG (사기 있으면 DMG 200 / 없으면 140)
 	var c := CardRes.new()
-	c.card_name = "보로디노 포격"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.borodino_bombardment.name"); c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.borodino_bombardment.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 140; e.base_value = 140
@@ -206,10 +206,10 @@ static func _borodino_bombardment() -> Resource:
 static func _total_assault_order() -> Resource:
 	# 총공세 명령 — RARE, 1코, SKILL, 지휘: MORALE+2 + DRAW 1
 	var c := CardRes.new()
-	c.card_name = "총공세 명령"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.total_assault_order.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.total_assault_order.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.GAIN_MORALE
 	ea.value = 2; ea.base_value = 2
@@ -221,10 +221,10 @@ static func _total_assault_order() -> Resource:
 static func _emperors_command() -> Resource:
 	# 황제의 명령 — LEGENDARY, 2코, ATTACK, 지휘: DMG 80 ALL + MORALE+2
 	var c := CardRes.new()
-	c.card_name = "황제의 명령"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.emperors_command.name"); c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.emperors_command.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "ALL"
@@ -236,10 +236,10 @@ static func _emperors_command() -> Resource:
 static func _emperors_spirit() -> Resource:
 	# 황제의 기개 — DIVINE, 0코, ATTACK, 돌격: CONSUME_MORALE(3)→DMG 300 + WEAK 1
 	var c := CardRes.new()
-	c.card_name = "황제의 기개"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.emperors_spirit.name"); c.owner_id = "napoleon"
 	c.cost = 0; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.emperors_spirit.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CONSUME_MORALE
 	ea.value = 3; ea.base_value = 3
@@ -256,10 +256,10 @@ static func _emperors_spirit() -> Resource:
 static func _advance_order() -> Resource:
 	# 전진 명령 — COMMON, 1코, ATTACK, 돌격: DMG 100 + MORALE+1
 	var c := CardRes.new()
-	c.card_name = "전진 명령"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.advance_order.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.advance_order.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
@@ -271,10 +271,10 @@ static func _advance_order() -> Resource:
 static func _trench_construction() -> Resource:
 	# 참호 구축 — COMMON, 1코, SKILL, 군단: BLOCK 80
 	var c := CardRes.new()
-	c.card_name = "참호 구축"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.trench_construction.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.trench_construction.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 80; e.base_value = 80; e.target = "SELF"
@@ -283,10 +283,10 @@ static func _trench_construction() -> Resource:
 static func _scout_patrol() -> Resource:
 	# 척후 정찰 — COMMON, 0코, SKILL, 지휘: DRAW 1 + ENERGY+1
 	var c := CardRes.new()
-	c.card_name = "척후 정찰"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.scout_patrol.name"); c.owner_id = "napoleon"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.scout_patrol.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW
 	ea.value = 1; ea.base_value = 1
@@ -298,10 +298,10 @@ static func _scout_patrol() -> Resource:
 static func _drum_beat() -> Resource:
 	# 북소리 — COMMON, 0코, SKILL, 군단: MORALE+1
 	var c := CardRes.new()
-	c.card_name = "북소리"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.drum_beat.name"); c.owner_id = "napoleon"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.drum_beat.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.GAIN_MORALE
 	e.value = 1; e.base_value = 1
@@ -310,10 +310,10 @@ static func _drum_beat() -> Resource:
 static func _charge_bugle() -> Resource:
 	# 진격 나팔 — COMMON, 1코, SKILL, 지휘: DRAW 1 + MORALE+1
 	var c := CardRes.new()
-	c.card_name = "진격 나팔"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.charge_bugle.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.charge_bugle.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW
 	ea.value = 1; ea.base_value = 1
@@ -325,10 +325,10 @@ static func _charge_bugle() -> Resource:
 static func _cavalry_threat() -> Resource:
 	# 기병 위협 — COMMON, 1코, ATTACK, 돌격: DMG 100
 	var c := CardRes.new()
-	c.card_name = "기병 위협"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.cavalry_threat.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.cavalry_threat.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
@@ -337,10 +337,10 @@ static func _cavalry_threat() -> Resource:
 static func _guard_charge() -> Resource:
 	# 근위대 돌격 — UNCOMMON, 1코, ATTACK, 군단: SUMMON_TOKEN 1 + DMG 80
 	var c := CardRes.new()
-	c.card_name = "근위대 돌격"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.guard_charge.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.guard_charge.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SUMMON_TOKEN
 	ea.value = 1; ea.base_value = 1
@@ -352,10 +352,10 @@ static func _guard_charge() -> Resource:
 static func _breakthrough_advance() -> Resource:
 	# 전선 돌파 — UNCOMMON, 1코, ATTACK, 돌격: DMG 110 + COST_NEXT -1
 	var c := CardRes.new()
-	c.card_name = "전선 돌파"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.breakthrough_advance.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.breakthrough_advance.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 110; ea.base_value = 110; ea.target = "SINGLE"
@@ -367,10 +367,10 @@ static func _breakthrough_advance() -> Resource:
 static func _commanders_eye() -> Resource:
 	# 지휘관의 눈 — UNCOMMON, 1코, SKILL, 지휘: DRAW 2 + ENERGY+1
 	var c := CardRes.new()
-	c.card_name = "지휘관의 눈"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.commanders_eye.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.commanders_eye.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW
 	ea.value = 2; ea.base_value = 2
@@ -382,10 +382,10 @@ static func _commanders_eye() -> Resource:
 static func _supply_line_secured() -> Resource:
 	# 보급선 확보 — UNCOMMON, 0코, SKILL, 지휘: DRAW 1 + MORALE+1
 	var c := CardRes.new()
-	c.card_name = "보급선 확보"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.supply_line_secured.name"); c.owner_id = "napoleon"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.supply_line_secured.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW
 	ea.value = 1; ea.base_value = 1
@@ -397,10 +397,10 @@ static func _supply_line_secured() -> Resource:
 static func _artillery_gather() -> Resource:
 	# 포병 집결 — UNCOMMON, 1코, SKILL, 군단: SUMMON_TOKEN 1 + BLOCK 60
 	var c := CardRes.new()
-	c.card_name = "포병 집결"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.artillery_gather.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.artillery_gather.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SUMMON_TOKEN
 	ea.value = 1; ea.base_value = 1
@@ -412,10 +412,10 @@ static func _artillery_gather() -> Resource:
 static func _mobile_firing() -> Resource:
 	# 기동 사격 — UNCOMMON, 1코, ATTACK, 돌격: DMG 100 + MORALE+1 + ENERGY+1
 	var c := CardRes.new()
-	c.card_name = "기동 사격"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.mobile_firing.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.mobile_firing.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
@@ -430,10 +430,10 @@ static func _mobile_firing() -> Resource:
 static func _bridgehead_capture() -> Resource:
 	# 교두보 점령 — UNCOMMON, 2코, SKILL, 군단: BLOCK_ALL 60
 	var c := CardRes.new()
-	c.card_name = "교두보 점령"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.bridgehead_capture.name"); c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.bridgehead_capture.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK_ALL
 	e.value = 60; e.base_value = 60
@@ -442,10 +442,10 @@ static func _bridgehead_capture() -> Resource:
 static func _imperial_artillery() -> Resource:
 	# 황실 포병대 — UNCOMMON, 1코, ATTACK, 군단: DMG 80 + MORALE+1
 	var c := CardRes.new()
-	c.card_name = "황실 포병대"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.imperial_artillery.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.imperial_artillery.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
@@ -457,10 +457,10 @@ static func _imperial_artillery() -> Resource:
 static func _imperial_infantry_call() -> Resource:
 	# 제국 보병 소집 — RARE, 2코, SKILL, 군단: SUMMON_TOKEN 2
 	var c := CardRes.new()
-	c.card_name = "제국 보병 소집"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.imperial_infantry_call.name"); c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.imperial_infantry_call.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.SUMMON_TOKEN
 	e.value = 2; e.base_value = 2
@@ -469,10 +469,10 @@ static func _imperial_infantry_call() -> Resource:
 static func _austerlitz_maneuver() -> Resource:
 	# 아우스터리츠 기동 — RARE, 1코, ATTACK, 돌격: DMG 100 + BLOCK 60 + MORALE+1
 	var c := CardRes.new()
-	c.card_name = "아우스터리츠 기동"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.austerlitz_maneuver.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.austerlitz_maneuver.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
@@ -487,10 +487,10 @@ static func _austerlitz_maneuver() -> Resource:
 static func _waterloo_resolve() -> Resource:
 	# 워털루 이전의 결의 — RARE, 1코, SKILL, 지휘: DRAW 2 + MORALE+2
 	var c := CardRes.new()
-	c.card_name = "워털루 이전의 결의"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.waterloo_resolve.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.waterloo_resolve.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW
 	ea.value = 2; ea.base_value = 2
@@ -502,10 +502,10 @@ static func _waterloo_resolve() -> Resource:
 static func _eagle_standard() -> Resource:
 	# 독수리 군기 — RARE, 2코, SKILL, 군단: SUMMON_TOKEN 1 + BLOCK_ALL 70
 	var c := CardRes.new()
-	c.card_name = "독수리 군기"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.eagle_standard.name"); c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.eagle_standard.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SUMMON_TOKEN
 	ea.value = 1; ea.base_value = 1
@@ -517,10 +517,10 @@ static func _eagle_standard() -> Resource:
 static func _victory_proclamation() -> Resource:
 	# 승리의 포고 — RARE, 1코, ATTACK, 지휘: CONDITIONAL_DMG (MORALE 2 이상이면 150 / 미만 100)
 	var c := CardRes.new()
-	c.card_name = "승리의 포고"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.victory_proclamation.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.victory_proclamation.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 100; e.base_value = 100
@@ -531,10 +531,10 @@ static func _victory_proclamation() -> Resource:
 static func _great_army_siege() -> Resource:
 	# 대육군 포위전 — RARE, 2코, ATTACK, 군단: DMG 80 ALL (토큰×60 추가 피해는 battle_manager 처리)
 	var c := CardRes.new()
-	c.card_name = "대육군 포위전"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.great_army_siege.name"); c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.great_army_siege.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 80; e.base_value = 80; e.target = "ALL"
@@ -543,10 +543,10 @@ static func _great_army_siege() -> Resource:
 static func _emperors_encirclement() -> Resource:
 	# 황제의 포위령 — RARE, 1코, SKILL, 지휘: COST_NEXT -2 + DRAW 1
 	var c := CardRes.new()
-	c.card_name = "황제의 포위령"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.emperors_encirclement.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.emperors_encirclement.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.COST_NEXT
 	ea.value = 2; ea.base_value = 2
@@ -558,10 +558,10 @@ static func _emperors_encirclement() -> Resource:
 static func _one_man_army() -> Resource:
 	# 일기당천 — RARE, 1코, ATTACK, 돌격: CONSUME_MORALE(1)→DMG 150 + ENERGY+1
 	var c := CardRes.new()
-	c.card_name = "일기당천"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.one_man_army.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.one_man_army.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CONSUME_MORALE
 	ea.value = 1; ea.base_value = 1
@@ -574,10 +574,10 @@ static func _one_man_army() -> Resource:
 static func _strategic_retreat() -> Resource:
 	# 전략적 후퇴 — LEGENDARY, 1코, SKILL, 지휘: DRAW 3 + MORALE+2 + BLOCK_ALL 60
 	var c := CardRes.new()
-	c.card_name = "전략적 후퇴"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.strategic_retreat.name"); c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "지휘"
+	c.archetype = TranslationServer.translate("card.napoleon.strategic_retreat.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW
 	ea.value = 3; ea.base_value = 3
@@ -592,10 +592,10 @@ static func _strategic_retreat() -> Resource:
 static func _emperors_assault() -> Resource:
 	# 황제의 돌격 — LEGENDARY, 2코, ATTACK, 돌격: CONSUME_MORALE(2)→DMG 250 + BLOCK 100
 	var c := CardRes.new()
-	c.card_name = "황제의 돌격"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.emperors_assault.name"); c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = "돌격"
+	c.archetype = TranslationServer.translate("card.napoleon.emperors_assault.archetype")
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CONSUME_MORALE
 	ea.value = 2; ea.base_value = 2
@@ -608,10 +608,10 @@ static func _emperors_assault() -> Resource:
 static func _empire_glory() -> Resource:
 	# 제국의 영광 — DIVINE, 0코, POWER, 군단: SUMMON_TOKEN 1 (지속 효과는 battle_manager 처리)
 	var c := CardRes.new()
-	c.card_name = "제국의 영광"; c.owner_id = "napoleon"
+	c.card_name = TranslationServer.translate("card.napoleon.empire_glory.name"); c.owner_id = "napoleon"
 	c.cost = 0; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "idle"
-	c.archetype = "군단"
+	c.archetype = TranslationServer.translate("card.napoleon.empire_glory.archetype")
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.SUMMON_TOKEN
 	e.value = 1; e.base_value = 1

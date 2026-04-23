@@ -19,6 +19,7 @@ var TestCardEffectsEngine = preload("res://tests/test_card_effects_engine.gd")
 var TestCardPoolDistribution = preload("res://tests/test_card_pool_distribution.gd")
 var TestLocaleManager = preload("res://tests/test_locale_manager.gd")
 var TestCardScene = preload("res://tests/test_card_scene.gd")
+var TestEffectDisplayText = preload("res://tests/test_effect_display_text.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -42,6 +43,7 @@ func _init() -> void:
 		TestCardPoolDistribution.new(),
 		TestLocaleManager.new(),
 		TestCardScene.new(),
+		TestEffectDisplayText.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()
