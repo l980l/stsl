@@ -1157,11 +1157,17 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		card_node.scale = Vector2(0.65, 0.65)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
-		card_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_set_mouse_ignore_recursive(card_node)
 
 		var captured_wrapper: Control = wrapper
 		wrapper.mouse_entered.connect(func(): _show_deck_tooltip(captured_res, captured_wrapper))
 		wrapper.mouse_exited.connect(func(): _hide_deck_tooltip())
+
+func _set_mouse_ignore_recursive(node: Node) -> void:
+	if node is Control:
+		(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for child in node.get_children():
+		_set_mouse_ignore_recursive(child)
 
 func _show_deck_tooltip(card: Resource, node: Control) -> void:
 	if _deck_viewer_tooltip == null:
