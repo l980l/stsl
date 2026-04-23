@@ -18,10 +18,10 @@ expand_mode = 0
 stretch_mode = 6
 
 [node name="CostLabel" type="Label" parent="Container"]
-offset_left = 45.0
-offset_top = 45.0
-offset_right = 150.0
-offset_bottom = 150.0
+offset_left = 35.0
+offset_top = 30.0
+offset_right = 175.0
+offset_bottom = 185.0
 horizontal_alignment = 1
 vertical_alignment = 1
 theme_override_font_sizes/font_size = 80
@@ -29,9 +29,9 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 
 [node name="TitleLabel" type="Label" parent="Container"]
-offset_left = 155.0
-offset_top = 50.0
-offset_right = 745.0
+offset_left = 180.0
+offset_top = 35.0
+offset_right = 760.0
 offset_bottom = 130.0
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 72
@@ -39,17 +39,17 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 
 [node name="ArtRect" type="TextureRect" parent="Container"]
-offset_left = 50.0
-offset_top = 140.0
-offset_right = 755.0
-offset_bottom = 765.0
+offset_left = 40.0
+offset_top = 135.0
+offset_right = 765.0
+offset_bottom = 760.0
 expand_mode = 3
 
 [node name="DescLabel" type="Label" parent="Container"]
-offset_left = 50.0
-offset_top = 780.0
+offset_left = 55.0
+offset_top = 790.0
 offset_right = 755.0
-offset_bottom = 1075.0
+offset_bottom = 1100.0
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 60
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
