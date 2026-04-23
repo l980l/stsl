@@ -2,11 +2,11 @@
 class_name CardScene
 extends Control
 
-const Mode = {"HAND": 0, "REWARD": 1, "UPGRADE": 2}
+enum Mode { HAND, REWARD, UPGRADE }
 const DRAG_THRESHOLD := 10.0
 const FRAME_DIR := "res://assets/art/cards/cardframes/"
 
-var _card: Resource
+var _card: CardResource
 var _mode: int = Mode.HAND
 var _disabled: bool = false
 
@@ -16,10 +16,12 @@ func setup(card: Resource, mode: int) -> void:
 	refresh()
 
 func refresh() -> void:
+	if _card == null:
+		return
 	$Container/Frame.texture = _resolve_frame_texture(_card.owner_id)
 	$Container/CostLabel.text = str(_card.cost)
 	$Container/TitleLabel.text = _card.card_name
-	$Container/ArtRect.texture = _card.art if _card.art != null else null
+	$Container/ArtRect.texture = _card.art
 	$Container/DescLabel.text = _build_desc()
 
 func _build_desc() -> String:
