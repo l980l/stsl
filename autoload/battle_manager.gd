@@ -136,7 +136,7 @@ func _phase_player_main() -> void:
 	if team_mgr:
 		for hero in team_mgr.heroes:
 			_hero_block[hero.hero_id] = 0
-			for stype: String in ["weak", "vulnerable"]:
+			for stype: String in ["weak", "vulnerable", "taunt"]:
 				var cur: int = _hero_status.get(hero.hero_id, {}).get(stype, 0)
 				if cur > 0:
 					if not _hero_status.has(hero.hero_id):
@@ -694,7 +694,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 						_deal_damage_to_hero(hero.hero_id, dmg)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
-				var target_id: String = _pick_hero_target(intent.target, enemy_index)
+				var target_id: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 				if target_id != "":
 					_deal_damage_to_hero(target_id, dmg)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": target_id})
@@ -726,12 +726,37 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 		IntentRes.ActionType.PREPARE:
 			pass  # 준비 턴 — 아무 효과 없음
 
-func _pick_hero_target(target_type: int, enemy_index: int) -> String:
+func _get_taunting_heroes() -> Array:
+	var result: Array = []
+	if team_mgr == null:
+		return result
+	for hero in team_mgr.get_living_heroes():
+		var status: Dictionary = _hero_status.get(hero.hero_id, {})
+		if status.get("taunt", 0) > 0:
+			result.append(hero.hero_id)
+	return result
+
+func _pick_highest_hp(hero_ids: Array) -> String:
+	var best_id: String = hero_ids[0]
+	var best_hp: int = team_mgr.get_current_hp(best_id)
+	for hid in hero_ids:
+		var hp: int = team_mgr.get_current_hp(hid)
+		if hp > best_hp:
+			best_hp = hp
+			best_id = hid
+	return best_id
+
+func _pick_hero_target(target_type: int, enemy_index: int, action_type: int = -1) -> String:
 	if team_mgr == null:
 		return ""
 	var living: Array = team_mgr.get_living_heroes()
 	if living.is_empty():
 		return ""
+	# 도발 우회: ATTACK 인텐트이면 도발 영웅 강제 선택
+	if action_type == IntentRes.ActionType.ATTACK:
+		var taunters: Array = _get_taunting_heroes()
+		if taunters.size() > 0:
+			return _pick_highest_hp(taunters)
 	match target_type:
 		IntentRes.TargetType.RANDOM:
 			return living[randi() % living.size()].hero_id
