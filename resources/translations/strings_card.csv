@@ -1,4 +1,4 @@
-keys,ko,en,fr,it,es,ja,el,zh
+﻿keys,ko,en,fr,it,es,ja,el,zh
 effect.damage.text,피해 %d%s%s,,,,,,,
 effect.block.text,방어 %d,,,,,,,
 effect.block_all.text,전체 방어 %d,,,,,,,
