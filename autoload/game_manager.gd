@@ -28,6 +28,7 @@ const _EventsAct3     = preload("res://resources/events/events_act3.gd")
 const _EventsKorean   = preload("res://resources/events/events_korean.gd")
 const _EventsChinese  = preload("res://resources/events/events_chinese.gd")
 const _EventsJapanese = preload("res://resources/events/events_japanese.gd")
+const _MapNodeRes      = preload("res://resources/map_node_resource.gd")
 const _KoreanNormals   = preload("res://resources/enemies/korean/korean_normals.gd")
 const _KoreanAct1      = preload("res://resources/enemies/korean/korean_act1.gd")
 const _KoreanAct2      = preload("res://resources/enemies/korean/korean_act2.gd")
@@ -182,29 +183,30 @@ func enter_node(node_id: int) -> void:
 	current_floor = node.floor_num
 	node_entered.emit(node_id)
 
-	var MapNodeRes = load("res://resources/map_node_resource.gd")
 	match node.room_type:
-		MapNodeRes.RoomType.BATTLE, \
-		MapNodeRes.RoomType.ELITE, \
-		MapNodeRes.RoomType.BOSS:
+		_MapNodeRes.RoomType.BATTLE, \
+		_MapNodeRes.RoomType.ELITE, \
+		_MapNodeRes.RoomType.BOSS:
 			pending_enemies = _make_enemies_for_node(node)
-			_last_elite_solo = (node.room_type == MapNodeRes.RoomType.ELITE and pending_enemies.size() == 1)
-			if node.room_type == MapNodeRes.RoomType.BOSS and pending_enemies.size() > 0:
+			_last_elite_solo = (node.room_type == _MapNodeRes.RoomType.ELITE and pending_enemies.size() == 1)
+			if node.room_type == _MapNodeRes.RoomType.BOSS and pending_enemies.size() > 0:
 				_last_boss_enemy_id = pending_enemies[0].enemy_name
 			else:
 				_last_boss_enemy_id = ""
 			change_state(GameState.BATTLE)
 			_request_scene("res://scenes/battle/battle_scene.tscn")
-		MapNodeRes.RoomType.REST:
+		_MapNodeRes.RoomType.REST:
 			change_state(GameState.REST)
 			_request_scene("res://scenes/rest/rest_scene.tscn")
-		MapNodeRes.RoomType.EVENT:
+		_MapNodeRes.RoomType.EVENT:
 			pending_event = _get_random_event()
 			change_state(GameState.EVENT)
 			_request_scene("res://scenes/event/event_scene.tscn")
-		MapNodeRes.RoomType.SHOP:
+		_MapNodeRes.RoomType.SHOP:
 			change_state(GameState.SHOP)
 			_request_scene("res://scenes/shop/shop_scene.tscn")
+		_MapNodeRes.RoomType.SECRET:
+			_resolve_secret_room()
 
 func complete_battle(won: bool) -> void:
 	pending_enemies.clear()
@@ -215,10 +217,9 @@ func complete_battle(won: bool) -> void:
 		# 룸 타입별 카드 보상 수량 및 보스 릴릭 처리
 		if current_node_id >= 0 and current_node_id < run_map.size():
 			var node: Resource = run_map[current_node_id]
-			var MapNodeRes = load("res://resources/map_node_resource.gd")
 			var pm = get_node_or_null("/root/ProgressManager")
 			match node.room_type:
-				MapNodeRes.RoomType.ELITE:
+				_MapNodeRes.RoomType.ELITE:
 					card_rewards_pick_count = 2
 					add_gold(randi_range(20, 25))
 					if pm:
@@ -226,7 +227,7 @@ func complete_battle(won: bool) -> void:
 						if _last_elite_solo:
 							pm.increment_flag("elite_solo_kills")
 						pm.check_unlock_conditions()
-				MapNodeRes.RoomType.BOSS:
+				_MapNodeRes.RoomType.BOSS:
 					card_rewards_pick_count = 2
 					add_gold(40)
 					var relic := get_random_relic()
@@ -235,6 +236,12 @@ func complete_battle(won: bool) -> void:
 					if pm and _last_boss_enemy_id != "":
 						pm.set_flag("kill_boss:" + _last_boss_enemy_id)
 						pm.check_unlock_conditions()
+				_MapNodeRes.RoomType.SECRET:
+					# 비밀 전투 보상: 기본 카드 픽 + 유물 1개
+					card_rewards_pick_count = 1
+					var secret_relic := get_random_relic()
+					if secret_relic:
+						add_relic(secret_relic)
 				_:
 					card_rewards_pick_count = 1
 					add_gold(randi_range(10, 15))
@@ -252,9 +259,8 @@ func complete_battle(won: bool) -> void:
 func complete_card_pick() -> void:
 	var node: Resource = run_map[current_node_id]
 	_advance_nodes_from(current_node_id)
-	var MapNodeRes = load("res://resources/map_node_resource.gd")
 	card_rewards.clear()
-	if node.room_type == MapNodeRes.RoomType.BOSS:
+	if node.room_type == _MapNodeRes.RoomType.BOSS:
 		# 보스 승리: 카드 강화 1회 후 게임 오버(승)
 		pending_boss_upgrade = true
 		change_state(GameState.CARD_UPGRADE)
@@ -288,6 +294,42 @@ func complete_rest() -> void:
 	_advance_nodes_from(current_node_id)
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
+
+# ── 비밀룸 ─────────────────────────────────────────────
+
+## 4가지 보상 중 랜덤 1개 지급
+## 0: 레어 카드 보상  1: 유물 즉시 지급  2: 골드  3: 비밀 전투
+func _resolve_secret_room() -> void:
+	var roll := randi() % 4
+	match roll:
+		0:
+			# 카드 보상 — 현재 풀에서 3장 추출 후 카드픽 화면으로 이동
+			card_rewards = _generate_card_rewards()
+			card_rewards_pick_count = 1
+			change_state(GameState.CARD_PICK)
+			_request_scene("res://scenes/card_pick/card_pick_scene.tscn")
+		1:
+			# 유물 즉시 지급 — 비밀룸은 랜덤 유물 바로 획득
+			var relic := get_random_relic()
+			if relic:
+				add_relic(relic)
+			_advance_nodes_from(current_node_id)
+			change_state(GameState.MAP)
+			_request_scene("res://scenes/map/map_scene.tscn")
+		2:
+			# 골드 100~150
+			add_gold(randi_range(100, 150))
+			_advance_nodes_from(current_node_id)
+			change_state(GameState.MAP)
+			_request_scene("res://scenes/map/map_scene.tscn")
+		3:
+			# 비밀 전투 — 엘리트급 적 1마리, 승리 시 유물 보너스 보장
+			pending_enemies = _make_elite_enemies()
+			_apply_act_difficulty(pending_enemies, current_act)
+			_last_elite_solo = (pending_enemies.size() == 1)
+			_last_boss_enemy_id = ""
+			change_state(GameState.BATTLE)
+			_request_scene("res://scenes/battle/battle_scene.tscn")
 
 func enter_card_upgrade() -> void:
 	_advance_nodes_from(current_node_id)
@@ -499,14 +541,13 @@ func _apply_act_difficulty(enemies: Array, act: int) -> void:
 					intent.value = int(intent.value * dmg_m)
 
 func _make_enemies_for_node(node: Resource) -> Array:
-	var MapNodeRes = load("res://resources/map_node_resource.gd")
 	var enemies: Array
 	match node.room_type:
-		MapNodeRes.RoomType.BATTLE:
+		_MapNodeRes.RoomType.BATTLE:
 			enemies = _make_normal_enemies()
-		MapNodeRes.RoomType.ELITE:
+		_MapNodeRes.RoomType.ELITE:
 			enemies = _make_elite_enemies()
-		MapNodeRes.RoomType.BOSS:
+		_MapNodeRes.RoomType.BOSS:
 			enemies = _make_boss_enemies()
 		_:
 			enemies = []
@@ -666,9 +707,8 @@ func from_dict(data: Dictionary) -> void:
 	current_node_id = data.get("current_node_id", -1)
 	available_node_ids = data.get("available_node_ids", [0, 1, 2])
 	run_map.clear()
-	var MapNodeRes = load("res://resources/map_node_resource.gd")
 	for nd in data.get("run_map", []):
-		var node: Resource = MapNodeRes.new()
+		var node: Resource = _MapNodeRes.new()
 		node.node_id = nd["node_id"]
 		node.floor_num = nd["floor_num"]
 		node.column = nd["column"]

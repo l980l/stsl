@@ -41,7 +41,7 @@ static func generate(act: int = 1) -> Array:  # -> Array[MapNodeResource]
 
 	return nodes
 
-static func _pick_room_type(floor_num: int, col: int, _act: int = 1) -> MapNodeRes.RoomType:
+static func _pick_room_type(floor_num: int, col: int, _act: int = 1) -> int:
 	# act 파라미터는 향후 액트별 레이아웃을 위해 예약됨. Phase A: 무시.
 	if floor_num == 3 and col == 1: return MapNodeRes.RoomType.REST
 	if floor_num == 3 and col == 2: return MapNodeRes.RoomType.SHOP
@@ -54,6 +54,11 @@ static func _pick_room_type(floor_num: int, col: int, _act: int = 1) -> MapNodeR
 	if floor_num == 7 and col == 2: return MapNodeRes.RoomType.REST
 	# floor 8 전체 ELITE — 보스 직전 층 난이도 상승 (스펙 의도)
 	if floor_num == 8:               return MapNodeRes.RoomType.ELITE
+	# 비밀룸: 1층(floor 0)과 보스 직전(floor 8)에는 배치 금지, 나머지 3~5% 확률
+	if floor_num > 0 and floor_num < 8:
+		var roll := randf()
+		if roll < 0.04:  # 4% 확률
+			return MapNodeRes.RoomType.SECRET
 	return MapNodeRes.RoomType.BATTLE
 
 # col 0 → 다음 floor col 0~1
