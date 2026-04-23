@@ -205,6 +205,8 @@ func enter_node(node_id: int) -> void:
 		MapNodeRes.RoomType.SHOP:
 			change_state(GameState.SHOP)
 			_request_scene("res://scenes/shop/shop_scene.tscn")
+		MapNodeRes.RoomType.SECRET:
+			_resolve_secret_room()
 
 func complete_battle(won: bool) -> void:
 	pending_enemies.clear()
@@ -286,6 +288,48 @@ func complete_event() -> void:
 
 func complete_rest() -> void:
 	_advance_nodes_from(current_node_id)
+	change_state(GameState.MAP)
+	_request_scene("res://scenes/map/map_scene.tscn")
+
+# ── 비밀룸 ─────────────────────────────────────────────
+
+## 4가지 보상 중 랜덤 1개 지급
+## 0: 레어 카드 보상  1: 유물 즉시 지급  2: 골드  3: 비밀 전투
+func _resolve_secret_room() -> void:
+	var roll := randi() % 4
+	match roll:
+		0:
+			# 카드 보상 — 현재 풀에서 3장 추출 후 카드픽 화면으로 이동
+			card_rewards = _generate_card_rewards()
+			card_rewards_pick_count = 1
+			change_state(GameState.CARD_PICK)
+			_request_scene("res://scenes/card_pick/card_pick_scene.tscn")
+		1:
+			# 유물 즉시 지급 — 비밀룸은 랜덤 유물 바로 획득
+			var relic := get_random_relic()
+			if relic:
+				add_relic(relic)
+			_advance_nodes_from(current_node_id)
+			change_state(GameState.MAP)
+			_request_scene("res://scenes/map/map_scene.tscn")
+		2:
+			# 골드 100~150
+			add_gold(randi_range(100, 150))
+			_advance_nodes_from(current_node_id)
+			change_state(GameState.MAP)
+			_request_scene("res://scenes/map/map_scene.tscn")
+		3:
+			# 비밀 전투 — 엘리트급 적 1마리, 승리 시 유물 보너스 보장
+			pending_enemies = _make_elite_enemies()
+			_apply_act_difficulty(pending_enemies, current_act)
+			_last_elite_solo = (pending_enemies.size() == 1)
+			_last_boss_enemy_id = ""
+			change_state(GameState.BATTLE)
+			_request_scene("res://scenes/battle/battle_scene.tscn")
+
+func complete_secret_room_card_pick() -> void:
+	_advance_nodes_from(current_node_id)
+	card_rewards.clear()
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
 
