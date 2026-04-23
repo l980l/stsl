@@ -4,6 +4,7 @@ extends Node2D
 const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
+const CardScene = preload("res://scenes/card/card_scene.tscn")
 
 const WINDOW_W := 1920
 const WINDOW_H := 1080
@@ -41,9 +42,6 @@ var _selected_card: Resource = null
 
 var _drag_card: Resource = null
 var _drag_preview: Label = null
-var _potential_drag_card: Resource = null
-var _drag_start_pos: Vector2 = Vector2.ZERO
-const DRAG_THRESHOLD := 10.0
 
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
@@ -612,50 +610,62 @@ func _update_enemy_ui(index: int) -> void:
 # ─────────────────────────────────────────────
 
 func _refresh_hand() -> void:
-	for btn in _card_buttons:
-		if is_instance_valid(btn):
-			btn.queue_free()
+	for n in _card_buttons:
+		if is_instance_valid(n):
+			n.queue_free()
 	_card_buttons.clear()
 
 	var hand: Array = DeckManager.hand
 	if hand.is_empty():
 		return
 
-	var total_w: float = hand.size() * (CARD_W + 10) - 10
+	var card_w: int = 140
+	var gap: int = 10
+	var total_w: int = hand.size() * (card_w + gap) - gap
 	var start_x: float = (WINDOW_W - total_w) / 2.0
 
 	for i in range(hand.size()):
 		var card: Resource = hand[i]
-		var can_play: bool = DeckManager.can_play(card)
-
-		var btn := Button.new()
-		btn.position = Vector2(start_x + i * (CARD_W + 10), BOTTOM_Y)
-		btn.size = Vector2(CARD_W, CARD_H)
-
-		var card_name: String = card.get("card_name") if card.get("card_name") != null else "?"
-		var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
-		var upgraded_mark: String = " ★" if card.get("upgraded") else ""
-		var effect_desc: String = _card_effect_text(card)
-		btn.text = "[%d] %s%s\n%s\n%s" % [card.cost, card_name, upgraded_mark, owner_id, effect_desc]
-		btn.add_theme_font_size_override("font_size", 11)
-		btn.disabled = not can_play
-		if BattleManager.has_synergy_bonus(card):
-			btn.add_theme_color_override("font_color", Color(1.0, 0.2, 1.0))
-			btn.add_theme_color_override("font_hover_color", Color(1.0, 0.4, 1.0))
-
-		var captured_card := card
-		var captured_card2 := card
-		btn.button_down.connect(func(): _on_card_button_down(captured_card2))
-		btn.pressed.connect(func(): _on_card_pressed(captured_card))
-		add_child(btn)
-		_card_buttons.append(btn)
+		var node := CardScene.instantiate()
+		node.position = Vector2(start_x + i * (card_w + gap), BOTTOM_Y)
+		node.setup(card, node.Mode.HAND)
+		node.set_disabled(not DeckManager.can_play(card))
+		node.card_clicked.connect(_on_card_clicked)
+		node.card_drag_started.connect(_on_card_drag_started)
+		node.card_drag_moved.connect(_on_card_drag_moved)
+		node.card_drag_released.connect(_on_card_drag_released)
+		node.card_hovered.connect(_on_card_hovered)
+		node.card_unhovered.connect(_on_card_unhovered)
+		add_child(node)
+		_card_buttons.append(node)
 
 # ─────────────────────────────────────────────
 # 인터랙션 핸들러 (Task 4~5에서 구현)
 # ─────────────────────────────────────────────
 
-func _on_card_pressed(_card: Resource) -> void:
+func _on_card_clicked(_card: Resource) -> void:
 	pass  # 드래그 앤 드롭 방식으로만 카드 사용 가능
+
+func _on_card_drag_started(card: Resource, screen_pos: Vector2) -> void:
+	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
+		return
+	_start_drag(card)
+	if _drag_preview != null:
+		_drag_preview.position = screen_pos + Vector2(8, 8)
+
+func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
+	if _drag_card != null and _drag_preview != null:
+		_drag_preview.position = screen_pos + Vector2(8, 8)
+
+func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
+	if _drag_card != null:
+		_finish_drag(screen_pos)
+
+func _on_card_hovered(_card: Resource) -> void:
+	pass
+
+func _on_card_unhovered(_card: Resource) -> void:
+	pass
 
 func _on_enemy_pressed(index: int) -> void:
 	if _debug_hp_target_mode and OS.is_debug_build():
@@ -722,10 +732,10 @@ func _on_enemy_turn_started() -> void:
 
 func _on_energy_changed(new_energy: int) -> void:
 	_energy_label.text = "⚡ %d / %d" % [new_energy, DeckManager.MAX_ENERGY]
-	# 카드 버튼 활성/비활성 갱신
+	# 카드 노드 활성/비활성 갱신
 	var hand: Array = DeckManager.hand
 	for i in range(min(_card_buttons.size(), hand.size())):
-		_card_buttons[i].disabled = not DeckManager.can_play(hand[i])
+		_card_buttons[i].set_disabled(not DeckManager.can_play(hand[i]))
 
 func _on_card_played(card: Resource) -> void:
 	call_deferred("_refresh_all_hero_ui")
@@ -919,12 +929,6 @@ func _on_status_applied(target: String, _status_type: String, _stacks: int) -> v
 	else:
 		_refresh_status_icons_hero(target)
 
-func _card_effect_text(card: Resource) -> String:
-	var lines: Array = []
-	for eff in card.effects:
-		lines.append(eff.display_text())
-	return "\n".join(lines)
-
 func _refresh_debug_badge() -> void:
 	if _debug_badge == null:
 		return
@@ -956,26 +960,8 @@ func _refresh_synergy_hud() -> void:
 		lbl.modulate = Color(1.0, 0.0, 1.0)
 		_synergy_box.add_child(lbl)
 
-func _on_card_button_down(card: Resource) -> void:
-	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
-		return
-	_potential_drag_card = card
-	_drag_start_pos = get_viewport().get_mouse_position()
-
-func _input(event: InputEvent) -> void:
-	if event is InputEventMouseMotion:
-		if _potential_drag_card != null and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-			var dist := get_viewport().get_mouse_position().distance_to(_drag_start_pos)
-			if dist > DRAG_THRESHOLD and _drag_card == null:
-				_start_drag(_potential_drag_card)
-			if _drag_card != null:
-				_drag_preview.position = get_viewport().get_mouse_position() + Vector2(8, 8)
-	elif event is InputEventMouseButton \
-			and event.button_index == MOUSE_BUTTON_LEFT \
-			and not event.pressed:
-		if _drag_card != null:
-			_finish_drag(get_viewport().get_mouse_position())
-		_potential_drag_card = null
+func _input(_event: InputEvent) -> void:
+	pass  # 드래그 처리는 card_scene 시그널(_on_card_drag_*)로 위임됨
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if OS.is_debug_build() and event.pressed and not event.echo:
