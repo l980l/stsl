@@ -694,11 +694,11 @@ func _on_card_hovered(card: Resource, card_node: CardScene) -> void:
 		return
 	_free_card_tooltip()
 	var tooltip: CardScene = CARD_SCENE.instantiate()
-	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tooltip.scale = Vector2(2.5, 2.5)
 	tooltip.z_index = 100
 	tooltip.setup(card, tooltip.Mode.HAND)
 	add_child(tooltip)
+	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_card_tooltip = tooltip
 	# 카드 정중앙 위쪽에 고정 (툴팁 350×500 기준)
 	var base: Vector2 = card_node.global_position
@@ -1106,12 +1106,13 @@ func _show_deck_viewer_in_battle() -> void:
 	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
 
 	# 툴팁을 미리 한 번만 생성 — visible 토글로 깜빡임 방지
+	# mouse_filter는 반드시 add_child 이후에 설정 (_ready()가 STOP으로 덮어쓰기 때문)
 	var tip: CardScene = CARD_SCENE.instantiate()
-	tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tip.scale = Vector2(2.5, 2.5)
 	tip.z_index = 200
 	tip.visible = false
 	overlay.add_child(tip)
+	tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_deck_viewer_tooltip = tip
 
 	_deck_viewer = canvas
