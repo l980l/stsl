@@ -4,7 +4,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func death_reaper(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "저승사자"; e.max_hp = 320; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.korean.death_reaper"); e.max_hp = 320; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.LOWEST_HP
@@ -18,7 +18,7 @@ static func death_reaper(scene: PackedScene) -> Resource:
 
 static func cheoyong(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "처용"; e.max_hp = 450; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.korean.cheoyong"); e.max_hp = 450; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 40; i1.status_type = "block"
@@ -33,7 +33,7 @@ static func cheoyong(scene: PackedScene) -> Resource:
 
 static func dokkaebi(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "도깨비"; e.max_hp = 380; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.korean.dokkaebi"); e.max_hp = 380; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
@@ -47,7 +47,7 @@ static func dokkaebi(scene: PackedScene) -> Resource:
 
 static func three_legged_crow(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "삼족오"; e.max_hp = 280; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.korean.three_legged_crow"); e.max_hp = 280; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
@@ -58,7 +58,7 @@ static func three_legged_crow(scene: PackedScene) -> Resource:
 
 static func gumiho(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "구미호"; e.max_hp = 350; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.korean.gumiho"); e.max_hp = 350; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "vulnerable"
@@ -75,7 +75,7 @@ static func gumiho(scene: PackedScene) -> Resource:
 
 static func bulgasari(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "불가사리"; e.max_hp = 900; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.korean.bulgasari"); e.max_hp = 900; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"

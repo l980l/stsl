@@ -13,91 +13,74 @@ static func make_hero(hero_id: String) -> Resource:
 	hero.hero_id = hero_id
 	match hero_id:
 		"napoleon":
-			hero.hero_name = "나폴레옹"
-			hero.historical_figure = "나폴레옹 보나파르트"
+			hero.hero_name = TranslationServer.translate("hero.napoleon.name")
+			hero.historical_figure = TranslationServer.translate("hero.napoleon.figure")
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
 			hero.unlock_condition = "default"
 			hero.unlock_description = ""
 		"cleopatra":
-			hero.hero_name = "클레오파트라"
-			hero.historical_figure = "클레오파트라 7세"
+			hero.hero_name = TranslationServer.translate("hero.cleopatra.name")
+			hero.historical_figure = TranslationServer.translate("hero.cleopatra.figure")
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
 			hero.unlock_condition = "default"
 			hero.unlock_description = ""
 		"yi_sun_sin":
-			hero.hero_name = "이순신"
-			hero.historical_figure = "이순신 장군"
+			hero.hero_name = TranslationServer.translate("hero.yi_sun_sin.name")
+			hero.historical_figure = TranslationServer.translate("hero.yi_sun_sin.figure")
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
 			hero.unlock_condition = "default"
 			hero.unlock_description = ""
 		"joan_of_arc":
-			hero.hero_name = "잔다르크"
-			hero.historical_figure = "잔 다르크"
+			hero.hero_name = TranslationServer.translate("hero.joan_of_arc.name")
+			hero.historical_figure = TranslationServer.translate("hero.joan_of_arc.figure")
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/joan_of_arc/joan_of_arc.tscn")
 			hero.unlock_condition = "clear_chapter_1"
-			hero.unlock_description = "챕터 1 클리어 후 해금"
+			hero.unlock_description = TranslationServer.translate("hero.joan_of_arc.unlock_desc")
 		"genghis_khan":
-			hero.hero_name = "칭기즈칸"
-			hero.historical_figure = "칭기즈 칸"
+			hero.hero_name = TranslationServer.translate("hero.genghis_khan.name")
+			hero.historical_figure = TranslationServer.translate("hero.genghis_khan.figure")
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/genghis_khan/genghis_khan.tscn")
 			hero.unlock_condition = "flag:kill_boss:oshiris"
-			hero.unlock_description = "오시리스 처치 후 해금"
+			hero.unlock_description = TranslationServer.translate("hero.genghis_khan.unlock_desc")
 		"musashi":
-			hero.hero_name = "무사시"
-			hero.historical_figure = "미야모토 무사시"
+			hero.hero_name = TranslationServer.translate("hero.musashi.name")
+			hero.historical_figure = TranslationServer.translate("hero.musashi.figure")
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/musashi/musashi.tscn")
 			hero.unlock_condition = "elite_solo_kills>=5"
-			hero.unlock_description = "1:1 엘리트 5회 처치 후 해금"
+			hero.unlock_description = TranslationServer.translate("hero.musashi.unlock_desc")
+		_:
+			return null
 	return hero
 
 static func get_display_info(hero_id: String) -> Dictionary:
+	var h: Resource = make_hero(hero_id)
+	if h == null:
+		return {}
+	return {
+		"name": h.hero_name,
+		"hp": h.max_hp,
+		"desc": _get_hero_desc(hero_id),
+		"unlock_description": h.unlock_description,
+	}
+
+static func _get_hero_desc(hero_id: String) -> String:
 	match hero_id:
 		"napoleon":
-			return {
-				"name": "나폴레옹",
-				"hp": 1000,
-				"desc": "포지션: 공격형 지휘관\n고유 메카닉: 사기(Morale)\n아키타입: 돌격(Blitz)\n\n스타터: 스트라이크×3 + 디펜드×2",
-				"unlock_description": "",
-			}
+			return "포지션: 공격형 지휘관\n고유 메카닉: 사기(Morale)\n아키타입: 돌격(Blitz)\n\n스타터: 스트라이크×3 + 디펜드×2"
 		"cleopatra":
-			return {
-				"name": "클레오파트라",
-				"hp": 1000,
-				"desc": "포지션: 디버프/조종형\n고유 메카닉: 매혹(Charm)\n아키타입: 독살(Venom)\n\n스타터: 독침×2 + 왕실 방어×2",
-				"unlock_description": "",
-			}
+			return "포지션: 디버프/조종형\n고유 메카닉: 매혹(Charm)\n아키타입: 독살(Venom)\n\n스타터: 독침×2 + 왕실 방어×2"
 		"yi_sun_sin":
-			return {
-				"name": "이순신",
-				"hp": 1000,
-				"desc": "포지션: 방어형 역공\n고유 메카닉: 진형(Formation)\n아키타입: 거북선(Turtle)\n\n스타터: 방패×2 + 역공×2",
-				"unlock_description": "",
-			}
+			return "포지션: 방어형 역공\n고유 메카닉: 진형(Formation)\n아키타입: 거북선(Turtle)\n\n스타터: 방패×2 + 역공×2"
 		"joan_of_arc":
-			return {
-				"name": "잔다르크",
-				"hp": 1000,
-				"desc": "포지션: 서포트/생존형\n고유 메카닉: 부활(Revive)·순교\n아키타입: 신성(Holy)\n\n스타터: 스트라이크×3 + 디펜드×2",
-				"unlock_description": "챕터 1 클리어 후 해금",
-			}
+			return "포지션: 서포트/생존형\n고유 메카닉: 부활(Revive)·순교\n아키타입: 신성(Holy)\n\n스타터: 스트라이크×3 + 디펜드×2"
 		"genghis_khan":
-			return {
-				"name": "칭기즈칸",
-				"hp": 1000,
-				"desc": "포지션: 기동형 정복자\n고유 메카닉: 몽골 기병(DMG ALL)\n아키타입: 기동(0~1코) / 약탈\n\n스타터: 스트라이크×3 + 디펜드×2",
-				"unlock_description": "오시리스 처치 후 해금",
-			}
+			return "포지션: 기동형 정복자\n고유 메카닉: 몽골 기병(DMG ALL)\n아키타입: 기동(0~1코) / 약탈\n\n스타터: 스트라이크×3 + 디펜드×2"
 		"musashi":
-			return {
-				"name": "무사시",
-				"hp": 1000,
-				"desc": "포지션: 결투형 검사\n고유 메카닉: 이도류(×2 히트) / 결투·무심 조건\n아키타입: 이도류 / 결투 / 무심\n\n스타터: 참격×3 + 회피×2",
-				"unlock_description": "1:1 엘리트 5회 처치 후 해금",
-			}
-	return {}
+			return "포지션: 결투형 검사\n고유 메카닉: 이도류(×2 히트) / 결투·무심 조건\n아키타입: 이도류 / 결투 / 무심\n\n스타터: 참격×3 + 회피×2"
+	return ""

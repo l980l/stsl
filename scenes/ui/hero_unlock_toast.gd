@@ -15,7 +15,8 @@ func _ready() -> void:
 func _on_hero_unlocked(hero_id: String) -> void:
 	var info: Dictionary = _HR.get_display_info(hero_id)
 	var hero_name: String = info.get("name", hero_id) as String
-	_label.text = "새 영웅 해금: %s" % hero_name
+	_label.text = tr("ui.hero_unlock.message") % hero_name
 	visible = true
+	LabelUtils.fit_text(_label, 28, 16)
 	await get_tree().create_timer(DISPLAY_SECONDS).timeout
 	queue_free()

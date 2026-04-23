@@ -5,7 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func golden_horn_king(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "금각 대왕"; e.max_hp = 1600; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.golden_horn_king"); e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 40; i1.status_type = "block"
@@ -27,7 +27,7 @@ static func golden_horn_king(scene: PackedScene) -> Resource:
 
 static func silver_horn_king(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "은각 대왕"; e.max_hp = 1700; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.silver_horn_king"); e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"
@@ -44,7 +44,7 @@ static func silver_horn_king(scene: PackedScene) -> Resource:
 
 static func black_wind_demon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "흑풍괴"; e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.black_wind_demon"); e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"
@@ -64,7 +64,7 @@ static func black_wind_demon(scene: PackedScene) -> Resource:
 
 static func chiyou(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "치우"; e.max_hp = 4500; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.chiyou"); e.max_hp = 4500; e.character_scene = scene
 	e.mythology = "chinese"
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 청동 창

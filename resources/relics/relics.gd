@@ -25,92 +25,92 @@ static func build_pool() -> Array:
 	]
 
 static func _burning_blood() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "버닝 블러드"
-	r.description = "전투 승리 시 팀 전체 HP +6"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.burning_blood.name")
+	r.description = TranslationServer.translate("relic.burning_blood.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.HEAL; r.value = 6; return r
 
 static func _phoenix_feather() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "불사조 깃털"
-	r.description = "플레이어 턴 시작 시 에너지 +1"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.phoenix_feather.name")
+	r.description = TranslationServer.translate("relic.phoenix_feather.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
 	r.effect_type = RelicRes.EffectType.ENERGY; r.value = 1; return r
 
 static func _poison_vial() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "독약 병"
-	r.description = "전투 시작 시 무작위 적에게 독 3"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.poison_vial.name")
+	r.description = TranslationServer.translate("relic.poison_vial.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY; r.value = 3; return r
 
 static func _war_drum() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "전쟁 북"
-	r.description = "플레이어 턴 시작 시 카드 1장 추가 드로우"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.war_drum.name")
+	r.description = TranslationServer.translate("relic.war_drum.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
 	r.effect_type = RelicRes.EffectType.DRAW; r.value = 1; return r
 
 static func _ancient_artifact() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "고대 유물"
-	r.description = "팀 전체 최대 HP +15"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.ancient_artifact.name")
+	r.description = TranslationServer.translate("relic.ancient_artifact.desc")
 	r.trigger = RelicRes.TriggerType.PASSIVE
 	r.effect_type = RelicRes.EffectType.MAX_HP; r.value = 15; return r
 
 static func _hourglass() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "모래시계"
-	r.description = "턴 종료 시 덱에서 카드 1장 드로우"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.hourglass.name")
+	r.description = TranslationServer.translate("relic.hourglass.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
 	r.effect_type = RelicRes.EffectType.DRAW; r.value = 1; return r
 
 static func _blood_stone() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "피의 돌"
-	r.description = "피해 5 이상 받을 시 에너지 +1"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.blood_stone.name")
+	r.description = TranslationServer.translate("relic.blood_stone.desc")
 	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
 	r.effect_type = RelicRes.EffectType.ENERGY; r.value = 1; r.condition_value = 5; return r
 
 static func _emperors_seal() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "황제의 인장"
-	r.description = "전투 시작 시 사기 +2 (나폴레옹 생존 시 적용)"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.emperors_seal.name")
+	r.description = TranslationServer.translate("relic.emperors_seal.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.GAIN_MORALE
 	r.owner_hero_id = "napoleon"; r.value = 0; r.bonus_value = 2; return r
 
 static func _serpent_bracelet() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "독사의 팔찌"
-	r.description = "전투 시작 시 무작위 적 독 2 (클레오파트라 생존 시 독 4)"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.serpent_bracelet.name")
+	r.description = TranslationServer.translate("relic.serpent_bracelet.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
 	r.owner_hero_id = "cleopatra"; r.value = 2; r.bonus_value = 4; return r
 
 static func _turtle_ship_model() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "거북선 모형"
-	r.description = "플레이어 턴 시작 시 방어도 +2 (이순신 생존 시 +4)"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.turtle_ship_model.name")
+	r.description = TranslationServer.translate("relic.turtle_ship_model.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
 	r.effect_type = RelicRes.EffectType.BLOCK
 	r.owner_hero_id = "yi_sun_sin"; r.value = 2; r.bonus_value = 4; return r
 
 static func _artillery_horn() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "포병 나팔"
-	r.description = "플레이어 턴 시작 시 사기 +1 (나폴레옹 생존 시 적용)"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.artillery_horn.name")
+	r.description = TranslationServer.translate("relic.artillery_horn.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
 	r.effect_type = RelicRes.EffectType.GAIN_MORALE
 	r.owner_hero_id = "napoleon"; r.value = 0; r.bonus_value = 1; return r
 
 static func _nanjung_ilgi() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "난중일기"
-	r.description = "전투 승리 시 팀 HP +8 (이순신 생존 시 적용)"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.nanjung_ilgi.name")
+	r.description = TranslationServer.translate("relic.nanjung_ilgi.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.HEAL
 	r.owner_hero_id = "yi_sun_sin"; r.value = 0; r.bonus_value = 8; return r
 
 static func _pharaoh_seal() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "파라오의 인장"
-	r.description = "플레이어 턴 시작 시 무작위 적 독 +1 (클레오파트라 생존 시 적용)"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.pharaoh_seal.name")
+	r.description = TranslationServer.translate("relic.pharaoh_seal.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
 	r.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
 	r.owner_hero_id = "cleopatra"; r.value = 0; r.bonus_value = 1; return r
 
 static func _devils_contract() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "악마의 계약"
-	r.description = "전투 승리 시 팀 HP +20. 단, 매 플레이어 턴 시작 시 무작위 영웅 HP -3"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.devils_contract.name")
+	r.description = TranslationServer.translate("relic.devils_contract.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.HEAL; r.value = 20
 	r.is_cursed = true
@@ -118,8 +118,8 @@ static func _devils_contract() -> Resource:
 	r.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r.penalty_value = 3; return r
 
 static func _cursed_crown() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "저주받은 왕관"
-	r.description = "최대 HP +25. 단, 매 전투 시작 시 무작위 영웅 HP -8"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.cursed_crown.name")
+	r.description = TranslationServer.translate("relic.cursed_crown.desc")
 	r.trigger = RelicRes.TriggerType.PASSIVE
 	r.effect_type = RelicRes.EffectType.MAX_HP; r.value = 25
 	r.is_cursed = true
@@ -127,8 +127,8 @@ static func _cursed_crown() -> Resource:
 	r.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r.penalty_value = 8; return r
 
 static func _blood_oath() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "피의 서약"
-	r.description = "플레이어 턴 시작 시 에너지 +1. 단, 턴 종료 시 무작위 영웅 HP -4"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.blood_oath.name")
+	r.description = TranslationServer.translate("relic.blood_oath.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
 	r.effect_type = RelicRes.EffectType.ENERGY; r.value = 1
 	r.is_cursed = true
@@ -136,122 +136,122 @@ static func _blood_oath() -> Resource:
 	r.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r.penalty_value = 4; return r
 
 static func _tacticians_map() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "전술가의 지도"
-	r.description = "전투 시작 시 카드 1장 추가 드로우"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.tacticians_map.name")
+	r.description = TranslationServer.translate("relic.tacticians_map.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.DRAW; r.value = 1; return r
 
 static func _iron_will() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "강철 의지"
-	r.description = "전투 시작 시 에너지 +1"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.iron_will.name")
+	r.description = TranslationServer.translate("relic.iron_will.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.ENERGY; r.value = 1; return r
 
 static func _ancient_shield() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "고대의 방패"
-	r.description = "전투 시작 시 팀 전체 방어도 +4"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.ancient_shield.name")
+	r.description = TranslationServer.translate("relic.ancient_shield.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 4; return r
 
 # ──── Act 2 렐릭 (이집트 신화) ────
 
 static func _ankh_of_life() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "앙크의 생명"
-	r.description = "전투 승리 시 팀 전체 HP +12"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.ankh_of_life.name")
+	r.description = TranslationServer.translate("relic.ankh_of_life.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.HEAL; r.value = 12; return r
 
 static func _eye_of_horus() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "호루스의 눈"
-	r.description = "플레이어 턴 시작 시 카드 1장 드로우. 클레오파트라 생존 시 +2장"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.eye_of_horus.name")
+	r.description = TranslationServer.translate("relic.eye_of_horus.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
 	r.effect_type = RelicRes.EffectType.DRAW
 	r.value = 1; r.bonus_value = 2; r.owner_hero_id = "cleopatra"; return r
 
 static func _scarab_talisman() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "스카라베 부적"
-	r.description = "전투 시작 시 팀 전체 방어도 +8"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.scarab_talisman.name")
+	r.description = TranslationServer.translate("relic.scarab_talisman.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 8; return r
 
 # ──── Act 3 렐릭 (북유럽 신화) ────
 
 static func _rune_of_fate() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "운명의 룬"
-	r.description = "전투 시작 시 카드 2장 추가 드로우"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.rune_of_fate.name")
+	r.description = TranslationServer.translate("relic.rune_of_fate.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.DRAW; r.value = 2; return r
 
 static func _mjolnir_shard() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "묠니르의 파편"
-	r.description = "전투 시작 시 팀 전체 방어도 +10"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.mjolnir_shard.name")
+	r.description = TranslationServer.translate("relic.mjolnir_shard.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 10; return r
 
 static func _idun_apple() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "이둔의 사과"
-	r.description = "전투 승리 시 팀 전체 HP +15"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.idun_apple.name")
+	r.description = TranslationServer.translate("relic.idun_apple.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.HEAL; r.value = 15; return r
 
 # ──── 챕터 2 렐릭 (한국 신화) ────
 
 static func _underworld_talisman() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "저승 부적"
-	r.description = "전투 시작 시 에너지 +1"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.underworld_talisman.name")
+	r.description = TranslationServer.translate("relic.underworld_talisman.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.ENERGY; r.value = 1; return r
 
 static func _dokkaebi_hammer_shard() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "도깨비 방망이 파편"
-	r.description = "전투 승리 시 팀 사기 +3"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.dokkaebi_hammer_shard.name")
+	r.description = TranslationServer.translate("relic.dokkaebi_hammer_shard.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.GAIN_MORALE; r.value = 3; return r
 
 static func _samtaegeuk_charm() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "삼태극 부적"
-	r.description = "영웅이 피해를 받을 때 방어도 +10"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.samtaegeuk_charm.name")
+	r.description = TranslationServer.translate("relic.samtaegeuk_charm.desc")
 	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
 	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 10; return r
 
 # ──── 챕터 2 렐릭 (중국 신화) ────
 
 static func _dragon_scale() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "용의 비늘"
-	r.description = "전투 시작 시 다음 카드 코스트 -1"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.dragon_scale.name")
+	r.description = TranslationServer.translate("relic.dragon_scale.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.COST_REDUCTION; r.value = 1; return r
 
 static func _eight_immortals_charm() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "팔선의 부적"
-	r.description = "플레이어 턴 종료 시 팀 전체 HP +15"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.eight_immortals_charm.name")
+	r.description = TranslationServer.translate("relic.eight_immortals_charm.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
 	r.effect_type = RelicRes.EffectType.HEAL; r.value = 15; return r
 
 static func _queen_mother_peach_relic() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "서왕모의 복숭아"
-	r.description = "전투 승리 시 팀 최대 HP +10"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.queen_mother_peach_relic.name")
+	r.description = TranslationServer.translate("relic.queen_mother_peach_relic.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.MAX_HP; r.value = 10; return r
 
 # ──── 챕터 2 렐릭 (일본 신화) ────
 
 static func _ghost_talisman() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "귀신 부적"
-	r.description = "플레이어 턴 종료 시 무작위 적에게 독 2 부여"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.ghost_talisman.name")
+	r.description = TranslationServer.translate("relic.ghost_talisman.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
 	r.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
 	r.status_type = "poison"; r.value = 2; return r
 
 static func _tengu_feather() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "텐구의 깃털"
-	r.description = "전투 시작 시 카드 1장 추가 드로우"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.tengu_feather.name")
+	r.description = TranslationServer.translate("relic.tengu_feather.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.DRAW; r.value = 1; return r
 
 static func _orochi_scale() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "오로치의 비늘"
-	r.description = "영웅이 피해를 받을 때 무작위 적에게 약화 1 부여"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.orochi_scale.name")
+	r.description = TranslationServer.translate("relic.orochi_scale.desc")
 	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
 	r.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
 	r.status_type = "weak"; r.value = 1; return r
@@ -259,15 +259,15 @@ static func _orochi_scale() -> Resource:
 # ──── 잔다르크 전용 렐릭 ────
 
 static func _flag_of_orleans() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "오를레앙 깃발"
-	r.description = "플레이어 턴 시작 시 HP +20 (잔다르크 생존 시 +40)"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.flag_of_orleans.name")
+	r.description = TranslationServer.translate("relic.flag_of_orleans.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
 	r.effect_type = RelicRes.EffectType.HEAL
 	r.owner_hero_id = "joan_of_arc"; r.value = 20; r.bonus_value = 40; return r
 
 static func _saints_tears() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "성녀의 눈물"
-	r.description = "영웅이 피해를 받을 때 팀 전체 HP +30 (잔다르크 생존 시 +60)"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.saints_tears.name")
+	r.description = TranslationServer.translate("relic.saints_tears.desc")
 	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
 	r.effect_type = RelicRes.EffectType.HEAL
 	r.owner_hero_id = "joan_of_arc"; r.value = 30; r.bonus_value = 60; return r
@@ -275,15 +275,15 @@ static func _saints_tears() -> Resource:
 # ──── 칭기즈칸 전용 렐릭 ────
 
 static func _thousand_horses() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "천군만마"
-	r.description = "전투 시작 시 팀 전체 방어도 +30"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.thousand_horses.name")
+	r.description = TranslationServer.translate("relic.thousand_horses.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.BLOCK
 	r.owner_hero_id = "genghis_khan"; r.value = 30; return r
 
 static func _conquerors_whip() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "정복자의 채찍"
-	r.description = "전투 승리 시 카드 1장 드로우"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.conquerors_whip.name")
+	r.description = TranslationServer.translate("relic.conquerors_whip.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.DRAW
 	r.owner_hero_id = "genghis_khan"; r.value = 1; return r
@@ -291,15 +291,15 @@ static func _conquerors_whip() -> Resource:
 # ──── 무사시 전용 렐릭 ────
 
 static func _niten_ichi_ryu() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "니텐이치류"
-	r.description = "전투 시작 시 에너지 +1 (무사시 전용)"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.niten_ichi_ryu.name")
+	r.description = TranslationServer.translate("relic.niten_ichi_ryu.desc")
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.ENERGY
 	r.owner_hero_id = "musashi"; r.value = 1; return r
 
 static func _gorin_sho_relic() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "오륜서"
-	r.description = "플레이어 턴 시작 시 카드 1장 추가 드로우 (무사시 전용)"
+	var r: Resource = RelicRes.new(); r.relic_name = TranslationServer.translate("relic.gorin_sho_relic.name")
+	r.description = TranslationServer.translate("relic.gorin_sho_relic.desc")
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
 	r.effect_type = RelicRes.EffectType.DRAW
 	r.owner_hero_id = "musashi"; r.value = 1; return r

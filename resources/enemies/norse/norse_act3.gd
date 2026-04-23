@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func fenrir_cub(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "펜리르 새끼"; e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.norse.fenrir_cub"); e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.5]
 	# 페이즈0: strength 버프 후 공격 (매 루프 강해짐)
@@ -26,7 +26,7 @@ static func fenrir_cub(scene: PackedScene) -> Resource:
 
 static func valkyrie(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "발키리"; e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.norse.valkyrie"); e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "norse"
 	# 단일 페이즈 5턴 패턴
 	e.phase_thresholds = []
@@ -48,7 +48,7 @@ static func valkyrie(scene: PackedScene) -> Resource:
 
 static func jormungandr_shard(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "요르문간드르 분신"; e.max_hp = 2000; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.norse.jormungandr_shard"); e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.4]
 	# 페이즈0: 공격 후 독 부여 (2인텐트 분리)
@@ -73,7 +73,7 @@ static func jormungandr_shard(scene: PackedScene) -> Resource:
 
 static func jormungandr(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "요르문간드르"; e.max_hp = 5000; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.norse.jormungandr"); e.max_hp = 5000; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.65, 0.3]
 	# 페이즈0

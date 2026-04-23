@@ -5,7 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func dokkaebi_chief(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "도깨비 대장"; e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.korean.dokkaebi_chief"); e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
@@ -21,7 +21,7 @@ static func dokkaebi_chief(scene: PackedScene) -> Resource:
 
 static func sea_dragon_general(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "용왕의 장군"; e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.korean.sea_dragon_general"); e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
@@ -37,7 +37,7 @@ static func sea_dragon_general(scene: PackedScene) -> Resource:
 
 static func dongmyeong(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "동명성왕"; e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.korean.dongmyeong"); e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM
@@ -57,7 +57,7 @@ static func dongmyeong(scene: PackedScene) -> Resource:
 static func samsin_grandma(scene: PackedScene) -> Resource:
 	# 생명·점지의 여신 — Phase 0 "점지의 손길" → Phase 1 "축복과 저주" → Phase 2 "삼신의 분노"
 	var e := EnemyRes.new()
-	e.enemy_name = "삼신할미"; e.max_hp = 4800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.korean.samsin_grandma"); e.max_hp = 4800; e.character_scene = scene
 	e.mythology = "korean"
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0: 점지의 손길

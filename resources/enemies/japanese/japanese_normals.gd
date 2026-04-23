@@ -5,7 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func oni(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "오니"; e.max_hp = 420; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.oni"); e.max_hp = 420; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM
@@ -18,7 +18,7 @@ static func oni(scene: PackedScene) -> Resource:
 
 static func tengu(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "텐구"; e.max_hp = 320; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.tengu"); e.max_hp = 320; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "weak"
@@ -35,7 +35,7 @@ static func tengu(scene: PackedScene) -> Resource:
 
 static func yuki_onna(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "유키온나"; e.max_hp = 300; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.yuki_onna"); e.max_hp = 300; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"
@@ -50,7 +50,7 @@ static func yuki_onna(scene: PackedScene) -> Resource:
 
 static func kappa(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "갓파"; e.max_hp = 380; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.kappa"); e.max_hp = 380; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 30; i1.status_type = "block"
@@ -66,7 +66,7 @@ static func kappa(scene: PackedScene) -> Resource:
 
 static func shuten_minion(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "슈텐도지 졸개"; e.max_hp = 350; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.shuten_minion"); e.max_hp = 350; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM
@@ -81,7 +81,7 @@ static func shuten_minion(scene: PackedScene) -> Resource:
 
 static func ronin_ghost(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "로닌 망령"; e.max_hp = 450; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.ronin_ghost"); e.max_hp = 450; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"

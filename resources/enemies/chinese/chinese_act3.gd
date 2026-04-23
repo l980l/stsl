@@ -5,7 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func white_tiger_general(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "백호 신장"; e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.white_tiger_general"); e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 3; i1.status_type = "strength"
@@ -21,7 +21,7 @@ static func white_tiger_general(scene: PackedScene) -> Resource:
 
 static func vermilion_bird_general(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "주작 신장"; e.max_hp = 2000; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.vermilion_bird_general"); e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"
@@ -38,7 +38,7 @@ static func vermilion_bird_general(scene: PackedScene) -> Resource:
 
 static func black_tortoise_general(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "현무 신장"; e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.black_tortoise_general"); e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 70; i1.status_type = "block"
@@ -57,7 +57,7 @@ static func black_tortoise_general(scene: PackedScene) -> Resource:
 
 static func pangu(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "반고"; e.max_hp = 4800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.pangu"); e.max_hp = 4800; e.character_scene = scene
 	e.mythology = "chinese"
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 혼돈

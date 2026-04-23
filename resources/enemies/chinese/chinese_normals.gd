@@ -5,7 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func yaksha(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "야차"; e.max_hp = 340; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.yaksha"); e.max_hp = 340; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM
@@ -18,7 +18,7 @@ static func yaksha(scene: PackedScene) -> Resource:
 
 static func nezha_soldier(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "나타 병사"; e.max_hp = 280; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.nezha_soldier"); e.max_hp = 280; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM
@@ -31,7 +31,7 @@ static func nezha_soldier(scene: PackedScene) -> Resource:
 
 static func heavenly_king_soldier(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "사대천왕 병사"; e.max_hp = 450; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.heavenly_king_soldier"); e.max_hp = 450; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 50; i1.status_type = "block"
@@ -46,7 +46,7 @@ static func heavenly_king_soldier(scene: PackedScene) -> Resource:
 
 static func shanhaijing_beast(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "산해경 괴수"; e.max_hp = 380; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.shanhaijing_beast"); e.max_hp = 380; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"
@@ -63,7 +63,7 @@ static func shanhaijing_beast(scene: PackedScene) -> Resource:
 
 static func immortal_trainee(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "선인 수련생"; e.max_hp = 300; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.immortal_trainee"); e.max_hp = 300; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
@@ -78,7 +78,7 @@ static func immortal_trainee(scene: PackedScene) -> Resource:
 
 static func azure_dragon_guard(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "청룡 수호병"; e.max_hp = 520; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.chinese.azure_dragon_guard"); e.max_hp = 520; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"

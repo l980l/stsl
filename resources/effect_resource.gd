@@ -39,40 +39,50 @@ enum EffectType {
 @export var hit_count: int = 1              # DAMAGE 히트 횟수 (이도류, 징기스의 분노)
 @export var condition: String = ""  # 빈 문자열=무조건 발동. "hand_size_0"등 조건 키 설정 시 조건 불충족이면 이 효과 스킵
 
+const _STATUS_NAME_KEYS := {
+	"weak":       "status.weak.name",
+	"vulnerable": "status.vulnerable.name",
+	"morale":     "status.morale.name",
+	"charm":      "status.charm.name",
+	"strength":   "status.strength.name",
+	"taunt":      "status.taunt.name",
+}
+
 func display_text() -> String:
 	match effect_type:
 		EffectType.DAMAGE:
 			var hit_str: String = " ×%d" % hit_count if hit_count > 1 else ""
-			return "피해 %d%s%s" % [value, " (전체)" if target == "ALL" else "", hit_str]
+			var aoe_str: String = TranslationServer.translate("effect.aoe_suffix") if target == "ALL" else ""
+			return TranslationServer.translate("effect.damage.text") % [value, aoe_str, hit_str]
 		EffectType.BLOCK:
-			return "방어 %d" % value
+			return TranslationServer.translate("effect.block.text") % value
 		EffectType.BLOCK_ALL:
-			return "전체 방어 %d" % value
+			return TranslationServer.translate("effect.block_all.text") % value
 		EffectType.FORMATION_BLOCK:
-			return "영웅수×%d 방어" % value
+			return TranslationServer.translate("effect.formation_block.text") % value
 		EffectType.APPLY_STATUS:
 			if status_type == "poison":
-				return "독 %d 데미지" % (value * 10)
-			var st_name: String = {"weak":"약화","vulnerable":"취약",
-				"morale":"사기","charm":"매혹","strength":"강화","taunt":"도발"}.get(status_type, status_type)
+				return TranslationServer.translate("effect.apply_status_poison.text") % [tr("status.poison.name"), value * 10]
+			var st_key: String = _STATUS_NAME_KEYS.get(status_type, "")
+			var st_name: String = tr(st_key) if st_key else status_type
 			return "%s %d" % [st_name, value]
-		EffectType.DRAW:        return "드로우 %d" % value
-		EffectType.ENERGY:      return "에너지 +%d" % value
-		EffectType.HEAL:        return "회복 %d" % value
-		EffectType.HEAL_ALL:    return "전체 회복 %d" % value
-		EffectType.GAIN_MORALE: return "사기 +%d" % value
-		EffectType.CONSUME_MORALE: return "사기→피해 %d" % bonus_value
-		EffectType.POISON_BURST:   return "독 즉발"
-		EffectType.COUNTER_BLOCK:  return "방어도×%d%%" % value
-		EffectType.COST_NEXT:      return "다음 비용 -%d" % value
-		EffectType.CONDITIONAL_DMG: return "%d/%d(%s)" % [bonus_value, value, status_type]
-		EffectType.SUMMON_TOKEN:   return "병사 소환 %d" % value
-		EffectType.CHARM:          return "매혹 %d" % value
-		EffectType.REVIVE:              return "부활 %d%%" % value
-		EffectType.SACRIFICE_HP:        return "자기 HP -%d" % value
-		EffectType.COST_ZERO_TURN:      return "이번 턴 코스트 0"
-		EffectType.BLOCK_PER_CARDS_PLAYED: return "카드수×%d 방어" % value
-		EffectType.ON_KILL_DRAW:        return "처치시 드로우 %d" % value
-		EffectType.PURGE_STATUS:        return "디버프 제거"
-		EffectType.PER_DRAW_DMG:        return "드로우수×%d 피해" % value
+		EffectType.DRAW:        return TranslationServer.translate("effect.draw.text") % value
+		EffectType.ENERGY:      return TranslationServer.translate("effect.energy.text") % value
+		EffectType.HEAL:        return TranslationServer.translate("effect.heal.text") % value
+		EffectType.HEAL_ALL:    return TranslationServer.translate("effect.heal_all.text") % value
+		EffectType.GAIN_MORALE: return TranslationServer.translate("effect.gain_morale.text") % value
+		EffectType.CONSUME_MORALE: return TranslationServer.translate("effect.consume_morale.text") % bonus_value
+		EffectType.POISON_BURST:   return TranslationServer.translate("effect.poison_burst.text")
+		EffectType.COUNTER_BLOCK:  return TranslationServer.translate("effect.counter_block.text") % value
+		EffectType.COST_NEXT:      return TranslationServer.translate("effect.cost_next.text") % value
+		EffectType.CONDITIONAL_DMG: return TranslationServer.translate("effect.conditional_dmg.text") % [bonus_value, value, status_type]
+		EffectType.SUMMON_TOKEN:   return TranslationServer.translate("effect.summon_token.text") % value
+		EffectType.CHARM:          return TranslationServer.translate("effect.charm.text") % value
+		EffectType.REVIVE:              return TranslationServer.translate("effect.revive.text") % value
+		EffectType.SACRIFICE_HP:        return TranslationServer.translate("effect.sacrifice_hp.text") % value
+		EffectType.COST_ZERO_TURN:      return TranslationServer.translate("effect.cost_zero_turn.text")
+		EffectType.BLOCK_PER_CARDS_PLAYED: return TranslationServer.translate("effect.block_per_cards_played.text") % value
+		EffectType.ON_KILL_DRAW:        return TranslationServer.translate("effect.on_kill_draw.text") % value
+		EffectType.PURGE_STATUS:        return TranslationServer.translate("effect.purge_status.text")
+		EffectType.PER_DRAW_DMG:        return TranslationServer.translate("effect.per_draw_dmg.text") % value
 	return ""

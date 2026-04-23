@@ -19,13 +19,14 @@ func _build_ui() -> void:
 	add_child(bg)
 
 	var title := Label.new()
-	title.text = "승리!" if is_win else "패배"
+	title.text = tr("ui.game_over.victory") if is_win else tr("ui.game_over.defeat")
 	title.position = Vector2(660, 200)
-	title.size = Vector2(600, 120)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 72)
 	title.modulate = Color(1.0, 0.9, 0.3) if is_win else Color(0.9, 0.3, 0.3)
 	add_child(title)
+	title.size = Vector2(600, 120)
+	LabelUtils.fit_text(title, 72, 40)
 
 	var info := Label.new()
 	info.text = "도달 층: %d / 9\n보유 골드: %d" % [GameManager.current_floor, GameManager.gold]
@@ -36,12 +37,13 @@ func _build_ui() -> void:
 	add_child(info)
 
 	var btn := Button.new()
-	btn.text = "메인 메뉴로"
+	btn.text = tr("ui.game_over.btn_main_menu")
 	btn.position = Vector2(810, 520)
-	btn.size = Vector2(300, 60)
 	btn.add_theme_font_size_override("font_size", 24)
 	btn.pressed.connect(_on_main_menu)
 	add_child(btn)
+	btn.size = Vector2(300, 60)
+	LabelUtils.fit_text(btn, 24, 14)
 
 func _on_main_menu() -> void:
 	get_tree().change_scene_to_file("res://scenes/main_menu/main_menu_scene.tscn")

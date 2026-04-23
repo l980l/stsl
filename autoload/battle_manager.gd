@@ -891,35 +891,35 @@ func get_active_synergies() -> Array:
 	var g: bool = team_mgr.is_alive("genghis_khan")
 	var m: bool = team_mgr.is_alive("musashi")
 	if n and y:
-		synergies.append({"name": "철벽 진군 (나폴레옹×이순신)", "desc": "나폴레옹 사기 카드 사용 시 이순신 방어도 +3"})
+		synergies.append({"name_key": "synergy.napoleon_yi.name", "desc_key": "synergy.napoleon_yi.desc"})
 	if y and c:
-		synergies.append({"name": "독침 반격 (이순신×클레오파트라)", "desc": "이순신 공격 카드 사용 시 독 걸린 적에게 추가 피해 +4"})
+		synergies.append({"name_key": "synergy.yi_cleopatra.name", "desc_key": "synergy.yi_cleopatra.desc"})
 	if n and c:
-		synergies.append({"name": "혼란의 돌격 (나폴레옹×클레오파트라)", "desc": "나폴레옹 사기 소모 카드 성공 시 대상 매혹 +1"})
+		synergies.append({"name_key": "synergy.napoleon_cleopatra.name", "desc_key": "synergy.napoleon_cleopatra.desc"})
 	if j and n:
-		synergies.append({"name": "성전 (잔다르크×나폴레옹)", "desc": "잔다르크 전체 회복 카드 사용 시 나폴레옹 사기 +2"})
+		synergies.append({"name_key": "synergy.joan_napoleon.name", "desc_key": "synergy.joan_napoleon.desc"})
 	if g and c:
-		synergies.append({"name": "약탈과 독 (칭기즈칸×클레오파트라)", "desc": "칭기즈칸 전체 공격 카드 사용 시 적 전체 독 +2"})
+		synergies.append({"name_key": "synergy.genghis_cleopatra.name", "desc_key": "synergy.genghis_cleopatra.desc"})
 	if m and y:
-		synergies.append({"name": "검사의 약속 (무사시×이순신)", "desc": "무사시 일기토 카드 사용 시 이순신 방어도 +15"})
+		synergies.append({"name_key": "synergy.musashi_yi.name", "desc_key": "synergy.musashi_yi.desc"})
 	if j and y:
-		synergies.append({"name": "성녀의 방패 (잔다르크×이순신)", "desc": "잔다르크 부활 카드 사용 시 이순신 방어도 +20"})
+		synergies.append({"name_key": "synergy.joan_yi.name", "desc_key": "synergy.joan_yi.desc"})
 	if j and c:
-		synergies.append({"name": "성스러운 독 (잔다르크×클레오파트라)", "desc": "잔다르크 정화 카드 사용 시 무작위 적 독 +3"})
+		synergies.append({"name_key": "synergy.joan_cleopatra.name", "desc_key": "synergy.joan_cleopatra.desc"})
 	if j and g:
-		synergies.append({"name": "신의 원정 (잔다르크×칭기즈칸)", "desc": "잔다르크 전체 회복 카드 사용 시 카드 1장 드로우"})
+		synergies.append({"name_key": "synergy.joan_genghis.name", "desc_key": "synergy.joan_genghis.desc"})
 	if j and m:
-		synergies.append({"name": "희생의 칼날 (잔다르크×무사시)", "desc": "잔다르크 체력 희생 카드 사용 시 무사시 방어도 +10"})
+		synergies.append({"name_key": "synergy.joan_musashi.name", "desc_key": "synergy.joan_musashi.desc"})
 	if n and g:
-		synergies.append({"name": "정복자의 기세 (나폴레옹×칭기즈칸)", "desc": "나폴레옹 사기 카드 사용 시 카드 1장 드로우"})
+		synergies.append({"name_key": "synergy.napoleon_genghis.name", "desc_key": "synergy.napoleon_genghis.desc"})
 	if n and m:
-		synergies.append({"name": "황제의 무도 (나폴레옹×무사시)", "desc": "나폴레옹 사기 소모 카드 성공 시 무사시 방어도 +8"})
+		synergies.append({"name_key": "synergy.napoleon_musashi.name", "desc_key": "synergy.napoleon_musashi.desc"})
 	if y and g:
-		synergies.append({"name": "수륙 협공 (이순신×칭기즈칸)", "desc": "이순신 전체 공격 카드 사용 시 카드 1장 드로우"})
+		synergies.append({"name_key": "synergy.yi_genghis.name", "desc_key": "synergy.yi_genghis.desc"})
 	if g and m:
-		synergies.append({"name": "초원의 결투사 (칭기즈칸×무사시)", "desc": "무사시 공격 카드 사용 시 칭기즈칸 방어도 +4"})
+		synergies.append({"name_key": "synergy.genghis_musashi.name", "desc_key": "synergy.genghis_musashi.desc"})
 	if c and m:
-		synergies.append({"name": "독날 (클레오파트라×무사시)", "desc": "무사시 공격 카드 사용 시 대상에게 독 +1"})
+		synergies.append({"name_key": "synergy.cleopatra_musashi.name", "desc_key": "synergy.cleopatra_musashi.desc"})
 	return synergies
 
 

@@ -5,7 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func chaos_tengu(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "혼돈의 텐구"; e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.chaos_tengu"); e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"
@@ -21,7 +21,7 @@ static func chaos_tengu(scene: PackedScene) -> Resource:
 
 static func yasha(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "야샤"; e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.yasha"); e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
@@ -37,7 +37,7 @@ static func yasha(scene: PackedScene) -> Resource:
 
 static func nureriyon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "누레리온"; e.max_hp = 1700; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.nureriyon"); e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 120; i1.target = IntentRes.TargetType.RANDOM
@@ -57,7 +57,7 @@ static func nureriyon(scene: PackedScene) -> Resource:
 
 static func shuten_doji(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "슈텐도지"; e.max_hp = 4800; e.character_scene = scene
+	e.enemy_name = TranslationServer.translate("enemy.japanese.shuten_doji"); e.max_hp = 4800; e.character_scene = scene
 	e.mythology = "japanese"
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 술판
