@@ -39,6 +39,8 @@ var _active_powers: Dictionary = {}
 
 # 이번 플레이어 턴 카드 사용 횟수 (만리 원정용)
 var _cards_played_this_turn: int = 0
+# 적별 카드 타입 카운터: { enemy_index: { "count": int, "fired_count": int } }
+var _enemy_card_counters: Dictionary = {}
 var _cards_drawn_this_turn: int = 0
 var _kills_this_card: int = 0
 
@@ -53,6 +55,7 @@ signal hero_damaged(hero_id: String, amount: int)
 signal status_applied(target: String, status_type: String, stacks: int)
 signal morale_changed(hero_id: String, new_value: int)
 signal active_powers_changed()
+signal enemy_counter_changed(enemy_index: int)
 
 func setup_battle(enemies: Array) -> void:
 	_enemies = enemies.duplicate()
@@ -65,6 +68,10 @@ func setup_battle(enemies: Array) -> void:
 	_hero_status.clear()
 	_last_attacker.clear()
 	_active_powers.clear()
+	_enemy_card_counters.clear()
+	for ei in range(_enemies.size()):
+		if _enemies[ei].card_count_trigger.size() > 0:
+			_enemy_card_counters[ei] = {"count": 0, "fired_count": 0}
 	for enemy in _enemies:
 		_enemy_hp.append(enemy.max_hp)
 		_enemy_alive.append(true)
@@ -158,6 +165,7 @@ func play_card(card: Resource, target_enemy_index: int, target_hero_id: String =
 	if deck_mgr == null or not deck_mgr.play_card(card):
 		return false
 	_cards_played_this_turn += 1
+	_track_card_type_counters(card)   # 카드 타입 카운터 추적
 	_apply_card_effects(card, target_enemy_index, target_hero_id)
 	return true
 
@@ -218,6 +226,38 @@ func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
 						_deal_damage_to_enemy(enemy_idx, int(blk * v / 100.0))
 	if phase == "player_turn_start":
 		active_powers_changed.emit()
+
+func _track_card_type_counters(card: Resource) -> void:
+	for ei in _enemy_card_counters:
+		if not _enemy_alive[int(ei)]:
+			continue
+		var trigger: Dictionary = _enemies[int(ei)].card_count_trigger
+		if int(card.card_type) != int(trigger.get("card_type", -1)):
+			continue
+		var ctr: Dictionary = _enemy_card_counters[ei]
+		ctr["count"] += 1
+		var threshold: int = trigger.get("threshold", 0)
+		var fired: int = ctr.get("fired_count", 0)
+		var should_fire: bool = threshold > 0 and ctr["count"] >= threshold * (fired + 1)
+		if should_fire and not trigger.get("repeat", true) and fired >= 1:
+			should_fire = false
+		if should_fire:
+			ctr["fired_count"] = fired + 1
+			var intent: Resource = trigger.get("intent")
+			if intent != null:
+				_execute_intent(int(ei), intent)
+		enemy_counter_changed.emit(int(ei))
+
+func get_enemy_counter(enemy_index: int) -> Dictionary:
+	if not _enemy_card_counters.has(enemy_index):
+		return {}
+	var ctr: Dictionary = _enemy_card_counters[enemy_index]
+	var trigger: Dictionary = _enemies[enemy_index].card_count_trigger
+	return {
+		"count": ctr.get("count", 0),
+		"threshold": trigger.get("threshold", 0),
+		"card_type": trigger.get("card_type", -1),
+	}
 
 func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> void:
 	# 카드 소유 영웅이 사망 상태면 효과 없음
