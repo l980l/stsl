@@ -55,3 +55,6 @@ ui.secret.reward.card,신비한 카드를 발견했다!,You found a mysterious c
 ui.secret.reward.relic,고대 유물을 발견했다!,You found an ancient relic!,,,,,,
 ui.secret.reward.gold,숨겨진 보물을 발견했다!,You found hidden treasure!,,,,,,
 ui.secret.reward.battle,강력한 수호자가 나타났다!,A powerful guardian appears!,,,,,,
+ui.settings.title,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置
+ui.settings.language,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言
+ui.common.btn_settings,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置
