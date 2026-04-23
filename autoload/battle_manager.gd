@@ -70,7 +70,8 @@ func setup_battle(enemies: Array) -> void:
 	_active_powers.clear()
 	_enemy_card_counters.clear()
 	for ei in range(_enemies.size()):
-		if _enemies[ei].card_count_trigger.size() > 0:
+		var trig = _enemies[ei].get("card_count_trigger")
+		if trig != null and trig is Dictionary and trig.size() > 0:
 			_enemy_card_counters[ei] = {"count": 0, "fired_count": 0}
 	for enemy in _enemies:
 		_enemy_hp.append(enemy.max_hp)
@@ -244,7 +245,7 @@ func _track_card_type_counters(card: Resource) -> void:
 		if should_fire:
 			ctr["fired_count"] = fired + 1
 			var intent: Resource = trigger.get("intent")
-			if intent != null:
+			if intent != null and intent is IntentRes:
 				_execute_intent(int(ei), intent)
 		enemy_counter_changed.emit(int(ei))
 
