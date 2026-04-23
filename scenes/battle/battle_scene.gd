@@ -55,7 +55,7 @@ var _debug_hp_target_mode: bool = false
 var _debug_grid_visible: bool = false
 var _debug_grid_nodes: Array = []
 
-var _deck_viewer: Control = null
+var _deck_viewer: CanvasLayer = null
 var _deck_viewer_tab: String = "draw"
 
 const STATUS_EMOJI := {
