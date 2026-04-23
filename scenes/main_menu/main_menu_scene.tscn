@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/main_menu/main_menu_scene.gd" id="1"]
 
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_button.tscn" id="sb"]
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_overlay.tscn" id="so"]
 [node name="MainMenuScene" type="Node2D"]
 script = ExtResource("1")
+[node name="SettingsButton" parent="." instance=ExtResource("sb")]
+[node name="SettingsOverlay" parent="." instance=ExtResource("so")]
