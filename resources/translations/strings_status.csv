@@ -1,0 +1,17 @@
+keys,ko,en,fr,it,es,ja,el,zh
+status.weak.name,약화,Weak,Faible,Debole,Débil,弱体化,Αδύναμος,虚弱
+status.vulnerable.name,취약,Vulnerable,Vulnérable,Vulnerabile,Vulnerable,脆弱,Ευάλωτος,易伤
+status.poison.name,독,Poison,Poison,Veleno,Veneno,毒,Δηλητήριο,毒
+status.strength.name,강화,Strength,Force,Forza,Fuerza,強化,Δύναμη,强化
+status.charm.name,매혹,Charm,Charme,Fascino,Encanto,魅了,Γοητεία,魅惑
+status.taunt.name,도발,Taunt,Provocation,Provocazione,Provocación,挑発,Πρόκληση,嘲讽
+status.morale.name,사기,Morale,Moral,Morale,Moral,士気,Ηθικό,士气
+status.poison_dmg.desc,독: 매 턴 %d×10 피해. 지속 3턴 중첩 시 갱신,,,,,,,
+status.weak.desc,약화: 공격 피해 25% 감소. 매 턴 1 감소,,,,,,,
+status.vulnerable.desc,취약: 받는 피해 50% 증가. 매 턴 1 감소,,,,,,,
+status.morale.desc,사기: CONSUME_MORALE 카드로 추가 피해 제공,,,,,,,
+status.charm.desc,매혹: 다음 행동 아군에게 적용,,,,,,,
+status.strength.desc,강화: 피해 +%d,,,,,,,
+status.taunt.desc,도발: 이 대상이 우선 공격 받음,,,,,,,
+status.counter_block.desc,반격 방어: 피해 = 현재 방어도 기반,,,,,,,
+status.charm_resistance.desc,매혹 저항 %d: 매혹 스택 초과 시 반함,,,,,,,

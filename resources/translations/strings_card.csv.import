@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bcard000001"
+
+[deps]
+
+files=["res://resources/translations/strings_card.ko.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation"]
+
+source_file="res://resources/translations/strings_card.csv"
+dest_files=["res://resources/translations/strings_card.ko.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

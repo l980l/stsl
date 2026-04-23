@@ -1,6 +1,7 @@
 # scenes/card_upgrade/card_upgrade_scene.gd
 extends Node2D
 
+const CardScene = preload("res://scenes/card/card_scene.tscn")
 const CARD_W := 140
 const CARD_H := 200
 const COLS := 6
@@ -53,13 +54,10 @@ func _build_ui(upgradeable: Array) -> void:
 	scroll.add_child(grid)
 
 	for card: Resource in upgradeable:
-		var btn := Button.new()
-		btn.custom_minimum_size = Vector2(CARD_W, CARD_H)
-		btn.text = "[%d]\n%s\n%s\n→ 강화" % [card.cost, card.card_name, card.owner_id]
-		btn.add_theme_font_size_override("font_size", 14)
-		var captured_card: Resource = card
-		btn.pressed.connect(func(): _on_card_selected(captured_card))
-		grid.add_child(btn)
+		var node := CardScene.instantiate()
+		node.setup(card, node.Mode.UPGRADE)
+		node.card_clicked.connect(func(c): _on_card_selected(c))
+		grid.add_child(node)
 
 	var skip_btn := Button.new()
 	skip_btn.position = Vector2(880, 1000)

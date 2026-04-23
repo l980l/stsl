@@ -1,6 +1,7 @@
 # scenes/card_pick/card_pick_scene.gd
 extends Node2D
 
+const CardScene = preload("res://scenes/card/card_scene.tscn")
 const CARD_W := 140
 const CARD_H := 200
 
@@ -31,23 +32,16 @@ func _build_ui() -> void:
 	_title_label.size = Vector2(600, 60)
 	LabelUtils.fit_text(_title_label, 32, 18)
 
-	var total_w: float = GameManager.card_rewards.size() * (CARD_W + 20) - 20
-	var start_x: float = (1920.0 - total_w) / 2.0
+	var start_x: float = (1920.0 - GameManager.card_rewards.size() * 160) / 2.0  # 카드 폭 140 + 간격 20
 
 	for i in range(GameManager.card_rewards.size()):
 		var card: Resource = GameManager.card_rewards[i]
-		var btn := Button.new()
-		btn.position = Vector2(start_x + i * (CARD_W + 20), 400)
-		btn.size = Vector2(CARD_W, CARD_H)
-		var card_name: String = card.get("card_name") if card.get("card_name") != null else "?"
-		var cost: int = card.get("cost") if card.get("cost") != null else 0
-		btn.text = "[%d]\n%s\n%s" % [cost, card_name, card.get("owner_id") if card.get("owner_id") != null else ""]
-		btn.add_theme_font_size_override("font_size", 15)
-		var captured_card := card
-		var captured_btn := btn
-		btn.pressed.connect(func(): _on_card_selected(captured_card, captured_btn))
-		add_child(btn)
-		_card_buttons.append({"card": card, "btn": btn})
+		var node := CardScene.instantiate()
+		node.position = Vector2(start_x + i * 160, 400)
+		node.setup(card, node.Mode.REWARD)
+		node.card_clicked.connect(func(c): _on_card_selected(c, node))
+		add_child(node)
+		_card_buttons.append({"card": card, "node": node})
 
 	var skip_btn := Button.new()
 	skip_btn.position = Vector2(880, 680)
@@ -58,9 +52,9 @@ func _build_ui() -> void:
 	skip_btn.size = Vector2(160, 50)
 	LabelUtils.fit_text(skip_btn, 18, 12)
 
-func _on_card_selected(card: Resource, btn: Button) -> void:
+func _on_card_selected(card: Resource, node) -> void:
 	DeckManager.add_card_to_deck(card)
-	btn.disabled = true
+	node.set_disabled(true)
 	_picked_count += 1
 	_title_label.text = tr("ui.card_pick.title") % [_picked_count, _pick_max]
 	if _picked_count >= _pick_max:
