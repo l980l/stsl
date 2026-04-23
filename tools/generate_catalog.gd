@@ -120,9 +120,9 @@ func _rarity_name(r: int) -> String:
 
 func _card_type_name(t: int) -> String:
 	match t:
-		CardRes.CardType.ATTACK: return "ATTACK"
-		CardRes.CardType.SKILL:  return "SKILL"
-		CardRes.CardType.POWER:  return "POWER"
+		CardRes.CardType.ATTACK: return "공격"
+		CardRes.CardType.SKILL:  return "기술"
+		CardRes.CardType.POWER:  return "권능"
 	return "?"
 
 func _action_type_name(t: int) -> String:
