@@ -56,7 +56,6 @@ var _debug_grid_visible: bool = false
 var _debug_grid_nodes: Array = []
 
 var _deck_viewer: CanvasLayer = null
-var _deck_viewer_tab: String = "draw"
 
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
@@ -1041,11 +1040,9 @@ func _input(event: InputEvent) -> void:
 # ─────────────────────────────────────────────
 
 func _show_deck_viewer_in_battle() -> void:
-	# 이미 열려있으면 무시
 	if _deck_viewer != null:
 		return
 
-	# 반투명 풀스크린 배경 (CanvasLayer로 최상단 렌더)
 	var canvas := CanvasLayer.new()
 	canvas.layer = 10
 	add_child(canvas)
@@ -1054,7 +1051,6 @@ func _show_deck_viewer_in_battle() -> void:
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	canvas.add_child(overlay)
 
-	# 반투명 배경 — 바깥 클릭으로 닫기
 	var bg_rect := ColorRect.new()
 	bg_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg_rect.color = Color(0.0, 0.0, 0.0, 0.72)
@@ -1064,114 +1060,78 @@ func _show_deck_viewer_in_battle() -> void:
 	)
 	overlay.add_child(bg_rect)
 
-	# 메인 패널
 	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(1400, 820)
-	panel.position = Vector2(260, 130)
+	panel.custom_minimum_size = Vector2(1200, 680)
+	panel.size = Vector2(1200, 680)
+	panel.position = Vector2((WINDOW_W - 1200) / 2.0, (WINDOW_H - 680) / 2.0)
 	overlay.add_child(panel)
 
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 8)
 	panel.add_child(vbox)
 
-	# 제목 + X 버튼 행
 	var title_row := HBoxContainer.new()
 	vbox.add_child(title_row)
 
 	var title_lbl := Label.new()
 	title_lbl.text = tr("ui.battle.btn_deck_view")
-	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_font_size_override("font_size", 22)
 	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_row.add_child(title_lbl)
 
 	var close_btn := Button.new()
 	close_btn.text = "✕"
-	close_btn.add_theme_font_size_override("font_size", 20)
+	close_btn.add_theme_font_size_override("font_size", 18)
 	close_btn.pressed.connect(_close_deck_viewer)
 	title_row.add_child(close_btn)
 
-	# 탭 버튼 행
-	var tab_row := HBoxContainer.new()
-	tab_row.add_theme_constant_override("separation", 6)
-	vbox.add_child(tab_row)
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 16)
+	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(columns)
 
-	var tabs := ["draw", "hand", "discard", "exhaust"]
-	var tab_keys := {
-		"draw": "ui.battle.deck_viewer.draw",
-		"hand": "ui.battle.deck_viewer.hand",
-		"discard": "ui.battle.deck_viewer.discard",
-		"exhaust": "ui.battle.deck_viewer.exhaust",
-	}
-	for tab_id in tabs:
-		var tb := Button.new()
-		tb.text = tr(tab_keys[tab_id])
-		tb.add_theme_font_size_override("font_size", 18)
-		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		tb.pressed.connect(_switch_deck_tab.bind(tab_id))
-		tab_row.add_child(tb)
+	var draw_cards := DeckManager.draw_pile.duplicate()
+	draw_cards.shuffle()
+	var discard_cards := DeckManager.discard_pile.duplicate()
 
-	# 카드 그리드 스크롤
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.custom_minimum_size = Vector2(0, 600)
-	vbox.add_child(scroll)
-
-	var grid := GridContainer.new()
-	grid.columns = 8
-	grid.add_theme_constant_override("h_separation", 10)
-	grid.add_theme_constant_override("v_separation", 10)
-	grid.name = "CardGrid"
-	scroll.add_child(grid)
+	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw") + " (%d)" % draw_cards.size(), draw_cards)
+	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
 
 	_deck_viewer = canvas
-	_deck_viewer_tab = "draw"
-	_switch_deck_tab("draw")
 
-func _switch_deck_tab(tab: String) -> void:
-	if _deck_viewer == null:
-		return
-	_deck_viewer_tab = tab
 
-	# CardGrid 노드 찾기
-	var grid: GridContainer = null
-	for child in _deck_viewer.get_children():
-		grid = _find_node_by_name(child, "CardGrid")
-		if grid != null:
-			break
-	if grid == null:
-		return
+func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> void:
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_theme_constant_override("separation", 6)
+	parent.add_child(col)
 
-	# 기존 카드 제거
-	for c in grid.get_children():
-		c.queue_free()
+	var lbl := Label.new()
+	lbl.text = header
+	lbl.add_theme_font_size_override("font_size", 18)
+	col.add_child(lbl)
 
-	# 탭별 카드 목록 결정
-	var card_list: Array = []
-	match tab:
-		"draw":
-			card_list = DeckManager.draw_pile.duplicate()
-			card_list.shuffle()  # 실제 순서 노출 금지
-		"hand":
-			card_list = DeckManager.hand.duplicate()
-		"discard":
-			card_list = DeckManager.discard_pile.duplicate()
-		"exhaust":
-			card_list = DeckManager.exhaust_pile.duplicate()
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	col.add_child(scroll)
 
-	if card_list.is_empty():
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 8)
+	scroll.add_child(grid)
+
+	if cards.is_empty():
 		var empty_lbl := Label.new()
 		empty_lbl.text = tr("ui.battle.deck_viewer.empty")
-		empty_lbl.add_theme_font_size_override("font_size", 18)
+		empty_lbl.add_theme_font_size_override("font_size", 16)
 		grid.add_child(empty_lbl)
 		return
 
-	# CardScene 인스턴스화
-	for card_res in card_list:
+	for card_res in cards:
 		var card_node: CardScene = CARD_SCENE.instantiate()
 		card_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		card_node.scale = Vector2(2.5, 2.5)
-		# 카드 씬이 클릭/드래그 시그널 방출 억제 — REWARD 모드로 표시
+		card_node.scale = Vector2(1.0, 1.0)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
 		grid.add_child(card_node)
 
@@ -1179,15 +1139,6 @@ func _close_deck_viewer() -> void:
 	if _deck_viewer != null:
 		_deck_viewer.queue_free()
 		_deck_viewer = null
-
-func _find_node_by_name(node: Node, target_name: String) -> Node:
-	if node.name == target_name:
-		return node
-	for child in node.get_children():
-		var result := _find_node_by_name(child, target_name)
-		if result != null:
-			return result
-	return null
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if OS.is_debug_build() and event.pressed and not event.echo:
