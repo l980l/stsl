@@ -29,6 +29,7 @@ static func pool() -> Array:
 		_peerless_cut(), _forward_cut(), _final_duel(),
 		_void_void(), _clear_wind(), _undying(),
 		_spirit_sword(), _five_rings_realm(),
+		_sword_enlightenment(),
 	]
 
 # ─────────────────────────────────────────
@@ -648,3 +649,16 @@ static func _five_rings_realm() -> Resource:
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 3; eb.base_value = 3
 	c.effects = [ea, eb]; return c
+
+# #41 검의 깨달음 — RARE, cost 2, POWER, 무심: 매 턴 시작 시 BLOCK +30
+static func _sword_enlightenment() -> Resource:
+	var c := CardRes.new()
+	c.card_name = TranslationServer.translate("card.musashi.sword_enlightenment.name"); c.owner_id = "musashi"
+	c.cost = 2; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = TranslationServer.translate("card.musashi.sword_enlightenment.archetype")
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.block_per_turn"
+	e.value = 30; e.base_value = 30
+	c.effects = [e]; return c

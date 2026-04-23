@@ -391,7 +391,7 @@ static func _shield_guard() -> Resource:
 	c.effects = [e]; return c
 
 # #22 반격 태세 — RARE, cost 1, POWER, 거북선
-# COUNTER_BLOCK 발동 시 피해 +20 고정 추가 (persistent passive)
+# 권능: 적 공격마다 현재 방어도×20% 반격 피해
 static func _counter_stance() -> Resource:
 	var c := CardRes.new()
 	c.card_name = TranslationServer.translate("card.yi_sun_sin.counter_stance.name"); c.owner_id = "yi_sun_sin"; c.cost = 1
@@ -400,9 +400,9 @@ static func _counter_stance() -> Resource:
 	c.play_animation = "idle"
 	c.archetype = TranslationServer.translate("card.yi_sun_sin.counter_stance.archetype")
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.COUNTER_BLOCK
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.counter_per_attack"
 	e.value = 20; e.base_value = 20
-	e.status_type = "persistent_bonus"
 	c.effects = [e]; return c
 
 # #23 함대 결집 — RARE, cost 2, SKILL, 거북선
@@ -640,7 +640,7 @@ static func _war_drum() -> Resource:
 	c.effects = [e1, e2]; return c
 
 # #39 전사의 각오 — RARE, cost 2, POWER, 필사즉생
-# HP≤50% 시 BLOCK 카드 효과 +20% (persistent passive)
+# 권능: 매 턴 시작 시 BLOCK +20
 static func _warriors_resolve() -> Resource:
 	var c := CardRes.new()
 	c.card_name = TranslationServer.translate("card.yi_sun_sin.warriors_resolve.name"); c.owner_id = "yi_sun_sin"; c.cost = 2
@@ -649,9 +649,9 @@ static func _warriors_resolve() -> Resource:
 	c.play_animation = "idle"
 	c.archetype = TranslationServer.translate("card.yi_sun_sin.warriors_resolve.archetype")
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.BLOCK
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.block_per_turn"
 	e.value = 20; e.base_value = 20
-	e.status_type = "low_hp_block_bonus"
 	c.effects = [e]; return c
 
 # #40 불사조 — LEGENDARY, cost 2, SKILL, 필사즉생
