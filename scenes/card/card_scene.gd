@@ -36,6 +36,7 @@ func refresh() -> void:
 	$Container/Frame.texture = _resolve_frame_texture(_card.owner_id)
 	$Container/CostLabel.text = str(_card.cost)
 	$Container/TitleLabel.text = _card.card_name
+	LabelUtils.fit_text($Container/TitleLabel, 50, 28)
 	$Container/ArtRect.texture = _card.art
 	$Container/DescLabel.text = _build_desc()
 	$Container/TypeLabel.text = _type_display(_card.card_type)
@@ -52,7 +53,7 @@ func _build_desc() -> String:
 	var lines: Array = []
 	for eff in _card.effects:
 		lines.append(eff.display_text())
-	return "\n".join(lines)
+	return ", ".join(lines)
 
 func _resolve_frame_texture(owner_id: String) -> Texture2D:
 	var hero_path := "%s%s_frame.png" % [FRAME_DIR, owner_id]

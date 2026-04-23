@@ -56,7 +56,8 @@ var _debug_grid_visible: bool = false
 var _debug_grid_nodes: Array = []
 
 var _deck_viewer: CanvasLayer = null
-var _deck_viewer_tab: String = "draw"
+var _deck_viewer_tooltip: CardScene = null
+
 
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
@@ -122,10 +123,10 @@ func _build_ui() -> void:
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
 	add_child(_end_turn_btn)
 
-	# 덱 보기 버튼 (End Turn 왼쪽)
+	# 덱 보기 버튼 (End Turn 아래)
 	var deck_btn := Button.new()
-	deck_btn.position = Vector2(WINDOW_W - 350, BOTTOM_Y + 16)
-	deck_btn.size = Vector2(120, 60)
+	deck_btn.position = Vector2(WINDOW_W - 220, BOTTOM_Y + 84)
+	deck_btn.size = Vector2(200, 60)
 	deck_btn.text = tr("ui.battle.btn_deck_view")
 	deck_btn.add_theme_font_size_override("font_size", 18)
 	deck_btn.pressed.connect(_show_deck_viewer_in_battle)
@@ -263,21 +264,9 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	status_box.z_index = 1
 	add_child(status_box)
 
-	var counter_lbl := Label.new()
-	counter_lbl.position = Vector2(pos.x + SLOT_W - 80, pos.y + 4)
-	counter_lbl.size = Vector2(78, 22)
-	counter_lbl.add_theme_font_size_override("font_size", 14)
-	counter_lbl.modulate = Color(1.0, 0.7, 0.4)
-	counter_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	counter_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	counter_lbl.visible = false
-	counter_lbl.z_index = 2
-	add_child(counter_lbl)
-
 	return { "panel": panel, "intent_lbl": intent_lbl, "btn": btn,
 			 "name_lbl": name_lbl, "hp_bar": hp_bar, "hp_lbl": hp_lbl,
-			 "block_lbl": block_lbl, "status_box": status_box,
-			 "counter_lbl": counter_lbl }
+			 "block_lbl": block_lbl, "status_box": status_box }
 
 func _refresh_relics() -> void:
 	for child in _relic_container.get_children():
@@ -481,7 +470,6 @@ func _setup_enemies() -> void:
 		entry["hp_lbl"].queue_free()
 		entry["block_lbl"].queue_free()
 		entry["status_box"].queue_free()
-		entry["counter_lbl"].queue_free()
 	_enemy_nodes.clear()
 	_enemy_status_containers.clear()
 
@@ -613,22 +601,22 @@ func _update_enemy_ui(index: int) -> void:
 	if intent != null:
 		match intent.action_type:
 			IntentRes.ActionType.ATTACK:
-				entry["intent_lbl"].text = "⚔ %d" % intent.value
+				entry["intent_lbl"].text = tr("battle.intent.attack") % intent.value
 			IntentRes.ActionType.BUFF:
 				match intent.status_type:
-					"strength": entry["intent_lbl"].text = "💪 강화 %d" % intent.value
-					_:          entry["intent_lbl"].text = "🛡 %d" % intent.value
+					"strength": entry["intent_lbl"].text = tr("battle.intent.buff.strength") % intent.value
+					_:          entry["intent_lbl"].text = tr("battle.intent.buff.block") % intent.value
 			IntentRes.ActionType.DEBUFF:
-				entry["intent_lbl"].text = "💀 약화"
+				entry["intent_lbl"].text = tr("battle.intent.debuff")
 			IntentRes.ActionType.PREPARE:
-				entry["intent_lbl"].text = "⏳ 준비"
+				entry["intent_lbl"].text = tr("battle.intent.prepare")
 			_:
 				entry["intent_lbl"].text = "?"
 
 	if not BattleManager.is_enemy_alive(index):
 		entry["panel"].modulate = Color(0.3, 0.3, 0.3)
 		entry["btn"].disabled = true
-		entry["intent_lbl"].text = "✝"
+		entry["intent_lbl"].text = tr("battle.intent.dead")
 
 	_refresh_status_icons_enemy(index)
 
@@ -694,11 +682,11 @@ func _on_card_hovered(card: Resource, card_node: CardScene) -> void:
 		return
 	_free_card_tooltip()
 	var tooltip: CardScene = CARD_SCENE.instantiate()
-	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tooltip.scale = Vector2(2.5, 2.5)
 	tooltip.z_index = 100
 	tooltip.setup(card, tooltip.Mode.HAND)
 	add_child(tooltip)
+	_set_mouse_ignore_recursive(tooltip)
 	_card_tooltip = tooltip
 	# 카드 정중앙 위쪽에 고정 (툴팁 350×500 기준)
 	var base: Vector2 = card_node.global_position
@@ -901,6 +889,15 @@ func _on_hero_revived(hero_id: String) -> void:
 		entry["status_box"].visible = true
 		_update_hero_ui(hero_id)
 		break
+	# 스프라이트 복원 (death 애니메이션 트랙 리셋 후 idle 재생)
+	var char_node = _hero_char_nodes.get(hero_id)
+	if char_node != null:
+		char_node.visible = true
+		if char_node.has_node("AnimationPlayer"):
+			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+			ap.stop()
+			if ap.has_animation("idle"):
+				ap.play("idle")
 
 func _on_battle_won() -> void:
 	_message_label.text = tr("battle.msg_victory")
@@ -969,6 +966,26 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		if val <= 0:
 			continue
 		box.add_child(_make_status_label(key, val, status))
+	# 카드 카운터가 있으면 상태 아이콘 영역에 버프처럼 표시
+	var cinfo: Dictionary = BattleManager.get_enemy_counter(index)
+	if not cinfo.is_empty():
+		var ct: int = int(cinfo.get("card_type", -1))
+		var label_key: String = ""
+		match ct:
+			CardResource.CardType.ATTACK: label_key = "enemy.counter.attack.label"
+			CardResource.CardType.SKILL:  label_key = "enemy.counter.skill.label"
+			CardResource.CardType.POWER:  label_key = "enemy.counter.power.label"
+		if label_key != "":
+			var lbl := Label.new()
+			lbl.text = tr(label_key) % [cinfo["count"], cinfo["threshold"]]
+			lbl.tooltip_text = _counter_tooltip_text(cinfo)
+			lbl.add_theme_font_size_override("font_size", 12)
+			lbl.custom_minimum_size = Vector2(0, 18)
+			lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+			lbl.modulate = Color(1.0, 0.75, 0.3)
+			box.add_child(lbl)
 
 func _on_morale_changed(hero_id: String, _new_value: int) -> void:
 	_update_hero_ui(hero_id)
@@ -989,7 +1006,10 @@ func _on_active_powers_changed() -> void:
 		lbl.text = fmt % v if fmt.contains("%") else fmt
 		lbl.add_theme_font_size_override("font_size", 14)
 		lbl.modulate = Color(0.7, 0.4, 0.9)
-		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+		var desc_fmt: String = tr(base_key + ".desc")
+		if desc_fmt != base_key + ".desc":
+			lbl.tooltip_text = desc_fmt % v if desc_fmt.contains("%d") else desc_fmt
 		_active_powers_box.add_child(lbl)
 
 func _on_status_applied(target: String, _status_type: String, _stacks: int) -> void:
@@ -1032,8 +1052,8 @@ func _refresh_synergy_hud() -> void:
 
 func _input(event: InputEvent) -> void:
 	# 드래그 처리는 card_scene 시그널(_on_card_drag_*)로 위임됨
-	if _deck_viewer != null and event is InputEventKey:
-		if event.keycode == KEY_ESCAPE and event.pressed:
+	if event is InputEventKey and event.keycode == KEY_ESCAPE and event.pressed:
+		if _deck_viewer != null:
 			_close_deck_viewer()
 
 # ─────────────────────────────────────────────
@@ -1041,11 +1061,9 @@ func _input(event: InputEvent) -> void:
 # ─────────────────────────────────────────────
 
 func _show_deck_viewer_in_battle() -> void:
-	# 이미 열려있으면 무시
 	if _deck_viewer != null:
 		return
 
-	# 반투명 풀스크린 배경 (CanvasLayer로 최상단 렌더)
 	var canvas := CanvasLayer.new()
 	canvas.layer = 10
 	add_child(canvas)
@@ -1054,7 +1072,6 @@ func _show_deck_viewer_in_battle() -> void:
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	canvas.add_child(overlay)
 
-	# 반투명 배경 — 바깥 클릭으로 닫기
 	var bg_rect := ColorRect.new()
 	bg_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg_rect.color = Color(0.0, 0.0, 0.0, 0.72)
@@ -1064,130 +1081,132 @@ func _show_deck_viewer_in_battle() -> void:
 	)
 	overlay.add_child(bg_rect)
 
-	# 메인 패널
 	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(1400, 820)
-	panel.position = Vector2(260, 130)
+	panel.custom_minimum_size = Vector2(1200, 680)
+	panel.size = Vector2(1200, 680)
+	panel.position = Vector2((WINDOW_W - 1200) / 2.0, (WINDOW_H - 680) / 2.0)
 	overlay.add_child(panel)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 20)
+	margin.add_theme_constant_override("margin_right", 20)
+	margin.add_theme_constant_override("margin_top", 14)
+	margin.add_theme_constant_override("margin_bottom", 14)
+	panel.add_child(margin)
 
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 8)
-	panel.add_child(vbox)
+	margin.add_child(vbox)
 
-	# 제목 + X 버튼 행
 	var title_row := HBoxContainer.new()
 	vbox.add_child(title_row)
 
 	var title_lbl := Label.new()
 	title_lbl.text = tr("ui.battle.btn_deck_view")
-	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_font_size_override("font_size", 22)
 	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_row.add_child(title_lbl)
 
 	var close_btn := Button.new()
 	close_btn.text = "✕"
-	close_btn.add_theme_font_size_override("font_size", 20)
+	close_btn.add_theme_font_size_override("font_size", 18)
 	close_btn.pressed.connect(_close_deck_viewer)
 	title_row.add_child(close_btn)
 
-	# 탭 버튼 행
-	var tab_row := HBoxContainer.new()
-	tab_row.add_theme_constant_override("separation", 6)
-	vbox.add_child(tab_row)
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 16)
+	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(columns)
 
-	var tabs := ["draw", "hand", "discard", "exhaust"]
-	var tab_keys := {
-		"draw": "ui.battle.deck_viewer.draw",
-		"hand": "ui.battle.deck_viewer.hand",
-		"discard": "ui.battle.deck_viewer.discard",
-		"exhaust": "ui.battle.deck_viewer.exhaust",
-	}
-	for tab_id in tabs:
-		var tb := Button.new()
-		tb.text = tr(tab_keys[tab_id])
-		tb.add_theme_font_size_override("font_size", 18)
-		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		tb.pressed.connect(_switch_deck_tab.bind(tab_id))
-		tab_row.add_child(tb)
+	var draw_cards := DeckManager.draw_pile.duplicate()
+	draw_cards.shuffle()
+	var discard_cards := DeckManager.discard_pile.duplicate()
 
-	# 카드 그리드 스크롤
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.custom_minimum_size = Vector2(0, 600)
-	vbox.add_child(scroll)
+	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw") + " (%d)" % draw_cards.size(), draw_cards)
+	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
 
-	var grid := GridContainer.new()
-	grid.columns = 8
-	grid.add_theme_constant_override("h_separation", 10)
-	grid.add_theme_constant_override("v_separation", 10)
-	grid.name = "CardGrid"
-	scroll.add_child(grid)
+	var tip: CardScene = CARD_SCENE.instantiate()
+	tip.scale = Vector2(2.5, 2.5)
+	tip.z_index = 200
+	tip.visible = false
+	overlay.add_child(tip)
+	_set_mouse_ignore_recursive(tip)
+	_deck_viewer_tooltip = tip
 
 	_deck_viewer = canvas
-	_deck_viewer_tab = "draw"
-	_switch_deck_tab("draw")
 
-func _switch_deck_tab(tab: String) -> void:
-	if _deck_viewer == null:
-		return
-	_deck_viewer_tab = tab
 
-	# CardGrid 노드 찾기
-	var grid: GridContainer = null
-	for child in _deck_viewer.get_children():
-		grid = _find_node_by_name(child, "CardGrid")
-		if grid != null:
-			break
-	if grid == null:
-		return
+func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> void:
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_theme_constant_override("separation", 6)
+	parent.add_child(col)
 
-	# 기존 카드 제거
-	for c in grid.get_children():
-		c.queue_free()
+	var lbl := Label.new()
+	lbl.text = header
+	lbl.add_theme_font_size_override("font_size", 18)
+	col.add_child(lbl)
 
-	# 탭별 카드 목록 결정
-	var card_list: Array = []
-	match tab:
-		"draw":
-			card_list = DeckManager.draw_pile.duplicate()
-			card_list.shuffle()  # 실제 순서 노출 금지
-		"hand":
-			card_list = DeckManager.hand.duplicate()
-		"discard":
-			card_list = DeckManager.discard_pile.duplicate()
-		"exhaust":
-			card_list = DeckManager.exhaust_pile.duplicate()
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	col.add_child(scroll)
 
-	if card_list.is_empty():
+	var grid := GridContainer.new()
+	grid.columns = 5
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 10)
+	scroll.add_child(grid)
+
+	if cards.is_empty():
 		var empty_lbl := Label.new()
 		empty_lbl.text = tr("ui.battle.deck_viewer.empty")
-		empty_lbl.add_theme_font_size_override("font_size", 18)
+		empty_lbl.add_theme_font_size_override("font_size", 16)
 		grid.add_child(empty_lbl)
 		return
 
-	# CardScene 인스턴스화
-	for card_res in card_list:
+	for card_res in cards:
+		var captured_res: Resource = card_res
+
+		var wrapper := Control.new()
+		wrapper.custom_minimum_size = Vector2(91, 130)
+		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
+		grid.add_child(wrapper)
+
 		var card_node: CardScene = CARD_SCENE.instantiate()
-		card_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		card_node.scale = Vector2(2.5, 2.5)
-		# 카드 씬이 클릭/드래그 시그널 방출 억제 — REWARD 모드로 표시
+		card_node.scale = Vector2(0.65, 0.65)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
-		grid.add_child(card_node)
+		wrapper.add_child(card_node)
+
+		var captured_wrapper: Control = wrapper
+		card_node.card_hovered.connect(func(_c): _show_deck_tooltip(captured_res, captured_wrapper))
+		card_node.card_unhovered.connect(func(_c): _hide_deck_tooltip())
+
+func _show_deck_tooltip(card: Resource, node: Control) -> void:
+	if _deck_viewer_tooltip == null:
+		return
+	_deck_viewer_tooltip.setup(card, CardScene.Mode.HAND)
+	var base := node.global_position
+	var x: float = clamp(base.x + 45.0 - 175.0, 0.0, float(WINDOW_W - 350))
+	var y: float = clamp(base.y - 510.0, 20.0, float(WINDOW_H - 500))
+	_deck_viewer_tooltip.position = Vector2(x, y)
+	_deck_viewer_tooltip.visible = true
+
+func _hide_deck_tooltip() -> void:
+	if _deck_viewer_tooltip != null:
+		_deck_viewer_tooltip.visible = false
 
 func _close_deck_viewer() -> void:
 	if _deck_viewer != null:
+		_deck_viewer_tooltip = null
 		_deck_viewer.queue_free()
 		_deck_viewer = null
 
-func _find_node_by_name(node: Node, target_name: String) -> Node:
-	if node.name == target_name:
-		return node
-	for child in node.get_children():
-		var result := _find_node_by_name(child, target_name)
-		if result != null:
-			return result
-	return null
+func _set_mouse_ignore_recursive(node: Node) -> void:
+	if node is Control:
+		(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for c in node.get_children():
+		_set_mouse_ignore_recursive(c)
+
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if OS.is_debug_build() and event.pressed and not event.echo:
@@ -1260,25 +1279,40 @@ func _on_enemy_counter_changed(enemy_index: int) -> void:
 func _refresh_enemy_counter(enemy_index: int) -> void:
 	if enemy_index < 0 or enemy_index >= _enemy_nodes.size():
 		return
-	var slot: Dictionary = _enemy_nodes[enemy_index]
-	var lbl: Label = slot.get("counter_lbl")
-	if lbl == null:
-		return
-	var info: Dictionary = BattleManager.get_enemy_counter(enemy_index)
-	if info.is_empty():
-		lbl.visible = false
-		return
-	var ct: int = int(info.get("card_type", -1))
-	var key: String = ""
-	match ct:
-		CardResource.CardType.ATTACK: key = "enemy.counter.attack.label"
-		CardResource.CardType.SKILL:  key = "enemy.counter.skill.label"
-		CardResource.CardType.POWER:  key = "enemy.counter.power.label"
-		_:
-			lbl.visible = false
-			return
-	lbl.text = tr(key) % [info["count"], info["threshold"]]
-	lbl.visible = true
+	_refresh_status_icons_enemy(enemy_index)
+
+func _counter_tooltip_text(info: Dictionary) -> String:
+	var tkey: String = info.get("tooltip_key", "")
+	if tkey != "":
+		return tr(tkey)
+	# tooltip_key 없는 경우 동적 생성 (fallback)
+	var card_type: int = info.get("card_type", -1)
+	var threshold: int = info.get("threshold", 0)
+	var intent: Resource = info.get("intent")
+	var card_name: String
+	match card_type:
+		CardResource.CardType.ATTACK: card_name = tr("card_type.attack.name")
+		CardResource.CardType.SKILL:  card_name = tr("card_type.skill.name")
+		CardResource.CardType.POWER:  card_name = tr("card_type.power.name")
+		_: card_name = "?"
+	var effect_desc: String = "?"
+	if intent != null:
+		var target_str: String
+		match int(intent.target):
+			IntentRes.TargetType.ALL:       target_str = tr("battle.target.all_ally")
+			IntentRes.TargetType.LOWEST_HP: target_str = tr("battle.target.lowest_hp_ally")
+			IntentRes.TargetType.RANDOM:    target_str = tr("battle.target.random_ally")
+			_:                              target_str = tr("battle.target.ally")
+		match intent.action_type:
+			IntentRes.ActionType.ATTACK:
+				effect_desc = tr("battle.counter.effect.attack") % [target_str, intent.value]
+			IntentRes.ActionType.DEBUFF:
+				var sname: String = tr("status.%s.name" % intent.status_type)
+				effect_desc = tr("battle.counter.effect.debuff") % [target_str, sname, intent.value]
+			IntentRes.ActionType.BUFF:
+				var sname: String = tr("status.%s.name" % intent.status_type)
+				effect_desc = tr("battle.counter.effect.buff") % [sname, intent.value]
+	return tr("battle.counter.tooltip.format") % [card_name, threshold, effect_desc]
 
 func _make_border_rects(x: int, y: int, w: int, h: int, color: Color) -> Array:
 	var rects: Array = []
@@ -1314,6 +1348,8 @@ func _card_target_type(card: Resource) -> String:
 			EffectRes.EffectType.HEAL:
 				if effect.target == "SINGLE":
 					return "ally"
+			EffectRes.EffectType.REVIVE:
+				return "dead_ally"
 	return "none"
 
 func _start_drag(card: Resource) -> void:
@@ -1338,6 +1374,11 @@ func _start_drag(card: Resource) -> void:
 			for entry in _hero_nodes:
 				if entry["panel"].visible:
 					entry["panel"].color = Color(0.12, 0.25, 0.12)
+		"dead_ally":
+			_message_label.text = tr("battle.drag_dead_ally")
+			for entry in _hero_nodes:
+				if entry["panel"].visible and not TeamManager.is_alive(entry["hero_id"]):
+					entry["panel"].color = Color(0.25, 0.12, 0.35)
 		"none":
 			_message_label.text = tr("battle.drag_release")
 
@@ -1362,6 +1403,18 @@ func _finish_drag(drop_pos: Vector2) -> void:
 					continue
 				var hero_id: String = entry["hero_id"]
 				if not TeamManager.is_alive(hero_id):
+					continue
+				if entry["panel"].get_global_rect().has_point(drop_pos):
+					BattleManager.play_card(_drag_card, -1, hero_id)
+					_cleanup_drag()
+					return
+			_cleanup_drag()
+		"dead_ally":
+			for entry in _hero_nodes:
+				if not entry["panel"].visible:
+					continue
+				var hero_id: String = entry["hero_id"]
+				if TeamManager.is_alive(hero_id):
 					continue
 				if entry["panel"].get_global_rect().has_point(drop_pos):
 					BattleManager.play_card(_drag_card, -1, hero_id)
