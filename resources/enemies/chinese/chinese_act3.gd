@@ -1,7 +1,8 @@
 # resources/enemies/chinese/chinese_act3.gd
 # 중국 신화 Act 3 — 엘리트 3종(백호·주작·현무 신장) + 보스(반고)
-const EnemyRes  = preload("res://resources/enemy_resource.gd")
-const IntentRes = preload("res://resources/intent_resource.gd")
+const EnemyRes   = preload("res://resources/enemy_resource.gd")
+const IntentRes  = preload("res://resources/intent_resource.gd")
+const CardResource = preload("res://resources/card_resource.gd")
 
 static func white_tiger_general(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
@@ -110,6 +111,19 @@ static func pangu(scene: PackedScene) -> Resource:
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 2
+	# 카드 타입 카운터: 권능 카드 사용 때마다 영웅 전체에 약화 +2 부여
+	var _ptrigger := IntentRes.new()
+	_ptrigger.action_type = IntentRes.ActionType.DEBUFF
+	_ptrigger.value = 2
+	_ptrigger.target = IntentRes.TargetType.ALL
+	_ptrigger.status_type = "weak"
+	_ptrigger.play_animation = "buff"
+	e.card_count_trigger = {
+		"card_type": CardResource.CardType.POWER,
+		"threshold": 1,
+		"intent": _ptrigger,
+		"repeat": true,
+	}
 	return e
 
 static func elites() -> Array:
