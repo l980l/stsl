@@ -56,6 +56,7 @@ var _debug_grid_visible: bool = false
 var _debug_grid_nodes: Array = []
 
 var _deck_viewer: CanvasLayer = null
+var _deck_viewer_tooltip: CardScene = null
 
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
@@ -1094,13 +1095,13 @@ func _show_deck_viewer_in_battle() -> void:
 	draw_cards.shuffle()
 	var discard_cards := DeckManager.discard_pile.duplicate()
 
-	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw") + " (%d)" % draw_cards.size(), draw_cards)
-	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
+	_add_deck_column(columns, overlay, tr("ui.battle.deck_viewer.draw") + " (%d)" % draw_cards.size(), draw_cards)
+	_add_deck_column(columns, overlay, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
 
 	_deck_viewer = canvas
 
 
-func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> void:
+func _add_deck_column(parent: HBoxContainer, overlay: Control, header: String, cards: Array) -> void:
 	var col := VBoxContainer.new()
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.add_theme_constant_override("separation", 6)
@@ -1130,13 +1131,38 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 
 	for card_res in cards:
 		var card_node: CardScene = CARD_SCENE.instantiate()
-		card_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		card_node.scale = Vector2(1.0, 1.0)
+		card_node.mouse_filter = Control.MOUSE_FILTER_PASS
+		card_node.scale = Vector2(0.65, 0.65)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
+		var captured_res := card_res
+		var captured_node := card_node
+		var captured_overlay := overlay
+		card_node.card_hovered.connect(func(_c): _show_deck_tooltip(captured_res, captured_node, captured_overlay))
+		card_node.card_unhovered.connect(func(_c): _hide_deck_tooltip())
 		grid.add_child(card_node)
+
+func _show_deck_tooltip(card: Resource, card_node: CardScene, overlay: Control) -> void:
+	_hide_deck_tooltip()
+	var tip: CardScene = CARD_SCENE.instantiate()
+	tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tip.scale = Vector2(2.5, 2.5)
+	tip.z_index = 200
+	tip.setup(card, CardScene.Mode.HAND)
+	overlay.add_child(tip)
+	_deck_viewer_tooltip = tip
+	var base := card_node.global_position
+	var x := clamp(base.x + 45.0 - 175.0, 0.0, float(WINDOW_W - 350))
+	var y := clamp(base.y - 510.0, 20.0, float(WINDOW_H - 500))
+	tip.position = Vector2(x, y)
+
+func _hide_deck_tooltip() -> void:
+	if _deck_viewer_tooltip != null:
+		_deck_viewer_tooltip.queue_free()
+		_deck_viewer_tooltip = null
 
 func _close_deck_viewer() -> void:
 	if _deck_viewer != null:
+		_deck_viewer_tooltip = null
 		_deck_viewer.queue_free()
 		_deck_viewer = null
 
