@@ -20,9 +20,9 @@ func _assert(cond: bool, msg: String) -> void:
 		print("  FAIL: " + msg)
 
 func test_all_effect_types_return_string() -> void:
-	# EffectType enum 개수: 30 (0~29)
+	# EffectType enum 개수: 24 (0~23)
 	var eff := EffectRes.new()
-	for t in range(30):
+	for t in range(24):
 		eff.effect_type = t
 		eff.value = 5
 		eff.bonus_value = 10
@@ -32,3 +32,4 @@ func test_all_effect_types_return_string() -> void:
 		var result: String = eff.display_text()
 		_assert(result != null, "EffectType %d display_text() non-null" % t)
 		_assert(result is String, "EffectType %d display_text() is String" % t)
+		_assert(result != "", "EffectType %d display_text() 빈 문자열 아님" % t)
