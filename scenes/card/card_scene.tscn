@@ -28,7 +28,7 @@ offset_top = 64.076416
 offset_right = 149.31372
 offset_bottom = 163.10362
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
+theme_override_constants/outline_size = 11
 theme_override_font_sizes/font_size = 70
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -40,7 +40,7 @@ offset_top = 75.726685
 offset_right = 729.34015
 offset_bottom = 157.2785
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
+theme_override_constants/outline_size = 11
 theme_override_font_sizes/font_size = 50
 horizontal_alignment = 1
 
@@ -55,21 +55,21 @@ expand_mode = 3
 [node name="DescLabel" type="Label" parent="Container" unique_id=1387990002]
 layout_mode = 0
 offset_left = 80.399704
-offset_top = 798.0427
+offset_top = 832.9935
 offset_right = 723.59735
 offset_bottom = 1083.4741
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 35
+theme_override_constants/outline_size = 9
+theme_override_font_sizes/font_size = 40
 autowrap_mode = 3
 
 [node name="TypeLabel" type="Label" parent="Container" unique_id=1111111111]
 layout_mode = 0
-offset_left = 178.0
-offset_top = 158.0
-offset_right = 728.0
-offset_bottom = 198.0
+offset_left = 132.08524
+offset_top = 792.2176
+offset_right = 682.0852
+offset_bottom = 834.2176
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 6
+theme_override_constants/outline_size = 9
 theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1

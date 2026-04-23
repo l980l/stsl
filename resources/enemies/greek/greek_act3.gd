@@ -2,7 +2,6 @@
 # 그리스 신화 — Act3 엘리트 3종 + 보스(크로노스)
 const EnemyRes   = preload("res://resources/enemy_resource.gd")
 const IntentRes  = preload("res://resources/intent_resource.gd")
-const CardResource = preload("res://resources/card_resource.gd")
 
 # ──── 엘리트 3종 ────
 
@@ -116,6 +115,7 @@ static func kronos(scene: PackedScene) -> Resource:
 		"threshold": 5,
 		"intent": _ktrigger,
 		"repeat": true,
+		"tooltip_key": "enemy.greek.kronos.counter",
 	}
 	return e
 

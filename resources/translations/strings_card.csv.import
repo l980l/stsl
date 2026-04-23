@@ -6,10 +6,10 @@ uid="uid://bcard000001"
 
 [deps]
 
-files=["res://resources/translations/strings_card.ko.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation"]
+files=["res://resources/translations/strings_card.ko.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.zh.translation"]
 
 source_file="res://resources/translations/strings_card.csv"
-dest_files=["res://resources/translations/strings_card.ko.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation"]
+dest_files=["res://resources/translations/strings_card.ko.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.zh.translation"]
 
 [params]
 
