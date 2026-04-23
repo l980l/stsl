@@ -452,11 +452,17 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				status_applied.emit(card.owner_id, "tokens", effect.value)
 			EffectRes.EffectType.REVIVE:
 				if team_mgr:
-					for hero in team_mgr.heroes:
-						if not team_mgr.is_alive(hero.hero_id):
-							var revive_hp: int = max(1, hero.max_hp * effect.value / 100)
-							team_mgr.revive(hero.hero_id, revive_hp)
-							break
+					var revive_id: String = target_hero_id
+					if revive_id == "" or team_mgr.is_alive(revive_id):
+						for hero in team_mgr.heroes:
+							if not team_mgr.is_alive(hero.hero_id):
+								revive_id = hero.hero_id
+								break
+					if revive_id != "" and not team_mgr.is_alive(revive_id):
+						var revive_hero = team_mgr.get_hero(revive_id)
+						if revive_hero != null:
+							var revive_hp: int = max(1, revive_hero.max_hp * effect.value / 100)
+							team_mgr.revive(revive_id, revive_hp)
 			EffectRes.EffectType.SACRIFICE_HP:
 				if team_mgr:
 					team_mgr.take_damage(card.owner_id, effect.value)

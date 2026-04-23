@@ -902,12 +902,13 @@ func _on_hero_revived(hero_id: String) -> void:
 		entry["status_box"].visible = true
 		_update_hero_ui(hero_id)
 		break
-	# 스프라이트 복원 (death 애니메이션으로 숨겨진 경우 복구)
+	# 스프라이트 복원 (death 애니메이션 트랙 리셋 후 idle 재생)
 	var char_node = _hero_char_nodes.get(hero_id)
 	if char_node != null:
 		char_node.visible = true
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+			ap.stop()
 			if ap.has_animation("idle"):
 				ap.play("idle")
 
@@ -1324,6 +1325,8 @@ func _card_target_type(card: Resource) -> String:
 			EffectRes.EffectType.HEAL:
 				if effect.target == "SINGLE":
 					return "ally"
+			EffectRes.EffectType.REVIVE:
+				return "dead_ally"
 	return "none"
 
 func _start_drag(card: Resource) -> void:
@@ -1348,6 +1351,11 @@ func _start_drag(card: Resource) -> void:
 			for entry in _hero_nodes:
 				if entry["panel"].visible:
 					entry["panel"].color = Color(0.12, 0.25, 0.12)
+		"dead_ally":
+			_message_label.text = tr("battle.drag_dead_ally")
+			for entry in _hero_nodes:
+				if entry["panel"].visible and not TeamManager.is_alive(entry["hero_id"]):
+					entry["panel"].color = Color(0.25, 0.12, 0.35)
 		"none":
 			_message_label.text = tr("battle.drag_release")
 
@@ -1372,6 +1380,18 @@ func _finish_drag(drop_pos: Vector2) -> void:
 					continue
 				var hero_id: String = entry["hero_id"]
 				if not TeamManager.is_alive(hero_id):
+					continue
+				if entry["panel"].get_global_rect().has_point(drop_pos):
+					BattleManager.play_card(_drag_card, -1, hero_id)
+					_cleanup_drag()
+					return
+			_cleanup_drag()
+		"dead_ally":
+			for entry in _hero_nodes:
+				if not entry["panel"].visible:
+					continue
+				var hero_id: String = entry["hero_id"]
+				if TeamManager.is_alive(hero_id):
 					continue
 				if entry["panel"].get_global_rect().has_point(drop_pos):
 					BattleManager.play_card(_drag_card, -1, hero_id)
