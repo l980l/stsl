@@ -1067,9 +1067,16 @@ func _show_deck_viewer_in_battle() -> void:
 	panel.position = Vector2((WINDOW_W - 1200) / 2.0, (WINDOW_H - 680) / 2.0)
 	overlay.add_child(panel)
 
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 20)
+	margin.add_theme_constant_override("margin_right", 20)
+	margin.add_theme_constant_override("margin_top", 14)
+	margin.add_theme_constant_override("margin_bottom", 14)
+	panel.add_child(margin)
+
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 8)
-	panel.add_child(vbox)
+	margin.add_child(vbox)
 
 	var title_row := HBoxContainer.new()
 	vbox.add_child(title_row)
@@ -1095,13 +1102,22 @@ func _show_deck_viewer_in_battle() -> void:
 	draw_cards.shuffle()
 	var discard_cards := DeckManager.discard_pile.duplicate()
 
-	_add_deck_column(columns, overlay, tr("ui.battle.deck_viewer.draw") + " (%d)" % draw_cards.size(), draw_cards)
-	_add_deck_column(columns, overlay, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
+	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw") + " (%d)" % draw_cards.size(), draw_cards)
+	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
+
+	# 툴팁을 미리 한 번만 생성 — visible 토글로 깜빡임 방지
+	var tip: CardScene = CARD_SCENE.instantiate()
+	tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tip.scale = Vector2(2.5, 2.5)
+	tip.z_index = 200
+	tip.visible = false
+	overlay.add_child(tip)
+	_deck_viewer_tooltip = tip
 
 	_deck_viewer = canvas
 
 
-func _add_deck_column(parent: HBoxContainer, overlay: Control, header: String, cards: Array) -> void:
+func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> void:
 	var col := VBoxContainer.new()
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.add_theme_constant_override("separation", 6)
@@ -1131,10 +1147,7 @@ func _add_deck_column(parent: HBoxContainer, overlay: Control, header: String, c
 
 	for card_res in cards:
 		var captured_res: Resource = card_res
-		var captured_overlay: Control = overlay
 
-		# 래퍼가 레이아웃 크기(91×130)를 결정하고 마우스 이벤트 전담
-		# 카드 자체는 IGNORE로 두어 자식 노드들의 이벤트 간섭 차단
 		var wrapper := Control.new()
 		wrapper.custom_minimum_size = Vector2(91, 130)
 		wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -1144,30 +1157,25 @@ func _add_deck_column(parent: HBoxContainer, overlay: Control, header: String, c
 		card_node.scale = Vector2(0.65, 0.65)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
-		card_node.mouse_filter = Control.MOUSE_FILTER_IGNORE  # _ready() 이후 덮어씀
+		card_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 		var captured_wrapper: Control = wrapper
-		wrapper.mouse_entered.connect(func(): _show_deck_tooltip(captured_res, captured_wrapper, captured_overlay))
+		wrapper.mouse_entered.connect(func(): _show_deck_tooltip(captured_res, captured_wrapper))
 		wrapper.mouse_exited.connect(func(): _hide_deck_tooltip())
 
-func _show_deck_tooltip(card: Resource, node: Control, overlay: Control) -> void:
-	_hide_deck_tooltip()
-	var tip: CardScene = CARD_SCENE.instantiate()
-	tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tip.scale = Vector2(2.5, 2.5)
-	tip.z_index = 200
-	tip.setup(card, CardScene.Mode.HAND)
-	overlay.add_child(tip)
-	_deck_viewer_tooltip = tip
+func _show_deck_tooltip(card: Resource, node: Control) -> void:
+	if _deck_viewer_tooltip == null:
+		return
+	_deck_viewer_tooltip.setup(card, CardScene.Mode.HAND)
 	var base := node.global_position
 	var x: float = clamp(base.x + 45.0 - 175.0, 0.0, float(WINDOW_W - 350))
 	var y: float = clamp(base.y - 510.0, 20.0, float(WINDOW_H - 500))
-	tip.position = Vector2(x, y)
+	_deck_viewer_tooltip.position = Vector2(x, y)
+	_deck_viewer_tooltip.visible = true
 
 func _hide_deck_tooltip() -> void:
 	if _deck_viewer_tooltip != null:
-		_deck_viewer_tooltip.queue_free()
-		_deck_viewer_tooltip = null
+		_deck_viewer_tooltip.visible = false
 
 func _close_deck_viewer() -> void:
 	if _deck_viewer != null:
