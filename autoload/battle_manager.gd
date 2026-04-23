@@ -737,6 +737,8 @@ func _get_taunting_heroes() -> Array:
 	return result
 
 func _pick_highest_hp(hero_ids: Array) -> String:
+	if hero_ids.is_empty():
+		return ""
 	var best_id: String = hero_ids[0]
 	var best_hp: int = team_mgr.get_current_hp(best_id)
 	for hid in hero_ids:
