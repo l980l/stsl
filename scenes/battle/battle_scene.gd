@@ -269,7 +269,7 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	counter_lbl.size = Vector2(78, 22)
 	counter_lbl.add_theme_font_size_override("font_size", 14)
 	counter_lbl.modulate = Color(1.0, 0.7, 0.4)
-	counter_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	counter_lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 	counter_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	counter_lbl.visible = false
 	counter_lbl.z_index = 2
@@ -999,7 +999,10 @@ func _on_active_powers_changed() -> void:
 		lbl.text = fmt % v if fmt.contains("%") else fmt
 		lbl.add_theme_font_size_override("font_size", 14)
 		lbl.modulate = Color(0.7, 0.4, 0.9)
-		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+		var desc_fmt: String = tr(base_key + ".desc")
+		if desc_fmt != base_key + ".desc":
+			lbl.tooltip_text = desc_fmt % v if desc_fmt.contains("%d") else desc_fmt
 		_active_powers_box.add_child(lbl)
 
 func _on_status_applied(target: String, _status_type: String, _stacks: int) -> void:
@@ -1289,7 +1292,37 @@ func _refresh_enemy_counter(enemy_index: int) -> void:
 			lbl.visible = false
 			return
 	lbl.text = tr(key) % [info["count"], info["threshold"]]
+	lbl.tooltip_text = _counter_tooltip_text(info)
 	lbl.visible = true
+
+func _counter_tooltip_text(info: Dictionary) -> String:
+	var card_type: int = info.get("card_type", -1)
+	var threshold: int = info.get("threshold", 0)
+	var intent: Resource = info.get("intent")
+	var card_name: String
+	match card_type:
+		CardResource.CardType.ATTACK: card_name = "공격"
+		CardResource.CardType.SKILL:  card_name = "기술"
+		CardResource.CardType.POWER:  card_name = "권능"
+		_: card_name = "카드"
+	var effect_desc: String = "특수 효과 발동"
+	if intent != null:
+		var target_str: String
+		match int(intent.target):
+			IntentRes.TargetType.ALL:       target_str = "전체 아군"
+			IntentRes.TargetType.LOWEST_HP: target_str = "최저 HP 아군"
+			IntentRes.TargetType.RANDOM:    target_str = "무작위 아군"
+			_:                              target_str = "아군"
+		match intent.action_type:
+			IntentRes.ActionType.ATTACK:
+				effect_desc = "%s에게 %d 피해" % [target_str, intent.value]
+			IntentRes.ActionType.DEBUFF:
+				var sname: String = tr("status.%s.name" % intent.status_type)
+				effect_desc = "%s에게 %s +%d" % [target_str, sname, intent.value]
+			IntentRes.ActionType.BUFF:
+				var sname: String = tr("status.%s.name" % intent.status_type)
+				effect_desc = "자신에게 %s +%d" % [sname, intent.value]
+	return "%s 카드 %d장마다:\n%s" % [card_name, threshold, effect_desc]
 
 func _make_border_rects(x: int, y: int, w: int, h: int, color: Color) -> Array:
 	var rects: Array = []

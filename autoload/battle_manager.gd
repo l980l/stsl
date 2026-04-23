@@ -248,6 +248,7 @@ func _track_card_type_counters(card: Resource) -> void:
 			should_fire = false
 		if should_fire:
 			ctr["fired_count"] = fired + 1
+			ctr["count"] = 0
 			var intent: Resource = trigger.get("intent")
 			if intent != null and intent is IntentRes:
 				_execute_intent(int(ei), intent)
@@ -262,6 +263,7 @@ func get_enemy_counter(enemy_index: int) -> Dictionary:
 		"count": ctr.get("count", 0),
 		"threshold": trigger.get("threshold", 0),
 		"card_type": trigger.get("card_type", -1),
+		"intent": trigger.get("intent"),
 	}
 
 func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> void:
