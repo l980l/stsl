@@ -56,12 +56,10 @@ func _make_hero(id: String, hp: int) -> Resource:
 func _make_enemy(hp: int) -> Resource:
 	var e := EnemyRes.new()
 	e.max_hp = hp
-	e.base_pattern = []
 	return e
 
 func _make_power_card(owner_id: String, status_type: String, value: int) -> Resource:
 	var c := CardRes.new()
-	c.card_id = "test_power"
 	c.card_name = "Test Power"
 	c.owner_id = owner_id
 	c.cost = 0
@@ -78,8 +76,7 @@ func _make_power_card(owner_id: String, status_type: String, value: int) -> Reso
 func test_poison_per_turn_register() -> void:
 	print("[TestPowerCards] test_poison_per_turn_register")
 	var bm := _make_bm()
-	var hero := _make_hero("cleopatra", 50)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -95,8 +92,7 @@ func test_poison_per_turn_register() -> void:
 func test_poison_per_turn_trigger() -> void:
 	print("[TestPowerCards] test_poison_per_turn_trigger")
 	var bm := _make_bm()
-	var hero := _make_hero("cleopatra", 50)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -107,17 +103,15 @@ func test_poison_per_turn_trigger() -> void:
 
 	# 다음 턴 시작 시 trigger
 	bm.start_player_turn()
-	# poison은 스택으로 누적됨 (_apply_status_to_enemy)
-	var poison_stack: int = bm._enemy_status[0].get("poison", 0)
-	_assert(poison_stack >= 3, "다음 턴 시작 시 적 독 스택 +3 이상 (poison >= 3)")
+	var poison_stack: int = bm._enemy_status[0].get("poison_dmg", 0)
+	_assert(poison_stack >= 3, "다음 턴 시작 시 적 독 스택 +3 이상 (poison_dmg >= 3)")
 
 # ---------- 2. 전사의 각오 (block_per_turn) — 이순신 ----------
 
 func test_block_per_turn_register() -> void:
 	print("[TestPowerCards] test_block_per_turn_register")
 	var bm := _make_bm()
-	var hero := _make_hero("yi_sun_sin", 60)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 60))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -133,8 +127,7 @@ func test_block_per_turn_register() -> void:
 func test_block_per_turn_trigger() -> void:
 	print("[TestPowerCards] test_block_per_turn_trigger")
 	var bm := _make_bm()
-	var hero := _make_hero("yi_sun_sin", 60)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 60))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -151,8 +144,7 @@ func test_block_per_turn_trigger() -> void:
 func test_block_per_turn_permanent() -> void:
 	print("[TestPowerCards] test_block_per_turn_permanent")
 	var bm := _make_bm()
-	var hero := _make_hero("yi_sun_sin", 60)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 60))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -175,8 +167,7 @@ func test_block_per_turn_permanent() -> void:
 func test_counter_per_attack_register() -> void:
 	print("[TestPowerCards] test_counter_per_attack_register")
 	var bm := _make_bm()
-	var hero := _make_hero("yi_sun_sin", 60)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 60))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -192,8 +183,7 @@ func test_counter_per_attack_register() -> void:
 func test_counter_per_attack_trigger() -> void:
 	print("[TestPowerCards] test_counter_per_attack_trigger")
 	var bm := _make_bm()
-	var hero := _make_hero("yi_sun_sin", 60)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 60))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -219,8 +209,7 @@ func test_counter_per_attack_trigger() -> void:
 func test_heal_team_per_turn_register() -> void:
 	print("[TestPowerCards] test_heal_team_per_turn_register")
 	var bm := _make_bm()
-	var hero := _make_hero("joan_of_arc", 60)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 60))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -236,8 +225,7 @@ func test_heal_team_per_turn_register() -> void:
 func test_heal_team_per_turn_trigger() -> void:
 	print("[TestPowerCards] test_heal_team_per_turn_trigger")
 	var bm := _make_bm()
-	var hero := _make_hero("joan_of_arc", 60)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 60))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -262,8 +250,7 @@ func test_heal_team_per_turn_trigger() -> void:
 func test_draw_per_turn_register() -> void:
 	print("[TestPowerCards] test_draw_per_turn_register")
 	var bm := _make_bm()
-	var hero := _make_hero("genghis_khan", 55)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 55))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -279,15 +266,13 @@ func test_draw_per_turn_register() -> void:
 func test_draw_per_turn_trigger() -> void:
 	print("[TestPowerCards] test_draw_per_turn_trigger")
 	var bm := _make_bm()
-	var hero := _make_hero("genghis_khan", 55)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 55))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
 	# 더미 카드 드로우파일에 추가
 	for i in range(5):
 		var dummy := CardRes.new()
-		dummy.card_id = "dummy_%d" % i
 		dummy.owner_id = "genghis_khan"
 		dummy.cost = 0
 		dummy.effects = []
@@ -307,9 +292,8 @@ func test_draw_per_turn_trigger() -> void:
 func test_block_per_turn_musashi_register() -> void:
 	print("[TestPowerCards] test_block_per_turn_musashi_register")
 	var bm := _make_bm()
-	var musashi := _make_hero("musashi", 70)
-	var yi := _make_hero("yi_sun_sin", 60)
-	bm.team_mgr.setup([musashi, yi])
+	bm.team_mgr.add_hero(_make_hero("musashi", 70))
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 60))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -326,9 +310,8 @@ func test_block_per_turn_musashi_register() -> void:
 func test_block_per_turn_musashi_trigger() -> void:
 	print("[TestPowerCards] test_block_per_turn_musashi_trigger")
 	var bm := _make_bm()
-	var musashi := _make_hero("musashi", 70)
-	var yi := _make_hero("yi_sun_sin", 60)
-	bm.team_mgr.setup([musashi, yi])
+	bm.team_mgr.add_hero(_make_hero("musashi", 70))
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 60))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
@@ -348,8 +331,7 @@ func test_block_per_turn_musashi_trigger() -> void:
 func test_setup_battle_clears_powers() -> void:
 	print("[TestPowerCards] test_setup_battle_clears_powers")
 	var bm := _make_bm()
-	var hero := _make_hero("cleopatra", 50)
-	bm.team_mgr.setup([hero])
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
 	bm.setup_battle([_make_enemy(100)])
 	bm.start_player_turn()
 
