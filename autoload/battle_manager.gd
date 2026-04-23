@@ -781,6 +781,9 @@ func get_enemy_status(index: int) -> Dictionary:
 func get_active_power(key: String) -> Dictionary:
 	return _active_powers.get(key, {}).duplicate()
 
+func get_all_active_powers() -> Dictionary:
+	return _active_powers.duplicate()
+
 func clear() -> void:
 	_enemies.clear()
 	_enemy_hp.clear()
