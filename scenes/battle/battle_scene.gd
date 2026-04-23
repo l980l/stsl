@@ -1130,9 +1130,6 @@ func _show_deck_viewer_in_battle() -> void:
 	tip.z_index = 200
 	tip.visible = false
 	overlay.add_child(tip)
-	# 루트만 IGNORE 하면 내부 Label/TextureRect(기본 STOP)가 이벤트를 가로채
-	# 원본 카드에 mouse_exited → 툴팁 hide → mouse_entered → 툴팁 show 깜빡임 발생
-	# 서브트리 전체를 IGNORE로 만들어 완전히 마우스 투과
 	_set_mouse_ignore_recursive(tip)
 	_deck_viewer_tooltip = tip
 
@@ -1209,6 +1206,7 @@ func _set_mouse_ignore_recursive(node: Node) -> void:
 		(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	for c in node.get_children():
 		_set_mouse_ignore_recursive(c)
+
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if OS.is_debug_build() and event.pressed and not event.echo:
