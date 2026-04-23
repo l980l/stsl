@@ -902,6 +902,14 @@ func _on_hero_revived(hero_id: String) -> void:
 		entry["status_box"].visible = true
 		_update_hero_ui(hero_id)
 		break
+	# 스프라이트 복원 (death 애니메이션으로 숨겨진 경우 복구)
+	var char_node = _hero_char_nodes.get(hero_id)
+	if char_node != null:
+		char_node.visible = true
+		if char_node.has_node("AnimationPlayer"):
+			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+			if ap.has_animation("idle"):
+				ap.play("idle")
 
 func _on_battle_won() -> void:
 	_message_label.text = tr("battle.msg_victory")
