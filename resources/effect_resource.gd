@@ -51,8 +51,12 @@ const _STATUS_NAME_KEYS := {
 func display_text() -> String:
 	match effect_type:
 		EffectType.DAMAGE:
-			var hit_str: String = " ×%d" % hit_count if hit_count > 1 else ""
-			var aoe_str: String = TranslationServer.translate("effect.aoe_suffix") if target == "ALL" else ""
+			var hit_str: String = ""
+			if hit_count > 1:
+				hit_str = " ×%d" % hit_count
+			var aoe_str: String = ""
+			if target == "ALL":
+				aoe_str = TranslationServer.translate("effect.aoe_suffix")
 			return TranslationServer.translate("effect.damage.text") % [value, aoe_str, hit_str]
 		EffectType.BLOCK:
 			return TranslationServer.translate("effect.block.text") % value
