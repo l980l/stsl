@@ -236,6 +236,12 @@ func complete_battle(won: bool) -> void:
 					if pm and _last_boss_enemy_id != "":
 						pm.set_flag("kill_boss:" + _last_boss_enemy_id)
 						pm.check_unlock_conditions()
+				_MapNodeRes.RoomType.SECRET:
+					# 비밀 전투 보상: 기본 카드 픽 + 유물 1개
+					card_rewards_pick_count = 1
+					var secret_relic := get_random_relic()
+					if secret_relic:
+						add_relic(secret_relic)
 				_:
 					card_rewards_pick_count = 1
 					add_gold(randi_range(10, 15))
@@ -324,12 +330,6 @@ func _resolve_secret_room() -> void:
 			_last_boss_enemy_id = ""
 			change_state(GameState.BATTLE)
 			_request_scene("res://scenes/battle/battle_scene.tscn")
-
-func complete_secret_room_card_pick() -> void:
-	_advance_nodes_from(current_node_id)
-	card_rewards.clear()
-	change_state(GameState.MAP)
-	_request_scene("res://scenes/map/map_scene.tscn")
 
 func enter_card_upgrade() -> void:
 	_advance_nodes_from(current_node_id)
