@@ -1134,7 +1134,7 @@ func _add_deck_column(parent: HBoxContainer, overlay: Control, header: String, c
 		card_node.mouse_filter = Control.MOUSE_FILTER_PASS
 		card_node.scale = Vector2(0.65, 0.65)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
-		var captured_res := card_res
+		var captured_res: Resource = card_res
 		var captured_node := card_node
 		var captured_overlay := overlay
 		card_node.card_hovered.connect(func(_c): _show_deck_tooltip(captured_res, captured_node, captured_overlay))
@@ -1151,8 +1151,8 @@ func _show_deck_tooltip(card: Resource, card_node: CardScene, overlay: Control) 
 	overlay.add_child(tip)
 	_deck_viewer_tooltip = tip
 	var base := card_node.global_position
-	var x := clamp(base.x + 45.0 - 175.0, 0.0, float(WINDOW_W - 350))
-	var y := clamp(base.y - 510.0, 20.0, float(WINDOW_H - 500))
+	var x: float = clamp(base.x + 45.0 - 175.0, 0.0, float(WINDOW_W - 350))
+	var y: float = clamp(base.y - 510.0, 20.0, float(WINDOW_H - 500))
 	tip.position = Vector2(x, y)
 
 func _hide_deck_tooltip() -> void:
