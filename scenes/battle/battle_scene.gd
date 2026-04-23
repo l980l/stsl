@@ -42,6 +42,7 @@ var _selected_card: Resource = null
 
 var _drag_card: Resource = null
 var _drag_preview: Label = null
+var _card_tooltip: Control = null
 
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
@@ -661,11 +662,36 @@ func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 	if _drag_card != null:
 		_finish_drag(screen_pos)
 
-func _on_card_hovered(_card: Resource) -> void:
-	pass
+func _on_card_hovered(card: Resource) -> void:
+	if _drag_card != null:
+		return
+	_free_card_tooltip()
+	var tooltip := CardScene.instantiate()
+	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tooltip.custom_minimum_size = Vector2(280, 400)
+	tooltip.z_index = 100
+	tooltip.setup(card, tooltip.Mode.HAND)
+	add_child(tooltip)
+	_card_tooltip = tooltip
+	_reposition_card_tooltip()
 
 func _on_card_unhovered(_card: Resource) -> void:
-	pass
+	_free_card_tooltip()
+
+func _reposition_card_tooltip() -> void:
+	if _card_tooltip == null:
+		return
+	const W := 280.0
+	const H := 400.0
+	var mp := get_global_mouse_position()
+	var x := clamp(mp.x - W / 2.0, 0.0, 1920.0 - W)
+	var y := clamp(mp.y - H - 20.0, 0.0, 1080.0 - H)
+	_card_tooltip.position = Vector2(x, y)
+
+func _free_card_tooltip() -> void:
+	if _card_tooltip != null:
+		_card_tooltip.queue_free()
+		_card_tooltip = null
 
 func _on_enemy_pressed(index: int) -> void:
 	if _debug_hp_target_mode and OS.is_debug_build():
@@ -1065,6 +1091,7 @@ func _card_target_type(card: Resource) -> String:
 	return "none"
 
 func _start_drag(card: Resource) -> void:
+	_free_card_tooltip()
 	_drag_card = card
 	_selected_card = null
 	_drag_preview = Label.new()
