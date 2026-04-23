@@ -12,6 +12,7 @@ var failed: int = 0
 func run_all() -> Dictionary:
 	test_card_scene_script_loads()
 	test_resolve_frame_fallback()
+	test_resolve_frame_napoleon()
 	test_build_desc_empty_effects()
 	test_build_desc_with_effects()
 	test_set_disabled()
@@ -38,6 +39,15 @@ func test_resolve_frame_fallback() -> void:
 	var scene = CardSceneScript.new()
 	var tex = scene._resolve_frame_texture("nonexistent_hero_xxx")
 	_assert(tex != null, "존재하지 않는 영웅 ID → sampleframe.png fallback, null 아님")
+	scene.free()
+
+func test_resolve_frame_napoleon() -> void:
+	print("[TestCardScene] test_resolve_frame_napoleon")
+	var scene = CardSceneScript.new()
+	var tex = scene._resolve_frame_texture("napoleon")
+	_assert(tex != null, "napoleon_frame.png 존재 시 해당 텍스처 반환")
+	var tex2 = scene._resolve_frame_texture("nonexistent_zzz")
+	_assert(tex2 != null, "존재하지 않는 영웅은 sampleframe.png fallback")
 	scene.free()
 
 func test_build_desc_empty_effects() -> void:
