@@ -122,6 +122,7 @@ static func pangu(scene: PackedScene) -> Resource:
 		"threshold": 1,
 		"intent": _ptrigger,
 		"repeat": true,
+		"tooltip_key": "enemy.chinese.pangu.counter",
 	}
 	return e
 

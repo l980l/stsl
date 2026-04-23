@@ -36,6 +36,7 @@ func refresh() -> void:
 	$Container/Frame.texture = _resolve_frame_texture(_card.owner_id)
 	$Container/CostLabel.text = str(_card.cost)
 	$Container/TitleLabel.text = _card.card_name
+	LabelUtils.fit_text($Container/TitleLabel, 50, 28)
 	$Container/ArtRect.texture = _card.art
 	$Container/DescLabel.text = _build_desc()
 	$Container/TypeLabel.text = _type_display(_card.card_type)

@@ -264,6 +264,7 @@ func get_enemy_counter(enemy_index: int) -> Dictionary:
 		"threshold": trigger.get("threshold", 0),
 		"card_type": trigger.get("card_type", -1),
 		"intent": trigger.get("intent"),
+		"tooltip_key": trigger.get("tooltip_key", ""),
 	}
 
 func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> void:

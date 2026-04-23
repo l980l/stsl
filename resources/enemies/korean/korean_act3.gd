@@ -32,6 +32,7 @@ static func underworld_judge(scene: PackedScene) -> Resource:
 		"threshold": 4,
 		"intent": _jtrigger,
 		"repeat": true,
+		"tooltip_key": "enemy.korean.underworld_judge.counter",
 	}
 	return e
 

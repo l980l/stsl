@@ -1296,33 +1296,37 @@ func _refresh_enemy_counter(enemy_index: int) -> void:
 	lbl.visible = true
 
 func _counter_tooltip_text(info: Dictionary) -> String:
+	var tkey: String = info.get("tooltip_key", "")
+	if tkey != "":
+		return tr(tkey)
+	# tooltip_key 없는 경우 동적 생성 (fallback)
 	var card_type: int = info.get("card_type", -1)
 	var threshold: int = info.get("threshold", 0)
 	var intent: Resource = info.get("intent")
 	var card_name: String
 	match card_type:
-		CardResource.CardType.ATTACK: card_name = "공격"
-		CardResource.CardType.SKILL:  card_name = "기술"
-		CardResource.CardType.POWER:  card_name = "권능"
-		_: card_name = "카드"
-	var effect_desc: String = "특수 효과 발동"
+		CardResource.CardType.ATTACK: card_name = tr("card_type.attack.name")
+		CardResource.CardType.SKILL:  card_name = tr("card_type.skill.name")
+		CardResource.CardType.POWER:  card_name = tr("card_type.power.name")
+		_: card_name = "?"
+	var effect_desc: String = "?"
 	if intent != null:
 		var target_str: String
 		match int(intent.target):
-			IntentRes.TargetType.ALL:       target_str = "전체 아군"
-			IntentRes.TargetType.LOWEST_HP: target_str = "최저 HP 아군"
-			IntentRes.TargetType.RANDOM:    target_str = "무작위 아군"
-			_:                              target_str = "아군"
+			IntentRes.TargetType.ALL:       target_str = tr("battle.target.all_ally")
+			IntentRes.TargetType.LOWEST_HP: target_str = tr("battle.target.lowest_hp_ally")
+			IntentRes.TargetType.RANDOM:    target_str = tr("battle.target.random_ally")
+			_:                              target_str = tr("battle.target.ally")
 		match intent.action_type:
 			IntentRes.ActionType.ATTACK:
-				effect_desc = "%s에게 %d 피해" % [target_str, intent.value]
+				effect_desc = tr("battle.counter.effect.attack") % [target_str, intent.value]
 			IntentRes.ActionType.DEBUFF:
 				var sname: String = tr("status.%s.name" % intent.status_type)
-				effect_desc = "%s에게 %s +%d" % [target_str, sname, intent.value]
+				effect_desc = tr("battle.counter.effect.debuff") % [target_str, sname, intent.value]
 			IntentRes.ActionType.BUFF:
 				var sname: String = tr("status.%s.name" % intent.status_type)
-				effect_desc = "자신에게 %s +%d" % [sname, intent.value]
-	return "%s 카드 %d장마다:\n%s" % [card_name, threshold, effect_desc]
+				effect_desc = tr("battle.counter.effect.buff") % [sname, intent.value]
+	return tr("battle.counter.tooltip.format") % [card_name, threshold, effect_desc]
 
 func _make_border_rects(x: int, y: int, w: int, h: int, color: Color) -> Array:
 	var rects: Array = []

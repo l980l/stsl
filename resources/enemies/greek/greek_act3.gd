@@ -115,6 +115,7 @@ static func kronos(scene: PackedScene) -> Resource:
 		"threshold": 5,
 		"intent": _ktrigger,
 		"repeat": true,
+		"tooltip_key": "enemy.greek.kronos.counter",
 	}
 	return e
 
