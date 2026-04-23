@@ -1,0 +1,57 @@
+[gd_scene load_steps=2 format=3 uid="uid://settings_overlay"]
+
+[ext_resource type="Script" path="res://scenes/ui/settings_overlay.gd" id="1_overlay"]
+
+[node name="SettingsOverlay" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_overlay")
+visible = false
+
+[node name="BgRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.6)
+mouse_filter = 0
+
+[node name="Panel" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = 200.0
+
+[node name="Title" type="Label" parent="Panel"]
+anchor_right = 1.0
+offset_top = 20.0
+offset_bottom = 60.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
+text = "설정"
+
+[node name="LangLbl" type="Label" parent="Panel"]
+offset_left = 40.0
+offset_top = 120.0
+offset_right = 200.0
+offset_bottom = 155.0
+theme_override_font_sizes/font_size = 18
+text = "언어"
+
+[node name="LangOpt" type="OptionButton" parent="Panel"]
+offset_left = 210.0
+offset_top = 118.0
+offset_right = 560.0
+offset_bottom = 158.0
+theme_override_font_sizes/font_size = 18
+
+[node name="BtnClose" type="Button" parent="Panel"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -80.0
+offset_top = 330.0
+offset_right = 80.0
+offset_bottom = 370.0
+theme_override_font_sizes/font_size = 18
+text = "닫기"
