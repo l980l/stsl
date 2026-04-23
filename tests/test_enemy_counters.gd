@@ -214,7 +214,7 @@ func test_kronos_skill_5_triggers_vulnerable() -> void:
 		_track(bm, CardRes.CardType.SKILL)
 
 	var ctr: Dictionary = bm._enemy_card_counters.get(0, {})
-	_assert(ctr.get("count", -1) == 5, "크로노스: SKILL 5장 후 count == 5")
+	_assert(ctr.get("count", -1) == 0, "크로노스: SKILL 5장 후 발동 → count 리셋 == 0")
 	_assert(ctr.get("fired_count", 0) == 1, "크로노스: SKILL 5장 후 fired_count == 1")
 
 # ────────────────────────────────────────────
@@ -232,7 +232,7 @@ func test_underworld_judge_attack_4_triggers_damage() -> void:
 		_track(bm, CardRes.CardType.ATTACK)
 
 	var ctr: Dictionary = bm._enemy_card_counters.get(0, {})
-	_assert(ctr.get("count", -1) == 4, "저승 판관: ATTACK 4장 후 count == 4")
+	_assert(ctr.get("count", -1) == 0, "저승 판관: ATTACK 4장 후 발동 → count 리셋 == 0")
 	_assert(ctr.get("fired_count", 0) == 1, "저승 판관: ATTACK 4장 후 fired_count == 1")
 
 # ────────────────────────────────────────────
@@ -249,5 +249,5 @@ func test_pangu_power_1_triggers_weak() -> void:
 	_track(bm, CardRes.CardType.POWER)
 
 	var ctr: Dictionary = bm._enemy_card_counters.get(0, {})
-	_assert(ctr.get("count", -1) == 1, "반고: POWER 1장 후 count == 1")
+	_assert(ctr.get("count", -1) == 0, "반고: POWER 1장 후 발동 → count 리셋 == 0")
 	_assert(ctr.get("fired_count", 0) == 1, "반고: POWER 1장 후 fired_count == 1 (threshold=1)")

@@ -243,7 +243,7 @@ func _track_card_type_counters(card: Resource) -> void:
 		ctr["count"] += 1
 		var threshold: int = trigger.get("threshold", 0)
 		var fired: int = ctr.get("fired_count", 0)
-		var should_fire: bool = threshold > 0 and ctr["count"] >= threshold * (fired + 1)
+		var should_fire: bool = threshold > 0 and ctr["count"] >= threshold
 		if should_fire and not trigger.get("repeat", true) and fired >= 1:
 			should_fire = false
 		if should_fire:
