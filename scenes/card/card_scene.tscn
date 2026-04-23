@@ -1,56 +1,64 @@
-[gd_scene load_steps=2 format=3 uid="uid://c7x9m2k4p1q8r"]
+[gd_scene format=3 uid="uid://c7yam2k4p1q8r"]
 
-[ext_resource type="Script" path="res://scenes/card/card_scene.gd" id="1_cscrpt"]
+[ext_resource type="Script" uid="uid://b0d8lg03pq3fi" path="res://scenes/card/card_scene.gd" id="1_cscrpt"]
+[ext_resource type="Texture2D" uid="uid://fyxsb7murkls" path="res://assets/art/cards/cardframes/sampleframe.png" id="2_frame"]
 
-[node name="CardScene" type="Control"]
-script = ExtResource("1_cscrpt")
+[node name="CardScene" type="Control" unique_id=837172487]
 custom_minimum_size = Vector2(140, 200)
-mouse_filter = 0
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_cscrpt")
 
-[node name="Container" type="Control" parent="."]
-mouse_filter = 2
+[node name="Container" type="Control" parent="." unique_id=579565981]
+anchors_preset = 0
 scale = Vector2(0.17413, 0.17167)
+mouse_filter = 2
 
-[node name="Frame" type="TextureRect" parent="Container"]
+[node name="Frame" type="TextureRect" parent="Container" unique_id=1481964751]
+layout_mode = 0
 offset_right = 804.0
 offset_bottom = 1165.0
-expand_mode = 0
+texture = ExtResource("2_frame")
 stretch_mode = 6
 
-[node name="CostLabel" type="Label" parent="Container"]
-offset_left = 40.0
-offset_top = 30.0
-offset_right = 160.0
-offset_bottom = 185.0
+[node name="CostLabel" type="Label" parent="Container" unique_id=1210760756]
+layout_mode = 0
+offset_left = 74.65686
+offset_top = 64.076416
+offset_right = 149.31372
+offset_bottom = 163.10362
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 70
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_font_sizes/font_size = 80
+
+[node name="TitleLabel" type="Label" parent="Container" unique_id=1997810324]
+layout_mode = 0
+offset_left = 178.02783
+offset_top = 75.726685
+offset_right = 729.34015
+offset_bottom = 157.2785
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
-
-[node name="TitleLabel" type="Label" parent="Container"]
-offset_left = 180.0
-offset_top = 80.0
-offset_right = 760.0
-offset_bottom = 165.0
+theme_override_font_sizes/font_size = 50
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 72
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
 
-[node name="ArtRect" type="TextureRect" parent="Container"]
-offset_left = 40.0
-offset_top = 135.0
-offset_right = 765.0
-offset_bottom = 760.0
+[node name="ArtRect" type="TextureRect" parent="Container" unique_id=1030648202]
+layout_mode = 0
+offset_left = 74.65687
+offset_top = 180.57901
+offset_right = 729.34015
+offset_bottom = 757.26685
 expand_mode = 3
 
-[node name="DescLabel" type="Label" parent="Container"]
-offset_left = 80.0
-offset_top = 790.0
-offset_right = 755.0
-offset_bottom = 1100.0
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 60
+[node name="DescLabel" type="Label" parent="Container" unique_id=1387990002]
+layout_mode = 0
+offset_left = 80.399704
+offset_top = 798.0427
+offset_right = 723.59735
+offset_bottom = 1083.4741
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 35
+autowrap_mode = 3
