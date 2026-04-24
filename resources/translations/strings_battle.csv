@@ -10,3 +10,18 @@ battle.msg_defeat,💀 패배...,💀 Defeat...,💀 Défaite...,💀 Sconfitta.
 battle.drag_enemy,적을 선택하세요 ▶,Select Enemy ▶,Choisir l'ennemi ▶,Seleziona Nemico ▶,Seleccionar Enemigo ▶,敵を選択してください ▶,Επιλογή Εχθρού ▶,选择敌人 ▶
 battle.drag_ally,아군을 선택하세요 ▶,Select Ally ▶,Choisir l'allié ▶,Seleziona Alleato ▶,Seleccionar Aliado ▶,味方を選択してください ▶,Επιλογή Συμμάχου ▶,选择队友 ▶
 battle.drag_release,놓아서 사용 ▶,Release to Use ▶,Relâcher pour utiliser ▶,Rilascia per usare ▶,Soltar para usar ▶,離して使用 ▶,Αφήστε για Χρήση ▶,松开以使用 ▶
+battle.intent.attack,⚔️ %d,⚔️ %d,,,,,,
+battle.intent.buff.strength,💪 +%d,💪 +%d,,,,,,
+battle.intent.buff.block,🛡 +%d,🛡 +%d,,,,,,
+battle.intent.debuff,👿 디버프,👿 Debuff,,,,,,
+battle.intent.prepare,⏳ 준비 중,⏳ Preparing,,,,,,
+battle.intent.dead,💀 사망,💀 Dead,,,,,,
+battle.target.ally,아군,Ally,,,,,,
+battle.target.all_ally,아군 전체,All Allies,,,,,,
+battle.target.lowest_hp_ally,최저 HP 아군,Lowest HP Ally,,,,,,
+battle.target.random_ally,랜덤 아군,Random Ally,,,,,,
+battle.counter.effect.attack,%s에게 %d 피해,%s: %d damage,,,,,,
+battle.counter.effect.debuff,%s에게 %s %d 부여,%s: %s %d,,,,,,
+battle.counter.effect.buff,%s +%d 부여,Grant %s +%d,,,,,,
+battle.counter.tooltip.format,[%s] 카운터 %d회 달성 시: %s,[%s] On %d counters: %s,,,,,,
+battle.drag_dead_ally,사망한 영웅,Dead Ally,,,,,,

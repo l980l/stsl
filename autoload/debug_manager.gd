@@ -249,7 +249,7 @@ func _open_hero_hp_dialog() -> void:
 
 		var half_btn := Button.new()
 		half_btn.text = "½"
-		half_btn.pressed.connect(func(): edit.text = str(max(1, cap_max / 2)))
+		half_btn.pressed.connect(func(): edit.text = str(max(1, cap_max >> 1)))
 		row.add_child(half_btn)
 
 		var one_btn := Button.new()

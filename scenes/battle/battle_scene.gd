@@ -3,7 +3,6 @@ extends Node2D
 
 const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
-const CardResource = preload("res://resources/card_resource.gd")
 const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 
