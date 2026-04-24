@@ -13,47 +13,47 @@ static func make_hero(hero_id: String) -> Resource:
 	hero.hero_id = hero_id
 	match hero_id:
 		"napoleon":
-			hero.hero_name = TranslationServer.translate("hero.napoleon.name")
-			hero.historical_figure = TranslationServer.translate("hero.napoleon.figure")
+			hero.hero_name = "hero.napoleon.name"
+			hero.historical_figure = "hero.napoleon.figure"
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
 			hero.unlock_condition = "default"
 			hero.unlock_description = ""
 		"cleopatra":
-			hero.hero_name = TranslationServer.translate("hero.cleopatra.name")
-			hero.historical_figure = TranslationServer.translate("hero.cleopatra.figure")
+			hero.hero_name = "hero.cleopatra.name"
+			hero.historical_figure = "hero.cleopatra.figure"
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
 			hero.unlock_condition = "default"
 			hero.unlock_description = ""
 		"yi_sun_sin":
-			hero.hero_name = TranslationServer.translate("hero.yi_sun_sin.name")
-			hero.historical_figure = TranslationServer.translate("hero.yi_sun_sin.figure")
+			hero.hero_name = "hero.yi_sun_sin.name"
+			hero.historical_figure = "hero.yi_sun_sin.figure"
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
 			hero.unlock_condition = "default"
 			hero.unlock_description = ""
 		"joan_of_arc":
-			hero.hero_name = TranslationServer.translate("hero.joan_of_arc.name")
-			hero.historical_figure = TranslationServer.translate("hero.joan_of_arc.figure")
+			hero.hero_name = "hero.joan_of_arc.name"
+			hero.historical_figure = "hero.joan_of_arc.figure"
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/joan_of_arc/joan_of_arc.tscn")
 			hero.unlock_condition = "clear_chapter_1"
-			hero.unlock_description = TranslationServer.translate("hero.joan_of_arc.unlock_desc")
+			hero.unlock_description = "hero.joan_of_arc.unlock_desc"
 		"genghis_khan":
-			hero.hero_name = TranslationServer.translate("hero.genghis_khan.name")
-			hero.historical_figure = TranslationServer.translate("hero.genghis_khan.figure")
+			hero.hero_name = "hero.genghis_khan.name"
+			hero.historical_figure = "hero.genghis_khan.figure"
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/genghis_khan/genghis_khan.tscn")
 			hero.unlock_condition = "flag:kill_boss:oshiris"
-			hero.unlock_description = TranslationServer.translate("hero.genghis_khan.unlock_desc")
+			hero.unlock_description = "hero.genghis_khan.unlock_desc"
 		"musashi":
-			hero.hero_name = TranslationServer.translate("hero.musashi.name")
-			hero.historical_figure = TranslationServer.translate("hero.musashi.figure")
+			hero.hero_name = "hero.musashi.name"
+			hero.historical_figure = "hero.musashi.figure"
 			hero.max_hp = 1000
 			hero.character_scene = load("res://characters/heroes/musashi/musashi.tscn")
 			hero.unlock_condition = "elite_solo_kills>=5"
-			hero.unlock_description = TranslationServer.translate("hero.musashi.unlock_desc")
+			hero.unlock_description = "hero.musashi.unlock_desc"
 		_:
 			return null
 	return hero

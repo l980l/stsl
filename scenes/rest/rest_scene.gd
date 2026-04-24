@@ -26,7 +26,7 @@ func _build_ui() -> void:
 			var hero: Resource = tm.heroes[i]
 			var current_hp: int = tm.get_current_hp(hero.hero_id) if tm.has_method("get_current_hp") else hero.max_hp
 			var lbl := Label.new()
-			lbl.text = tr("ui.rest.hero_hp_format") % [hero.hero_name, current_hp, hero.max_hp]
+			lbl.text = tr("ui.rest.hero_hp_format") % [tr(hero.hero_name), current_hp, hero.max_hp]
 			lbl.position = Vector2(660, 240 + i * 50)
 			lbl.size = Vector2(600, 40)
 			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

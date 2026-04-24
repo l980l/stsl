@@ -14,7 +14,7 @@ func _ready() -> void:
 
 func _on_hero_unlocked(hero_id: String) -> void:
 	var info: Dictionary = _HR.get_display_info(hero_id)
-	var hero_name: String = info.get("name", hero_id) as String
+	var hero_name: String = tr(info.get("name", hero_id) as String)
 	_label.text = tr("ui.hero_unlock.message") % hero_name
 	visible = true
 	LabelUtils.fit_text(_label, 28, 16)

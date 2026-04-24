@@ -357,7 +357,7 @@ func _start_test_battle() -> void:
 	TeamManager.clear()
 	var napoleon = HeroRes.new()
 	napoleon.hero_id = "napoleon"
-	napoleon.hero_name = "나폴레옹"
+	napoleon.hero_name = "hero.napoleon.name"
 	napoleon.max_hp = 70
 	napoleon.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
 	TeamManager.add_hero(napoleon)
@@ -366,7 +366,7 @@ func _start_test_battle() -> void:
 	DeckManager.clear()
 	for _i in range(3):
 		var card = CardRes.new()
-		card.card_name = "스트라이크"
+		card.card_name = "card.napoleon.strike.name"
 		card.owner_id = "napoleon"
 		card.cost = 1
 		card.play_animation = "attack"
@@ -378,7 +378,7 @@ func _start_test_battle() -> void:
 		DeckManager.add_card_to_deck(card)
 	for _i in range(2):
 		var card = CardRes.new()
-		card.card_name = "디펜드"
+		card.card_name = "card.napoleon.defend.name"
 		card.owner_id = "napoleon"
 		card.cost = 1
 		card.play_animation = "idle"
@@ -441,7 +441,7 @@ func _setup_heroes() -> void:
 		entry["block_lbl"].visible = true
 		entry["status_box"].visible = true
 		entry["hero_id"] = hero.hero_id
-		entry["name_lbl"].text = hero.get("hero_name") if hero.get("hero_name") != null else hero.hero_id
+		entry["name_lbl"].text = tr(hero.get("hero_name")) if hero.get("hero_name") != null else hero.hero_id
 
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()

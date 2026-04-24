@@ -77,7 +77,8 @@ func _build_ui() -> void:
 		# 툴팁: 설명 + 잠금 조건
 		var tooltip: String = info.get("desc", "") as String
 		if is_locked:
-			var unlock_desc: String = info.get("unlock_description", "") as String
+			var unlock_desc_key: String = info.get("unlock_description", "") as String
+			var unlock_desc: String = tr(unlock_desc_key) if unlock_desc_key != "" else ""
 			tooltip += "\n\n🔒 " + (unlock_desc if unlock_desc != "" else tr("ui.hero_select.unlock_condition_none"))
 
 		# 카드 패널
@@ -99,7 +100,7 @@ func _build_ui() -> void:
 
 		# 이름 + HP
 		var name_lbl := Label.new()
-		name_lbl.text = "%s\nHP %d" % [info.get("name", hid) as String, info.get("hp", 0) as int]
+		name_lbl.text = "%s\nHP %d" % [tr(info.get("name", hid) as String), info.get("hp", 0) as int]
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_lbl.add_theme_font_size_override("font_size", 22)
 		name_lbl.custom_minimum_size = Vector2(0, 70)
@@ -123,9 +124,9 @@ func _build_ui() -> void:
 			btn.text = tr("ui.hero_select.locked")
 			btn.disabled = true
 		elif is_recruit:
-			btn.text = tr("ui.hero_select.btn_recruit") % (info.get("name", hid) as String)
+			btn.text = tr("ui.hero_select.btn_recruit") % tr(info.get("name", hid) as String)
 		else:
-			btn.text = tr("ui.hero_select.btn_select") % (info.get("name", hid) as String)
+			btn.text = tr("ui.hero_select.btn_select") % tr(info.get("name", hid) as String)
 		if not already_owned and not is_locked:
 			var captured_id: String = hid
 			btn.pressed.connect(func(): _on_hero_selected(captured_id))
