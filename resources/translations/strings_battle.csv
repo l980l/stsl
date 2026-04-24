@@ -1,4 +1,4 @@
-﻿keys,ko,en,fr,it,es,ja,el,zh
+keys,ko,en,fr,it,es,ja,el,zh
 battle.btn_end_turn,턴 종료,End Turn,Fin du tour,Fine Turno,Finalizar Turno,ターン終了,Τέλος Γύρου,结束回合
 battle.token_tooltip,다음 턴 시작 시 상대를 공격합니다,Attacks opponent at start of next turn.,Attaque l'adversaire au début du prochain tour.,Attacca l'avversario all'inizio del prossimo turno.,Ataca al oponente al inicio del próximo turno.,次のターンの開始時に相手を攻撃します。,Επιτίθεται στον αντίπαλο στην αρχή του επόμενου γύρου.,在下一回合开始时攻击对手。
 battle.token_soldier,병사,Soldier,Soldat,Soldato,Soldado,兵士,Στρατιώτης,士兵
@@ -10,18 +10,18 @@ battle.msg_defeat,💀 패배...,💀 Defeat...,💀 Défaite...,💀 Sconfitta.
 battle.drag_enemy,적을 선택하세요 ▶,Select Enemy ▶,Choisir l'ennemi ▶,Seleziona Nemico ▶,Seleccionar Enemigo ▶,敵を選択してください ▶,Επιλογή Εχθρού ▶,选择敌人 ▶
 battle.drag_ally,아군을 선택하세요 ▶,Select Ally ▶,Choisir l'allié ▶,Seleziona Alleato ▶,Seleccionar Aliado ▶,味方を選択してください ▶,Επιλογή Συμμάχου ▶,选择队友 ▶
 battle.drag_release,놓아서 사용 ▶,Release to Use ▶,Relâcher pour utiliser ▶,Rilascia per usare ▶,Soltar para usar ▶,離して使用 ▶,Αφήστε για Χρήση ▶,松开以使用 ▶
-battle.intent.attack,⚔️ %d,⚔️ %d,,,,,,
-battle.intent.buff.strength,💪 +%d,💪 +%d,,,,,,
-battle.intent.buff.block,🛡 +%d,🛡 +%d,,,,,,
-battle.intent.debuff,👿 디버프,👿 Debuff,,,,,,
-battle.intent.prepare,⏳ 준비 중,⏳ Preparing,,,,,,
-battle.intent.dead,💀 사망,💀 Dead,,,,,,
-battle.target.ally,아군,Ally,,,,,,
-battle.target.all_ally,아군 전체,All Allies,,,,,,
-battle.target.lowest_hp_ally,최저 HP 아군,Lowest HP Ally,,,,,,
-battle.target.random_ally,랜덤 아군,Random Ally,,,,,,
-battle.counter.effect.attack,%s에게 %d 피해,%s: %d damage,,,,,,
-battle.counter.effect.debuff,%s에게 %s %d 부여,%s: %s %d,,,,,,
-battle.counter.effect.buff,%s +%d 부여,Grant %s +%d,,,,,,
-battle.counter.tooltip.format,[%s] 카운터 %d회 달성 시: %s,[%s] On %d counters: %s,,,,,,
-battle.drag_dead_ally,사망한 영웅,Dead Ally,,,,,,
+battle.intent.attack,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d
+battle.intent.buff.strength,💪 +%d,💪 +%d,💪 +%d,💪 +%d,💪 +%d,💪 +%d,💪 +%d,💪 +%d
+battle.intent.buff.block,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d
+battle.intent.debuff,👿 디버프,👿 Debuff,👿 Débuff,👿 Debuff,👿 Debuff,👿 デバフ,👿 Εξασθένηση,👿 减益
+battle.intent.prepare,⏳ 준비 중,⏳ Preparing,⏳ Préparation,⏳ Preparazione,⏳ Preparando,⏳ 準備中,⏳ Προετοιμασία,⏳ 准备中
+battle.intent.dead,💀 사망,💀 Dead,💀 Mort,💀 Morto,💀 Muerto,💀 死亡,💀 Νεκρός,💀 死亡
+battle.target.ally,아군,Ally,Allié,Alleato,Aliado,味方,Σύμμαχος,队友
+battle.target.all_ally,아군 전체,All Allies,Tous les alliés,Tutti gli Alleati,Todos los Aliados,全味方,Όλοι οι Σύμμαχοι,全队友
+battle.target.lowest_hp_ally,최저 HP 아군,Lowest HP Ally,Allié HP le plus bas,Alleato HP più basso,Aliado con HP más bajo,最低HP味方,Σύμμαχος με Χαμηλότερο HP,最低HP队友
+battle.target.random_ally,랜덤 아군,Random Ally,Allié aléatoire,Alleato Casuale,Aliado Aleatorio,ランダム味方,Τυχαίος Σύμμαχος,随机队友
+battle.counter.effect.attack,%s에게 %d 피해,%s: %d damage,%s : %d dégâts,%s: %d danni,%s: %d daño,%s: %d ダメージ,%s: %d ζημιά,%s: %d 伤害
+battle.counter.effect.debuff,%s에게 %s %d 부여,%s: %s %d,%s : %s %d,%s: %s %d,%s: %s %d,%s: %s %d,%s: %s %d,%s: %s %d
+battle.counter.effect.buff,%s +%d 부여,Grant %s +%d,Accorde %s +%d,Concede %s +%d,Concede %s +%d,%s +%d 付与,%s +%d χάρισε,%s +%d 赋予
+battle.counter.tooltip.format,[%s] 카운터 %d회 달성 시: %s,[%s] On %d counters: %s,[%s] À %d compteurs: %s,[%s] A %d contatori: %s,[%s] A %d contadores: %s,[%s] %d カウンター時: %s,[%s] Στους %d μετρητές: %s,[%s] %d计数时: %s
+battle.drag_dead_ally,사망한 영웅,Dead Ally,Héros mort,Eroe morto,Héroe muerto,死亡した英雄,Νεκρός Ήρωας,已死亡英雄
