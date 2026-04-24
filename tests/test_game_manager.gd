@@ -7,6 +7,7 @@ const MapGen = preload("res://autoload/map_generator.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_run_map_initialized()
@@ -28,6 +29,10 @@ func run_all() -> Dictionary:
 	test_act_serialization()
 	test_act_transition()
 	test_act_difficulty()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -46,6 +51,7 @@ func _make_gm() -> GameManagerClass:
 	gm.current_node_id = -1
 	gm.pending_enemies = []
 	gm.card_rewards = []
+	_to_free.append(gm)
 	return gm
 
 func test_run_map_initialized() -> void:

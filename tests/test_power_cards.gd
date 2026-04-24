@@ -14,6 +14,7 @@ const IntentRes  = preload("res://resources/intent_resource.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	print("[TestPowerCards] 권능 카드 테스트 시작")
@@ -31,6 +32,10 @@ func run_all() -> Dictionary:
 	test_block_per_turn_musashi_register()
 	test_block_per_turn_musashi_trigger()
 	test_setup_battle_clears_powers()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -45,6 +50,9 @@ func _make_bm() -> BattleManagerClass:
 	var bm := BattleManagerClass.new()
 	bm.team_mgr = TeamManagerClass.new()
 	bm.deck_mgr = DeckManagerClass.new()
+	_to_free.append(bm)
+	_to_free.append(bm.team_mgr)
+	_to_free.append(bm.deck_mgr)
 	return bm
 
 func _make_hero(id: String, hp: int) -> Resource:

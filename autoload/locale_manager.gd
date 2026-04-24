@@ -39,7 +39,6 @@ func _setup_fonts() -> void:
 
 func set_locale(code: String) -> void:
 	if not code in LOCALES:
-		push_warning("Unknown locale: %s" % code)
 		return
 	current_locale = code
 	TranslationServer.set_locale(code)

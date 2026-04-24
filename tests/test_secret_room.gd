@@ -1,4 +1,4 @@
-# tests/test_secret_room.gd
+﻿# tests/test_secret_room.gd
 class_name TestSecretRoom
 extends RefCounted
 
@@ -8,6 +8,7 @@ const GameManagerClass = preload("res://autoload/game_manager.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_secret_room_enum_exists()
@@ -15,6 +16,10 @@ func run_all() -> Dictionary:
 	test_map_generator_spawns_secret()
 	test_map_generator_no_secret_on_floor_1()
 	test_secret_resolves_one_of_four()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -106,6 +111,7 @@ func test_map_generator_no_secret_on_floor_1() -> void:
 func test_secret_resolves_one_of_four() -> void:
 	print("[TestSecretRoom] test_secret_resolves_one_of_four")
 	var gm := GameManagerClass.new()
+	_to_free.append(gm)
 	gm.act_mythologies = ["greek", "egyptian", "norse"]
 	var map := MapGen.generate()
 	gm.run_map = map
@@ -121,6 +127,7 @@ func test_secret_resolves_one_of_four() -> void:
 	var all_ok := true
 	for forced_roll in [0, 1, 2, 3]:
 		var test_gm := GameManagerClass.new()
+		_to_free.append(test_gm)
 		test_gm.act_mythologies = ["greek", "egyptian", "norse"]
 		test_gm.run_map = MapGen.generate()
 		test_gm.available_node_ids = [0, 1, 2]

@@ -1,4 +1,4 @@
-# tests/test_deck_manager.gd
+﻿# tests/test_deck_manager.gd
 class_name TestDeckManager
 extends RefCounted
 
@@ -7,6 +7,7 @@ var DeckManagerClass = preload("res://autoload/deck_manager.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_draw_cards()
@@ -17,6 +18,10 @@ func run_all() -> Dictionary:
 	test_cost_reduction_applies_to_next_card()
 	test_cost_reduction_resets_after_one_card()
 	test_cost_reduction_cannot_go_below_zero()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
@@ -36,6 +41,7 @@ func _make_card(card_name: String, cost: int = 1) -> Resource:
 func test_draw_cards() -> void:
 	print("[TestDeckManager] test_draw_cards")
 	var dm = DeckManagerClass.new()
+	_to_free.append(dm)
 	for i in range(10):
 		dm.draw_pile.append(_make_card("card_%d" % i))
 	dm.draw_cards(5)
@@ -45,6 +51,7 @@ func test_draw_cards() -> void:
 func test_energy_cost() -> void:
 	print("[TestDeckManager] test_energy_cost")
 	var dm = DeckManagerClass.new()
+	_to_free.append(dm)
 	dm.current_energy = 3
 	var card = _make_card("attack", 2)
 	dm.hand.append(card)
@@ -57,6 +64,7 @@ func test_energy_cost() -> void:
 func test_reshuffle_on_empty() -> void:
 	print("[TestDeckManager] test_reshuffle_on_empty")
 	var dm = DeckManagerClass.new()
+	_to_free.append(dm)
 	for i in range(3):
 		dm.discard_pile.append(_make_card("card_%d" % i))
 	dm.draw_cards(5)
@@ -66,6 +74,7 @@ func test_reshuffle_on_empty() -> void:
 func test_discard_hand() -> void:
 	print("[TestDeckManager] test_discard_hand")
 	var dm = DeckManagerClass.new()
+	_to_free.append(dm)
 	for i in range(5):
 		dm.hand.append(_make_card("card_%d" % i))
 	dm.discard_hand()
@@ -75,6 +84,7 @@ func test_discard_hand() -> void:
 func test_remove_from_deck() -> void:
 	print("[TestDeckManager] test_remove_from_deck")
 	var dm = DeckManagerClass.new()
+	_to_free.append(dm)
 	var card1 = _make_card("strike")
 	var card2 = _make_card("defend")
 	dm.draw_pile.append(card1)
@@ -94,6 +104,7 @@ func test_remove_from_deck() -> void:
 func test_cost_reduction_applies_to_next_card() -> void:
 	print("[TestDeckManager] test_cost_reduction_applies_to_next_card")
 	var dm = DeckManagerClass.new()
+	_to_free.append(dm)
 	dm.current_energy = 3
 	dm.pending_cost_reduction = 1
 	var card = _make_card("test_card", 2)
@@ -105,6 +116,7 @@ func test_cost_reduction_applies_to_next_card() -> void:
 func test_cost_reduction_resets_after_one_card() -> void:
 	print("[TestDeckManager] test_cost_reduction_resets_after_one_card")
 	var dm = DeckManagerClass.new()
+	_to_free.append(dm)
 	dm.current_energy = 3
 	dm.pending_cost_reduction = 2
 	var card1 = _make_card("c1", 1)
@@ -119,6 +131,7 @@ func test_cost_reduction_resets_after_one_card() -> void:
 func test_cost_reduction_cannot_go_below_zero() -> void:
 	print("[TestDeckManager] test_cost_reduction_cannot_go_below_zero")
 	var dm = DeckManagerClass.new()
+	_to_free.append(dm)
 	dm.current_energy = 3
 	dm.pending_cost_reduction = 5
 	var card = _make_card("c", 1)

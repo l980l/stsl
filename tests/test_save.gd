@@ -1,4 +1,4 @@
-# tests/test_save.gd
+﻿# tests/test_save.gd
 class_name TestSave
 extends RefCounted
 
@@ -11,6 +11,7 @@ const MapNodeRes = preload("res://resources/map_node_resource.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_game_manager_roundtrip()
@@ -20,6 +21,10 @@ func run_all() -> Dictionary:
 	test_relic_serialization_roundtrip()
 	test_deck_from_dict_preserves_effects()
 	test_upgraded_flag_preserved_in_save()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -79,6 +84,7 @@ func test_game_manager_roundtrip() -> void:
 func test_team_manager_roundtrip() -> void:
 	print("[TestSave] test_team_manager_roundtrip")
 	var tm := TeamManagerClass.new()
+	_to_free.append(tm)
 	var hero := HeroRes.new()
 	hero.hero_id = "napoleon"
 	hero.hero_name = "나폴레옹"
@@ -94,6 +100,7 @@ func test_team_manager_roundtrip() -> void:
 
 	# from_dict 복원 (씬 로드 없이 hero_id만 검증)
 	var tm2 := TeamManagerClass.new()
+	_to_free.append(tm2)
 	# _get_hero_scene은 실제 .tscn 로드 시도 — 헤드리스에서 실패할 수 있음
 	# 직접 수동으로 hero 추가 후 _hero_hp 검증
 	var hero2 := HeroRes.new()
@@ -108,6 +115,7 @@ func test_team_manager_roundtrip() -> void:
 func test_deck_manager_roundtrip() -> void:
 	print("[TestSave] test_deck_manager_roundtrip")
 	var dm := DeckManagerClass.new()
+	_to_free.append(dm)
 	for _i in range(5):
 		var card := CardRes.new()
 		card.card_name = "스트라이크"
@@ -126,6 +134,7 @@ func test_deck_manager_roundtrip() -> void:
 	_assert(d["base_draw_count"] == 5, "base_draw_count 보존")
 
 	var dm2 := DeckManagerClass.new()
+	_to_free.append(dm2)
 	dm2.from_dict(d)
 	_assert(dm2.draw_pile.size() == 5, "from_dict 덱 크기 복원")
 
@@ -160,6 +169,7 @@ func test_relic_serialization_roundtrip() -> void:
 func test_deck_from_dict_preserves_effects() -> void:
 	print("[TestSave] test_deck_from_dict_preserves_effects")
 	var dm := DeckManagerClass.new()
+	_to_free.append(dm)
 	var card := CardRes.new()
 	card.card_name = "포이즌 스트라이크"
 	card.owner_id = "napoleon"
@@ -173,6 +183,7 @@ func test_deck_from_dict_preserves_effects() -> void:
 
 	var d: Dictionary = dm.to_dict()
 	var dm2 := DeckManagerClass.new()
+	_to_free.append(dm2)
 	dm2.from_dict(d)
 
 	_assert(dm2.draw_pile.size() == 1, "카드 1장 복원")
@@ -184,6 +195,7 @@ func test_deck_from_dict_preserves_effects() -> void:
 func test_upgraded_flag_preserved_in_save() -> void:
 	print("[TestSave] test_upgraded_flag_preserved_in_save")
 	var dm := DeckManagerClass.new()
+	_to_free.append(dm)
 	var card := CardRes.new()
 	card.card_name = "스트라이크"
 	card.owner_id = "napoleon"
@@ -195,6 +207,7 @@ func test_upgraded_flag_preserved_in_save() -> void:
 
 	var d: Dictionary = dm.to_dict()
 	var dm2 := DeckManagerClass.new()
+	_to_free.append(dm2)
 	dm2.from_dict(d)
 
 	var restored: Resource = dm2.draw_pile[0]

@@ -13,6 +13,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_setup_battle()
@@ -55,6 +56,10 @@ func run_all() -> Dictionary:
 	test_synergy_genghis_cleopatra_not_present()
 	test_synergy_musashi_yisunsin_duel()
 	test_synergy_musashi_yisunsin_not_present()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -69,6 +74,9 @@ func _make_bm() -> BattleManagerClass:
 	var bm := BattleManagerClass.new()
 	bm.team_mgr = TeamManagerClass.new()
 	bm.deck_mgr = DeckManagerClass.new()
+	_to_free.append(bm)
+	_to_free.append(bm.team_mgr)
+	_to_free.append(bm.deck_mgr)
 	return bm
 
 func _make_hero(id: String, hp: int) -> Resource:
@@ -387,6 +395,7 @@ func test_dead_hero_card_has_no_effect() -> void:
 func test_get_hero_status_empty_by_default() -> void:
 	print("[TestBattleManager] test_get_hero_status_empty_by_default")
 	var bm := BattleManagerClass.new()
+	_to_free.append(bm)
 	var status: Dictionary = bm.get_hero_status("napoleon")
 	_assert(status.is_empty(), "영웅 상태 기본값 빈 딕셔너리")
 
@@ -394,6 +403,7 @@ func test_get_enemy_status_after_apply() -> void:
 	print("[TestBattleManager] test_get_enemy_status_after_apply")
 	var EnemyRes = load("res://resources/enemy_resource.gd")
 	var bm := BattleManagerClass.new()
+	_to_free.append(bm)
 	var enemy = EnemyRes.new()
 	enemy.enemy_name = "테스트적"
 	enemy.max_hp = 30

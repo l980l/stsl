@@ -12,6 +12,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_relic_pool_size()
@@ -34,6 +35,10 @@ func run_all() -> Dictionary:
 	test_korean_relics_exist()
 	test_chinese_relics_exist()
 	test_japanese_relics_exist()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -63,7 +68,9 @@ func _build_pool() -> Array:
 	return pool
 
 func _make_tm() -> TeamManagerClass:
-	return TeamManagerClass.new()
+	var tm := TeamManagerClass.new()
+	_to_free.append(tm)
+	return tm
 
 func _make_hero(id: String, hp: int) -> Resource:
 	var h := HeroRes.new()

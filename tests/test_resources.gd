@@ -1,4 +1,4 @@
-# tests/test_resources.gd
+﻿# tests/test_resources.gd
 class_name TestResources
 extends RefCounted
 
@@ -12,6 +12,7 @@ var GameManagerClass = preload("res://autoload/game_manager.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_effect_resource_defaults()
@@ -20,6 +21,10 @@ func run_all() -> Dictionary:
 	test_enemy_resource_defaults()
 	test_relic_resource_defaults()
 	test_game_manager_defaults()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
@@ -77,6 +82,7 @@ func test_relic_resource_defaults() -> void:
 func test_game_manager_defaults() -> void:
 	print("[TestResources] test_game_manager_defaults")
 	var gm = GameManagerClass.new()
+	_to_free.append(gm)
 	_assert(gm.current_state == GameManagerClass.GameState.MAP, "초기 상태 MAP")
 	_assert(gm.current_act == 1, "초기 액트 1")
 	_assert(gm.gold == 0, "초기 골드 0")

@@ -6,6 +6,7 @@ const HR = preload("res://resources/heroes/hero_registry.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_all_hero_ids_returns_default_three()
@@ -14,6 +15,10 @@ func run_all() -> Dictionary:
 	test_make_hero_genghis_khan()
 	test_make_hero_musashi()
 	test_get_display_info_returns_required_keys()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:

@@ -13,6 +13,7 @@ const NorseAct3    = preload("res://resources/enemies/norse/norse_act3.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_normal_enemy_variety()
@@ -69,6 +70,10 @@ func run_all() -> Dictionary:
 	test_japanese_act1_shape()
 	test_japanese_act2_shape()
 	test_japanese_act3_shape()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -87,6 +92,7 @@ func _make_gm() -> GameManagerClass:
 	gm.current_node_id = -1
 	gm.pending_enemies = []
 	gm.card_rewards = []
+	_to_free.append(gm)
 	return gm
 
 func test_normal_enemy_variety() -> void:
@@ -262,6 +268,8 @@ func _make_bm_with_hero() -> Node:
 	hero.hero_id = "napoleon"; hero.max_hp = 1000; hero.hero_name = "나폴레옹"
 	tm.add_hero(hero)
 	bm.team_mgr = tm
+	_to_free.append(bm)
+	_to_free.append(tm)
 	return bm
 
 func test_act2_boss_name() -> void:

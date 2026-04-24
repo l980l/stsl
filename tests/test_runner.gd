@@ -60,4 +60,5 @@ func _init() -> void:
 		total_passed += result.passed
 		total_failed += result.failed
 	print("\n=== Results: %d passed, %d failed ===" % [total_passed, total_failed])
+	suites.clear()
 	quit(1 if total_failed > 0 else 0)

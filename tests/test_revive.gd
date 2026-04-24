@@ -1,4 +1,4 @@
-# tests/test_revive.gd
+﻿# tests/test_revive.gd
 # 부활(REVIVE) 버그 수정 검증 테스트 (Plan 28-B)
 class_name TestRevive
 extends RefCounted
@@ -13,6 +13,7 @@ const IntentRes          = preload("res://resources/intent_resource.gd")
 var passed: int = 0
 var failed: int = 0
 var _signal_counter: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	print("[TestRevive] 부활 버그 수정 테스트 시작")
@@ -21,6 +22,10 @@ func run_all() -> Dictionary:
 	test_revive_emits_signal()
 	test_team_manager_saves_alive_state()
 	test_team_manager_from_dict_without_alive_key()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return { "passed": passed, "failed": failed }
 
 func _assert(cond: bool, msg: String) -> void:
@@ -39,6 +44,9 @@ func _make_bm() -> BattleManagerClass:
 	var bm := BattleManagerClass.new()
 	bm.team_mgr = TeamManagerClass.new()
 	bm.deck_mgr = DeckManagerClass.new()
+	_to_free.append(bm)
+	_to_free.append(bm.team_mgr)
+	_to_free.append(bm.deck_mgr)
 	return bm
 
 func _make_hero(id: String, hp: int) -> Resource:
@@ -111,6 +119,7 @@ func _on_test_revived(_id: String) -> void:
 func test_revive_emits_signal() -> void:
 	print("[TestRevive] test_revive_emits_signal")
 	var tm := TeamManagerClass.new()
+	_to_free.append(tm)
 	tm.add_hero(_make_hero("napoleon", 50))
 	tm._hero_alive["napoleon"] = false
 	tm._hero_hp["napoleon"] = 0
@@ -129,6 +138,7 @@ func test_revive_emits_signal() -> void:
 func test_team_manager_saves_alive_state() -> void:
 	print("[TestRevive] test_team_manager_saves_alive_state")
 	var tm := TeamManagerClass.new()
+	_to_free.append(tm)
 	tm.add_hero(_make_hero("napoleon", 50))
 	tm.add_hero(_make_hero("cleopatra", 60))
 
@@ -139,6 +149,7 @@ func test_team_manager_saves_alive_state() -> void:
 	# 저장 → 복원
 	var d: Dictionary = tm.to_dict()
 	var tm2 := TeamManagerClass.new()
+	_to_free.append(tm2)
 	tm2.from_dict(d)
 
 	_assert(tm2.is_alive("napoleon") == false,
@@ -159,6 +170,7 @@ func test_team_manager_from_dict_without_alive_key() -> void:
 		]
 	}
 	var tm := TeamManagerClass.new()
+	_to_free.append(tm)
 	tm.from_dict(legacy_dict)
 
 	_assert(tm.is_alive("napoleon") == true,

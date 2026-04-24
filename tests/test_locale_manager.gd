@@ -6,6 +6,7 @@ const LocaleManagerClass = preload("res://autoload/locale_manager.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	print("--- TestLocaleManager ---")
@@ -15,6 +16,10 @@ func run_all() -> Dictionary:
 	test_set_locale_invalid_rejected()
 	test_get_display_name_known()
 	test_get_display_name_unknown_returns_code()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return { "passed": passed, "failed": failed }
 
 func _assert(condition: bool, msg: String) -> void:
@@ -26,7 +31,9 @@ func _assert(condition: bool, msg: String) -> void:
 		failed += 1
 
 func _make_lm() -> LocaleManagerClass:
-	return LocaleManagerClass.new()
+	var lm := LocaleManagerClass.new()
+	_to_free.append(lm)
+	return lm
 
 func test_locales_list_contains_all_eight() -> void:
 	var lm := _make_lm()

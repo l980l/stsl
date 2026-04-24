@@ -1,4 +1,4 @@
-# tests/test_team_manager.gd
+﻿# tests/test_team_manager.gd
 class_name TestTeamManager
 extends RefCounted
 
@@ -7,11 +7,16 @@ var TeamManagerClass = preload("res://autoload/team_manager.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_add_hero()
 	test_take_damage()
 	test_hero_death()
+	for n in _to_free:
+		if is_instance_valid(n):
+			n.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
 
 func _assert(condition: bool, msg: String) -> void:
@@ -31,6 +36,7 @@ func _make_hero(id: String, hp: int) -> Resource:
 func test_add_hero() -> void:
 	print("[TestTeamManager] test_add_hero")
 	var tm = TeamManagerClass.new()
+	_to_free.append(tm)
 	var hero = _make_hero("napoleon", 80)
 	tm.add_hero(hero)
 	_assert(tm.get_current_hp("napoleon") == 80, "추가 후 HP == max_hp")
@@ -39,6 +45,7 @@ func test_add_hero() -> void:
 func test_take_damage() -> void:
 	print("[TestTeamManager] test_take_damage")
 	var tm = TeamManagerClass.new()
+	_to_free.append(tm)
 	tm.add_hero(_make_hero("napoleon", 80))
 	tm.take_damage("napoleon", 20)
 	_assert(tm.get_current_hp("napoleon") == 60, "20 피해 후 HP == 60")
@@ -46,6 +53,7 @@ func test_take_damage() -> void:
 func test_hero_death() -> void:
 	print("[TestTeamManager] test_hero_death")
 	var tm = TeamManagerClass.new()
+	_to_free.append(tm)
 	tm.add_hero(_make_hero("napoleon", 80))
 	tm.take_damage("napoleon", 80)
 	_assert(tm.get_current_hp("napoleon") == 0, "치사 피해 후 HP == 0")
