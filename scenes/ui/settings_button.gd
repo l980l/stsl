@@ -7,6 +7,7 @@ const OverlayScene := preload("res://scenes/ui/settings_overlay.tscn")
 
 func _ready() -> void:
 	_btn.text = tr("ui.common.btn_settings")
+	LabelUtils.fit_text(_btn, 16, 10)
 	_btn.pressed.connect(_on_pressed)
 
 func _on_pressed() -> void:

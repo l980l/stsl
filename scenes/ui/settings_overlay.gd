@@ -13,8 +13,11 @@ func _ready() -> void:
 	_lang_opt.item_selected.connect(_on_locale_selected)
 	_btn_close.pressed.connect(close)
 	_title_lbl.text = tr("ui.settings.title")
+	LabelUtils.fit_text(_title_lbl, 28, 16)
 	_lang_lbl.text = tr("ui.settings.language")
+	LabelUtils.fit_text(_lang_lbl, 18, 12)
 	_btn_close.text = tr("ui.map.btn_close")
+	LabelUtils.fit_text(_btn_close, 18, 12)
 
 func open() -> void:
 	visible = true

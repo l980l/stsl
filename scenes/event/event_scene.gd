@@ -17,6 +17,9 @@ func _ready() -> void:
 	for choice in event.choices:
 		var btn := Button.new()
 		btn.text = tr(choice.label)
+		btn.add_theme_font_size_override("font_size", 18)
+		btn.custom_minimum_size = Vector2(300, 50)
+		LabelUtils.fit_text(btn, 18, 12)
 		btn.pressed.connect(_on_choice_selected.bind(choice))
 		choices_container.add_child(btn)
 
