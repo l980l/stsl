@@ -4,7 +4,7 @@ extends Node2D
 const SLOT_W := 240
 const SLOT_H := 280
 const TOKEN_COLS := 6
-const TOKEN_ROWS := 2
+const TOKEN_ROWS := 1
 const TOKEN_TILE_W := 111
 const TOKEN_TILE_H := 138
 const TOKEN_TILE_GAP := 4
