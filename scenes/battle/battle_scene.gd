@@ -10,9 +10,6 @@ const ARROW_HEAD_TEX    := preload("res://assets/art/ui/arrow_head.png")
 
 const WINDOW_W := 1920
 const WINDOW_H := 1080
-const HERO_X := 20
-const ENEMY_X := 1440
-const ENEMY_COL_GAP := 20
 const SLOT_W := 240
 const SLOT_H := 280
 const BOTTOM_Y := 840
@@ -23,7 +20,6 @@ const FAN_PIVOT_Y_OFFSET := 1200.0
 const FAN_ANGLE_PER_CARD := 0.10
 const FAN_MAX_TOTAL_ANGLE := 0.9
 const HAND_BASE_Y := 960
-const SLOT_GAP := 20
 const MAX_ENEMY_COUNT := 6
 const TOKEN_COLS := 6
 const TOKEN_ROWS := 2
@@ -178,36 +174,38 @@ func _build_ui() -> void:
 		_hero_nodes.append(_make_hero_slot(i))
 	# 적 슬롯은 _setup_enemies()에서 동적 생성
 
+func _hero_slot_pos(index: int) -> Vector2:
+	return (get_node("HeroSlot%d" % (index + 1)) as Marker2D).position
+
 func _make_hero_slot(index: int) -> Dictionary:
-	var y := 80 + index * (SLOT_H + SLOT_GAP)
+	var pos := _hero_slot_pos(index)
 	var panel := ColorRect.new()
-	panel.color = Color(0.12, 0.12, 0.2)
-	panel.position = Vector2(HERO_X, y)
+	panel.color = Color(0, 0, 0, 0)
+	panel.position = pos
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
 	add_child(panel)
 
-	# UI 상단 배치, 스프라이트는 그 뒤에 렌더 (z_index=1 for UI)
 	var bar_w: float = 211.0
 	var _bar_h: float = 12.0
-	var bar_x: float = HERO_X + (SLOT_W - bar_w) / 2.0
+	var bar_x: float = pos.x + (SLOT_W - bar_w) / 2.0
 
-	var name_lbl := _make_label(Vector2(bar_x, y + 4), Vector2(bar_w, 22), 16)
+	var name_lbl := _make_label(Vector2(bar_x, pos.y + 4), Vector2(bar_w, 22), 16)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.z_index = 1
 	name_lbl.visible = false
 
-	var hp_bar := _make_hp_bar(Vector2(bar_x, y + 28), bar_w)
+	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 28), bar_w)
 	hp_bar.z_index = 1
 	hp_bar.visible = false
 
-	var hp_lbl := _make_label(Vector2(bar_x, y + 22), Vector2(bar_w, 24), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 22), Vector2(bar_w, 24), 12)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hp_lbl.z_index = 1
 	hp_lbl.visible = false
 
-	var block_lbl := _make_label(Vector2(bar_x, y + 22), Vector2(bar_w, 24), 12)
+	var block_lbl := _make_label(Vector2(bar_x, pos.y + 22), Vector2(bar_w, 24), 12)
 	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	block_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
@@ -215,7 +213,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 	block_lbl.visible = false
 
 	var status_box := HBoxContainer.new()
-	status_box.position = Vector2(bar_x, y + 42)
+	status_box.position = Vector2(bar_x, pos.y + 42)
 	status_box.size = Vector2(bar_w, 18)
 	status_box.z_index = 1
 	status_box.visible = false
@@ -225,17 +223,13 @@ func _make_hero_slot(index: int) -> Dictionary:
 			 "hp_lbl": hp_lbl, "block_lbl": block_lbl,
 			 "hero_id": "", "status_box": status_box }
 
-func _enemy_slot_pos(index: int, total: int) -> Vector2:
-	if total <= 3:
-		return Vector2(ENEMY_X, 80 + index * (SLOT_H + SLOT_GAP))
-	var row: int = int(index / 2.0)
-	var col: int = index % 2
-	return Vector2(ENEMY_X + col * (SLOT_W + ENEMY_COL_GAP), 80 + row * (SLOT_H + SLOT_GAP))
+func _enemy_slot_pos(index: int, _total: int = 0) -> Vector2:
+	return (get_node("EnemySlot%d" % (index + 1)) as Marker2D).position
 
 func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	var pos: Vector2 = _enemy_slot_pos(index, total)
 	var panel := ColorRect.new()
-	panel.color = Color(0.18, 0.10, 0.10)
+	panel.color = Color(0, 0, 0, 0)
 	panel.position = pos
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
@@ -466,8 +460,8 @@ func _setup_heroes() -> void:
 
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
-			var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
-			char_node.position = Vector2(HERO_X + SLOT_W / 2.0 - 40.0 * 1.44, slot_y + 88)
+			var slot_pos := _hero_slot_pos(i)
+			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 40.0 * 1.44, slot_pos.y + 88)
 			char_node.scale = Vector2(1.44, 2.4)
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
@@ -565,9 +559,9 @@ func _refresh_token_tiles(hero_id: String) -> void:
 	if hero_idx < 0:
 		return
 
-	var slot_y: int = 80 + hero_idx * (SLOT_H + SLOT_GAP)
+	var slot_pos := _hero_slot_pos(hero_idx)
 	var grid_h: int = TOKEN_ROWS * TOKEN_TILE_H + (TOKEN_ROWS - 1) * TOKEN_TILE_GAP
-	var base_y: int = slot_y + int((SLOT_H - grid_h) / 2.0)
+	var base_y: int = int(slot_pos.y) + int((SLOT_H - grid_h) / 2.0)
 	var max_tokens: int = TOKEN_COLS * TOKEN_ROWS
 
 	for t in range(min(token_count, max_tokens)):
@@ -1298,16 +1292,16 @@ func _refresh_debug_grid() -> void:
 
 	# 영웅 슬롯 외곽선 (파란색)
 	for i in range(_hero_nodes.size()):
-		var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
-		for border in _make_border_rects(HERO_X, slot_y, SLOT_W, SLOT_H, Color(0.3, 0.6, 1.0, 0.8)):
+		var sp := _hero_slot_pos(i)
+		for border in _make_border_rects(int(sp.x), int(sp.y), SLOT_W, SLOT_H, Color(0.3, 0.6, 1.0, 0.8)):
 			add_child(border)
 			_debug_grid_nodes.append(border)
 
 	# 소환물 그리드 (노란색)
 	for i in range(3):
-		var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
+		var sp := _hero_slot_pos(i)
 		var grid_h: int = TOKEN_ROWS * TOKEN_TILE_H + (TOKEN_ROWS - 1) * TOKEN_TILE_GAP
-		var base_y: int = slot_y + int((SLOT_H - grid_h) / 2.0)
+		var base_y: int = int(sp.y) + int((SLOT_H - grid_h) / 2.0)
 		for r in range(TOKEN_ROWS):
 			for c in range(TOKEN_COLS):
 				var cx: int = TOKEN_AREA_X + c * (TOKEN_TILE_W + TOKEN_TILE_GAP)
@@ -1496,10 +1490,10 @@ func _cleanup_drag() -> void:
 	_message_label.text = ""
 	for entry in _enemy_nodes:
 		if entry["panel"].visible:
-			entry["panel"].color = Color(0.18, 0.10, 0.10)
+			entry["panel"].color = Color(0, 0, 0, 0)
 	for entry in _hero_nodes:
 		if entry["panel"].visible:
-			entry["panel"].color = Color(0.12, 0.12, 0.2)
+			entry["panel"].color = Color(0, 0, 0, 0)
 
 func _create_drag_arrow(start_pos: Vector2) -> void:
 	_drag_end_pos = start_pos
