@@ -540,3 +540,64 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | 🟢 장기 | 오디오 임포트 및 AudioManager (M7-6) | 몰입감 |
 | 🟢 장기 | 모바일 최적화 (M8) | 출시 요건 |
 | 🔵 출시 직전 | 밸런싱 / 튜토리얼 / 업적 / QA (M9) | 품질 보증 |
+
+---
+
+## Bonus — 부채꼴 카드 핸드 Godot 에셋 오픈소스 배포
+
+> **배경:** STSL 전투 핸드에 구현된 부채꼴 레이아웃 + 호버 확대 시스템을 게임 로직과 분리해,  
+> Godot 4를 사용하는 모든 카드게임 개발자가 재사용할 수 있는 독립 에셋으로 배포한다.  
+> 우선순위 낮음 — 게임 본체 완성(M9) 이후 진행.
+
+### 현재 구현 위치
+
+- **핵심 파일:** `scenes/battle/battle_scene.gd`
+- **관련 상수 (line 19~23):**
+  ```gdscript
+  const BASE_CARD_SCALE := 1.4        # 카드 기본 시각 크기 배율
+  const FAN_PIVOT_Y_OFFSET := 1200.0  # 화면 아래 가상 회전축까지 거리 (px)
+  const FAN_ANGLE_PER_CARD := 0.10    # 카드 1장당 회전 간격 (rad ≈ 5.7°)
+  const FAN_MAX_TOTAL_ANGLE := 0.9    # 전체 부채각 상한 (rad ≈ 51°)
+  const HAND_BASE_Y := 960            # 부채 중심 카드의 월드 y 좌표
+  ```
+- **핵심 함수:**
+  - `_refresh_hand()` — 부채꼴 좌표·회전 계산 + CardScene 인스턴스화
+  - `_on_card_hovered()` — 호버 카드 1.4× 확대·상승 + 인접 카드 spread Tween
+  - `_on_card_unhovered()` / `_reset_hand_fan()` — 원위치 복귀 Tween
+- **동적 lift 계산 (클리핑 방지, `_on_card_hovered` 내부):**
+  ```gdscript
+  var hover_scale := BASE_CARD_SCALE * 1.4
+  var card_bottom := base_pos.y + hover_scale * 100.0 + 100.0
+  var lift := maxf(60.0, card_bottom - (WINDOW_H - 20.0))
+  ```
+- **카드별 메타 저장 패턴:** `set_meta("_fan_pos")` / `set_meta("_fan_rot")` / `set_meta("_fan_idx")`  
+  → `_refresh_hand()` 시 저장, 호버 함수에서 읽어 기준점으로 사용
+
+### 부채꼴 수학 요약
+
+```
+fan_pivot = Vector2(WINDOW_W / 2, HAND_BASE_Y + FAN_PIVOT_Y_OFFSET)
+step = min(FAN_ANGLE_PER_CARD, FAN_MAX_TOTAL_ANGLE / (n_cards - 1))
+angle[i] = (i - (n_cards - 1) / 2.0) * step          # 가운데 카드 = 0 rad
+arc_pos[i] = fan_pivot + Vector2(sin(angle), -cos(angle)) * FAN_PIVOT_Y_OFFSET
+node.position = arc_pos[i] - Vector2(70, 100) * BASE_CARD_SCALE  # 카드 중심 보정
+node.rotation = angle[i]
+node.pivot_offset = Vector2(70, 100)   # CardScene 내부 카드 중심점 (local space)
+```
+
+### 에셋화 작업 목록 (~3~4일)
+
+| 항목 | 내용 |
+|---|---|
+| `FanHandContainer.gd` 분리 | `DeckManager` 의존 제거 → `add_card(node)` / `remove_card(node)` API |
+| `@export` 파라미터 노출 | 상수 전부 인스펙터에서 조정 가능하게 |
+| 범용 카드 인터페이스 | `IFanCard` — `pivot_offset`, `card_hovered` 시그널만 요구 |
+| 데모 씬 | 임의 Control 노드를 카드처럼 사용하는 예제 |
+| README + AssetLib 설명 | 설치 방법, 파라미터 설명, 스크린샷 |
+
+### AssetLib 배포 체크리스트
+
+- [ ] Godot 4.x 플러그인 구조 (`addons/fan_hand/`) 로 패키징
+- [ ] MIT 라이선스 명시
+- [ ] `plugin.cfg` 작성
+- [ ] AssetLib 제출 (에셋 카테고리: 2D / UI)
