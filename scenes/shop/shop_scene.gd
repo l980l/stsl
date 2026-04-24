@@ -28,7 +28,7 @@ func _build_ui() -> void:
 
 	var gold_lbl := Label.new()
 	gold_lbl.name = "GoldLabel"
-	gold_lbl.text = "보유 골드: %d" % GameManager.gold
+	gold_lbl.text = tr("ui.shop.gold_label") % GameManager.gold
 	gold_lbl.position = Vector2(50, 30)
 	gold_lbl.size = Vector2(300, 40)
 	gold_lbl.add_theme_font_size_override("font_size", 20)
@@ -49,7 +49,7 @@ func _build_ui() -> void:
 
 func _build_card_section() -> void:
 	var sec_lbl := Label.new()
-	sec_lbl.text = "카드 구매 (%d 골드)" % _inventory.get("card_price", 75)
+	sec_lbl.text = tr("ui.shop.card_section") % _inventory.get("card_price", 75)
 	sec_lbl.position = Vector2(100, 100)
 	sec_lbl.size = Vector2(400, 40)
 	sec_lbl.add_theme_font_size_override("font_size", 18)
@@ -75,7 +75,7 @@ func _build_card_section() -> void:
 		add_child(name_lbl)
 
 		var owner_lbl := Label.new()
-		owner_lbl.text = "[%s] 비용 %d" % [card.owner_id, card.cost]
+		owner_lbl.text = tr("ui.shop.card_owner_cost") % [card.owner_id, card.cost]
 		owner_lbl.position = Vector2(110 + i * 320, 205)
 		owner_lbl.size = Vector2(260, 30)
 		owner_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -84,7 +84,7 @@ func _build_card_section() -> void:
 		add_child(owner_lbl)
 
 		var btn := Button.new()
-		btn.text = "구매 (%d 골드)" % price
+		btn.text = tr("ui.shop.btn_buy") % price
 		btn.position = Vector2(110 + i * 320, 280)
 		btn.size = Vector2(260, 40)
 		btn.add_theme_font_size_override("font_size", 14)
@@ -95,7 +95,7 @@ func _build_card_section() -> void:
 
 func _build_relic_section() -> void:
 	var sec_lbl := Label.new()
-	sec_lbl.text = "릴릭 구매 (%d 골드)" % _inventory.get("relic_price", 150)
+	sec_lbl.text = tr("ui.shop.relic_section") % _inventory.get("relic_price", 150)
 	sec_lbl.position = Vector2(1100, 100)
 	sec_lbl.size = Vector2(400, 40)
 	sec_lbl.add_theme_font_size_override("font_size", 18)
@@ -130,7 +130,7 @@ func _build_relic_section() -> void:
 		add_child(desc_lbl)
 
 		_relic_btn = Button.new()
-		_relic_btn.text = "구매 (%d 골드)" % price
+		_relic_btn.text = tr("ui.shop.btn_buy") % price
 		_relic_btn.position = Vector2(1260, 285)
 		_relic_btn.size = Vector2(280, 40)
 		_relic_btn.add_theme_font_size_override("font_size", 14)
@@ -159,7 +159,7 @@ func _build_service_section() -> void:
 	var heal_btn := Button.new()
 	var heal_price: int = _inventory.get("heal_price", 30)
 	var heal_amount: int = _inventory.get("heal_amount", 20)
-	heal_btn.text = "회복 %dHP (%d 골드)" % [heal_amount, heal_price]
+	heal_btn.text = tr("ui.shop.btn_heal") % [heal_amount, heal_price]
 	heal_btn.position = Vector2(100, 450)
 	heal_btn.size = Vector2(320, 50)
 	heal_btn.add_theme_font_size_override("font_size", 16)
@@ -168,7 +168,7 @@ func _build_service_section() -> void:
 
 	var remove_btn := Button.new()
 	var remove_price: int = _inventory.get("remove_price", 100)
-	remove_btn.text = "카드 제거 (%d 골드)" % remove_price
+	remove_btn.text = tr("ui.shop.btn_remove_card") % remove_price
 	remove_btn.position = Vector2(460, 450)
 	remove_btn.size = Vector2(320, 50)
 	remove_btn.add_theme_font_size_override("font_size", 16)
@@ -221,7 +221,7 @@ func _on_open_remove_panel(remove_btn: Button, price: int) -> void:
 	_remove_panel.add_child(bg)
 
 	var lbl := Label.new()
-	lbl.text = "제거할 카드를 선택하세요 (%d 골드)" % price
+	lbl.text = tr("ui.shop.remove_prompt") % price
 	lbl.position = Vector2(10, 10)
 	lbl.size = Vector2(700, 35)
 	lbl.add_theme_font_size_override("font_size", 18)
@@ -230,7 +230,7 @@ func _on_open_remove_panel(remove_btn: Button, price: int) -> void:
 	for i in range(full_deck.size()):
 		var card: Resource = full_deck[i]
 		var card_btn := Button.new()
-		card_btn.text = "%s (비용 %d)" % [card.card_name, card.cost]
+		card_btn.text = tr("ui.shop.card_name_cost") % [card.card_name, card.cost]
 		card_btn.position = Vector2(10 + (i % 8) * 210, 55 + int(i / 8.0) * 60)
 		card_btn.size = Vector2(200, 50)
 		card_btn.add_theme_font_size_override("font_size", 13)
@@ -252,7 +252,7 @@ func _on_remove_card(card: Resource, remove_btn: Button, price: int) -> void:
 func _refresh_gold_label() -> void:
 	var lbl := get_node_or_null("GoldLabel")
 	if lbl:
-		lbl.text = "보유 골드: %d" % GameManager.gold
+		lbl.text = tr("ui.shop.gold_label") % GameManager.gold
 
 func _on_exit() -> void:
 	GameManager.complete_shop()

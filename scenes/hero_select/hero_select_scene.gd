@@ -78,7 +78,7 @@ func _build_ui() -> void:
 		var tooltip: String = info.get("desc", "") as String
 		if is_locked:
 			var unlock_desc: String = info.get("unlock_description", "") as String
-			tooltip += "\n\n🔒 " + (unlock_desc if unlock_desc != "" else "해금 조건 미달성")
+			tooltip += "\n\n🔒 " + (unlock_desc if unlock_desc != "" else tr("ui.hero_select.unlock_condition_none"))
 
 		# 카드 패널
 		var panel := PanelContainer.new()
@@ -123,9 +123,9 @@ func _build_ui() -> void:
 			btn.text = tr("ui.hero_select.locked")
 			btn.disabled = true
 		elif is_recruit:
-			btn.text = (info.get("name", hid) as String) + " 영입"
+			btn.text = tr("ui.hero_select.btn_recruit") % (info.get("name", hid) as String)
 		else:
-			btn.text = (info.get("name", hid) as String) + " 선택"
+			btn.text = tr("ui.hero_select.btn_select") % (info.get("name", hid) as String)
 		if not already_owned and not is_locked:
 			var captured_id: String = hid
 			btn.pressed.connect(func(): _on_hero_selected(captured_id))

@@ -29,7 +29,7 @@ func _build_ui() -> void:
 	LabelUtils.fit_text(title, 72, 40)
 
 	var info := Label.new()
-	info.text = "도달 층: %d / 9\n보유 골드: %d" % [GameManager.current_floor, GameManager.gold]
+	info.text = tr("ui.game_over.stats") % [GameManager.current_floor, GameManager.gold]
 	info.position = Vector2(660, 380)
 	info.size = Vector2(600, 80)
 	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

@@ -58,3 +58,21 @@ ui.secret.reward.battle,강력한 수호자가 나타났다!,A powerful guardian
 ui.settings.title,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置
 ui.settings.language,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言
 ui.common.btn_settings,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置
+ui.shop.gold_label,보유 골드: %d,Gold: %d,,,,,,
+ui.shop.card_section,카드 구매 (%d 골드),Cards (%d Gold),,,,,,
+ui.shop.relic_section,릴릭 구매 (%d 골드),Relic (%d Gold),,,,,,
+ui.shop.btn_buy,구매 (%d 골드),Buy (%d Gold),,,,,,
+ui.shop.card_owner_cost,[%s] 비용 %d,[%s] Cost %d,,,,,,
+ui.shop.btn_heal,회복 %dHP (%d 골드),Heal %d HP (%d Gold),,,,,,
+ui.shop.btn_remove_card,카드 제거 (%d 골드),Remove Card (%d Gold),,,,,,
+ui.shop.remove_prompt,제거할 카드를 선택하세요 (%d 골드),Select a card to remove (%d Gold),,,,,,
+ui.shop.card_name_cost,%s (비용 %d),%s (Cost %d),,,,,,
+ui.map.act_title,Act %d,Act %d,,,,,,
+ui.map.floor_label,현재 층: %d / 9,Floor: %d / 9,,,,,,
+ui.map.deck_list_title,덱 목록 (%d장),Deck (%d cards),,,,,,
+ui.map.deck_card_format,[%d코스트]  %s  (%s),[Cost %d]  %s  (%s),,,,,,
+ui.rest.hero_hp_format,%s  HP: %d / %d,%s  HP: %d / %d,,,,,,
+ui.game_over.stats,도달 층: %d / 9\n보유 골드: %d,Floor: %d / 9\nGold: %d,,,,,,
+ui.hero_select.unlock_condition_none,해금 조건 미달성,Unlock condition not met,,,,,,
+ui.hero_select.btn_recruit,%s 영입,Recruit %s,,,,,,
+ui.hero_select.btn_select,%s 선택,Select %s,,,,,,
