@@ -25,7 +25,7 @@ static func fit_text(control: Control, max_px: int, min_px: int, target_w: float
 			await tree.process_frame
 	else:
 		var check_w: float = target_w if target_w > 0.0 else control.size.x
-		while control.get_minimum_size().x > check_w and fs > min_px:
-			fs -= 1
+		var text_w := control.get_minimum_size().x
+		if text_w > check_w and text_w > 0.0:
+			fs = max(min_px, int(fs * check_w / text_w))
 			control.add_theme_font_size_override("font_size", fs)
-			await tree.process_frame

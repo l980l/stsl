@@ -26,6 +26,8 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
+	if _card != null:
+		refresh()
 
 func setup(card: Resource, mode: int) -> void:
 	_card = card
