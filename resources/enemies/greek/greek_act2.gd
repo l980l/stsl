@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func cerberus(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.cerberus"); e.max_hp = 2000; e.character_scene = scene
+	e.enemy_name = "enemy.greek.cerberus"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 170; i1.target = IntentRes.TargetType.RANDOM
@@ -22,7 +22,7 @@ static func cerberus(scene: PackedScene) -> Resource:
 
 static func charon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.charon"); e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = "enemy.greek.charon"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"
@@ -38,7 +38,7 @@ static func charon(scene: PackedScene) -> Resource:
 
 static func erinyes(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.erinyes"); e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = "enemy.greek.erinyes"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.5]
 	var p0i1 := IntentRes.new()
@@ -60,7 +60,7 @@ static func erinyes(scene: PackedScene) -> Resource:
 
 static func hades(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.hades"); e.max_hp = 4800; e.character_scene = scene
+	e.enemy_name = "enemy.greek.hades"; e.max_hp = 4800; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.65, 0.3]
 	# 페이즈0

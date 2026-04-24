@@ -5,7 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func haechi(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.korean.haechi"); e.max_hp = 1600; e.character_scene = scene
+	e.enemy_name = "enemy.korean.haechi"; e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 60; i1.status_type = "block"
@@ -24,7 +24,7 @@ static func haechi(scene: PackedScene) -> Resource:
 
 static func jangseung(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.korean.jangseung"); e.max_hp = 1700; e.character_scene = scene
+	e.enemy_name = "enemy.korean.jangseung"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"
@@ -42,7 +42,7 @@ static func jangseung(scene: PackedScene) -> Resource:
 
 static func haemosu(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.korean.haemosu"); e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = "enemy.korean.haemosu"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
@@ -60,7 +60,7 @@ static func haemosu(scene: PackedScene) -> Resource:
 
 static func dangun(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.korean.dangun"); e.max_hp = 4500; e.character_scene = scene
+	e.enemy_name = "enemy.korean.dangun"; e.max_hp = 4500; e.character_scene = scene
 	e.mythology = "korean"
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0: 개벽의 빛

@@ -191,7 +191,7 @@ func _show_deck_viewer() -> void:
 	scroll.add_child(vbox)
 
 	for card in all_cards:
-		var card_name: String = card.get("card_name") if card.get("card_name") != null else "?"
+		var card_name: String = tr(card.get("card_name")) if card.get("card_name") != null else "?"
 		var cost: int = card.get("cost") if card.get("cost") != null else 0
 		var card_owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
 		var lbl := Label.new()

@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func apophis_serpent(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.egyptian.apophis_serpent"); e.max_hp = 2000; e.character_scene = scene
+	e.enemy_name = "enemy.egyptian.apophis_serpent"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "egyptian"
 	# 4턴 순환: DEBUFF poison ALL / ATK RANDOM / ATK RANDOM / DEBUFF poison RANDOM
 	var i1 := IntentRes.new()
@@ -25,7 +25,7 @@ static func apophis_serpent(scene: PackedScene) -> Resource:
 
 static func set_tempest(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.egyptian.set_tempest"); e.max_hp = 2100; e.character_scene = scene
+	e.enemy_name = "enemy.egyptian.set_tempest"; e.max_hp = 2100; e.character_scene = scene
 	e.mythology = "egyptian"
 	# 4턴 순환: ATK RANDOM / ATK RANDOM / BUFF strength / ATK ALL
 	var i1 := IntentRes.new()
@@ -41,7 +41,7 @@ static func set_tempest(scene: PackedScene) -> Resource:
 
 static func isis_phantom(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.egyptian.isis_phantom"); e.max_hp = 1950; e.character_scene = scene
+	e.enemy_name = "enemy.egyptian.isis_phantom"; e.max_hp = 1950; e.character_scene = scene
 	e.mythology = "egyptian"
 	e.phase_thresholds = [0.5]
 	# 페이즈0: DEBUFF weak ALL / DEBUFF vulnerable ALL / ATK RANDOM
@@ -69,7 +69,7 @@ static func isis_phantom(scene: PackedScene) -> Resource:
 
 static func ra_horakhty(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.egyptian.ra_horakhty"); e.max_hp = 5000; e.character_scene = scene
+	e.enemy_name = "enemy.egyptian.ra_horakhty"; e.max_hp = 5000; e.character_scene = scene
 	e.mythology = "egyptian"
 	e.phase_thresholds = [0.65, 0.3]
 	e.charm_resistance = 2

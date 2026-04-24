@@ -67,7 +67,7 @@ func _build_card_section() -> void:
 		add_child(panel)
 
 		var name_lbl := Label.new()
-		name_lbl.text = card.card_name
+		name_lbl.text = tr(card.card_name)
 		name_lbl.position = Vector2(110 + i * 320, 160)
 		name_lbl.size = Vector2(260, 40)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -230,7 +230,7 @@ func _on_open_remove_panel(remove_btn: Button, price: int) -> void:
 	for i in range(full_deck.size()):
 		var card: Resource = full_deck[i]
 		var card_btn := Button.new()
-		card_btn.text = tr("ui.shop.card_name_cost") % [card.card_name, card.cost]
+		card_btn.text = tr("ui.shop.card_name_cost") % [tr(card.card_name), card.cost]
 		card_btn.position = Vector2(10 + (i % 8) * 210, 55 + int(i / 8.0) * 60)
 		card_btn.size = Vector2(200, 50)
 		card_btn.add_theme_font_size_override("font_size", 13)

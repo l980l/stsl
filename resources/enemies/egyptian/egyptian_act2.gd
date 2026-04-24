@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func apep_snake(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.egyptian.apep_snake"); e.max_hp = 1600; e.character_scene = scene
+	e.enemy_name = "enemy.egyptian.apep_snake"; e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 140; i1.target = IntentRes.TargetType.RANDOM
@@ -27,7 +27,7 @@ static func apep_snake(scene: PackedScene) -> Resource:
 
 static func seth_hound(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.egyptian.seth_hound"); e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = "enemy.egyptian.seth_hound"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 150; i1.target = IntentRes.TargetType.RANDOM
@@ -43,7 +43,7 @@ static func seth_hound(scene: PackedScene) -> Resource:
 
 static func ba_bird(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.egyptian.ba_bird"); e.max_hp = 1500; e.character_scene = scene
+	e.enemy_name = "enemy.egyptian.ba_bird"; e.max_hp = 1500; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 110; i1.target = IntentRes.TargetType.RANDOM
@@ -63,7 +63,7 @@ static func ba_bird(scene: PackedScene) -> Resource:
 
 static func osiris(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.egyptian.osiris"); e.max_hp = 3000; e.character_scene = scene
+	e.enemy_name = "enemy.egyptian.osiris"; e.max_hp = 3000; e.character_scene = scene
 	e.mythology = "egyptian"
 	e.phase_thresholds = [0.5]
 	e.phase_heal_ratios = [0.6]

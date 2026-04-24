@@ -5,7 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func iwato_guardian(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.japanese.iwato_guardian"); e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = "enemy.japanese.iwato_guardian"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 70; i1.status_type = "block"
@@ -21,7 +21,7 @@ static func iwato_guardian(scene: PackedScene) -> Resource:
 
 static func susanoo_blade(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.japanese.susanoo_blade"); e.max_hp = 2000; e.character_scene = scene
+	e.enemy_name = "enemy.japanese.susanoo_blade"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 3; i1.status_type = "strength"
@@ -38,7 +38,7 @@ static func susanoo_blade(scene: PackedScene) -> Resource:
 
 static func blizzard_queen(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.japanese.blizzard_queen"); e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = "enemy.japanese.blizzard_queen"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 3; i1.status_type = "weak"
@@ -58,7 +58,7 @@ static func blizzard_queen(scene: PackedScene) -> Resource:
 
 static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.japanese.yamata_no_orochi"); e.max_hp = 4800; e.character_scene = scene
+	e.enemy_name = "enemy.japanese.yamata_no_orochi"; e.max_hp = 4800; e.character_scene = scene
 	e.mythology = "japanese"
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 여덟 머리 (8 heads)

@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func draugr(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.norse.draugr"); e.max_hp = 420; e.character_scene = scene
+	e.enemy_name = "enemy.norse.draugr"; e.max_hp = 420; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM
@@ -20,7 +20,7 @@ static func draugr(scene: PackedScene) -> Resource:
 
 static func urdr_spider(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.norse.urdr_spider"); e.max_hp = 300; e.character_scene = scene
+	e.enemy_name = "enemy.norse.urdr_spider"; e.max_hp = 300; e.character_scene = scene
 	e.mythology = "norse"
 	# 3턴 루프: 독공격, 일반공격, 독공격
 	var i1 := IntentRes.new()
@@ -40,7 +40,7 @@ static func urdr_spider(scene: PackedScene) -> Resource:
 
 static func jotun_soldier(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.norse.jotun_soldier"); e.max_hp = 600; e.character_scene = scene
+	e.enemy_name = "enemy.norse.jotun_soldier"; e.max_hp = 600; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.status_type = "block"; i1.value = 80
@@ -53,7 +53,7 @@ static func jotun_soldier(scene: PackedScene) -> Resource:
 
 static func volva_witch(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.norse.volva_witch"); e.max_hp = 320; e.character_scene = scene
+	e.enemy_name = "enemy.norse.volva_witch"; e.max_hp = 320; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.status_type = "weak"; i1.value = 2
@@ -68,7 +68,7 @@ static func volva_witch(scene: PackedScene) -> Resource:
 
 static func hrimfaxi_rider(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.norse.hrimfaxi_rider"); e.max_hp = 380; e.character_scene = scene
+	e.enemy_name = "enemy.norse.hrimfaxi_rider"; e.max_hp = 380; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM
@@ -81,7 +81,7 @@ static func hrimfaxi_rider(scene: PackedScene) -> Resource:
 
 static func garlarr_snake(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.norse.garlarr_snake"); e.max_hp = 340; e.character_scene = scene
+	e.enemy_name = "enemy.norse.garlarr_snake"; e.max_hp = 340; e.character_scene = scene
 	e.mythology = "norse"
 	# SPECIAL value=1: 카드 1장 버리기
 	var i1 := IntentRes.new()

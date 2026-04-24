@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func minotaur(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.minotaur"); e.max_hp = 2000; e.character_scene = scene
+	e.enemy_name = "enemy.greek.minotaur"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 150; i1.target = IntentRes.TargetType.RANDOM
@@ -21,7 +21,7 @@ static func minotaur(scene: PackedScene) -> Resource:
 
 static func medusa(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.medusa"); e.max_hp = 1700; e.character_scene = scene
+	e.enemy_name = "enemy.greek.medusa"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 130; i1.target = IntentRes.TargetType.RANDOM
@@ -39,7 +39,7 @@ static func medusa(scene: PackedScene) -> Resource:
 
 static func gorgon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.gorgon"); e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = "enemy.greek.gorgon"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.5]
 	var p0i1 := IntentRes.new()
@@ -71,7 +71,7 @@ static func gorgon(scene: PackedScene) -> Resource:
 
 static func scylla(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.scylla"); e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = "enemy.greek.scylla"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.5]
 	var p0i1 := IntentRes.new()
@@ -105,7 +105,7 @@ static func scylla(scene: PackedScene) -> Resource:
 
 static func hydra(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.hydra"); e.max_hp = 4500; e.character_scene = scene
+	e.enemy_name = "enemy.greek.hydra"; e.max_hp = 4500; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.66, 0.33]
 	var p0i1 := IntentRes.new()

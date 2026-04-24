@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func satyr(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.satyr"); e.max_hp = 350; e.character_scene = scene
+	e.enemy_name = "enemy.greek.satyr"; e.max_hp = 350; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 80; i1.target = IntentRes.TargetType.RANDOM
@@ -18,7 +18,7 @@ static func satyr(scene: PackedScene) -> Resource:
 
 static func harpy(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.harpy"); e.max_hp = 280; e.character_scene = scene
+	e.enemy_name = "enemy.greek.harpy"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 45; i1.target = IntentRes.TargetType.RANDOM
@@ -35,7 +35,7 @@ static func harpy(scene: PackedScene) -> Resource:
 
 static func cyclops(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.cyclops"); e.max_hp = 700; e.character_scene = scene
+	e.enemy_name = "enemy.greek.cyclops"; e.max_hp = 700; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.PREPARE; i1.value = 0; i1.condition = "준비"
@@ -46,7 +46,7 @@ static func cyclops(scene: PackedScene) -> Resource:
 
 static func snake(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.snake"); e.max_hp = 300; e.character_scene = scene
+	e.enemy_name = "enemy.greek.snake"; e.max_hp = 300; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM
@@ -58,7 +58,7 @@ static func snake(scene: PackedScene) -> Resource:
 
 static func cerberus(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.cerberus"); e.max_hp = 900; e.character_scene = scene
+	e.enemy_name = "enemy.greek.cerberus"; e.max_hp = 900; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM
@@ -77,7 +77,7 @@ static func cerberus(scene: PackedScene) -> Resource:
 
 static func myrmidon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.greek.myrmidon"); e.max_hp = 250; e.character_scene = scene
+	e.enemy_name = "enemy.greek.myrmidon"; e.max_hp = 250; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM

@@ -7,7 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func nidhogg_larva(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.norse.nidhogg_larva"); e.max_hp = 1750; e.character_scene = scene
+	e.enemy_name = "enemy.norse.nidhogg_larva"; e.max_hp = 1750; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 3; i1.status_type = "poison"
@@ -24,7 +24,7 @@ static func nidhogg_larva(scene: PackedScene) -> Resource:
 
 static func skoll(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.norse.skoll"); e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = "enemy.norse.skoll"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 140; i1.target = IntentRes.TargetType.LOWEST_HP
@@ -39,7 +39,7 @@ static func skoll(scene: PackedScene) -> Resource:
 
 static func hrimthurs_scout(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.norse.hrimthurs_scout"); e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = "enemy.norse.hrimthurs_scout"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.5]
 	var p0i1 := IntentRes.new()
@@ -58,7 +58,7 @@ static func hrimthurs_scout(scene: PackedScene) -> Resource:
 
 static func fjorgynn(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.norse.fjorgynn"); e.max_hp = 4500; e.character_scene = scene
+	e.enemy_name = "enemy.norse.fjorgynn"; e.max_hp = 4500; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.66, 0.33]
 	# 페이즈0

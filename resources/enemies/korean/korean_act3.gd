@@ -5,7 +5,7 @@ const IntentRes  = preload("res://resources/intent_resource.gd")
 
 static func underworld_judge(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.korean.underworld_judge"); e.max_hp = 1900; e.character_scene = scene
+	e.enemy_name = "enemy.korean.underworld_judge"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"
@@ -38,7 +38,7 @@ static func underworld_judge(scene: PackedScene) -> Resource:
 
 static func gat_spirit(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.korean.gat_spirit"); e.max_hp = 2000; e.character_scene = scene
+	e.enemy_name = "enemy.korean.gat_spirit"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
@@ -54,7 +54,7 @@ static func gat_spirit(scene: PackedScene) -> Resource:
 
 static func cheoyong_god(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.korean.cheoyong_god"); e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = "enemy.korean.cheoyong_god"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 50; i1.status_type = "block"
@@ -75,7 +75,7 @@ static func cheoyong_god(scene: PackedScene) -> Resource:
 static func gusamseung_halmang(scene: PackedScene) -> Resource:
 	# 제주 무속의 생사 경계 여신 — Phase 0 "생명의 실" → Phase 1 "운명의 저울" → Phase 2 "저승 인도"
 	var e := EnemyRes.new()
-	e.enemy_name = TranslationServer.translate("enemy.korean.gusamseung_halmang"); e.max_hp = 4800; e.character_scene = scene
+	e.enemy_name = "enemy.korean.gusamseung_halmang"; e.max_hp = 4800; e.character_scene = scene
 	e.mythology = "korean"
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0: 생명의 실

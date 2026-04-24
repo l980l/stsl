@@ -392,7 +392,7 @@ func _start_test_battle() -> void:
 	# 적 설정
 	var IntentResClass = load("res://resources/intent_resource.gd")
 	var satyr = EnemyRes.new()
-	satyr.enemy_name = "사티로스"
+	satyr.enemy_name = "enemy.greek.satyr"
 	satyr.max_hp = 30
 	satyr.character_scene = load("res://characters/enemies/satyr/satyr.tscn")
 	var intent = IntentResClass.new()
@@ -486,7 +486,7 @@ func _setup_enemies() -> void:
 		entry["panel"].visible = true
 		entry["btn"].visible = true
 		entry["btn"].disabled = false
-		entry["name_lbl"].text = enemy.get("enemy_name") if enemy.get("enemy_name") != null else "적"
+		entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
 
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
@@ -1356,7 +1356,7 @@ func _start_drag(card: Resource) -> void:
 	_drag_card = card
 	_selected_card = null
 	_drag_preview = Label.new()
-	_drag_preview.text = "[%d] %s" % [card.cost, card.get("card_name") if card.get("card_name") else "?"]
+	_drag_preview.text = "[%d] %s" % [card.cost, tr(card.get("card_name")) if card.get("card_name") else "?"]
 	_drag_preview.add_theme_font_size_override("font_size", 14)
 	_drag_preview.size = Vector2(120, 30)
 	_drag_preview.modulate = Color(1.0, 1.0, 0.6, 0.85)
