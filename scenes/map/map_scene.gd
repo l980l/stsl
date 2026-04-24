@@ -28,7 +28,7 @@ func _build_ui() -> void:
 
 	# 제목 (동적 포맷 — 번역 스코프 아웃)
 	var title := Label.new()
-	title.text = "Act %d" % GameManager.current_act
+	title.text = tr("ui.map.act_title") % GameManager.current_act
 	title.position = Vector2(860, 20)
 	title.size = Vector2(200, 50)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -108,7 +108,7 @@ func _refresh_map() -> void:
 		if node_id == GameManager.current_node_id:
 			btn.modulate = Color(1.0, 1.0, 0.3)
 
-	_floor_label.text = "현재 층: %d / 9" % GameManager.current_floor
+	_floor_label.text = tr("ui.map.floor_label") % GameManager.current_floor
 
 func _node_center(node: Resource) -> Vector2:
 	return Vector2(
@@ -174,7 +174,7 @@ func _show_deck_viewer() -> void:
 	_deck_overlay.add_child(panel)
 
 	var header := Label.new()
-	header.text = "덱 목록  (%d장)" % all_cards.size()
+	header.text = tr("ui.map.deck_list_title") % all_cards.size()
 	header.position = Vector2(460, 110)
 	header.size = Vector2(1000, 50)
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -195,7 +195,7 @@ func _show_deck_viewer() -> void:
 		var cost: int = card.get("cost") if card.get("cost") != null else 0
 		var card_owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
 		var lbl := Label.new()
-		lbl.text = "[%d코스트]  %s  (%s)" % [cost, card_name, card_owner]
+		lbl.text = tr("ui.map.deck_card_format") % [cost, card_name, card_owner]
 		lbl.add_theme_font_size_override("font_size", 16)
 		vbox.add_child(lbl)
 
