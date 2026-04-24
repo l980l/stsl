@@ -505,13 +505,20 @@ func _setup_enemies() -> void:
 		entry["btn"].disabled = false
 		entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
 
+		var slot_pos: Vector2 = _enemy_slot_pos(i, total)
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
-			var slot_pos: Vector2 = _enemy_slot_pos(i, total)
 			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0 + 40.0 * 1.44, slot_pos.y + 88)
 			char_node.scale = Vector2(-1.44, 2.4)
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
+		else:
+			var placeholder := ColorRect.new()
+			placeholder.color = Color(0.45, 0.45, 0.5, 0.6)
+			placeholder.size = Vector2(60, 120)
+			placeholder.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 30, slot_pos.y + 40)
+			add_child(placeholder)
+			_enemy_char_nodes[i] = placeholder
 
 		_update_enemy_ui(i)
 		_refresh_enemy_counter(i)
@@ -570,32 +577,12 @@ func _refresh_token_tiles(hero_id: String) -> void:
 		var tile_x: int = int(area_pos.x) + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
 		var tile_y: int = int(area_pos.y) + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
 
-		# 셀 배경
-		var bg := ColorRect.new()
-		bg.color = Color(0.18, 0.16, 0.10)
-		bg.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
-		bg.position = Vector2(tile_x, tile_y)
-		bg.tooltip_text = tr("battle.token_tooltip")
-		bg.mouse_filter = Control.MOUSE_FILTER_STOP
-		add_child(bg)
-		_token_tile_nodes[hero_id].append(bg)
-
-		# 병사 캐릭터 씬 (idle 애니메이션 포함)
+		# 병사 캐릭터 씬 (2배 스케일)
 		var char_node = SoldierScene.instantiate()
-		char_node.position = Vector2(tile_x + (TOKEN_TILE_W - 40) / 2.0, tile_y + TOKEN_TILE_H - 20 - 50)
+		char_node.scale = Vector2(2.0, 2.0)
+		char_node.position = Vector2(tile_x + TOKEN_TILE_W / 2.0 - 40.0, tile_y + TOKEN_TILE_H - 20)
 		add_child(char_node)
 		_token_tile_nodes[hero_id].append(char_node)
-
-		# 이름 라벨 (하단)
-		var lbl := Label.new()
-		lbl.text = tr("battle.token_soldier")
-		lbl.add_theme_font_size_override("font_size", 11)
-		lbl.position = Vector2(tile_x, tile_y + TOKEN_TILE_H - 18)
-		lbl.size = Vector2(TOKEN_TILE_W, 16)
-		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(lbl)
-		_token_tile_nodes[hero_id].append(lbl)
 
 func _update_enemy_ui(index: int) -> void:
 	var entry: Dictionary = _enemy_nodes[index]
