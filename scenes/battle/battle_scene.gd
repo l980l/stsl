@@ -20,7 +20,7 @@ const BASE_CARD_SCALE := 1.4
 const FAN_PIVOT_Y_OFFSET := 1200.0
 const FAN_ANGLE_PER_CARD := 0.10
 const FAN_MAX_TOTAL_ANGLE := 0.9
-const HAND_BASE_Y := 900
+const HAND_BASE_Y := 960
 const SLOT_GAP := 20
 const MAX_ENEMY_COUNT := 6
 const TOKEN_COLS := 6
@@ -70,7 +70,9 @@ const STATUS_EMOJI := {
 
 func _trf(key: String, args) -> String:
 	var s := tr(key)
-	return s % args if "%" in s else s
+	if "%d" in s or "%s" in s or "%f" in s:
+		return s % args
+	return s
 
 func _ready() -> void:
 	_build_ui()
@@ -708,8 +710,12 @@ func _on_card_hovered(_card: Resource, card_node: CardScene) -> void:
 		var base_rot: float = btn.get_meta("_fan_rot")
 		var tw := create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 		if idx == hover_idx:
-			tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE * 1.2, BASE_CARD_SCALE * 1.2), 0.12)
-			tw.tween_property(btn, "position", base_pos + Vector2(0, -60.0), 0.12)
+			var hover_scale := BASE_CARD_SCALE * 1.4
+			# 호버 후 카드 하단 y = base_pos.y + hover_scale * 100 + 100
+			var card_bottom := base_pos.y + hover_scale * 100.0 + 100.0
+			var lift := maxf(60.0, card_bottom - (WINDOW_H - 20.0))
+			tw.tween_property(btn, "scale", Vector2(hover_scale, hover_scale), 0.12)
+			tw.tween_property(btn, "position", base_pos + Vector2(0, -lift), 0.12)
 			tw.tween_property(btn, "rotation", 0.0, 0.12)
 			btn.z_index = 200
 		else:

@@ -18,7 +18,9 @@ var _deck_viewer_tooltip: CardScene = null
 
 func _trf(key: String, args) -> String:
 	var s := tr(key)
-	return s % args if "%" in s else s
+	if "%d" in s or "%s" in s or "%f" in s:
+		return s % args
+	return s
 
 func _ready() -> void:
 	_build_ui()
