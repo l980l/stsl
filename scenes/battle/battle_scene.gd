@@ -1282,15 +1282,15 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_debug_grid_visible = not _debug_grid_visible
 			_refresh_debug_grid()
 			_refresh_debug_badge()
-		elif event.keycode == KEY_M and event.shift_pressed:
+		elif event.keycode == KEY_O and event.shift_pressed:
 			if BattleManager.debug_add_dummy_enemy(MAX_ENEMY_COUNT):
 				_setup_enemies()
-		elif event.keycode == KEY_T and event.shift_pressed:
+		elif event.keycode == KEY_S and event.shift_pressed:
 			var living := TeamManager.get_living_heroes()
 			if not living.is_empty():
 				var hero_id: String = living[0].hero_id
 				BattleManager.debug_add_dummy_token(hero_id)
-				_refresh_token_grid(hero_id)
+				_refresh_token_tiles(hero_id)
 
 func _refresh_debug_grid() -> void:
 	for node in _debug_grid_nodes:
