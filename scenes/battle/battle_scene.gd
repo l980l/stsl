@@ -26,7 +26,6 @@ const TOKEN_ROWS := 2
 const TOKEN_TILE_W := 111
 const TOKEN_TILE_H := 138
 const TOKEN_TILE_GAP := 4
-const TOKEN_AREA_X := 270
 
 # UI 참조 (Dictionary 배열)
 # hero entry: {panel, name_lbl, hp_lbl, block_lbl, hero_id}
@@ -176,6 +175,9 @@ func _build_ui() -> void:
 
 func _hero_slot_pos(index: int) -> Vector2:
 	return (get_node("HeroSlot%d" % (index + 1)) as Marker2D).position
+
+func _summon_area_pos(index: int) -> Vector2:
+	return (get_node("SummonArea%d" % (index + 1)) as Marker2D).position
 
 func _make_hero_slot(index: int) -> Dictionary:
 	var pos := _hero_slot_pos(index)
@@ -559,16 +561,14 @@ func _refresh_token_tiles(hero_id: String) -> void:
 	if hero_idx < 0:
 		return
 
-	var slot_pos := _hero_slot_pos(hero_idx)
-	var grid_h: int = TOKEN_ROWS * TOKEN_TILE_H + (TOKEN_ROWS - 1) * TOKEN_TILE_GAP
-	var base_y: int = int(slot_pos.y) + int((SLOT_H - grid_h) / 2.0)
+	var area_pos := _summon_area_pos(hero_idx)
 	var max_tokens: int = TOKEN_COLS * TOKEN_ROWS
 
 	for t in range(min(token_count, max_tokens)):
 		var col: int = int(t / float(TOKEN_ROWS))
 		var row: int = t % TOKEN_ROWS
-		var tile_x: int = TOKEN_AREA_X + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
-		var tile_y: int = base_y + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
+		var tile_x: int = int(area_pos.x) + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
+		var tile_y: int = int(area_pos.y) + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
 
 		# 셀 배경
 		var bg := ColorRect.new()
@@ -1299,13 +1299,11 @@ func _refresh_debug_grid() -> void:
 
 	# 소환물 그리드 (노란색)
 	for i in range(3):
-		var sp := _hero_slot_pos(i)
-		var grid_h: int = TOKEN_ROWS * TOKEN_TILE_H + (TOKEN_ROWS - 1) * TOKEN_TILE_GAP
-		var base_y: int = int(sp.y) + int((SLOT_H - grid_h) / 2.0)
+		var ap := _summon_area_pos(i)
 		for r in range(TOKEN_ROWS):
 			for c in range(TOKEN_COLS):
-				var cx: int = TOKEN_AREA_X + c * (TOKEN_TILE_W + TOKEN_TILE_GAP)
-				var cy: int = base_y + r * (TOKEN_TILE_H + TOKEN_TILE_GAP)
+				var cx: int = int(ap.x) + c * (TOKEN_TILE_W + TOKEN_TILE_GAP)
+				var cy: int = int(ap.y) + r * (TOKEN_TILE_H + TOKEN_TILE_GAP)
 				var cell := ColorRect.new()
 				cell.color = Color(0.8, 0.8, 0.2, 0.12)
 				cell.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
