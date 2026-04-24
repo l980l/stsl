@@ -1082,6 +1082,27 @@ func has_synergy_bonus(card: Resource) -> bool:
 					return true
 	return false
 
+func debug_add_dummy_enemy(max_count: int = 6) -> bool:
+	if _enemies.size() >= max_count:
+		return false
+	var e := EnemyResource.new()
+	e.enemy_name = "debug.dummy_enemy"
+	e.max_hp = 100
+	_enemies.append(e)
+	_enemy_hp.append(e.max_hp)
+	_enemy_alive.append(true)
+	_enemy_block.append(0)
+	_enemy_status.append({})
+	_enemy_intent_index.append(0)
+	_enemy_phase.append(0)
+	return true
+
+func debug_add_dummy_token(hero_id: String) -> void:
+	if not _hero_status.has(hero_id):
+		_hero_status[hero_id] = {}
+	var cur: int = _hero_status[hero_id].get("tokens", 0)
+	_hero_status[hero_id]["tokens"] = min(cur + 1, TOKEN_MAX_STACK)
+
 func debug_set_enemy_hp(index: int, hp: int) -> void:
 	if index < 0 or index >= _enemy_hp.size():
 		return
