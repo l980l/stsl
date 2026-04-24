@@ -10,13 +10,13 @@ func _ready() -> void:
 	if event == null:
 		GameManager._request_scene("res://scenes/map/map_scene.tscn")
 		return
-	name_label.text = event.event_name
-	desc_label.text = event.description
+	name_label.text = tr(event.event_name)
+	desc_label.text = tr(event.description)
 	LabelUtils.fit_text(name_label, 36, 20)
 	LabelUtils.fit_text(desc_label, 20, 12)
 	for choice in event.choices:
 		var btn := Button.new()
-		btn.text = choice.label
+		btn.text = tr(choice.label)
 		btn.pressed.connect(_on_choice_selected.bind(choice))
 		choices_container.add_child(btn)
 

@@ -112,7 +112,7 @@ func _build_relic_section() -> void:
 
 	if relic:
 		var name_lbl := Label.new()
-		name_lbl.text = relic.relic_name
+		name_lbl.text = tr(relic.relic_name)
 		name_lbl.position = Vector2(1110, 160)
 		name_lbl.size = Vector2(580, 40)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -121,7 +121,7 @@ func _build_relic_section() -> void:
 		add_child(name_lbl)
 
 		var desc_lbl := Label.new()
-		desc_lbl.text = relic.description
+		desc_lbl.text = tr(relic.description)
 		desc_lbl.position = Vector2(1110, 205)
 		desc_lbl.size = Vector2(580, 60)
 		desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

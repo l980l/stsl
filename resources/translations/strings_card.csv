@@ -22,7 +22,7 @@ effect.block_per_cards_played.text,카드수×%d 방어,%d Block per card played
 effect.on_kill_draw.text,처치시 드로우 %d,Draw %d on kill,Piochez %d par élimination,Pesca %d all'uccisione,Roba %d al matar,撃破時ドロー %d,Τράβηξε %d κατά την εξόντωση,击杀时抽 %d 张牌
 effect.purge_status.text,디버프 제거,Remove debuffs,Retire les malus,Rimuovi debuff,Elimina penalizaciones,デバフ除去,Αφαίρεση εξασθενήσεων,移除负面状态
 effect.per_draw_dmg.text,드로우수×%d 피해,%d damage per draw,%d dégâts par pioche,%d danni per pesca,%d daño por robo,ドロー数×%d ダメージ,%d ζημιά ανά τράβηγμα,抽牌数×%d 伤害
-effect.apply_status_poison.text,%s %d 데미지,%d %s damage,%d dégâts de %s,%d danni da %s,%d de daño de %s,%s %d ダメージ,%d %s ζημιά,%s %d 伤害
+effect.apply_status_poison.text,%s %d 데미지,%s %d damage,%s %d dégâts,%s %d danni,%s %d de daño,%s %d ダメージ,%s %d ζημιά,%s %d 伤害
 effect.aoe_suffix, (전체), (All), (Tous), (Tutti), (Todos), (全体), (Όλοι), (全体)
 card.napoleon.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击
 card.napoleon.strike.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击

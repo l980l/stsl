@@ -124,8 +124,8 @@ func _refresh_relics() -> void:
 		child.queue_free()
 	for relic in GameManager.relics:
 		var lbl := Label.new()
-		lbl.text = "[%s]" % relic.relic_name
-		lbl.tooltip_text = relic.description
+		lbl.text = "[%s]" % tr(relic.relic_name)
+		lbl.tooltip_text = tr(relic.description)
 		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 		lbl.add_theme_font_size_override("font_size", 14)
 		lbl.modulate = Color(1.0, 0.85, 0.3)
