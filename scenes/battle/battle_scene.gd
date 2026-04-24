@@ -64,6 +64,10 @@ const STATUS_EMOJI := {
 	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜"
 }
 
+func _trf(key: String, args) -> String:
+	var s := tr(key)
+	return s % args if "%" in s else s
+
 func _ready() -> void:
 	_build_ui()
 	if OS.is_debug_build():
@@ -600,11 +604,11 @@ func _update_enemy_ui(index: int) -> void:
 	if intent != null:
 		match intent.action_type:
 			IntentRes.ActionType.ATTACK:
-				entry["intent_lbl"].text = tr("battle.intent.attack") % intent.value
+				entry["intent_lbl"].text = _trf("battle.intent.attack", intent.value)
 			IntentRes.ActionType.BUFF:
 				match intent.status_type:
-					"strength": entry["intent_lbl"].text = tr("battle.intent.buff.strength") % intent.value
-					_:          entry["intent_lbl"].text = tr("battle.intent.buff.block") % intent.value
+					"strength": entry["intent_lbl"].text = _trf("battle.intent.buff.strength", intent.value)
+					_:          entry["intent_lbl"].text = _trf("battle.intent.buff.block", intent.value)
 			IntentRes.ActionType.DEBUFF:
 				entry["intent_lbl"].text = tr("battle.intent.debuff")
 			IntentRes.ActionType.PREPARE:
@@ -923,10 +927,10 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Label:
 	if key == "poison_dmg":
 		var dur: int = status.get("poison_dur", 0)
 		lbl.text = "☠%d/%d" % [val * 10, dur]
-		lbl.tooltip_text = tr("status.%s.desc" % key) % val
+		lbl.tooltip_text = _trf("status.%s.desc" % key, val)
 	else:
 		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
-		lbl.tooltip_text = tr("status.%s.desc" % key) % val
+		lbl.tooltip_text = _trf("status.%s.desc" % key, val)
 	lbl.add_theme_font_size_override("font_size", 12)
 	lbl.custom_minimum_size = Vector2(0, 18)
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -976,7 +980,7 @@ func _refresh_status_icons_enemy(index: int) -> void:
 			CardResource.CardType.POWER:  label_key = "enemy.counter.power.label"
 		if label_key != "":
 			var lbl := Label.new()
-			lbl.text = tr(label_key) % [cinfo["count"], cinfo["threshold"]]
+			lbl.text = _trf(label_key, [cinfo["count"], cinfo["threshold"]])
 			lbl.tooltip_text = _counter_tooltip_text(cinfo)
 			lbl.add_theme_font_size_override("font_size", 12)
 			lbl.custom_minimum_size = Vector2(0, 18)
@@ -1304,14 +1308,14 @@ func _counter_tooltip_text(info: Dictionary) -> String:
 			_:                              target_str = tr("battle.target.ally")
 		match intent.action_type:
 			IntentRes.ActionType.ATTACK:
-				effect_desc = tr("battle.counter.effect.attack") % [target_str, intent.value]
+				effect_desc = _trf("battle.counter.effect.attack", [target_str, intent.value])
 			IntentRes.ActionType.DEBUFF:
 				var sname: String = tr("status.%s.name" % intent.status_type)
-				effect_desc = tr("battle.counter.effect.debuff") % [target_str, sname, intent.value]
+				effect_desc = _trf("battle.counter.effect.debuff", [target_str, sname, intent.value])
 			IntentRes.ActionType.BUFF:
 				var sname: String = tr("status.%s.name" % intent.status_type)
-				effect_desc = tr("battle.counter.effect.buff") % [sname, intent.value]
-	return tr("battle.counter.tooltip.format") % [card_name, threshold, effect_desc]
+				effect_desc = _trf("battle.counter.effect.buff", [sname, intent.value])
+	return _trf("battle.counter.tooltip.format", [card_name, threshold, effect_desc])
 
 func _make_border_rects(x: int, y: int, w: int, h: int, color: Color) -> Array:
 	var rects: Array = []

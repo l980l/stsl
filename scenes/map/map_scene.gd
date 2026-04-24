@@ -16,6 +16,10 @@ var _relic_container: HBoxContainer
 var _deck_viewer: CanvasLayer = null
 var _deck_viewer_tooltip: CardScene = null
 
+func _trf(key: String, args) -> String:
+	var s := tr(key)
+	return s % args if "%" in s else s
+
 func _ready() -> void:
 	_build_ui()
 	_refresh_map()
@@ -35,7 +39,7 @@ func _build_ui() -> void:
 
 	# 제목 (동적 포맷 — 번역 스코프 아웃)
 	var title := Label.new()
-	title.text = tr("ui.map.act_title") % GameManager.current_act
+	title.text = _trf("ui.map.act_title", GameManager.current_act)
 	title.position = Vector2(860, 20)
 	title.size = Vector2(200, 50)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -115,7 +119,7 @@ func _refresh_map() -> void:
 		if node_id == GameManager.current_node_id:
 			btn.modulate = Color(1.0, 1.0, 0.3)
 
-	_floor_label.text = tr("ui.map.floor_label") % GameManager.current_floor
+	_floor_label.text = _trf("ui.map.floor_label", GameManager.current_floor)
 
 func _node_center(node: Resource) -> Vector2:
 	return Vector2(
@@ -202,7 +206,7 @@ func _show_deck_viewer() -> void:
 	vbox.add_child(title_row)
 
 	var title_lbl := Label.new()
-	title_lbl.text = tr("ui.map.deck_list_title") % all_cards.size()
+	title_lbl.text = _trf("ui.map.deck_list_title", all_cards.size())
 	title_lbl.add_theme_font_size_override("font_size", 22)
 	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_row.add_child(title_lbl)

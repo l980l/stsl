@@ -50,8 +50,7 @@ func _make_chapter_card(chapter: Dictionary, idx: int) -> void:
 	name_label.text = tr(chapter["name_key"])
 	name_label.position = Vector2(card_x + 20, 330)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	name_label.clip_contents = true
+	name_label.clip_text = true
 	name_label.add_theme_font_size_override("font_size", 32)
 	add_child(name_label)
 	name_label.size = Vector2(560, 80)

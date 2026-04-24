@@ -13,7 +13,8 @@ func _ready() -> void:
 	_lang_opt.item_selected.connect(_on_locale_selected)
 	_btn_close.pressed.connect(close)
 	_title_lbl.text = tr("ui.settings.title")
-	LabelUtils.fit_text(_title_lbl, 28, 16)
+	var panel_w := ($Panel as Panel).offset_right - ($Panel as Panel).offset_left
+	LabelUtils.fit_text(_title_lbl, 28, 16, panel_w)
 	_lang_lbl.text = tr("ui.settings.language")
 	LabelUtils.fit_text(_lang_lbl, 18, 12)
 	_btn_close.text = tr("ui.map.btn_close")
