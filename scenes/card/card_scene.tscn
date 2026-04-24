@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b0d8lg03pq3fi" path="res://scenes/card/card_scene.gd" id="1_cscrpt"]
 [ext_resource type="Texture2D" uid="uid://fyxsb7murkls" path="res://assets/art/cards/cardframes/sampleframe.png" id="2_frame"]
+[ext_resource type="Texture2D" uid="uid://6o0m4uehxi50" path="res://assets/art/cards/cardgems/card_rarity_common.png" id="3_gem"]
 
 [node name="CardScene" type="Control" unique_id=837172487]
 custom_minimum_size = Vector2(140, 200)
@@ -21,15 +22,25 @@ offset_bottom = 1165.0
 texture = ExtResource("2_frame")
 stretch_mode = 6
 
+[node name="RarityGem" type="TextureRect" parent="Container" unique_id=-1949288395]
+layout_mode = 0
+offset_left = 57.428375
+offset_top = 58.25128
+offset_right = 166.54224
+offset_bottom = 168.92876
+texture = ExtResource("3_gem")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="CostLabel" type="Label" parent="Container" unique_id=1210760756]
 layout_mode = 0
 offset_left = 74.65686
-offset_top = 64.076416
+offset_top = 58.25128
 offset_right = 149.31372
-offset_bottom = 163.10362
+offset_bottom = 168.92876
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 11
-theme_override_font_sizes/font_size = 70
+theme_override_constants/outline_size = 20
+theme_override_font_sizes/font_size = 80
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -52,24 +63,23 @@ offset_right = 729.34015
 offset_bottom = 757.26685
 expand_mode = 3
 
+[node name="TypeIcon" type="TextureRect" parent="Container" unique_id=-838178284]
+modulate = Color(1, 1, 1, 0.7)
+layout_mode = 0
+offset_left = 315.8556
+offset_top = 856.29443
+offset_right = 488.14105
+offset_bottom = 1025.2229
+expand_mode = 1
+stretch_mode = 5
+
 [node name="DescLabel" type="Label" parent="Container" unique_id=1387990002]
 layout_mode = 0
-offset_left = 80.399704
-offset_top = 832.9935
-offset_right = 723.59735
-offset_bottom = 1083.4741
+offset_left = 97.628235
+offset_top = 821.34326
+offset_right = 712.1117
+offset_bottom = 1071.824
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 9
 theme_override_font_sizes/font_size = 40
 autowrap_mode = 3
-
-[node name="TypeLabel" type="Label" parent="Container" unique_id=1111111111]
-layout_mode = 0
-offset_left = 132.08524
-offset_top = 792.2176
-offset_right = 682.0852
-offset_bottom = 834.2176
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 9
-theme_override_font_sizes/font_size = 30
-horizontal_alignment = 1

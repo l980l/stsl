@@ -6,12 +6,12 @@ status.strength.name,강화,Strength,Force,Forza,Fuerza,強化,Δύναμη,强�
 status.charm.name,매혹,Charm,Charme,Fascino,Encanto,魅了,Γοητεία,魅惑
 status.taunt.name,도발,Taunt,Provocation,Provocazione,Provocación,挑発,Πρόκληση,嘲讽
 status.morale.name,사기,Morale,Moral,Morale,Moral,士気,Ηθικό,士气
-status.poison_dmg.desc,독: 매 턴 %d×10 피해. 지속 3턴 중첩 시 갱신,,,,,,,
-status.weak.desc,약화: 공격 피해 25% 감소. 매 턴 1 감소,,,,,,,
-status.vulnerable.desc,취약: 받는 피해 50% 증가. 매 턴 1 감소,,,,,,,
-status.morale.desc,사기: CONSUME_MORALE 카드로 추가 피해 제공,,,,,,,
-status.charm.desc,매혹: 다음 행동 아군에게 적용,,,,,,,
-status.strength.desc,강화: 피해 +%d,,,,,,,
-status.taunt.desc,도발: 이 대상이 우선 공격 받음,,,,,,,
-status.counter_block.desc,반격 방어: 피해 = 현재 방어도 기반,,,,,,,
-status.charm_resistance.desc,매혹 저항 %d: 매혹 스택 초과 시 반함,,,,,,,
+status.poison_dmg.desc,독: 매 턴 %d×10 피해. 지속 3턴 중첩 시 갱신,Poison: %d×10 damage every turn. Lasts 3 turns; refreshes on stack.,"Poison : %d×10 dégâts chaque tour. Dure 3 tours ; se rafraîchit à l'empilement.","Veleno: %d×10 danni ogni turno. Dura 3 turni; si aggiorna accumulandosi.","Veneno: %d×10 de daño cada turno. Dura 3 turnos; se actualiza al acumularse.","毒：毎ターン %d×10 ダメージ。3ターン継続、重複時に更新。","Δηλητήριο: %d×10 ζημιά κάθε γύρο. Διαρκεί 3 γύρους. ανανεώνεται στη στοίβα.","毒：每回合造成 %d×10 点伤害。持续3回合，堆叠时刷新。"
+status.weak.desc,약화: 공격 피해 25% 감소. 매 턴 1 감소,Weak: Attack damage reduced by 25%. Decreases by 1 every turn.,Faible : Dégâts d'attaque réduits de 25%. Diminue de 1 chaque tour.,Debole: Danni d'attacco ridotti del 25%. Diminuisce di 1 ogni turno.,Débil: Daño de ataque reducido en un 25%. Disminuye en 1 cada turno.,弱体化：攻撃ダメージが25%%減少。毎ターン1減少。,Αδύναμος: Η ζημιά επίθεσης μειώνεται κατά 25%. Μειώνεται κατά 1 κάθε γύρο.,虚弱：攻击伤害降低25%。每回合减少1层。
+status.vulnerable.desc,취약: 받는 피해 50% 증가. 매 턴 1 감소,Vulnerable: Incoming damage increased by 50%. Decreases by 1 every turn.,Vulnérable : Dégâts reçus augmentés de 50%. Diminue de 1 chaque tour.,Vulnerabile: Danni subiti aumentati del 50%. Diminuisce di 1 ogni turno.,Vulnerable: Daño recibido aumentado en un 50%. Disminuye en 1 cada turno.,脆弱：受けるダメージが50%%増加。毎ターン1減少。,Ευάλωτος: Η δεχόμενη ζημιά αυξάνεται κατά 50%. Μειώνεται κατά 1 κάθε γύρο.,易伤：受到的伤害增加50%。每回合减少1层。
+status.morale.desc,사기: CONSUME_MORALE 카드로 추가 피해 제공,Morale: Provides bonus damage with CONSUME_MORALE cards.,Moral : Fournit des dégâts bonus avec les cartes CONSUME_MORALE.,Morale: Fornisce danni bonus con le carte CONSUME_MORALE.,Moral: Proporciona daño adicional con cartas de CONSUME_MORALE.,士気：CONSUME_MORALEカードで追加ダメージを提供。,Ηθικό: Παρέχει επιπλέον ζημιά με κάρτες CONSUME_MORALE.,士气：通过“消耗士气”卡牌提供额外伤害。
+status.charm.desc,매혹: 다음 행동 아군에게 적용,Charm: Next action applied to allies.,Charme : Prochaine action appliquée aux alliés.,Fascino: Prossima azione applicata agli alleati.,Encanto: Próxima acción aplicada a los aliados.,魅了：次の行動を味方に適用。,Γοητεία: Η επόμενη ενέργεια εφαρμόζεται στους συμμάχους.,魅惑：下一次行动将作用于友方。
+status.strength.desc,강화: 피해 +%d,Strength: Damage +%d,Force : Dégâts +%d,Forza: Danno +%d,Fuerza: Daño +%d,強化：ダメージ +%d,Δύναμη: Ζημιά +%d,强化：伤害 +%d
+status.taunt.desc,도발: 이 대상이 우선 공격 받음,Taunt: This target is prioritized for attacks.,Provocation : Cette cible est prioritaire pour les attaques.,Provocazione: Questo bersaglio ha la priorità per gli attacchi.,Provocación: Este objetivo es priorizado para los ataques.,挑発：この対象が優先的に攻撃を受ける。,Πρόκληση: Αυτός ο στόχος έχει προτεραιότητα στις επιθέσεις.,嘲讽：此目标会被优先攻击。
+status.counter_block.desc,반격 방어: 피해 = 현재 방어도 기반,Counter Block: Damage based on current Block.,Bloc de contre : Dégâts basés sur le Bloc actuel.,Contro Blocco: Danni basati sul Blocco attuale.,Contra Bloqueo: Daño basado en el Bloqueo actual.,反撃防御：ダメージは現在のブロック値に基づく。,Αντεπίθεση Μπλοκ: Ζημιά με βάση το τρέχον Μπλοκ.,反击格挡：伤害基于当前格挡值。
+status.charm_resistance.desc,매혹 저항 %d: 매혹 스택 초과 시 반함,Charm Resistance %d: Charmed when charm stacks exceed this.,Résistance au charme %d : Charmé lorsque les piles de charme dépassent cela.,Resistenza al Fascino %d: Affascinato quando gli accumuli di fascino superano questo.,Resistencia al Encanto %d: Encantado cuando las acumulaciones de encanto superan esto.,魅了耐性 %d：魅了スタックがこれを超えると魅了状態になる。,Αντίσταση στη Γοητεία %d: Γοητεύεται όταν οι στοίβες γοητείας υπερβαίνουν αυτό.,魅惑抗性 %d：当魅惑层数超过此值时被魅惑。

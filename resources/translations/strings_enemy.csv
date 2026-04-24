@@ -1,109 +1,109 @@
 ﻿keys,ko,en,fr,it,es,ja,el,zh
-enemy.greek.satyr,사티로스,,,,,,,
-enemy.greek.harpy,하르피아,,,,,,,
-enemy.greek.cyclops,사이클롭스,,,,,,,
-enemy.greek.snake,메두사의 뱀,,,,,,,
-enemy.greek.cerberus,케르베로스,,,,,,,
-enemy.greek.myrmidon,미르미돈 병사,,,,,,,
-enemy.greek.minotaur,미노타우로스,,,,,,,
-enemy.greek.medusa,메두사,,,,,,,
-enemy.greek.gorgon,고르곤,,,,,,,
-enemy.greek.scylla,스킬라,,,,,,,
-enemy.greek.hydra,히드라,,,,,,,
-enemy.greek.charon,카론,,,,,,,
-enemy.greek.erinyes,에리니에스,,,,,,,
-enemy.greek.hades,하데스,,,,,,,
-enemy.greek.ares_hound,아레스의 사냥개,,,,,,,
-enemy.greek.poseidon_apostle,포세이돈 사도,,,,,,,
-enemy.greek.hephaestus_automaton,헤파이스토스 자동기계,,,,,,,
-enemy.greek.kronos,크로노스,,,,,,,
-enemy.egyptian.sand_scout,사막 척후병,,,,,,,
-enemy.egyptian.desert_scorpion,사막 전갈,,,,,,,
-enemy.egyptian.mummy_warrior,미라 전사,,,,,,,
-enemy.egyptian.sphinx_cub,스핑크스 새끼,,,,,,,
-enemy.egyptian.sand_ifrit,모래 이프리트,,,,,,,
-enemy.egyptian.ka_spirit,카 영혼,,,,,,,
-enemy.egyptian.jackal_warrior,자칼 전사,,,,,,,
-enemy.egyptian.scarab_queen,스카라베 여왕,,,,,,,
-enemy.egyptian.obelisk_guardian,오벨리스크 수호자,,,,,,,
-enemy.egyptian.sekhmet,세크메트,,,,,,,
-enemy.egyptian.apep_snake,아펩 뱀,,,,,,,
-enemy.egyptian.seth_hound,세트의 사냥개,,,,,,,
-enemy.egyptian.ba_bird,바 새,,,,,,,
-enemy.egyptian.osiris,오시리스,,,,,,,
-enemy.egyptian.apophis_serpent,아포피스의 뱀,,,,,,,
-enemy.egyptian.set_tempest,세트의 폭풍,,,,,,,
-enemy.egyptian.isis_phantom,이시스의 환영,,,,,,,
-enemy.egyptian.ra_horakhty,라-호라크티,,,,,,,
-enemy.norse.draugr,드라우그르,,,,,,,
-enemy.norse.urdr_spider,우르드의 거미,,,,,,,
-enemy.norse.jotun_soldier,요툰 병사,,,,,,,
-enemy.norse.volva_witch,볼바 마녀,,,,,,,
-enemy.norse.hrimfaxi_rider,흐림팍시 기수,,,,,,,
-enemy.norse.garlarr_snake,갸르라르 뱀,,,,,,,
-enemy.norse.nidhogg_larva,니드호그 유충,,,,,,,
-enemy.norse.skoll,스콜 늑대,,,,,,,
-enemy.norse.hrimthurs_scout,서리 거인 척후,,,,,,,
-enemy.norse.fjorgynn,피요르기닌,,,,,,,
-enemy.norse.troll_warrior,트롤 전사,,,,,,,
-enemy.norse.norn,운명의 여신 노른,,,,,,,
-enemy.norse.vanir_elf,바나헤임 엘프,,,,,,,
-enemy.norse.surtr,수르트,,,,,,,
-enemy.norse.fenrir_cub,펜리르 새끼,,,,,,,
-enemy.norse.valkyrie,발키리,,,,,,,
-enemy.norse.jormungandr_shard,요르문간드르 분신,,,,,,,
-enemy.norse.jormungandr,요르문간드르,,,,,,,
-enemy.korean.death_reaper,저승사자,,,,,,,
-enemy.korean.cheoyong,처용,,,,,,,
-enemy.korean.dokkaebi,도깨비,,,,,,,
-enemy.korean.three_legged_crow,삼족오,,,,,,,
-enemy.korean.gumiho,구미호,,,,,,,
-enemy.korean.bulgasari,불가사리,,,,,,,
-enemy.korean.haechi,해치,,,,,,,
-enemy.korean.jangseung,장승,,,,,,,
-enemy.korean.haemosu,해모수,,,,,,,
-enemy.korean.dangun,단군,,,,,,,
-enemy.korean.dokkaebi_chief,도깨비 대장,,,,,,,
-enemy.korean.sea_dragon_general,용왕의 장군,,,,,,,
-enemy.korean.dongmyeong,동명성왕,,,,,,,
-enemy.korean.samsin_grandma,삼신할미,,,,,,,
-enemy.korean.underworld_judge,저승 판관,,,,,,,
-enemy.korean.gat_spirit,갓신,,,,,,,
-enemy.korean.cheoyong_god,처용신,,,,,,,
-enemy.korean.gusamseung_halmang,구삼승할망,,,,,,,
-enemy.japanese.oni,오니,,,,,,,
-enemy.japanese.tengu,텐구,,,,,,,
-enemy.japanese.yuki_onna,유키온나,,,,,,,
-enemy.japanese.kappa,갓파,,,,,,,
-enemy.japanese.shuten_minion,슈텐도지 졸개,,,,,,,
-enemy.japanese.ronin_ghost,로닌 망령,,,,,,,
-enemy.japanese.oni_general,오니 장군,,,,,,,
-enemy.japanese.yamamba,야마우바,,,,,,,
-enemy.japanese.invincible_ronin,로닌 무적,,,,,,,
-enemy.japanese.raijin,라이덴,,,,,,,
-enemy.japanese.chaos_tengu,혼돈의 텐구,,,,,,,
-enemy.japanese.yasha,야샤,,,,,,,
-enemy.japanese.nureriyon,누레리온,,,,,,,
-enemy.japanese.shuten_doji,슈텐도지,,,,,,,
-enemy.japanese.iwato_guardian,아마노이와토 수문장,,,,,,,
-enemy.japanese.susanoo_blade,스사노오의 검,,,,,,,
-enemy.japanese.blizzard_queen,유키온나의 여왕,,,,,,,
-enemy.japanese.yamata_no_orochi,야마타노오로치,,,,,,,
-enemy.chinese.yaksha,야차,,,,,,,
-enemy.chinese.nezha_soldier,나타 병사,,,,,,,
-enemy.chinese.heavenly_king_soldier,사대천왕 병사,,,,,,,
-enemy.chinese.shanhaijing_beast,산해경 괴수,,,,,,,
-enemy.chinese.immortal_trainee,선인 수련생,,,,,,,
-enemy.chinese.azure_dragon_guard,청룡 수호병,,,,,,,
-enemy.chinese.golden_horn_king,금각 대왕,,,,,,,
-enemy.chinese.silver_horn_king,은각 대왕,,,,,,,
-enemy.chinese.black_wind_demon,흑풍괴,,,,,,,
-enemy.chinese.chiyou,치우,,,,,,,
-enemy.chinese.red_boy,홍해아,,,,,,,
-enemy.chinese.nine_dragon_general,구룡 차장,,,,,,,
-enemy.chinese.heavenly_hound_brothers,천구 형제,,,,,,,
-enemy.chinese.erlang_shen,이랑신,,,,,,,
-enemy.chinese.white_tiger_general,백호 신장,,,,,,,
-enemy.chinese.vermilion_bird_general,주작 신장,,,,,,,
-enemy.chinese.black_tortoise_general,현무 신장,,,,,,,
-enemy.chinese.pangu,반고,,,,,,,
+enemy.greek.satyr,사티로스,Satyr,Satyre,Satiro,Sátiro,サテュロス,Σάτυρος,萨堤尔
+enemy.greek.harpy,하르피아,Harpy,Harpie,Arpia,Arpía,ハルピュイア,Άρπυια,哈耳庇厄
+enemy.greek.cyclops,사이클롭스,Cyclops,Cyclope,Ciclope,Cíclope,キュクロプス,Κύκλωπας,独眼巨人
+enemy.greek.snake,메두사의 뱀,Medusa's Serpent,Serpent de Méduse,Serpente di Medusa,Serpiente de Medusa,メドゥーサの蛇,Φίδι της Μέδουσας,美杜莎之蛇
+enemy.greek.cerberus,케르베로스,Cerberus,Cerbère,Cerbero,Cerbero,ケルベロス,Κέρβερος,刻耳柏洛斯
+enemy.greek.myrmidon,미르미돈 병사,Myrmidon Soldier,Soldat Myrmidon,Soldato Mirmidone,Soldado Mirmidón,ミュルミドーンの兵士,Μυρμιδόνας Στρατιώτης,密耳弥多涅士兵
+enemy.greek.minotaur,미노타우로스,Minotaur,Minotaure,Minotauro,Minotauro,ミノタウロス,Μινώταυρος,弥诺陶洛斯
+enemy.greek.medusa,메두사,Medusa,Méduse,Medusa,Medusa,メドゥーサ,Μέδουσα,美杜莎
+enemy.greek.gorgon,고르곤,Gorgon,Gorgone,Gorgone,Gorgona,ゴルゴン,Γοργόνα,戈耳工
+enemy.greek.scylla,스킬라,Scylla,Scylla,Scilla,Escila,スキュラ,Σκύλλα,斯库拉
+enemy.greek.hydra,히드라,Hydra,Hydre,Idra,Hidra,ヒュドラ,Ύδρα,许德拉
+enemy.greek.charon,카론,Charon,Charon,Caronte,Caronte,カローン,Χάρων,卡戎
+enemy.greek.erinyes,에리니에스,Erinyes,Erinyes,Erinni,Erinias,エリニュス,Ερινύες,厄里倪厄斯
+enemy.greek.hades,하데스,Hades,Hadès,Ade,Hades,ハデス,Άδης,哈迪斯
+enemy.greek.ares_hound,아레스의 사냥개,Hound of Ares,Chien d'Arès,Levriero di Ares,Sabueso de Ares,アレスの猟犬,Σκύλος του Άρη,阿瑞斯之犬
+enemy.greek.poseidon_apostle,포세이돈 사도,Apostle of Poseidon,Apôtre de Poséidon,Apostolo di Poseidone,Apóstol de Poseidón,ポセイドンの使徒,Απόστολος του Ποσειδώνα,波塞冬使者
+enemy.greek.hephaestus_automaton,헤파이스토스 자동기계,Hephaestus Automaton,Automate d'Héphaïstos,Automa di Efesto,Autómata de Hefesto,ヘファイ스트スの自動機械,Αυτόματο του Ηφαίστου,赫菲斯托斯机关人
+enemy.greek.kronos,크로노스,Kronos,Cronos,Crono,Cronos,クロノス,Κρόνος,克洛诺斯
+enemy.egyptian.sand_scout,사막 척후병,Sand Scout,Éclaireur des sables,Esploratore delle Sabbie,Explorador de Arena,砂漠の斥候,Πρόσκοπος της Άμμου,沙漠斥候
+enemy.egyptian.desert_scorpion,사막 전갈,Desert Scorpion,Scorpion du désert,Scorpione del Deserto,Escorpión del Desierto,砂漠のサソリ,Σκορπιός της Ερήμου,沙漠蝎子
+enemy.egyptian.mummy_warrior,미라 전사,Mummy Warrior,Guerrier Momie,Guerriero Mummia,Guerrero Momia,ミイラ戦士,Πολεμιστής Μούμια,木乃伊战士
+enemy.egyptian.sphinx_cub,스핑크스 새끼,Sphinx Cub,Petit Sphinx,Cucciolo di Sfinge,Cachorro de Esfinge,スフィンクスの子供,Λιονταράκι Σφίγγας,小斯芬克斯
+enemy.egyptian.sand_ifrit,모래 이프리트,Sand Ifrit,Ifrit des sables,Ifrit delle Sabbie,Ifrit de Arena,砂のイフリート,Ιφρίτ της Άμμου,沙伊夫利特
+enemy.egyptian.ka_spirit,카 영혼,Ka Spirit,Esprit Ka,Spirito Ka,Espíritu Ka,カの魂,Πνεύμα Κα,卡灵
+enemy.egyptian.jackal_warrior,자칼 전사,Jackal Warrior,Guerrier Chacal,Guerriero Sciacallo,Guerrero Chacal,ジャッカル戦士,Πολεμιστής Τσακάλι,豺狼战士
+enemy.egyptian.scarab_queen,스카라베 여왕,Scarab Queen,Reine Scarabée,Regina Scarabeo,Reina Escarabajo,スカラベ女王,Βασίλισσα Σκαραβαίος,圣甲虫女王
+enemy.egyptian.obelisk_guardian,오벨리스크 수호자,Obelisk Guardian,Gardien d'Obélisque,Guardiano dell'Obelisco,Guardián del Obelisco,オベリスクの守護者,Φύλακας Οβελίσκου,方尖碑守护者
+enemy.egyptian.sekhmet,세크메트,Sekhmet,Sekhmet,Sekhmet,Sekhmet,セクメト,Σεκμέτ,塞赫麦特
+enemy.egyptian.apep_snake,아펩 뱀,Apep Serpent,Serpent Apep,Serpente Apep,Serpiente Apep,アペプの蛇,Φίδι Άπεπ,阿佩普之蛇
+enemy.egyptian.seth_hound,세트의 사냥개,Hound of Seth,Chien de Seth,Levriero di Seth,Sabueso de Seth,セトの猟犬,Σκύλος του Σεθ,赛特之犬
+enemy.egyptian.ba_bird,바 새,Ba Bird,Oiseau Ba,Uccello Ba,Pájaro Ba,バーの鳥,Πουλί Μπα,巴鸟
+enemy.egyptian.osiris,오시리스,Osiris,Osiris,Osiride,Osiris,オシリス,Όσιρις,奥西里斯
+enemy.egyptian.apophis_serpent,아포피스의 뱀,Serpent of Apophis,Serpent d'Apophis,Serpente di Apophis,Serpiente de Apofis,アポフィスの蛇,Φίδι του Άποφι,阿波菲斯之蛇
+enemy.egyptian.set_tempest,세트의 폭풍,Tempest of Set,Tempête de Seth,Tempesta di Seth,Tempestad de Seth,セトの嵐,Καταιγίδα του Σεθ,赛特风暴
+enemy.egyptian.isis_phantom,이시스의 환영,Phantom of Isis,Fantôme d'Isis,Fantasma di Iside,Fantasma de Isis,イ시스의 幻影,Φάντασμα της Ίσιδας,伊西斯幻影
+enemy.egyptian.ra_horakhty,라-호라크티,Ra-Horakhty,Rê-Horakhty,Ra-Horakhty,Ra-Horajti,ラー・ホルアクティ,Ρα-Ωράχτι,拉-霍拉克提
+enemy.norse.draugr,드라우그르,Draugr,Draugr,Draugr,Draugr,ドラウグル,Ντράουγκρ,尸鬼
+enemy.norse.urdr_spider,우르드의 거미,Urdr's Spider,Araignée d'Urd,Ragno di Urdr,Araña de Urd,ウルズの蜘蛛,Αράχνη της Ούρντ,兀儿德之蛛
+enemy.norse.jotun_soldier,요툰 병사,Jotun Soldier,Soldat Jötunn,Soldato Jotun,Soldado Jotun,ヨトゥン兵士,Γιοτούν Στρατιώτης,约顿巨人士兵
+enemy.norse.volva_witch,볼바 마녀,Völva Witch,Sorcière Völva,Strega Völva,Bruja Völva,ヴォルヴァの魔女,Μάγισσα Βόλβα,瓦尔娃女巫
+enemy.norse.hrimfaxi_rider,흐림팍시 기수,Hrimfaxi Rider,Cavalier de Hrimfaxi,Cavaliere di Hrimfaxi,Jinete de Hrimfaxi,フリームファクシの騎手,Καβαλάρης του Χριμφάξι,霜之马骑手
+enemy.norse.garlarr_snake,갸르라르 뱀,Garlarr Snake,Serpent Garlarr,Serpente Garlarr,Serpiente Garlarr,ギャルラルル蛇,Φίδι Γκάρλαρ,加拉尔之蛇
+enemy.norse.nidhogg_larva,니드호그 유충,Nidhogg Larva,Larve de Nidhogg,Larva di Nidhogg,Larva de Nidhogg,ニーズヘッグの幼虫,Λάρβα του Νίντχογκ,尼德霍格幼虫
+enemy.norse.skoll,스콜 늑대,Sköll Wolf,Loup Sköll,Lupo Sköll,Lobo Sköll,スコルの狼,Λύκος Σκολ,斯库尔狼
+enemy.norse.hrimthurs_scout,서리 거인 척후,Hrimthurs Scout,Éclaireur Hrimthurs,Esploratore Hrimthurs,Explorador Hrimthurs,霜の巨人の斥候,Πρόσκοπος Χρίμθουρς,霜巨人斥候
+enemy.norse.fjorgynn,피요르기닌,Fjörgyn,Fjörgyn,Fjörgyn,Fjörgyn,フィヨルギュン,Φιοργκύν,费욜균
+enemy.norse.troll_warrior,트롤 전사,Troll Warrior,Guerrier Troll,Guerriero Troll,Guerrero Troll,トロール戦士,Πολεμιστής Τρολ,巨魔战士
+enemy.norse.norn,운명의 여신 노른,Norn of Fate,Norne du Destin,Norna del Destino,Norna del Destino,運命の女神ノルン,Νόρνα του Πεπρωμένου,命运女神诺恩
+enemy.norse.vanir_elf,바나헤임 엘프,Vanaheim Elf,Elfe de Vanaheim,Elfo di Vanaheim,Elfo de Vanaheim,ヴァナヘイムのエルフ,Ξωτικό του Βάναχαϊμ,华纳海姆精灵
+enemy.norse.surtr,수르트,Surtr,Surtr,Surtr,Surtr,スルト,Σούρτρ,苏尔特尔
+enemy.norse.fenrir_cub,펜리르 새끼,Fenrir Cub,Petit Fenrir,Cucciolo di Fenrir,Cachorro de Fenrir,フェンリルの子供,Λυκάκι του Φένριρ,小芬里尔
+enemy.norse.valkyrie,발키리,Valkyrie,Valkyrie,Valchiria,Valquiria,ヴァルキリー,Βαλκυρία,女武神
+enemy.norse.jormungandr_shard,요르문간드르 분신,Shard of Jormungandr,Éclat de Jormungandr,Frammento di Jormungandr,Fragmento de Jormungandr,ヨルムンガンドの分身,Θραύσμα του Γιόρμουνγκαντρ,耶梦加得碎片
+enemy.norse.jormungandr,요르문간드르,Jormungandr,Jormungandr,Jormungandr,Jormungandr,ヨルムンガンド,Γιόρμουνγκαντρ,耶梦加得
+enemy.korean.death_reaper,저승사자,Grim Reaper (Jeoseung Saja),Faucheur des Enfers,Mietitore dell'Oltretomba,Segador de Almas,死神（チョスンサジャ）,Χάρος (Θεριστής),阴间使者
+enemy.korean.cheoyong,처용,Cheoyong,Cheoyong,Cheoyong,Cheoyong,処容,Τσεογιόνγκ,处容
+enemy.korean.dokkaebi,도깨비,Dokkaebi,Dokkaebi,Dokkaebi,Dokkaebi,トッケビ,Ντοκάεμπι,独角鬼
+enemy.korean.three_legged_crow,삼족오,Three-Legged Crow,Corbeau à trois pattes,Corvo a tre zampe,Cuervo de tres patas,三足烏,Τρίποδο Κοράκι,三足乌
+enemy.korean.gumiho,구미호,Gumiho (Nine-Tailed Fox),Gumiho (Renard à neuf queues),Gumiho (Volpe a nove code),Gumiho (Zorro de nueve colas),九尾の狐,Γκουμιχό,九尾狐
+enemy.korean.bulgasari,불가사리,Bulgasari,Bulgasari,Bulgasari,Bulgasari,プルガサ리,Μπουλγκασάρι,不可杀
+enemy.korean.haechi,해치,Haechi,Haechi,Haechi,Haechi,ヘチ,Χαέτσι,獬豸
+enemy.korean.jangseung,장승,Jangseung,Jangseung,Jangseung,Jangseung,チャンスン,Τζανγκσεόνγκ,长丞
+enemy.korean.haemosu,해모수,Haemosu,Haemosu,Haemosu,Haemosu,ヘモス,Χεμοσού,解慕漱
+enemy.korean.dangun,단군,Dangun,Dangun,Dangun,Dangun,タングン,Ντανγκούν,檀君
+enemy.korean.dokkaebi_chief,도깨비 대장,Dokkaebi Chief,Chef Dokkaebi,Capo Dokkaebi,Jefe Dokkaebi,トッケビの頭領,Αρχηγός Ντοκάεμπι,独角鬼首领
+enemy.korean.sea_dragon_general,용왕의 장군,General of the Sea King,Général du Roi Dragon,Generale del Re Dragone,General del Rey Dragón,竜王の将軍,Στρατηγός του Βασιλιά των Θαλασσών,龙王将军
+enemy.korean.dongmyeong,동명성왕,King Dongmyeong,Roi Dongmyeong,Re Dongmyeong,Rey Dongmyeong,東明聖王,Βασιλιάς Ντονγκμιόνγκ,东明圣王
+enemy.korean.samsin_grandma,삼신할미,Samsin Halmoni,Samsin Halmoni,Samsin Halmoni,Samsin Halmoni,三神ハルモニ,Γιαγιά Σαμσίν,三神奶奶
+enemy.korean.underworld_judge,저승 판관,Underworld Judge,Juge des Enfers,Giudice dell'Oltretomba,Juez del Inframundo,冥府の判官,Δικαστής του Κάτω Κόσμου,阴间判官
+enemy.korean.gat_spirit,갓신,Gat Spirit,Esprit du Gat,Spirito del Gat,Espíritu del Gat,カッの神,Πνεύμα Γκατ,笠帽神
+enemy.korean.cheoyong_god,처용신,God Cheoyong,Dieu Cheoyong,Dio Cheoyong,Dios Cheoyong,処容神,Θεός Τσεογιόνγκ,处容神
+enemy.korean.gusamseung_halmang,구삼승할망,Gusamseung Halmang,Gusamseung Halmang,Gusamseung Halmang,Gusamseung Halmang,クサムスンハルマン,Γκουσαμσέουνγκ Χαλμάνγκ,九三丞奶奶
+enemy.japanese.oni,오니,Oni,Oni,Oni,Oni,鬼（おに）,Όνι,鬼
+enemy.japanese.tengu,텐구,Tengu,Tengu,Tengu,Tengu,天狗,Τένγκου,天狗
+enemy.japanese.yuki_onna,유키온나,Yuki-onna,Yuki-onna,Yuki-onna,Yuki-onna,雪女,Γιούκι-όννα,雪女
+enemy.japanese.kappa,갓파,Kappa,Kappa,Kappa,Kappa,河童,Κάππα,河童
+enemy.japanese.shuten_minion,슈텐도지 졸개,Shuten-doji Minion,Sbire de Shuten-doji,Scagnozzo di Shuten-doji,Secuaz de Shuten-doji,酒呑童子の手下,Υπηρέτης του Σούτεν-ντότζι,酒吞童子部下
+enemy.japanese.ronin_ghost,로닌 망령,Ronin Ghost,Fantôme Ronin,Fantasma Ronin,Fantasma Ronin,浪人の亡霊,Φάντασμα Ρόνιν,浪人亡灵
+enemy.japanese.oni_general,오니 장군,Oni General,Général Oni,Generale Oni,General Oni,鬼将軍,Στρατηγός Όνι,鬼将军
+enemy.japanese.yamamba,야마우바,Yamamba,Yamamba,Yamamba,Yamamba,山姥,Γιαμάμπα,山姥
+enemy.japanese.invincible_ronin,로닌 무적,Invincible Ronin,Ronin Invincible,Ronin Invincibile,Ronin Invencible,無敵の浪人,Αήττητος Ρόνιν,无敌浪人
+enemy.japanese.raijin,라이덴,Raijin,Raijin,Raijin,Raijin,雷神,Ραϊτζίν,雷神
+enemy.japanese.chaos_tengu,혼돈의 텐구,Chaos Tengu,Tengu du Chaos,Tengu del Caos,Tengu del Caos,混沌の天狗,Τένγκου του Χάους,混沌天狗
+enemy.japanese.yasha,야샤,Yasha,Yasha,Yasha,Yasha,夜叉,Γιάσα,夜叉
+enemy.japanese.nureriyon,누레리온,Nurarihyon,Nurarihyon,Nurarihyon,Nurarihyon,ぬらりひょん,Νουραριχιόν,滑瓢
+enemy.japanese.shuten_doji,슈텐도지,Shuten-doji,Shuten-doji,Shuten-doji,Shuten-doji,酒呑童子,Σούτεν-ντότζι,酒吞童子
+enemy.japanese.iwato_guardian,아마노이와토 수문장,Amano-Iwato Guardian,Gardien d'Amano-Iwato,Guardiano di Amano-Iwato,Guardián de Amano-Iwato,天岩戸の守衛,Φύλακας του Αμάνο-Ιουάτο,天岩户守门人
+enemy.japanese.susanoo_blade,스사노오의 검,Blade of Susanoo,Lame de Susanoo,Lama di Susanoo,Filo de Susanoo,スサ노オの剣,Λεπίδα του Σουσανόο,素盏呜尊之剑
+enemy.japanese.blizzard_queen,유키온나의 여왕,Blizzard Queen,Reine du blizzard,Regina della Tormenta,Reina de la Ventisca,雪女の女王,Βασίλισσα της Χιονοθύελλας,雪女之女王
+enemy.japanese.yamata_no_orochi,야마타노오로치,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi,八岐大蛇,Γιαμάτα νο Ορότσι,八岐大蛇
+enemy.chinese.yaksha,야차,Yaksha,Yaksha,Yaksha,Yaksha,夜叉,Γιάκσα,夜叉
+enemy.chinese.nezha_soldier,나타 병사,Nezha Soldier,Soldat de Nezha,Soldato di Nezha,Soldado de Nezha,哪吒の兵士,Στρατιώτης του Νέζα,哪吒士兵
+enemy.chinese.heavenly_king_soldier,사대천왕 병사,Heavenly King Soldier,Soldat du Roi Céleste,Soldato del Re Celeste,Soldado del Rey Celestial,四天王の兵士,Στρατιώτης του Ουράνιου Βασιλιά,四大天王士兵
+enemy.chinese.shanhaijing_beast,산해경 괴수,Shanhaijing Beast,Bête du Shanhaijing,Bestia del Shanhaijing,Bestia de Shanhaijing,山海経の怪獣,Θηρίο του Σανχαϊτζίνγκ,山海经怪兽
+enemy.chinese.immortal_trainee,선인 수련생,Immortal Trainee,Apprenti Immortel,Apprendista Immortale,Aprendiz Inmortal,仙人の見習い,Μαθητευόμενος Αθάνατος,仙人修炼生
+enemy.chinese.azure_dragon_guard,청룡 수호병,Azure Dragon Guard,Garde du Dragon d'Azur,Guardia del Dragone Azzurro,Guardia del Dragón Azur,青龍の守護兵,Φρουρός του Γαλάζιου Δράκου,青龙卫士
+enemy.chinese.golden_horn_king,금각 대왕,Golden Horn King,Roi à la corne d'or,Re dal Corno d'Oro,Rey del Cuerno de Oro,金角大王,Βασιλιάς με το Χρυσό Κέρας,金角大王
+enemy.chinese.silver_horn_king,은각 대왕,Silver Horn King,Roi à la corne d'argent,Re dal Corno d'Argento,Rey del Cuerno de Plata,銀角大王,Βασιλιάς με το Ασημένιο Κέρας,银角大王
+enemy.chinese.black_wind_demon,흑풍괴,Black Wind Demon,Démon du vent noir,Demone del Vento Nero,Demonio del Viento Negro,黒風怪,Δαίμονας του Μαύρου Ανέμου,黑风怪
+enemy.chinese.chiyou,치우,Chiyou,Chiyou,Chiyou,Chiyou,蚩尤,Τσι-γιού,蚩尤
+enemy.chinese.red_boy,홍해아,Red Boy,Enfant Rouge,Ragazzo Rosso,Niño Rojo,紅孩児,Κόκκινο Αγόρι,红孩儿
+enemy.chinese.nine_dragon_general,구룡 차장,Nine Dragon General,Général aux Neuf Dragons,Generale dei Nove Draghi,General de los Nueve Dragones,九龍の将軍,Στρατηγός των Εννέα Δράκων,九龙将军
+enemy.chinese.heavenly_hound_brothers,천구 형제,Heavenly Hound Brothers,Frères Chiens Célestes,Fratelli Segugi Celesti,Hermanos Sabuesos Celestiales,天狗の兄弟,Αδελφοί Ουράνιοι Σκύλοι,天狗兄弟
+enemy.chinese.erlang_shen,이랑신,Erlang Shen,Erlang Shen,Erlang Shen,Erlang Shen,二郎神,Ερλάνγκ Σεν,二郎神
+enemy.chinese.white_tiger_general,백호 신장,White Tiger General,Général du Tigre Blanc,Generale della Tigre Bianca,General del Tigre Blanco,白虎神将,Στρατηγός της Λευκής Τίγρης,白虎神将
+enemy.chinese.vermilion_bird_general,주작 신장,Vermilion Bird General,Général de l'Oiseau Vermillon,Generale dell'Uccello Vermiglio,General del Pájaro Vermellón,朱雀神将,Στρατηγός του Πορφυρού Πουλιού,朱雀神将
+enemy.chinese.black_tortoise_general,현무 신장,Black Tortoise General,Général de la Tortue Noire,Generale della Tartaruga Nera,General de la Tortuga Negra,玄武神将,Στρατηγός της Μαύρης Χελώνας,玄武神将
+enemy.chinese.pangu,반고,Pangu,Pangu,Pangu,Pangu,盤古,Παν-γκού,盘古

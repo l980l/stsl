@@ -9,70 +9,35 @@ ui.chapter_select.start,챕터 시작,Start Chapter,Commencer,Inizia Capitolo,In
 ui.chapter_select.locked,잠금,Locked,Verrouillé,Bloccato,Bloqueado,ロック中,Κλειδωμένο,已锁定
 ui.chapter_select.unlock_hint,이전 챕터를 클리어하면 해금됩니다.,Clear the previous chapter to unlock.,Terminez le chapitre précédent pour déverrouiller.,Completa il capitolo precedente per sbloccare.,Completa el capítulo anterior para desbloquear.,前のチャプターをクリアして解放してください。,Ολοκληρώστε το προηγούμενο κεφάλαιο για να ξεκλειδώσετε.,通关前一章节即可解锁。
 "ui.chapter_select.chapter1.name","챕터 1 — 지중해, 북방 신화","Chapter 1 — Mediterranean & Nordic Myths","Chapitre 1 — Mythes Méditerranéens & Nordiques","Capitolo 1 — Miti Mediterranei e Nordici","Capítulo 1 — Mitos Mediterráneos y Nórdicos","チャプター1 — 地中海・北欧神話","Κεφάλαιο 1 — Μεσογειακοί & Βορειακοί Μύθοι","第1章 — 地中海·北欧神话"
-"ui.chapter_select.chapter1.desc","그리스, 이집트, 북유럽 신화의 적이 각 Act에 랜덤 배정됩니다.","Enemies from Greek, Egyptian, and Norse mythology are randomly assigned to each Act.","Les ennemis des mythologies grecque, égyptienne et nordique sont assignés aléatoirement à chaque Acte.","I nemici delle mitologie greca, egizia e norrena sono assegnati casualmente a ogni Atto.","Los enemigos de las mitologías griega, egipcia y nórdica se asignan aleatoriamente a cada Acto.","ギリシャ・エジプト・北欧神話の敵が各アクトにランダム配置されます。","Εχθροί από την ελληνική, αιγυπτιακή και σκανδιναβική μυθολογία ανατίθενται τυχαία σε κάθε Πράξη.","希腊、埃及和北欧神话的敌人将随机分配到每个幕次。"
+"ui.chapter_select.chapter1.desc","그리스, 이집트, 북유럽 신화의 적이 각 Act에 랜덤 배정됩니다.","Enemies from Greek, Egyptian, and Norse mythology are randomly assigned to each Act.","Les ennemis des mythologies grecque, égyptienne et nordique sont assignés aléatoirement à chaque Acte.","I nemici delle mitologie greca, egizia e norrena sono assegnati casualmente a ogni Atto.","Los enemigos de las mitologías griega, egipcia y nórdica se asignan aleatoriamente a cada Acto.","ギリシャ・エジプト・北欧神話の敵가各アクトにランダム配置されます。","Εχθροί από την ελληνική, αιγυπτιακή και σκανδιναβική μυθολογία ανατίθενται τυχαία σε κάθε Πράξη.","希腊、埃及和北欧神话的敌人将随机分配到每个幕次。"
 "ui.chapter_select.chapter2.name","챕터 2 — 동아시아 신화","Chapter 2 — East Asian Myths","Chapitre 2 — Mythes d'Asie de l'Est","Capitolo 2 — Miti dell'Asia Orientale","Capítulo 2 — Mitos del Este Asiático","チャプター2 — 東アジア神話","Κεφάλαιο 2 — Μύθοι Ανατολικής Ασίας","第2章 — 东亚神话"
-"ui.chapter_select.chapter2.desc","한국, 중국, 일본 신화의 적이 각 Act에 랜덤 배정됩니다.","Enemies from Korean, Chinese, and Japanese mythology are randomly assigned to each Act.","Les ennemis des mythologies coréenne, chinoise et japonaise sont assignés aléatoirement à chaque Acte.","I nemici delle mitologie coreana, cinese e giapponese sono assegnati casualmente a ogni Atto.","Los enemigos de las mitologías coreana, china y japonesa se asignan aleatoriamente a cada Acto.","韓国・中国・日本神話の敵が各アクトにランダム配置されます。","Εχθροί από την κορεατική, κινεζική και ιαπωνική μυθολογία ανατίθενται τυχαία σε κάθε Πράξη.","韩国、中国和日本神话的敌人将随机分配到每个幕次。"
-ui.hero_select.title_start,시작 영웅 선택,,,,,,,
-ui.hero_select.title_recruit,영웅 영입,,,,,,,
-ui.hero_select.already_owned,이미 보유,,,,,,,
-ui.hero_select.locked,잠김,,,,,,,
-ui.map.btn_deck,덱 보기,,,,,,,
-ui.map.btn_close,닫기,,,,,,,
-ui.map.room_battle,전투,,,,,,,
-ui.map.room_elite,정예,,,,,,,
-ui.map.room_rest,휴식,,,,,,,
-ui.map.room_shop,상점,,,,,,,
-ui.map.room_boss,보스,,,,,,,
-ui.shop.title,상점,,,,,,,
-ui.shop.relic_empty,릴릭 없음,,,,,,,
-ui.shop.sec_service,기타 서비스,,,,,,,
-ui.shop.btn_exit,나가기,,,,,,,
-ui.shop.btn_purchased,구매 완료,,,,,,,
-ui.shop.btn_removed,제거 완료,,,,,,,
-ui.rest.title,휴식,,,,,,,
-ui.rest.btn_heal,회복,,,,,,,
-ui.rest.btn_upgrade,카드 강화,,,,,,,
-ui.rest.btn_leave,떠나기,,,,,,,
-ui.card_pick.title,카드를 선택하세요 (%d/%d),,,,,,,
-ui.card_pick.btn_skip,건너뛰기,,,,,,,
-ui.card_upgrade.title,카드 강화,,,,,,,
-ui.card_upgrade.btn_skip,건너뛰기,,,,,,,
-ui.game_over.victory,승리!,,,,,,,
-ui.game_over.defeat,패배...,,,,,,,
-ui.game_over.btn_main_menu,메인 메뉴,,,,,,,
-ui.hero_unlock.message,새 영웅 해금: %s,,,,,,,
-ui.battle.btn_deck_view,덱 보기,View Deck,,,,,,
-ui.battle.deck_viewer.draw,🃏 덱,🃏 Draw,,,,,,
-ui.battle.deck_viewer.hand,✋ 패,✋ Hand,,,,,,
-ui.battle.deck_viewer.discard,🗑️ 버림,🗑️ Discard,,,,,,
-ui.battle.deck_viewer.exhaust,💀 소멸,💀 Exhaust,,,,,,
-ui.battle.deck_viewer.empty,카드 없음,No cards,,,,,,
-ui.map.room_event,이벤트,Event,,,,,,
-ui.map.room_type.secret,비밀룸,Secret Room,,,,,,
-ui.secret.title,비밀의 방,Secret Room,,,,,,
-ui.secret.prompt,무언가가 숨어있다...,Something hides here...,,,,,,
-ui.secret.reward.card,신비한 카드를 발견했다!,You found a mysterious card!,,,,,,
-ui.secret.reward.relic,고대 유물을 발견했다!,You found an ancient relic!,,,,,,
-ui.secret.reward.gold,숨겨진 보물을 발견했다!,You found hidden treasure!,,,,,,
-ui.secret.reward.battle,강력한 수호자가 나타났다!,A powerful guardian appears!,,,,,,
-ui.settings.title,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置
-ui.settings.language,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言
-ui.common.btn_settings,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置
-ui.shop.gold_label,보유 골드: %d,Gold: %d,,,,,,
-ui.shop.card_section,카드 구매 (%d 골드),Cards (%d Gold),,,,,,
-ui.shop.relic_section,릴릭 구매 (%d 골드),Relic (%d Gold),,,,,,
-ui.shop.btn_buy,구매 (%d 골드),Buy (%d Gold),,,,,,
-ui.shop.card_owner_cost,[%s] 비용 %d,[%s] Cost %d,,,,,,
-ui.shop.btn_heal,회복 %dHP (%d 골드),Heal %d HP (%d Gold),,,,,,
-ui.shop.btn_remove_card,카드 제거 (%d 골드),Remove Card (%d Gold),,,,,,
-ui.shop.remove_prompt,제거할 카드를 선택하세요 (%d 골드),Select a card to remove (%d Gold),,,,,,
-ui.shop.card_name_cost,%s (비용 %d),%s (Cost %d),,,,,,
-ui.map.act_title,Act %d,Act %d,,,,,,
-ui.map.floor_label,현재 층: %d / 9,Floor: %d / 9,,,,,,
-ui.map.deck_list_title,덱 목록 (%d장),Deck (%d cards),,,,,,
-ui.map.deck_card_format,[%d코스트]  %s  (%s),[Cost %d]  %s  (%s),,,,,,
-ui.rest.hero_hp_format,%s  HP: %d / %d,%s  HP: %d / %d,,,,,,
-ui.game_over.stats,도달 층: %d / 9\n보유 골드: %d,Floor: %d / 9\nGold: %d,,,,,,
-ui.hero_select.unlock_condition_none,해금 조건 미달성,Unlock condition not met,,,,,,
-ui.hero_select.btn_recruit,%s 영입,Recruit %s,,,,,,
-ui.hero_select.btn_select,%s 선택,Select %s,,,,,,
+"ui.chapter_select.chapter2.desc","한국, 중국, 일본 신화의 적이 각 Act에 랜덤 배정됩니다.","Enemies from Korean, Chinese, and Japanese mythology are randomly assigned to each Act.","Les ennemis des mythologies coréenne, chinoise et japonaise sont assignés aléatoirement à chaque Acte.","I nemici delle mitologie coreana, cinese e giapponese sono assegnati casualmente a ogni Atto.","Los enemigos de las mitologías coreana, china y japonesa se asignan aleatoriamente a cada Acto.","韓国・中国・日本神話の敵가各アクトにランダム配置されます。","Εχθροί από την κορεατική, κινεζική και ιαπωνική μυθολογία ανατίθενται τυχαία σε κάθε Πράξη.","韩国、中国和日本神话的敌人将随机分配到每个幕次。"
+ui.hero_select.title_start,시작 영웅 선택,Select Starting Hero,Choisir le héros de départ,Seleziona l'eroe iniziale,Seleccionar héroe inicial,開始英雄選択,Επιλογή Αρχικού Ήρωα,选择初始英雄
+ui.hero_select.title_recruit,영웅 영입,Recruit Hero,Recruter un héros,Recluta Eroe,Reclutar héroe,英雄を仲間にする,Στρατολόγηση Ήρωα,招募英雄
+ui.hero_select.already_owned,이미 보유,Already Owned,Déjà possédé,Già posseduto,Ya lo tienes,所有済み,Ήδη στην κατοχή,已拥有
+ui.hero_select.locked,잠김,Locked,Verrouillé,Bloccato,Bloqueado,ロック中,Κλειδωμένο,已锁定
+ui.map.btn_deck,덱 보기,View Deck,Voir le deck,Visualizza Deck,Ver mazo,デッキ表示,Προβολή Τράπουλας,查看卡组
+ui.map.btn_close,닫기,Close,Fermer,Chiudi,Cerrar,閉じる,Κλείσιμο,关闭
+ui.map.room_battle,전투,Battle,Combat,Battaglia,Batalla,戦闘,Μάχη,战斗
+ui.map.room_elite,정예,Elite,Élite,Elite,Élite,エリート,Ελίτ,精英
+ui.map.room_rest,휴식,Rest,Repos,Riposo,Descanso,休憩,Ανάπαυση,休息
+ui.map.room_shop,상점,Shop,Boutique,Negozio,Tienda,ショップ,Κατάστημα,商店
+ui.map.room_boss,보스,Boss,Boss,Boss,Jefe,ボス,Αρχηγός,首领
+ui.shop.title,상점,Shop,Boutique,Negozio,Tienda,ショップ,Κατάστημα,商店
+ui.shop.relic_empty,릴릭 없음,No Relics,Aucune relique,Nessuna Reliquia,Sin reliquias,レリックなし,Χωρίς Κειμήλια,无遗物
+ui.shop.sec_service,기타 서비스,Other Services,Autres services,Altri Servizi,Otros servicios,その他サービス,Άλλες Υπηρεσίες,其他服务
+ui.shop.btn_exit,나가기,Exit,Quitter,Esci,Salir,戻る,Έξοδος,退出
+ui.shop.btn_purchased,구매 완료,Purchased,Acheté,Acquistato,Comprado,購入済み,Αγοράστηκε,已购买
+ui.shop.btn_removed,제거 완료,Removed,Retiré,Rimosso,Eliminado,削除済み,Αφαιρέθηκε,已移除
+ui.rest.title,휴식,Rest,Repos,Riposo,Descanso,休憩,Ανάπαυση,休息
+ui.rest.btn_heal,회복,Heal,Soigner,Cura,Curar,回復,Θεραπεία,恢复
+ui.rest.btn_upgrade,카드 강화,Upgrade Cards,Améliorer cartes,Potenzia Carte,Mejorar cartas,カード強化,Αναβάθμιση Καρτών,强化卡牌
+ui.rest.btn_leave,떠나기,Leave,Partir,Lascia,Irse,去る,Αναχώρηση,离开
+ui.card_pick.title,카드를 선택하세요 (%d/%d),Select Cards (%d/%d),Choisir des cartes (%d/%d),Seleziona Carte (%d/%d),Seleccionar cartas (%d/%d),カードを選択してください (%d/%d),Επιλογή Καρτών (%d/%d),请选择卡牌 (%d/%d)
+ui.card_pick.btn_skip,건너뛰기,Skip,Passer,Salta,Omitir,スキップ,Παράλειψη,跳过
+ui.card_upgrade.title,카드 강화,Card Upgrade,Amélioration,Potenziamento,Mejora de carta,カード強化,Αναβάθμιση Κάρτας,强化卡牌
+ui.card_upgrade.btn_skip,건너뛰기,Skip,Passer,Salta,Omitir,スキップ,Παράλειψη,跳过
+ui.game_over.victory,승리!,Victory!,Victoire !,Vittoria!,¡Victoria!,勝利！,Νίκη!,胜利！
+ui.game_over.defeat,패배...,Defeat...,Défaite...,Sconfitta...,Derrota...,敗北...,Ήττα...,失败...
+ui.game_over.btn_main_menu,메인 메뉴,Main Menu,Menu Principal,Menu Principale,Menú Principal,メインメニュー,Κύριο Μενού,主菜单
+ui.hero_unlock.message,새 영웅 해금: %s,New Hero Unlocked: %s,Nouveau héros débloqué : %s,Nuovo Eroe Sbloccato: %s,Nuevo héroe desbloqueado: %s,新しい英雄を解放: %s,Νέος Ήρωας Ξεκλειδώθηκε: %s,新英雄解锁: %s

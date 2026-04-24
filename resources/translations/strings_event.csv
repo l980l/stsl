@@ -1,255 +1,255 @@
 ﻿keys,ko,en,fr,it,es,ja,el,zh
-event.act1.golden_chest.name,황금 상자,,,,,,,
-event.act1.golden_chest.desc,낡은 황금 상자가 놓여 있다.,,,,,,,
-event.act1.golden_chest.choice_1,열기,,,,,,,
-event.act1.golden_chest.choice_2,무시,,,,,,,
-event.act1.wounded_warrior.name,상처 입은 전사,,,,,,,
-event.act1.wounded_warrior.desc,부상당한 병사가 치료를 요청한다.,,,,,,,
-event.act1.wounded_warrior.choice_1,치료 (골드 -20),,,,,,,
-event.act1.wounded_warrior.choice_2,무시,,,,,,,
-event.act1.ancient_library.name,고대 도서관,,,,,,,
-event.act1.ancient_library.desc,신비로운 지식이 담긴 도서관. 공부하면 지식을 얻지만 기력을 소모한다.,,,,,,,
-event.act1.ancient_library.choice_1,공부 (HP -5),,,,,,,
-event.act1.ancient_library.choice_2,무시,,,,,,,
-event.act1.cursed_altar.name,저주받은 제단,,,,,,,
-event.act1.cursed_altar.desc,제단에 무언가를 바치면 강력한 유물을 얻을 수 있다.,,,,,,,
-event.act1.cursed_altar.choice_1,카드 바치기 (덱에서 1장 제거),,,,,,,
-event.act1.cursed_altar.choice_2,무시,,,,,,,
-event.act1.companion_encounter.name,동료 만남,,,,,,,
-event.act1.companion_encounter.desc,역사 속 영웅이 합류를 요청한다.,,,,,,,
-event.act1.companion_encounter.choice_1,합류시키기,,,,,,,
-event.act1.companion_encounter.choice_2,거절,,,,,,,
-event.act1.prometheus_fire.name,프로메테우스의 불,,,,,,,
-event.act1.prometheus_fire.desc,제우스에게 불을 훔친 티탄이 불씨를 건넨다. 받겠는가?,,,,,,,
-event.act1.prometheus_fire.choice_1,불씨를 받는다 (드로우 +1 HP -20),,,,,,,
-event.act1.prometheus_fire.choice_2,거절한다,,,,,,,
-event.act1.heracles_trial.name,헤라클레스의 시련,,,,,,,
-event.act1.heracles_trial.desc,헤라클레스가 힘겨루기를 제안한다. 이기면 황금을 준다.,,,,,,,
-event.act1.heracles_trial.choice_1,맞선다 (골드 +60 HP -25),,,,,,,
-event.act1.heracles_trial.choice_2,포기한다,,,,,,,
-event.act1.circe_magic.name,키르케의 마법,,,,,,,
-event.act1.circe_magic.desc,마법사 키르케가 황금을 받고 체력을 회복시켜 주겠다고 한다.,,,,,,,
-event.act1.circe_magic.choice_1,마법을 받는다 (HP +25 골드 -50),,,,,,,
-event.act1.circe_magic.choice_2,거절한다,,,,,,,
-event.act1.hades_contract.name,하데스의 계약,,,,,,,
-event.act1.hades_contract.desc,저승의 신 하데스가 강력한 유물을 제시한다. 대신 생명력을 요구한다.,,,,,,,
-event.act1.hades_contract.choice_1,계약한다 (렐릭 획득 HP -30),,,,,,,
-event.act1.hades_contract.choice_2,거절한다,,,,,,,
-event.act1.hermes_gamble.name,헤르메스의 도박,,,,,,,
-event.act1.hermes_gamble.desc,교활한 헤르메스가 황금과 덱 경량화 중 하나를 선택하라 한다.,,,,,,,
-event.act1.hermes_gamble.choice_1,황금을 받는다 (골드 +50),,,,,,,
-event.act1.hermes_gamble.choice_2,덱을 가볍게 한다 (카드 1장 제거),,,,,,,
-event.act1.devils_deal.name,악마의 거래,,,,,,,
-event.act1.devils_deal.desc,어둠 속 제단에서 목소리가 들린다. 50% 확률로 강력한 렐릭 또는 저주 렐릭을 얻는다.,,,,,,,
-event.act1.devils_deal.choice_1,받아들인다,,,,,,,
-event.act1.devils_deal.choice_2,거절한다,,,,,,,
-event.act2.book_of_the_dead.name,사자의 서,,,,,,,
-event.act2.book_of_the_dead.desc,죽은 자에게 주어지는 주문서가 놓여 있다. 지식이 담겨 있지만 읽는 것은 고통스럽다.,,,,,,,
-event.act2.book_of_the_dead.choice_1,읽는다 (HP -15),,,,,,,
-event.act2.book_of_the_dead.choice_2,무시,,,,,,,
-event.act2.anubis_judgment.name,아누비스의 심판,,,,,,,
-event.act2.anubis_judgment.desc,아누비스가 저울 위에 심장을 올려놓는다. 깨끗한 심장은 가볍다.,,,,,,,
-event.act2.anubis_judgment.choice_1,심장을 바친다 (카드 1장 제거),,,,,,,
-event.act2.anubis_judgment.choice_2,도망친다 (HP -10),,,,,,,
-event.act2.scarab_beetle.name,스카라베 풍뎅이,,,,,,,
-event.act2.scarab_beetle.desc,황금빛 딱정벌레가 굴러가고 있다. 성스러운 것이라 하지만 가치가 있어 보인다.,,,,,,,
-event.act2.scarab_beetle.choice_1,잡는다 (골드 +40),,,,,,,
-event.act2.scarab_beetle.choice_2,놓아준다,,,,,,,
-event.act2.pharaoh_tomb.name,파라오의 무덤,,,,,,,
-event.act2.pharaoh_tomb.desc,봉인된 석관이 놓여 있다. 위험한 저주가 걸려 있지만 그 안에는 보물이 있을 것이다.,,,,,,,
-event.act2.pharaoh_tomb.choice_1,연다 (HP -35),,,,,,,
-event.act2.pharaoh_tomb.choice_2,봉인을 존중한다 (골드 +15),,,,,,,
-event.act2.nile_flood.name,나일강의 범람,,,,,,,
-event.act2.nile_flood.desc,나일강이 넘쳐흘러 주변을 적신다. 농경신의 축복이라 하지만 여정을 지연시킨다.,,,,,,,
-event.act2.nile_flood.choice_1,강물로 씻는다 (HP +30 골드 -40),,,,,,,
-event.act2.nile_flood.choice_2,지나친다,,,,,,,
-event.act2.thoth_wisdom.name,토트의 지혜,,,,,,,
-event.act2.thoth_wisdom.desc,지식의 신 토트가 가르침을 제공한다. 배움은 대가를 요구한다.,,,,,,,
-event.act2.thoth_wisdom.choice_1,가르침을 받는다 (골드 -60),,,,,,,
-event.act2.thoth_wisdom.choice_2,거절한다,,,,,,,
-event.act2.bastet_cats.name,바스테트의 고양이,,,,,,,
-event.act2.bastet_cats.desc,성스러운 고양이 무리가 길을 막고 있다. 바스테트의 가호를 받은 존재들이다.,,,,,,,
-event.act2.bastet_cats.choice_1,먹이를 준다 (HP +15 골드 -25),,,,,,,
-event.act2.bastet_cats.choice_2,쫓아낸다 (HP -8),,,,,,,
-event.act2.oasis_merchant.name,오아시스 상인,,,,,,,
-event.act2.oasis_merchant.desc,사막 한가운데 오아시스에서 행상인을 만났다. 진귀한 물건을 팔고 있다.,,,,,,,
-event.act2.oasis_merchant.choice_1,렐릭 구매 (골드 -100),,,,,,,
-event.act2.oasis_merchant.choice_2,약초 구매 (HP +25 골드 -30),,,,,,,
-event.act2.oasis_merchant.choice_3,지나간다,,,,,,,
-event.act2.mummy_curse.name,미라의 저주,,,,,,,
-event.act2.mummy_curse.desc,열린 석관에서 차가운 바람이 불어온다. 위험하지만 안에 무언가 있다.,,,,,,,
-event.act2.mummy_curse.choice_1,용기를 낸다 (랜덤 렐릭),,,,,,,
-event.act2.mummy_curse.choice_2,도망친다 (HP -20),,,,,,,
-event.act2.ra_sunboat.name,라의 태양선,,,,,,,
-event.act2.ra_sunboat.desc,태양신 라의 황금 배가 눈앞에 나타난다. 동행을 제안하는 존재가 있다.,,,,,,,
-event.act2.ra_sunboat.choice_1,합류한다 (영웅 획득),,,,,,,
-event.act2.ra_sunboat.choice_2,거절한다 (골드 +20),,,,,,,
-event.act3.odin_ravens.name,오딘의 까마귀,,,,,,,
-event.act3.odin_ravens.desc,후긴과 무닌이 어깨에 내려앉아 지혜를 속삭인다.,,,,,,,
-event.act3.odin_ravens.choice_1,귀를 기울인다 (HP -12),,,,,,,
-event.act3.odin_ravens.choice_2,쫓아낸다,,,,,,,
-event.act3.yggdrasil_fruit.name,유그드라실의 열매,,,,,,,
-event.act3.yggdrasil_fruit.desc,세계수 가지에서 신성한 열매가 떨어졌다.,,,,,,,
-event.act3.yggdrasil_fruit.choice_1,먹는다 (골드 -50),,,,,,,
-event.act3.yggdrasil_fruit.choice_2,지나친다,,,,,,,
-event.act3.ragnarok_prophecy.name,라그나로크의 예언,,,,,,,
-event.act3.ragnarok_prophecy.desc,종말의 징조가 하늘에 새겨진다. 도박이지만 기회다.,,,,,,,
-event.act3.ragnarok_prophecy.choice_1,받아들인다,,,,,,,
-event.act3.ragnarok_prophecy.choice_2,거부한다 (HP -15),,,,,,,
-event.act3.valhalla_invitation.name,발할라 초대장,,,,,,,
-event.act3.valhalla_invitation.desc,용감한 전사에게 발할라의 문이 열렸다.,,,,,,,
-event.act3.valhalla_invitation.choice_1,합류한다 (영웅 획득),,,,,,,
-event.act3.valhalla_invitation.choice_2,거절한다 (골드 +25),,,,,,,
-event.act3.mimirs_well.name,미미르의 샘,,,,,,,
-event.act3.mimirs_well.desc,지혜의 샘 앞에 섰다. 오딘도 한쪽 눈을 바쳤다.,,,,,,,
-event.act3.mimirs_well.choice_1,마신다 (카드 1장 제거),,,,,,,
-event.act3.mimirs_well.choice_2,지나친다,,,,,,,
-event.act3.dragon_gold.name,드래곤의 금화,,,,,,,
-event.act3.dragon_gold.desc,니드호그의 둥지에서 금화가 쏟아져 나온다.,,,,,,,
-event.act3.dragon_gold.choice_1,집는다 (HP -10),,,,,,,
-event.act3.dragon_gold.choice_2,놔둔다,,,,,,,
-event.act3.rune_stone.name,룬 스톤,,,,,,,
-event.act3.rune_stone.desc,고대 룬 문자가 새겨진 돌이 빛난다.,,,,,,,
-event.act3.rune_stone.choice_1,해독한다 (골드 -120),,,,,,,
-event.act3.rune_stone.choice_2,문양을 그린다 (골드 +20),,,,,,,
-event.act3.thor_hammer_mark.name,토르의 망치 자국,,,,,,,
-event.act3.thor_hammer_mark.desc,묠니르가 남긴 신성한 흔적이다. 배움의 기회.,,,,,,,
-event.act3.thor_hammer_mark.choice_1,새긴다 (골드 -40),,,,,,,
-event.act3.thor_hammer_mark.choice_2,지나친다,,,,,,,
-event.act3.frost_giant_corpse.name,얼음 거인의 시체,,,,,,,
-event.act3.frost_giant_corpse.desc,쓰러진 요툰의 유해에서 뭔가 빛난다.,,,,,,,
-event.act3.frost_giant_corpse.choice_1,뒤진다 (HP -25),,,,,,,
-event.act3.frost_giant_corpse.choice_2,무시한다,,,,,,,
-event.act3.freyja_tears.name,프레이야의 눈물,,,,,,,
-event.act3.freyja_tears.desc,황금 눈물방울이 땅에 떨어져 있다. 강력한 여신의 슬픔.,,,,,,,
-event.act3.freyja_tears.choice_1,집어든다 (HP +25),,,,,,,
-event.act3.freyja_tears.choice_2,놔둔다,,,,,,,
-event.korean.death_reaper_visit.name,저승사자의 방문,,,,,,,
-event.korean.death_reaper_visit.desc,밤길을 걷다 검은 갓을 쓴 저승사자와 마주쳤다.,,,,,,,
-event.korean.death_reaper_visit.choice_1,받아들인다 (HP -40),,,,,,,
-event.korean.death_reaper_visit.choice_2,거절한다,,,,,,,
-event.korean.dokkaebi_hammer.name,도깨비 방망이,,,,,,,
-event.korean.dokkaebi_hammer.desc,길가에 낡은 방망이가 떨어져 있다. 잡으면 이상한 기운이 느껴진다.,,,,,,,
-event.korean.dokkaebi_hammer.choice_1,금 나와라 뚝딱!,,,,,,,
-event.korean.dokkaebi_hammer.choice_2,쌀 나와라 뚝딱!,,,,,,,
-event.korean.dokkaebi_hammer.choice_3,가져간다 (도박),,,,,,,
-event.korean.gumiho_temptation.name,구미호의 유혹,,,,,,,
-event.korean.gumiho_temptation.desc,여우 눈빛의 여인이 앞을 막는다.,,,,,,,
-event.korean.gumiho_temptation.choice_1,거래한다 (카드 1장 제거),,,,,,,
-event.korean.gumiho_temptation.choice_2,거절한다,,,,,,,
-event.korean.shaman_gut.name,무당의 굿판,,,,,,,
-event.korean.shaman_gut.desc,붉은 무복의 무당이 굿을 올린다.,,,,,,,
-event.korean.shaman_gut.choice_1,굿을 부탁한다 (골드 -50),,,,,,,
-event.korean.shaman_gut.choice_2,구경만 한다,,,,,,,
-event.korean.samsin_blessing.name,삼신할머니의 축복,,,,,,,
-event.korean.samsin_blessing.desc,노파가 따뜻한 빛을 내밀며 말한다.,,,,,,,
-event.korean.samsin_blessing.choice_1,감사히 받는다,,,,,,,
-event.korean.samsin_blessing.choice_2,괜찮다고 한다,,,,,,,
-event.korean.dangun_prophecy.name,단군의 예언,,,,,,,
-event.korean.dangun_prophecy.desc,마니산 제단에서 고요한 목소리가 들린다.,,,,,,,
-event.korean.dangun_prophecy.choice_1,강인함의 길,,,,,,,
-event.korean.dangun_prophecy.choice_2,지혜의 길,,,,,,,
-event.korean.mountain_god_bet.name,산신령과의 내기,,,,,,,
-event.korean.mountain_god_bet.desc,백발 노인이 바위 위에 앉아 말한다.,,,,,,,
-event.korean.mountain_god_bet.choice_1,내기를 수락한다,,,,,,,
-event.korean.mountain_god_bet.choice_2,그냥 지나친다,,,,,,,
-event.korean.sea_king_test.name,용왕의 시험,,,,,,,
-event.korean.sea_king_test.desc,용의 발톱이 물 속에서 드러난다.,,,,,,,
-event.korean.sea_king_test.choice_1,시험에 응한다 (HP -30),,,,,,,
-event.korean.sea_king_test.choice_2,뇌물을 바친다 (골드 -60),,,,,,,
-event.korean.sea_king_test.choice_3,돌아간다,,,,,,,
-event.korean.hero_joins.name,동료 영웅의 합류,,,,,,,
-event.korean.hero_joins.desc,전장을 헤매던 한 영웅이 당신의 팀을 발견했다.,,,,,,,
-event.korean.hero_joins.choice_1,함께 싸우자,,,,,,,
-event.korean.hero_joins.choice_2,아직은 아니야,,,,,,,
-event.korean.underworld_deal.name,저승의 거래,,,,,,,
-event.korean.underworld_deal.desc,어둠 속 흰 도포를 입은 자가 나타난다.,,,,,,,
-event.korean.underworld_deal.choice_1,거래한다,,,,,,,
-event.korean.underworld_deal.choice_2,거절한다,,,,,,,
-event.japanese.ise_shrine_blessing.name,이세 신궁의 축복,,,,,,,
-event.japanese.ise_shrine_blessing.desc,신성한 기운이 감도는 신궁에서 아마테라스의 사자가 나타난다.,,,,,,,
-event.japanese.ise_shrine_blessing.choice_1,신궁에 제물을 바친다 (골드 -30),,,,,,,
-event.japanese.ise_shrine_blessing.choice_2,기도만 드린다,,,,,,,
-event.japanese.oni_shogi.name,오니의 장기,,,,,,,
-event.japanese.oni_shogi.desc,거대한 오니가 장기판을 내밀며 말한다.,,,,,,,
-event.japanese.oni_shogi.choice_1,장기 대결을 받아들인다 (도박),,,,,,,
-event.japanese.oni_shogi.choice_2,정중히 거절한다,,,,,,,
-event.japanese.yuki_onna_blizzard.name,유키온나의 눈보라,,,,,,,
-event.japanese.yuki_onna_blizzard.desc,하얀 여인이 손을 내밀며 속삭인다.,,,,,,,
-event.japanese.yuki_onna_blizzard.choice_1,온기를 나눠준다 (HP -20),,,,,,,
-event.japanese.yuki_onna_blizzard.choice_2,유물을 건네준다 (HP -35),,,,,,,
-event.japanese.yuki_onna_blizzard.choice_3,거절하고 달아난다,,,,,,,
-event.japanese.tengu_training.name,텐구의 수련,,,,,,,
-event.japanese.tengu_training.desc,산중에서 만난 텐구가 말한다.,,,,,,,
-event.japanese.tengu_training.choice_1,수련을 받는다 (카드 1장 제거),,,,,,,
-event.japanese.tengu_training.choice_2,거절한다,,,,,,,
-event.japanese.shrine_omamori.name,신사의 오마모리,,,,,,,
-event.japanese.shrine_omamori.desc,오래된 신사에서 신관이 부적을 꺼낸다.,,,,,,,
-event.japanese.shrine_omamori.choice_1,부적을 구입한다 (골드 -50),,,,,,,
-event.japanese.shrine_omamori.choice_2,오래된 부적을 집어든다 (도박),,,,,,,
-event.japanese.shrine_omamori.choice_3,그냥 지나친다,,,,,,,
-event.japanese.tanuki_illusion.name,너구리의 환술,,,,,,,
-event.japanese.tanuki_illusion.desc,너구리가 상인으로 변장하여 나타난다.,,,,,,,
-event.japanese.tanuki_illusion.choice_1,물건을 구입한다 (도박 골드 -40),,,,,,,
-event.japanese.tanuki_illusion.choice_2,정체를 폭로한다,,,,,,,
-event.japanese.kappa_river_crossing.name,갓파의 강 건너기,,,,,,,
-event.japanese.kappa_river_crossing.desc,강가에서 갓파가 외친다.,,,,,,,
-event.japanese.kappa_river_crossing.choice_1,씨름을 받아들인다 (도박),,,,,,,
-event.japanese.kappa_river_crossing.choice_2,우회로를 찾는다,,,,,,,
-event.japanese.shuten_doji_feast.name,슈텐도지의 주연,,,,,,,
-event.japanese.shuten_doji_feast.desc,요괴 두목이 술잔을 건네며 말한다.,,,,,,,
-event.japanese.shuten_doji_feast.choice_1,함께 마신다 (HP -30),,,,,,,
-event.japanese.shuten_doji_feast.choice_2,술만 챙긴다,,,,,,,
-event.japanese.shuten_doji_feast.choice_3,거절한다,,,,,,,
-event.japanese.fujisan_spirit.name,후지산의 영기,,,,,,,
-event.japanese.fujisan_spirit.desc,산꼭대기에서 신비로운 기운이 흘러내린다.,,,,,,,
-event.japanese.fujisan_spirit.choice_1,영기를 흡수한다 (HP -15),,,,,,,
-event.japanese.fujisan_spirit.choice_2,그냥 바라본다,,,,,,,
-event.japanese.amaterasu_return.name,아마테라스의 귀환,,,,,,,
-event.japanese.amaterasu_return.desc,동굴에서 태양신이 나오며 세상이 밝아진다.,,,,,,,
-event.japanese.amaterasu_return.choice_1,빛을 받아들인다,,,,,,,
-event.japanese.amaterasu_return.choice_2,빛을 담아간다 (도박),,,,,,,
-event.chinese.queen_mother_peach.name,서왕모의 복숭아나무,,,,,,,
-event.chinese.queen_mother_peach.desc,곤륜산 깊숙이 불로불사의 복숭아가 달려 있다.,,,,,,,
-event.chinese.queen_mother_peach.choice_1,복숭아를 따 먹는다,,,,,,,
-event.chinese.queen_mother_peach.choice_2,그냥 지나친다,,,,,,,
-event.chinese.monkey_king_challenge.name,손오공의 도전,,,,,,,
-event.chinese.monkey_king_challenge.desc,원숭이가 우쭐대며 말한다.,,,,,,,
-event.chinese.monkey_king_challenge.choice_1,도전을 받아들인다 (도박),,,,,,,
-event.chinese.monkey_king_challenge.choice_2,거절한다,,,,,,,
-event.chinese.tang_monk_scripture.name,당삼장의 경전,,,,,,,
-event.chinese.tang_monk_scripture.desc,서역에서 돌아온 스님이 경전을 펼쳐 보인다.,,,,,,,
-event.chinese.tang_monk_scripture.choice_1,경전을 탐독한다,,,,,,,
-event.chinese.tang_monk_scripture.choice_2,감사히 거절한다,,,,,,,
-event.chinese.eight_immortals_feast.name,팔선의 연회,,,,,,,
-event.chinese.eight_immortals_feast.desc,하늘에서 내려온 여덟 신선이 잔치를 열고 당신을 초대한다.,,,,,,,
-event.chinese.eight_immortals_feast.choice_1,잔치에 참여한다 (골드 -40),,,,,,,
-event.chinese.eight_immortals_feast.choice_2,술을 가져간다,,,,,,,
-event.chinese.eight_immortals_feast.choice_3,그냥 지나친다,,,,,,,
-event.chinese.celestial_market.name,천계 시장,,,,,,,
-event.chinese.celestial_market.desc,구름 위 하늘 시장에 도착했다. 선인들이 기이한 물건을 팔고 있다.,,,,,,,
-event.chinese.celestial_market.choice_1,고가 유물을 구입한다 (골드 -80),,,,,,,
-event.chinese.celestial_market.choice_2,불량품을 집어든다 (도박 골드 -30),,,,,,,
-event.chinese.celestial_market.choice_3,그냥 구경만 한다,,,,,,,
-event.chinese.dragon_king_invitation.name,용왕의 용궁 초대,,,,,,,
-event.chinese.dragon_king_invitation.desc,바다 아래에서 용왕의 사자가 나타난다.,,,,,,,
-event.chinese.dragon_king_invitation.choice_1,초대에 응한다 (HP -25),,,,,,,
-event.chinese.dragon_king_invitation.choice_2,보물 하나만 요청한다 (HP -40),,,,,,,
-event.chinese.dragon_king_invitation.choice_3,정중히 거절한다,,,,,,,
-event.chinese.lu_dongbin_sword.name,여동빈의 검술 수련,,,,,,,
-event.chinese.lu_dongbin_sword.desc,검을 든 노인이 말한다.,,,,,,,
-event.chinese.lu_dongbin_sword.choice_1,수련을 받는다 (카드 1장 제거),,,,,,,
-event.chinese.lu_dongbin_sword.choice_2,감사히 거절한다,,,,,,,
-event.chinese.pangu_fragment.name,반고의 파편,,,,,,,
-event.chinese.pangu_fragment.desc,고요한 들판에 거대한 빛 조각이 떨어져 있다.,,,,,,,
-event.chinese.pangu_fragment.choice_1,파편의 도움을 받는다,,,,,,,
-event.chinese.pangu_fragment.choice_2,조용히 놓아둔다,,,,,,,
-event.chinese.shennong_herbs.name,신농의 약초,,,,,,,
-event.chinese.shennong_herbs.desc,황소 머리의 신인이 약초를 잔뜩 지고 있다.,,,,,,,
-event.chinese.shennong_herbs.choice_1,약초를 먹는다 (HP -15),,,,,,,
-event.chinese.shennong_herbs.choice_2,좋은 약초만 고른다 (골드 -40),,,,,,,
-event.chinese.shennong_herbs.choice_3,거절한다,,,,,,,
-event.chinese.phoenix_rebirth.name,봉황의 부활,,,,,,,
-event.chinese.phoenix_rebirth.desc,불꽃 속에서 아름다운 새가 솟아오른다.,,,,,,,
-event.chinese.phoenix_rebirth.choice_1,깃털을 가져간다 (도박),,,,,,,
-event.chinese.phoenix_rebirth.choice_2,깃털을 바람에 돌려보낸다,,,,,,,
+event.act1.golden_chest.name,황금 상자,Golden Chest,Coffre d'Or,Scrigno d'Oro,Cofre de Oro,黄金の宝箱,Χρυσό Σεντούκι,黄金宝箱
+event.act1.golden_chest.desc,낡은 황금 상자가 놓여 있다.,An ancient chest of gold lies before thee.,Un vieux coffre d'or repose ici.,Un antico scrigno d'oro giace dinanzi a te.,Un viejo cofre de oro yace ante ti.,古びた黄金の宝箱이置かれている。,Ένα παλιό χρυσό σεντούκι βρίσκεται εδώ.,此处陈放着一只陈旧的黄金宝箱。
+event.act1.golden_chest.choice_1,열기,Open,Ouvrir,Apri,Abrir,開ける,Άνοιγμα,开启
+event.act1.golden_chest.choice_2,무시,Ignore,Ignorer,Ignora,Ignorar,無視する,Αγνόησε,忽略
+event.act1.wounded_warrior.name,상처 입은 전사,Wounded Warrior,Guerrier Blessé,Guerriero Ferito,Guerrero Herido,手負いの戦士,Πληγωμένος Πολεμιστής,负伤的战士
+event.act1.wounded_warrior.desc,부상당한 병사가 치료를 요청한다.,A fallen soldier cries out for thy mercy.,Un soldat blessé implore tes soins.,Un soldat ferito implora il tuo aiuto.,Un soldado herido implora tu ayuda.,傷ついた兵士が手当てを求めている。,Ένας τραυματισμένος στρατιώτης ζητά θεραπεία.,一名受伤的士兵正在请求治疗。
+event.act1.wounded_warrior.choice_1,치료 (골드 -20),Heal (Gold -20),Soigner (Or -20),Cura (Oro -20),Curar (Oro -20),手当てする (ゴールド -20),Θεραπεία (Χρυσός -20),治疗 (金币 -20)
+event.act1.wounded_warrior.choice_2,무시,Ignore,Ignorer,Ignora,Ignorar,無視する,Αγνόησε,忽略
+event.act1.ancient_library.name,고대 도서관,Ancient Library,Bibliothèque Antique,Antica Biblioteca,Biblioteca Antigua,古代の図書館,Αρχαία Βιβλιοθήκη,古代图书馆
+event.act1.ancient_library.desc,신비로운 지식이 담긴 도서관. 공부하면 지식을 얻지만 기력을 소모한다.,A sanctuary of arcane lore. Wisdom demands a toll of vitality.,Un sanctuaire de savoir mystique. L'étude exige un tribut de vie.,Un santuario di saperi arcani. Lo studio esige un tributo di vita.,Un santuario de saber místico. El estudio exige un tributo de vida.,神秘的な知識が眠る図書館。学びは英知をもたらすが、生気を奪う。,Μια βιβλιοθήκη με μυστηριώδεις γνώσεις. Η μελέτη δίνει γνώση αλλά καταναλώνει ενέργεια.,蕴含神秘知识的图书馆。学习可获智慧，但会消耗气力。
+event.act1.ancient_library.choice_1,공부 (HP -5),Study (HP -5),Étudier (PV -5),Studia (PF -5),Estudiar (PV -5),学ぶ (HP -5),Μελέτη (HP -5),钻研 (生命值 -5)
+event.act1.ancient_library.choice_2,무시,Ignore,Ignorer,Ignora,Ignorar,無視する,Αγνόησε,忽略
+event.act1.cursed_altar.name,저주받은 제단,Cursed Altar,Autel Maudit,Altare Maledetto,Altar Maldito,呪われた祭壇,Καταραμένος Βωμός,受诅咒的祭坛
+event.act1.cursed_altar.desc,제단에 무언가를 바치면 강력한 유물을 얻을 수 있다.,An offering to the abyss may grant thee unholy power.,Une offrande aux abysses pourrait t'offrir un grand pouvoir.,Un'offerta agli abissi può donarti un grande potere.,Una ofrenda a los abismos puede otorgarte un gran poder.,祭壇に供物を捧げれば、強大な遺物が手に入るだろう。,Αν προσφέρεις κάτι στο βωμό, μπορείς να αποκτήσεις ένα ισχυρό κειμήλιο.,若向祭坛献祭，便可获得强大的遗物。
+event.act1.cursed_altar.choice_1,카드 바치기 (덱에서 1장 제거),Sacrifice Card (Remove 1 card),Sacrifier une Carte (Retirer 1 carte),Sacrifica Carta (Rimuovi 1 carta),Sacrificar Carta (Eliminar 1 carta),カードを捧げる (1枚削除),Θυσία κάρτας (Αφαίρεση 1 κάρτας),献祭卡牌 (从牌组移除1张)
+event.act1.cursed_altar.choice_2,무시,Ignore,Ignorer,Ignora,Ignorar,無視する,Αγνόησε,忽略
+event.act1.companion_encounter.name,동료 만남,Heroic Meeting,Rencontre Héroïque,Incontro Eroico,Encuentro Heroico,英雄との出会い,Συνάντηση με Σύντροφο,邂逅同伴
+event.act1.companion_encounter.desc,역사 속 영웅이 합류를 요청한다.,A legend of old seeks to walk by thy side.,Un héros d'antan désire se joindre à ta quête.,Un eroe d'altri tempi desidera unirsi alla tua cerca.,Un héroe de antaño desea unirse a tu gesta.,歴史に名を刻む英雄が同行を求めている。,Ένας ήρωας της ιστορίας ζητά να ενταχθεί.,史诗中的英雄请求加入。
+event.act1.companion_encounter.choice_1,합류시키기,Invite,Recruter,Invita,Invitar,仲間に加える,Ένταξη,邀请加入
+event.act1.companion_encounter.choice_2,거절,Refuse,Refuser,Rifiuta,Rechazar,断る,Απόρριψη,拒绝
+event.act1.prometheus_fire.name,프로메테우스의 불,Prometheus's Flame,Le Feu de Prométhée,Il Fuoco di Prometeo,El Fuego de Prometeo,プロメテウスの火,Το Φωτιά του Προμηθέα,普罗米修斯之火
+event.act1.prometheus_fire.desc,제우스에게 불을 훔친 티탄이 불씨를 건넨다. 받겠는가?,The Titan who defied Zeus offers thee a spark of divinity.,Le Titan qui défia Zeus t'offre une étincelle divine.,Il Titano che sfidò Zeus ti offre una scintilla divina.,El Titán que desafió a Zeus te ofrece una chispa divina.,ゼウスから火を盗んだタイタンが、残り火を差し出している。,Ο Τιτάνας που έκλεψε τη φωτιά από τον Δία σου προσφέρει μια σπίθα. Θα τη δεχτείς;,曾向宙斯窃火的提坦递来火种。你可愿接受？
+event.act1.prometheus_fire.choice_1,불씨를 받는다 (드로우 +1 HP -20),Accept Ember (Draw +1, HP -20),Accepter l'Étincelle (Pioche +1, PV -20),Accetta la Scintilla (Pesca +1, PF -20),Aceptar la Chispa (Robo +1, PV -20),火種を受け取る (ドロー+1, HP -20),Αποδοχή σπίθας (Draw +1, HP -20),接受火种 (抽牌+1, 生命值-20)
+event.act1.prometheus_fire.choice_2,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶する,Απόρριψη,拒绝
+event.act1.heracles_trial.name,헤라클레스의 시련,Trial of Heracles,L'Épreuve d'Héraclès,La Prova di Eracle,La Prueba de Heracles,ヘラクレスの試練,Ο Άθλος του Ηρακλή,赫拉克勒斯的试练
+event.act1.heracles_trial.desc,헤라클레스가 힘겨루기를 제안한다. 이기면 황금을 준다.,The mighty Heracles challenges thy strength. Victory yields gold.,Le puissant Héraclès défie ta force. La victoire apporte l'or.,Il possente Eracle sfida la tua forza. La vittoria porta oro.,El poderoso Heracles desafía tu fuerza. La victoria trae oro.,ヘラクレスが力比べを挑んできた。勝てば黄金が手に入る。,Ο Ηρακλής προτείνει έναν αγώνα δύναμης. Αν νικήσεις, θα πάρεις χρυσό.,赫拉克勒斯提议比试力气。胜者可获黄金。
+event.act1.heracles_trial.choice_1,맞선다 (골드 +60 HP -25),Challenge (Gold +60, HP -25),Relever le Défi (Or +60, PV -25),Accetta la Sfida (Oro +60, PF -25),Aceptar Desafío (Oro +60, PV -25),立ち向かう (ゴールド +60, HP -25),Αντιμετώπιση (Χρυσός +60, HP -25),迎战 (金币+60, 生命值-25)
+event.act1.heracles_trial.choice_2,포기한다,Forfeit,Abandonner,Rinuncia,Rendirse,諦める,Παραίτηση,放弃
+event.act1.circe_magic.name,키르케의 마법,Circe's Sorcery,La Magie de Circé,La Magia di Circe,La Magia de Circe,キルケの魔法,Τα Μάγια της Κίρκης,喀耳刻的魔法
+event.act1.circe_magic.desc,마법사 키르케가 황금을 받고 체력을 회복시켜 주겠다고 한다.,The enchantress Circe offers restoration for thy riches.,L'enchanteresse Circé offre la guérison contre ton or.,L'incantatrice Circe offre guarigione in cambio di oro.,La hechicera Circe ofrece sanación a cambio de oro.,魔女キルケが、黄金と引き換えに傷を癒やすと囁いている。,Η μάγισσα Κίρκη προσφέρει θεραπεία έναντι χρυσού.,女巫喀耳刻愿以黄金换取对你生命值的恢复。
+event.act1.circe_magic.choice_1,마법을 받는다 (HP +25 골드 -50),Accept Magic (HP +25, Gold -50),Accepter la Magie (PV +25, Or -50),Accetta la Magia (PF +25, Oro -50),Aceptar Magia (PV +25, Oro -50),魔法を受ける (HP +25, ゴールド -50),Αποδοχή μάγιας (HP +25, Χρυσός -50),接受魔法 (生命值+25, 金币-50)
+event.act1.circe_magic.choice_2,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶する,Απόρριψη,拒绝
+event.act1.hades_contract.name,하데스의 계약,Hades' Contract,Le Pacte d'Hadès,Il Contratto di Ade,El Contrato de Hades,ハデスの契約,Το Συμβόλαιο του Άδη,哈迪斯的契约
+event.act1.hades_contract.desc,저승의 신 하데스가 강력한 유물을 제시한다. 대신 생명력을 요구한다.,The Lord of the Dead offers power, but demands thy life essence.,Le Seigneur des Morts offre le pouvoir, mais exige ta vie.,Il Signore dei Morti offre potere, ma esige la tua vita.,El Señor de los Muertos ofrece poder, pero exige tu vida.,冥界の神ハデスが強大な遺物を提示した。代償は汝の生命力だ。,Ο Άδης προσφέρει ένα ισχυρό κειμήλιο, αλλά ζητά τη ζωή σου ως αντάλλαγμα.,冥王哈迪斯出示了强大的遗物。作为交换，他要求你支付生命力。
+event.act1.hades_contract.choice_1,계약한다 (렐릭 획득 HP -30),Sign (Relic, HP -30),Signer (Relique, PV -30),Firma (Reliquia, PF -30),Firmar (Reliquia, PV -30),契約する (遺物獲得, HP -30),Συμβόλαιο (Κειμήλιο, HP -30),签订契约 (获得遗物, 生命值-30)
+event.act1.hades_contract.choice_2,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶하는,Απόρριψη,拒绝
+event.act1.hermes_gamble.name,헤르메스의 도박,Hermes' Gamble,Le Pari d'Hermès,La Scommessa di Ermes,La Apuesta de Hermes,ヘルメスの賭け,Το Στοίχημα του Ερμή,赫尔墨斯的赌局
+event.act1.hermes_gamble.desc,교활한 헤르메스가 황금과 덱 경량화 중 하나를 선택하라 한다.,Swift Hermes offers a choice: riches or swiftness of mind.,Le rusé Hermès te propose : la richesse ou la légèreté.,Il furbesco Ermes ti propone: ricchezza o agilità mentale.,El astuto Hermes te propone: riqueza o agilidad mental.,狡猾なヘルメスが、黄金か英知の洗練かの選択を迫っている。,Ο πονηρός Ερμής σου ζητά να διαλέξεις ανάμεσα σε χρυσό ή ελαφρύτερο τράπουλα.,狡诈的赫尔墨斯让你在黄金与精简牌组之间做出抉择。
+event.act1.hermes_gamble.choice_1,황금을 받는다 (골드 +50),Take Gold (Gold +50),Prendre l'Or (Or +50),Prendi Oro (Oro +50),Tomar Oro (Oro +50),黄金を受け取る (ゴールド +50),Λήψη χρυσού (Χρυσός +50),接受黄金 (金币+50)
+event.act1.hermes_gamble.choice_2,덱을 가볍게 한다 (카드 1장 제거),Refine Deck (Remove 1 card),Affiner le Jeu (Retirer 1 carte),Affina il Mazzo (Rimuovi 1 carta),Refinar Mazo (Eliminar 1 carta),デッキを洗練させる (1枚削除),Ελάφρυνση τράπουλας (Αφαίρεση 1 κάρτας),精简牌组 (移除1张卡牌)
+event.act1.devils_deal.name,악마의 거래,Devil's Bargain,Marché du Diable,Patto col Diavolo,Trato con el Diablo,悪魔の取引,Η Συμφωνία του Διαβόλου,恶魔的交易
+event.act1.devils_deal.desc,어둠 속 제단에서 목소리가 들린다. 50% 확률로 강력한 렐릭 또는 저주 렐릭을 얻는다.,A voice echoes from the dark. Luck may grant thee power or a curse.,Une voix résonne dans l'ombre. Le sort t'offrira la puissance ou la ruine.,Una voce echeggia nell'ombra. La sorte ti darà potere o rovina.,Una voz resuena en la oscuridad. El destino te dará poder o ruina.,闇の祭壇から声が響く。強大な遺物か、忌まわしき呪いか。,Μια φωνή ακούγεται από το σκοτάδι. 50% πιθανότητα για ισχυρό ή κατα라라μένο κειμήλιο.,黑暗中的祭坛传来声音。你有50%的几率获得强大遗物或诅咒遗物。
+event.act1.devils_deal.choice_1,받아들인다,Accept,Accepter,Accetta,Aceptar,受け入れる,Αποδοχή,接受
+event.act1.devils_deal.choice_2,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶する,Απόρριψη,拒绝
+event.act2.book_of_the_dead.name,사자의 서,Book of the Dead,Le Livre des Morts,Il Libro dei Morti,El Libro de los Muertos,死者の書,Το Βιβλίο των Νεκρών,亡灵书
+event.act2.book_of_the_dead.desc,죽은 자에게 주어지는 주문서가 놓여 있다. 지식이 담겨 있지만 읽는 것은 고통스럽다.,A scroll for the departed. It holds wisdom, but to read it is to suffer.,Un grimoire pour les défunts. Il contient le savoir, mais sa lecture est douleur.,Un grimorio per i defunti. Contiene il sapere, ma la sua lettura è dolore.,Un grimorio para los difuntos. Contiene el saber, pero su lectura es dolor.,死者に授けられる魔導書が置かれている。英知は苦痛の中にのみ在る。,Ένα χειρόγραφο για τους νεκρούς. Περιέχει γνώση, αλλά η ανάγνωσή του είναι επώδυνη.,此处陈放着赠予死者的卷轴。虽蕴含知识，但阅读过程痛苦万分。
+event.act2.book_of_the_dead.choice_1,읽는다 (HP -15),Read (HP -15),Lire (PV -15),Leggi (PF -15),Leer (PV -15),読む (HP -15),Ανάγνωση (HP -15),阅读 (生命值-15)
+event.act2.book_of_the_dead.choice_2,무시,Ignore,Ignorer,Ignora,Ignorar,無視する,Αγνόησε,忽略
+event.act2.anubis_judgment.name,아누비스의 심판,Anubis's Judgment,Le Jugement d'Anubis,Il Giudizio di Anubi,El Juicio de Anubis,アヌビスの審판,Η Κρίση του Άνουβη,阿努比斯的审判
+event.act2.anubis_judgment.desc,아누비스가 저울 위에 심장을 올려놓는다. 깨끗한 심장은 가볍다.,Anubis places thy heart upon the scales. A pure heart is light as a feather.,Anubis place ton cœur sur la balance. Un cœur pur est léger comme une plume.,Anubi pone il tuo cuore sulla bilancia. Un cuore puro è leggero come una piuma.,Anubis pone tu corazón en la balanza. Un corazón puro es ligero como una pluma.,アヌビスが天秤に汝の心臓を載せる。清き魂は羽よりも軽い。,Ο Άνουβις τοποθετεί την καρδιά στη ζυγαριά. Οι καθαρές καρδιές είναι ελαφριές.,阿努比斯将心脏置于天平之上。纯净的心灵轻如鸿毛。
+event.act2.anubis_judgment.choice_1,심장을 바친다 (카드 1장 제거),Offer Heart (Remove 1 card),Offrir son Cœur (Retirer 1 carte),Offri il Cuore (Rimuovi 1 carta),Ofrecer Corazón (Eliminar 1 carta),心臓を捧げる (1枚削除),Προσφορά καρδιάς (Αφαίρεση 1 κάρτας),献祭心脏 (移除1张卡牌)
+event.act2.anubis_judgment.choice_2,도망친다 (HP -10),Flee (HP -10),S'enfuir (PV -10),Fuggi (PF -10),Huir (PV -10),逃げ出す (HP -10),Φυγή (HP -10),逃离 (生命值-10)
+event.act2.scarab_beetle.name,스카라베 풍뎅이,Scarab Beetle,Le Scarabée,Lo Scarabeo,El Escarabajo,スカラベの黄金虫,Σκαραβαίος,圣甲虫
+event.act2.scarab_beetle.desc,황금빛 딱정벌레가 굴러가고 있다. 성스러운 것이라 하지만 가치가 있어 보인다.,A golden beetle rolls across the sand. Sacred to gods, precious to men.,Un scarabée d'or roule dans le sable. Sacré pour les dieux, précieux pour les hommes.,Uno scarabeo d'oro rotola nella sabbia. Sacro agli dei, prezioso agli uomini.,Un escarabajo de oro rueda en la arena. Sagrado para los dioses, valioso para los hombres.,黄金色に輝くスカラベが転がっている。神聖なものだが、価値はありそうだ。,Ένας χρυσός σκαραβαίος κυλά. Θεωρείται ιερός, αλλά φαίνεται πολύτιμος.,一只金色的圣甲虫正在地上爬行。虽说是神圣之物，但似乎颇具价值。
+event.act2.scarab_beetle.choice_1,잡는다 (골드 +40),Catch (Gold +40),Capturer (Or +40),Cattura (Oro +40),Capturar (Oro +40),捕まえる (ゴールド +40),Σύλληψη (Χρυσός +40),捕捉 (金币+40)
+event.act2.scarab_beetle.choice_2,놓아준다,Release,Relâcher,Libera,Liberar,逃がす,Απελευθέρωση,放生
+event.act2.pharaoh_tomb.name,파라오의 무덤,Pharaoh's Tomb,Le Tombeau du Pharaon,La Tomba del Faraone,La Tumba del Faraón,ファラオの墓,Τάφος του Φαραώ,法老之墓
+event.act2.pharaoh_tomb.desc,봉인된 석관이 놓여 있다. 위험한 저주가 걸려 있지만 그 안에는 보물이 있을 것이다.,A sealed sarcophagus awaits. Cursed be the hand that wakes the king, but rich the reward.,Un sarcophage scellé attend. Maudite soit la main qui réveille le roi, mais riche la récompense.,Un sarcofago sigillato attende. Maledetta la mano che sveglia il re, ma ricca la ricompensa.,Un sarcófago sellado espera. Maldita la mano que despierte al rey, pero rica la recompensa.,封印された石棺が横たわっている。呪いの気配がするが、中には財宝があるはずだ。,Μια σφραγισμένη σαρκοφάγος. Υπάρχει κατάρα, αλλά και θησαυρός μέσα.,此处陈放着密封的石棺。虽有危险的诅咒，但内部定有宝藏。
+event.act2.pharaoh_tomb.choice_1,연다 (HP -35),Open (HP -35),Ouvrir (PV -35),Apri (PF -35),Abrir (PV -35),開ける (HP -35),Άνοιγμα (HP -35),开启 (生命值-35)
+event.act2.pharaoh_tomb.choice_2,봉인을 존중한다 (골드 +15),Respect Seal (Gold +15),Respecter le Sceau (Or +15),Rispetta il Sigillo (Oro +15),Respetar Sello (Oro +15),封印を敬う (ゴールド +15),Σεβασμός σφραγίδας (Χρυσός +15),尊重封印 (金币+15)
+event.act2.nile_flood.name,나일강의 범람,Nile's Flood,La Crue du Nil,L'Inondazione del Nilo,La Inundación del Nilo,ナイルの氾濫,Η Πλημμύρα του Νείλου,尼罗河的泛滥
+event.act2.nile_flood.desc,나일강이 넘쳐흘러 주변을 적신다. 농경신의 축복이라 하지만 여정을 지연시킨다.,The Nile overflows, drenching the earth. A blessing of the soil, but a burden to thy step.,Le Nil déborde, trempant la terre. Bénédiction du sol, mais fardeau pour tes pas.,Il Nilo straripa, bagnando la terra. Benedizione del suolo, ma peso per i tuoi passi.,El Nilo se desborda, empapando la tierra. Bendición del suelo, pero carga para tus pasos.,ナイル川が溢れ、大地を濡らしている。豊穣の神の恵みだが、旅を遅らせるだろう。,Ο Νείλος πλημμυρίζει. Είναι ευλογία για τη γη, αλλά καθυστερεί το ταξίδι.,尼罗河水泛滥，浸润了周围的大地。虽说是农耕神的恩赐，却会耽误行程。
+event.act2.nile_flood.choice_1,강물로 씻는다 (HP +30 골드 -40),Bathe (HP +30, Gold -40),Se Baigner (PV +30, Or -40),Lavati (PF +30, Oro -40),Lavarse (PV +30, Oro -40),川で清める (HP +30, ゴールド -40),Πλύσιμο (HP +30, Χρυσός -40),在河水中洗浴 (生命值+30, 金币-40)
+event.act2.nile_flood.choice_2,지나친다,Pass,Passer,Oltrepassa,Pasar,通り過ぎる,Προσπέραση,路过
+event.act2.thoth_wisdom.name,토트의 지혜,Wisdom of Thoth,La Sagesse de Thot,La Sapienza di Thot,La Sabiduría de Thoth,トトの英知,Η Σοφία του Θωθ,托特的智慧
+event.act2.thoth_wisdom.desc,지식의 신 토트가 가르침을 제공한다. 배움은 대가를 요구한다.,The god of knowledge offers his light. Wisdom demands a sacrifice of wealth.,Le dieu du savoir t'offre sa lumière. La sagesse exige un sacrifice d'or.,Il dio del sapere ti offre la sua luce. La sapienza esige un sacrificio d'oro.,El dios del saber te ofrece su luz. La sabiduría exige un sacrificio de oro.,知恵の神トトが教えを授けようとしている。学びには対価が必要だ。,Ο θεός της γνώσης Θωθ προσφέρει διδαχή. Η μάθηση απαιτεί αντάλλαγμα.,知识之神托特赐予教诲。学习需要支付代价。
+event.act2.thoth_wisdom.choice_1,가르침을 받는다 (골드 -60),Accept (Gold -60),Apprendre (Or -60),Impara (Oro -60),Aprender (Oro -60),教えを受ける (ゴールド -60),Λήψη διδαχής (Χρυσός -60),接受教诲 (金币-60)
+event.act2.thoth_wisdom.choice_2,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶する,Απόρριψη,拒绝
+event.act2.bastet_cats.name,바스테트의 고양이,Bastet's Cats,Les Chats de Bastet,I Gatti di Bastet,Los Gatos de Bastet,バステトの猫たち,Οι Γάτες της Μπαστέτ,巴斯特之猫
+event.act2.bastet_cats.desc,성스러운 고양이 무리가 길을 막고 있다. 바스테트의 가호를 받은 존재들이다.,A pride of sacred cats bars thy path. Bastet's favor follows these noble beasts.,Une troupe de chats sacrés barre ton chemin. La faveur de Bastet suit ces nobles bêtes.,Un branco di gatti sacri sbarra il cammino. Il favore di Bastet segue queste nobili bestie.,Una manada de gatos sagrados bloquea el camino. El favor de Bastet sigue a estas nobles bestias.,神聖な猫の群れが道を塞いでいる。バステトの加護を受けし者たちだ。,Μια ομάδα ιερών γατών κλείνει το δρόμο. Είναι προστατευόμενες της Μπαστέτ.,一群神圣的小猫挡住了去路。它们是受巴斯特庇佑的存在。
+event.act2.bastet_cats.choice_1,먹이를 준다 (HP +15 골드 -25),Feed (HP +15, Gold -25),Nourrir (PV +15, Or -25),Nutri (PF +15, Oro -25),Alimentar (PV +15, Oro -25),餌をやる (HP +15, ゴールド -25),Τάισμα (HP +15, Χρυσός -25),喂食 (生命值+15, 金币-25)
+event.act2.bastet_cats.choice_2,쫓아낸다 (HP -8),Shoo (HP -8),Chasser (PV -8),Scaccia (PF -8),Espantar (PV -8),追い払う (HP -8),Διώξιμο (HP -8),驱赶 (生命值-8)
+event.act2.oasis_merchant.name,오아시스 상인,Oasis Merchant,Marchand de l'Oasis,Mercante dell'Oasi,Mercader del Oasis,オアシスの商人,Έμπορος της Όασης,绿洲商人
+event.act2.oasis_merchant.desc,사막 한가운데 오아시스에서 행상인을 만났다. 진귀한 물건을 팔고 있다.,A traveler in the heart of the waste. He peddles wonders from distant lands.,Un voyageur au cœur du désert. Il vend des merveilles de terres lointaines.,Un viaggiatore nel cuore del deserto. Vende meraviglie di terre lontane.,Un viajero en el corazón del desierto. Vende maravillas de tierras lejanas.,砂漠の真ん中、オアシスで行商人に会った。珍しい品を揃えているようだ。,Ένας έμπορος στην όαση. Πουλάει σπάνια αντικείμενα.,在沙漠中心的绿洲偶遇了一名行商。他正在出售珍奇物件。
+event.act2.oasis_merchant.choice_1,렐릭 구매 (골드 -100),Buy Relic (Gold -100),Acheter Relique (Or -100),Compra Reliquia (Oro -100),Comprar Reliquia (Oro -100),遺物を買う (ゴールド -100),Αγορά κειμηλίου (Χρυσός -100),购买遗物 (金币-100)
+event.act2.oasis_merchant.choice_2,약초 구매 (HP +25 골드 -30),Buy Herbs (HP +25, Gold -30),Acheter Herbes (PV +25, Or -30),Compra Erbe (PF +25, Oro -30),Comprar Hierbas (PV +25, Oro -30),薬草を買う (HP +25, ゴールド -30),Αγορά βοτάνων (HP +25, Χρυσός -30),购买药草 (生命值+25, 金币-30)
+event.act2.oasis_merchant.choice_3,지나간다,Pass,Passer,Oltrepassa,Pasar,通り過ぎる,Προσπέραση,路过
+event.act2.mummy_curse.name,미라의 저주,Mummy's Curse,La Malédiction de la Momie,La Maledizione della Mummia,La Maldición de la Momia,ミイラの呪い,Η Κατάρα της Μούμιας,木乃伊的诅咒
+event.act2.mummy_curse.desc,열린 석관에서 차가운 바람이 불어온다. 위험하지만 안에 무언가 있다.,A chill wind blows from the open stone. Danger lurks, yet so does power.,Un vent glacial souffle de la pierre ouverte. Le danger guette, mais le pouvoir aussi.,Un vento gelido soffia dalla pietra aperta. Il pericolo incombe, ma anche il potere.,Un viento gélido sopla desde la piedra abierta. El peligro acecha, pero también el poder.,開かれた石棺から冷たい風が吹き抜ける。危険だが、中には何かがある。,Ένας κρύος άνεμος φυσά από τη σαρκοφάγο. Είναι επικίνδυνο, αλλά κάτι υπάρχει μέσα.,开启的石棺中吹出阵阵寒风。虽有危险，但内部必有乾坤。
+event.act2.mummy_curse.choice_1,용기를 낸다 (랜덤 렐릭),Be Brave (Random Relic),Être Brave (Relique Aléatoire),Sii Audace (Reliquia Casuale),Ser Valiente (Reliquia Aleatoria),勇気を出す (ランダム遺物),Τόλμη (Τυχαίο κειμήλιο),拿出勇气 (随机遗物)
+event.act2.mummy_curse.choice_2,도망친다 (HP -20),Flee (HP -20),S'enfuir (PV -20),Fuggi (PF -20),Huir (PV -20),逃げ出す (HP -20),Φυγή (HP -20),逃离 (生命值-20)
+event.act2.ra_sunboat.name,라의 태양선,Ra's Sunboat,La Barque Solaire de Râ,La Barca Solare di Ra,La Barca Solar de Ra,ラーの太陽船,Η Ηλιακή Λέμβος του Ρα,拉的太阳船
+event.act2.ra_sunboat.desc,태양신 라의 황금 배가 눈앞에 나타난다. 동행을 제안하는 존재가 있다.,The golden barge of Ra shines before thee. One within offers to join thy quest.,La barque d'or de Râ brille devant toi. Quelqu'un à bord offre de t'aider.,La barca d'oro di Ra brilla dinanzi a te. Qualcuno a bordo offre il suo aiuto.,La barca de oro de Ra brilla ante ti. Alguien a bordo ofrece su ayuda.,太陽神ラーの黄金の船が姿を現した。同行を申し出る者がいるようだ。,Το χρυσό πλοίο του Ρα εμφανίζεται. Κάποιος προτείνει να σε συνοδεύσει.,太阳神拉的黄金船出现在眼前。有人提议同行。
+event.act2.ra_sunboat.choice_1,합류한다 (영웅 획득),Join (Gain Hero),Recruter (Obtenir Héros),Unisciti (Ottieni Eroe),Unirse (Obtener Héroe),同行する (英雄獲得),Ένταξη (Απόκτηση ήρωα),加入 (获得英雄)
+event.act2.ra_sunboat.choice_2,거절한다 (골드 +20),Refuse (Gold +20),Refuser (Or +20),Rifiuta (Oro +20),Rechazar (Oro +20),拒絶する (ゴールド +20),Απόρριψη (Χρυσός +20),拒绝 (金币+20)
+event.act3.odin_ravens.name,오딘의 까마귀,Odin's Ravens,Les Corbeaux d'Odin,I Corvi di Odino,Los Cuervos de Odín,オーディンの烏,Τα Κοράκια του Οντίν,奥丁的双鸦
+event.act3.odin_ravens.desc,후긴과 무닌이 어깨에 내려앉아 지혜를 속삭인다.,Huginn and Muninn alight upon thy shoulders to whisper secrets of the Allfather.,Huginn et Muninn se posent sur tes épaules pour murmurer les secrets d'Odin.,Huginn e Muninn si posano sulle tue spalle per sussurrare i segreti di Odino.,Huginn y Muninn se posan en tus hombros para susurrar los secretos de Odín.,フギンとムニンが肩に降り立ち、英知を囁いている。,Ο Χούγκιν και ο Μούνιν ψιθυρίζουν σοφία στον ώμο σου.,福金与雾尼停在肩头，窃窃私语着智慧。
+event.act3.odin_ravens.choice_1,귀를 기울인다 (HP -12),Listen (HP -12),Écouter (PV -12),Ascolta (PF -12),Escuchar (PV -12),耳を傾ける (HP -12),Ακρόαση (HP -12),侧耳倾听 (生命值-12)
+event.act3.odin_ravens.choice_2,쫓아낸다,Shoo,Chasser,Scaccia,Espantar,追い払う,Διώξιμο,驱赶
+event.act3.yggdrasil_fruit.name,유그드라실의 열매,Fruit of Yggdrasil,Fruit d'Yggdrasil,Frutto di Yggdrasil,Fruto de Yggdrasil,ユグドラシルの実,Καρπός του Υγκντρασίλ,世界树之果
+event.act3.yggdrasil_fruit.desc,세계수 가지에서 신성한 열매가 떨어졌다.,A sacred fruit has fallen from the boughs of the World Tree.,Un fruit sacré est tombé des branches de l'Arbre-Monde.,Un frutto sacro è caduto dai rami dell'Albero del Mondo.,Un fruto sagrado ha caído de las ramas del Árbol del Mundo.,世界樹の枝から神聖な実が落ちてきた。,Ένας ιερός καρπός έπεσε από το Παγκόσμιο Δέντρο.,神圣的果实从世界树的枝头落下。
+event.act3.yggdrasil_fruit.choice_1,먹는다 (골드 -50),Eat (Gold -50),Manger (Or -50),Mangia (Oro -50),Comer (Oro -50),食べる (ゴールド -50),Βρώση (Χρυσός -50),食用 (金币-50)
+event.act3.yggdrasil_fruit.choice_2,지나친다,Pass,Passer,Oltrepassa,Pasar,通り過ぎる,Προσπέραση,路过
+event.act3.ragnarok_prophecy.name,라그나로크의 예언,Prophecy of Ragnarök,Prophétie du Ragnarök,Profezia del Ragnarök,Profecía del Ragnarök,ラグナロクの予言,Η Προφητεία του Ράγκναροκ,诸神黄昏的预言
+event.act3.ragnarok_prophecy.desc,종말의 징조가 하늘에 새겨진다. 도박이지만 기회다.,The signs of doom are written in the stars. A peril, yet a path to glory.,Les signes du déclin sont écrits dans le ciel. Un péril, mais une chance.,I segni del declino sono scritti nel cielo. Un pericolo, ma un'opportunità.,Los signos del declive están escritos en el cielo. Un peligro, pero una oportunidad.,終末の兆しが空に刻まれている。危うき賭けだが、好機でもある。,Σημάδια του τέλους χαράσσονται στον ουρανό. Είναι ρίσκο, αλλά και ευκαιρία.,毁灭之兆刻于天际。虽是豪赌，亦是机遇。
+event.act3.ragnarok_prophecy.choice_1,받아들인다,Accept,Accepter,Accetta,Aceptar,受け入れる,Αποδοχή,接受
+event.act3.ragnarok_prophecy.choice_2,거부한다 (HP -15),Refuse (HP -15),Refuser (PV -15),Rifiuta (PF -15),Rechazar (PV -15),拒絶する (HP -15),Απόρριψη (HP -15),拒绝 (生命值-15)
+event.act3.valhalla_invitation.name,발할라 초대장,Invitation to Valhalla,Invitation au Valhalla,Invito al Valhalla,Invitación al Valhalla,ヴァルハラの招待状,Πρόσκληση στη Βαλχάλα,英灵殿邀请函
+event.act3.valhalla_invitation.desc,용감한 전사에게 발할라의 문이 열렸다.,The gates of Valhalla open for one of true valor.,Les portes du Valhalla s'ouvrent pour un cœur vaillant.,Le porte del Valhalla si aprono per un cuore valoroso.,Las puertas del Valhalla se abren para un corazón valeroso.,勇猛なる戦士にヴァルハラの門が開かれた。,Οι πύλες της Βαλχάλα άνοιξαν για έναν γενναίο πολεμιστή.,英灵殿之门已向勇武的战士敞开。
+event.act3.valhalla_invitation.choice_1,합류한다 (영웅 획득),Join (Gain Hero),Recruter (Obtenir Héros),Unisciti (Ottieni Eroe),Unirse (Obtener Héroe),同行する (英雄獲得),Ένταξη (Απόκτηση ήρωα),加入 (获得英雄)
+event.act3.valhalla_invitation.choice_2,거절한다 (골드 +25),Refuse (Gold +25),Refuser (Or +25),Rifiuta (Oro +25),Rechazar (Oro +25),拒絶する (ゴールド +25),Απόρριψη (Χρυσός +25),拒绝 (金币+25)
+event.act3.mimirs_well.name,미미르의 샘,Mimir's Well,Le Puits de Mimir,Il Pozzo di Mimir,El Pozo de Mimir,ミーミルの泉,Το Πηγάδι του Μιμίρ,密米尔之泉
+event.act3.mimirs_well.desc,지혜의 샘 앞에 섰다. 오딘도 한쪽 눈을 바쳤다.,Thou standest before the Well of Wisdom. Even Odin paid with an eye.,Tu te tiens devant le Puits de la Sagesse. Même Odin y laissa un œil.,Ti trovi dinanzi al Pozzo della Sapienza. Persino Odino vi lasciò un occhio.,Te encuentras ante el Pozo de la Sabiduría. Incluso Odín dejó un ojo allí.,英知の泉の前に立った。かつてオーディンも片眼を捧げた場所だ。,Στέκεσαι μπροστά στο Πηγάδι της Σοφίας. Ο Οντίν έδωσε το μάτι του εδώ.,你伫立于智慧之泉前。纵使是奥丁，也曾为此献出一只眼。
+event.act3.mimirs_well.choice_1,마신다 (카드 1장 제거),Drink (Remove 1 card),Boire (Retirer 1 carte),Bevi (Rimuovi 1 carta),Beber (Eliminar 1 carta),飲む (1枚削除),Πόση (Αφαίρεση 1 κάρτας),饮用 (移除1张卡牌)
+event.act3.mimirs_well.choice_2,지나친다,Pass,Passer,Oltrepassa,Pasar,通り過ぎる,Προσπέραση,路过
+event.act3.dragon_gold.name,드래곤의 금화,Dragon's Gold,L'Or du Dragon,L'Oro del Drago,El Oro del Dragón,ドラゴンの金貨,Χρυσός του Δράκου,巨龙的金币
+event.act3.dragon_gold.desc,니드호그의 둥지에서 금화가 쏟아져 나온다.,Gold overflows from the hoard of Nidhogg.,L'or déborde du nid de Nidhogg.,L'oro trabocca dal nido di Nidhogg.,El oro rebosa del nido de Nidhogg.,ニーズヘッグの巣から金貨が溢れ出している。,Χρυσά νομίσματα ξεχειλίζουν από τη φωλιά του Νίντχογκ.,尼德霍格的巢穴中散落出大片金币。
+event.act3.dragon_gold.choice_1,집는다 (HP -10),Take (HP -10),Prendre (PV -10),Prendi (PF -10),Tomar (PV -10),手にする (HP -10),Λήψη (HP -10),拾取 (生命值-10)
+event.act3.dragon_gold.choice_2,놔둔다,Leave,Laisser,Lascia,Dejar,放っておく,Άφησέ το,放下
+event.act3.rune_stone.name,룬 스톤,Rune Stone,La Pierre Runique,La Pietra Runica,La Piedra Rúnica,ルーンストーン,Ρουνικός Λίθος,卢恩符文石
+event.act3.rune_stone.desc,고대 룬 문자가 새겨진 돌이 빛난다.,Ancient runes glow upon the weathered stone.,Des runes anciennes brillent sur la pierre.,Antiche rune brillano sulla pietra.,Antiguas runas brillan en la piedra.,古代のルーン文字が刻まれた石が光を放っている。,Ένας λίθος με αρχαίους ρούνους λάμπει.,刻有古代卢恩文字的石头正发出光芒。
+event.act3.rune_stone.choice_1,해독한다 (골드 -120),Decipher (Gold -120),Déchiffrer (Or -120),Decifra (Oro -120),Descifrar (Oro -120),解読する (ゴールド -120),Αποκρυπτογράφηση (Χρυσός -120),解读 (金币-120)
+event.act3.rune_stone.choice_2,문양을 그린다 (골드 +20),Trace Glyphs (Gold +20),Tracer les Glyphes (Or +20),Traccia i Glifi (Oro +20),Trazar Glifos (Oro +20),紋様を描く (ゴールド +20),Χάραξη συμβόλων (Χρυσός +20),描画纹路 (金币+20)
+event.act3.thor_hammer_mark.name,토르의 망치 자국,Mark of Thor's Hammer,La Marque de Mjöllnir,Il Segno di Mjolnir,La Marca de Mjolnir,トールの槌の跡,Το Σημάδι του Σφυριού του Θώρα,索尔的锤印
+event.act3.thor_hammer_mark.desc,묠니르가 남긴 신성한 흔적이다. 배움의 기회.,The sacred mark left by Mjolnir. A chance to learn the way of thunder.,La marque sacrée laissée par Mjöllnir. Une chance d'apprendre.,Il segno sacro lasciato da Mjolnir. Una possibilità di apprendere.,La marca sagrada dejada por Mjolnir. Una oportunidad de aprender.,ミョルニルが残した神聖な痕跡だ。学びの機会となるだろう。,Ένα ιερό σημάδι από το Μγιόλνιρ. Μια ευκαιρία για μάθηση.,这是妙尔尼尔留下的神圣痕迹。是学习的契机。
+event.act3.thor_hammer_mark.choice_1,새긴다 (골드 -40),Etch (Gold -40),Graver (Or -40),Incidi (Oro -40),Grabar (Oro -40),刻む (ゴールド -40),Χάραξη (Χρυσός -40),铭刻 (金币-40)
+event.act3.thor_hammer_mark.choice_2,지나친다,Pass,Passer,Oltrepassa,Pasar,通り過ぎる,Προσπέ라ση,路过
+event.act3.frost_giant_corpse.name,얼음 거인의 시체,Frost Giant's Corpse,Cadavre de Géant du Givre,Cadavere di Gigante di Ghiaccio,Cadáver de Gigante de Escarcha,氷の巨人の死体,Πτώμα Παγωμένου Γίγαντα,霜巨人的尸骸
+event.act3.frost_giant_corpse.desc,쓰러진 요툰의 유해에서 뭔가 빛난다.,Something glimmers within the remains of the fallen Jotun.,Quelque chose brille dans les restes du Jotun tombé.,Qualcosa luccica tra i resti del Jotun caduto.,Algo brilla entre los restos del Jotun caído.,倒れたヨトゥンの遺骸から何かが光っている。,Κάτι λάμπει στα λείψανα του πεσμένου Γίγαντα.,倒下的约通遗骸中有什么在闪烁。
+event.act3.frost_giant_corpse.choice_1,뒤진다 (HP -25),Search (HP -25),Fouiller (PV -25),Cerca (PF -25),Buscar (PV -25),探る (HP -25),Έρευνα (HP -25),搜寻 (生命值-25)
+event.act3.frost_giant_corpse.choice_2,무시한다,Ignore,Ignorer,Ignora,Ignorar,無視する,Αγνόησε,忽略
+event.act3.freyja_tears.name,프레이야의 눈물,Freyja's Tears,Les Larmes de Freyja,Le Lacrime di Freyja,Las Lágrimas de Freyja,フレイヤの涙,Τα Δάκρυα της Φρέγια,芙蕾雅之泪
+event.act3.freyja_tears.desc,황금 눈물방울이 땅에 떨어져 있다. 강력한 여신의 슬픔.,Golden droplets lie upon the earth. The sorrow of a mighty goddess.,Des gouttes d'or jonchent le sol. Le chagrin d'une déesse.,Gocce d'oro giacciono al suolo. Il dolore di una dea possente.,Gotas de oro yacen en el suelo. El dolor de una diosa poderosa.,黄金の涙が地に落ちている。強き女神の悲しみの欠片だ。,Χρυσά δάκρυα στο έδαφος. Η θλίψη μιας ισχυρής θεάς.,地上的金色泪滴，那是强大女神的悲伤。
+event.act3.freyja_tears.choice_1,집어든다 (HP +25),Take (HP +25),Ramasser (PV +25),Prendi (PF +25),Tomar (PV +25),拾い上げる (HP +25),Λήψη (HP +25),捡起 (生命值+25)
+event.act3.freyja_tears.choice_2,놔둔다,Leave,Laisser,Lascia,Dejar,放っておく,Άφησέ το,放下
+event.korean.death_reaper_visit.name,저승사자의 방문,Visit of the Underworld Messenger,La Visite du Messager de l'Au-delà,La Visita del Messaggero dell'Oltretomba,La Visita del Mensajero del Inframundo,死神の訪れ,Επίσκεψη του Αγγελιαφόρου του Κάτω Κόσμου,冥使来访
+event.korean.death_reaper_visit.desc,밤길을 걷다 검은 갓을 쓴 저승사자와 마주쳤다.,Beneath the moon, a messenger in black bars thy path.,Sous la lune, un messager en noir barre ton chemin.,Sotto la luna, un messaggero in nero sbarra il cammino.,Bajo la luna, un mensajero de negro bloquea tu camino.,夜道を歩いていると、黒い笠を被った死神に出くわした。,Περπατώντας τη νύχτα, συνάντησες έναν αγγελιαφόρο με μαύρο καπέλο.,走在夜路上，迎面撞见了头戴黑笠的冥界使者。
+event.korean.death_reaper_visit.choice_1,받아들인다 (HP -40),Accept (HP -40),Accepter (PV -40),Accetta (PF -40),Aceptar (PV -40),受け入れる (HP -40),Αποδοχή (HP -40),接受 (生命值-40)
+event.korean.death_reaper_visit.choice_2,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶する,Απόρριψη,拒绝
+event.korean.dokkaebi_hammer.name,도깨비 방망이,Dokkaebi's Club,La Massue du Dokkaebi,La Clava del Dokkaebi,La Maza del Dokkaebi,トッケビの棍棒,Το Ρόπαλο του Ντοκαέμπι,独脚鬼之槌
+event.korean.dokkaebi_hammer.desc,길가에 낡은 방망이가 떨어져 있다. 잡으면 이상한 기운이 느껴진다.,An old club lies by the path. It pulses with a strange, mischievous power.,Une vieille massue gît sur le chemin. Elle vibre d'un pouvoir étrange.,Una vecchia clava giace sul sentiero. Vibra di un potere strano.,Una vieja maza yace en el camino. Vibra con un poder extraño.,道端に古びた棍棒が落ちている。手に取ると奇妙な気配を感じる。,Ένα παλιό ρόπαλο στο δρόμο. Αισθάνεσαι μια περίεργη ενέργεια.,路边丢着一把旧木槌。握住它时，能感觉到一股异样的气息。
+event.korean.dokkaebi_hammer.choice_1,금 나와라 뚝딱!,Gold, come forth!,Que l'or apparaisse !,Che l'oro appaia!,¡Que salga el oro!,金よ、出ろ！,Χρυσέ, εμφάνισε!,金币快出来！
+event.korean.dokkaebi_hammer.choice_2,쌀 나와라 뚝딱!,Rice, come forth!,Que le riz apparaisse !,Che il riso appaia!,¡Que salga el arroz!,米よ、出ろ！,Ρύζι, εμφάνισε!,白米快出来！
+event.korean.dokkaebi_hammer.choice_3,가져간다 (도박),Take (Gamble),Prendre (Pari),Prendi (Scommessa),Tomar (Apuesta),持ち去る (賭け),Λήψη (Τζόγος),带走 (赌一把)
+event.korean.gumiho_temptation.name,구미호의 유혹,Gumiho's Temptation,La Tentation de la Gumiho,La Tentazione della Gumiho,La Tentación de la Gumiho,九尾の狐の誘惑,Ο Πειρασμός της Γκουμίχο,九尾狐的诱惑
+event.korean.gumiho_temptation.desc,여우 눈빛의 여인이 앞을 막는다.,A woman with the eyes of a fox blocks thy way.,Une femme aux yeux de renard barre ton chemin.,Una donna dagli occhi di volpe sbarra il cammino.,Una mujer con ojos de zorra bloquea tu camino.,狐の目をした女が、行く手を阻んでいる。,Μια γυναίκα με μάτια αλεπούς σου κλείνει το δρόμο.,一名眼神如狐狸般的女子挡住了去路。
+event.korean.gumiho_temptation.choice_1,거래한다 (카드 1장 제거),Deal (Remove 1 card),Marchander (Retirer 1 carte),Fai un Patto (Rimuovi 1 carta),Tratar (Eliminar 1 carta),取引する (1枚削除),Συμφωνία (Αφαίρεση 1 κάρτας),交易 (移除1张卡牌)
+event.korean.gumiho_temptation.choice_2,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶する,Απόρριψη,拒绝
+event.korean.shaman_gut.name,무당의 굿판,Shaman's Ritual,Le Rituel du Chamane,Il Rituale dello Sciamano,El Ritual del Chamán,巫女の儀式,Το Τελετουργικό της Σαμάνου,巫师的祭礼
+event.korean.shaman_gut.desc,붉은 무복의 무당이 굿을 올린다.,A shaman in crimson robes performs a rite to soothe the spirits.,Une chamane en robe pourpre accomplit un rite.,Una sciamana in vesti cremisi compie un rito.,Una chamán con túnica carmesí realiza un rito.,赤い装束の巫女が、祈祷を捧げている。,Μια σαμάνος με κόκκινα ρούχα κάνει μια τελετή.,一名身着红袍的巫师正在举行祭礼。
+event.korean.shaman_gut.choice_1,굿을 부탁한다 (골드 -50),Request Rite (Gold -50),Demander le Rite (Or -50),Richiedi il Rito (Oro -50),Pedir Ritual (Oro -50),祈祷を頼む (ゴールド -50),Αίτημα τελετής (Χρυσός -50),请求祭礼 (金币-50)
+event.korean.shaman_gut.choice_2,구경만 한다,Watch,Regarder,Guarda,Mirar,見守る,Παρακολούθηση,观摩
+event.korean.samsin_blessing.name,삼신할머니의 축복,Blessing of Samsin,La Bénédiction de Samsin,La Benedizione di Samsin,La Bendición de Samsin,サムシンおばあさんの祝福,Η Ευλογία της Σαμσίν,三神奶奶的祝福
+event.korean.samsin_blessing.desc,노파가 따뜻한 빛을 내밀며 말한다.,An elder woman offers thee a warm, divine light.,Une vieille femme t'offre une lumière divine.,Una vecchia donna ti offre una luce divina.,Una anciana te ofrece una luz divina.,老婆婆が温かな光を差し出し、語りかけてくる。,Μια ηλικιωμένη γυναίκα σου προσφέρει ένα ζεστό φως.,一名老妇人递来温暖的光芒。
+event.korean.samsin_blessing.choice_1,감사히 받는다,Accept,Accepter,Accetta,Aceptar,ありがたく受け取る,Αποδοχή με ευγνωμοσύνη,感激地接受
+event.korean.samsin_blessing.choice_2,괜찮다고 한다,Decline,Décliner,Declina,Declinar,遠慮する,Άρνηση,婉言拒绝
+event.korean.dangun_prophecy.name,단군의 예언,Dangun's Prophecy,La Prophétie de Dangun,La Profezia di Dangun,La Profecía de Dangun,タングンの予言,Η Προφητεία του Ντανγκούν,檀君的预言
+event.korean.dangun_prophecy.desc,마니산 제단에서 고요한 목소리가 들린다.,A serene voice echoes from the altar of Mount Mani.,Une voix sereine résonne de l'autel du mont Mani.,Una voce serena echeggia dall'altare del monte Mani.,Una voz serena resuena desde el altar del monte Mani.,摩尼山の祭壇から、静かな声が響いてくる。,Μια ήρεμη φωνή ακούγεται από τον βωμό του όρους Μανί.,摩尼山祭坛传来了沉静的声音。
+event.korean.dangun_prophecy.choice_1,강인함의 길,Path of Strength,Voie de la Force,Via della Forza,Senda de la Fuerza,強靭の道,Μονοπάτι της Δύναμης,刚毅之道
+event.korean.dangun_prophecy.choice_2,지혜의 길,Path of Wisdom,Voie de la Sagesse,Via della Sapienza,Senda de la Sabiduría,知恵の道,Μονοπάτι της Σοφίας,智慧之道
+event.korean.mountain_god_bet.name,산신령과의 내기,Wager with the Mountain God,Le Pari du Dieu de la Montagne,La Scommessa del Dio della Montagna,La Apuesta del Dios de la Montaña,山神との賭け,Στοίχημα με το Θεό του Βουνού,与山神的博弈
+event.korean.mountain_god_bet.desc,백발 노인이 바위 위에 앉아 말한다.,A white-haired sage sits upon a rock, challenging thy fate.,Un sage aux cheveux blancs sur un rocher défie ton destin.,Un saggio dai capelli bianchi su una roccia sfida il tuo destino.,Un sabio de cabellos blancos en una roca desafía tu destino.,白髪の老人が岩の上に座り、汝に語りかける。,Ένας γέροντας με άσπρα μαλλιά κάθεται σε ένα βράχο.,一名白发老人坐在岩石上。
+event.korean.mountain_god_bet.choice_1,내기를 수락한다,Accept Wager,Accepter le Pari,Accetta la Scommessa,Aceptar Apuesta,賭けを受ける,Αποδοχή στοιχήματος,接受博弈
+event.korean.mountain_god_bet.choice_2,그냥 지나친다,Pass by,Passer son chemin,Oltrepassa,Pasar de largo,通り過ぎる,Προσπέραση,径直路过
+event.korean.sea_king_test.name,용왕의 시험,Trial of the Dragon King,L'Épreuve du Roi Dragon,La Prova del Re Dragone,La Prueba del Rey Dragón,龍王の試練,Η Δοκιμασία του Βασιλιά των Δράκων,龙王的考验
+event.korean.sea_king_test.desc,용의 발톱이 물 속에서 드러난다.,The dragon's claw emerges from the depths.,La griffe du dragon surgit des profondeurs.,L'artiglio del drago emerge dalle profondità.,La garra del dragón surge de las profundidades.,龍の爪が水の中から現れた。,Το νύχι του δράκου αναδύεται από το νερό.,龙爪从水中显露。
+event.korean.sea_king_test.choice_1,시험에 응한다 (HP -30),Take Trial (HP -30),Relever l'Épreuve (PV -30),Accetta la Prova (PF -30),Aceptar Prueba (PV -30),試練に応じる (HP -30),Δοκιμασία (HP -30),接受考验 (生命值-30)
+event.korean.sea_king_test.choice_2,뇌물을 바친다 (골드 -60),Offer Bribe (Gold -60),Offrir un Pot-de-vin (Or -60),Offri Bustarella (Oro -60),Ofrecer Soborno (Oro -60),賄賂を渡す (ゴールド -60),Δωροδοκία (Χρυσός -60),献上贿赂 (金币-60)
+event.korean.sea_king_test.choice_3,돌아간다,Return,Retourner,Ritorna,Regresar,引き返す,Επιστροφή,返回
+event.korean.hero_joins.name,동료 영웅의 합류,A Hero Joins,Un Héros se Joint à Vous,Un Eroe si Unisce,Un Héroe se Une,英雄の合流,Ένας Ήρωας Εντάσσεται,英雄入队
+event.korean.hero_joins.desc,전장을 헤매던 한 영웅이 당신의 팀을 발견했다.,A wandering legend has found thy company.,Une légende errante a trouvé ta compagnie.,Una leggenda errante ha trovato la tua compagnia.,Una leyenda errante ha encontrado tu compañía.,戦場を彷徨っていた英雄が、汝の隊を見つけた。,Ένας περιπλανώμενος ήρωας βρήκε την ομάδα σου.,一名徘徊于战场的英雄发现了你的队伍。
+event.korean.hero_joins.choice_1,함께 싸우자,Fight with me,Luttons ensemble,Combatti con me,Luchemos juntos,共に戦おう,Πολεμήστε μαζί μας,并肩作战吧
+event.korean.hero_joins.choice_2,아직은 아니야,Not yet,Pas encore,Non ancora,Aún no,まだその時ではない,Όχι ακόμα,时机未到
+event.korean.underworld_deal.name,저승의 거래,Underworld Deal,Marché de l'Au-delà,Patto dell'Oltretomba,Trato del Inframundo,冥土の取引,Συμφωνία του Κάτω Κόσμου,冥界交易
+event.korean.underworld_deal.desc,어둠 속 흰 도포를 입은 자가 나타난다.,A figure in white robes emerges from the gloom.,Une figure en robe blanche surgit de l'ombre.,Una figura in vesti bianche emerge dall'ombra.,Una figura con túnica blanca surge de la sombra.,闇の中から、白い装束を纏った者が現れた。,Μια φιγούρα με λευκά ρούχα εμφανίζεται στο σκοτάδι.,黑暗中出现了一名身着白袍的人。
+event.korean.underworld_deal.choice_1,거래한다,Deal,Marchander,Fai un Patto,Tratar,取引する,Συμφωνία,进行交易
+event.korean.underworld_deal.choice_2,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶하는,Απόρριψη,拒绝
+event.japanese.ise_shrine_blessing.name,이세 신궁의 축복,Blessing of Ise Shrine,Bénédiction du Sanctuaire d'Ise,Benedizione del Santuario di Ise,Bendición del Santuario de Ise,伊勢神宮の祝福,Ευλογία του Ιερού Ίσε,伊势神宫的祝福
+event.japanese.ise_shrine_blessing.desc,신성한 기운이 감도는 신궁에서 아마테라스의 사자가 나타난다.,A messenger of Amaterasu appears within the sacred shrine.,Un messager d'Amaterasu apparaît au sanctuaire.,Un messaggero di Amaterasu appare al santuario.,Un mensajero de Amaterasu aparece en el santuario.,神聖な気が満ちる神宮から、天照大神の使いが現れた。,Ένας αγγελιαφόρος της Αματεράσου εμφανίζεται στο ιερό.,在灵气缭绕的神宫中，天照大神的使者现身了。
+event.japanese.ise_shrine_blessing.choice_1,신궁에 제물을 바친다 (골드 -30),Sacrifice (Gold -30),Offrir Sacrifice (Or -30),Offri Sacrificio (Oro -30),Ofrecer Sacrificio (Oro -30),神宮に供物を捧げる (ゴールド -30),Προσφορά (Χρυσός -30),向神宫进献祭品 (金币-30)
+event.japanese.ise_shrine_blessing.choice_2,기도만 드린다,Pray,Prier,Prega,Rezar,祈りを捧げる,Προσευχή,仅作祈祷
+event.japanese.oni_shogi.name,오니의 장기,Oni's Shogi,Le Shogi de l'Oni,Lo Shogi dell'Oni,El Shogi del Oni,鬼の将棋,Σόγκι του Όνι,鬼之将棋
+event.japanese.oni_shogi.desc,거대한 오니가 장기판을 내밀며 말한다.,A towering Oni offers a match of Shogi.,Un Oni imposant propose une partie de Shogi.,Un imponente Oni propone una partita di Shogi.,Un imponente Oni propone una partida de Shogi.,巨躯の鬼が将棋盤を差し出し、語りかけてきた。,Ένα τεράστιο Όνι προσφέρει έναν αγώνα Σόγκι.,巨大的鬼怪递过棋盘。
+event.japanese.oni_shogi.choice_1,장기 대결을 받아들인다 (도박),Accept Match (Gamble),Accepter le Match (Pari),Accetta la Sfida (Scommessa),Aceptar Partida (Apuesta),将棋の対局を受ける (賭け),Αποδοχή αγώνα (Τζόγος),接受将棋对决 (赌一把)
+event.japanese.oni_shogi.choice_2,정중히 거절한다,Politely Decline,Décliner Poliment,Rifiuta Gentilmente,Rechazar Educadamente,丁寧にお断りする,Ευγενική άρνηση,郑重拒绝
+event.japanese.yuki_onna_blizzard.name,유키온나의 눈보라,Yuki-onna's Blizzard,Le Blizzard de la Yuki-onna,La Tormenta della Yuki-onna,La Ventisca de la Yuki-onna,雪女の吹雪,Η Χιονοθύελλα της Γιούκι-όνα,雪女的暴风雪
+event.japanese.yuki_onna_blizzard.desc,하얀 여인이 손을 내밀며 속삭인다.,A lady in white whispers amidst the biting frost.,Une dame en blanc murmure dans le froid mordant.,Una dama in bianco sussurra nel freddo pungente.,Una dama de blanco susurra en el frío cortante.,白き衣の女が手を差し出し、囁いている。,Μια λευκή γυναίκα ψιθυρίζει στην παγωνιά.,白衣女子伸出手，轻声呢喃。
+event.japanese.yuki_onna_blizzard.choice_1,온기를 나눠준다 (HP -20),Share Warmth (HP -20),Partager la Chaleur (PV -20),Condividi Calore (PF -20),Compartir Calor (PV -20),温もりを分かつ (HP -20),Μοίρασμα ζεστασιάς (HP -20),分享温暖 (生命值-20)
+event.japanese.yuki_onna_blizzard.choice_2,유물을 건네준다 (HP -35),Offer Relic (HP -35),Offrir Relique (PV -35),Offri Reliquia (PF -35),Ofrecer Reliquia (PV -35),遺物を渡す (HP -35),Προσφορά κειμηλίου (HP -35),交出遗物 (生命值-35)
+event.japanese.yuki_onna_blizzard.choice_3,거절하고 달아난다,Flee,S'enfuir,Fuggi,Huir,拒絶して逃げる,Φυγή,拒绝并逃离
+event.japanese.tengu_training.name,텐구의 수련,Tengu's Training,L'Entraînement du Tengu,L'Allenamento del Tengu,El Entrenamiento del Tengu,天狗の修練,Εκπαίδευση του Τένγκου,天狗的修炼
+event.japanese.tengu_training.desc,산중에서 만난 텐구가 말한다.,A Tengu in the mountains offers his wisdom.,Un Tengu des montagnes offre sa sagesse.,Un Tengu delle montagne offre la sua sapienza.,Un Tengu de las montañas ofrece su sabiduría.,山中で出会った天狗が、汝に語りかける。,Ένα Τένγκου στο βουνό προσφέρει τη σοφία του.,山中偶遇的天狗正在说话。
+event.japanese.tengu_training.choice_1,수련을 받는다 (카드 1장 제거),Train (Remove 1 card),S'entraîner (Retirer 1 carte),Allenati (Rimuovi 1 carta),Entrenar (Eliminar 1 carta),修練を受ける (1枚削除),Εκπαίδευση (Αφαίρεση 1 κάρτας),接受修炼 (移除1张卡牌)
+event.japanese.tengu_training.choice_2,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶する,Απόρριψη,拒绝
+event.japanese.shrine_omamori.name,신사의 오마모리,Shrine Omamori,L'Omamori du Sanctuaire,L'Omamori del Santuario,El Omamori del Santuario,神社の御守り,Ομαμόρι του Ιερού,神社的御守
+event.japanese.shrine_omamori.desc,오래된 신사에서 신관이 부적을 꺼낸다.,A priest presents a charm from an ancient shrine.,Un prêtre présente une amulette antique.,Un prete presenta un amuleto antico.,Un sacerdote presenta un amuleto antiguo.,古びた神社で、神官が守りを取り出した。,Ένας ιερέας δείχνει ένα φυλαχτό.,在古老的神社中，神官拿出了护身符。
+event.japanese.shrine_omamori.choice_1,부적을 구입한다 (골드 -50),Buy Charm (Gold -50),Acheter Amulette (Or -50),Compra Amuleto (Oro -50),Comprar Amuleto (Oro -50),御守りを買う (ゴールド -50),Αγορά φυλαχτού (Χρυσός -50),购买护身符 (金币-50)
+event.japanese.shrine_omamori.choice_2,오래된 부적을 집어든다 (도박),Take Old Charm (Gamble),Prendre une Vieille Amulette (Pari),Prendi Vecchio Amuleto (Scommessa),Tomar Amuleto Viejo (Apuesta),古びた御守りを手に取る (賭け),Λήψη παλιού φυλαχτού (Τζόγος),拿取旧护身符 (赌一把)
+event.japanese.shrine_omamori.choice_3,그냥 지나친다,Pass by,Passer son chemin,Oltrepassa,Pasar de largo,通り過ぎる,Προσπέραση,径直路过
+event.japanese.tanuki_illusion.name,너구리의 환술,Tanuki's Illusion,L'Illusion du Tanuki,L'Illusione del Tanuki,La Ilusión del Tanuki,狸の幻術,Η Ψευδαίσθηση του Τανούκι,狸猫的幻术
+event.japanese.tanuki_illusion.desc,너구리가 상인으로 변장하여 나타난다.,A clever Tanuki disguises itself as a merchant.,Un Tanuki rusé se déguise en marchand.,Un furbo Tanuki si traveste da mercante.,Un astuto Tanuki se disfraza de mercader.,狸が商人に化けて現れた。,Ένα Τανούκι μεταμφιεσμένο σε έμπορο.,一只狸猫伪装成商人出现了。
+event.japanese.tanuki_illusion.choice_1,물건을 구입한다 (도박 골드 -40),Buy Items (Gamble, Gold -40),Acheter (Pari, Or -40),Compra (Scommessa, Oro -40),Comprar (Apuesta, Oro -40),品物を買う (賭け, ゴールド -40),Αγορά (Τζόγος, Χρυσός -40),购买物品 (赌一把, 金币-40)
+event.japanese.tanuki_illusion.choice_2,정체를 폭로한다,Expose,Exposer,Smaschera,Exponer,正体を暴く,Αποκάλυψη,揭穿真面目
+event.japanese.kappa_river_crossing.name,갓파의 강 건너기,Kappa's River Crossing,La Traversée du Kappa,L'Attraversamento del Kappa,El Cruce del Kappa,河童の川渡り,Το Πέρασμα του Ποταμού του Κάπα,河童的渡河之请
+event.japanese.kappa_river_crossing.desc,강가에서 갓파가 외친다.,A Kappa shouts from the riverbank.,Un Kappa crie depuis la rive.,Un Kappa grida dalla riva.,Un Kappa grita desde la orilla.,川辺で河童が叫んでいる。,Ένα Κάπα φωνάζει από την όχθη.,河边传来河童的叫声。
+event.japanese.kappa_river_crossing.choice_1,씨름을 받아들인다 (도박),Sumo Match (Gamble),Match de Sumo (Pari),Sfida di Sumo (Scommessa),Combate de Sumo (Apuesta),相撲を受ける (賭け),Αγώνας Σούμο (Τζόγος),接受相扑对决 (赌一把)
+event.japanese.kappa_river_crossing.choice_2,우회로를 찾는다,Find Detour,Chercher un Détour,Trova Deviazione,Buscar Desvío,迂回路を探す,Εναλλακτική διαδρομή,寻找绕行之路
+event.japanese.shuten_doji_feast.name,슈텐도지의 주연,Shuten-dōji's Feast,Le Festin de Shuten-dōji,Il Banchetto di Shuten-doji,El Banquete de Shuten-doji,酒呑童子の酒宴,Το Συμπόσιο του Σούτεν-ντότζι,酒吞童子的酒宴
+event.japanese.shuten_doji_feast.desc,요괴 두목이 술잔을 건네며 말한다.,The leader of the Oni offers thee a cup of sake.,Le chef des Oni t'offre une coupe de saké.,Il capo degli Oni ti offre una coppa di sake.,El líder de los Oni te ofrece una copa de sake.,妖怪の首領が酒杯を差し出し、語りかけてきた。,Ο αρχηγός των Όνι σου προσφέρει σάκε.,妖怪首领递过酒杯。
+event.japanese.shuten_doji_feast.choice_1,함께 마신다 (HP -30),Drink (HP -30),Boire (PV -30),Bevi (PF -30),Beber (PV -30),共に飲む (HP -30),Πόση (HP -30),与之共饮 (生命值-30)
+event.japanese.shuten_doji_feast.choice_2,술만 챙긴다,Take Sake,Prendre le Saké,Prendi il Sake,Tomar el Sake,酒だけ受け取る,Λήψη σάκε,只取走酒
+event.japanese.shuten_doji_feast.choice_3,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶하는,Απόρριψη,拒绝
+event.japanese.fujisan_spirit.name,후지산의 영기,Spirit of Mt. Fuji,L'Esprit du Mont Fuji,Lo Spirito del Monte Fuji,El Espíritu del Monte Fuji,富士山の霊気,Το Πνεύμα του Όρους Φούτζι,富士山的灵气
+event.japanese.fujisan_spirit.desc,산꼭대기에서 신비로운 기운이 흘러내린다.,Mystic energy flows from the mountain peak.,Une énergie mystique coule du sommet.,Un'energia mistica fluisce dalla cima.,Una energía mística fluye de la cima.,山の頂から、神秘的な気が流れ出している。,Μυστικιστική ενέργεια ρέει από την κορυφή.,山顶流泻下神秘的气息。
+event.japanese.fujisan_spirit.choice_1,영기를 흡수한다 (HP -15),Absorb Energy (HP -15),Absorber l'Énergie (PV -15),Assorbi Energia (PF -15),Absorber Energía (PV -15),霊気を吸収する (HP -15),Απορρόφηση ενέργειας (HP -15),吸收灵气 (生命值-15)
+event.japanese.fujisan_spirit.choice_2,그냥 바라본다,Watch,Regarder,Guarda,Mirar,ただ眺める,Παρακολούθηση,静静注视
+event.japanese.amaterasu_return.name,아마테라스의 귀환,Return of Amaterasu,Le Retour d'Amaterasu,Il Ritorno di Amaterasu,El Regreso de Amaterasu,天照大神の帰還,Η Επιστροφή της Αματεράσου,天照大神的回归
+event.japanese.amaterasu_return.desc,동굴에서 태양신이 나오며 세상이 밝아진다.,The sun goddess emerges, and the world is bathed in light.,La déesse du soleil émerge, et le monde baigne dans la lumière.,La dea del sole emerge, e il mondo brilla di luce.,La diosa del sol emerge, y el mundo brilla con luz.,洞窟から天照大神が現れ、世界が光に包まれる。,Η θεά του ήλιου αναδύεται και ο κόσμος φωτίζεται.,太阳神走出山洞，世界重获光明。
+event.japanese.amaterasu_return.choice_1,빛을 받아들인다,Accept Light,Accepter la Lumière,Accetta la Luce,Aceptar la Luz,光を受け入れる,Αποδοχή φωτός,接受光芒
+event.japanese.amaterasu_return.choice_2,빛을 담아간다 (도박),Store Light (Gamble),Capturer la Lumière (Pari),Cattura la Luce (Scommessa),Capturar la Luz (Apuesta),光を封じる (賭け),Λήψη φωτός (Τζόγος),收纳光芒 (赌一把)
+event.chinese.queen_mother_peach.name,서왕모의 복숭아나무,Peaches of the Queen Mother,Pêches de la Reine Mère,Pesche della Regina Madre,Melocotones de la Reina Madre,西王母の桃の木,Τα Ροδάκινα της Βασίλισσας Μητέρας,西王母的蟠桃树
+event.chinese.queen_mother_peach.desc,곤륜산 깊숙이 불로불사의 복숭아가 달려 있다.,Peaches of immortality grow deep within Mount Kunlun.,Des pêches d'immortalité poussent au mont Kunlun.,Pesche d'immortalità crescono sul monte Kunlun.,Melocotones de inmortalidad crecen en el monte Kunlun.,昆仑山の深奥に、不老不死の桃が実っている。,Ροδάκινα αθανασίας στο όρος Κουνλούν.,昆仑山深处生长着长生不老的蟠桃。
+event.chinese.queen_mother_peach.choice_1,복숭아를 따 먹는다,Eat Peach,Manger une Pêche,Mangia la Pesca,Comer el Melocotón,桃を食べる,Βρώση ροδάκινου,采食蟠桃
+event.chinese.queen_mother_peach.choice_2,그냥 지나친다,Pass by,Passer son chemin,Oltrepassa,Pasar de largo,通り過ぎる,Προσπέραση,径直路过
+event.chinese.monkey_king_challenge.name,손오공의 도전,Monkey King's Challenge,Le Défi du Roi Singe,La Sfida del Re Scimmia,El Desafío del Rey Mono,孫悟空の挑戦,Η Πρόκληση του Βασιλιά των Πιθήκων,孙悟空的挑战
+event.chinese.monkey_king_challenge.desc,원숭이가 우쭐대며 말한다.,A boastful monkey speaks with great pride.,Un singe vantard parle avec orgueil.,Una scimmia vanto parla con orgoglio.,Un mono jactancioso habla con orgullo.,猿が誇らしげに語りかけてくる。,Ένας πίθηκος μιλάει με περηφάνια.,猴子正得意洋洋地说话。
+event.chinese.monkey_king_challenge.choice_1,도전을 받아들인다 (도박),Accept Challenge (Gamble),Accepter le Défi (Pari),Accetta la Sfida (Scommessa),Aceptar Desafío (Apuesta),挑戦を受ける (賭け),Αποδοχή πρόκλησης (Τζόγος),接受挑战 (赌一把)
+event.chinese.monkey_king_challenge.choice_2,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶する,Απόρριψη,拒绝
+event.chinese.tang_monk_scripture.name,당삼장의 경전,Tang Monk's Scriptures,Sutras du Moine Tang,Sutra del Monaco Tang,Sutras del Monje Tang,唐三蔵の経典,Τα Χειρόγραφα του Μοναχού Τανγκ,唐三藏的经书
+event.chinese.tang_monk_scripture.desc,서역에서 돌아온 스님이 경전을 펼쳐 보인다.,A monk returned from the west unfolds sacred scrolls.,Un moine revenu de l'ouest déploie des parchemins.,Un monaco tornato dall'ovest dispiega antiche pergamene.,Un monje regresado del oeste despliega pergaminos.,西域から戻った僧が、経典を広げて見せている。,Ένας μοναχός δείχνει ιερά χειρόγραφα.,从西天取经而归的僧人翻开了经书。
+event.chinese.tang_monk_scripture.choice_1,경전을 탐독한다,Study Scriptures,Étudier les Sutras,Studia i Sutra,Estudiar Sutras,経典を読み耽る,Μελέτη χειρογράφων,研读经书
+event.chinese.tang_monk_scripture.choice_2,감사히 거절한다,Politely Decline,Décliner Poliment,Rifiuta Gentilmente,Rechazar Educadamente,丁寧にお断りする,Ευγενική άρνηση,心领并拒绝
+event.chinese.eight_immortals_feast.name,팔선의 연회,Feast of the Eight Immortals,Le Banquet des Huit Immortels,Il Banchetto degli Otto Immortali,El Banquete de los Ocho Inmortales,八仙の宴,Το Συμπόσιο των Οκτώ Αθανάτων,八仙过海的盛宴
+event.chinese.eight_immortals_feast.desc,하늘에서 내려온 여덟 신선이 잔치를 열고 당신을 초대한다.,Eight immortals descend from the heavens and invite thee.,Huit immortels descendent des cieux et t'invitent.,Otto immortali scendono dai cieli e ti invitano.,Ocho inmortales descienden de los cielos y te invitan.,天上より降り立った八仙が、汝を宴に招いている。,Οκτώ αθάνατοι σε προσκαλούν σε συμπόσιο.,从天而降的八位神仙举行盛宴并邀请了你。
+event.chinese.eight_immortals_feast.choice_1,잔치에 참여한다 (골드 -40),Join Feast (Gold -40),Rejoindre le Banquet (Or -40),Unisciti al Banchetto (Oro -40),Unirse al Banquete (Oro -40),宴に参加する (ゴールド -40),Ένταξη στο συμπόσιο (Χρυσός -40),赴宴 (金币-40)
+event.chinese.eight_immortals_feast.choice_2,술을 가져간다,Take Wine,Prendre le Vin,Prendi il Vino,Tomar el Vino,酒を受け取る,Λήψη οίνου,带走美酒
+event.chinese.eight_immortals_feast.choice_3,그냥 지나친다,Pass by,Passer son chemin,Oltrepassa,Pasar de largo,通り過ぎる,Προσπέραση,径直路过
+event.chinese.celestial_market.name,천계 시장,Celestial Market,Le Marché Céleste,Il Mercato Celeste,El Mercado Celestial,天界の市場,Η Ουράνια Αγορά,天界市场
+event.chinese.celestial_market.desc,구름 위 하늘 시장에 도착했다. 선인들이 기이한 물건을 팔고 있다.,A market amidst the clouds. Immortals peddle curiosities.,Un marché au milieu des nuages. Les immortels vendent des curiosités.,Un mercato tra le nuvole. Gli immortali vendono curiosità.,Un mercado entre las nubes. Los inmortales venden curiosidades.,雲の上の市場に辿り着いた。仙人たちが奇妙な品を売っている。,Μια αγορά στα σύννεφα. Οι αθάνατοι πουλούν περίεργα πράγματα.,抵达了云端之上的天宫市场。众仙正在出售奇异物件。
+event.chinese.celestial_market.choice_1,고가 유물을 구입한다 (골드 -80),Buy Relic (Gold -80),Acheter Relique (Or -80),Compra Reliquia (Oro -80),Comprar Reliquia (Oro -80),高価な遺物を買う (ゴールド -80),Αγορά κειμηλίου (Χρυσός -80),购买名贵遗物 (金币-80)
+event.chinese.celestial_market.choice_2,불량품을 집어든다 (도박 골드 -30),Take Junk (Gamble, Gold -30),Prendre une Babiole (Pari, Or -30),Prendi Cianfrusaglia (Scommessa, Oro -30),Tomar Chatarra (Apuesta, Oro -30),不良品を手に取る (賭け, ゴールド -30),Λήψη άχρηστων (Τζόγος, Χρυσός -30),拿取次品 (赌一把, 金币-30)
+event.chinese.celestial_market.choice_3,그냥 구경만 한다,Watch,Regarder,Guarda,Mirar,眺めるだけにする,Παρακολούθηση,仅作围观
+event.chinese.dragon_king_invitation.name,용왕의 용궁 초대,Dragon King's Invitation,Invitation du Roi Dragon,Invito del Re Dragone,Invitación del Rey Dragón,龍王の招待,Πρόσκληση του Βασιλιά των Δράκων,龙王的龙宫邀请
+event.chinese.dragon_king_invitation.desc,바다 아래에서 용왕의 사자가 나타난다.,A messenger of the Dragon King emerges from the deep.,Un messager du Roi Dragon surgit des profondeurs.,Un messaggero del Re Dragone emerge dalle profondità.,Un mensajero del Rey Dragón surge de las profundidades.,海底から龍王の使いが現れた。,Ένας αγγελιαφόρος του Βασιλιά των Δράκων εμφανίζεται.,大海深处显现出了龙王的使者。
+event.chinese.dragon_king_invitation.choice_1,초대에 응한다 (HP -25),Accept (HP -25),Accepter (PV -25),Accetta (PF -25),Aceptar (PV -25),招待に応じる (HP -25),Αποδοχή πρόσκλησης (HP -25),应邀赴约 (生命值-25)
+event.chinese.dragon_king_invitation.choice_2,보물 하나만 요청한다 (HP -40),Request Treasure (HP -40),Demander un Trésor (PV -40),Richiedi Tesoro (PF -40),Pedir Tesoro (PV -40),宝を一つ求める (HP -40),Αίτημα θησαυρού (HP -40),仅请求一份宝物 (生命值-40)
+event.chinese.dragon_king_invitation.choice_3,정중히 거절한다,Politely Decline,Décliner Poliment,Rifiuta Gentilmente,Rechazar Educadamente,丁寧にお断りする,Ευγενική άρνηση,郑重拒绝
+event.chinese.lu_dongbin_sword.name,여동빈의 검술 수련,Lü Dongbin's Training,L'Entraînement de Lü Dongbin,L'Allenamento di Lü Dongbin,El Entrenamiento de Lü Dongbin,呂洞賓の剣術修練,Εκπαίδευση του Λου Ντονγκμπίν,吕洞宾的剑术修炼
+event.chinese.lu_dongbin_sword.desc,검을 든 노인이 말한다.,An old master with a sword offers his guidance.,Un vieux maître au sabre offre ses conseils.,Un vecchio maestro con la spada offre la sua guida.,Un viejo maestro con la espada ofrece su guía.,剣を携えた老人が、汝に語りかける。,Ένας γέροντας με σπαθί προσφέρει καθοδήγηση.,手持长剑的老者正在说话。
+event.chinese.lu_dongbin_sword.choice_1,수련을 받는다 (카드 1장 제거),Train (Remove 1 card),S'entraîner (Retirer 1 carte),Allenati (Rimuovi 1 carta),Entrenar (Eliminar 1 carta),修練を受ける (1枚削除),Εκπαίδευση (Αφαίρεση 1 κάρτας),接受修炼 (移除1张卡牌)
+event.chinese.lu_dongbin_sword.choice_2,감사히 거절한다,Politely Decline,Décliner Poliment,Rifiuta Gentilmente,Rechazar Educadamente,丁寧にお断리する,Ευγενική άρνηση,感激并拒绝
+event.chinese.pangu_fragment.name,반고의 파편,Fragment of Pangu,Le Fragment de Pangu,Il Frammento di Pangu,El Fragmento de Pangu,盤古の破片,Θραύσμα του Πανγκού,盘古碎块
+event.chinese.pangu_fragment.desc,고요한 들판에 거대한 빛 조각이 떨어져 있다.,A shard of divine light lies upon the silent field.,Un éclat de lumière divine jonche le sol.,Un frammento di luce divina giace al suolo.,Un fragmento de luz divina yace en el suelo.,静かな野原に、巨大な光の欠片が落ちている。,Ένα θραύσμα θεϊκού φωτός στο πεδίο.,寂静的旷野上掉落着巨大的光之碎片。
+event.chinese.pangu_fragment.choice_1,파편의 도움을 받는다,Accept Aid,Accepter l'Aide,Accetta Aiuto,Aceptar Ayuda,破片の助けを受ける,Αποδοχή βοήθειας,接受碎片的帮助
+event.chinese.pangu_fragment.choice_2,조용히 놓아둔다,Leave in Peace,Laisser en Paix,Lascia in Pace,Dejar en Paz,静かに置いておく,Άφησέ το στην ησυχία του,静静地放下
+event.chinese.shennong_herbs.name,신농의 약초,Shennong's Herbs,Les Herbes de Shennong,Le Erbe di Shennong,Las Hierbas de Shennong,神農の薬草,Τα Βότανα του Σενόνγκ,神农百草
+event.chinese.shennong_herbs.desc,황소 머리의 신인이 약초를 잔뜩 지고 있다.,The deity with the bull's head carries a bounty of herbs.,La divinité à tête de taureau porte des herbes.,La divinità con testa di toro porta delle erbe.,La deidad con cabeza de toro lleva hierbas.,牛の頭を持つ神人が、薬草を背負っている。,Ο θεός με το κεφάλι ταύρου μεταφέρει βότανα.,牛头人身的仙人背着许多药草。
+event.chinese.shennong_herbs.choice_1,약초를 먹는다 (HP -15),Eat Herbs (HP -15),Manger les Herbes (PV -15),Mangia le Erbe (PF -15),Comer Hierbas (PV -15),薬草を食べる (HP -15),Βρώση βοτάνων (HP -15),服下药草 (生命值-15)
+event.chinese.shennong_herbs.choice_2,좋은 약초만 고른다 (골드 -40),Pick Quality Herbs (Gold -40),Choisir les Meilleures (Or -40),Scegli le Migliori (Oro -40),Elegir Calidad (Oro -40),良い薬草を選ぶ (ゴールド -40),Επιλογή βοτάνων (Χρυσός -40),挑选良药 (金币-40)
+event.chinese.shennong_herbs.choice_3,거절한다,Refuse,Refuser,Rifiuta,Rechazar,拒絶する,Απόρριψη,拒绝
+event.chinese.phoenix_rebirth.name,봉황의 부활,Phoenix Rebirth,La Renaissance du Phénix,La Rinascita della Fenice,El Renacimiento del Fénix,鳳凰の復活,Η Αναγέννηση του Φοίνικα,凤凰涅槃
+event.chinese.phoenix_rebirth.desc,불꽃 속에서 아름다운 새가 솟아오른다.,A bird of splendor rises from the embers.,Un oiseau de splendeur surgit des braises.,Un uccello splendente sorge dalle braci.,Un ave de esplendor surge de las brasas.,炎の中から美しき鳥が舞い上がる。,Ένα πουλί αναδύεται από τις φλόγες.,美丽的禽鸟从火焰中冲天而起。
+event.chinese.phoenix_rebirth.choice_1,깃털을 가져간다 (도박),Take Feather (Gamble),Prendre une Plume (Pari),Prendi una Piuma (Scommessa),Tomar Pluma (Apuesta),羽を持ち去る (賭け),Λήψη φτερού (Τζόγος),带走羽毛 (赌一把)
+event.chinese.phoenix_rebirth.choice_2,깃털을 바람에 돌려보낸다,Return Feather,Rendre la Plume,Restituisci la Piuma,Devolver Pluma,羽を風に返す,Επιστροφή φτερού,让羽毛随风而归

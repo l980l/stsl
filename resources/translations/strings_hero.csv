@@ -1,16 +1,16 @@
 ﻿keys,ko,en,fr,it,es,ja,el,zh
-hero.napoleon.name,나폴레옹,,,,,,,
-hero.napoleon.figure,나폴레옹 보나파르트,,,,,,,
-hero.cleopatra.name,클레오파트라,,,,,,,
-hero.cleopatra.figure,클레오파트라 7세,,,,,,,
-hero.yi_sun_sin.name,이순신,,,,,,,
-hero.yi_sun_sin.figure,이순신 장군,,,,,,,
-hero.joan_of_arc.name,잔다르크,,,,,,,
-hero.joan_of_arc.figure,잔 다르크,,,,,,,
-hero.joan_of_arc.unlock_desc,챕터 1 클리어 후 해금,,,,,,,
-hero.genghis_khan.name,칭기즈칸,,,,,,,
-hero.genghis_khan.figure,칭기즈 칸,,,,,,,
-hero.genghis_khan.unlock_desc,오시리스 처치 후 해금,,,,,,,
-hero.musashi.name,무사시,,,,,,,
-hero.musashi.figure,미야모토 무사시,,,,,,,
-hero.musashi.unlock_desc,1:1 엘리트 5회 처치 후 해금,,,,,,,
+hero.napoleon.name,나폴레옹,Napoleon,Napoléon,Napoleone,Napoleón,ナポレオン,Ναπολέων,拿破仑
+hero.napoleon.figure,나폴레옹 보나파르트,Napoleon Bonaparte,Napoléon Bonaparte,Napoleone Bonaparte,Napoleón Bonaparte,ナポレオン・ボナパルト,Ναπολέων Βοναπάρτης,拿破仑·波拿巴
+hero.cleopatra.name,클레오파트라,Cleopatra,Cléopâtre,Cleopatra,Cleopatra,クレオパトラ,Κλεοπάτρα,克娄巴特拉
+hero.cleopatra.figure,클레오파트라 7세,Cleopatra VII,Cléopâtre VII,Cleopatra VII,Cleopatra VII,クレオパトラ7世,Κλεοπάτρα Ζ',克娄巴特拉七世
+hero.yi_sun_sin.name,이순신,Yi Sun-sin,Yi Sun-sin,Yi Sun-sin,Yi Sun-sin,李舜臣,Γι Σουν-σιν,李舜臣
+hero.yi_sun_sin.figure,이순신 장군,Admiral Yi Sun-sin,Amiral Yi Sun-sin,Ammiraglio Yi Sun-sin,Almirante Yi Sun-sin,李舜臣将軍,Ναύαρχος Γι Σουν-σιν,李舜臣将军
+hero.joan_of_arc.name,잔다르크,Joan of Arc,Jeanne d'Arc,Giovanna d'Arco,Juana de Arco,ジャンヌ・ダルク,Ιωάννα της Λωρραίνης,圣女贞德
+hero.joan_of_arc.figure,잔 다르크,Joan of Arc,Jeanne d'Arc,Giovanna d'Arco,Juana de Arco,ジャンヌ・ダルク,Ιωάννα της Λωρραίνης,圣女贞德
+hero.joan_of_arc.unlock_desc,챕터 1 클리어 후 해금,Unlocked after clearing Chapter 1,Débloqué après avoir terminé le chapitre 1,Sbloccato dopo aver completato il capitolo 1,Desbloqueado tras completar el capítulo 1,チャプター1クリア後に解放,Ξεκλειδώνει μετά την ολοκλήρωση του Κεφαλαίου 1,通关第一章后解锁
+hero.genghis_khan.name,칭기즈칸,Genghis Khan,Gengis Khan,Gengis Khan,Gengis Khan,チンギス・カン,Τζένγκις Χαν,成吉思汗
+hero.genghis_khan.figure,칭기즈 칸,Genghis Khan,Gengis Khan,Gengis Khan,Gengis Khan,チンギス・ハン,Τζένγκις Χαν,成吉思汗
+hero.genghis_khan.unlock_desc,오시리스 처치 후 해금,Unlocked after defeating Osiris,Débloqué après avoir vaincu Osiris,Sbloccato dopo aver sconfitto Osiride,Desbloqueado tras derrotar a Osiris,オシリス撃破後に解放,Ξεκλειδώνει μετά την ήττα του Όσιρι,击败奥西里斯后解锁
+hero.musashi.name,무사시,Musashi,Musashi,Musashi,Musashi,武蔵,Μουσάσι,武藏
+hero.musashi.figure,미야모토 무사시,Miyamoto Musashi,Miyamoto Musashi,Miyamoto Musashi,Miyamoto Musashi,宮本武蔵,Μιγιαμότο Μουσάσι,宫本武藏
+hero.musashi.unlock_desc,1:1 엘리트 5회 처치 후 해금,Unlocked after defeating 1:1 Elite 5 times,Débloqué après avoir vaincu l'Élite 1:1 5 fois,Sbloccato dopo aver sconfitto l'Elite 1:1 per 5 volte,Desbloqueado tras derrotar al Élite 1:1 5 veces,1:1エリートを5回撃破後に解放,Ξεκλειδώνει μετά την ήττα 5 φορές της Ελίτ 1:1,击败1:1精英5次后解锁
