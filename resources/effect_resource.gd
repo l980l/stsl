@@ -79,7 +79,16 @@ func display_text() -> String:
 		EffectType.POISON_BURST:   return TranslationServer.translate("effect.poison_burst.text")
 		EffectType.COUNTER_BLOCK:  return TranslationServer.translate("effect.counter_block.text") % value
 		EffectType.COST_NEXT:      return TranslationServer.translate("effect.cost_next.text") % value
-		EffectType.CONDITIONAL_DMG: return TranslationServer.translate("effect.conditional_dmg.text") % [bonus_value, value, status_type]
+		EffectType.CONDITIONAL_DMG:
+			var cond_key: String = _STATUS_NAME_KEYS.get(status_type, "")
+			var cond_name: String
+			if status_type == "poison":
+				cond_name = tr("status.poison.name")
+			elif cond_key:
+				cond_name = tr(cond_key)
+			else:
+				cond_name = status_type
+			return TranslationServer.translate("effect.conditional_dmg.text") % [bonus_value, value, cond_name]
 		EffectType.SUMMON_TOKEN:   return TranslationServer.translate("effect.summon_token.text") % value
 		EffectType.CHARM:          return TranslationServer.translate("effect.charm.text") % value
 		EffectType.REVIVE:              return TranslationServer.translate("effect.revive.text") % value

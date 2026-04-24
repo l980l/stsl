@@ -2,6 +2,7 @@
 extends Node2D
 
 const MapNodeRes = preload("res://resources/map_node_resource.gd")
+const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 
 const COL_X := [760, 960, 1160]
 const FLOOR_Y_BOTTOM := 900
@@ -12,11 +13,17 @@ const NODE_H := 50
 var _node_buttons: Dictionary = {}  # node_id → Button
 var _floor_label: Label
 var _relic_container: HBoxContainer
-var _deck_overlay: Control = null
+var _deck_viewer: CanvasLayer = null
+var _deck_viewer_tooltip: CardScene = null
 
 func _ready() -> void:
 	_build_ui()
 	_refresh_map()
+
+func _unhandled_input(ev: InputEvent) -> void:
+	if _deck_viewer and ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
+		_hide_deck_viewer()
+		get_viewport().set_input_as_handled()
 
 func _build_ui() -> void:
 	# 배경
@@ -143,7 +150,7 @@ func _room_type_text(room_type: int) -> String:
 		_: return "?"
 
 func _show_deck_viewer() -> void:
-	if _deck_overlay:
+	if _deck_viewer:
 		return
 
 	var dm: Object = null
@@ -158,57 +165,113 @@ func _show_deck_viewer() -> void:
 		all_cards.append_array(dm.discard_pile)
 		all_cards.append_array(dm.hand)
 
-	_deck_overlay = Control.new()
-	_deck_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(_deck_overlay)
+	var canvas := CanvasLayer.new()
+	canvas.layer = 10
+	add_child(canvas)
 
-	var dim := ColorRect.new()
-	dim.color = Color(0.0, 0.0, 0.0, 0.75)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_deck_overlay.add_child(dim)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	canvas.add_child(overlay)
 
-	var panel := ColorRect.new()
-	panel.color = Color(0.1, 0.1, 0.2)
-	panel.position = Vector2(460, 100)
-	panel.size = Vector2(1000, 850)
-	_deck_overlay.add_child(panel)
+	var bg_rect := ColorRect.new()
+	bg_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg_rect.color = Color(0.0, 0.0, 0.0, 0.75)
+	bg_rect.gui_input.connect(func(ev: InputEvent) -> void:
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			_hide_deck_viewer()
+	)
+	overlay.add_child(bg_rect)
 
-	var header := Label.new()
-	header.text = tr("ui.map.deck_list_title") % all_cards.size()
-	header.position = Vector2(460, 110)
-	header.size = Vector2(1000, 50)
-	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	header.add_theme_font_size_override("font_size", 26)
-	_deck_overlay.add_child(header)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(1200, 700)
+	panel.position = Vector2((1920 - 1200) / 2.0, (1080 - 700) / 2.0)
+	overlay.add_child(panel)
 
-	var scroll := ScrollContainer.new()
-	scroll.position = Vector2(470, 170)
-	scroll.size = Vector2(980, 700)
-	_deck_overlay.add_child(scroll)
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 20)
+	margin.add_theme_constant_override("margin_right", 20)
+	margin.add_theme_constant_override("margin_top", 14)
+	margin.add_theme_constant_override("margin_bottom", 14)
+	panel.add_child(margin)
 
 	var vbox := VBoxContainer.new()
-	vbox.custom_minimum_size = Vector2(960, 0)
-	scroll.add_child(vbox)
+	vbox.add_theme_constant_override("separation", 8)
+	margin.add_child(vbox)
 
-	for card in all_cards:
-		var card_name: String = tr(card.get("card_name")) if card.get("card_name") != null else "?"
-		var cost: int = card.get("cost") if card.get("cost") != null else 0
-		var card_owner: String = card.get("owner_id") if card.get("owner_id") != null else ""
-		var lbl := Label.new()
-		lbl.text = tr("ui.map.deck_card_format") % [cost, card_name, card_owner]
-		lbl.add_theme_font_size_override("font_size", 16)
-		vbox.add_child(lbl)
+	var title_row := HBoxContainer.new()
+	vbox.add_child(title_row)
+
+	var title_lbl := Label.new()
+	title_lbl.text = tr("ui.map.deck_list_title") % all_cards.size()
+	title_lbl.add_theme_font_size_override("font_size", 22)
+	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_row.add_child(title_lbl)
 
 	var close_btn := Button.new()
-	close_btn.text = tr("ui.map.btn_close")
-	close_btn.position = Vector2(880, 960)
+	close_btn.text = "✕"
+	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.add_theme_font_size_override("font_size", 18)
 	close_btn.pressed.connect(_hide_deck_viewer)
-	_deck_overlay.add_child(close_btn)
-	close_btn.size = Vector2(160, 45)
-	LabelUtils.fit_text(close_btn, 18, 12)
+	title_row.add_child(close_btn)
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(scroll)
+
+	var grid := GridContainer.new()
+	grid.columns = 9
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 10)
+	scroll.add_child(grid)
+
+	for card_res in all_cards:
+		var captured_res: Resource = card_res
+		var wrapper := Control.new()
+		wrapper.custom_minimum_size = Vector2(91, 130)
+		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
+		grid.add_child(wrapper)
+
+		var card_node: CardScene = CARD_SCENE.instantiate()
+		card_node.scale = Vector2(0.65, 0.65)
+		card_node.setup(card_res, CardScene.Mode.REWARD)
+		wrapper.add_child(card_node)
+
+		var captured_wrapper: Control = wrapper
+		card_node.card_hovered.connect(func(_c): _show_deck_tooltip(captured_res, captured_wrapper))
+		card_node.card_unhovered.connect(func(_c): _hide_deck_tooltip())
+
+	var tip: CardScene = CARD_SCENE.instantiate()
+	tip.scale = Vector2(2.5, 2.5)
+	tip.z_index = 200
+	tip.visible = false
+	overlay.add_child(tip)
+	_set_mouse_ignore_recursive(tip)
+	_deck_viewer_tooltip = tip
+
+	_deck_viewer = canvas
+
+func _show_deck_tooltip(card: Resource, node: Control) -> void:
+	if _deck_viewer_tooltip == null:
+		return
+	_deck_viewer_tooltip.setup(card, CardScene.Mode.HAND)
+	var base := node.global_position
+	var x: float = clamp(base.x + 45.0 - 175.0, 0.0, 1920.0 - 350.0)
+	var y: float = clamp(base.y - 510.0, 20.0, 1080.0 - 500.0)
+	_deck_viewer_tooltip.position = Vector2(x, y)
+	_deck_viewer_tooltip.visible = true
+
+func _hide_deck_tooltip() -> void:
+	if _deck_viewer_tooltip != null:
+		_deck_viewer_tooltip.visible = false
 
 func _hide_deck_viewer() -> void:
-	if _deck_overlay:
-		_deck_overlay.queue_free()
-		_deck_overlay = null
+	if _deck_viewer:
+		_deck_viewer_tooltip = null
+		_deck_viewer.queue_free()
+		_deck_viewer = null
+
+func _set_mouse_ignore_recursive(node: Node) -> void:
+	if node is Control:
+		(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for child in node.get_children():
+		_set_mouse_ignore_recursive(child)
