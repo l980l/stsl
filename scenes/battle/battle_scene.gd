@@ -16,6 +16,11 @@ const SLOT_H := 280
 const BOTTOM_Y := 840
 const CARD_W := 110
 const CARD_H := 160
+const BASE_CARD_SCALE := 1.4
+const FAN_PIVOT_Y_OFFSET := 1200.0
+const FAN_ANGLE_PER_CARD := 0.10
+const FAN_MAX_TOTAL_ANGLE := 0.9
+const HAND_BASE_Y := 900
 const SLOT_GAP := 20
 const MAX_ENEMY_COUNT := 6
 const TOKEN_COLS := 6
@@ -42,7 +47,6 @@ var _selected_card: Resource = null
 
 var _drag_card: Resource = null
 var _drag_preview: Label = null
-var _card_tooltip: Control = null
 
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
@@ -637,15 +641,25 @@ func _refresh_hand() -> void:
 	if hand.is_empty():
 		return
 
-	var card_w: int = 140
-	var gap: int = 10
-	var total_w: int = hand.size() * (card_w + gap) - gap
-	var start_x: float = (WINDOW_W - total_w) / 2.0
+	var n_cards: int = hand.size()
+	var step: float = FAN_ANGLE_PER_CARD if n_cards <= 1 else \
+		minf(FAN_ANGLE_PER_CARD, FAN_MAX_TOTAL_ANGLE / float(n_cards - 1))
+	var fan_pivot := Vector2(WINDOW_W / 2.0, HAND_BASE_Y + FAN_PIVOT_Y_OFFSET)
+	var half_card := Vector2(70, 100) * BASE_CARD_SCALE
 
-	for i in range(hand.size()):
+	for i in range(n_cards):
 		var card: Resource = hand[i]
 		var node: CardScene = CARD_SCENE.instantiate()
-		node.position = Vector2(start_x + i * (card_w + gap), BOTTOM_Y)
+		var angle: float = (i - (n_cards - 1) / 2.0) * step
+		var arc_pos: Vector2 = fan_pivot + Vector2(sin(angle), -cos(angle)) * FAN_PIVOT_Y_OFFSET
+		node.position = arc_pos - half_card
+		node.rotation = angle
+		node.pivot_offset = Vector2(70, 100)
+		node.scale = Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE)
+		node.z_index = i
+		node.set_meta("_fan_pos", node.position)
+		node.set_meta("_fan_rot", node.rotation)
+		node.set_meta("_fan_idx", i)
 		node.setup(card, node.Mode.HAND)
 		node.set_disabled(not DeckManager.can_play(card))
 		node.card_clicked.connect(_on_card_clicked)
@@ -680,30 +694,46 @@ func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 	if _drag_card != null:
 		_finish_drag(screen_pos)
 
-func _on_card_hovered(card: Resource, card_node: CardScene) -> void:
+func _on_card_hovered(_card: Resource, card_node: CardScene) -> void:
 	if _drag_card != null:
 		return
-	_free_card_tooltip()
-	var tooltip: CardScene = CARD_SCENE.instantiate()
-	tooltip.scale = Vector2(2.5, 2.5)
-	tooltip.z_index = 100
-	tooltip.setup(card, tooltip.Mode.HAND)
-	add_child(tooltip)
-	_set_mouse_ignore_recursive(tooltip)
-	_card_tooltip = tooltip
-	# 카드 정중앙 위쪽에 고정 (툴팁 350×500 기준)
-	var base: Vector2 = card_node.global_position
-	var x: float = clamp(base.x + 70.0 - 175.0, 0.0, 1570.0)
-	var y: float = clamp(base.y - 510.0, 0.0, 580.0)
-	tooltip.position = Vector2(x, y)
+	var hover_idx: int = card_node.get_meta("_fan_idx", -1)
+	if hover_idx < 0:
+		return
+	for btn in _card_buttons:
+		if not is_instance_valid(btn):
+			continue
+		var idx: int = btn.get_meta("_fan_idx", 0)
+		var base_pos: Vector2 = btn.get_meta("_fan_pos")
+		var base_rot: float = btn.get_meta("_fan_rot")
+		var tw := create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+		if idx == hover_idx:
+			tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE * 1.2, BASE_CARD_SCALE * 1.2), 0.12)
+			tw.tween_property(btn, "position", base_pos + Vector2(0, -60.0), 0.12)
+			tw.tween_property(btn, "rotation", 0.0, 0.12)
+			btn.z_index = 200
+		else:
+			var dist: int = idx - hover_idx
+			var sign_x: float = 1.0 if dist > 0 else -1.0
+			var falloff: float = maxf(0.0, 1.0 - abs(dist) / 4.0)
+			tw.tween_property(btn, "position", base_pos + Vector2(sign_x * 35.0 * falloff, 0), 0.12)
+			tw.tween_property(btn, "rotation", base_rot, 0.12)
+			tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE), 0.12)
+			btn.z_index = idx
 
 func _on_card_unhovered(_card: Resource) -> void:
-	_free_card_tooltip()
+	_reset_hand_fan()
 
-func _free_card_tooltip() -> void:
-	if _card_tooltip != null:
-		_card_tooltip.queue_free()
-		_card_tooltip = null
+func _reset_hand_fan() -> void:
+	for btn in _card_buttons:
+		if not is_instance_valid(btn):
+			continue
+		var idx: int = btn.get_meta("_fan_idx", 0)
+		var tw := create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+		tw.tween_property(btn, "position", btn.get_meta("_fan_pos"), 0.12)
+		tw.tween_property(btn, "rotation", btn.get_meta("_fan_rot"), 0.12)
+		tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE), 0.12)
+		btn.z_index = idx
 
 func _on_enemy_pressed(index: int) -> void:
 	if _debug_hp_target_mode and OS.is_debug_build():
@@ -1356,7 +1386,7 @@ func _card_target_type(card: Resource) -> String:
 	return "none"
 
 func _start_drag(card: Resource) -> void:
-	_free_card_tooltip()
+	_reset_hand_fan()
 	_drag_card = card
 	_selected_card = null
 	_drag_preview = Label.new()
