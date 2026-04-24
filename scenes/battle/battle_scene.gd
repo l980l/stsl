@@ -10,9 +10,6 @@ const ARROW_HEAD_TEX    := preload("res://assets/art/ui/arrow_head.png")
 
 const WINDOW_W := 1920
 const WINDOW_H := 1080
-const HERO_X := 20
-const ENEMY_X := 1440
-const ENEMY_COL_GAP := 20
 const SLOT_W := 240
 const SLOT_H := 280
 const BOTTOM_Y := 840
@@ -23,14 +20,12 @@ const FAN_PIVOT_Y_OFFSET := 1200.0
 const FAN_ANGLE_PER_CARD := 0.10
 const FAN_MAX_TOTAL_ANGLE := 0.9
 const HAND_BASE_Y := 960
-const SLOT_GAP := 20
 const MAX_ENEMY_COUNT := 6
 const TOKEN_COLS := 6
-const TOKEN_ROWS := 2
+const TOKEN_ROWS := 1
 const TOKEN_TILE_W := 111
 const TOKEN_TILE_H := 138
 const TOKEN_TILE_GAP := 4
-const TOKEN_AREA_X := 270
 
 # UI 참조 (Dictionary 배열)
 # hero entry: {panel, name_lbl, hp_lbl, block_lbl, hero_id}
@@ -48,7 +43,6 @@ var _relic_container: HBoxContainer
 var _selected_card: Resource = null
 
 var _drag_card: Resource = null
-var _drag_preview: Label = null
 var _drag_chevrons: Array = []
 var _drag_arrow_head: Sprite2D = null
 var _drag_start_pos: Vector2 = Vector2.ZERO
@@ -64,6 +58,7 @@ var _debug_badge: Label = null
 var _debug_hp_target_mode: bool = false
 var _debug_grid_visible: bool = false
 var _debug_grid_nodes: Array = []
+var _debug_token_hero_idx: int = 0
 
 var _deck_viewer: CanvasLayer = null
 var _deck_viewer_tooltip: CardScene = null
@@ -179,36 +174,41 @@ func _build_ui() -> void:
 		_hero_nodes.append(_make_hero_slot(i))
 	# 적 슬롯은 _setup_enemies()에서 동적 생성
 
+func _hero_slot_pos(index: int) -> Vector2:
+	return (get_node("HeroSlot%d" % (index + 1)) as Marker2D).position
+
+func _summon_area_pos(index: int) -> Vector2:
+	return (get_node("SummonArea%d" % (index + 1)) as Marker2D).position
+
 func _make_hero_slot(index: int) -> Dictionary:
-	var y := 80 + index * (SLOT_H + SLOT_GAP)
+	var pos := _hero_slot_pos(index)
 	var panel := ColorRect.new()
-	panel.color = Color(0.12, 0.12, 0.2)
-	panel.position = Vector2(HERO_X, y)
+	panel.color = Color(0, 0, 0, 0)
+	panel.position = pos
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
 	add_child(panel)
 
-	# UI 상단 배치, 스프라이트는 그 뒤에 렌더 (z_index=1 for UI)
 	var bar_w: float = 211.0
 	var _bar_h: float = 12.0
-	var bar_x: float = HERO_X + (SLOT_W - bar_w) / 2.0
+	var bar_x: float = pos.x + (SLOT_W - bar_w) / 2.0
 
-	var name_lbl := _make_label(Vector2(bar_x, y + 4), Vector2(bar_w, 22), 16)
+	var name_lbl := _make_label(Vector2(bar_x, pos.y + 4), Vector2(bar_w, 22), 16)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.z_index = 1
 	name_lbl.visible = false
 
-	var hp_bar := _make_hp_bar(Vector2(bar_x, y + 28), bar_w)
+	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 28), bar_w)
 	hp_bar.z_index = 1
 	hp_bar.visible = false
 
-	var hp_lbl := _make_label(Vector2(bar_x, y + 22), Vector2(bar_w, 24), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 22), Vector2(bar_w, 24), 12)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hp_lbl.z_index = 1
 	hp_lbl.visible = false
 
-	var block_lbl := _make_label(Vector2(bar_x, y + 22), Vector2(bar_w, 24), 12)
+	var block_lbl := _make_label(Vector2(bar_x, pos.y + 22), Vector2(bar_w, 24), 12)
 	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	block_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
@@ -216,7 +216,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 	block_lbl.visible = false
 
 	var status_box := HBoxContainer.new()
-	status_box.position = Vector2(bar_x, y + 42)
+	status_box.position = Vector2(bar_x, pos.y + 42)
 	status_box.size = Vector2(bar_w, 18)
 	status_box.z_index = 1
 	status_box.visible = false
@@ -226,17 +226,13 @@ func _make_hero_slot(index: int) -> Dictionary:
 			 "hp_lbl": hp_lbl, "block_lbl": block_lbl,
 			 "hero_id": "", "status_box": status_box }
 
-func _enemy_slot_pos(index: int, total: int) -> Vector2:
-	if total <= 3:
-		return Vector2(ENEMY_X, 80 + index * (SLOT_H + SLOT_GAP))
-	var row: int = int(index / 2.0)
-	var col: int = index % 2
-	return Vector2(ENEMY_X + col * (SLOT_W + ENEMY_COL_GAP), 80 + row * (SLOT_H + SLOT_GAP))
+func _enemy_slot_pos(index: int, _total: int = 0) -> Vector2:
+	return (get_node("EnemySlot%d" % (index + 1)) as Marker2D).position
 
 func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	var pos: Vector2 = _enemy_slot_pos(index, total)
 	var panel := ColorRect.new()
-	panel.color = Color(0.18, 0.10, 0.10)
+	panel.color = Color(0, 0, 0, 0)
 	panel.position = pos
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
@@ -467,8 +463,8 @@ func _setup_heroes() -> void:
 
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
-			var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
-			char_node.position = Vector2(HERO_X + SLOT_W / 2.0 - 40.0 * 1.44, slot_y + 88)
+			var slot_pos := _hero_slot_pos(i)
+			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 40.0 * 1.44, slot_pos.y + 88)
 			char_node.scale = Vector2(1.44, 2.4)
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
@@ -510,13 +506,20 @@ func _setup_enemies() -> void:
 		entry["btn"].disabled = false
 		entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
 
+		var slot_pos: Vector2 = _enemy_slot_pos(i, total)
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
-			var slot_pos: Vector2 = _enemy_slot_pos(i, total)
 			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0 + 40.0 * 1.44, slot_pos.y + 88)
 			char_node.scale = Vector2(-1.44, 2.4)
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
+		else:
+			var placeholder := ColorRect.new()
+			placeholder.color = Color(0.45, 0.45, 0.5, 0.6)
+			placeholder.size = Vector2(60, 120)
+			placeholder.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 30, slot_pos.y + 40)
+			add_child(placeholder)
+			_enemy_char_nodes[i] = placeholder
 
 		_update_enemy_ui(i)
 		_refresh_enemy_counter(i)
@@ -566,43 +569,21 @@ func _refresh_token_tiles(hero_id: String) -> void:
 	if hero_idx < 0:
 		return
 
-	var slot_y: int = 80 + hero_idx * (SLOT_H + SLOT_GAP)
-	var grid_h: int = TOKEN_ROWS * TOKEN_TILE_H + (TOKEN_ROWS - 1) * TOKEN_TILE_GAP
-	var base_y: int = slot_y + int((SLOT_H - grid_h) / 2.0)
+	var area_pos := _summon_area_pos(hero_idx)
 	var max_tokens: int = TOKEN_COLS * TOKEN_ROWS
 
 	for t in range(min(token_count, max_tokens)):
 		var col: int = int(t / float(TOKEN_ROWS))
 		var row: int = t % TOKEN_ROWS
-		var tile_x: int = TOKEN_AREA_X + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
-		var tile_y: int = base_y + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
+		var tile_x: int = int(area_pos.x) + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
+		var tile_y: int = int(area_pos.y) + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
 
-		# 셀 배경
-		var bg := ColorRect.new()
-		bg.color = Color(0.18, 0.16, 0.10)
-		bg.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
-		bg.position = Vector2(tile_x, tile_y)
-		bg.tooltip_text = tr("battle.token_tooltip")
-		bg.mouse_filter = Control.MOUSE_FILTER_STOP
-		add_child(bg)
-		_token_tile_nodes[hero_id].append(bg)
-
-		# 병사 캐릭터 씬 (idle 애니메이션 포함)
+		# 병사 캐릭터 씬 (2배 스케일)
 		var char_node = SoldierScene.instantiate()
-		char_node.position = Vector2(tile_x + (TOKEN_TILE_W - 40) / 2.0, tile_y + TOKEN_TILE_H - 20 - 50)
+		char_node.scale = Vector2(2.0, 2.0)
+		char_node.position = Vector2(tile_x + TOKEN_TILE_W / 2.0 - 40.0, tile_y + TOKEN_TILE_H / 4.0)
 		add_child(char_node)
 		_token_tile_nodes[hero_id].append(char_node)
-
-		# 이름 라벨 (하단)
-		var lbl := Label.new()
-		lbl.text = tr("battle.token_soldier")
-		lbl.add_theme_font_size_override("font_size", 11)
-		lbl.position = Vector2(tile_x, tile_y + TOKEN_TILE_H - 18)
-		lbl.size = Vector2(TOKEN_TILE_W, 16)
-		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(lbl)
-		_token_tile_nodes[hero_id].append(lbl)
 
 func _update_enemy_ui(index: int) -> void:
 	var entry: Dictionary = _enemy_nodes[index]
@@ -670,7 +651,7 @@ func _refresh_hand() -> void:
 		node.rotation = angle
 		node.pivot_offset = Vector2(70, 100)
 		node.scale = Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE)
-		node.z_index = i
+		node.z_index = 10 + i
 		node.set_meta("_fan_pos", node.position)
 		node.set_meta("_fan_rot", node.rotation)
 		node.set_meta("_fan_idx", i)
@@ -707,12 +688,8 @@ func _on_card_drag_started(card: Resource, screen_pos: Vector2) -> void:
 			break
 	_start_drag(card)
 	_create_drag_arrow(screen_pos)
-	if _drag_preview != null:
-		_drag_preview.position = screen_pos + Vector2(8, 8)
 
 func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
-	if _drag_card != null and _drag_preview != null:
-		_drag_preview.position = screen_pos + Vector2(8, 8)
 	_drag_end_pos = screen_pos
 	_update_drag_arrow(screen_pos)
 
@@ -749,7 +726,7 @@ func _on_card_hovered(_card: Resource, card_node: CardScene) -> void:
 			tw.tween_property(btn, "position", base_pos + Vector2(sign_x * 35.0 * falloff, 0), 0.12)
 			tw.tween_property(btn, "rotation", base_rot, 0.12)
 			tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE), 0.12)
-			btn.z_index = idx
+			btn.z_index = 10 + idx
 
 func _on_card_unhovered(_card: Resource) -> void:
 	_reset_hand_fan()
@@ -1293,6 +1270,17 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_debug_grid_visible = not _debug_grid_visible
 			_refresh_debug_grid()
 			_refresh_debug_badge()
+		elif event.keycode == KEY_O and event.shift_pressed:
+			if BattleManager.debug_add_dummy_enemy(MAX_ENEMY_COUNT):
+				_setup_enemies()
+		elif event.keycode == KEY_S and event.shift_pressed:
+			var living := TeamManager.get_living_heroes()
+			if not living.is_empty():
+				_debug_token_hero_idx = _debug_token_hero_idx % living.size()
+				var hero_id: String = living[_debug_token_hero_idx].hero_id
+				BattleManager.debug_add_dummy_token(hero_id)
+				_refresh_token_tiles(hero_id)
+				_debug_token_hero_idx += 1
 
 func _refresh_debug_grid() -> void:
 	for node in _debug_grid_nodes:
@@ -1303,20 +1291,18 @@ func _refresh_debug_grid() -> void:
 
 	# 영웅 슬롯 외곽선 (파란색)
 	for i in range(_hero_nodes.size()):
-		var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
-		for border in _make_border_rects(HERO_X, slot_y, SLOT_W, SLOT_H, Color(0.3, 0.6, 1.0, 0.8)):
+		var sp := _hero_slot_pos(i)
+		for border in _make_border_rects(int(sp.x), int(sp.y), SLOT_W, SLOT_H, Color(0.3, 0.6, 1.0, 0.8)):
 			add_child(border)
 			_debug_grid_nodes.append(border)
 
 	# 소환물 그리드 (노란색)
 	for i in range(3):
-		var slot_y: int = 80 + i * (SLOT_H + SLOT_GAP)
-		var grid_h: int = TOKEN_ROWS * TOKEN_TILE_H + (TOKEN_ROWS - 1) * TOKEN_TILE_GAP
-		var base_y: int = slot_y + int((SLOT_H - grid_h) / 2.0)
+		var ap := _summon_area_pos(i)
 		for r in range(TOKEN_ROWS):
 			for c in range(TOKEN_COLS):
-				var cx: int = TOKEN_AREA_X + c * (TOKEN_TILE_W + TOKEN_TILE_GAP)
-				var cy: int = base_y + r * (TOKEN_TILE_H + TOKEN_TILE_GAP)
+				var cx: int = int(ap.x) + c * (TOKEN_TILE_W + TOKEN_TILE_GAP)
+				var cy: int = int(ap.y) + r * (TOKEN_TILE_H + TOKEN_TILE_GAP)
 				var cell := ColorRect.new()
 				cell.color = Color(0.8, 0.8, 0.2, 0.12)
 				cell.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
@@ -1419,13 +1405,6 @@ func _start_drag(card: Resource) -> void:
 	_reset_hand_fan()
 	_drag_card = card
 	_selected_card = null
-	_drag_preview = Label.new()
-	_drag_preview.text = "[%d] %s" % [card.cost, tr(card.get("card_name")) if card.get("card_name") else "?"]
-	_drag_preview.add_theme_font_size_override("font_size", 14)
-	_drag_preview.size = Vector2(120, 30)
-	_drag_preview.modulate = Color(1.0, 1.0, 0.6, 0.85)
-	_drag_preview.z_index = 10
-	add_child(_drag_preview)
 	match _card_target_type(card):
 		"enemy":
 			_message_label.text = tr("battle.drag_enemy")
@@ -1489,9 +1468,6 @@ func _finish_drag(drop_pos: Vector2) -> void:
 			_cleanup_drag()
 
 func _cleanup_drag() -> void:
-	if _drag_preview != null:
-		_drag_preview.queue_free()
-		_drag_preview = null
 	for spr in _drag_chevrons:
 		if is_instance_valid(spr):
 			spr.queue_free()
@@ -1503,15 +1479,18 @@ func _cleanup_drag() -> void:
 	for btn in _card_buttons:
 		if is_instance_valid(btn):
 			btn.modulate = Color(1.0, 1.0, 1.0, 1.0)
+			var card_res: Resource = btn.get_meta("_card_res", null)
+			if card_res != null:
+				btn.set_disabled(not DeckManager.can_play(card_res))
 	_drag_card = null
 	_selected_card = null
 	_message_label.text = ""
 	for entry in _enemy_nodes:
 		if entry["panel"].visible:
-			entry["panel"].color = Color(0.18, 0.10, 0.10)
+			entry["panel"].color = Color(0, 0, 0, 0)
 	for entry in _hero_nodes:
 		if entry["panel"].visible:
-			entry["panel"].color = Color(0.12, 0.12, 0.2)
+			entry["panel"].color = Color(0, 0, 0, 0)
 
 func _create_drag_arrow(start_pos: Vector2) -> void:
 	_drag_end_pos = start_pos
