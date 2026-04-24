@@ -12,6 +12,8 @@ signal card_unhovered(card)
 enum Mode { HAND, REWARD, UPGRADE }
 const DRAG_THRESHOLD := 10.0
 const FRAME_DIR := "res://assets/art/cards/cardframes/"
+const GEM_DIR := "res://assets/art/cards/cardgems/"
+const TYPE_ICON_DIR := "res://assets/art/cards/cardtypes/"
 
 var _card: CardResource
 var _mode: int = Mode.HAND
@@ -38,22 +40,34 @@ func refresh() -> void:
 	$Container/TitleLabel.text = _card.card_name
 	LabelUtils.fit_text($Container/TitleLabel, 50, 28)
 	$Container/ArtRect.texture = _card.art
+	$Container/RarityGem.texture = _resolve_gem_texture(_card.rarity)
+	$Container/TypeIcon.texture = _resolve_type_icon(_card.card_type)
 	$Container/DescLabel.text = _build_desc()
-	$Container/TypeLabel.text = _type_display(_card.card_type)
-	$Container/TypeLabel.modulate = Color(0.7, 0.4, 0.9) if _card.card_type == CardResource.CardType.POWER else Color.WHITE
 
-func _type_display(t: int) -> String:
-	match t:
-		CardResource.CardType.ATTACK: return tr("card_type.attack.name")
-		CardResource.CardType.SKILL:  return tr("card_type.skill.name")
-		CardResource.CardType.POWER:  return tr("card_type.power.name")
-	return ""
 
 func _build_desc() -> String:
 	var lines: Array = []
 	for eff in _card.effects:
 		lines.append(eff.display_text())
 	return ", ".join(lines)
+
+func _resolve_gem_texture(rarity: int) -> Texture2D:
+	const NAMES := {
+		CardResource.Rarity.COMMON:    "card_rarity_common.png",
+		CardResource.Rarity.UNCOMMON:  "card_rarity_uncommon.png",
+		CardResource.Rarity.RARE:      "card_rarity_rare.png",
+		CardResource.Rarity.LEGENDARY: "card_rarity_legendary.png",
+		CardResource.Rarity.DIVINE:    "card_rarity_divine.png",
+	}
+	return load(GEM_DIR + NAMES.get(rarity, "card_rarity_common.png"))
+
+func _resolve_type_icon(card_type: int) -> Texture2D:
+	const NAMES := {
+		CardResource.CardType.ATTACK: "card_type_attack.png",
+		CardResource.CardType.SKILL:  "card_type_skill.png",
+		CardResource.CardType.POWER:  "card_type_power.png",
+	}
+	return load(TYPE_ICON_DIR + NAMES.get(card_type, "card_type_attack.png"))
 
 func _resolve_frame_texture(owner_id: String) -> Texture2D:
 	var hero_path := "%s%s_frame.png" % [FRAME_DIR, owner_id]
