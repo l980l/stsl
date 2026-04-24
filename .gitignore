@@ -4,6 +4,7 @@
 
 # 임포트된 에셋 (재생성 가능)
 *.import
+*.translation
 
 # 아트 에셋 — git 미추적, 로컬에서 직접 관리
 assets/art/
