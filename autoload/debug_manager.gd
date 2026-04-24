@@ -6,6 +6,7 @@ const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 �
 var _pinned_label: Label = null
 var _hover_lbl: Label = null
 var _show_keys: bool = false
+var _saved_translations: Array = []
 
 func _ready() -> void:
 	if not OS.is_debug_build():
@@ -55,9 +56,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event.keycode == KEY_T:
 		_show_keys = not _show_keys
 		if _show_keys:
-			TranslationServer.set_locale("xx")
+			_remove_all_translations()
 		else:
-			TranslationServer.set_locale(LocaleManager.current_locale)
+			_restore_all_translations()
 		_apply_key_mode_style()
 		get_tree().reload_current_scene()
 		return
@@ -518,6 +519,25 @@ func _effect_summary(card: Resource) -> String:
 	for eff in card.effects:
 		parts.append(eff.display_text())
 	return " / ".join(parts)
+
+func _remove_all_translations() -> void:
+	_saved_translations.clear()
+	while true:
+		var found := false
+		for locale in Array(TranslationServer.get_loaded_locales()):
+			var t := TranslationServer.get_translation_object(locale)
+			if t != null:
+				_saved_translations.append(t)
+				TranslationServer.remove_translation(t)
+				found = true
+		if not found:
+			break
+
+func _restore_all_translations() -> void:
+	for t in _saved_translations:
+		TranslationServer.add_translation(t)
+	_saved_translations.clear()
+	TranslationServer.set_locale(LocaleManager.current_locale)
 
 func _apply_key_mode_style() -> void:
 	if _hover_lbl == null:
