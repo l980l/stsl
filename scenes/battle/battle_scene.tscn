@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scenes/battle/battle_scene.gd" id="1"]
+[ext_resource type="Script" path="res://scenes/battle/battle_slot_preview.gd" id="preview"]
 
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_button.tscn" id="sb"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_overlay.tscn" id="so"]
@@ -24,5 +25,7 @@ position = Vector2(1700, 80)
 position = Vector2(1700, 380)
 [node name="EnemySlot6" type="Marker2D" parent="."]
 position = Vector2(1700, 680)
+[node name="SlotPreview" type="Node2D" parent="."]
+script = ExtResource("preview")
 [node name="SettingsButton" parent="." instance=ExtResource("sb")]
 [node name="SettingsOverlay" parent="." instance=ExtResource("so")]
