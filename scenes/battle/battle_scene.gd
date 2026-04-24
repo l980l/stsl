@@ -48,7 +48,6 @@ var _relic_container: HBoxContainer
 var _selected_card: Resource = null
 
 var _drag_card: Resource = null
-var _drag_preview: Label = null
 var _drag_chevrons: Array = []
 var _drag_arrow_head: Sprite2D = null
 var _drag_start_pos: Vector2 = Vector2.ZERO
@@ -707,12 +706,8 @@ func _on_card_drag_started(card: Resource, screen_pos: Vector2) -> void:
 			break
 	_start_drag(card)
 	_create_drag_arrow(screen_pos)
-	if _drag_preview != null:
-		_drag_preview.position = screen_pos + Vector2(8, 8)
 
 func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
-	if _drag_card != null and _drag_preview != null:
-		_drag_preview.position = screen_pos + Vector2(8, 8)
 	_drag_end_pos = screen_pos
 	_update_drag_arrow(screen_pos)
 
@@ -1419,13 +1414,6 @@ func _start_drag(card: Resource) -> void:
 	_reset_hand_fan()
 	_drag_card = card
 	_selected_card = null
-	_drag_preview = Label.new()
-	_drag_preview.text = "[%d] %s" % [card.cost, tr(card.get("card_name")) if card.get("card_name") else "?"]
-	_drag_preview.add_theme_font_size_override("font_size", 14)
-	_drag_preview.size = Vector2(120, 30)
-	_drag_preview.modulate = Color(1.0, 1.0, 0.6, 0.85)
-	_drag_preview.z_index = 10
-	add_child(_drag_preview)
 	match _card_target_type(card):
 		"enemy":
 			_message_label.text = tr("battle.drag_enemy")
@@ -1489,9 +1477,6 @@ func _finish_drag(drop_pos: Vector2) -> void:
 			_cleanup_drag()
 
 func _cleanup_drag() -> void:
-	if _drag_preview != null:
-		_drag_preview.queue_free()
-		_drag_preview = null
 	for spr in _drag_chevrons:
 		if is_instance_valid(spr):
 			spr.queue_free()
@@ -1503,6 +1488,9 @@ func _cleanup_drag() -> void:
 	for btn in _card_buttons:
 		if is_instance_valid(btn):
 			btn.modulate = Color(1.0, 1.0, 1.0, 1.0)
+			var card_res: Resource = btn.get_meta("_card_res", null)
+			if card_res != null:
+				btn.set_disabled(not DeckManager.can_play(card_res))
 	_drag_card = null
 	_selected_card = null
 	_message_label.text = ""

@@ -79,7 +79,10 @@ func _resolve_frame_texture(owner_id: String) -> Texture2D:
 
 func set_disabled(v: bool) -> void:
 	_disabled = v
-	modulate = Color(0.5, 0.5, 0.5) if v else Color.WHITE
+	if _mode == Mode.HAND:
+		$Container/CostLabel.modulate = Color(1.0, 0.3, 0.3) if v else Color.WHITE
+	else:
+		modulate = Color(0.5, 0.5, 0.5) if v else Color.WHITE
 
 func set_highlight(v: bool) -> void:
 	modulate = Color(1.2, 1.2, 0.8) if v else Color.WHITE
