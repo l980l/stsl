@@ -136,13 +136,25 @@ func _refresh_relics() -> void:
 	for child in _relic_container.get_children():
 		child.queue_free()
 	for relic in GameManager.relics:
-		var lbl := Label.new()
-		lbl.text = "[%s]" % tr(relic.relic_name)
-		lbl.tooltip_text = tr(relic.description)
-		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-		lbl.add_theme_font_size_override("font_size", 14)
-		lbl.modulate = Color(1.0, 0.85, 0.3)
-		_relic_container.add_child(lbl)
+		var tip: String = "%s\n%s" % [tr(relic.relic_name), tr(relic.description)]
+		var tex: Texture2D = IconUtils.get_relic_icon(relic.relic_name)
+		if tex != null:
+			var rect := TextureRect.new()
+			rect.texture = tex
+			rect.custom_minimum_size = Vector2(28, 28)
+			rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			rect.tooltip_text = tip
+			rect.mouse_filter = Control.MOUSE_FILTER_STOP
+			_relic_container.add_child(rect)
+		else:
+			var lbl := Label.new()
+			lbl.text = "[%s]" % tr(relic.relic_name)
+			lbl.tooltip_text = tip
+			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+			lbl.add_theme_font_size_override("font_size", 14)
+			lbl.modulate = Color(1.0, 0.85, 0.3)
+			_relic_container.add_child(lbl)
 
 func _room_type_text(room_type: int) -> String:
 	match room_type:
