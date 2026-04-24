@@ -17,7 +17,7 @@ func _ready() -> void:
 	_lang_lbl.text = tr("ui.settings.language")
 	LabelUtils.fit_text(_lang_lbl, 18, 12)
 	_btn_close.text = tr("ui.map.btn_close")
-	LabelUtils.fit_text(_btn_close, 18, 12)
+	LabelUtils.fit_text(_btn_close, 18, 12, _btn_close.offset_right - _btn_close.offset_left)
 
 func open() -> void:
 	visible = true
