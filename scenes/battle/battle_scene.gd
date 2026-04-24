@@ -58,6 +58,7 @@ var _debug_badge: Label = null
 var _debug_hp_target_mode: bool = false
 var _debug_grid_visible: bool = false
 var _debug_grid_nodes: Array = []
+var _debug_token_hero_idx: int = 0
 
 var _deck_viewer: CanvasLayer = null
 var _deck_viewer_tooltip: CardScene = null
@@ -580,7 +581,7 @@ func _refresh_token_tiles(hero_id: String) -> void:
 		# 병사 캐릭터 씬 (2배 스케일)
 		var char_node = SoldierScene.instantiate()
 		char_node.scale = Vector2(2.0, 2.0)
-		char_node.position = Vector2(tile_x + TOKEN_TILE_W / 2.0 - 40.0, tile_y + TOKEN_TILE_H / 2.0)
+		char_node.position = Vector2(tile_x + TOKEN_TILE_W / 2.0 - 40.0, tile_y + TOKEN_TILE_H / 4.0)
 		add_child(char_node)
 		_token_tile_nodes[hero_id].append(char_node)
 
@@ -1275,9 +1276,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		elif event.keycode == KEY_S and event.shift_pressed:
 			var living := TeamManager.get_living_heroes()
 			if not living.is_empty():
-				var hero_id: String = living[0].hero_id
+				_debug_token_hero_idx = _debug_token_hero_idx % living.size()
+				var hero_id: String = living[_debug_token_hero_idx].hero_id
 				BattleManager.debug_add_dummy_token(hero_id)
 				_refresh_token_tiles(hero_id)
+				_debug_token_hero_idx += 1
 
 func _refresh_debug_grid() -> void:
 	for node in _debug_grid_nodes:
