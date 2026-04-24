@@ -578,10 +578,9 @@ func _refresh_token_tiles(hero_id: String) -> void:
 		var tile_x: int = int(area_pos.x) + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
 		var tile_y: int = int(area_pos.y) + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
 
-		# 병사 캐릭터 씬 (2배 스케일, 카드 뒤 렌더)
+		# 병사 캐릭터 씬 (2배 스케일)
 		var char_node = SoldierScene.instantiate()
 		char_node.scale = Vector2(2.0, 2.0)
-		char_node.z_index = -1
 		char_node.position = Vector2(tile_x + TOKEN_TILE_W / 2.0 - 40.0, tile_y + TOKEN_TILE_H / 4.0)
 		add_child(char_node)
 		_token_tile_nodes[hero_id].append(char_node)
@@ -652,7 +651,7 @@ func _refresh_hand() -> void:
 		node.rotation = angle
 		node.pivot_offset = Vector2(70, 100)
 		node.scale = Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE)
-		node.z_index = i
+		node.z_index = 10 + i
 		node.set_meta("_fan_pos", node.position)
 		node.set_meta("_fan_rot", node.rotation)
 		node.set_meta("_fan_idx", i)
@@ -727,7 +726,7 @@ func _on_card_hovered(_card: Resource, card_node: CardScene) -> void:
 			tw.tween_property(btn, "position", base_pos + Vector2(sign_x * 35.0 * falloff, 0), 0.12)
 			tw.tween_property(btn, "rotation", base_rot, 0.12)
 			tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE), 0.12)
-			btn.z_index = idx
+			btn.z_index = 10 + idx
 
 func _on_card_unhovered(_card: Resource) -> void:
 	_reset_hand_fan()
