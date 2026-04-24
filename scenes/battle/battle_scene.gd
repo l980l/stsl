@@ -5,6 +5,8 @@ const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const ARROW_CHEVRON_TEX := preload("res://assets/art/ui/arrow_chevron.png")
+const ARROW_HEAD_TEX    := preload("res://assets/art/ui/arrow_head.png")
 
 const WINDOW_W := 1920
 const WINDOW_H := 1080
@@ -47,6 +49,11 @@ var _selected_card: Resource = null
 
 var _drag_card: Resource = null
 var _drag_preview: Label = null
+var _drag_chevrons: Array = []
+var _drag_arrow_head: Sprite2D = null
+var _drag_start_pos: Vector2 = Vector2.ZERO
+var _drag_end_pos: Vector2 = Vector2.ZERO
+var _drag_t_offset: float = 0.0
 
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
@@ -89,6 +96,11 @@ func _ready() -> void:
 		_debug_badge.add_theme_color_override("font_color", Color.RED)
 		_debug_badge.visible = false
 		add_child(_debug_badge)
+
+func _process(delta: float) -> void:
+	if _drag_card != null and not _drag_chevrons.is_empty():
+		_drag_t_offset = fmod(_drag_t_offset + delta * 0.15, 1.0)
+		_update_drag_chevrons()
 
 func _build_debug_tooltip() -> void:
 	pass  # DebugManager autoload에서 전역 처리
@@ -662,6 +674,9 @@ func _refresh_hand() -> void:
 		node.set_meta("_fan_pos", node.position)
 		node.set_meta("_fan_rot", node.rotation)
 		node.set_meta("_fan_idx", i)
+		node.set_meta("_fan_center", arc_pos)
+		node.set_meta("_fan_title_pos", arc_pos + Vector2(0, -70.0 * BASE_CARD_SCALE).rotated(angle))
+		node.set_meta("_card_res", card)
 		node.setup(card, node.Mode.HAND)
 		node.set_disabled(not DeckManager.can_play(card))
 		node.card_clicked.connect(_on_card_clicked)
@@ -684,13 +699,22 @@ func _on_card_clicked(_card: Resource) -> void:
 func _on_card_drag_started(card: Resource, screen_pos: Vector2) -> void:
 	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
 		return
+	_drag_start_pos = screen_pos
+	for btn in _card_buttons:
+		if is_instance_valid(btn) and btn.get_meta("_card_res", null) == card:
+			_drag_start_pos = btn.get_meta("_fan_title_pos", screen_pos)
+			btn.modulate = Color(1.0, 1.0, 1.0, 0.4)
+			break
 	_start_drag(card)
+	_create_drag_arrow(screen_pos)
 	if _drag_preview != null:
 		_drag_preview.position = screen_pos + Vector2(8, 8)
 
 func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
 	if _drag_card != null and _drag_preview != null:
 		_drag_preview.position = screen_pos + Vector2(8, 8)
+	_drag_end_pos = screen_pos
+	_update_drag_arrow(screen_pos)
 
 func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 	if _drag_card != null:
@@ -1468,6 +1492,17 @@ func _cleanup_drag() -> void:
 	if _drag_preview != null:
 		_drag_preview.queue_free()
 		_drag_preview = null
+	for spr in _drag_chevrons:
+		if is_instance_valid(spr):
+			spr.queue_free()
+	_drag_chevrons.clear()
+	if _drag_arrow_head != null:
+		_drag_arrow_head.queue_free()
+		_drag_arrow_head = null
+	_drag_t_offset = 0.0
+	for btn in _card_buttons:
+		if is_instance_valid(btn):
+			btn.modulate = Color(1.0, 1.0, 1.0, 1.0)
 	_drag_card = null
 	_selected_card = null
 	_message_label.text = ""
@@ -1477,3 +1512,84 @@ func _cleanup_drag() -> void:
 	for entry in _hero_nodes:
 		if entry["panel"].visible:
 			entry["panel"].color = Color(0.12, 0.12, 0.2)
+
+func _create_drag_arrow(start_pos: Vector2) -> void:
+	_drag_end_pos = start_pos
+	_drag_t_offset = 0.0
+
+	for i in range(8):
+		var chev := Sprite2D.new()
+		chev.texture = ARROW_CHEVRON_TEX
+		chev.scale = Vector2(0.15, 0.15)
+		chev.modulate = Color(1.0, 1.0, 1.0, 0.0)
+		chev.z_index = 5
+		add_child(chev)
+		_drag_chevrons.append(chev)
+
+	_drag_arrow_head = Sprite2D.new()
+	_drag_arrow_head.texture = ARROW_HEAD_TEX
+	_drag_arrow_head.scale = Vector2(0.2, 0.2)
+	_drag_arrow_head.modulate = Color.WHITE
+	_drag_arrow_head.z_index = 6
+	add_child(_drag_arrow_head)
+
+	_update_drag_arrow(start_pos)
+
+func _drag_arrow_color(pos: Vector2) -> Color:
+	if _drag_card == null:
+		return Color.WHITE
+	if pos.y >= BOTTOM_Y:
+		return Color(1.0, 0.25, 0.25)
+	match _card_target_type(_drag_card):
+		"enemy":
+			for i in range(_enemy_nodes.size()):
+				var panel: ColorRect = _enemy_nodes[i]["panel"]
+				if panel.visible and BattleManager.is_enemy_alive(i) \
+						and panel.get_global_rect().has_point(pos):
+					return Color(0.3, 1.0, 0.4)
+			return Color(1.0, 0.25, 0.25)
+		"ally":
+			for entry in _hero_nodes:
+				if entry["panel"].visible and TeamManager.is_alive(entry["hero_id"]) \
+						and entry["panel"].get_global_rect().has_point(pos):
+					return Color(0.3, 1.0, 0.4)
+			return Color(1.0, 0.25, 0.25)
+		"dead_ally":
+			for entry in _hero_nodes:
+				if entry["panel"].visible and not TeamManager.is_alive(entry["hero_id"]) \
+						and entry["panel"].get_global_rect().has_point(pos):
+					return Color(0.3, 1.0, 0.4)
+			return Color(1.0, 0.25, 0.25)
+		"none":
+			return Color(0.3, 1.0, 0.4)
+	return Color.WHITE
+
+func _update_drag_arrow(end_pos: Vector2) -> void:
+	if _drag_arrow_head == null:
+		return
+	var start := _drag_start_pos
+	var ctrl := (start + end_pos) * 0.5 + Vector2(0, -200.0)
+	var base := _drag_arrow_color(end_pos)
+	var tangent_end := (end_pos - ctrl).normalized()
+	_drag_arrow_head.position = end_pos
+	_drag_arrow_head.rotation = tangent_end.angle()
+	_drag_arrow_head.modulate = base
+
+func _update_drag_chevrons() -> void:
+	if _drag_chevrons.is_empty():
+		return
+	var start := _drag_start_pos
+	var end_pos := _drag_end_pos
+	var ctrl := (start + end_pos) * 0.5 + Vector2(0, -200.0)
+	var base := _drag_arrow_color(end_pos)
+	var n := _drag_chevrons.size()
+	for i in range(n):
+		var t_raw := fmod(_drag_t_offset + float(i) / float(n), 1.0)
+		var t := t_raw * 0.88
+		var p := (1-t)*(1-t)*start + 2*(1-t)*t*ctrl + t*t*end_pos
+		var tangent := (2.0*(1-t)*(ctrl - start) + 2.0*t*(end_pos - ctrl)).normalized()
+		var alpha := sin(PI * t_raw)
+		var chev: Sprite2D = _drag_chevrons[i]
+		chev.position = p
+		chev.rotation = tangent.angle()
+		chev.modulate = Color(base.r, base.g, base.b, alpha)
