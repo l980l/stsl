@@ -168,7 +168,10 @@ func start_run(initial_hero_id: String = "napoleon", chapter: int = 1) -> void:
 	# 맵 생성
 	var MapGen = load("res://autoload/map_generator.gd")
 	run_map = MapGen.generate(current_act)
-	available_node_ids = [0, 1, 2]
+	available_node_ids = []
+	for node in run_map:
+		if node.floor_num == 0:
+			available_node_ids.append(node.node_id)
 	run_started.emit()
 
 func _make_hero_by_id(hero_id: String) -> Resource:
@@ -377,7 +380,10 @@ func _start_next_act() -> void:
 	pending_boss_recruit = false
 	var MapGen = load("res://autoload/map_generator.gd")
 	run_map = MapGen.generate(current_act)
-	available_node_ids = [0, 1, 2]
+	available_node_ids = []
+	for node in run_map:
+		if node.floor_num == 0:
+			available_node_ids.append(node.node_id)
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
 
@@ -723,6 +729,7 @@ func to_dict() -> Dictionary:
 			"column": node.column,
 			"room_type": node.room_type,
 			"connections": node.connections.duplicate(),
+			"parents": node.parents.duplicate(),
 			"visited": node.visited,
 		})
 	return {
@@ -741,7 +748,7 @@ func from_dict(data: Dictionary) -> void:
 	current_floor = data.get("current_floor", 0)
 	gold = data.get("gold", 0)
 	current_node_id = data.get("current_node_id", -1)
-	available_node_ids = data.get("available_node_ids", [0, 1, 2])
+	available_node_ids = data.get("available_node_ids", [])
 	run_map.clear()
 	for nd in data.get("run_map", []):
 		var node: Resource = _MapNodeRes.new()
@@ -750,6 +757,7 @@ func from_dict(data: Dictionary) -> void:
 		node.column = nd["column"]
 		node.room_type = nd["room_type"]
 		node.connections = nd["connections"].duplicate()
+		node.parents = nd.get("parents", []).duplicate()
 		node.visited = nd["visited"]
 		run_map.append(node)
 

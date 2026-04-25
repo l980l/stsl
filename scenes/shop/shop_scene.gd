@@ -17,6 +17,13 @@ const SVC_PANEL_GAP := 20
 var _inventory:           Dictionary  = {}
 var _remove_layer:        CanvasLayer = null
 var _upgrade_layer:       CanvasLayer = null
+var _remove_overlay:      Control         = null
+var _upgrade_overlay:     Control         = null
+var _remove_scroll:       ScrollContainer = null
+var _upgrade_scroll:      ScrollContainer = null
+var _remove_card_parents: Dictionary      = {}
+var _upgrade_card_parents:Dictionary      = {}
+var _active_scroll:       ScrollContainer = null
 var _card_tweens:         Dictionary  = {}
 var _remove_card_tweens:  Dictionary  = {}
 var _upgrade_card_tweens: Dictionary  = {}
@@ -34,6 +41,17 @@ var _confirm_upgrade_btn:   Button    = null
 func _ready() -> void:
 	_inventory = GameManager.generate_shop_inventory()
 	_build_ui()
+
+func _input(ev: InputEvent) -> void:
+	if _active_scroll == null:
+		return
+	if ev is InputEventMouseButton:
+		if ev.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_active_scroll.scroll_vertical -= 40
+			get_viewport().set_input_as_handled()
+		elif ev.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_active_scroll.scroll_vertical += 40
+			get_viewport().set_input_as_handled()
 
 func _unhandled_input(ev: InputEvent) -> void:
 	if ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
@@ -261,15 +279,22 @@ func _build_relic_section() -> void:
 			panel.add_child(bound_lbl)
 
 		# 설명
+		var desc_box := Control.new()
+		desc_box.position           = Vector2(100, 64)
+		desc_box.size               = Vector2(288, 70)
+		desc_box.custom_minimum_size= Vector2(288, 70)
+		desc_box.clip_children      = Control.CLIP_CHILDREN_AND_DRAW
+		desc_box.mouse_filter       = Control.MOUSE_FILTER_IGNORE
+		panel.add_child(desc_box)
+
 		var desc_lbl := Label.new()
 		desc_lbl.theme_type_variation = "SubLabel"
-		desc_lbl.text          = tr(relic.description)
-		desc_lbl.position      = Vector2(100, 64)
-		desc_lbl.size          = Vector2(288, 70)
-		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc_lbl.text                 = tr(relic.description)
+		desc_lbl.autowrap_mode        = TextServer.AUTOWRAP_WORD_SMART
 		desc_lbl.add_theme_font_size_override("font_size", 14)
-		panel.add_child(desc_lbl)
-		LabelUtils.fit_text(desc_lbl, 14, 9)
+		desc_box.add_child(desc_lbl)
+		desc_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		LabelUtils.fit_text(desc_lbl, 14, 9, -1.0, 70.0)
 
 		# 가격
 		var price_lbl := Label.new()
@@ -391,15 +416,22 @@ func _build_service_section() -> void:
 		LabelUtils.fit_text(name_lbl, 15, 11)
 
 		# 설명
+		var desc_box := Control.new()
+		desc_box.position           = Vector2(68, 42)
+		desc_box.size               = Vector2(184, 54)
+		desc_box.custom_minimum_size= Vector2(184, 54)
+		desc_box.clip_children      = Control.CLIP_CHILDREN_AND_DRAW
+		desc_box.mouse_filter       = Control.MOUSE_FILTER_IGNORE
+		panel.add_child(desc_box)
+
 		var desc_lbl := Label.new()
 		desc_lbl.theme_type_variation = "SubLabel"
-		desc_lbl.text          = svc["desc"]
-		desc_lbl.position      = Vector2(68, 42)
-		desc_lbl.size          = Vector2(184, 54)
-		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc_lbl.text                 = svc["desc"]
+		desc_lbl.autowrap_mode        = TextServer.AUTOWRAP_WORD_SMART
 		desc_lbl.add_theme_font_size_override("font_size", 13)
-		panel.add_child(desc_lbl)
-		LabelUtils.fit_text(desc_lbl, 13, 9)
+		desc_box.add_child(desc_lbl)
+		desc_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		LabelUtils.fit_text(desc_lbl, 13, 9, -1.0, 54.0)
 
 		# 가격
 		var price_lbl := Label.new()
@@ -492,6 +524,7 @@ func _show_remove_panel(price: int) -> void:
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_remove_layer.add_child(overlay)
+	_remove_overlay = overlay
 
 	var dim := ColorRect.new()
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -543,8 +576,9 @@ func _show_remove_panel(price: int) -> void:
 
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	scroll.clip_contents = false
+	scroll.clip_contents = true
 	clip_box.add_child(scroll)
+	_remove_scroll = scroll
 
 	var grid := GridContainer.new()
 	grid.columns = 8
@@ -596,6 +630,10 @@ func _show_remove_panel(price: int) -> void:
 func _show_remove_card_hover(node: CardScene) -> void:
 	if node in _remove_card_tweens:
 		_remove_card_tweens[node].kill()
+	_active_scroll = _remove_scroll
+	if _remove_overlay and node.get_parent() != _remove_overlay:
+		_remove_card_parents[node] = node.get_parent()
+		node.reparent(_remove_overlay, true)
 	node.z_index = 50
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
@@ -607,8 +645,16 @@ func _clear_remove_card_hover(node: CardScene) -> void:
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
 	tw.tween_callback(func():
-		if is_instance_valid(node):
-			node.z_index = 0
+		if not is_instance_valid(node):
+			return
+		node.z_index = 0
+		if node in _remove_card_parents:
+			var orig: Node = _remove_card_parents[node]
+			_remove_card_parents.erase(node)
+			if is_instance_valid(orig):
+				node.reparent(orig, false)
+				node.position = Vector2(-1.75, -5.0)
+				node.scale    = Vector2(0.975, 0.975)
 	)
 	_remove_card_tweens[node] = tw
 
@@ -618,8 +664,12 @@ func _hide_remove_panel() -> void:
 			if tw.is_valid():
 				tw.kill()
 		_remove_card_tweens.clear()
+		_remove_card_parents.clear()
 		_remove_layer.queue_free()
-		_remove_layer = null
+		_remove_layer   = null
+		_remove_overlay = null
+		_remove_scroll  = null
+		_active_scroll  = null
 		_selected_remove_card = null
 		_selected_remove_node = null
 		_confirm_remove_btn   = null
@@ -674,6 +724,7 @@ func _show_upgrade_panel(price: int) -> void:
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_upgrade_layer.add_child(overlay)
+	_upgrade_overlay = overlay
 
 	var dim := ColorRect.new()
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -725,8 +776,9 @@ func _show_upgrade_panel(price: int) -> void:
 
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	scroll.clip_contents = false
+	scroll.clip_contents = true
 	clip_box.add_child(scroll)
+	_upgrade_scroll = scroll
 
 	var grid := GridContainer.new()
 	grid.columns = 8
@@ -778,6 +830,10 @@ func _show_upgrade_panel(price: int) -> void:
 func _show_upgrade_card_hover(node: CardScene) -> void:
 	if node in _upgrade_card_tweens:
 		_upgrade_card_tweens[node].kill()
+	_active_scroll = _upgrade_scroll
+	if _upgrade_overlay and node.get_parent() != _upgrade_overlay:
+		_upgrade_card_parents[node] = node.get_parent()
+		node.reparent(_upgrade_overlay, true)
 	node.z_index = 50
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
@@ -789,8 +845,16 @@ func _clear_upgrade_card_hover(node: CardScene) -> void:
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
 	tw.tween_callback(func():
-		if is_instance_valid(node):
-			node.z_index = 0
+		if not is_instance_valid(node):
+			return
+		node.z_index = 0
+		if node in _upgrade_card_parents:
+			var orig: Node = _upgrade_card_parents[node]
+			_upgrade_card_parents.erase(node)
+			if is_instance_valid(orig):
+				node.reparent(orig, false)
+				node.position = Vector2(-1.75, -5.0)
+				node.scale    = Vector2(0.975, 0.975)
 	)
 	_upgrade_card_tweens[node] = tw
 
@@ -800,8 +864,12 @@ func _hide_upgrade_panel() -> void:
 			if tw.is_valid():
 				tw.kill()
 		_upgrade_card_tweens.clear()
+		_upgrade_card_parents.clear()
 		_upgrade_layer.queue_free()
-		_upgrade_layer = null
+		_upgrade_layer   = null
+		_upgrade_overlay = null
+		_upgrade_scroll  = null
+		_active_scroll   = null
 		_selected_upgrade_card = null
 		_selected_upgrade_node = null
 		_confirm_upgrade_btn   = null

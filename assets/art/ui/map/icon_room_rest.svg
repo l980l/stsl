@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Left log -->
+  <line x1="5" y1="22" x2="12" y2="16"/>
+  <!-- Right log -->
+  <line x1="19" y1="22" x2="12" y2="16"/>
+  <!-- Ground line -->
+  <line x1="7" y1="21" x2="17" y2="21"/>
+  <!-- Flame (closed teardrop shape) -->
+  <path d="M12 16c-2-3 0-6 0-9 3 3 4 6 0 9"/>
+</svg>

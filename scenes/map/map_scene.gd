@@ -4,17 +4,26 @@ extends Node2D
 const MapNodeRes = preload("res://resources/map_node_resource.gd")
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 
-const COL_X := [760, 960, 1160]
-const FLOOR_Y_BOTTOM := 900
-const FLOOR_GAP := 88
-const NODE_W := 120
-const NODE_H := 50
+const NODE_SIZE      := 56
+const COL_GAP        := 130   # MapGenerator.COLS=7 과 동기화: 7×130=910
+const FLOOR_GAP      := 128
+const MAP_PAD_TOP    := 48    # 보스 노드 위 여백
+const MAP_PAD_BOT    := 64    # floor 0 노드 아래 여백
+const MAP_SCROLL_TOP := 150   # 스크롤 영역 시작 Y (타이틀·렐릭 아래)
+const _MAP_W         := 7 * COL_GAP
+const COL_X_BASE     := int((1920 - _MAP_W) / 2.0) + int(COL_GAP / 2.0)
 
 var _node_buttons: Dictionary = {}  # node_id → Button
 var _floor_label: Label
 var _relic_container: FlowContainer
-var _deck_viewer: CanvasLayer = null
-var _deck_card_tweens: Dictionary = {}
+var _map_scroll:        ScrollContainer = null
+var _map_content:       Control         = null
+var _deck_viewer:       CanvasLayer     = null
+var _deck_overlay:      Control         = null
+var _deck_scroll:       ScrollContainer = null
+var _deck_card_tweens:  Dictionary      = {}
+var _deck_card_parents: Dictionary      = {}
+var _active_scroll:     ScrollContainer = null
 
 func _trf(key: String, args) -> String:
 	var s := tr(key)
@@ -25,6 +34,18 @@ func _trf(key: String, args) -> String:
 func _ready() -> void:
 	_build_ui()
 	_refresh_map()
+	call_deferred("_init_map_scroll")
+
+func _input(ev: InputEvent) -> void:
+	if _active_scroll != null and ev is InputEventMouseButton:
+		if ev.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_active_scroll.scroll_vertical -= 40
+			get_viewport().set_input_as_handled()
+			return
+		elif ev.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_active_scroll.scroll_vertical += 40
+			get_viewport().set_input_as_handled()
+			return
 
 func _unhandled_input(ev: InputEvent) -> void:
 	if _deck_viewer and ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
@@ -48,12 +69,6 @@ func _build_ui() -> void:
 	add_child(title)
 	LabelUtils.fit_text(title, 32, 18)
 
-	_floor_label = Label.new()
-	_floor_label.theme_type_variation = "SubLabel"
-	_floor_label.position = Vector2(50, 520)
-	_floor_label.size = Vector2(300, 40)
-	add_child(_floor_label)
-
 	# 릴릭 표시
 	_relic_container = FlowContainer.new()
 	_relic_container.position = Vector2(20, 70)
@@ -63,7 +78,33 @@ func _build_ui() -> void:
 	add_child(_relic_container)
 	_refresh_relics()
 
-	# 덱 보기 버튼
+	# 맵 스크롤 영역
+	var content_h := MAP_PAD_TOP + (MapGenerator.FLOORS - 1) * FLOOR_GAP + NODE_SIZE + MAP_PAD_BOT
+	_map_scroll = ScrollContainer.new()
+	_map_scroll.position               = Vector2(0, MAP_SCROLL_TOP)
+	_map_scroll.size                   = Vector2(1920, 1080 - MAP_SCROLL_TOP)
+	_map_scroll.vertical_scroll_mode   = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	_map_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(_map_scroll)
+
+	_map_content = Control.new()
+	_map_content.custom_minimum_size = Vector2(1920, content_h)
+	_map_scroll.add_child(_map_content)
+
+	# 연결선 먼저 그리기 (버튼 뒤에)
+	_draw_connections()
+
+	# 노드 버튼 생성
+	for node in GameManager.run_map:
+		_create_node_button(node)
+
+	# 오버레이 UI (스크롤 위에 렌더)
+	_floor_label = Label.new()
+	_floor_label.theme_type_variation = "SubLabel"
+	_floor_label.position = Vector2(50, 520)
+	_floor_label.size = Vector2(300, 40)
+	add_child(_floor_label)
+
 	var deck_btn := Button.new()
 	deck_btn.text = tr("ui.map.btn_deck")
 	deck_btn.position = Vector2(50, 570)
@@ -73,13 +114,6 @@ func _build_ui() -> void:
 	deck_btn.size = Vector2(160, 40)
 	LabelUtils.fit_text(deck_btn, 16, 12)
 	SacredTheme.animate_button(deck_btn)
-
-	# 연결선 먼저 그리기 (버튼 뒤에)
-	_draw_connections()
-
-	# 노드 버튼 생성
-	for node in GameManager.run_map:
-		_create_node_button(node)
 
 func _draw_connections() -> void:
 	for node in GameManager.run_map:
@@ -91,14 +125,23 @@ func _draw_connections() -> void:
 			line.add_point(to)
 			line.width = 2.0
 			line.default_color = Color(SacredPalette.BRASS_700.r, SacredPalette.BRASS_700.g, SacredPalette.BRASS_700.b, 0.4)
-			add_child(line)
+			_map_content.add_child(line)
 
 func _create_node_button(node: Resource) -> void:
 	var btn := Button.new()
 	btn.position = _node_top_left(node)
-	btn.size = Vector2(NODE_W, NODE_H)
-	btn.text = _room_type_text(node.room_type)
-	btn.add_theme_font_size_override("font_size", 13)
+	btn.size = Vector2(NODE_SIZE, NODE_SIZE)
+	btn.tooltip_text = _room_type_text(node.room_type)
+	var icon: Texture2D = IconUtils.get_room_icon(node.room_type)
+	if icon != null:
+		btn.icon = icon
+		btn.expand_icon = true
+		btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		btn.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
+	else:
+		btn.text = _room_type_text(node.room_type)
+		btn.add_theme_font_size_override("font_size", 13)
+		LabelUtils.fit_text(btn, 13, 10)
 	match node.room_type:
 		MapNodeRes.RoomType.ELITE:
 			btn.theme_type_variation = "EliteRoomButton"
@@ -108,10 +151,18 @@ func _create_node_button(node: Resource) -> void:
 			btn.theme_type_variation = "RoomButton"
 	var captured_id: int = node.node_id
 	btn.pressed.connect(func(): GameManager.enter_node(captured_id))
-	add_child(btn)
+	_map_content.add_child(btn)
 	_node_buttons[node.node_id] = btn
-	LabelUtils.fit_text(btn, 13, 10)
 	SacredTheme.animate_button(btn)
+
+func _init_map_scroll() -> void:
+	if _map_scroll == null:
+		return
+	# 현재 층 노드가 화면 중앙에 오도록 초기 스크롤 설정
+	var cur_floor: int = GameManager.current_floor if GameManager.current_floor >= 0 else 0
+	var node_y := MAP_PAD_TOP + (MapGenerator.FLOORS - 1 - cur_floor) * FLOOR_GAP + int(NODE_SIZE / 2.0)
+	var visible_h := 1080 - MAP_SCROLL_TOP
+	_map_scroll.scroll_vertical = max(0, int(node_y - visible_h * 0.5))
 
 func _refresh_map() -> void:
 	for node_id in _node_buttons:
@@ -123,7 +174,7 @@ func _refresh_map() -> void:
 			btn.modulate = Color(0.5, 0.5, 0.5)
 		elif node_id in GameManager.available_node_ids:
 			btn.disabled = false
-			btn.modulate = Color(1.0, 1.0, 1.0)
+			btn.modulate = SacredPalette.BRASS_300
 		else:
 			btn.disabled = true
 			btn.modulate = Color(0.6, 0.6, 0.7, 0.5)
@@ -134,14 +185,20 @@ func _refresh_map() -> void:
 	_floor_label.text = _trf("ui.map.floor_label", GameManager.current_floor)
 	LabelUtils.fit_text(_floor_label, 18, 12)
 
+func _node_jitter(node: Resource) -> Vector2:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = node.node_id * 7919 + 31337
+	return Vector2(rng.randf_range(-22.0, 22.0), rng.randf_range(-18.0, 18.0))
+
 func _node_center(node: Resource) -> Vector2:
-	return Vector2(
-		COL_X[node.column],
-		FLOOR_Y_BOTTOM - node.floor_num * FLOOR_GAP
+	var base := Vector2(
+		COL_X_BASE + node.column * COL_GAP,
+		MAP_PAD_TOP + (MapGenerator.FLOORS - 1 - node.floor_num) * FLOOR_GAP + int(NODE_SIZE / 2.0)
 	)
+	return base + _node_jitter(node)
 
 func _node_top_left(node: Resource) -> Vector2:
-	return _node_center(node) - Vector2(NODE_W / 2.0, NODE_H / 2.0)
+	return _node_center(node) - Vector2(NODE_SIZE / 2.0, NODE_SIZE / 2.0)
 
 func _refresh_relics() -> void:
 	for child in _relic_container.get_children():
@@ -221,6 +278,7 @@ func _show_deck_viewer() -> void:
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	canvas.add_child(overlay)
+	_deck_overlay = overlay
 
 	var bg_rect := ColorRect.new()
 	bg_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -280,8 +338,8 @@ func _show_deck_viewer() -> void:
 
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	scroll.clip_contents = false
 	clip_box.add_child(scroll)
+	_deck_scroll = scroll
 
 	var grid := GridContainer.new()
 	grid.columns = 8
@@ -311,6 +369,10 @@ func _show_deck_viewer() -> void:
 func _show_deck_card_hover(node: CardScene) -> void:
 	if node in _deck_card_tweens:
 		_deck_card_tweens[node].kill()
+	_active_scroll = _deck_scroll
+	if _deck_overlay and node.get_parent() != _deck_overlay:
+		_deck_card_parents[node] = node.get_parent()
+		node.reparent(_deck_overlay, true)
 	node.z_index = 50
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
@@ -322,13 +384,25 @@ func _clear_deck_card_hover(node: CardScene) -> void:
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
 	tw.tween_callback(func():
-		if is_instance_valid(node):
-			node.z_index = 0
+		if not is_instance_valid(node):
+			return
+		node.z_index = 0
+		if node in _deck_card_parents:
+			var orig: Node = _deck_card_parents[node]
+			_deck_card_parents.erase(node)
+			if is_instance_valid(orig):
+				node.reparent(orig, false)
+				node.position = Vector2(-1.75, -5.0)
+				node.scale    = Vector2(0.975, 0.975)
 	)
 	_deck_card_tweens[node] = tw
 
 func _hide_deck_viewer() -> void:
 	if _deck_viewer:
 		_deck_card_tweens.clear()
+		_deck_card_parents.clear()
+		_active_scroll = null
+		_deck_scroll   = null
+		_deck_overlay  = null
 		_deck_viewer.queue_free()
 		_deck_viewer = null
