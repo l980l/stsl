@@ -111,7 +111,7 @@ func _build_debug_tooltip() -> void:
 func _build_ui() -> void:
 	# 배경
 	var bg := ColorRect.new()
-	bg.color = Color(0.08, 0.08, 0.12)
+	bg.color = SacredPalette.INK_1000
 	bg.position = Vector2.ZERO
 	bg.size = Vector2(WINDOW_W, WINDOW_H)
 	add_child(bg)
@@ -124,14 +124,32 @@ func _build_ui() -> void:
 	_message_label.add_theme_font_size_override("font_size", 26)
 	add_child(_message_label)
 
-	# 에너지 레이블
+	# 에너지 오브
+	var energy_wrap := Control.new()
+	energy_wrap.position = Vector2(WINDOW_W - 224, BOTTOM_Y - 46)
+	energy_wrap.size = Vector2(208, 46)
+	var orb_bg := Panel.new()
+	var orb_style := StyleBoxFlat.new()
+	orb_style.bg_color = SacredPalette.INK_800
+	orb_style.border_color = SacredPalette.BRASS_500
+	orb_style.set_border_width_all(2)
+	orb_style.corner_radius_top_left = 8
+	orb_style.corner_radius_top_right = 8
+	orb_style.corner_radius_bottom_left = 8
+	orb_style.corner_radius_bottom_right = 8
+	orb_bg.add_theme_stylebox_override("panel", orb_style)
+	energy_wrap.add_child(orb_bg)
+	orb_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(energy_wrap)
+
 	_energy_label = Label.new()
-	_energy_label.position = Vector2(WINDOW_W - 220, BOTTOM_Y - 34)
-	_energy_label.size = Vector2(200, 30)
-	_energy_label.add_theme_font_size_override("font_size", 22)
+	_energy_label.theme_type_variation = "SubLabel"
+	_energy_label.add_theme_font_size_override("font_size", 20)
 	_energy_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_energy_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_energy_label.text = "⚡ 0 / 3"
-	add_child(_energy_label)
+	energy_wrap.add_child(_energy_label)
+	_energy_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 	# 턴 종료 버튼
 	_end_turn_btn = Button.new()
@@ -141,7 +159,9 @@ func _build_ui() -> void:
 	_end_turn_btn.add_theme_font_size_override("font_size", 22)
 	_end_turn_btn.disabled = true
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
+	_end_turn_btn.theme_type_variation = "PrimaryButton"
 	add_child(_end_turn_btn)
+	SacredTheme.animate_button(_end_turn_btn)
 
 	# 덱 보기 버튼 (End Turn 아래)
 	var deck_btn := Button.new()
@@ -150,7 +170,9 @@ func _build_ui() -> void:
 	deck_btn.text = tr("ui.battle.btn_deck_view")
 	deck_btn.add_theme_font_size_override("font_size", 18)
 	deck_btn.pressed.connect(_show_deck_viewer_in_battle)
+	deck_btn.theme_type_variation = "VowButton"
 	add_child(deck_btn)
+	SacredTheme.animate_button(deck_btn)
 
 	# HUD 바 — 시너지 + 릴릭 아이콘, 메시지 레이블 아래
 	_relic_container = FlowContainer.new()
@@ -187,6 +209,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
 	add_child(panel)
+	SacredTheme.add_corner_brackets(panel, SacredPalette.BRASS_500, 16, 2, 1)
 
 	var bar_w: float = 211.0
 	var _bar_h: float = 12.0
@@ -236,6 +259,7 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
 	add_child(panel)
+	SacredTheme.add_corner_brackets(panel, SacredPalette.BRASS_500, 16, 2, 1)
 
 	var bar_w: float = 211.0
 	var _bar_h: float = 12.0
@@ -352,14 +376,14 @@ func _make_hp_bar(pos: Vector2, width: float) -> Control:
 	var bg := ColorRect.new()
 	bg.position = Vector2.ZERO
 	bg.size = Vector2(width, 12)
-	bg.color = Color(0.15, 0.15, 0.15)
+	bg.color = SacredPalette.INK_700
 	wrapper.add_child(bg)
 
 	var fill := ColorRect.new()
 	fill.name = "Fill"
 	fill.position = Vector2.ZERO
 	fill.size = Vector2(width, 12)
-	fill.color = Color(0.8, 0.15, 0.15)
+	fill.color = SacredPalette.BLOOD_500
 	wrapper.add_child(fill)
 
 	add_child(wrapper)
