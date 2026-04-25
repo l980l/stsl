@@ -188,7 +188,7 @@ func _refresh_map() -> void:
 func _node_jitter(node: Resource) -> Vector2:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = node.node_id * 7919 + 31337
-	return Vector2(rng.randf_range(-22.0, 22.0), rng.randf_range(-18.0, 18.0))
+	return Vector2(rng.randf_range(-35.0, 35.0), rng.randf_range(-28.0, 28.0))
 
 func _node_center(node: Resource) -> Vector2:
 	var base := Vector2(

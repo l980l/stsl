@@ -13,6 +13,8 @@ func _ready() -> void:
 		return
 	name_label.theme_type_variation = "TitleLabel"
 	desc_label.theme_type_variation = "SubLabel"
+	($VBoxContainer as VBoxContainer).add_theme_constant_override("separation", 40)
+	(choices_container as HBoxContainer).add_theme_constant_override("separation", 32)
 	name_label.text = tr(event.event_name)
 	desc_label.text = tr(event.description)
 	LabelUtils.fit_text(name_label, 36, 20)

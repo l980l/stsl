@@ -223,7 +223,6 @@ func _make_chapter_card(chapter: Dictionary, idx: int) -> void:
 	desc_lbl.theme_type_variation = "SubLabel"
 	desc_lbl.text = tr(chapter["desc_key"])
 	desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc_lbl.clip_contents = true
 	desc_lbl.position = Vector2(20, 408)
 	desc_lbl.size = Vector2(card_w - 40, 90)

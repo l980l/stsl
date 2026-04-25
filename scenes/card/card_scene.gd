@@ -25,6 +25,17 @@ var _glow_panel: Panel = null
 var _glow_tween: Tween = null
 
 func _ready() -> void:
+	$Container/CostLabel.theme_type_variation = "AccentLabel"
+	$Container/CostLabel.add_theme_color_override("font_color", Color.WHITE)
+	$Container/CostLabel.add_theme_color_override("font_outline_color", Color.BLACK)
+	$Container/CostLabel.add_theme_constant_override("outline_size", 30)
+	$Container/TitleLabel.theme_type_variation = "AccentLabel"
+	$Container/TitleLabel.add_theme_color_override("font_color", Color.WHITE)
+	$Container/TitleLabel.add_theme_color_override("font_outline_color", Color.BLACK)
+	$Container/TitleLabel.add_theme_constant_override("outline_size", 16)
+	$Container/DescLabel.add_theme_color_override("font_color", Color.WHITE)
+	$Container/DescLabel.add_theme_color_override("font_outline_color", Color.BLACK)
+	$Container/DescLabel.add_theme_constant_override("outline_size", 16)
 	_create_glow_panel()
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_entered.connect(_on_mouse_entered)
