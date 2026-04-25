@@ -133,8 +133,12 @@ func _build_ui() -> void:
 			btn.pressed.connect(func(): _on_hero_selected(captured_id))
 		card_vbox.add_child(btn)
 
+		# PanelContainer는 직접 자식을 풀사이즈로 강제하므로, 브라켓은 overlay Control에 붙임
+		var bracket_overlay := Control.new()
+		bracket_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		panel.add_child(bracket_overlay)
 		var bracket_color: Color = P.BRASS_700 if inactive else P.BRASS_500
-		SacredTheme.add_corner_brackets(panel, bracket_color, 10, 4)
+		SacredTheme.add_corner_brackets(bracket_overlay, bracket_color, 10, 4)
 		if not inactive:
 			SacredTheme.animate_button(btn)
 
