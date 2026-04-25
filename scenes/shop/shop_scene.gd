@@ -1,9 +1,17 @@
 # scenes/shop/shop_scene.gd
 extends Node2D
 
+const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const CARD_W := 140
+const CARD_H := 200
+const CARD_GAP := 20
+const RELIC_PANEL_W := 420
+const RELIC_PANEL_GAP := 20
+const RELIC_PANEL_H := 150
+
 var _inventory: Dictionary = {}
-var _relic_btn: Button = null
 var _remove_panel: Control = null
+var _hover_preview: CardScene = null
 
 func _ready() -> void:
 	_inventory = GameManager.generate_shop_inventory()
@@ -38,9 +46,10 @@ func _build_ui() -> void:
 	var gold_lbl := Label.new()
 	gold_lbl.name = "GoldLabel"
 	gold_lbl.theme_type_variation = "EyebrowLabel"
+	gold_lbl.add_theme_font_size_override("font_size", 42)
 	gold_lbl.text = tr("ui.shop.gold_label") % GameManager.gold
-	gold_lbl.position = Vector2(50, 30)
-	gold_lbl.size = Vector2(300, 40)
+	gold_lbl.position = Vector2(30, 20)
+	gold_lbl.size = Vector2(380, 60)
 	add_child(gold_lbl)
 
 	_build_card_section()
@@ -50,7 +59,7 @@ func _build_ui() -> void:
 	var exit_btn := Button.new()
 	exit_btn.theme_type_variation = "VowButton"
 	exit_btn.text = tr("ui.shop.btn_exit")
-	exit_btn.position = Vector2(860, 980)
+	exit_btn.position = Vector2(860, 790)
 	exit_btn.add_theme_font_size_override("font_size", 20)
 	exit_btn.pressed.connect(_on_exit)
 	add_child(exit_btn)
@@ -59,48 +68,60 @@ func _build_ui() -> void:
 	SacredTheme.animate_button(exit_btn)
 
 func _build_card_section() -> void:
-	var P := SacredPalette
+	var cards: Array = _inventory.get("cards", [])
+	var prices: Array = _inventory.get("card_prices", [])
+
 	var sec_lbl := Label.new()
-	sec_lbl.text = tr("ui.shop.card_section") % _inventory.get("card_price", 75)
-	sec_lbl.position = Vector2(100, 100)
-	sec_lbl.size = Vector2(400, 40)
-	sec_lbl.add_theme_font_size_override("font_size", 18)
+	sec_lbl.theme_type_variation = "EyebrowLabel"
+	sec_lbl.text = "— Cards —"
+	sec_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sec_lbl.position = Vector2(460, 100)
+	sec_lbl.size = Vector2(1000, 26)
 	add_child(sec_lbl)
 
-	var cards: Array = _inventory.get("cards", [])
-	var price: int = _inventory.get("card_price", 75)
-	for i in range(cards.size()):
+	var n := cards.size()
+	if n == 0:
+		return
+	var total_w := n * CARD_W + (n - 1) * CARD_GAP
+	var start_x := int((1920 - total_w) / 2)
+
+	for i in range(n):
 		var card: Resource = cards[i]
+		var price: int = prices[i] if i < prices.size() else 75
+		var cx := start_x + i * (CARD_W + CARD_GAP)
 
-		var panel := ColorRect.new()
-		panel.color = P.INK_800
-		panel.position = Vector2(100 + i * 320, 150)
-		panel.size = Vector2(280, 180)
-		add_child(panel)
+		var node: CardScene = CARD_SCENE.instantiate()
+		node.position = Vector2(cx, 128)
+		node.setup(card, CardScene.Mode.REWARD)
+		var captured_card := card
+		node.mouse_entered.connect(func(): _show_hover_preview(captured_card))
+		node.mouse_exited.connect(func(): _hide_hover_preview())
+		add_child(node)
 
-		var name_lbl := Label.new()
-		name_lbl.theme_type_variation = "AccentLabel"
-		name_lbl.text = tr(card.card_name)
-		name_lbl.position = Vector2(110 + i * 320, 160)
-		name_lbl.size = Vector2(260, 40)
-		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		add_child(name_lbl)
+		var rarity_lbl := Label.new()
+		rarity_lbl.theme_type_variation = "SubLabel"
+		rarity_lbl.text = _rarity_label(card.rarity)
+		rarity_lbl.position = Vector2(cx, 332)
+		rarity_lbl.size = Vector2(CARD_W, 22)
+		rarity_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		rarity_lbl.modulate = _rarity_color(card.rarity)
+		add_child(rarity_lbl)
 
-		var owner_lbl := Label.new()
-		owner_lbl.theme_type_variation = "SubLabel"
-		owner_lbl.text = tr("ui.shop.card_owner_cost") % [card.owner_id, card.cost]
-		owner_lbl.position = Vector2(110 + i * 320, 205)
-		owner_lbl.size = Vector2(260, 30)
-		owner_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		add_child(owner_lbl)
+		var price_lbl := Label.new()
+		price_lbl.theme_type_variation = "SubLabel"
+		price_lbl.text = "%dg" % price
+		price_lbl.position = Vector2(cx, 354)
+		price_lbl.size = Vector2(CARD_W, 20)
+		price_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		price_lbl.modulate = SacredPalette.BRASS_400
+		add_child(price_lbl)
 
 		var btn := Button.new()
 		btn.theme_type_variation = "PrimaryButton"
 		btn.text = tr("ui.shop.btn_buy") % price
-		btn.position = Vector2(110 + i * 320, 280)
-		btn.size = Vector2(260, 40)
-		btn.add_theme_font_size_override("font_size", 14)
-		var captured_card := card
+		btn.position = Vector2(cx, 378)
+		btn.size = Vector2(CARD_W, 36)
+		btn.add_theme_font_size_override("font_size", 13)
 		var captured_btn := btn
 		btn.pressed.connect(func(): _on_buy_card(captured_card, captured_btn, price))
 		add_child(btn)
@@ -108,87 +129,142 @@ func _build_card_section() -> void:
 
 func _build_relic_section() -> void:
 	var P := SacredPalette
+	var relics: Array = _inventory.get("relics", [])
+	var relic_price: int = _inventory.get("relic_price", 150)
+
 	var sec_lbl := Label.new()
-	sec_lbl.text = tr("ui.shop.relic_section") % _inventory.get("relic_price", 150)
-	sec_lbl.position = Vector2(1100, 100)
-	sec_lbl.size = Vector2(400, 40)
-	sec_lbl.add_theme_font_size_override("font_size", 18)
+	sec_lbl.theme_type_variation = "EyebrowLabel"
+	sec_lbl.text = "— Relics (%dg) —" % relic_price
+	sec_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sec_lbl.position = Vector2(460, 432)
+	sec_lbl.size = Vector2(1000, 26)
 	add_child(sec_lbl)
 
-	var relic = _inventory.get("relic", null)
-	var price: int = _inventory.get("relic_price", 150)
+	if relics.is_empty():
+		var empty_lbl := Label.new()
+		empty_lbl.theme_type_variation = "SubLabel"
+		empty_lbl.text = tr("ui.shop.relic_empty")
+		empty_lbl.position = Vector2(660, 480)
+		empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		empty_lbl.size = Vector2(600, 40)
+		add_child(empty_lbl)
+		return
 
-	var panel := ColorRect.new()
-	panel.color = P.INK_800
-	panel.position = Vector2(1100, 150)
-	panel.size = Vector2(600, 180)
-	add_child(panel)
+	var n := relics.size()
+	var total_w := n * RELIC_PANEL_W + (n - 1) * RELIC_PANEL_GAP
+	var start_x := int((1920 - total_w) / 2)
 
-	if relic:
+	for i in range(n):
+		var relic: Resource = relics[i]
+		var px := start_x + i * (RELIC_PANEL_W + RELIC_PANEL_GAP)
+		var py := 462
+
+		var panel := ColorRect.new()
+		panel.color = P.INK_800
+		panel.position = Vector2(px, py)
+		panel.size = Vector2(RELIC_PANEL_W, RELIC_PANEL_H)
+		add_child(panel)
+
+		var tex: Texture2D = IconUtils.get_relic_icon(relic.relic_name)
+		if tex:
+			var icon := TextureRect.new()
+			icon.texture = tex
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.position = Vector2(px + 8, py + int((RELIC_PANEL_H - 48) / 2))
+			icon.size = Vector2(48, 48)
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			add_child(icon)
+
 		var name_lbl := Label.new()
 		name_lbl.theme_type_variation = "AccentLabel"
 		name_lbl.text = tr(relic.relic_name)
-		name_lbl.position = Vector2(1110, 160)
-		name_lbl.size = Vector2(580, 40)
-		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_lbl.position = Vector2(px + 64, py + 8)
+		name_lbl.size = Vector2(RELIC_PANEL_W - 72, 34)
 		add_child(name_lbl)
 
 		var desc_lbl := Label.new()
 		desc_lbl.theme_type_variation = "SubLabel"
 		desc_lbl.text = tr(relic.description)
-		desc_lbl.position = Vector2(1110, 205)
-		desc_lbl.size = Vector2(580, 60)
-		desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		desc_lbl.position = Vector2(px + 64, py + 46)
+		desc_lbl.size = Vector2(RELIC_PANEL_W - 72, 56)
+		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		add_child(desc_lbl)
 
-		_relic_btn = Button.new()
-		_relic_btn.theme_type_variation = "PrimaryButton"
-		_relic_btn.text = tr("ui.shop.btn_buy") % price
-		_relic_btn.position = Vector2(1260, 285)
-		_relic_btn.size = Vector2(280, 40)
-		_relic_btn.add_theme_font_size_override("font_size", 14)
-		_relic_btn.pressed.connect(func(): _on_buy_relic(relic, price))
-		add_child(_relic_btn)
-		SacredTheme.animate_button(_relic_btn)
-	else:
-		var empty_lbl := Label.new()
-		empty_lbl.theme_type_variation = "SubLabel"
-		empty_lbl.text = tr("ui.shop.relic_empty")
-		empty_lbl.position = Vector2(1110, 205)
-		empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		add_child(empty_lbl)
-		empty_lbl.size = Vector2(580, 40)
-		LabelUtils.fit_text(empty_lbl, 16, 12)
+		var btn := Button.new()
+		btn.theme_type_variation = "PrimaryButton"
+		btn.text = tr("ui.shop.btn_buy") % relic_price
+		btn.position = Vector2(px + 64, py + 106)
+		btn.size = Vector2(200, 36)
+		btn.add_theme_font_size_override("font_size", 13)
+		var captured_relic := relic
+		var captured_btn := btn
+		btn.pressed.connect(func(): _on_buy_relic(captured_relic, captured_btn, relic_price))
+		add_child(btn)
+		SacredTheme.animate_button(btn)
 
 func _build_service_section() -> void:
 	var sec_lbl := Label.new()
-	sec_lbl.text = tr("ui.shop.sec_service")
-	sec_lbl.position = Vector2(100, 400)
-	sec_lbl.add_theme_font_size_override("font_size", 18)
+	sec_lbl.theme_type_variation = "EyebrowLabel"
+	sec_lbl.text = "— " + tr("ui.shop.sec_service") + " —"
+	sec_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sec_lbl.position = Vector2(460, 638)
+	sec_lbl.size = Vector2(1000, 26)
 	add_child(sec_lbl)
-	sec_lbl.size = Vector2(200, 40)
-	LabelUtils.fit_text(sec_lbl, 18, 12)
 
-	var heal_btn := Button.new()
 	var heal_price: int = _inventory.get("heal_price", 30)
 	var heal_amount: int = _inventory.get("heal_amount", 20)
+	var heal_btn := Button.new()
 	heal_btn.text = tr("ui.shop.btn_heal") % [heal_amount, heal_price]
-	heal_btn.position = Vector2(100, 450)
-	heal_btn.size = Vector2(320, 50)
+	heal_btn.position = Vector2(480, 676)
+	heal_btn.size = Vector2(380, 50)
 	heal_btn.add_theme_font_size_override("font_size", 16)
 	heal_btn.pressed.connect(func(): _on_heal(heal_amount, heal_price))
 	add_child(heal_btn)
 	SacredTheme.animate_button(heal_btn)
 
-	var remove_btn := Button.new()
 	var remove_price: int = _inventory.get("remove_price", 100)
+	var remove_btn := Button.new()
 	remove_btn.text = tr("ui.shop.btn_remove_card") % remove_price
-	remove_btn.position = Vector2(460, 450)
-	remove_btn.size = Vector2(320, 50)
+	remove_btn.position = Vector2(900, 676)
+	remove_btn.size = Vector2(380, 50)
 	remove_btn.add_theme_font_size_override("font_size", 16)
 	remove_btn.pressed.connect(func(): _on_open_remove_panel(remove_btn, remove_price))
 	add_child(remove_btn)
 	SacredTheme.animate_button(remove_btn)
+
+func _rarity_label(rarity: int) -> String:
+	match rarity:
+		CardResource.Rarity.COMMON:    return "COMMON"
+		CardResource.Rarity.UNCOMMON:  return "UNCOMMON"
+		CardResource.Rarity.RARE:      return "RARE"
+		CardResource.Rarity.LEGENDARY: return "LEGENDARY"
+		CardResource.Rarity.DIVINE:    return "DIVINE"
+	return ""
+
+func _rarity_color(rarity: int) -> Color:
+	var P := SacredPalette
+	match rarity:
+		CardResource.Rarity.COMMON:    return Color(0.85, 0.85, 0.85)
+		CardResource.Rarity.UNCOMMON:  return P.EMERALD_400
+		CardResource.Rarity.RARE:      return P.LAPIS_400
+		CardResource.Rarity.LEGENDARY: return P.BRASS_400
+		CardResource.Rarity.DIVINE:    return P.AMETHYST_400
+	return Color.WHITE
+
+func _show_hover_preview(card: Resource) -> void:
+	_hide_hover_preview()
+	_hover_preview = CARD_SCENE.instantiate()
+	_hover_preview.position = Vector2(1530, 80)
+	_hover_preview.z_index = 100
+	_hover_preview.setup(card, CardScene.Mode.REWARD)
+	add_child(_hover_preview)
+	_hover_preview.scale = Vector2(2.0, 2.0)
+	_hover_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+func _hide_hover_preview() -> void:
+	if _hover_preview:
+		_hover_preview.queue_free()
+		_hover_preview = null
 
 func _on_buy_card(card: Resource, btn: Button, price: int) -> void:
 	if not GameManager.spend_gold(price):
@@ -198,13 +274,12 @@ func _on_buy_card(card: Resource, btn: Button, price: int) -> void:
 	btn.text = tr("ui.shop.btn_purchased")
 	_refresh_gold_label()
 
-func _on_buy_relic(relic: Resource, price: int) -> void:
+func _on_buy_relic(relic: Resource, btn: Button, price: int) -> void:
 	if not GameManager.spend_gold(price):
 		return
 	GameManager.add_relic(relic)
-	if _relic_btn:
-		_relic_btn.disabled = true
-		_relic_btn.text = tr("ui.shop.btn_purchased")
+	btn.disabled = true
+	btn.text = tr("ui.shop.btn_purchased")
 	_refresh_gold_label()
 
 func _on_heal(amount: int, price: int) -> void:
@@ -225,15 +300,15 @@ func _on_open_remove_panel(remove_btn: Button, price: int) -> void:
 		return
 
 	_remove_panel = Control.new()
-	_remove_panel.position = Vector2(100, 520)
-	_remove_panel.size = Vector2(1720, 400)
+	_remove_panel.position = Vector2(100, 736)
+	_remove_panel.size = Vector2(1720, 320)
 	add_child(_remove_panel)
 	SacredTheme.add_corner_brackets(_remove_panel)
 
 	var bg := ColorRect.new()
-	bg.color = Color(0.05, 0.05, 0.1, 0.95)
+	bg.color = Color(0.05, 0.05, 0.1, 0.96)
 	bg.position = Vector2.ZERO
-	bg.size = Vector2(1720, 400)
+	bg.size = Vector2(1720, 320)
 	_remove_panel.add_child(bg)
 
 	var lbl := Label.new()
