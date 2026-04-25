@@ -14,7 +14,7 @@ func _build_ui() -> void:
 
 	var eyebrow := Label.new()
 	eyebrow.theme_type_variation = "EyebrowLabel"
-	eyebrow.text = "— SHRINE —"
+	eyebrow.text = "— Event —"
 	eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	eyebrow.position = Vector2(760, 82)
 	eyebrow.size = Vector2(400, 24)
@@ -61,7 +61,10 @@ func _build_ui() -> void:
 	add_child(upgrade_btn)
 	upgrade_btn.size = Vector2(400, 55)
 	LabelUtils.fit_text(upgrade_btn, 20, 12)
-	SacredTheme.animate_button(upgrade_btn)
+	if not _has_upgradeable_cards():
+		upgrade_btn.disabled = true
+	else:
+		SacredTheme.animate_button(upgrade_btn)
 
 	var leave_btn := Button.new()
 	leave_btn.theme_type_variation = "VowButton"
@@ -72,6 +75,15 @@ func _build_ui() -> void:
 	leave_btn.size = Vector2(400, 55)
 	LabelUtils.fit_text(leave_btn, 20, 12)
 	SacredTheme.animate_button(leave_btn)
+
+func _has_upgradeable_cards() -> bool:
+	var all: Array = DeckManager.draw_pile.duplicate()
+	all.append_array(DeckManager.discard_pile)
+	all.append_array(DeckManager.hand)
+	for card in all:
+		if card.upgrade_level < card.max_upgrade_level():
+			return true
+	return false
 
 func _get_tm() -> Object:
 	if Engine.has_singleton("TeamManager"):

@@ -119,6 +119,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_open_hero_hp_dialog()
 		KEY_V:
 			_open_event_enter_dialog()
+		KEY_S:
+			GameManager.change_state(GameManager.GameState.SHOP)
+			GameManager._request_scene("res://scenes/shop/shop_scene.tscn")
+		KEY_G:
+			_open_gold_dialog()
 
 # ── 영웅 파티 추가 ──────────────────────────────────
 
@@ -136,6 +141,7 @@ func _open_hero_add_dialog() -> void:
 		dlg.confirmed.connect(func(): dlg.queue_free())
 		dlg.canceled.connect(func(): dlg.queue_free())
 		get_tree().root.add_child(dlg)
+		SacredTheme.attach_popup_brackets_to_dialog(dlg)
 		dlg.popup_centered()
 		return
 	var opts: Array = []
@@ -203,6 +209,7 @@ func _open_relic_remove_dialog() -> void:
 		dlg.confirmed.connect(func(): dlg.queue_free())
 		dlg.canceled.connect(func(): dlg.queue_free())
 		get_tree().root.add_child(dlg)
+		SacredTheme.attach_popup_brackets_to_dialog(dlg)
 		dlg.popup_centered()
 		return
 	var opts: Array = []
@@ -292,6 +299,7 @@ func _open_hero_hp_dialog() -> void:
 	)
 	dlg.canceled.connect(func(): dlg.queue_free())
 	get_tree().root.add_child(dlg)
+	SacredTheme.attach_popup_brackets_to_dialog(dlg)
 	dlg.popup_centered()
 
 # ── 몬스터 선택 전투 ────────────────────────────────
@@ -383,6 +391,38 @@ func _open_event_enter_dialog() -> void:
 		GameManager._request_scene("res://scenes/event/event_scene.tscn")
 	)
 
+# ── 골드 추가 ────────────────────────────────────────
+
+func _open_gold_dialog() -> void:
+	var dlg := AcceptDialog.new()
+	dlg.title = "골드 추가"
+	dlg.get_ok_button().text = "추가"
+	dlg.add_cancel_button("닫기")
+	dlg.min_size = Vector2i(340, 120)
+
+	var vbox := VBoxContainer.new()
+	var lbl := Label.new()
+	lbl.text = "현재 골드: %d\n추가할 금액:" % GameManager.gold
+	vbox.add_child(lbl)
+
+	var amounts := [50, 100, 200, 500, 1000]
+	var hbox := HBoxContainer.new()
+	for amt in amounts:
+		var btn := Button.new()
+		btn.text = "+%d" % amt
+		btn.pressed.connect(func():
+			GameManager.add_gold(amt)
+			lbl.text = "현재 골드: %d\n추가할 금액:" % GameManager.gold
+		)
+		hbox.add_child(btn)
+	vbox.add_child(hbox)
+
+	dlg.add_child(vbox)
+	dlg.confirmed.connect(func(): dlg.queue_free())
+	dlg.canceled.connect(func(): dlg.queue_free())
+	get_tree().root.add_child(dlg)
+	dlg.popup_centered()
+
 # ── UI 헬퍼 ─────────────────────────────────────────
 
 func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, on_confirm: Callable, show_select_all: bool = false) -> void:
@@ -390,7 +430,7 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 	dlg.title = title
 	dlg.get_ok_button().text = confirm_text
 	dlg.add_cancel_button("닫기")
-	dlg.min_size = Vector2i(600, 580)
+	dlg.min_size = Vector2i(900, 580)
 
 	var outer := VBoxContainer.new()
 
@@ -407,7 +447,7 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 		)
 
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(560, 480)
+	scroll.custom_minimum_size = Vector2(860, 480)
 	var vbox := VBoxContainer.new()
 	scroll.add_child(vbox)
 
@@ -433,6 +473,7 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 	)
 	dlg.canceled.connect(func(): dlg.queue_free())
 	get_tree().root.add_child(dlg)
+	SacredTheme.attach_popup_brackets_to_dialog(dlg)
 	dlg.popup_centered()
 
 # options: Array of [label, payload, is_enabled, color]
@@ -474,6 +515,7 @@ func _make_radio_dialog(title: String, options: Array, confirm_text: String, on_
 	)
 	dlg.canceled.connect(func(): dlg.queue_free())
 	get_tree().root.add_child(dlg)
+	SacredTheme.attach_popup_brackets_to_dialog(dlg)
 	dlg.popup_centered()
 
 # ── 카드 유틸 ────────────────────────────────────────

@@ -98,28 +98,10 @@ func _build_card_section() -> void:
 		node.mouse_exited.connect(func(): _hide_hover_preview())
 		add_child(node)
 
-		var rarity_lbl := Label.new()
-		rarity_lbl.theme_type_variation = "SubLabel"
-		rarity_lbl.text = _rarity_label(card.rarity)
-		rarity_lbl.position = Vector2(cx, 332)
-		rarity_lbl.size = Vector2(CARD_W, 22)
-		rarity_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		rarity_lbl.modulate = _rarity_color(card.rarity)
-		add_child(rarity_lbl)
-
-		var price_lbl := Label.new()
-		price_lbl.theme_type_variation = "SubLabel"
-		price_lbl.text = "%dg" % price
-		price_lbl.position = Vector2(cx, 354)
-		price_lbl.size = Vector2(CARD_W, 20)
-		price_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		price_lbl.modulate = SacredPalette.BRASS_400
-		add_child(price_lbl)
-
 		var btn := Button.new()
 		btn.theme_type_variation = "PrimaryButton"
 		btn.text = tr("ui.shop.btn_buy") % price
-		btn.position = Vector2(cx, 378)
+		btn.position = Vector2(cx, 332)
 		btn.size = Vector2(CARD_W, 36)
 		btn.add_theme_font_size_override("font_size", 13)
 		var captured_btn := btn
@@ -170,7 +152,7 @@ func _build_relic_section() -> void:
 			var icon := TextureRect.new()
 			icon.texture = tex
 			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			icon.position = Vector2(px + 8, py + int((RELIC_PANEL_H - 48) / 2))
+			icon.position = Vector2(px + 8, py + 8)
 			icon.size = Vector2(48, 48)
 			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			add_child(icon)
