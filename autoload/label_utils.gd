@@ -17,8 +17,9 @@ static func fit_text(control: Control, max_px: int, min_px: int, target_w: float
 		# 줄바꿈 라벨: layout 정착 후 한 프레임씩 줄임
 		var lbl := control as Label
 		var fs := max_px
+		var target_h := lbl.size.y  # await 전에 캡처 — 레이아웃 패스가 size.y를 늘리기 전
 		await control.get_tree().process_frame
-		while lbl.get_line_count() * lbl.get_line_height() > lbl.size.y and fs > min_px:
+		while lbl.get_line_count() * lbl.get_line_height() > target_h and fs > min_px:
 			fs -= 1
 			lbl.add_theme_font_size_override("font_size", fs)
 			await lbl.get_tree().process_frame

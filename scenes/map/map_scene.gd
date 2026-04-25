@@ -14,8 +14,12 @@ const COL_X_BASE   := (1920 - _MAP_W) / 2 + COL_GAP / 2
 var _node_buttons: Dictionary = {}  # node_id → Button
 var _floor_label: Label
 var _relic_container: FlowContainer
-var _deck_viewer: CanvasLayer = null
-var _deck_card_tweens: Dictionary = {}
+var _deck_viewer:       CanvasLayer     = null
+var _deck_overlay:      Control         = null
+var _deck_scroll:       ScrollContainer = null
+var _deck_card_tweens:  Dictionary      = {}
+var _deck_card_parents: Dictionary      = {}
+var _active_scroll:     ScrollContainer = null
 
 func _trf(key: String, args) -> String:
 	var s := tr(key)
@@ -26,6 +30,17 @@ func _trf(key: String, args) -> String:
 func _ready() -> void:
 	_build_ui()
 	_refresh_map()
+
+func _input(ev: InputEvent) -> void:
+	if _active_scroll != null and ev is InputEventMouseButton:
+		if ev.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_active_scroll.scroll_vertical -= 40
+			get_viewport().set_input_as_handled()
+			return
+		elif ev.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_active_scroll.scroll_vertical += 40
+			get_viewport().set_input_as_handled()
+			return
 
 func _unhandled_input(ev: InputEvent) -> void:
 	if _deck_viewer and ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
@@ -230,6 +245,7 @@ func _show_deck_viewer() -> void:
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	canvas.add_child(overlay)
+	_deck_overlay = overlay
 
 	var bg_rect := ColorRect.new()
 	bg_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -289,8 +305,8 @@ func _show_deck_viewer() -> void:
 
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	scroll.clip_contents = false
 	clip_box.add_child(scroll)
+	_deck_scroll = scroll
 
 	var grid := GridContainer.new()
 	grid.columns = 8
@@ -320,6 +336,10 @@ func _show_deck_viewer() -> void:
 func _show_deck_card_hover(node: CardScene) -> void:
 	if node in _deck_card_tweens:
 		_deck_card_tweens[node].kill()
+	_active_scroll = _deck_scroll
+	if _deck_overlay and node.get_parent() != _deck_overlay:
+		_deck_card_parents[node] = node.get_parent()
+		node.reparent(_deck_overlay, true)
 	node.z_index = 50
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
@@ -331,13 +351,25 @@ func _clear_deck_card_hover(node: CardScene) -> void:
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
 	tw.tween_callback(func():
-		if is_instance_valid(node):
-			node.z_index = 0
+		if not is_instance_valid(node):
+			return
+		node.z_index = 0
+		if node in _deck_card_parents:
+			var orig: Node = _deck_card_parents[node]
+			_deck_card_parents.erase(node)
+			if is_instance_valid(orig):
+				node.reparent(orig, false)
+				node.position = Vector2(-1.75, -5.0)
+				node.scale    = Vector2(0.975, 0.975)
 	)
 	_deck_card_tweens[node] = tw
 
 func _hide_deck_viewer() -> void:
 	if _deck_viewer:
 		_deck_card_tweens.clear()
+		_deck_card_parents.clear()
+		_active_scroll = null
+		_deck_scroll   = null
+		_deck_overlay  = null
 		_deck_viewer.queue_free()
 		_deck_viewer = null

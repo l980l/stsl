@@ -60,8 +60,12 @@ var _debug_grid_visible: bool = false
 var _debug_grid_nodes: Array = []
 var _debug_token_hero_idx: int = 0
 
-var _deck_viewer: CanvasLayer = null
-var _deck_card_tweens: Dictionary = {}
+var _deck_viewer:       CanvasLayer     = null
+var _deck_overlay:      Control         = null
+var _deck_card_tweens:  Dictionary      = {}
+var _deck_card_parents: Dictionary      = {}
+var _card_scroll_map:   Dictionary      = {}
+var _active_scroll:     ScrollContainer = null
 
 
 const STATUS_EMOJI := {
@@ -1145,6 +1149,15 @@ func _refresh_synergy_hud() -> void:
 	_refresh_hud()
 
 func _input(event: InputEvent) -> void:
+	if _active_scroll != null and event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_active_scroll.scroll_vertical -= 40
+			get_viewport().set_input_as_handled()
+			return
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_active_scroll.scroll_vertical += 40
+			get_viewport().set_input_as_handled()
+			return
 	# 드래그 처리는 card_scene 시그널(_on_card_drag_*)로 위임됨
 	if event is InputEventKey and event.keycode == KEY_ESCAPE and event.pressed:
 		if _deck_viewer != null:
@@ -1165,6 +1178,7 @@ func _show_deck_viewer_in_battle() -> void:
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	canvas.add_child(overlay)
+	_deck_overlay = overlay
 
 	var bg_rect := ColorRect.new()
 	bg_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1242,7 +1256,6 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	scroll.clip_contents = false
 	clip_box.add_child(scroll)
 
 	var grid := GridContainer.new()
@@ -1274,10 +1287,15 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		var captured_node: CardScene = card_node
 		card_node.card_hovered.connect(func(_c): _show_deck_card_hover(captured_node))
 		card_node.card_unhovered.connect(func(_c): _clear_deck_card_hover(captured_node))
+		_card_scroll_map[card_node] = scroll
 
 func _show_deck_card_hover(node: CardScene) -> void:
 	if node in _deck_card_tweens:
 		_deck_card_tweens[node].kill()
+	_active_scroll = _card_scroll_map.get(node, null)
+	if _deck_overlay and node.get_parent() != _deck_overlay:
+		_deck_card_parents[node] = node.get_parent()
+		node.reparent(_deck_overlay, true)
 	node.z_index = 50
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
@@ -1289,8 +1307,16 @@ func _clear_deck_card_hover(node: CardScene) -> void:
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
 	tw.tween_callback(func():
-		if is_instance_valid(node):
-			node.z_index = 0
+		if not is_instance_valid(node):
+			return
+		node.z_index = 0
+		if node in _deck_card_parents:
+			var orig: Node = _deck_card_parents[node]
+			_deck_card_parents.erase(node)
+			if is_instance_valid(orig):
+				node.reparent(orig, false)
+				node.position = Vector2(-1.75, -5.0)
+				node.scale    = Vector2(0.975, 0.975)
 	)
 	_deck_card_tweens[node] = tw
 
@@ -1300,6 +1326,10 @@ func _close_deck_viewer() -> void:
 			if tw.is_valid():
 				tw.kill()
 		_deck_card_tweens.clear()
+		_deck_card_parents.clear()
+		_card_scroll_map.clear()
+		_active_scroll = null
+		_deck_overlay  = null
 		_deck_viewer.queue_free()
 		_deck_viewer = null
 
