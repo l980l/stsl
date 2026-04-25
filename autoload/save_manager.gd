@@ -11,7 +11,7 @@ func save() -> void:
 	if _gm == null or _tm == null or _dm == null:
 		return
 	var data := {
-		"version": 1,
+		"version": 2,
 		"game_manager": _gm.to_dict(),
 		"team_manager": _tm.to_dict(),
 		"deck_manager": _dm.to_dict(),
@@ -32,6 +32,10 @@ func load_save() -> bool:
 	file.close()
 	var data = JSON.parse_string(text)
 	if data == null or not data.has("version"):
+		return false
+	if int(data["version"]) != 2:
+		push_warning("[SaveManager] 세이브 버전 %s 미지원 — 초기화합니다." % data["version"])
+		clear_save()
 		return false
 	var _gm = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
 	var _tm = Engine.get_singleton("TeamManager") if Engine.has_singleton("TeamManager") else null
