@@ -264,9 +264,9 @@ func _show_deck_viewer() -> void:
 	title_row.add_child(title_lbl)
 
 	var close_btn := Button.new()
-	close_btn.theme_type_variation = "IconButton"
-	close_btn.text = "✕"
-	close_btn.custom_minimum_size = Vector2(40, 40)
+	close_btn.theme_type_variation = "VowButton"
+	close_btn.text = "✕  닫기"
+	close_btn.custom_minimum_size = Vector2(80, 40)
 	close_btn.pressed.connect(_hide_deck_viewer)
 	title_row.add_child(close_btn)
 	SacredTheme.animate_button(close_btn)
