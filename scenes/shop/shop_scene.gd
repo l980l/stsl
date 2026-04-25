@@ -279,15 +279,22 @@ func _build_relic_section() -> void:
 			panel.add_child(bound_lbl)
 
 		# 설명
+		var desc_box := Control.new()
+		desc_box.position           = Vector2(100, 64)
+		desc_box.size               = Vector2(288, 70)
+		desc_box.custom_minimum_size= Vector2(288, 70)
+		desc_box.clip_children      = Control.CLIP_CHILDREN_AND_DRAW
+		desc_box.mouse_filter       = Control.MOUSE_FILTER_IGNORE
+		panel.add_child(desc_box)
+
 		var desc_lbl := Label.new()
 		desc_lbl.theme_type_variation = "SubLabel"
-		desc_lbl.text          = tr(relic.description)
-		desc_lbl.position      = Vector2(100, 64)
-		desc_lbl.size          = Vector2(288, 70)
-		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc_lbl.text                 = tr(relic.description)
+		desc_lbl.autowrap_mode        = TextServer.AUTOWRAP_WORD_SMART
 		desc_lbl.add_theme_font_size_override("font_size", 14)
-		panel.add_child(desc_lbl)
-		LabelUtils.fit_text(desc_lbl, 14, 9)
+		desc_box.add_child(desc_lbl)
+		desc_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		LabelUtils.fit_text(desc_lbl, 14, 9, -1.0, 70.0)
 
 		# 가격
 		var price_lbl := Label.new()
@@ -409,15 +416,22 @@ func _build_service_section() -> void:
 		LabelUtils.fit_text(name_lbl, 15, 11)
 
 		# 설명
+		var desc_box := Control.new()
+		desc_box.position           = Vector2(68, 42)
+		desc_box.size               = Vector2(184, 54)
+		desc_box.custom_minimum_size= Vector2(184, 54)
+		desc_box.clip_children      = Control.CLIP_CHILDREN_AND_DRAW
+		desc_box.mouse_filter       = Control.MOUSE_FILTER_IGNORE
+		panel.add_child(desc_box)
+
 		var desc_lbl := Label.new()
 		desc_lbl.theme_type_variation = "SubLabel"
-		desc_lbl.text          = svc["desc"]
-		desc_lbl.position      = Vector2(68, 42)
-		desc_lbl.size          = Vector2(184, 54)
-		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc_lbl.text                 = svc["desc"]
+		desc_lbl.autowrap_mode        = TextServer.AUTOWRAP_WORD_SMART
 		desc_lbl.add_theme_font_size_override("font_size", 13)
-		panel.add_child(desc_lbl)
-		LabelUtils.fit_text(desc_lbl, 13, 9)
+		desc_box.add_child(desc_lbl)
+		desc_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		LabelUtils.fit_text(desc_lbl, 13, 9, -1.0, 54.0)
 
 		# 가격
 		var price_lbl := Label.new()

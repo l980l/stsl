@@ -9,7 +9,7 @@ const COL_GAP      := 130   # MapGenerator.COLS=7 과 동기화: 7×130=910
 const FLOOR_GAP    := 64
 const MAP_BOTTOM_Y := 1020
 const _MAP_W       := 7 * COL_GAP
-const COL_X_BASE   := (1920 - _MAP_W) / 2 + COL_GAP / 2
+const COL_X_BASE   := int((1920 - _MAP_W) / 2.0) + int(COL_GAP / 2.0)
 
 var _node_buttons: Dictionary = {}  # node_id → Button
 var _floor_label: Label

@@ -47,7 +47,7 @@ static func _generate_with_rng(act: int, rng: RandomNumberGenerator) -> Array:
 			col = nc
 
 	# Phase 3: 보스 노드 (floor 14, 중앙 컬럼)
-	var boss_col := COLS / 2
+	var boss_col := int(COLS / 2.0)
 	var boss_id := _ensure(grid, nodes, FLOORS - 1, boss_col)
 	nodes[boss_id].room_type = MapNodeRes.RoomType.BOSS
 	for c in range(COLS):
@@ -60,15 +60,15 @@ static func _generate_with_rng(act: int, rng: RandomNumberGenerator) -> Array:
 	return nodes
 
 # 노드 생성 또는 기존 노드 ID 반환 (node_id == nodes 배열 인덱스 invariant 유지)
-static func _ensure(grid: Array, nodes: Array, floor: int, col: int) -> int:
-	if grid[floor][col] != -1:
-		return grid[floor][col]
+static func _ensure(grid: Array, nodes: Array, flr: int, col: int) -> int:
+	if grid[flr][col] != -1:
+		return grid[flr][col]
 	var node := MapNodeRes.new()
 	node.node_id = nodes.size()
-	node.floor_num = floor
+	node.floor_num = flr
 	node.column = col
 	nodes.append(node)
-	grid[floor][col] = node.node_id
+	grid[flr][col] = node.node_id
 	return node.node_id
 
 # 엣지 추가 (중복 방지, connections/parents 동시 설정)
@@ -83,23 +83,23 @@ static func _add_edge(edges_set: Dictionary, nodes: Array, from_id: int, to_id: 
 		nodes[to_id].parents.append(from_id)
 
 # 다음 컬럼 선택 (교차 금지 적용)
-static func _step(col: int, floor: int, rng: RandomNumberGenerator, edges_set: Dictionary, grid: Array) -> int:
+static func _step(col: int, flr: int, rng: RandomNumberGenerator, edges_set: Dictionary, grid: Array) -> int:
 	var candidates: Array = []
 	for delta: int in [-1, 0, 1]:
 		var nc: int = col + delta
 		if nc < 0 or nc >= COLS:
 			continue
-		if delta != 0 and _would_cross(grid, edges_set, floor, col, nc):
+		if delta != 0 and _would_cross(grid, edges_set, flr, col, nc):
 			continue
 		candidates.append(nc)
 	if candidates.is_empty():
-		return col  # fallback: 제자리
+		return col
 	return candidates[rng.randi_range(0, candidates.size() - 1)]
 
 # (floor, from_col)→(floor+1, to_col) 엣지가 (floor, to_col)→(floor+1, from_col)와 교차하는지 검사
-static func _would_cross(grid: Array, edges_set: Dictionary, floor: int, from_col: int, to_col: int) -> bool:
-	var mirror_from: int = grid[floor][to_col]
-	var mirror_to: int = grid[floor + 1][from_col]
+static func _would_cross(grid: Array, edges_set: Dictionary, flr: int, from_col: int, to_col: int) -> bool:
+	var mirror_from: int = grid[flr][to_col]
+	var mirror_to: int = grid[flr + 1][from_col]
 	if mirror_from == -1 or mirror_to == -1:
 		return false
 	return edges_set.has(_edge_key(mirror_from, mirror_to))
@@ -127,7 +127,7 @@ static func _assign_room_types(grid: Array, nodes: Array, rng: RandomNumberGener
 			else:
 				node.room_type = _weighted_room_type(node, nodes, f, c, grid, rng)
 
-static func _weighted_room_type(node: Resource, nodes: Array, floor: int, col: int, grid: Array, rng: RandomNumberGenerator) -> MapNodeRes.RoomType:
+static func _weighted_room_type(node: Resource, nodes: Array, flr: int, col: int, grid: Array, rng: RandomNumberGenerator) -> MapNodeRes.RoomType:
 	var weights := {
 		MapNodeRes.RoomType.BATTLE: 50,
 		MapNodeRes.RoomType.EVENT:  18,
@@ -138,9 +138,9 @@ static func _weighted_room_type(node: Resource, nodes: Array, floor: int, col: i
 	}
 
 	# 층 기반 제한
-	if floor < 5:
+	if flr < 5:
 		weights[MapNodeRes.RoomType.ELITE] = 0
-	if floor < 2:
+	if flr < 2:
 		weights[MapNodeRes.RoomType.SHOP] = 0
 		weights[MapNodeRes.RoomType.REST] = 0
 
@@ -153,8 +153,8 @@ static func _weighted_room_type(node: Resource, nodes: Array, floor: int, col: i
 				restricted.append(pt)
 
 	# 같은 층 좌측 노드와 동일 타입 금지 (ELITE/REST/SHOP)
-	if col > 0 and grid[floor][col - 1] != -1:
-		var lt: int = nodes[grid[floor][col - 1]].room_type
+	if col > 0 and grid[flr][col - 1] != -1:
+		var lt: int = nodes[grid[flr][col - 1]].room_type
 		if lt in [MapNodeRes.RoomType.ELITE, MapNodeRes.RoomType.REST, MapNodeRes.RoomType.SHOP]:
 			if lt not in restricted:
 				restricted.append(lt)

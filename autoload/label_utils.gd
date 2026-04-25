@@ -7,7 +7,7 @@ extends RefCounted
 # - Label + autowrap 있음 → 세로 초과 시 축소 (줄바꿈 발생, width 고정)
 # - Label autowrap 없음 / Button / 기타 Control → 가로 초과 시 축소 (1줄 유지)
 # target_w: size.x 가 레이아웃 패스 전에 0일 수 있으므로, layout_mode=0 라벨은 명시 전달 권장.
-static func fit_text(control: Control, max_px: int, min_px: int, target_w: float = -1.0) -> void:
+static func fit_text(control: Control, max_px: int, min_px: int, target_w: float = -1.0, target_h: float = -1.0) -> void:
 	if not control.is_inside_tree():
 		return
 	control.add_theme_font_size_override("font_size", max_px)
@@ -17,9 +17,9 @@ static func fit_text(control: Control, max_px: int, min_px: int, target_w: float
 		# 줄바꿈 라벨: layout 정착 후 한 프레임씩 줄임
 		var lbl := control as Label
 		var fs := max_px
-		var target_h := lbl.size.y  # await 전에 캡처 — 레이아웃 패스가 size.y를 늘리기 전
+		var check_h: float = target_h if target_h > 0.0 else lbl.size.y
 		await control.get_tree().process_frame
-		while lbl.get_line_count() * lbl.get_line_height() > target_h and fs > min_px:
+		while lbl.get_line_count() * lbl.get_line_height() > check_h and fs > min_px:
 			fs -= 1
 			lbl.add_theme_font_size_override("font_size", fs)
 			await lbl.get_tree().process_frame
