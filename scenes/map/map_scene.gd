@@ -4,11 +4,12 @@ extends Node2D
 const MapNodeRes = preload("res://resources/map_node_resource.gd")
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 
-const COL_X := [760, 960, 1160]
-const FLOOR_Y_BOTTOM := 900
-const FLOOR_GAP := 88
-const NODE_W := 120
-const NODE_H := 50
+const NODE_SIZE    := 56
+const COL_GAP      := 130   # MapGenerator.COLS=7 과 동기화: 7×130=910
+const FLOOR_GAP    := 64
+const MAP_BOTTOM_Y := 1020
+const _MAP_W       := 7 * COL_GAP
+const COL_X_BASE   := (1920 - _MAP_W) / 2 + COL_GAP / 2
 
 var _node_buttons: Dictionary = {}  # node_id → Button
 var _floor_label: Label
@@ -96,9 +97,18 @@ func _draw_connections() -> void:
 func _create_node_button(node: Resource) -> void:
 	var btn := Button.new()
 	btn.position = _node_top_left(node)
-	btn.size = Vector2(NODE_W, NODE_H)
-	btn.text = _room_type_text(node.room_type)
-	btn.add_theme_font_size_override("font_size", 13)
+	btn.size = Vector2(NODE_SIZE, NODE_SIZE)
+	btn.tooltip_text = _room_type_text(node.room_type)
+	var icon: Texture2D = IconUtils.get_room_icon(node.room_type)
+	if icon != null:
+		btn.icon = icon
+		btn.expand_icon = true
+		btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		btn.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
+	else:
+		btn.text = _room_type_text(node.room_type)
+		btn.add_theme_font_size_override("font_size", 13)
+		LabelUtils.fit_text(btn, 13, 10)
 	match node.room_type:
 		MapNodeRes.RoomType.ELITE:
 			btn.theme_type_variation = "EliteRoomButton"
@@ -110,7 +120,6 @@ func _create_node_button(node: Resource) -> void:
 	btn.pressed.connect(func(): GameManager.enter_node(captured_id))
 	add_child(btn)
 	_node_buttons[node.node_id] = btn
-	LabelUtils.fit_text(btn, 13, 10)
 	SacredTheme.animate_button(btn)
 
 func _refresh_map() -> void:
@@ -123,7 +132,7 @@ func _refresh_map() -> void:
 			btn.modulate = Color(0.5, 0.5, 0.5)
 		elif node_id in GameManager.available_node_ids:
 			btn.disabled = false
-			btn.modulate = Color(1.0, 1.0, 1.0)
+			btn.modulate = SacredPalette.BRASS_300
 		else:
 			btn.disabled = true
 			btn.modulate = Color(0.6, 0.6, 0.7, 0.5)
@@ -136,12 +145,12 @@ func _refresh_map() -> void:
 
 func _node_center(node: Resource) -> Vector2:
 	return Vector2(
-		COL_X[node.column],
-		FLOOR_Y_BOTTOM - node.floor_num * FLOOR_GAP
+		COL_X_BASE + node.column * COL_GAP,
+		MAP_BOTTOM_Y - node.floor_num * FLOOR_GAP
 	)
 
 func _node_top_left(node: Resource) -> Vector2:
-	return _node_center(node) - Vector2(NODE_W / 2.0, NODE_H / 2.0)
+	return _node_center(node) - Vector2(NODE_SIZE / 2.0, NODE_SIZE / 2.0)
 
 func _refresh_relics() -> void:
 	for child in _relic_container.get_children():
