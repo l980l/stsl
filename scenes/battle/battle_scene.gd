@@ -61,7 +61,7 @@ var _debug_grid_nodes: Array = []
 var _debug_token_hero_idx: int = 0
 
 var _deck_viewer: CanvasLayer = null
-var _deck_viewer_tooltip: CardScene = null
+var _deck_card_tweens: Dictionary = {}
 
 
 const STATUS_EMOJI := {
@@ -1176,9 +1176,9 @@ func _show_deck_viewer_in_battle() -> void:
 	overlay.add_child(bg_rect)
 
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(1200, 680)
-	panel.size = Vector2(1200, 680)
-	panel.position = Vector2((WINDOW_W - 1200) / 2.0, (WINDOW_H - 680) / 2.0)
+	panel.custom_minimum_size = Vector2(1300, 680)
+	panel.size = Vector2(1300, 680)
+	panel.position = Vector2((WINDOW_W - 1300) / 2.0, (WINDOW_H - 680) / 2.0)
 	overlay.add_child(panel)
 
 	var margin := MarginContainer.new()
@@ -1186,26 +1186,28 @@ func _show_deck_viewer_in_battle() -> void:
 	margin.add_theme_constant_override("margin_right", 20)
 	margin.add_theme_constant_override("margin_top", 14)
 	margin.add_theme_constant_override("margin_bottom", 14)
+	margin.clip_children = Control.CLIP_CHILDREN_ONLY
 	panel.add_child(margin)
 
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 8)
 	margin.add_child(vbox)
 
-	var title_row := HBoxContainer.new()
-	vbox.add_child(title_row)
-
 	var title_lbl := Label.new()
 	title_lbl.text = tr("ui.battle.btn_deck_view")
 	title_lbl.add_theme_font_size_override("font_size", 22)
-	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_row.add_child(title_lbl)
+	vbox.add_child(title_lbl)
 
 	var close_btn := Button.new()
+	close_btn.theme_type_variation = "IconButton"
 	close_btn.text = "✕"
-	close_btn.add_theme_font_size_override("font_size", 18)
+	close_btn.add_theme_font_size_override("font_size", 20)
+	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_close_deck_viewer)
-	title_row.add_child(close_btn)
+	overlay.add_child(close_btn)
+	close_btn.position = Vector2((WINDOW_W - 1300) / 2.0 + 1300 - 56, (WINDOW_H - 680) / 2.0 + 20)
+	close_btn.size     = Vector2(40, 40)
+	SacredTheme.animate_button(close_btn)
 
 	var columns := HBoxContainer.new()
 	columns.add_theme_constant_override("separation", 16)
@@ -1218,14 +1220,6 @@ func _show_deck_viewer_in_battle() -> void:
 
 	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw") + " (%d)" % draw_cards.size(), draw_cards)
 	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
-
-	var tip: CardScene = CARD_SCENE.instantiate()
-	tip.scale = Vector2(2.5, 2.5)
-	tip.z_index = 200
-	tip.visible = false
-	overlay.add_child(tip)
-	_set_mouse_ignore_recursive(tip)
-	_deck_viewer_tooltip = tip
 
 	_deck_viewer = canvas
 
@@ -1241,12 +1235,18 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 	lbl.add_theme_font_size_override("font_size", 18)
 	col.add_child(lbl)
 
+	var clip_box := Control.new()
+	clip_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	clip_box.clip_children = Control.CLIP_CHILDREN_ONLY
+	col.add_child(clip_box)
+
 	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	col.add_child(scroll)
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scroll.clip_contents = false
+	clip_box.add_child(scroll)
 
 	var grid := GridContainer.new()
-	grid.columns = 5
+	grid.columns = 4
 	grid.add_theme_constant_override("h_separation", 10)
 	grid.add_theme_constant_override("v_separation", 10)
 	scroll.add_child(grid)
@@ -1259,47 +1259,49 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		return
 
 	for card_res in cards:
-		var captured_res: Resource = card_res
-
 		var wrapper := Control.new()
-		wrapper.custom_minimum_size = Vector2(91, 130)
+		wrapper.custom_minimum_size = Vector2(137, 195)
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
 		grid.add_child(wrapper)
 
 		var card_node: CardScene = CARD_SCENE.instantiate()
-		card_node.scale = Vector2(0.65, 0.65)
+		card_node.position     = Vector2(-1.75, -5.0)
+		card_node.pivot_offset = Vector2(70.0, 200.0)
+		card_node.scale        = Vector2(0.975, 0.975)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 
-		var captured_wrapper: Control = wrapper
-		card_node.card_hovered.connect(func(_c): _show_deck_tooltip(captured_res, captured_wrapper))
-		card_node.card_unhovered.connect(func(_c): _hide_deck_tooltip())
+		var captured_node: CardScene = card_node
+		card_node.card_hovered.connect(func(_c): _show_deck_card_hover(captured_node))
+		card_node.card_unhovered.connect(func(_c): _clear_deck_card_hover(captured_node))
 
-func _show_deck_tooltip(card: Resource, node: Control) -> void:
-	if _deck_viewer_tooltip == null:
-		return
-	_deck_viewer_tooltip.setup(card, CardScene.Mode.HAND)
-	var base := node.global_position
-	var x: float = clamp(base.x + 45.0 - 175.0, 0.0, float(WINDOW_W - 350))
-	var y: float = clamp(base.y - 510.0, 20.0, float(WINDOW_H - 500))
-	_deck_viewer_tooltip.position = Vector2(x, y)
-	_deck_viewer_tooltip.visible = true
+func _show_deck_card_hover(node: CardScene) -> void:
+	if node in _deck_card_tweens:
+		_deck_card_tweens[node].kill()
+	node.z_index = 50
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
+	_deck_card_tweens[node] = tw
 
-func _hide_deck_tooltip() -> void:
-	if _deck_viewer_tooltip != null:
-		_deck_viewer_tooltip.visible = false
+func _clear_deck_card_hover(node: CardScene) -> void:
+	if node in _deck_card_tweens:
+		_deck_card_tweens[node].kill()
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
+	tw.tween_callback(func():
+		if is_instance_valid(node):
+			node.z_index = 0
+	)
+	_deck_card_tweens[node] = tw
 
 func _close_deck_viewer() -> void:
 	if _deck_viewer != null:
-		_deck_viewer_tooltip = null
+		for tw in _deck_card_tweens.values():
+			if tw.is_valid():
+				tw.kill()
+		_deck_card_tweens.clear()
 		_deck_viewer.queue_free()
 		_deck_viewer = null
-
-func _set_mouse_ignore_recursive(node: Node) -> void:
-	if node is Control:
-		(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for c in node.get_children():
-		_set_mouse_ignore_recursive(c)
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

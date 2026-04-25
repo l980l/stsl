@@ -448,19 +448,55 @@ func generate_shop_inventory() -> Dictionary:
 	if tm:
 		for hero in tm.heroes:
 			match hero.hero_id:
-				"napoleon":   card_pool.append_array(_napoleon_card_pool())
-				"cleopatra":  card_pool.append_array(_cleopatra_card_pool())
-				"yi_sun_sin": card_pool.append_array(_yi_sun_sin_card_pool())
+				"napoleon":    card_pool.append_array(_napoleon_card_pool())
+				"cleopatra":   card_pool.append_array(_cleopatra_card_pool())
+				"yi_sun_sin":  card_pool.append_array(_yi_sun_sin_card_pool())
+				"joan_of_arc": card_pool.append_array(_joan_of_arc_card_pool())
+				"genghis_khan": card_pool.append_array(_genghis_khan_card_pool())
+				"musashi":     card_pool.append_array(_musashi_card_pool())
 	card_pool.shuffle()
+	var shop_cards: Array = card_pool.slice(0, min(6, card_pool.size()))
+	var card_prices: Array = []
+	for card in shop_cards:
+		card_prices.append(_shop_price_for_rarity(card.rarity))
 	return {
-		"cards": card_pool.slice(0, min(3, card_pool.size())),
-		"card_price": 75,
-		"relic": get_random_relic(),
+		"cards": shop_cards,
+		"card_prices": card_prices,
+		"relics": _get_shop_relics(4),
 		"relic_price": 150,
 		"remove_price": 100,
+		"upgrade_price": 150,
 		"heal_price": 30,
 		"heal_amount": 20,
 	}
+
+func _shop_price_for_rarity(rarity: int) -> int:
+	match rarity:
+		CardResource.Rarity.COMMON:    return 50
+		CardResource.Rarity.UNCOMMON:  return 75
+		CardResource.Rarity.RARE:      return 120
+		CardResource.Rarity.LEGENDARY: return 180
+		CardResource.Rarity.DIVINE:    return 250
+	return 75
+
+func _get_shop_relics(count: int) -> Array:
+	var tm := _get_tm()
+	var pool := _build_relic_pool()
+	var owned_names: Array = []
+	for r in relics:
+		owned_names.append(r.relic_name)
+	var available: Array = []
+	for r in pool:
+		if r.relic_name in owned_names:
+			continue
+		if r.is_cursed:
+			continue
+		if r.owner_hero_id != "":
+			if tm == null or not tm.has_hero(r.owner_hero_id):
+				continue
+		available.append(r)
+	available.shuffle()
+	return available.slice(0, min(count, available.size()))
 
 func _advance_nodes_from(node_id: int) -> void:
 	var node: Resource = run_map[node_id]

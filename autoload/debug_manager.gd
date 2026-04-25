@@ -1,12 +1,13 @@
 # autoload/debug_manager.gd
 extends Node
 
-const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 승리\n[Shift+I]  무적 토글 (영웅 피해 차단)\n[Shift+E]  무한 코스트 토글\n[Shift+D]  카드 1장 드로우\n[Shift+H]  적 HP 설정 → 적 클릭\n[Shift+G]  그리드 토글\n[Shift+O]  더미 몬스터 추가\n[Shift+S]  더미 소환수 추가 (1번 영웅)\n── 전체 공통 ──\n[Shift+T]  번역 키 표시 토글\n[Shift+M]  몬스터 선택 전투\n[Shift+B]  영웅 HP 조정\n[Shift+W]  현재 챕터 즉시 클리어\n[Shift+F]  현재 Act 클리어 → 다음 Act 진입\n[Shift+P]  파티에 영웅 추가\n[Shift+A]  카드 추가 창\n[Shift+R]  덱 편집기 (카드 제거)\n[Shift+U]  카드 강화\n[Shift+N]  영웅 즉시 해금 창\n[Shift+L]  렐릭 추가 창\n[Shift+X]  렐릭 제거 창\n[Shift+V]  이벤트 씬 입장\n[Shift+C]  목록 고정/해제"
+const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 승리\n[Shift+I]  무적 토글 (영웅 피해 차단)\n[Shift+E]  무한 코스트 토글\n[Shift+D]  카드 1장 드로우\n[Shift+H]  적 HP 설정 → 적 클릭\n[Shift+G]  그리드 토글\n[Shift+O]  더미 몬스터 추가\n[Shift+S]  더미 소환수 추가 (1번 영웅)\n── 전체 공통 ──\n[Shift+T]  번역 키 표시 토글\n[Shift+B]  영웅 HP 조정\n[Shift+W]  현재 챕터 즉시 클리어\n[Shift+F]  현재 Act 클리어 → 다음 Act 진입\n[Shift+P]  파티에 영웅 추가\n[Shift+A]  카드 추가 창\n[Shift+R]  덱 편집기 (카드 제거)\n[Shift+U]  카드 강화\n[Shift+N]  영웅 즉시 해금 창\n[Shift+L]  렐릭 추가 창\n[Shift+X]  렐릭 제거 창\n[Shift+C]  목록 고정/해제\n── 씬 이동 ──\n[Shift+M]  몬스터 선택 전투\n[Shift+V]  이벤트 씬 입장\n[Space+S]  상점 즉시 입장\n[Space+G]  골드 추가 창"
 
 var _pinned_label: Label = null
 var _hover_lbl: Label = null
 var _show_keys: bool = false
 var _saved_translations: Array = []
+var _space_held: bool = false
 
 func _ready() -> void:
 	if not OS.is_debug_build():
@@ -45,8 +46,24 @@ func _ready() -> void:
 	add_child(layer)
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if not OS.is_debug_build() or not event.pressed or event.echo:
+	if not OS.is_debug_build():
 		return
+	# Space 홀드 상태 추적
+	if event.keycode == KEY_SPACE and not event.echo:
+		_space_held = event.pressed
+		return
+	if not event.pressed or event.echo:
+		return
+	# Space+S/G 단축키 (Shift+S/G는 전투 전용이라 충돌 방지)
+	if _space_held and not event.shift_pressed:
+		match event.keycode:
+			KEY_S:
+				GameManager.change_state(GameManager.GameState.SHOP)
+				GameManager._request_scene("res://scenes/shop/shop_scene.tscn")
+				return
+			KEY_G:
+				_open_gold_dialog()
+				return
 	if not event.shift_pressed:
 		return
 	if event.keycode == KEY_C:
@@ -136,6 +153,7 @@ func _open_hero_add_dialog() -> void:
 		dlg.confirmed.connect(func(): dlg.queue_free())
 		dlg.canceled.connect(func(): dlg.queue_free())
 		get_tree().root.add_child(dlg)
+		SacredTheme.attach_popup_brackets_to_dialog(dlg)
 		dlg.popup_centered()
 		return
 	var opts: Array = []
@@ -203,6 +221,7 @@ func _open_relic_remove_dialog() -> void:
 		dlg.confirmed.connect(func(): dlg.queue_free())
 		dlg.canceled.connect(func(): dlg.queue_free())
 		get_tree().root.add_child(dlg)
+		SacredTheme.attach_popup_brackets_to_dialog(dlg)
 		dlg.popup_centered()
 		return
 	var opts: Array = []
@@ -292,6 +311,7 @@ func _open_hero_hp_dialog() -> void:
 	)
 	dlg.canceled.connect(func(): dlg.queue_free())
 	get_tree().root.add_child(dlg)
+	SacredTheme.attach_popup_brackets_to_dialog(dlg)
 	dlg.popup_centered()
 
 # ── 몬스터 선택 전투 ────────────────────────────────
@@ -383,6 +403,38 @@ func _open_event_enter_dialog() -> void:
 		GameManager._request_scene("res://scenes/event/event_scene.tscn")
 	)
 
+# ── 골드 추가 ────────────────────────────────────────
+
+func _open_gold_dialog() -> void:
+	var dlg := AcceptDialog.new()
+	dlg.title = "골드 추가"
+	dlg.get_ok_button().text = "추가"
+	dlg.add_cancel_button("닫기")
+	dlg.min_size = Vector2i(340, 120)
+
+	var vbox := VBoxContainer.new()
+	var lbl := Label.new()
+	lbl.text = "현재 골드: %d\n추가할 금액:" % GameManager.gold
+	vbox.add_child(lbl)
+
+	var amounts := [50, 100, 200, 500, 1000]
+	var hbox := HBoxContainer.new()
+	for amt in amounts:
+		var btn := Button.new()
+		btn.text = "+%d" % amt
+		btn.pressed.connect(func():
+			GameManager.add_gold(amt)
+			lbl.text = "현재 골드: %d\n추가할 금액:" % GameManager.gold
+		)
+		hbox.add_child(btn)
+	vbox.add_child(hbox)
+
+	dlg.add_child(vbox)
+	dlg.confirmed.connect(func(): dlg.queue_free())
+	dlg.canceled.connect(func(): dlg.queue_free())
+	get_tree().root.add_child(dlg)
+	dlg.popup_centered()
+
 # ── UI 헬퍼 ─────────────────────────────────────────
 
 func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, on_confirm: Callable, show_select_all: bool = false) -> void:
@@ -390,7 +442,7 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 	dlg.title = title
 	dlg.get_ok_button().text = confirm_text
 	dlg.add_cancel_button("닫기")
-	dlg.min_size = Vector2i(600, 580)
+	dlg.min_size = Vector2i(900, 580)
 
 	var outer := VBoxContainer.new()
 
@@ -407,7 +459,7 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 		)
 
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(560, 480)
+	scroll.custom_minimum_size = Vector2(860, 480)
 	var vbox := VBoxContainer.new()
 	scroll.add_child(vbox)
 
@@ -433,6 +485,7 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 	)
 	dlg.canceled.connect(func(): dlg.queue_free())
 	get_tree().root.add_child(dlg)
+	SacredTheme.attach_popup_brackets_to_dialog(dlg)
 	dlg.popup_centered()
 
 # options: Array of [label, payload, is_enabled, color]
@@ -474,6 +527,7 @@ func _make_radio_dialog(title: String, options: Array, confirm_text: String, on_
 	)
 	dlg.canceled.connect(func(): dlg.queue_free())
 	get_tree().root.add_child(dlg)
+	SacredTheme.attach_popup_brackets_to_dialog(dlg)
 	dlg.popup_centered()
 
 # ── 카드 유틸 ────────────────────────────────────────
