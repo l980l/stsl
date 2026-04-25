@@ -1,0 +1,56 @@
+{
+  "1": {
+    "inputs": { "ckpt_name": "gameIconInstitute_v4XL.safetensors" },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": { "title": "체크포인트 로드" }
+  },
+  "2": {
+    "inputs": { "stop_at_clip_layer": -2, "clip": ["1", 1] },
+    "class_type": "CLIPSetLastLayer",
+    "_meta": { "title": "CLIP Skip" }
+  },
+  "3": {
+    "inputs": { "text": "", "clip": ["2", 0] },
+    "class_type": "CLIPTextEncode",
+    "_meta": { "title": "긍정 프롬프트" }
+  },
+  "4": {
+    "inputs": {
+      "text": "((wrong fingers, extra feet, extra hands)), (worst quality:2), (low quality:2), (normal quality:2), lowres, ((monochrome)), ((grayscale)), extra fingers, fewer fingers, bad hand, text, watermark",
+      "clip": ["2", 0]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": { "title": "부정 프롬프트" }
+  },
+  "5": {
+    "inputs": { "width": 512, "height": 512, "batch_size": 1 },
+    "class_type": "EmptyLatentImage",
+    "_meta": { "title": "빈 잠재 이미지" }
+  },
+  "6": {
+    "inputs": {
+      "seed": 0,
+      "steps": 20,
+      "cfg": 8,
+      "sampler_name": "euler_ancestral",
+      "scheduler": "normal",
+      "denoise": 1.0,
+      "model": ["1", 0],
+      "positive": ["3", 0],
+      "negative": ["4", 0],
+      "latent_image": ["5", 0]
+    },
+    "class_type": "KSampler",
+    "_meta": { "title": "KSampler" }
+  },
+  "7": {
+    "inputs": { "samples": ["6", 0], "vae": ["1", 2] },
+    "class_type": "VAEDecode",
+    "_meta": { "title": "VAE 디코드" }
+  },
+  "8": {
+    "inputs": { "filename_prefix": "stsl_icon", "images": ["7", 0] },
+    "class_type": "SaveImage",
+    "_meta": { "title": "이미지 저장" }
+  }
+}

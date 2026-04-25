@@ -39,7 +39,7 @@ var _enemy_char_nodes: Array = []      # index → Node2D
 var _energy_label: Label
 var _end_turn_btn: Button
 var _message_label: Label
-var _relic_container: HBoxContainer
+var _relic_container: FlowContainer
 var _selected_card: Resource = null
 
 var _drag_card: Resource = null
@@ -52,7 +52,7 @@ var _drag_t_offset: float = 0.0
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _token_tile_nodes: Dictionary = {}
-var _synergy_box: HBoxContainer = null
+var _synergy_box: FlowContainer = null
 var _active_powers_box: VBoxContainer = null
 var _debug_badge: Label = null
 var _debug_hp_target_mode: bool = false
@@ -148,20 +148,15 @@ func _build_ui() -> void:
 	deck_btn.pressed.connect(_show_deck_viewer_in_battle)
 	add_child(deck_btn)
 
-	# 상단 바 — 시너지 → 릴릭 순서, 넘치면 자동 줄바꿈
-	var top_bar := FlowContainer.new()
-	top_bar.position = Vector2(20, 4)
-	top_bar.size = Vector2(WINDOW_W - 40, 72)
-	add_child(top_bar)
-
-	_synergy_box = HBoxContainer.new()
-	_synergy_box.add_theme_constant_override("separation", 6)
-	top_bar.add_child(_synergy_box)
-
-	_relic_container = HBoxContainer.new()
-	_relic_container.add_theme_constant_override("separation", 6)
-	top_bar.add_child(_relic_container)
-	_refresh_relics()
+	# HUD 바 — 시너지 + 릴릭 아이콘, 메시지 레이블 아래
+	_relic_container = FlowContainer.new()
+	_relic_container.position = Vector2(20, 70)
+	_relic_container.size = Vector2(WINDOW_W - 40, 72)
+	_relic_container.add_theme_constant_override("h_separation", 6)
+	_relic_container.add_theme_constant_override("v_separation", 4)
+	add_child(_relic_container)
+	_synergy_box = _relic_container
+	_refresh_hud()
 
 	_active_powers_box = VBoxContainer.new()
 	_active_powers_box.position = Vector2(20, 800)
@@ -285,19 +280,56 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 			 "name_lbl": name_lbl, "hp_bar": hp_bar, "hp_lbl": hp_lbl,
 			 "block_lbl": block_lbl, "status_box": status_box }
 
-func _refresh_relics() -> void:
+func _refresh_hud() -> void:
+	if _relic_container == null:
+		return
 	for child in _relic_container.get_children():
 		child.queue_free()
+	for s in BattleManager.get_active_synergies():
+		var tip: String = "%s\n%s" % [tr(s["name_key"]), tr(s["desc_key"])]
+		var tex: Texture2D = IconUtils.get_synergy_icon(s["name_key"])
+		if tex != null:
+			var rect := TextureRect.new()
+			rect.texture = tex
+			rect.custom_minimum_size = Vector2(28, 28)
+			rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			rect.tooltip_text = tip
+			rect.mouse_filter = Control.MOUSE_FILTER_STOP
+			_relic_container.add_child(rect)
+		else:
+			var lbl := Label.new()
+			lbl.text = "[%s]" % tr(s["name_key"])
+			lbl.tooltip_text = tip
+			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+			lbl.add_theme_font_size_override("font_size", 13)
+			lbl.modulate = Color(1.0, 0.0, 1.0)
+			_relic_container.add_child(lbl)
 	if not GameManager or not GameManager.is_inside_tree():
 		return
 	for relic in GameManager.relics:
-		var lbl := Label.new()
-		lbl.text = "[%s]" % tr(relic.relic_name)
-		lbl.tooltip_text = tr(relic.description)
-		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-		lbl.add_theme_font_size_override("font_size", 13)
-		lbl.modulate = Color(1.0, 0.85, 0.3)
-		_relic_container.add_child(lbl)
+		var tip: String = "%s\n%s" % [tr(relic.relic_name), tr(relic.description)]
+		var tex: Texture2D = IconUtils.get_relic_icon(relic.relic_name)
+		if tex != null:
+			var rect := TextureRect.new()
+			rect.texture = tex
+			rect.custom_minimum_size = Vector2(28, 28)
+			rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			rect.tooltip_text = tip
+			rect.mouse_filter = Control.MOUSE_FILTER_STOP
+			_relic_container.add_child(rect)
+		else:
+			var lbl := Label.new()
+			lbl.text = "[%s]" % tr(relic.relic_name)
+			lbl.tooltip_text = tip
+			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+			lbl.add_theme_font_size_override("font_size", 13)
+			lbl.modulate = Color(1.0, 0.85, 0.3)
+			_relic_container.add_child(lbl)
+
+func _refresh_relics() -> void:
+	_refresh_hud()
 
 func _make_label(pos: Vector2, sz: Vector2, font_size: int) -> Label:
 	var lbl := Label.new()
@@ -959,15 +991,48 @@ func _on_battle_lost() -> void:
 # 카드 효과 텍스트 헬퍼
 # ─────────────────────────────────────────────
 
-func _make_status_label(key: String, val: int, status: Dictionary) -> Label:
+func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
+	var tex: Texture2D = IconUtils.get_status_icon(key)
+	var tooltip: String = _trf("status.%s.desc" % key, val)
+
+	if tex != null:
+		var hbox := HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 1)
+		hbox.custom_minimum_size = Vector2(0, 20)
+		hbox.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		hbox.mouse_filter = Control.MOUSE_FILTER_STOP
+		hbox.tooltip_text = tooltip
+
+		var icon := TextureRect.new()
+		icon.texture = tex
+		icon.custom_minimum_size = Vector2(20, 20)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		hbox.add_child(icon)
+
+		var lbl := Label.new()
+		if key == "poison_dmg":
+			var dur: int = status.get("poison_dur", 0)
+			lbl.text = "%d/%d" % [val * 10, dur]
+		else:
+			lbl.text = "%d" % val
+		lbl.add_theme_font_size_override("font_size", 11)
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		hbox.add_child(lbl)
+
+		return hbox
+
+	# 아이콘 없으면 이모지 fallback
 	var lbl := Label.new()
 	if key == "poison_dmg":
 		var dur: int = status.get("poison_dur", 0)
 		lbl.text = "☠%d/%d" % [val * 10, dur]
-		lbl.tooltip_text = _trf("status.%s.desc" % key, val)
 	else:
 		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
-		lbl.tooltip_text = _trf("status.%s.desc" % key, val)
+	lbl.tooltip_text = tooltip
 	lbl.add_theme_font_size_override("font_size", 12)
 	lbl.custom_minimum_size = Vector2(0, 18)
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -1077,18 +1142,7 @@ func _refresh_debug_badge() -> void:
 
 
 func _refresh_synergy_hud() -> void:
-	if _synergy_box == null:
-		return
-	for child in _synergy_box.get_children():
-		child.queue_free()
-	for s in BattleManager.get_active_synergies():
-		var lbl := Label.new()
-		lbl.text = "[%s]" % tr(s["name_key"])
-		lbl.tooltip_text = tr(s["desc_key"])
-		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-		lbl.add_theme_font_size_override("font_size", 13)
-		lbl.modulate = Color(1.0, 0.0, 1.0)
-		_synergy_box.add_child(lbl)
+	_refresh_hud()
 
 func _input(event: InputEvent) -> void:
 	# 드래그 처리는 card_scene 시그널(_on_card_drag_*)로 위임됨
