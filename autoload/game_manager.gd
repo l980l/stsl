@@ -465,6 +465,7 @@ func generate_shop_inventory() -> Dictionary:
 		"relics": _get_shop_relics(4),
 		"relic_price": 150,
 		"remove_price": 100,
+		"upgrade_price": 150,
 		"heal_price": 30,
 		"heal_amount": 20,
 	}
