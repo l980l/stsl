@@ -1202,10 +1202,12 @@ func _show_deck_viewer_in_battle() -> void:
 	title_row.add_child(title_lbl)
 
 	var close_btn := Button.new()
+	close_btn.theme_type_variation = "VowButton"
 	close_btn.text = "✕"
-	close_btn.add_theme_font_size_override("font_size", 18)
+	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_close_deck_viewer)
 	title_row.add_child(close_btn)
+	SacredTheme.animate_button(close_btn)
 
 	var columns := HBoxContainer.new()
 	columns.add_theme_constant_override("separation", 16)

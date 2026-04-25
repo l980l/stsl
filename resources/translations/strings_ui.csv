@@ -58,6 +58,15 @@ ui.shop.card_owner_cost,[%s] 비용 %d,[%s] Cost %d,[%s] Coût %d,[%s] Costo %d,
 ui.shop.btn_heal,회복 %dHP (%d 골드),Heal %dHP (%d Gold),Soigner %dPV (%d Or),Cura %dPS (%d Oro),Curar %dPV (%d Oro),回復 %dHP (%d G),Θεραπεία %dHP (%d Χρ.),恢复 %dHP (%d金)
 ui.shop.btn_remove_card,카드 제거 (%d 골드),Remove Card (%d Gold),Retirer carte (%d Or),Rimuovi carta (%d Oro),Quitar carta (%d Oro),カード除去 (%d G),Αφαίρεση Κάρτας (%d Χρ.),移除卡牌 (%d金)
 ui.shop.remove_prompt,제거할 카드를 선택하세요 (%d 골드),Select card to remove (%d Gold),Choisir une carte à retirer (%d Or),Seleziona carta da rimuovere (%d Oro),Elige carta a eliminar (%d Oro),除去するカードを選択 (%d G),Επίλεξε κάρτα για αφαίρεση (%d Χρ.),选择要移除的卡牌 (%d金)
+ui.shop.upgrade_prompt,강화할 카드를 선택하세요 (%d 골드),Select card to upgrade (%d Gold),Choisir une carte à améliorer (%d Or),Seleziona carta da potenziare (%d Oro),Elige carta a mejorar (%d Oro),強化するカードを選択 (%d G),Επίλεξε κάρτα για αναβάθμιση (%d Χρ.),选择要强化的卡牌 (%d金)
+ui.shop.btn_confirm_remove,제거 확인,Confirm Remove,Confirmer Retrait,Conferma Rimozione,Confirmar Eliminación,除去確認,Επιβεβαίωση Αφαίρεσης,确认移除
+ui.shop.btn_confirm_upgrade,강화 확인,Confirm Upgrade,Confirmer Amélioration,Conferma Potenziamento,Confirmar Mejora,強化確認,Επιβεβαίωση Αναβάθμισης,确认强化
+ui.shop.svc_heal_name,체력 회복,Heal HP,Soigner PV,Cura PS,Curar PV,HP回復,Θεραπεία HP,恢复HP
+ui.shop.svc_heal_desc,파티 전원 HP +%d,Party HP +%d,PV du groupe +%d,PS del gruppo +%d,PV del grupo +%d,パーティ全員 HP+%d,Ομάδα HP +%d,队伍全员 HP+%d
+ui.shop.svc_remove_name,카드 제거,Remove Card,Retirer Carte,Rimuovi Carta,Quitar Carta,カード除去,Αφαίρεση Κάρτας,移除卡牌
+ui.shop.svc_remove_desc,덱에서 카드 1장 제거,Remove 1 card from deck,Retirer 1 carte du deck,Rimuovi 1 carta dal mazzo,Quita 1 carta del mazo,デッキから1枚除去,Αφαίρεσε 1 φύλλο από τράπουλα,从卡组移除1张牌
+ui.shop.svc_upgrade_name,카드 강화,Upgrade Card,Améliorer Carte,Potenzia Carta,Mejorar Carta,カード強化,Αναβάθμιση Κάρτας,强化卡牌
+ui.shop.svc_upgrade_desc,덱의 카드 1장 강화,Upgrade 1 card in deck,Améliorer 1 carte du deck,Potenzia 1 carta nel mazzo,Mejora 1 carta del mazo,デッキの1枚を強化,Αναβάθμισε 1 φύλλο στην τράπουλα,强化卡组中1张牌
 ui.shop.card_name_cost,%s (비용 %d),%s (Cost %d),%s (Coût %d),%s (Costo %d),%s (Coste %d),%s (%d コスト),%s (Κόστος %d),%s (费用 %d)
 ui.rest.hero_hp_format,%s HP: %d / %d,%s HP: %d / %d,%s PV: %d / %d,%s PS: %d / %d,%s PV: %d / %d,%s HP: %d / %d,%s HP: %d / %d,%s HP: %d / %d
 "ui.game_over.stats","도달 층: %d / 9\n보유 골드: %d","Floor: %d / 9\nGold: %d","Étage: %d / 9\nOr: %d","Piano: %d / 9\nOro: %d","Piso: %d / 9\nOro: %d","フロア: %d / 9\nゴールド: %d","Όροφος: %d / 9\nΧρυσός: %d","楼层: %d / 9\n金币: %d"

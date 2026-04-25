@@ -266,7 +266,7 @@ func _show_deck_viewer() -> void:
 	var close_btn := Button.new()
 	close_btn.theme_type_variation = "VowButton"
 	close_btn.text = "✕"
-	close_btn.custom_minimum_size = Vector2(80, 40)
+	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_deck_viewer)
 	title_row.add_child(close_btn)
 	SacredTheme.animate_button(close_btn)
@@ -283,7 +283,6 @@ func _show_deck_viewer() -> void:
 	scroll.add_child(grid)
 
 	for card_res in all_cards:
-		var captured_res: Resource = card_res
 		var wrapper := Control.new()
 		wrapper.custom_minimum_size = Vector2(137, 195)
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS

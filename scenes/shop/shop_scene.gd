@@ -20,9 +20,16 @@ var _upgrade_layer:       CanvasLayer = null
 var _card_tweens:         Dictionary  = {}
 var _remove_card_tweens:  Dictionary  = {}
 var _upgrade_card_tweens: Dictionary  = {}
-var _card_removed:        bool        = false
-var _upgrade_btn_ref:     Button      = null
-var _upgrade_price:       int         = 0
+var _card_removed:          bool      = false
+var _upgrade_btn_ref:       Button    = null
+var _upgrade_price:         int       = 0
+var _remove_price:          int       = 0
+var _selected_remove_card:  Resource  = null
+var _selected_remove_node:  CardScene = null
+var _confirm_remove_btn:    Button    = null
+var _selected_upgrade_card: Resource  = null
+var _selected_upgrade_node: CardScene = null
+var _confirm_upgrade_btn:   Button    = null
 
 func _ready() -> void:
 	_inventory = GameManager.generate_shop_inventory()
@@ -104,7 +111,7 @@ func _build_card_section() -> void:
 	if n == 0:
 		return
 	var total_w := n * CARD_W + (n - 1) * CARD_GAP
-	var start_x := int((1920 - total_w) / 2)
+	var start_x: int = int((1920 - total_w) / 2.0)
 
 	for i in range(n):
 		var card: Resource = cards[i]
@@ -177,7 +184,7 @@ func _build_relic_section() -> void:
 
 	var n := relics.size()
 	var total_w := n * RELIC_PANEL_W + (n - 1) * RELIC_PANEL_GAP
-	var start_x := int((1920 - total_w) / 2)
+	var start_x: int = int((1920 - total_w) / 2.0)
 
 	for i in range(n):
 		var relic: Resource = relics[i]
@@ -304,8 +311,8 @@ func _build_service_section() -> void:
 	var services := [
 		{
 			"glyph":    "♥",
-			"name":     "체력 회복",
-			"desc":     "파티 전원 HP +%d" % heal_amount,
+			"name":     tr("ui.shop.svc_heal_name"),
+			"desc":     tr("ui.shop.svc_heal_desc") % heal_amount,
 			"price":    heal_price,
 			"accent":   P.EMERALD_400,
 			"callback": func(): _on_heal(heal_amount, heal_price),
@@ -313,8 +320,8 @@ func _build_service_section() -> void:
 		},
 		{
 			"glyph":    "✕",
-			"name":     "카드 제거",
-			"desc":     "덱에서 카드 1장 제거",
+			"name":     tr("ui.shop.svc_remove_name"),
+			"desc":     tr("ui.shop.svc_remove_desc"),
 			"price":    remove_price,
 			"accent":   P.BLOOD_400,
 			"callback": func(): _show_remove_panel(remove_price),
@@ -322,8 +329,8 @@ func _build_service_section() -> void:
 		},
 		{
 			"glyph":    "✦",
-			"name":     "카드 강화",
-			"desc":     "덱의 카드 1장 강화",
+			"name":     tr("ui.shop.svc_upgrade_name"),
+			"desc":     tr("ui.shop.svc_upgrade_desc"),
 			"price":    upgrade_price,
 			"accent":   P.AMETHYST_400,
 			"callback": func(): _on_upgrade_card(upgrade_price),
@@ -333,7 +340,7 @@ func _build_service_section() -> void:
 
 	var n := services.size()
 	var total_w := n * SVC_PANEL_W + (n - 1) * SVC_PANEL_GAP
-	var start_x := int((1920 - total_w) / 2)
+	var start_x: int = int((1920 - total_w) / 2.0)
 	var sy      := 676
 
 	for i in range(n):
@@ -365,7 +372,7 @@ func _build_service_section() -> void:
 		glyph_lbl.modulate             = accent
 		glyph_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		glyph_lbl.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
-		glyph_lbl.position = Vector2(12, int((SVC_PANEL_H - 40) / 2))
+		glyph_lbl.position = Vector2(12, int((SVC_PANEL_H - 40) / 2.0))
 		glyph_lbl.size     = Vector2(48, 40)
 		panel.add_child(glyph_lbl)
 
@@ -471,6 +478,7 @@ func _show_remove_panel(price: int) -> void:
 	if full_deck.is_empty():
 		return
 
+	_remove_price = price
 	_remove_layer = CanvasLayer.new()
 	_remove_layer.layer = 10
 	add_child(_remove_layer)
@@ -516,8 +524,8 @@ func _show_remove_panel(price: int) -> void:
 
 	var close_btn := Button.new()
 	close_btn.theme_type_variation = "VowButton"
-	close_btn.text = "✕  닫기"
-	close_btn.custom_minimum_size = Vector2(80, 36)
+	close_btn.text = "✕"
+	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_remove_panel)
 	title_row.add_child(close_btn)
 	SacredTheme.animate_button(close_btn)
@@ -553,8 +561,26 @@ func _show_remove_panel(price: int) -> void:
 		card_node.card_unhovered.connect(func(_c): _clear_remove_card_hover(captured_node))
 		card_node.gui_input.connect(func(ev: InputEvent):
 			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-				_on_remove_card(captured_card, price)
+				_on_select_remove_card(captured_card, captured_node)
 		)
+
+	var confirm_row := HBoxContainer.new()
+	vbox.add_child(confirm_row)
+	var spc_l := Control.new()
+	spc_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	confirm_row.add_child(spc_l)
+	var confirm_btn := Button.new()
+	confirm_btn.text = tr("ui.shop.btn_confirm_remove")
+	confirm_btn.custom_minimum_size = Vector2(200, 44)
+	confirm_btn.add_theme_font_size_override("font_size", 16)
+	confirm_btn.disabled = true
+	confirm_btn.pressed.connect(_on_confirm_remove)
+	confirm_row.add_child(confirm_btn)
+	_confirm_remove_btn = confirm_btn
+	SacredTheme.animate_button(confirm_btn)
+	var spc_r := Control.new()
+	spc_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	confirm_row.add_child(spc_r)
 
 func _show_remove_card_hover(node: CardScene) -> void:
 	if node in _remove_card_tweens:
@@ -583,12 +609,26 @@ func _hide_remove_panel() -> void:
 		_remove_card_tweens.clear()
 		_remove_layer.queue_free()
 		_remove_layer = null
+		_selected_remove_card = null
+		_selected_remove_node = null
+		_confirm_remove_btn   = null
 
-func _on_remove_card(card: Resource, price: int) -> void:
-	if not GameManager.spend_gold(price):
+func _on_select_remove_card(card: Resource, node: CardScene) -> void:
+	if is_instance_valid(_selected_remove_node):
+		_selected_remove_node.modulate = Color.WHITE
+	_selected_remove_card = card
+	_selected_remove_node = node
+	node.modulate = SacredPalette.BRASS_300
+	if is_instance_valid(_confirm_remove_btn):
+		_confirm_remove_btn.disabled = false
+
+func _on_confirm_remove() -> void:
+	if _selected_remove_card == null:
+		return
+	if not GameManager.spend_gold(_remove_price):
 		return
 	_card_removed = true
-	DeckManager.remove_from_deck(card)
+	DeckManager.remove_from_deck(_selected_remove_card)
 	_hide_remove_panel()
 	_refresh_gold_label()
 	_refresh_upgrade_btn()
@@ -654,15 +694,15 @@ func _show_upgrade_panel(price: int) -> void:
 
 	var title_lbl := Label.new()
 	title_lbl.theme_type_variation  = "TitleLabel"
-	title_lbl.text                  = "카드 강화 — %dg" % price
+	title_lbl.text                  = tr("ui.shop.upgrade_prompt") % price
 	title_lbl.add_theme_font_size_override("font_size", 20)
 	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_row.add_child(title_lbl)
 
 	var close_btn := Button.new()
 	close_btn.theme_type_variation = "VowButton"
-	close_btn.text = "✕  닫기"
-	close_btn.custom_minimum_size = Vector2(80, 36)
+	close_btn.text = "✕"
+	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_upgrade_panel)
 	title_row.add_child(close_btn)
 	SacredTheme.animate_button(close_btn)
@@ -698,8 +738,26 @@ func _show_upgrade_panel(price: int) -> void:
 		card_node.card_unhovered.connect(func(_c): _clear_upgrade_card_hover(captured_node))
 		card_node.gui_input.connect(func(ev: InputEvent):
 			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-				_on_do_upgrade_card(captured_card, price)
+				_on_select_upgrade_card(captured_card, captured_node)
 		)
+
+	var confirm_row := HBoxContainer.new()
+	vbox.add_child(confirm_row)
+	var spc_l := Control.new()
+	spc_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	confirm_row.add_child(spc_l)
+	var confirm_btn := Button.new()
+	confirm_btn.text = tr("ui.shop.btn_confirm_upgrade")
+	confirm_btn.custom_minimum_size = Vector2(200, 44)
+	confirm_btn.add_theme_font_size_override("font_size", 16)
+	confirm_btn.disabled = true
+	confirm_btn.pressed.connect(_on_confirm_upgrade)
+	confirm_row.add_child(confirm_btn)
+	_confirm_upgrade_btn = confirm_btn
+	SacredTheme.animate_button(confirm_btn)
+	var spc_r := Control.new()
+	spc_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	confirm_row.add_child(spc_r)
 
 func _show_upgrade_card_hover(node: CardScene) -> void:
 	if node in _upgrade_card_tweens:
@@ -728,11 +786,25 @@ func _hide_upgrade_panel() -> void:
 		_upgrade_card_tweens.clear()
 		_upgrade_layer.queue_free()
 		_upgrade_layer = null
+		_selected_upgrade_card = null
+		_selected_upgrade_node = null
+		_confirm_upgrade_btn   = null
 
-func _on_do_upgrade_card(card: Resource, price: int) -> void:
-	if not GameManager.spend_gold(price):
+func _on_select_upgrade_card(card: Resource, node: CardScene) -> void:
+	if is_instance_valid(_selected_upgrade_node):
+		_selected_upgrade_node.modulate = Color.WHITE
+	_selected_upgrade_card = card
+	_selected_upgrade_node = node
+	node.modulate = SacredPalette.BRASS_300
+	if is_instance_valid(_confirm_upgrade_btn):
+		_confirm_upgrade_btn.disabled = false
+
+func _on_confirm_upgrade() -> void:
+	if _selected_upgrade_card == null:
 		return
-	GameManager.upgrade_card(card)
+	if not GameManager.spend_gold(_upgrade_price):
+		return
+	GameManager.upgrade_card(_selected_upgrade_card)
 	_hide_upgrade_panel()
 	_refresh_gold_label()
 	if is_instance_valid(_upgrade_btn_ref):
