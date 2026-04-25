@@ -6,8 +6,15 @@
 *.import
 *.translation
 
-# 아트 에셋 — git 미추적, 로컬에서 직접 관리
-assets/art/
+# 아트 에셋 — git 미추적, 로컬에서 직접 관리 (라인 SVG 아이콘 제외)
+assets/art/backgrounds/
+assets/art/cards/
+assets/art/characters/
+assets/art/ui/intent/
+assets/art/ui/relic/
+assets/art/ui/status/
+assets/art/ui/synergy/
+# assets/art/ui/icon_settings.svg 및 assets/art/ui/map/ 은 추적 대상
 
 # 모노 빌드 결과물
 .mono/
