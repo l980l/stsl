@@ -230,8 +230,8 @@ func _show_deck_viewer() -> void:
 	overlay.add_child(bg_rect)
 
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(1200, 700)
-	panel.position = Vector2((1920 - 1200) / 2.0, (1080 - 700) / 2.0)
+	panel.custom_minimum_size = Vector2(1300, 700)
+	panel.position = Vector2((1920 - 1300) / 2.0, (1080 - 700) / 2.0)
 	overlay.add_child(panel)
 
 	# PanelContainer는 자식 레이아웃을 강제하므로 브라켓을 sibling Control에 배치
@@ -277,7 +277,7 @@ func _show_deck_viewer() -> void:
 	vbox.add_child(scroll)
 
 	var grid := GridContainer.new()
-	grid.columns = 9
+	grid.columns = 8
 	grid.add_theme_constant_override("h_separation", 10)
 	grid.add_theme_constant_override("v_separation", 10)
 	scroll.add_child(grid)
@@ -285,14 +285,14 @@ func _show_deck_viewer() -> void:
 	for card_res in all_cards:
 		var captured_res: Resource = card_res
 		var wrapper := Control.new()
-		wrapper.custom_minimum_size = Vector2(91, 130)
+		wrapper.custom_minimum_size = Vector2(137, 195)
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
 		grid.add_child(wrapper)
 
 		var card_node: CardScene = CARD_SCENE.instantiate()
-		card_node.position     = Vector2(-24.5, -70.0)
+		card_node.position     = Vector2(-1.75, -5.0)
 		card_node.pivot_offset = Vector2(70.0, 200.0)
-		card_node.scale        = Vector2(0.65, 0.65)
+		card_node.scale        = Vector2(0.975, 0.975)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 
@@ -307,15 +307,18 @@ func _show_deck_card_hover(node: CardScene) -> void:
 		_deck_card_tweens[node].kill()
 	node.z_index = 50
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(1.0, 1.0), 0.22)
+	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
 	_deck_card_tweens[node] = tw
 
 func _clear_deck_card_hover(node: CardScene) -> void:
 	if node in _deck_card_tweens:
 		_deck_card_tweens[node].kill()
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(0.65, 0.65), 0.16)
-	tw.tween_callback(func(): node.z_index = 0)
+	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
+	tw.tween_callback(func():
+		if is_instance_valid(node):
+			node.z_index = 0
+	)
 	_deck_card_tweens[node] = tw
 
 func _hide_deck_viewer() -> void:
