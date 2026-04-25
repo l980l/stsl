@@ -36,6 +36,7 @@ func _build_ui() -> void:
 			var current_hp: int = tm.get_current_hp(hero.hero_id) if tm.has_method("get_current_hp") else hero.max_hp
 			var lbl := Label.new()
 			lbl.theme_type_variation = "SubLabel"
+			lbl.add_theme_font_size_override("font_size", 26)
 			lbl.text = tr("ui.rest.hero_hp_format") % [tr(hero.hero_name), current_hp, hero.max_hp]
 			lbl.position = Vector2(660, 250 + i * 50)
 			lbl.size = Vector2(600, 40)
