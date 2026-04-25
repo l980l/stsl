@@ -227,6 +227,14 @@ func _show_deck_viewer() -> void:
 	panel.position = Vector2((1920 - 1200) / 2.0, (1080 - 700) / 2.0)
 	overlay.add_child(panel)
 
+	# PanelContainer는 자식 레이아웃을 강제하므로 브라켓을 sibling Control에 배치
+	var panel_brackets := Control.new()
+	panel_brackets.position = panel.position
+	panel_brackets.size = Vector2(1200, 700)
+	panel_brackets.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(panel_brackets)
+	SacredTheme.add_corner_brackets(panel_brackets)
+
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 20)
 	margin.add_theme_constant_override("margin_right", 20)

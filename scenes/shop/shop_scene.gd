@@ -213,6 +213,7 @@ func _on_open_remove_panel(remove_btn: Button, price: int) -> void:
 	_remove_panel.position = Vector2(100, 520)
 	_remove_panel.size = Vector2(1720, 400)
 	add_child(_remove_panel)
+	SacredTheme.add_corner_brackets(_remove_panel)
 
 	var bg := ColorRect.new()
 	bg.color = Color(0.05, 0.05, 0.1, 0.95)
