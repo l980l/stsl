@@ -78,6 +78,7 @@ func _build_ui() -> void:
 	gold_lbl.position = Vector2(30, 20)
 	gold_lbl.size     = Vector2(380, 60)
 	add_child(gold_lbl)
+	LabelUtils.fit_text(gold_lbl, 42, 24)
 
 	_build_card_section()
 	_build_relic_section()
@@ -86,7 +87,7 @@ func _build_ui() -> void:
 	var exit_btn := Button.new()
 	exit_btn.theme_type_variation = "VowButton"
 	exit_btn.text = tr("ui.shop.btn_exit")
-	exit_btn.position = Vector2(860, 820)
+	exit_btn.position = Vector2(860, 910)
 	exit_btn.add_theme_font_size_override("font_size", 20)
 	exit_btn.pressed.connect(_on_exit)
 	add_child(exit_btn)
@@ -103,7 +104,7 @@ func _build_card_section() -> void:
 	sec_lbl.theme_type_variation = "EyebrowLabel"
 	sec_lbl.text                 = "— Cards —"
 	sec_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sec_lbl.position             = Vector2(460, 100)
+	sec_lbl.position             = Vector2(460, 120)
 	sec_lbl.size                 = Vector2(1000, 26)
 	add_child(sec_lbl)
 
@@ -119,7 +120,7 @@ func _build_card_section() -> void:
 		var cx := start_x + i * (CARD_W + CARD_GAP)
 
 		var node: CardScene = CARD_SCENE.instantiate()
-		node.position     = Vector2(cx, 128)
+		node.position     = Vector2(cx, 150)
 		node.pivot_offset = Vector2(CARD_W / 2.0, CARD_H)
 		node.setup(card, CardScene.Mode.REWARD)
 		add_child(node)
@@ -130,7 +131,7 @@ func _build_card_section() -> void:
 
 		var btn := Button.new()
 		btn.text     = tr("ui.shop.btn_buy") % price
-		btn.position = Vector2(cx, 346)
+		btn.position = Vector2(cx, 368)
 		btn.size     = Vector2(CARD_W, 36)
 		btn.add_theme_font_size_override("font_size", 13)
 		var captured_card := card
@@ -168,7 +169,7 @@ func _build_relic_section() -> void:
 	sec_lbl.theme_type_variation = "EyebrowLabel"
 	sec_lbl.text                 = "— Relics —"
 	sec_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sec_lbl.position             = Vector2(460, 402)
+	sec_lbl.position             = Vector2(460, 444)
 	sec_lbl.size                 = Vector2(1000, 26)
 	add_child(sec_lbl)
 
@@ -189,7 +190,7 @@ func _build_relic_section() -> void:
 	for i in range(n):
 		var relic: Resource = relics[i]
 		var px := start_x + i * (RELIC_PANEL_W + RELIC_PANEL_GAP)
-		var py := 428
+		var py := 470
 		var hero_col: Color = _hero_color(relic.owner_hero_id)
 
 		# 패널 (INK_900 배경)
@@ -224,6 +225,7 @@ func _build_relic_section() -> void:
 		if tex:
 			var icon_rect := TextureRect.new()
 			icon_rect.texture      = tex
+			icon_rect.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
 			icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			icon_rect.position     = Vector2(4, 4)
 			icon_rect.size         = Vector2(60, 60)
@@ -245,6 +247,7 @@ func _build_relic_section() -> void:
 		name_lbl.position = Vector2(100, 12)
 		name_lbl.size     = Vector2(288, 30)
 		panel.add_child(name_lbl)
+		LabelUtils.fit_text(name_lbl, 22, 13)
 
 		# 영웅 전용 태그
 		if relic.owner_hero_id != "":
@@ -266,6 +269,7 @@ func _build_relic_section() -> void:
 		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc_lbl.add_theme_font_size_override("font_size", 14)
 		panel.add_child(desc_lbl)
+		LabelUtils.fit_text(desc_lbl, 14, 9)
 
 		# 가격
 		var price_lbl := Label.new()
@@ -279,7 +283,7 @@ func _build_relic_section() -> void:
 		# 구매 버튼
 		var btn := Button.new()
 		btn.text     = "구매"
-		btn.position = Vector2(264, 148)
+		btn.position = Vector2(260, 140)
 		btn.size     = Vector2(124, 38)
 		btn.add_theme_font_size_override("font_size", 14)
 		var captured_relic := relic
@@ -299,7 +303,7 @@ func _build_service_section() -> void:
 	sec_lbl.theme_type_variation = "EyebrowLabel"
 	sec_lbl.text                 = "— " + tr("ui.shop.sec_service") + " —"
 	sec_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sec_lbl.position             = Vector2(460, 648)
+	sec_lbl.position             = Vector2(460, 710)
 	sec_lbl.size                 = Vector2(1000, 26)
 	add_child(sec_lbl)
 
@@ -341,7 +345,7 @@ func _build_service_section() -> void:
 	var n := services.size()
 	var total_w := n * SVC_PANEL_W + (n - 1) * SVC_PANEL_GAP
 	var start_x: int = int((1920 - total_w) / 2.0)
-	var sy      := 676
+	var sy      := 738
 
 	for i in range(n):
 		var svc:    Dictionary = services[i]
@@ -384,6 +388,7 @@ func _build_service_section() -> void:
 		name_lbl.position = Vector2(68, 14)
 		name_lbl.size     = Vector2(184, 26)
 		panel.add_child(name_lbl)
+		LabelUtils.fit_text(name_lbl, 15, 11)
 
 		# 설명
 		var desc_lbl := Label.new()
@@ -394,6 +399,7 @@ func _build_service_section() -> void:
 		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc_lbl.add_theme_font_size_override("font_size", 13)
 		panel.add_child(desc_lbl)
+		LabelUtils.fit_text(desc_lbl, 13, 9)
 
 		# 가격
 		var price_lbl := Label.new()
@@ -408,8 +414,8 @@ func _build_service_section() -> void:
 		# 구매 버튼
 		var btn := Button.new()
 		btn.text     = "구매"
-		btn.position = Vector2(260, 46)
-		btn.size     = Vector2(108, 50)
+		btn.position = Vector2(260, 60)
+		btn.size     = Vector2(108, 35)
 		btn.add_theme_font_size_override("font_size", 14)
 		btn.disabled = not svc["enabled"]
 		var captured_cb: Callable = svc["callback"]
@@ -506,34 +512,39 @@ func _show_remove_panel(price: int) -> void:
 	margin.add_theme_constant_override("margin_right",  20)
 	margin.add_theme_constant_override("margin_top",    14)
 	margin.add_theme_constant_override("margin_bottom", 14)
+	margin.clip_children = Control.CLIP_CHILDREN_ONLY
 	panel.add_child(margin)
 
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 10)
 	margin.add_child(vbox)
 
-	var title_row := HBoxContainer.new()
-	vbox.add_child(title_row)
-
 	var title_lbl := Label.new()
-	title_lbl.theme_type_variation  = "TitleLabel"
-	title_lbl.text                  = tr("ui.shop.remove_prompt") % price
+	title_lbl.theme_type_variation = "TitleLabel"
+	title_lbl.text                 = tr("ui.shop.remove_prompt") % price
 	title_lbl.add_theme_font_size_override("font_size", 20)
-	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_row.add_child(title_lbl)
+	vbox.add_child(title_lbl)
+	LabelUtils.fit_text(title_lbl, 20, 14)
 
 	var close_btn := Button.new()
-	close_btn.theme_type_variation = "VowButton"
+	close_btn.theme_type_variation = "IconButton"
 	close_btn.text = "✕"
+	close_btn.add_theme_font_size_override("font_size", 20)
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_remove_panel)
-	title_row.add_child(close_btn)
+	overlay.add_child(close_btn)
+	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 600) / 2.0 + 20)
+	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
+	var clip_box := Control.new()
+	clip_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(clip_box)
+
 	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.clip_contents = false
-	vbox.add_child(scroll)
+	clip_box.add_child(scroll)
 
 	var grid := GridContainer.new()
 	grid.columns = 8
@@ -615,10 +626,10 @@ func _hide_remove_panel() -> void:
 
 func _on_select_remove_card(card: Resource, node: CardScene) -> void:
 	if is_instance_valid(_selected_remove_node):
-		_selected_remove_node.modulate = Color.WHITE
+		_selected_remove_node.tween_glow(0.0, 0.12)
 	_selected_remove_card = card
 	_selected_remove_node = node
-	node.modulate = SacredPalette.BRASS_300
+	node.tween_glow(1.0, 0.15)
 	if is_instance_valid(_confirm_remove_btn):
 		_confirm_remove_btn.disabled = false
 
@@ -683,34 +694,39 @@ func _show_upgrade_panel(price: int) -> void:
 	margin.add_theme_constant_override("margin_right",  20)
 	margin.add_theme_constant_override("margin_top",    14)
 	margin.add_theme_constant_override("margin_bottom", 14)
+	margin.clip_children = Control.CLIP_CHILDREN_ONLY
 	panel.add_child(margin)
 
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 10)
 	margin.add_child(vbox)
 
-	var title_row := HBoxContainer.new()
-	vbox.add_child(title_row)
-
 	var title_lbl := Label.new()
-	title_lbl.theme_type_variation  = "TitleLabel"
-	title_lbl.text                  = tr("ui.shop.upgrade_prompt") % price
+	title_lbl.theme_type_variation = "TitleLabel"
+	title_lbl.text                 = tr("ui.shop.upgrade_prompt") % price
 	title_lbl.add_theme_font_size_override("font_size", 20)
-	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_row.add_child(title_lbl)
+	vbox.add_child(title_lbl)
+	LabelUtils.fit_text(title_lbl, 20, 14)
 
 	var close_btn := Button.new()
-	close_btn.theme_type_variation = "VowButton"
+	close_btn.theme_type_variation = "IconButton"
 	close_btn.text = "✕"
+	close_btn.add_theme_font_size_override("font_size", 20)
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_upgrade_panel)
-	title_row.add_child(close_btn)
+	overlay.add_child(close_btn)
+	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 600) / 2.0 + 20)
+	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
+	var clip_box := Control.new()
+	clip_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(clip_box)
+
 	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.clip_contents = false
-	vbox.add_child(scroll)
+	clip_box.add_child(scroll)
 
 	var grid := GridContainer.new()
 	grid.columns = 8
@@ -792,10 +808,10 @@ func _hide_upgrade_panel() -> void:
 
 func _on_select_upgrade_card(card: Resource, node: CardScene) -> void:
 	if is_instance_valid(_selected_upgrade_node):
-		_selected_upgrade_node.modulate = Color.WHITE
+		_selected_upgrade_node.tween_glow(0.0, 0.12)
 	_selected_upgrade_card = card
 	_selected_upgrade_node = node
-	node.modulate = SacredPalette.BRASS_300
+	node.tween_glow(1.0, 0.15)
 	if is_instance_valid(_confirm_upgrade_btn):
 		_confirm_upgrade_btn.disabled = false
 

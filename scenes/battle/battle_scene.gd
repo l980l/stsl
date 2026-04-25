@@ -1186,27 +1186,27 @@ func _show_deck_viewer_in_battle() -> void:
 	margin.add_theme_constant_override("margin_right", 20)
 	margin.add_theme_constant_override("margin_top", 14)
 	margin.add_theme_constant_override("margin_bottom", 14)
+	margin.clip_children = Control.CLIP_CHILDREN_ONLY
 	panel.add_child(margin)
 
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 8)
 	margin.add_child(vbox)
 
-	var title_row := HBoxContainer.new()
-	vbox.add_child(title_row)
-
 	var title_lbl := Label.new()
 	title_lbl.text = tr("ui.battle.btn_deck_view")
 	title_lbl.add_theme_font_size_override("font_size", 22)
-	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_row.add_child(title_lbl)
+	vbox.add_child(title_lbl)
 
 	var close_btn := Button.new()
-	close_btn.theme_type_variation = "VowButton"
+	close_btn.theme_type_variation = "IconButton"
 	close_btn.text = "✕"
+	close_btn.add_theme_font_size_override("font_size", 20)
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_close_deck_viewer)
-	title_row.add_child(close_btn)
+	overlay.add_child(close_btn)
+	close_btn.position = Vector2((WINDOW_W - 1300) / 2.0 + 1300 - 56, (WINDOW_H - 680) / 2.0 + 20)
+	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
 	var columns := HBoxContainer.new()
@@ -1235,10 +1235,15 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 	lbl.add_theme_font_size_override("font_size", 18)
 	col.add_child(lbl)
 
+	var clip_box := Control.new()
+	clip_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	clip_box.clip_children = Control.CLIP_CHILDREN_ONLY
+	col.add_child(clip_box)
+
 	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.clip_contents = false
-	col.add_child(scroll)
+	clip_box.add_child(scroll)
 
 	var grid := GridContainer.new()
 	grid.columns = 4
@@ -1254,8 +1259,6 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		return
 
 	for card_res in cards:
-		var captured_res: Resource = card_res
-
 		var wrapper := Control.new()
 		wrapper.custom_minimum_size = Vector2(137, 195)
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS

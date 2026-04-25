@@ -21,13 +21,57 @@ var _disabled: bool = false
 var _press_pos: Vector2
 var _pressing: bool = false
 var _dragging: bool = false
+var _glow_panel: Panel = null
+var _glow_tween: Tween = null
 
 func _ready() -> void:
+	_create_glow_panel()
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	if _card != null:
 		refresh()
+
+func _create_glow_panel() -> void:
+	var glow := Panel.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0, 0, 0, 0)
+	sb.set_border_width_all(0)
+	sb.set_corner_radius_all(6)
+	sb.shadow_color  = Color(SacredPalette.BRASS_300.r, SacredPalette.BRASS_300.g, SacredPalette.BRASS_300.b, 0.22)
+	sb.shadow_size   = 8
+	sb.shadow_offset = Vector2.ZERO
+	glow.add_theme_stylebox_override("panel", sb)
+	glow.position     = Vector2(-3, -3)
+	glow.size         = Vector2(146, 206)
+	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	glow.modulate     = Color(1, 1, 1, 0)
+	add_child(glow)
+	move_child(glow, 0)
+	_glow_panel = glow
+
+func show_glow() -> void:
+	if _glow_panel:
+		_glow_panel.modulate = Color(1, 1, 1, 1)
+
+func hide_glow() -> void:
+	if _glow_panel:
+		_glow_panel.modulate = Color(1, 1, 1, 0)
+
+func set_glow_color(color: Color) -> void:
+	if not _glow_panel:
+		return
+	var sb := _glow_panel.get_theme_stylebox("panel") as StyleBoxFlat
+	if sb:
+		sb.shadow_color = Color(color.r, color.g, color.b, sb.shadow_color.a)
+
+func tween_glow(alpha: float, duration: float) -> void:
+	if not _glow_panel:
+		return
+	if _glow_tween and _glow_tween.is_valid():
+		_glow_tween.kill()
+	_glow_tween = create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	_glow_tween.tween_property(_glow_panel, "modulate:a", alpha, duration)
 
 func setup(card: Resource, mode: int) -> void:
 	_card = card

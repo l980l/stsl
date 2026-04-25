@@ -46,6 +46,7 @@ func _build_ui() -> void:
 	title.size = Vector2(400, 50)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
+	LabelUtils.fit_text(title, 32, 18)
 
 	_floor_label = Label.new()
 	_floor_label.theme_type_variation = "SubLabel"
@@ -131,6 +132,7 @@ func _refresh_map() -> void:
 			btn.modulate = Color(1.0, 1.0, 0.3)
 
 	_floor_label.text = _trf("ui.map.floor_label", GameManager.current_floor)
+	LabelUtils.fit_text(_floor_label, 18, 12)
 
 func _node_center(node: Resource) -> Vector2:
 	return Vector2(
@@ -237,7 +239,7 @@ func _show_deck_viewer() -> void:
 	# PanelContainer는 자식 레이아웃을 강제하므로 브라켓을 sibling Control에 배치
 	var panel_brackets := Control.new()
 	panel_brackets.position = panel.position
-	panel_brackets.size = Vector2(1200, 700)
+	panel_brackets.size = Vector2(1300, 700)
 	panel_brackets.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	overlay.add_child(panel_brackets)
 	SacredTheme.add_corner_brackets(panel_brackets)
@@ -247,34 +249,39 @@ func _show_deck_viewer() -> void:
 	margin.add_theme_constant_override("margin_right", 20)
 	margin.add_theme_constant_override("margin_top", 14)
 	margin.add_theme_constant_override("margin_bottom", 14)
+	margin.clip_children = Control.CLIP_CHILDREN_ONLY
 	panel.add_child(margin)
 
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 8)
 	margin.add_child(vbox)
 
-	var title_row := HBoxContainer.new()
-	vbox.add_child(title_row)
-
 	var title_lbl := Label.new()
 	title_lbl.theme_type_variation = "TitleLabel"
 	title_lbl.text = _trf("ui.map.deck_list_title", all_cards.size())
 	title_lbl.add_theme_font_size_override("font_size", 22)
-	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_row.add_child(title_lbl)
+	vbox.add_child(title_lbl)
+	LabelUtils.fit_text(title_lbl, 22, 14)
 
 	var close_btn := Button.new()
-	close_btn.theme_type_variation = "VowButton"
+	close_btn.theme_type_variation = "IconButton"
 	close_btn.text = "✕"
+	close_btn.add_theme_font_size_override("font_size", 20)
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_deck_viewer)
-	title_row.add_child(close_btn)
+	overlay.add_child(close_btn)
+	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 700) / 2.0 + 20)
+	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
+	var clip_box := Control.new()
+	clip_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(clip_box)
+
 	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.clip_contents = false
-	vbox.add_child(scroll)
+	clip_box.add_child(scroll)
 
 	var grid := GridContainer.new()
 	grid.columns = 8

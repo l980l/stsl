@@ -6,11 +6,12 @@ const OverlayScene := preload("res://scenes/ui/settings_overlay.tscn")
 @onready var _btn: Button = $Btn
 
 func _ready() -> void:
-	_btn.text = tr("ui.common.btn_settings")
-	# 앵커 offsets에서 의도한 버튼 너비 계산 (레이아웃 전 기준값으로 사용)
-	var target_w := _btn.offset_right - _btn.offset_left
-	LabelUtils.fit_text(_btn, 16, 10, target_w)
+	_btn.icon = load("res://assets/art/ui/icon_settings.svg") as Texture2D
+	_btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_btn.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
+	_btn.modulate = SacredPalette.BRASS_300
 	_btn.pressed.connect(_on_pressed)
+	SacredTheme.animate_button(_btn)
 
 func _on_pressed() -> void:
 	var overlay := get_parent().get_node_or_null("SettingsOverlay")

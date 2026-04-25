@@ -121,9 +121,9 @@ func _setup_buttons() -> void:
 	var P := SacredPalette
 
 	# ── 기본 Button (.sbtn) ──
-	var btn_normal  := _make_box(P.INK_1000, P.BRASS_700)
-	var btn_hover   := _make_box(P.INK_1000, P.BRASS_500, 1, 28, 13)
-	var btn_pressed := _make_box(P.INK_900, P.BRASS_600, 1, 28, 14)
+	var btn_normal  := _make_box(P.INK_1000, P.BRASS_700, 1, 16, 8)
+	var btn_hover   := _make_box(P.INK_1000, P.BRASS_500, 1, 16, 8)
+	var btn_pressed := _make_box(P.INK_900, P.BRASS_600, 1, 16, 9)
 	_apply_button_styles("Button", btn_normal, btn_hover, btn_pressed, P.BONE_100)
 	# CSS: .sbtn:hover { color: var(--brass-300) }
 	theme.set_color("font_hover_color", "Button", P.BRASS_300)
@@ -148,9 +148,9 @@ func _setup_buttons() -> void:
 
 	# ── VowButton (.sbtn--vow, ghost/cancel) ──
 	theme.set_type_variation("VowButton", "Button")
-	var vow_normal  := _make_box(Color(0, 0, 0, 0), P.LINE_2)
-	var vow_hover   := _make_box(Color(0, 0, 0, 0), P.BONE_400)
-	var vow_pressed := _make_box(Color(0, 0, 0, 0.08), P.BONE_400)
+	var vow_normal  := _make_box(Color(0, 0, 0, 0), P.LINE_2, 1, 16, 8)
+	var vow_hover   := _make_box(Color(0, 0, 0, 0), P.BONE_400, 1, 16, 8)
+	var vow_pressed := _make_box(Color(0, 0, 0, 0.08), P.BONE_400, 1, 16, 9)
 	_apply_button_styles("VowButton", vow_normal, vow_hover, vow_pressed, P.FG_2)
 
 	# ── IconButton (.sbtn--icon, 정사각) ──

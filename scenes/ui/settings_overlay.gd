@@ -17,7 +17,10 @@ func _ready() -> void:
 	LabelUtils.fit_text(_title_lbl, 28, 16, panel_w)
 	_lang_lbl.text = tr("ui.settings.language")
 	LabelUtils.fit_text(_lang_lbl, 18, 12)
+	_btn_close.theme_type_variation = "IconButton"
 	_btn_close.text = "✕"
+	_btn_close.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_btn_close.add_theme_font_size_override("font_size", 20)
 	_btn_close.custom_minimum_size = Vector2(40, 40)
 	SacredTheme.add_corner_brackets($Panel)
 
