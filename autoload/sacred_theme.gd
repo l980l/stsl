@@ -7,10 +7,26 @@ const _FONT_DIR  := "res://assets/fonts/"
 const _NOTO_PATH := "res://resources/theme/fonts/NotoSans-Regular.ttf"
 const _NOTO_CJK  := "res://resources/theme/fonts/NotoSansCJK-Regular.ttc"
 
+const _HERO_COUNTRY := {
+	"napoleon":     "france",
+	"joan_of_arc":  "france",
+	"cleopatra":    "egypt",
+	"genghis_khan": "mongolia",
+	"musashi":      "japan",
+	"yi_sun_sin":   "korea",
+}
+const _COUNTRY_FONTS := {
+	"france":   "CinzelDecorative-Regular.ttf",
+	"egypt":    "CinzelDecorative-Regular.ttf",
+	"mongolia": "Cinzel-Bold.ttf",
+	# japan/korea: Cinzel-Regular로 fallback (CJK 글리프는 NotoSansCJK로 렌더)
+}
+
 var theme: Theme
 var _cached_halo_shader: Shader = null
 var _cached_line_shader: Shader = null
 var _cached_btn_glow_shader: Shader = null
+var _country_font_cache: Dictionary = {}
 
 func _ready() -> void:
 	theme = load("res://resources/theme/global_theme.tres")
@@ -79,6 +95,17 @@ func _setup_fonts() -> void:
 	theme.set_font("font", "ToastLabel", font_mono)
 	theme.set_font_size("font_size", "ToastLabel", 12)
 	theme.set_color("font_color", "ToastLabel", SacredPalette.BRASS_300)
+
+# ── 영웅별 장식체 폰트 ────────────────────────────────────────────────
+
+func get_hero_font(hero_id: String) -> Font:
+	if _country_font_cache.has(hero_id):
+		return _country_font_cache[hero_id]
+	var country: String = _HERO_COUNTRY.get(hero_id, "")
+	var filename: String = _COUNTRY_FONTS.get(country, "Cinzel-Regular.ttf")
+	var font := _make_font(filename)
+	_country_font_cache[hero_id] = font
+	return font
 
 # ── StyleBoxFlat 헬퍼 ─────────────────────────────────────────────────
 
