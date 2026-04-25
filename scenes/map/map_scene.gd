@@ -34,25 +34,23 @@ func _unhandled_input(ev: InputEvent) -> void:
 func _build_ui() -> void:
 	# 배경
 	var bg := ColorRect.new()
-	bg.color = Color(0.05, 0.05, 0.1)
+	bg.color = SacredPalette.INK_1000
 	bg.position = Vector2.ZERO
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
-	# 제목 (동적 포맷 — 번역 스코프 아웃)
 	var title := Label.new()
+	title.theme_type_variation = "TitleLabel"
 	title.text = _trf("ui.map.act_title", GameManager.current_act)
-	title.position = Vector2(860, 20)
-	title.size = Vector2(200, 50)
+	title.position = Vector2(760, 14)
+	title.size = Vector2(400, 50)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 30)
 	add_child(title)
 
-	# 층 정보 (동적 포맷 — 번역 스코프 아웃)
 	_floor_label = Label.new()
+	_floor_label.theme_type_variation = "SubLabel"
 	_floor_label.position = Vector2(50, 520)
 	_floor_label.size = Vector2(300, 40)
-	_floor_label.add_theme_font_size_override("font_size", 18)
 	add_child(_floor_label)
 
 	# 릴릭 표시
@@ -73,6 +71,7 @@ func _build_ui() -> void:
 	add_child(deck_btn)
 	deck_btn.size = Vector2(160, 40)
 	LabelUtils.fit_text(deck_btn, 16, 12)
+	SacredTheme.animate_button(deck_btn)
 
 	# 연결선 먼저 그리기 (버튼 뒤에)
 	_draw_connections()
@@ -89,8 +88,8 @@ func _draw_connections() -> void:
 			var line := Line2D.new()
 			line.add_point(from)
 			line.add_point(to)
-			line.width = 3.0
-			line.default_color = Color(0.4, 0.4, 0.5, 0.6)
+			line.width = 2.0
+			line.default_color = Color(SacredPalette.BRASS_700.r, SacredPalette.BRASS_700.g, SacredPalette.BRASS_700.b, 0.4)
 			add_child(line)
 
 func _create_node_button(node: Resource) -> void:
@@ -99,11 +98,19 @@ func _create_node_button(node: Resource) -> void:
 	btn.size = Vector2(NODE_W, NODE_H)
 	btn.text = _room_type_text(node.room_type)
 	btn.add_theme_font_size_override("font_size", 13)
+	match node.room_type:
+		MapNodeRes.RoomType.ELITE:
+			btn.theme_type_variation = "EliteRoomButton"
+		MapNodeRes.RoomType.BOSS:
+			btn.theme_type_variation = "BossRoomButton"
+		_:
+			btn.theme_type_variation = "RoomButton"
 	var captured_id: int = node.node_id
 	btn.pressed.connect(func(): GameManager.enter_node(captured_id))
 	add_child(btn)
 	_node_buttons[node.node_id] = btn
 	LabelUtils.fit_text(btn, 13, 10)
+	SacredTheme.animate_button(btn)
 
 func _refresh_map() -> void:
 	for node_id in _node_buttons:
@@ -155,7 +162,7 @@ func _refresh_relics() -> void:
 			lbl.tooltip_text = tip
 			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 			lbl.add_theme_font_size_override("font_size", 13)
-			lbl.modulate = Color(1.0, 0.0, 1.0)
+			lbl.modulate = SacredPalette.AMETHYST_300
 			_relic_container.add_child(lbl)
 	for relic in GameManager.relics:
 		var tip: String = "%s\n%s" % [tr(relic.relic_name), tr(relic.description)]
@@ -175,7 +182,7 @@ func _refresh_relics() -> void:
 			lbl.tooltip_text = tip
 			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 			lbl.add_theme_font_size_override("font_size", 14)
-			lbl.modulate = Color(1.0, 0.85, 0.3)
+			lbl.modulate = SacredPalette.BRASS_300
 			_relic_container.add_child(lbl)
 
 func _room_type_text(room_type: int) -> String:
@@ -215,7 +222,7 @@ func _show_deck_viewer() -> void:
 
 	var bg_rect := ColorRect.new()
 	bg_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg_rect.color = Color(0.0, 0.0, 0.0, 0.75)
+	bg_rect.color = Color(SacredPalette.INK_1000.r, SacredPalette.INK_1000.g, SacredPalette.INK_1000.b, 0.85)
 	bg_rect.gui_input.connect(func(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
 			_hide_deck_viewer()
@@ -250,17 +257,19 @@ func _show_deck_viewer() -> void:
 	vbox.add_child(title_row)
 
 	var title_lbl := Label.new()
+	title_lbl.theme_type_variation = "TitleLabel"
 	title_lbl.text = _trf("ui.map.deck_list_title", all_cards.size())
 	title_lbl.add_theme_font_size_override("font_size", 22)
 	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_row.add_child(title_lbl)
 
 	var close_btn := Button.new()
+	close_btn.theme_type_variation = "IconButton"
 	close_btn.text = "✕"
 	close_btn.custom_minimum_size = Vector2(40, 40)
-	close_btn.add_theme_font_size_override("font_size", 18)
 	close_btn.pressed.connect(_hide_deck_viewer)
 	title_row.add_child(close_btn)
+	SacredTheme.animate_button(close_btn)
 
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL

@@ -10,28 +10,37 @@ func _ready() -> void:
 	_build_ui()
 
 func _build_ui() -> void:
+	var P := SacredPalette
+
 	var bg := ColorRect.new()
-	bg.color = Color(0.08, 0.05, 0.02)
+	bg.color = P.INK_1000
 	bg.position = Vector2.ZERO
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
+	var eyebrow := Label.new()
+	eyebrow.theme_type_variation = "EyebrowLabel"
+	eyebrow.text = "— MARKET —"
+	eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	eyebrow.position = Vector2(760, 14)
+	eyebrow.size = Vector2(400, 24)
+	add_child(eyebrow)
+
 	var title := Label.new()
+	title.theme_type_variation = "TitleLabel"
 	title.text = tr("ui.shop.title")
-	title.position = Vector2(860, 20)
+	title.position = Vector2(760, 40)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 32)
-	title.modulate = Color(1.0, 0.85, 0.3)
 	add_child(title)
-	title.size = Vector2(200, 50)
+	title.size = Vector2(400, 50)
 	LabelUtils.fit_text(title, 32, 18)
 
 	var gold_lbl := Label.new()
 	gold_lbl.name = "GoldLabel"
+	gold_lbl.theme_type_variation = "EyebrowLabel"
 	gold_lbl.text = tr("ui.shop.gold_label") % GameManager.gold
 	gold_lbl.position = Vector2(50, 30)
 	gold_lbl.size = Vector2(300, 40)
-	gold_lbl.add_theme_font_size_override("font_size", 20)
 	add_child(gold_lbl)
 
 	_build_card_section()
@@ -39,6 +48,7 @@ func _build_ui() -> void:
 	_build_service_section()
 
 	var exit_btn := Button.new()
+	exit_btn.theme_type_variation = "VowButton"
 	exit_btn.text = tr("ui.shop.btn_exit")
 	exit_btn.position = Vector2(860, 980)
 	exit_btn.add_theme_font_size_override("font_size", 20)
@@ -46,8 +56,10 @@ func _build_ui() -> void:
 	add_child(exit_btn)
 	exit_btn.size = Vector2(200, 50)
 	LabelUtils.fit_text(exit_btn, 20, 12)
+	SacredTheme.animate_button(exit_btn)
 
 func _build_card_section() -> void:
+	var P := SacredPalette
 	var sec_lbl := Label.new()
 	sec_lbl.text = tr("ui.shop.card_section") % _inventory.get("card_price", 75)
 	sec_lbl.position = Vector2(100, 100)
@@ -61,29 +73,29 @@ func _build_card_section() -> void:
 		var card: Resource = cards[i]
 
 		var panel := ColorRect.new()
-		panel.color = Color(0.15, 0.12, 0.08)
+		panel.color = P.INK_800
 		panel.position = Vector2(100 + i * 320, 150)
 		panel.size = Vector2(280, 180)
 		add_child(panel)
 
 		var name_lbl := Label.new()
+		name_lbl.theme_type_variation = "AccentLabel"
 		name_lbl.text = tr(card.card_name)
 		name_lbl.position = Vector2(110 + i * 320, 160)
 		name_lbl.size = Vector2(260, 40)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_lbl.add_theme_font_size_override("font_size", 16)
 		add_child(name_lbl)
 
 		var owner_lbl := Label.new()
+		owner_lbl.theme_type_variation = "SubLabel"
 		owner_lbl.text = tr("ui.shop.card_owner_cost") % [card.owner_id, card.cost]
 		owner_lbl.position = Vector2(110 + i * 320, 205)
 		owner_lbl.size = Vector2(260, 30)
 		owner_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		owner_lbl.add_theme_font_size_override("font_size", 13)
-		owner_lbl.modulate = Color(0.8, 0.8, 0.8)
 		add_child(owner_lbl)
 
 		var btn := Button.new()
+		btn.theme_type_variation = "PrimaryButton"
 		btn.text = tr("ui.shop.btn_buy") % price
 		btn.position = Vector2(110 + i * 320, 280)
 		btn.size = Vector2(260, 40)
@@ -92,8 +104,10 @@ func _build_card_section() -> void:
 		var captured_btn := btn
 		btn.pressed.connect(func(): _on_buy_card(captured_card, captured_btn, price))
 		add_child(btn)
+		SacredTheme.animate_button(btn)
 
 func _build_relic_section() -> void:
+	var P := SacredPalette
 	var sec_lbl := Label.new()
 	sec_lbl.text = tr("ui.shop.relic_section") % _inventory.get("relic_price", 150)
 	sec_lbl.position = Vector2(1100, 100)
@@ -105,44 +119,43 @@ func _build_relic_section() -> void:
 	var price: int = _inventory.get("relic_price", 150)
 
 	var panel := ColorRect.new()
-	panel.color = Color(0.15, 0.12, 0.08)
+	panel.color = P.INK_800
 	panel.position = Vector2(1100, 150)
 	panel.size = Vector2(600, 180)
 	add_child(panel)
 
 	if relic:
 		var name_lbl := Label.new()
+		name_lbl.theme_type_variation = "AccentLabel"
 		name_lbl.text = tr(relic.relic_name)
 		name_lbl.position = Vector2(1110, 160)
 		name_lbl.size = Vector2(580, 40)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_lbl.add_theme_font_size_override("font_size", 18)
-		name_lbl.modulate = Color(1.0, 0.85, 0.3)
 		add_child(name_lbl)
 
 		var desc_lbl := Label.new()
+		desc_lbl.theme_type_variation = "SubLabel"
 		desc_lbl.text = tr(relic.description)
 		desc_lbl.position = Vector2(1110, 205)
 		desc_lbl.size = Vector2(580, 60)
 		desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		desc_lbl.add_theme_font_size_override("font_size", 13)
-		desc_lbl.modulate = Color(0.8, 0.8, 0.8)
 		add_child(desc_lbl)
 
 		_relic_btn = Button.new()
+		_relic_btn.theme_type_variation = "PrimaryButton"
 		_relic_btn.text = tr("ui.shop.btn_buy") % price
 		_relic_btn.position = Vector2(1260, 285)
 		_relic_btn.size = Vector2(280, 40)
 		_relic_btn.add_theme_font_size_override("font_size", 14)
 		_relic_btn.pressed.connect(func(): _on_buy_relic(relic, price))
 		add_child(_relic_btn)
+		SacredTheme.animate_button(_relic_btn)
 	else:
 		var empty_lbl := Label.new()
+		empty_lbl.theme_type_variation = "SubLabel"
 		empty_lbl.text = tr("ui.shop.relic_empty")
 		empty_lbl.position = Vector2(1110, 205)
 		empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty_lbl.add_theme_font_size_override("font_size", 16)
-		empty_lbl.modulate = Color(0.5, 0.5, 0.5)
 		add_child(empty_lbl)
 		empty_lbl.size = Vector2(580, 40)
 		LabelUtils.fit_text(empty_lbl, 16, 12)
@@ -165,6 +178,7 @@ func _build_service_section() -> void:
 	heal_btn.add_theme_font_size_override("font_size", 16)
 	heal_btn.pressed.connect(func(): _on_heal(heal_amount, heal_price))
 	add_child(heal_btn)
+	SacredTheme.animate_button(heal_btn)
 
 	var remove_btn := Button.new()
 	var remove_price: int = _inventory.get("remove_price", 100)
@@ -174,6 +188,7 @@ func _build_service_section() -> void:
 	remove_btn.add_theme_font_size_override("font_size", 16)
 	remove_btn.pressed.connect(func(): _on_open_remove_panel(remove_btn, remove_price))
 	add_child(remove_btn)
+	SacredTheme.animate_button(remove_btn)
 
 func _on_buy_card(card: Resource, btn: Button, price: int) -> void:
 	if not GameManager.spend_gold(price):
