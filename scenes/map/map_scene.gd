@@ -12,7 +12,7 @@ const NODE_H := 50
 
 var _node_buttons: Dictionary = {}  # node_id → Button
 var _floor_label: Label
-var _relic_container: HBoxContainer
+var _relic_container: FlowContainer
 var _deck_viewer: CanvasLayer = null
 var _deck_viewer_tooltip: CardScene = null
 
@@ -56,9 +56,11 @@ func _build_ui() -> void:
 	add_child(_floor_label)
 
 	# 릴릭 표시
-	_relic_container = HBoxContainer.new()
-	_relic_container.position = Vector2(50, 60)
-	_relic_container.size = Vector2(1820, 40)
+	_relic_container = FlowContainer.new()
+	_relic_container.position = Vector2(20, 70)
+	_relic_container.size = Vector2(1880, 72)
+	_relic_container.add_theme_constant_override("h_separation", 6)
+	_relic_container.add_theme_constant_override("v_separation", 4)
 	add_child(_relic_container)
 	_refresh_relics()
 
@@ -135,6 +137,26 @@ func _node_top_left(node: Resource) -> Vector2:
 func _refresh_relics() -> void:
 	for child in _relic_container.get_children():
 		child.queue_free()
+	for s in BattleManager.get_active_synergies():
+		var tip: String = "%s\n%s" % [tr(s["name_key"]), tr(s["desc_key"])]
+		var tex: Texture2D = IconUtils.get_synergy_icon(s["name_key"])
+		if tex != null:
+			var rect := TextureRect.new()
+			rect.texture = tex
+			rect.custom_minimum_size = Vector2(28, 28)
+			rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			rect.tooltip_text = tip
+			rect.mouse_filter = Control.MOUSE_FILTER_STOP
+			_relic_container.add_child(rect)
+		else:
+			var lbl := Label.new()
+			lbl.text = "[%s]" % tr(s["name_key"])
+			lbl.tooltip_text = tip
+			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+			lbl.add_theme_font_size_override("font_size", 13)
+			lbl.modulate = Color(1.0, 0.0, 1.0)
+			_relic_container.add_child(lbl)
 	for relic in GameManager.relics:
 		var tip: String = "%s\n%s" % [tr(relic.relic_name), tr(relic.description)]
 		var tex: Texture2D = IconUtils.get_relic_icon(relic.relic_name)

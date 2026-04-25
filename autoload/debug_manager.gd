@@ -191,7 +191,7 @@ func _open_relic_add_dialog() -> void:
 	_make_checkbox_dialog("렐릭 추가", opts, "획득", func(picked: Array):
 		for r in picked:
 			GameManager.add_relic(r)
-	)
+	, true)
 
 # ── 렐릭 제거 ───────────────────────────────────────
 
@@ -398,15 +398,13 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 
 	if show_select_all:
 		var toggle_state := [false]
-		var sa_btn := Button.new()
-		sa_btn.text = "전체 선택"
+		var sa_btn: Button = dlg.add_button("전체 선택", false)
 		sa_btn.pressed.connect(func():
 			toggle_state[0] = not toggle_state[0]
 			sa_btn.text = "전체 해제" if toggle_state[0] else "전체 선택"
 			for c in checks:
 				c.button_pressed = toggle_state[0]
 		)
-		outer.add_child(sa_btn)
 
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(560, 480)

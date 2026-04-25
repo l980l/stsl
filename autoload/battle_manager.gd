@@ -1003,7 +1003,7 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 
 func get_active_synergies() -> Array:
 	if team_mgr == null:
-		return []
+		team_mgr = TeamManager
 	var synergies: Array = []
 	var n: bool = team_mgr.is_alive("napoleon")
 	var y: bool = team_mgr.is_alive("yi_sun_sin")
