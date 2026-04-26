@@ -26,6 +26,7 @@ var theme: Theme
 var _cached_halo_shader: Shader = null
 var _cached_line_shader: Shader = null
 var _cached_btn_glow_shader: Shader = null
+var _cached_card_glow_shader: Shader = null
 var _country_font_cache: Dictionary = {}
 var _cursor_base_image: Image = null
 
@@ -397,9 +398,14 @@ func _get_line_shader() -> Shader:
 func _get_btn_glow_shader() -> Shader:
 	if _cached_btn_glow_shader == null:
 		_cached_btn_glow_shader = Shader.new()
-		# CSS box-shadow 방식 — 버튼 직사각형 SDF, 버튼 내부는 0 (투명 배경 버튼 대응)
-		_cached_btn_glow_shader.code = "shader_type canvas_item;\nuniform float opacity : hint_range(0.0, 1.0) = 0.0;\nuniform vec2 edge_uv = vec2(0.1, 0.25);\nvoid fragment() {\n\tvec2 d2 = abs(UV - vec2(0.5)) - (vec2(0.5) - edge_uv);\n\tfloat outside = step(0.0, max(d2.x, d2.y));\n\tvec2 dn = max(d2, vec2(0.0)) / edge_uv;\n\tfloat t = length(dn);\n\tfloat alpha = smoothstep(1.0, 0.0, t) * opacity * 0.65 * outside;\n\tCOLOR = vec4(0.788, 0.659, 0.298, alpha);\n}\n"
+		_cached_btn_glow_shader.code = "shader_type canvas_item;\nuniform float opacity : hint_range(0.0, 1.0) = 0.0;\nuniform float radius : hint_range(0.0, 1.0) = 1.0;\nuniform vec2 edge_uv = vec2(0.1, 0.25);\nvoid fragment() {\n\tvec2 d2 = abs(UV - vec2(0.5)) - (vec2(0.5) - edge_uv);\n\tfloat outside = step(0.0, max(d2.x, d2.y));\n\tvec2 dn = max(d2, vec2(0.0)) / edge_uv;\n\tfloat t = clamp(length(dn), 0.0, 1.0);\n\tfloat g1 = exp(-pow(t / 0.20, 2.0));\n\tfloat g2 = exp(-pow(t / 0.50, 2.0)) * 0.60;\n\tfloat g3 = exp(-pow(t / 0.95, 2.0)) * 0.30;\n\tfloat falloff = (g1 + g2 + g3) / 1.90;\n\tfloat reveal = smoothstep(radius + 0.20, radius - 0.20, t);\n\tfloat alpha = falloff * reveal * opacity * 0.65 * outside;\n\tCOLOR = vec4(0.788, 0.659, 0.298, alpha);\n}\n"
 	return _cached_btn_glow_shader
+
+func _get_card_glow_shader() -> Shader:
+	if _cached_card_glow_shader == null:
+		_cached_card_glow_shader = Shader.new()
+		_cached_card_glow_shader.code = "shader_type canvas_item;\nuniform float opacity : hint_range(0.0, 1.0) = 0.0;\nuniform float radius  : hint_range(0.0, 1.0) = 0.0;\nuniform vec2  edge_uv = vec2(0.110, 0.080);\nuniform vec4  glow_color : source_color = vec4(0.788, 0.659, 0.298, 1.0);\nvoid fragment() {\n\tvec2 d2 = abs(UV - vec2(0.5)) - (vec2(0.5) - edge_uv);\n\tfloat outside = step(0.0, max(d2.x, d2.y));\n\tvec2 dn = max(d2, vec2(0.0)) / edge_uv;\n\tfloat t = clamp(length(dn), 0.0, 1.0);\n\tfloat g1 = exp(-pow(t / 0.15, 2.0));\n\tfloat g2 = exp(-pow(t / 0.40, 2.0)) * 0.60;\n\tfloat g3 = exp(-pow(t / 0.70, 2.0)) * 0.30;\n\tfloat falloff = (g1 + g2 + g3) / 1.90;\n\tfloat reveal = smoothstep(radius + 0.20, radius - 0.20, t);\n\tfloat alpha = falloff * reveal * opacity * 1.0 * outside;\n\tCOLOR = vec4(glow_color.rgb, alpha);\n}\n"
+	return _cached_card_glow_shader
 
 func animate_button(btn: Button) -> void:
 	var P := SacredPalette
@@ -469,6 +475,20 @@ func animate_button(btn: Button) -> void:
 		tw[0].parallel().tween_property(bot_line, "modulate", Color.WHITE, 0.16)
 	)
 
+# ── 글로우 material 트윈 헬퍼 — opacity + radius 동시 트윈 ──────────────
+# ease_in=false → EASE_OUT (호버 진입), ease_in=true → EASE_IN (호버 이탈)
+
+func tween_glow_material(node: Node, mat: ShaderMaterial, op_target: float, r_target: float, duration: float, ease_in: bool) -> Tween:
+	var cur_op_v = mat.get_shader_parameter("opacity")
+	var cur_op: float = cur_op_v if cur_op_v != null else 0.0
+	var cur_r_v = mat.get_shader_parameter("radius")
+	var cur_r: float = cur_r_v if cur_r_v != null else 1.0
+	var ease_type := Tween.EASE_IN if ease_in else Tween.EASE_OUT
+	var tw := node.create_tween().set_ease(ease_type).set_trans(Tween.TRANS_CUBIC).set_parallel(true)
+	tw.tween_method(func(v: float): mat.set_shader_parameter("opacity", v), cur_op, op_target, duration)
+	tw.tween_method(func(v: float): mat.set_shader_parameter("radius", v), cur_r, r_target, duration)
+	return tw
+
 # ── 버튼 외곽 후광 (box-shadow 방식) — animate_button 및 챕터 카드에서 재사용 ──
 # CSS: 0 0 24px rgba(212,169,72,0.18). VowButton은 호출하지 않을 것.
 
@@ -476,6 +496,7 @@ func attach_outer_glow(btn: Button, pad: float = 24.0, default_opacity: float = 
 	var og_mat := ShaderMaterial.new()
 	og_mat.shader = _get_btn_glow_shader()
 	og_mat.set_shader_parameter("opacity", default_opacity)
+	og_mat.set_shader_parameter("radius", 1.0 if default_opacity > 0.0 else 0.0)
 	var glow_size := btn.size + Vector2(pad * 2.0, pad * 2.0)
 	og_mat.set_shader_parameter("edge_uv", Vector2(pad / glow_size.x, pad / glow_size.y))
 	var outer_glow := ColorRect.new()
@@ -492,17 +513,14 @@ func attach_outer_glow(btn: Button, pad: float = 24.0, default_opacity: float = 
 		og_mat.set_shader_parameter("edge_uv", Vector2(pad / new_gs.x, pad / new_gs.y))
 	)
 	var ogtw := [null]
+	var rest_r := 1.0 if default_opacity > 0.0 else 0.0
 	btn.mouse_entered.connect(func():
 		if ogtw[0]: ogtw[0].kill()
-		var cur: float = og_mat.get_shader_parameter("opacity")
-		ogtw[0] = btn.create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-		ogtw[0].tween_method(func(v: float): og_mat.set_shader_parameter("opacity", v), cur, hover_opacity, 0.20)
+		ogtw[0] = tween_glow_material(btn, og_mat, hover_opacity, 1.0, 0.20, false)
 	)
 	btn.mouse_exited.connect(func():
 		if ogtw[0]: ogtw[0].kill()
-		var cur: float = og_mat.get_shader_parameter("opacity")
-		ogtw[0] = btn.create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
-		ogtw[0].tween_method(func(v: float): og_mat.set_shader_parameter("opacity", v), cur, default_opacity, 0.20)
+		ogtw[0] = tween_glow_material(btn, og_mat, default_opacity, rest_r, 0.20, true)
 	)
 
 # ── 챕터 카드 halo (방사형 금빛 후광) ────────────────────────────────
@@ -510,7 +528,7 @@ func attach_outer_glow(btn: Button, pad: float = 24.0, default_opacity: float = 
 func _get_halo_shader() -> Shader:
 	if _cached_halo_shader == null:
 		_cached_halo_shader = Shader.new()
-		_cached_halo_shader.code = "shader_type canvas_item;\nuniform float opacity : hint_range(0.0, 1.0) = 0.0;\nvoid fragment() {\n\tvec2 focus = vec2(0.5, 0.35);\n\tfloat d = length((UV - focus) * vec2(1.0, 1.5));\n\tfloat alpha = smoothstep(0.55, 0.0, d);\n\tCOLOR = vec4(0.788, 0.659, 0.298, alpha * 0.4 * opacity);\n}\n"
+		_cached_halo_shader.code = "shader_type canvas_item;\nuniform float opacity : hint_range(0.0, 1.0) = 0.0;\nuniform float radius : hint_range(0.0, 1.0) = 1.0;\nvoid fragment() {\n\tvec2 focus = vec2(0.5, 0.35);\n\tfloat t = clamp(length((UV - focus) * vec2(1.0, 1.5)) / 0.55, 0.0, 1.0);\n\tfloat g1 = exp(-pow(t / 0.20, 2.0));\n\tfloat g2 = exp(-pow(t / 0.50, 2.0)) * 0.60;\n\tfloat g3 = exp(-pow(t / 0.95, 2.0)) * 0.30;\n\tfloat falloff = (g1 + g2 + g3) / 1.90;\n\tfloat reveal = smoothstep(radius + 0.20, radius - 0.20, t);\n\tCOLOR = vec4(0.788, 0.659, 0.298, falloff * reveal * 0.40 * opacity);\n}\n"
 	return _cached_halo_shader
 
 func make_halo() -> ColorRect:
@@ -520,6 +538,7 @@ func make_halo() -> ColorRect:
 	var mat := ShaderMaterial.new()
 	mat.shader = _get_halo_shader()
 	mat.set_shader_parameter("opacity", 0.0)
+	mat.set_shader_parameter("radius", 0.0)
 	halo.material = mat
 	return halo
 
