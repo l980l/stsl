@@ -622,27 +622,24 @@ func style_sacred_scrollbar(scroll: ScrollContainer) -> void:
 	vsb.add_theme_stylebox_override("scroll", track)
 	vsb.add_theme_stylebox_override("scroll_focus", track)
 
-	var dw := 10
-	var dh := 10
-	var expand := (dw - 2) / 2.0  # 양쪽 확장으로 마름모를 트랙 중앙에 정렬
-	vsb.add_theme_constant_override("grab_distance", dh)
-
 	for state: String in ["grabber", "grabber_highlight", "grabber_pressed"]:
 		var bright: bool = state != "grabber"
 		var sbt := StyleBoxTexture.new()
-		sbt.texture = _make_diamond_tex(dw, dh, bright)
-		sbt.expand_margin_left  = expand
-		sbt.expand_margin_right = expand
+		sbt.texture = _make_grabber_line_tex(bright)
 		vsb.add_theme_stylebox_override(state, sbt)
 
-func _make_diamond_tex(w: int, h: int, bright: bool) -> ImageTexture:
-	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-	img.fill(Color(0, 0, 0, 0))
-	var cx := (w - 1) / 2.0
-	var cy := (h - 1) / 2.0
-	var c: Color = SacredPalette.BRASS_200 if bright else SacredPalette.BRASS_500
-	for y in h:
-		for x in w:
-			if abs(x - cx) / (cx + 0.5) + abs(y - cy) / (cy + 0.5) < 1.0:
-				img.set_pixel(x, y, c)
-	return ImageTexture.create_from_image(img)
+func _make_grabber_line_tex(bright: bool) -> GradientTexture2D:
+	var g := Gradient.new()
+	var edge: Color = SacredPalette.BRASS_800
+	var mid: Color  = SacredPalette.BRASS_200 if bright else SacredPalette.BRASS_400
+	g.set_color(0, edge)
+	g.set_color(1, edge)
+	g.add_point(0.5, mid)
+	var tex := GradientTexture2D.new()
+	tex.gradient  = g
+	tex.fill      = GradientTexture2D.FILL_LINEAR
+	tex.fill_from = Vector2(0.5, 0.0)
+	tex.fill_to   = Vector2(0.5, 1.0)
+	tex.width  = 2
+	tex.height = 64
+	return tex
