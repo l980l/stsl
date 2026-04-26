@@ -630,7 +630,7 @@ func style_sacred_scrollbar(scroll: ScrollContainer) -> void:
 
 func _make_grabber_line_tex(bright: bool) -> GradientTexture2D:
 	var g := Gradient.new()
-	var edge: Color = SacredPalette.BRASS_800
+	var edge: Color = SacredPalette.BRASS_700
 	var mid: Color  = SacredPalette.BRASS_200 if bright else SacredPalette.BRASS_400
 	g.set_color(0, edge)
 	g.set_color(1, edge)
