@@ -1,7 +1,7 @@
 # autoload/debug_manager.gd
 extends Node
 
-const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 승리\n[Shift+I]  무적 토글 (영웅 피해 차단)\n[Shift+E]  무한 코스트 토글\n[Shift+D]  카드 1장 드로우\n[Shift+H]  적 HP 설정 → 적 클릭\n[Shift+G]  그리드 토글\n[Shift+O]  더미 몬스터 추가\n[Shift+S]  더미 소환수 추가 (1번 영웅)\n── 전체 공통 ──\n[Shift+T]  번역 키 표시 토글\n[Shift+B]  영웅 HP 조정\n[Shift+W]  현재 챕터 즉시 클리어\n[Shift+F]  현재 Act 클리어 → 다음 Act 진입\n[Shift+P]  파티에 영웅 추가\n[Shift+A]  카드 추가 창\n[Shift+R]  덱 편집기 (카드 제거)\n[Shift+U]  카드 강화\n[Shift+N]  영웅 즉시 해금 창\n[Shift+L]  렐릭 추가 창\n[Shift+X]  렐릭 제거 창\n[Shift+C]  목록 고정/해제\n── 씬 이동 ──\n[Shift+M]  몬스터 선택 전투\n[Shift+V]  이벤트 씬 입장\n[Space+S]  상점 즉시 입장\n[Space+G]  골드 추가 창\n[Space+L]  레이블 렉트 표시 토글\n[Space+R]  휴식 씬 입장"
+const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 승리\n[Shift+I]  무적 토글 (영웅 피해 차단)\n[Shift+E]  무한 코스트 토글\n[Shift+D]  카드 1장 드로우\n[Shift+H]  적 HP 설정 → 적 클릭\n[Shift+G]  그리드 토글\n[Shift+O]  더미 몬스터 추가\n[Shift+S]  더미 소환수 추가 (1번 영웅)\n── 전체 공통 ──\n[Shift+T]  번역 키 표시 토글\n[Shift+B]  영웅 HP 조정\n[Shift+W]  현재 챕터 즉시 클리어\n[Shift+F]  현재 Act 클리어 → 다음 Act 진입\n[Shift+P]  파티에 영웅 추가\n[Shift+A]  카드 추가 창\n[Shift+R]  덱 편집기 (카드 제거)\n[Shift+U]  카드 강화\n[Shift+N]  영웅 즉시 해금 창\n[Shift+L]  렐릭 추가 창\n[Shift+X]  렐릭 제거 창\n[Shift+C]  목록 고정/해제\n── 씬 이동 ──\n[Shift+M]  몬스터 선택 전투\n[Shift+V]  이벤트 씬 입장\n[Space+S]  상점 즉시 입장\n[Space+G]  골드 추가 창\n[Space+L]  레이블 렉트 표시 토글\n[Space+R]  휴식 씬 입장\n[Space+P]  프레임 스파이크 프로파일러 토글"
 
 var _pinned_label: Label = null
 var _hover_lbl: Label = null
@@ -10,6 +10,19 @@ var _saved_translations: Array = []
 var _space_held: bool = false
 var _label_rect_layer: CanvasLayer = null
 var _label_rects_active: bool = false
+
+const _SPIKE_BUFFER_FRAMES: int = 60
+const _SPIKE_THRESHOLD_MS: float = 33.3
+const _SPIKE_RATIO: float = 2.5
+const _WARMUP_FRAMES: int = 60
+const _LOG_PATH := "res://log/spike_log.txt"
+
+var _profiler_active: bool = false
+var _spike_buffer: Array = []
+var _warmup_left: int = 0
+var _last_spike_msec: int = 0
+var _profiler_indicator: Label = null
+var _log_file: FileAccess = null
 
 func _ready() -> void:
 	if not OS.is_debug_build():
@@ -47,6 +60,19 @@ func _ready() -> void:
 
 	add_child(layer)
 
+	_profiler_indicator = Label.new()
+	_profiler_indicator.text = "● PROFILER ON"
+	_profiler_indicator.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_profiler_indicator.offset_left = 8.0
+	_profiler_indicator.offset_top = 8.0
+	_profiler_indicator.add_theme_font_size_override("font_size", 12)
+	_profiler_indicator.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
+	_profiler_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_profiler_indicator.visible = false
+	layer.add_child(_profiler_indicator)
+
+	set_process(false)
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not OS.is_debug_build():
 		return
@@ -71,6 +97,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				return
 			KEY_R:
 				GameManager._request_scene("res://scenes/rest/rest_scene.tscn")
+				return
+			KEY_P:
+				_toggle_profiler()
 				return
 	if not event.shift_pressed:
 		return
@@ -652,3 +681,117 @@ func _apply_key_mode_style() -> void:
 	else:
 		_hover_lbl.text = "🛠 디버그 단축키"
 		_hover_lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
+
+# ── 프레임 스파이크 프로파일러 ──────────────────────────────────────────────
+
+func _toggle_profiler() -> void:
+	_profiler_active = not _profiler_active
+	if _profiler_active:
+		_spike_buffer.clear()
+		_warmup_left = _WARMUP_FRAMES
+		_last_spike_msec = 0
+		_open_log_file()
+		set_process(true)
+	else:
+		set_process(false)
+		_spike_buffer.clear()
+		_close_log_file()
+	if _profiler_indicator:
+		_profiler_indicator.visible = _profiler_active
+	print("[Profiler] ", "ON" if _profiler_active else "OFF")
+
+func _process(delta: float) -> void:
+	if not _profiler_active:
+		return
+	var sample := _collect_frame_sample(delta)
+	_spike_buffer.append(sample)
+	if _spike_buffer.size() > _SPIKE_BUFFER_FRAMES:
+		_spike_buffer.pop_front()
+
+	if _warmup_left > 0:
+		_warmup_left -= 1
+		return
+
+	var avg_ms := _recent_avg_dt_ms()
+	if _is_spike(sample, avg_ms):
+		_write_spike_line(sample, avg_ms)
+
+func _collect_frame_sample(delta: float) -> Dictionary:
+	return {
+		"t": Time.get_ticks_msec(),
+		"dt_ms": delta * 1000.0,
+		"fps": Engine.get_frames_per_second(),
+		"proc_ms": Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
+		"draw": int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
+		"nodes": int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),
+		"mem_mb": Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0,
+	}
+
+func _is_spike(sample: Dictionary, recent_avg_ms: float) -> bool:
+	var dt: float = sample["dt_ms"]
+	if dt >= _SPIKE_THRESHOLD_MS:
+		return true
+	if recent_avg_ms > 0.0 and dt >= recent_avg_ms * _SPIKE_RATIO:
+		return true
+	return false
+
+func _recent_avg_dt_ms() -> float:
+	if _spike_buffer.is_empty():
+		return 0.0
+	var total := 0.0
+	for s in _spike_buffer:
+		total += s["dt_ms"]
+	return total / float(_spike_buffer.size())
+
+func _open_log_file() -> void:
+	var real_path := ProjectSettings.globalize_path(_LOG_PATH)
+	DirAccess.make_dir_recursive_absolute(real_path.get_base_dir())
+	if FileAccess.file_exists(real_path):
+		_log_file = FileAccess.open(real_path, FileAccess.READ_WRITE)
+		if _log_file:
+			_log_file.seek_end(0)
+	else:
+		_log_file = FileAccess.open(real_path, FileAccess.WRITE)
+	if _log_file == null:
+		push_error("[Profiler] 로그 파일 열기 실패: " + real_path)
+		return
+	var dt := Time.get_datetime_dict_from_system()
+	_log_file.store_line("")
+	_log_file.store_line("=== ON  %04d-%02d-%02d %02d:%02d:%02d  임계=%.0fms  평균비율=%.1fx ===" % [
+		dt["year"], dt["month"], dt["day"],
+		dt["hour"], dt["minute"], dt["second"],
+		_SPIKE_THRESHOLD_MS, _SPIKE_RATIO
+	])
+	_log_file.flush()
+
+func _close_log_file() -> void:
+	if _log_file == null:
+		return
+	_log_file.store_line("=== OFF ===")
+	_log_file.close()
+	_log_file = null
+
+func _write_spike_line(sample: Dictionary, avg_ms: float) -> void:
+	if _log_file == null:
+		return
+	var now_msec: int = sample["t"]
+	if _last_spike_msec > 0 and (now_msec - _last_spike_msec) > 2000:
+		_log_file.store_line("")
+	_last_spike_msec = now_msec
+
+	var scene_name := ""
+	if get_tree().current_scene:
+		scene_name = get_tree().current_scene.scene_file_path.get_file().get_basename()
+
+	var dt_val: float = sample["dt_ms"]
+	var ratio_str := "x%.1favg" % (dt_val / avg_ms) if avg_ms > 0.0 else ""
+
+	var ts := Time.get_datetime_dict_from_system()
+	_log_file.store_line("[%02d:%02d:%02d | %dms | %s]  dt=%.1f  fps=%d  proc=%.2f  draw=%d  nodes=%d  mem=%.1f  %s" % [
+		ts["hour"], ts["minute"], ts["second"],
+		now_msec, scene_name,
+		dt_val, sample["fps"], sample["proc_ms"],
+		sample["draw"], sample["nodes"], sample["mem_mb"],
+		ratio_str
+	])
+	_log_file.flush()

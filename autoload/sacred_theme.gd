@@ -35,7 +35,7 @@ func _ready() -> void:
 	_setup_panels()
 	_setup_labels()
 	var cursor_tex := load("res://assets/art/ui/cursor.svg")
-	Input.set_custom_mouse_cursor(cursor_tex, Input.CURSOR_ARROW, Vector2(16, 1))
+	Input.set_custom_mouse_cursor(cursor_tex, Input.CURSOR_ARROW, Vector2(32, 32))
 
 # ── 폰트 ──────────────────────────────────────────────────────────────
 

@@ -83,6 +83,9 @@ func get_card_type_icon(card_type: int) -> Texture2D:
 func get_energy_icon() -> Texture2D:
 	return _load(HUD_DIR + "energy.svg")
 
+func get_counter_icon() -> Texture2D:
+	return _load("res://assets/art/ui/clock.svg")
+
 func _strip(key: String) -> String:
 	var parts := key.split(".")
 	return parts[1] if parts.size() >= 2 else key

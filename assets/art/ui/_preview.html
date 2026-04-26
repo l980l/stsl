@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>STSL UI 아이콘 미리보기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0a1a; color: #f5f0e8; font-family: 'Segoe UI', sans-serif; padding: 24px; }
+  h1 { color: #c9a84c; font-size: 22px; margin-bottom: 8px; border-bottom: 2px solid #c9a84c; padding-bottom: 8px; }
+  .section { margin-bottom: 36px; }
+  .section-title {
+    color: #c9a84c; font-size: 16px; font-weight: bold;
+    margin: 20px 0 12px; padding: 6px 12px;
+    background: #1a1230; border-left: 4px solid #c9a84c; border-radius: 2px;
+  }
+  .count { font-size: 12px; color: #9b7a28; margin-left: 8px; font-weight: normal; }
+  .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  /* 기본 아이콘 카드 */
+  .item {
+    background: #1a1230; border: 1px solid #2a2050;
+    border-radius: 8px; padding: 10px 8px 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    width: 96px; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  }
+  .item:hover { border-color: #c9a84c; background: #221840; }
+  .item img { width: 64px; height: 64px; image-rendering: auto; }
+  .item .name { font-size: 9.5px; color: #9b9080; text-align: center; word-break: break-all; line-height: 1.3; }
+  .item:hover .name { color: #c9a84c; }
+
+  /* HUD/기타: 어두운 테마 배경에 흰 아이콘이 잘 보이도록 체크무늬 배경 */
+  .item.hud-item { background: #2a1a40; }
+  .item.hud-item .icon-bg {
+    width: 64px; height: 64px;
+    background: repeating-conic-gradient(#1a1040 0% 25%, #2a2060 25% 50%) 0 0 / 12px 12px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .item.hud-item img { width: 48px; height: 48px; }
+  /* cursor 카드는 64×64 그대로 */
+  .item.cursor-item .icon-bg { background: #333355; }
+  .item.cursor-item img { width: 64px; height: 64px; }
+
+  .search-bar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+  .search-bar input {
+    background: #1a1230; border: 1px solid #2a2050; color: #f5f0e8;
+    padding: 7px 12px; border-radius: 6px; font-size: 13px; width: 260px; outline: none;
+  }
+  .search-bar input:focus { border-color: #c9a84c; }
+  .search-bar input::placeholder { color: #554a38; }
+
+  .tab-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab {
+    padding: 6px 16px; border-radius: 20px; font-size: 13px; cursor: pointer;
+    border: 1px solid #2a2050; background: #1a1230; color: #9b9080; transition: all 0.15s;
+  }
+  .tab.active, .tab:hover { border-color: #c9a84c; color: #c9a84c; background: #221840; }
+  .no-result { color: #554a38; font-size: 13px; padding: 16px 0; }
+
+  /* 복사 토스트 */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #221840; border: 1px solid #c9a84c; color: #c9a84c;
+    padding: 8px 18px; border-radius: 20px; font-size: 13px;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  #toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<h1>STSL UI 아이콘 미리보기</h1>
+<p style="color:#554a38;font-size:12px;margin:6px 0 18px;">신성 테마 SVG 아이콘 전체 — gold #c9a84c / navy #1a1230 / cream #f5f0e8</p>
+
+<div class="search-bar">
+  <input type="text" id="search" placeholder="아이콘 이름 검색..." oninput="render()">
+  <span style="color:#554a38;font-size:12px;" id="total-count"></span>
+</div>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="showTab('all',this)">전체</div>
+  <div class="tab" onclick="showTab('status',this)">상태이상 / 카운터 (11)</div>
+  <div class="tab" onclick="showTab('relic',this)">렐릭 (40)</div>
+  <div class="tab" onclick="showTab('synergy',this)">시너지 (15)</div>
+  <div class="tab" onclick="showTab('map',this)">맵 (7)</div>
+  <div class="tab" onclick="showTab('intent',this)">인텐트 (6)</div>
+  <div class="tab" onclick="showTab('hud',this)">HUD / 기타</div>
+</div>
+
+<div id="gallery"></div>
+<div id="toast"></div>
+
+<script>
+const DATA = {
+  status: {
+    label: "상태이상 / 카운터", dir: "status/", ext: "svg",
+    items: ["charm","enthrall","charm_resistance","counter_block","morale","poison","strength","taunt","vulnerable","weak","__clock__"]
+  },
+  relic: {
+    label: "렐릭", dir: "relic/", ext: "svg",
+    items: [
+      "ancient_artifact","ancient_shield","ankh_of_life","artillery_horn",
+      "blood_oath","blood_stone","burning_blood","conquerors_whip",
+      "cursed_crown","devils_contract","dokkaebi_hammer_shard","dragon_scale",
+      "eight_immortals_charm","emperors_seal","eye_of_horus","flag_of_orleans",
+      "ghost_talisman","gorin_sho_relic","hourglass","idun_apple",
+      "iron_will","mjolnir_shard","nanjung_ilgi","niten_ichi_ryu",
+      "orochi_scale","pharaoh_seal","phoenix_feather","poison_vial",
+      "queen_mother_peach_relic","rune_of_fate","saints_tears","samtaegeuk_charm",
+      "scarab_talisman","serpent_bracelet","tacticians_map","tengu_feather",
+      "thousand_horses","turtle_ship_model","underworld_talisman","war_drum"
+    ]
+  },
+  synergy: {
+    label: "시너지", dir: "synergy/", ext: "svg",
+    items: [
+      "cleopatra_musashi","genghis_cleopatra","genghis_musashi",
+      "joan_cleopatra","joan_genghis","joan_musashi","joan_napoleon","joan_yi",
+      "musashi_yi","napoleon_cleopatra","napoleon_genghis","napoleon_musashi",
+      "napoleon_yi","yi_cleopatra","yi_genghis"
+    ]
+  },
+  map: {
+    label: "맵 룸 아이콘", dir: "map/", ext: "svg",
+    items: ["icon_room_battle","icon_room_elite","icon_room_boss","icon_room_shop","icon_room_rest","icon_room_event","icon_room_secret"]
+  },
+  intent: {
+    label: "인텐트 / 카드 타입", dir: "intent/", ext: "svg",
+    items: ["attack","buff","debuff","prepare","skill","power"]
+  },
+  hud: {
+    label: "HUD / 기타 UI", dir: "", ext: "",
+    items: [
+      { name: "clock",        path: "clock.svg",        label: "카운터 시계",    cls: "hud-item" },
+      { name: "cursor",       path: "cursor.svg",       label: "마우스 커서",    cls: "cursor-item" },
+      { name: "arrow_head",   path: "arrow_head.png",   label: "드래그 화살 헤드", cls: "hud-item" },
+      { name: "arrow_chevron",path: "arrow_chevron.png",label: "드래그 쉐브론",  cls: "hud-item" },
+      { name: "energy",       path: "hud/energy.svg",   label: "에너지 오브",    cls: "hud-item" },
+    ]
+  }
+};
+
+let currentTab = "all";
+
+function showTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('search').value = '';
+  render();
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 1200);
+}
+
+function makeItem(name, src, label, extraCls) {
+  const item = document.createElement('div');
+  item.className = 'item' + (extraCls ? ' ' + extraCls : '');
+  item.title = name;
+
+  const isHud = extraCls && extraCls.includes('hud-item') || extraCls === 'cursor-item';
+  if (isHud) {
+    item.innerHTML = `
+      <div class="icon-bg">
+        <img src="${src}" alt="${name}" loading="lazy"
+             onerror="this.style.opacity='0.15'">
+      </div>
+      <div class="name">${label || name}</div>`;
+  } else {
+    item.innerHTML = `
+      <img src="${src}" alt="${name}" loading="lazy"
+           onerror="this.style.opacity='0.15'">
+      <div class="name">${label || name}</div>`;
+  }
+
+  item.onclick = () => {
+    navigator.clipboard?.writeText(name).then(() => {
+      item.style.borderColor = '#44cc88';
+      setTimeout(() => item.style.borderColor = '', 800);
+      toast(`"${name}" 복사됨`);
+    });
+  };
+  return item;
+}
+
+function render() {
+  const query = document.getElementById('search').value.toLowerCase();
+  const gallery = document.getElementById('gallery');
+  gallery.innerHTML = '';
+  let totalVisible = 0;
+
+  const cats = currentTab === 'all' ? Object.keys(DATA) : [currentTab];
+
+  cats.forEach(cat => {
+    const { label, dir, ext, items } = DATA[cat];
+
+    // hud 카테고리는 객체 배열
+    let entries;
+    if (cat === 'hud') {
+      entries = items.filter(o => o.name.includes(query) || o.label.includes(query));
+    } else {
+      const displayName = n => n === '__clock__' ? 'clock 카운터' : n;
+      entries = items.filter(name => displayName(name).includes(query));
+    }
+    if (entries.length === 0) return;
+    totalVisible += entries.length;
+
+    const section = document.createElement('div');
+    section.className = 'section';
+    const title = document.createElement('div');
+    title.className = 'section-title';
+    title.innerHTML = label + `<span class="count">${entries.length}개</span>`;
+    section.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+
+    if (cat === 'hud') {
+      entries.forEach(o => {
+        grid.appendChild(makeItem(o.name, o.path, o.label, o.cls));
+      });
+    } else {
+      entries.forEach(name => {
+        if (name === '__clock__') {
+          grid.appendChild(makeItem('clock', '../clock.svg', 'clock (카운터)', ''));
+        } else {
+          grid.appendChild(makeItem(name, `${dir}${name}.${ext}`, name, ''));
+        }
+      });
+    }
+
+    section.appendChild(grid);
+    gallery.appendChild(section);
+  });
+
+  if (totalVisible === 0) {
+    gallery.innerHTML = '<div class="no-result">검색 결과 없음</div>';
+  }
+  document.getElementById('total-count').textContent = `총 ${totalVisible}개`;
+}
+
+render();
+</script>
+</body>
+</html>

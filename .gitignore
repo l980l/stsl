@@ -40,3 +40,6 @@ docs/catalog/*.csv
 docs/catalog/*.md
 !docs/catalog/README.md
 .worktrees/
+
+# 프레임 스파이크 로그 (로컬 디버그용)
+log/

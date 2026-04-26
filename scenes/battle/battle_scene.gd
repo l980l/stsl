@@ -1,4 +1,4 @@
-﻿# scenes/battle/battle_scene.gd
+# scenes/battle/battle_scene.gd
 extends Node2D
 
 const EffectRes = preload("res://resources/effect_resource.gd")
@@ -1219,6 +1219,31 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		return
 	for child in box.get_children():
 		child.queue_free()
+	# 카드 카운터를 먼저 표시 (발동 순서 고정)
+	var cinfo: Dictionary = BattleManager.get_enemy_counter(index)
+	if not cinfo.is_empty():
+		var hbox := HBoxContainer.new()
+		hbox.custom_minimum_size = Vector2(0, 18)
+		hbox.tooltip_text = _counter_tooltip_text(cinfo)
+		hbox.mouse_filter = Control.MOUSE_FILTER_STOP
+		var icon_tex := IconUtils.get_counter_icon()
+		if icon_tex != null:
+			var icon := TextureRect.new()
+			icon.texture = icon_tex
+			icon.custom_minimum_size = Vector2(20, 20)
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.modulate = Color(1.0, 0.75, 0.3)
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			hbox.add_child(icon)
+		var lbl := Label.new()
+		lbl.text = _trf("battle.counter.label", [cinfo["count"], cinfo["threshold"]])
+		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lbl.modulate = Color(1.0, 0.75, 0.3)
+		hbox.add_child(lbl)
+		box.add_child(hbox)
 	var status: Dictionary = BattleManager.get_enemy_status(index)
 	for key in status:
 		if key == "poison_dur":
@@ -1227,38 +1252,6 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		if val <= 0:
 			continue
 		box.add_child(_make_status_label(key, val, status))
-	# 카드 카운터가 있으면 상태 아이콘 영역에 버프처럼 표시
-	var cinfo: Dictionary = BattleManager.get_enemy_counter(index)
-	if not cinfo.is_empty():
-		var ct: int = int(cinfo.get("card_type", -1))
-		var label_key: String = ""
-		match ct:
-			CardResource.CardType.ATTACK: label_key = "enemy.counter.attack.label"
-			CardResource.CardType.SKILL:  label_key = "enemy.counter.skill.label"
-			CardResource.CardType.POWER:  label_key = "enemy.counter.power.label"
-		if label_key != "":
-			var hbox := HBoxContainer.new()
-			hbox.custom_minimum_size = Vector2(0, 18)
-			hbox.tooltip_text = _counter_tooltip_text(cinfo)
-			hbox.mouse_filter = Control.MOUSE_FILTER_STOP
-			var icon_tex := IconUtils.get_card_type_icon(ct)
-			if icon_tex != null:
-				var icon := TextureRect.new()
-				icon.texture = icon_tex
-				icon.custom_minimum_size = Vector2(14, 14)
-				icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-				icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-				icon.modulate = Color(1.0, 0.75, 0.3)
-				icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-				hbox.add_child(icon)
-			var lbl := Label.new()
-			lbl.text = _trf(label_key, [cinfo["count"], cinfo["threshold"]])
-			lbl.add_theme_font_size_override("font_size", 12)
-			lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			lbl.modulate = Color(1.0, 0.75, 0.3)
-			hbox.add_child(lbl)
-			box.add_child(hbox)
 
 func _on_morale_changed(hero_id: String, _new_value: int) -> void:
 	_update_hero_ui(hero_id)
@@ -1429,6 +1422,7 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 
 	var lbl := Label.new()
 	lbl.text = header
+	lbl.theme_type_variation = "AccentLabel"
 	lbl.add_theme_font_size_override("font_size", 15)
 	col.add_child(lbl)
 
@@ -1825,7 +1819,7 @@ func _update_drag_arrow(end_pos: Vector2) -> void:
 	if _drag_arrow_head == null:
 		return
 	var start := _drag_start_pos
-	var ctrl := (start + end_pos) * 0.5 + Vector2(0, -200.0)
+	var _ctrl := (start + end_pos) * 0.5 + Vector2(0, -200.0)
 	var base := _drag_arrow_color(end_pos)
 	_drag_arrow_head.position = end_pos.round()
 

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <filter id="clock-glow">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="face-grad" cx="38%" cy="33%" r="65%">
+      <stop offset="0%" stop-color="#e8dfc0"/>
+      <stop offset="55%" stop-color="#a08858"/>
+      <stop offset="100%" stop-color="#3d2810"/>
+    </radialGradient>
+    <radialGradient id="hub-grad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffd875"/>
+      <stop offset="100%" stop-color="#8b6010"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 외곽 다크 링 -->
+  <circle cx="128" cy="128" r="112" fill="#1a0e04" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 시계 페이스 -->
+  <circle cx="128" cy="128" r="103" fill="url(#face-grad)" stroke="#c9a84c" stroke-width="4"/>
+
+  <!-- 주요 틱 마크 (12·3·6·9시) -->
+  <rect x="122" y="24" width="12" height="20" rx="3" fill="#c9a84c"/>
+  <rect x="212" y="122" width="20" height="12" rx="3" fill="#c9a84c"/>
+  <rect x="122" y="212" width="12" height="20" rx="3" fill="#c9a84c"/>
+  <rect x="24"  y="122" width="20" height="12" rx="3" fill="#c9a84c"/>
+
+  <!-- 소형 틱 마크 (30도 간격) -->
+  <rect x="123" y="26" width="10" height="13" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(30  128 128)"/>
+  <rect x="123" y="26" width="10" height="13" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(60  128 128)"/>
+  <rect x="123" y="26" width="10" height="13" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(120 128 128)"/>
+  <rect x="123" y="26" width="10" height="13" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(150 128 128)"/>
+  <rect x="123" y="26" width="10" height="13" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(210 128 128)"/>
+  <rect x="123" y="26" width="10" height="13" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(240 128 128)"/>
+  <rect x="123" y="26" width="10" height="13" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(300 128 128)"/>
+  <rect x="123" y="26" width="10" height="13" rx="2" fill="#c9a84c" opacity="0.55" transform="rotate(330 128 128)"/>
+
+  <!-- 시침 (10시 방향, 짧고 두꺼움) -->
+  <line x1="128" y1="128" x2="76" y2="98" stroke="#2d1c08" stroke-width="11" stroke-linecap="round"/>
+  <line x1="128" y1="128" x2="76" y2="98" stroke="#c9a84c" stroke-width="4"  stroke-linecap="round" opacity="0.45"/>
+
+  <!-- 분침 (2시 방향, 길고 얇음) -->
+  <line x1="128" y1="128" x2="197" y2="88" stroke="#2d1c08" stroke-width="8" stroke-linecap="round"/>
+  <line x1="128" y1="128" x2="197" y2="88" stroke="#c9a84c" stroke-width="3"  stroke-linecap="round" opacity="0.45"/>
+
+  <!-- 중심 허브 -->
+  <circle cx="128" cy="128" r="10" fill="url(#hub-grad)" stroke="#1a1208" stroke-width="2.5" filter="url(#clock-glow)"/>
+
+  <!-- 페이스 하이라이트 -->
+  <ellipse cx="105" cy="95" rx="14" ry="22" fill="white" opacity="0.12" transform="rotate(-35 105 95)"/>
+</svg>
