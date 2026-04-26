@@ -622,9 +622,10 @@ func style_sacred_scrollbar(scroll: ScrollContainer) -> void:
 	vsb.add_theme_stylebox_override("scroll", track)
 	vsb.add_theme_stylebox_override("scroll_focus", track)
 
-	var dw := 14
-	var dh := 16
-	var expand := (dw - 2) / 2.0  # 6px 양쪽 확장으로 마름모를 트랙 중앙에 정렬
+	var dw := 10
+	var dh := 10
+	var expand := (dw - 2) / 2.0  # 양쪽 확장으로 마름모를 트랙 중앙에 정렬
+	vsb.add_theme_constant_override("grab_distance", dh)
 
 	for state: String in ["grabber", "grabber_highlight", "grabber_pressed"]:
 		var bright: bool = state != "grabber"
