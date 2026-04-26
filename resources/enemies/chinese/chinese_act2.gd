@@ -61,7 +61,7 @@ static func heavenly_hound_brothers(scene: PackedScene) -> Resource:
 static func erlang_shen(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.chinese.erlang_shen"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "chinese"
+	e.mythology = "chinese"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 지휘
 	var p0i1 := IntentRes.new()

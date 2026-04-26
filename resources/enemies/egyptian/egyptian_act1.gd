@@ -58,7 +58,7 @@ static func obelisk_guardian(scene: PackedScene) -> Resource:
 static func sekhmet(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.sekhmet"; e.max_hp = 4500; e.character_scene = scene
-	e.mythology = "egyptian"
+	e.mythology = "egyptian"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# 페이즈0
 	var p0i1 := IntentRes.new()

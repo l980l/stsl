@@ -106,7 +106,7 @@ static func scylla(scene: PackedScene) -> Resource:
 static func hydra(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.hydra"; e.max_hp = 4500; e.character_scene = scene
-	e.mythology = "greek"
+	e.mythology = "greek"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 180; p0i1.target = IntentRes.TargetType.RANDOM

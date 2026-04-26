@@ -62,7 +62,7 @@ static func vanir_elf(scene: PackedScene) -> Resource:
 static func surtr(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.surtr"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "norse"
+	e.mythology = "norse"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.65, 0.3]
 	# 페이즈0
 	var p0i1 := IntentRes.new()

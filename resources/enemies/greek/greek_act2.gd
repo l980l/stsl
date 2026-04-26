@@ -61,7 +61,7 @@ static func erinyes(scene: PackedScene) -> Resource:
 static func hades(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.hades"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "greek"
+	e.mythology = "greek"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.65, 0.3]
 	# 페이즈0
 	var p0i1 := IntentRes.new()

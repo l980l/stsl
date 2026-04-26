@@ -59,7 +59,7 @@ static func hrimthurs_scout(scene: PackedScene) -> Resource:
 static func fjorgynn(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.fjorgynn"; e.max_hp = 4500; e.character_scene = scene
-	e.mythology = "norse"
+	e.mythology = "norse"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# 페이즈0
 	var p0i1 := IntentRes.new()

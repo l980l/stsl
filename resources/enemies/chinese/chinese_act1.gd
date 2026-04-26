@@ -65,7 +65,7 @@ static func black_wind_demon(scene: PackedScene) -> Resource:
 static func chiyou(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.chinese.chiyou"; e.max_hp = 4500; e.character_scene = scene
-	e.mythology = "chinese"
+	e.mythology = "chinese"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 청동 창
 	var p0i1 := IntentRes.new()

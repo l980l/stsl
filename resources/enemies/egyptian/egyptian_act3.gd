@@ -70,7 +70,7 @@ static func isis_phantom(scene: PackedScene) -> Resource:
 static func ra_horakhty(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.ra_horakhty"; e.max_hp = 5000; e.character_scene = scene
-	e.mythology = "egyptian"
+	e.mythology = "egyptian"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.65, 0.3]
 	e.charm_resistance = 2
 	# 페이즈0: ATK RANDOM / DEBUFF weak ALL / ATK RANDOM / ATK ALL

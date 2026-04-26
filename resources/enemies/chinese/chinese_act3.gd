@@ -58,7 +58,7 @@ static func black_tortoise_general(scene: PackedScene) -> Resource:
 static func pangu(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.chinese.pangu"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "chinese"
+	e.mythology = "chinese"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 혼돈
 	var p0i1 := IntentRes.new()

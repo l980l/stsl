@@ -57,7 +57,7 @@ static func invincible_ronin(scene: PackedScene) -> Resource:
 static func raijin(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.raijin"; e.max_hp = 4500; e.character_scene = scene
-	e.mythology = "japanese"
+	e.mythology = "japanese"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 뇌고
 	var p0i1 := IntentRes.new()

@@ -61,7 +61,7 @@ static func haemosu(scene: PackedScene) -> Resource:
 static func dangun(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.korean.dangun"; e.max_hp = 4500; e.character_scene = scene
-	e.mythology = "korean"
+	e.mythology = "korean"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0: 개벽의 빛
 	var p0i1 := IntentRes.new()

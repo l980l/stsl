@@ -67,7 +67,7 @@ static func hephaestus_automaton(scene: PackedScene) -> Resource:
 static func kronos(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.kronos"; e.max_hp = 5200; e.character_scene = scene
-	e.mythology = "greek"
+	e.mythology = "greek"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.65, 0.3]
 	e.charm_resistance = 2
 	# 페이즈0: ATK RANDOM / DEBUFF weak ALL / ATK RANDOM / ATK ALL

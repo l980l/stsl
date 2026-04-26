@@ -74,7 +74,7 @@ static func jormungandr_shard(scene: PackedScene) -> Resource:
 static func jormungandr(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.jormungandr"; e.max_hp = 5000; e.character_scene = scene
-	e.mythology = "norse"
+	e.mythology = "norse"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.65, 0.3]
 	# 페이즈0
 	var p0i1 := IntentRes.new()

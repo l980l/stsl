@@ -55,6 +55,7 @@ var _drag_t_offset: float = 0.0
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _popup_stack: Dictionary = {}
+var _grad_cache: Dictionary = {}
 var _token_tile_nodes: Dictionary = {}
 var _synergy_box: FlowContainer = null
 var _active_powers_box: VBoxContainer = null
@@ -355,6 +356,9 @@ func _enemy_slot_pos(index: int, _total: int = 0) -> Vector2:
 
 func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	var pos: Vector2 = _enemy_slot_pos(index, total)
+	var enemy_res: Resource = BattleManager.get_enemy(index)
+	var is_boss: bool = enemy_res != null and enemy_res.grade == EnemyResource.Grade.BOSS
+
 	var panel := ColorRect.new()
 	panel.color = Color(0, 0, 0, 0)
 	panel.position = pos
@@ -364,7 +368,6 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	SacredTheme.add_corner_brackets(panel, SacredPalette.BRASS_500, 16, 2, 1)
 
 	var bar_w: float = 211.0
-	var _bar_h: float = 12.0
 	var bar_x: float = pos.x + (SLOT_W - bar_w) / 2.0
 
 	var intent_lbl := _make_label(Vector2(pos.x, pos.y + 4), Vector2(SLOT_W, 22), 18)
@@ -388,7 +391,7 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	name_lbl.theme_type_variation = "AccentLabel"
 	name_lbl.z_index = 1
 
-	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 48), bar_w)
+	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 48), bar_w, is_boss)
 	hp_bar.z_index = 1
 
 	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 42), Vector2(bar_w, 24), 12)
@@ -405,7 +408,8 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	block_lbl.z_index = 2
 
 	var status_box := HBoxContainer.new()
-	status_box.position = Vector2(bar_x, pos.y + 62)
+	var status_y: float = pos.y + (72.0 if is_boss else 62.0)
+	status_box.position = Vector2(bar_x, status_y)
 	status_box.size = Vector2(bar_w, 18)
 	status_box.z_index = 1
 	add_child(status_box)
@@ -473,27 +477,274 @@ func _make_label(pos: Vector2, sz: Vector2, font_size: int) -> Label:
 	add_child(lbl)
 	return lbl
 
-func _make_hp_bar(pos: Vector2, width: float) -> Control:
+func _get_gradient_tex(state: String) -> GradientTexture1D:
+	if _grad_cache.has(state):
+		return _grad_cache[state]
+	# Gradient.new()는 기본 2점(0=검정, 1=흰색) — 두 점 모두 덮어써야 흰색 방지
+	var g := Gradient.new()
+	match state:
+		"std_normal":
+			g.set_color(0, SacredPalette.BLOOD_700); g.set_offset(0, 0.0)
+			g.set_color(1, SacredPalette.BLOOD_400); g.set_offset(1, 1.0)
+			g.add_point(0.6, SacredPalette.BLOOD_500)
+		"std_low":
+			g.set_color(0, SacredPalette.BLOOD_600); g.set_offset(0, 0.0)
+			g.set_color(1, SacredPalette.BLOOD_400); g.set_offset(1, 1.0)
+		"std_crit":
+			g.set_color(0, SacredPalette.BLOOD_500); g.set_offset(0, 0.0)
+			g.set_color(1, SacredPalette.BLOOD_300); g.set_offset(1, 1.0)
+		"boss":
+			g.set_color(0, SacredPalette.BLOOD_700); g.set_offset(0, 0.0)
+			g.set_color(1, SacredPalette.BRASS_500); g.set_offset(1, 1.0)
+			g.add_point(0.5, SacredPalette.BLOOD_500)
+	var tex := GradientTexture1D.new()
+	tex.gradient = g
+	_grad_cache[state] = tex
+	return tex
+
+func _get_highlight_tex() -> GradientTexture2D:
+	if _grad_cache.has("highlight"):
+		return _grad_cache["highlight"]
+	var g := Gradient.new()
+	g.set_color(0, Color(1.0, 0.92, 0.82, 0.20))
+	g.set_color(1, Color(1.0, 0.92, 0.82, 0.0))
+	g.set_offset(0, 0.0)
+	g.set_offset(1, 1.0)
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.fill = GradientTexture2D.FILL_LINEAR
+	tex.fill_from = Vector2(0.5, 0.0)
+	tex.fill_to = Vector2(0.5, 0.5)
+	tex.width = 4
+	tex.height = 32
+	_grad_cache["highlight"] = tex
+	return tex
+
+func _get_shield_tex() -> ImageTexture:
+	if _grad_cache.has("shield"):
+		return _grad_cache["shield"]
+	var img := Image.create(12, 12, false, Image.FORMAT_RGBA8)
+	var c1: Color = SacredPalette.BONE_300
+	var c2: Color = SacredPalette.BONE_400
+	for y in range(12):
+		for x in range(12):
+			var d: int = (x + y) % 6
+			img.set_pixel(x, y, c1 if d < 3 else c2)
+	var tex := ImageTexture.create_from_image(img)
+	_grad_cache["shield"] = tex
+	return tex
+
+func _get_bloom_shader() -> Shader:
+	if _grad_cache.has("bloom_shader"):
+		return _grad_cache["bloom_shader"]
+	var sh := Shader.new()
+	sh.code = "shader_type canvas_item;\nuniform float intensity : hint_range(0.0, 1.5) = 0.4;\nuniform vec4 glow_color : source_color = vec4(0.85, 0.16, 0.19, 1.0);\nuniform vec2 inner = vec2(0.18, 0.45);\nvoid fragment() {\n\tvec2 d = abs(UV - vec2(0.5)) - (vec2(0.5) - inner);\n\tfloat outside = step(0.0, max(d.x, d.y));\n\tvec2 dn = max(d, vec2(0.0)) / inner;\n\tfloat t = length(dn);\n\tfloat alpha = smoothstep(1.0, 0.0, t) * intensity * outside;\n\tCOLOR = vec4(glow_color.rgb, alpha);\n}\n"
+	_grad_cache["bloom_shader"] = sh
+	return sh
+
+func _make_hp_bar(pos: Vector2, width: float, is_boss: bool = false) -> Control:
+	var height: float = 14.0
+	var P := SacredPalette
+
 	var wrapper := Control.new()
 	wrapper.position = pos
-	wrapper.size = Vector2(width, 12)
-	wrapper.custom_minimum_size = Vector2.ZERO
+	wrapper.size = Vector2(width, height)
+	wrapper.clip_contents = false
 
 	var bg := ColorRect.new()
-	bg.position = Vector2.ZERO
-	bg.size = Vector2(width, 12)
-	bg.color = SacredPalette.INK_700
+	bg.size = Vector2(width, height)
+	bg.color = P.INK_1000
 	wrapper.add_child(bg)
 
-	var fill := ColorRect.new()
+	# Fill (베이스 그라데이션)
+	var fill := TextureRect.new()
 	fill.name = "Fill"
-	fill.position = Vector2.ZERO
-	fill.size = Vector2(width, 12)
-	fill.color = SacredPalette.BLOOD_500
+	fill.texture = _get_gradient_tex("boss" if is_boss else "std_normal")
+	fill.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	fill.stretch_mode = TextureRect.STRETCH_SCALE
+	fill.size = Vector2(width, height)
+	fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	wrapper.add_child(fill)
+
+	# Bloom (Fill 자식 — fill width 따라 수축, 8px halo, show_behind_parent로 fill이 no-glow 영역 덮음)
+	var bloom := ColorRect.new()
+	bloom.name = "Bloom"
+	bloom.color = Color.WHITE
+	bloom.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bloom.offset_left = -8.0
+	bloom.offset_top = -8.0
+	bloom.offset_right = 8.0
+	bloom.offset_bottom = 8.0
+	bloom.show_behind_parent = true
+	bloom.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var bloom_mat := ShaderMaterial.new()
+	bloom_mat.shader = _get_bloom_shader()
+	bloom_mat.set_shader_parameter("intensity", 0.35)
+	bloom_mat.set_shader_parameter("glow_color", Color(P.BLOOD_400.r, P.BLOOD_400.g, P.BLOOD_400.b, 1.0))
+	bloom_mat.set_shader_parameter("inner", Vector2(8.0 / (width + 16.0), 8.0 / (height + 16.0)))
+	bloom.material = bloom_mat
+	fill.add_child(bloom)
+
+	# Highlight (Fill 위쪽 절반 — Fill 자식이라 Fill width 따라감)
+	var highlight := TextureRect.new()
+	highlight.name = "Highlight"
+	highlight.texture = _get_highlight_tex()
+	highlight.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	highlight.stretch_mode = TextureRect.STRETCH_SCALE
+	highlight.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	highlight.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fill.add_child(highlight)
+
+	# Ghost (최근 데미지 트레일)
+	var ghost := ColorRect.new()
+	ghost.name = "Ghost"
+	ghost.color = Color(P.BLOOD_300.r, P.BLOOD_300.g, P.BLOOD_300.b, 0.35)
+	ghost.position = Vector2(0, 0)
+	ghost.size = Vector2(0, height)
+	ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wrapper.add_child(ghost)
+
+	# Shield (체력 오른쪽에 붙는 본 색 줄무늬 오버레이)
+	var shield := TextureRect.new()
+	shield.name = "Shield"
+	shield.texture = _get_shield_tex()
+	shield.stretch_mode = TextureRect.STRETCH_TILE
+	shield.position = Vector2(0, 0)
+	shield.size = Vector2(0, height)
+	shield.visible = false
+	shield.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wrapper.add_child(shield)
+
+	# 노치
+	var notch_percents: Array = [16.66, 33.33, 50.0, 66.66, 83.33] if not is_boss else [25.0, 50.0, 75.0]
+	var notch_color: Color = Color(0.91, 0.78, 0.47, 0.4) if is_boss else Color(0, 0, 0, 0.6)
+	for pct in notch_percents:
+		var n := ColorRect.new()
+		n.position = Vector2(width * pct / 100.0, 0)
+		n.size = Vector2(1, height)
+		n.color = notch_color
+		n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		wrapper.add_child(n)
+
+	# 테두리
+	var border := Panel.new()
+	border.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	border.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	border.z_index = 10
+	var bstyle := StyleBoxFlat.new()
+	bstyle.bg_color = Color(0, 0, 0, 0)
+	bstyle.border_color = P.BRASS_500 if is_boss else P.BRASS_700
+	bstyle.set_border_width_all(1)
+	border.add_theme_stylebox_override("panel", bstyle)
+	wrapper.add_child(border)
 
 	add_child(wrapper)
 	return wrapper
+
+func _apply_hp_state(bar: Control, fill: TextureRect, ratio: float, is_boss: bool) -> void:
+	if bar.has_meta("pulse_tween"):
+		var old: Tween = bar.get_meta("pulse_tween")
+		if is_instance_valid(old):
+			old.kill()
+		bar.remove_meta("pulse_tween")
+	fill.modulate = Color.WHITE
+
+	var bloom: ColorRect = fill.get_node("Bloom") as ColorRect
+	var bloom_mat := bloom.material as ShaderMaterial
+
+	# 사망(HP 0) 시 bloom 완전히 끔
+	if ratio <= 0.0:
+		bloom_mat.set_shader_parameter("intensity", 0.0)
+		return
+
+	# fill width 변화에 맞춰 inner 동기화 (split 방지)
+	var fw: float = max(fill.size.x, 0.001)
+	var fh: float = max(fill.size.y, 0.001)
+	bloom_mat.set_shader_parameter("inner", Vector2(8.0 / (fw + 16.0), 8.0 / (fh + 16.0)))
+
+	var P := SacredPalette
+	var glow_col: Color = P.BLOOD_400
+
+	# 상태별 그라데이션·글로우 색상
+	if is_boss:
+		fill.texture = _get_gradient_tex("boss")
+	elif ratio > 0.40:
+		fill.texture = _get_gradient_tex("std_normal")
+	elif ratio > 0.15:
+		fill.texture = _get_gradient_tex("std_low")
+		glow_col = P.BLOOD_400
+	else:
+		fill.texture = _get_gradient_tex("std_crit")
+		glow_col = P.BLOOD_300
+
+	bloom_mat.set_shader_parameter("glow_color", Color(glow_col.r, glow_col.g, glow_col.b, 1.0))
+
+	# 펄스 — bloom intensity만 (fill alpha 건드리면 하위 레이어 가로줄이 비침)
+	var dur: float = 0.0
+	var lo_intensity: float = 0.35
+	var hi_intensity: float = 0.35
+	if ratio <= 0.15:
+		dur = 0.9
+		lo_intensity = 0.35
+		hi_intensity = 1.2
+	elif ratio <= 0.40:
+		dur = 1.6
+		lo_intensity = 0.30
+		hi_intensity = 0.85
+	else:
+		bloom_mat.set_shader_parameter("intensity", 0.35)
+		return
+
+	bloom_mat.set_shader_parameter("intensity", lo_intensity)
+	var tw := create_tween().set_loops()
+	tw.tween_method(func(v: float): bloom_mat.set_shader_parameter("intensity", v), lo_intensity, hi_intensity, dur * 0.5).set_ease(Tween.EASE_IN_OUT)
+	tw.tween_method(func(v: float): bloom_mat.set_shader_parameter("intensity", v), hi_intensity, lo_intensity, dur * 0.5).set_ease(Tween.EASE_IN_OUT)
+	bar.set_meta("pulse_tween", tw)
+
+func _apply_hp_change(bar: Control, new_ratio: float) -> void:
+	var ghost: ColorRect = bar.get_node("Ghost") as ColorRect
+	var bw: float = bar.size.x
+	var prev: float = bar.get_meta("prev_ratio", new_ratio)
+	bar.set_meta("prev_ratio", new_ratio)
+
+	if bar.has_meta("ghost_tween"):
+		var old: Tween = bar.get_meta("ghost_tween")
+		if is_instance_valid(old):
+			old.kill()
+		bar.remove_meta("ghost_tween")
+
+	# 회복·동일 → ghost 즉시 숨김
+	if new_ratio >= prev - 0.0005:
+		ghost.size.x = 0.0
+		return
+
+	ghost.position.x = bw * new_ratio
+	ghost.size.x = bw * (prev - new_ratio)
+	ghost.modulate.a = 1.0
+	var tw := create_tween()
+	tw.tween_interval(0.24)
+	tw.tween_property(ghost, "size:x", 0.0, 0.88).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	bar.set_meta("ghost_tween", tw)
+
+func _apply_shield(bar: Control, hp_ratio: float, block: int, max_hp: int) -> void:
+	var shield: TextureRect = bar.get_node("Shield") as TextureRect
+	if block <= 0 or max_hp <= 0:
+		shield.visible = false
+		return
+	var s_ratio: float = clamp(float(block) / float(max_hp), 0.0, 1.0)
+	if s_ratio <= 0.001:
+		shield.visible = false
+		return
+	shield.visible = true
+	var bw: float = bar.size.x
+	var available: float = 1.0 - hp_ratio
+	if s_ratio <= available:
+		# 빈 공간 안에 들어옴 — fill 끝에서 오른쪽으로
+		shield.position.x = bw * hp_ratio
+	else:
+		# 넘침 — 바 오른쪽 끝에 달라붙어 fill 위로 침범
+		shield.position.x = bw * (1.0 - s_ratio)
+	shield.size.x = bw * s_ratio
 
 # ─────────────────────────────────────────────
 # 시그널 연결 (스텁 — Task 3~5에서 채움)
@@ -703,7 +954,11 @@ func _update_hero_ui(hero_id: String) -> void:
 		var morale: int = status.get("morale", 0)
 		var _bar: Control = entry["hp_bar"]
 		var _ratio: float = float(cur_hp) / float(hero.max_hp) if hero.max_hp > 0 else 0.0
-		_bar.get_node("Fill").size.x = _bar.size.x * _ratio
+		var _fill: TextureRect = _bar.get_node("Fill")
+		_fill.size.x = _bar.size.x * _ratio
+		_apply_hp_state(_bar, _fill, _ratio, false)
+		_apply_hp_change(_bar, _ratio)
+		_apply_shield(_bar, _ratio, block, hero.max_hp)
 		entry["hp_lbl"].text = "%d / %d" % [cur_hp, hero.max_hp]
 		var block_str: String = "🛡%d " % block if block > 0 else ""
 		var morale_str: String = "★%d" % morale if morale > 0 else ""
@@ -758,9 +1013,14 @@ func _update_enemy_ui(index: int) -> void:
 		return
 	var cur_hp: int = BattleManager.get_enemy_hp(index)
 	var block: int = BattleManager.get_enemy_block(index)
+	var is_boss_enemy: bool = enemy.grade == EnemyResource.Grade.BOSS
 	var _bar: Control = entry["hp_bar"]
 	var _ratio: float = float(cur_hp) / float(enemy.max_hp) if enemy.max_hp > 0 else 0.0
-	_bar.get_node("Fill").size.x = _bar.size.x * _ratio
+	var _fill: TextureRect = _bar.get_node("Fill")
+	_fill.size.x = _bar.size.x * _ratio
+	_apply_hp_state(_bar, _fill, _ratio, is_boss_enemy)
+	_apply_hp_change(_bar, _ratio)
+	_apply_shield(_bar, _ratio, block, enemy.max_hp)
 	entry["hp_lbl"].text = "%d / %d" % [cur_hp, enemy.max_hp]
 	entry["block_lbl"].text = "🛡%d" % block if block > 0 else ""
 

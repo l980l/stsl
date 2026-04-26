@@ -76,7 +76,7 @@ static func gusamseung_halmang(scene: PackedScene) -> Resource:
 	# 제주 무속의 생사 경계 여신 — Phase 0 "생명의 실" → Phase 1 "운명의 저울" → Phase 2 "저승 인도"
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.korean.gusamseung_halmang"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "korean"
+	e.mythology = "korean"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0: 생명의 실
 	var p0i1 := IntentRes.new()

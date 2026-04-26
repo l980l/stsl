@@ -58,7 +58,7 @@ static func samsin_grandma(scene: PackedScene) -> Resource:
 	# 생명·점지의 여신 — Phase 0 "점지의 손길" → Phase 1 "축복과 저주" → Phase 2 "삼신의 분노"
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.korean.samsin_grandma"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "korean"
+	e.mythology = "korean"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0: 점지의 손길
 	var p0i1 := IntentRes.new()

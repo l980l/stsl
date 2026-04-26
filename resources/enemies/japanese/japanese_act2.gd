@@ -58,7 +58,7 @@ static func nureriyon(scene: PackedScene) -> Resource:
 static func shuten_doji(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.shuten_doji"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "japanese"
+	e.mythology = "japanese"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 술판
 	var p0i1 := IntentRes.new()

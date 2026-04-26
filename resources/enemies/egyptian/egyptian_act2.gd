@@ -64,7 +64,7 @@ static func ba_bird(scene: PackedScene) -> Resource:
 static func osiris(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.osiris"; e.max_hp = 3000; e.character_scene = scene
-	e.mythology = "egyptian"
+	e.mythology = "egyptian"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.5]
 	e.phase_heal_ratios = [0.6]
 	var p0_i1 := IntentRes.new()

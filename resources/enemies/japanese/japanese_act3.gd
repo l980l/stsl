@@ -59,7 +59,7 @@ static func blizzard_queen(scene: PackedScene) -> Resource:
 static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.yamata_no_orochi"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "japanese"
+	e.mythology = "japanese"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 여덟 머리 (8 heads)
 	var p0i1 := IntentRes.new()
