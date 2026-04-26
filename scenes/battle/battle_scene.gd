@@ -1921,8 +1921,9 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.vertical_scroll_mode   = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	scroll.vertical_scroll_mode   = ScrollContainer.SCROLL_MODE_AUTO
 	clip_box.add_child(scroll)
+	SacredTheme.style_sacred_scrollbar(scroll)
 
 	var grid := GridContainer.new()
 	grid.columns = 2

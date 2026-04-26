@@ -602,3 +602,39 @@ func attach_modal_dim(layer: CanvasLayer) -> ColorRect:
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	layer.add_child(dim)
 	return dim
+
+# ── Sacred 스크롤바 — 황금 세로선 트랙 + 마름모 그래버 ──────────────────
+
+func style_sacred_scrollbar(scroll: ScrollContainer) -> void:
+	var vsb: VScrollBar = scroll.get_v_scroll_bar()
+	vsb.custom_minimum_size = Vector2(2, 0)
+
+	var track := StyleBoxFlat.new()
+	track.bg_color = SacredPalette.BRASS_700
+	track.set_content_margin_all(0)
+	vsb.add_theme_stylebox_override("scroll", track)
+	vsb.add_theme_stylebox_override("scroll_focus", track)
+
+	var dw := 14
+	var dh := 16
+	var expand := (dw - 2) / 2.0  # 6px 양쪽 확장으로 마름모를 트랙 중앙에 정렬
+
+	for state in ["grabber", "grabber_highlight", "grabber_pressed"]:
+		var bright: bool = state != "grabber"
+		var sbt := StyleBoxTexture.new()
+		sbt.texture = _make_diamond_tex(dw, dh, bright)
+		sbt.expand_margin_left  = expand
+		sbt.expand_margin_right = expand
+		vsb.add_theme_stylebox_override(state, sbt)
+
+func _make_diamond_tex(w: int, h: int, bright: bool) -> ImageTexture:
+	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	var cx := (w - 1) / 2.0
+	var cy := (h - 1) / 2.0
+	var c: Color = SacredPalette.BRASS_200 if bright else SacredPalette.BRASS_500
+	for y in h:
+		for x in w:
+			if abs(x - cx) / (cx + 0.5) + abs(y - cy) / (cy + 0.5) < 1.0:
+				img.set_pixel(x, y, c)
+	return ImageTexture.create_from_image(img)
