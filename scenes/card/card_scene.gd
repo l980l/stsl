@@ -21,7 +21,9 @@ var _disabled: bool = false
 var _press_pos: Vector2
 var _pressing: bool = false
 var _dragging: bool = false
-var _glow_panel: Panel = null
+var _glow_rect: ColorRect = null
+var _glow_mat: ShaderMaterial = null
+var _glow_color: Color = SacredPalette.BRASS_300
 var _glow_tween: Tween = null
 
 func _ready() -> void:
@@ -36,53 +38,56 @@ func _ready() -> void:
 	$Container/DescLabel.add_theme_color_override("font_color", Color.WHITE)
 	$Container/DescLabel.add_theme_color_override("font_outline_color", Color.BLACK)
 	$Container/DescLabel.add_theme_constant_override("outline_size", 16)
-	_create_glow_panel()
+	_create_glow_rect()
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	if _card != null:
 		refresh()
 
-func _create_glow_panel() -> void:
-	var glow := Panel.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0, 0, 0, 0)
-	sb.set_border_width_all(0)
-	sb.set_corner_radius_all(6)
-	sb.shadow_color  = Color(SacredPalette.BRASS_300.r, SacredPalette.BRASS_300.g, SacredPalette.BRASS_300.b, 0.22)
-	sb.shadow_size   = 8
-	sb.shadow_offset = Vector2.ZERO
-	glow.add_theme_stylebox_override("panel", sb)
-	glow.position     = Vector2(-3, -3)
-	glow.size         = Vector2(146, 206)
+func _create_glow_rect() -> void:
+	const PAD   := 12.0  # 카드 외곽 글로우 링 두께
+	const INSET := 6.0   # 카드 내부로 밀어 넣어 뾰족한 코어를 가림 (프레임 코너 반경 ≈ 6px)
+	const W := 140.0 + PAD * 2.0
+	const H := 200.0 + PAD * 2.0
+	var glow := ColorRect.new()
+	var mat := ShaderMaterial.new()
+	mat.shader = SacredTheme._get_card_glow_shader()
+	mat.set_shader_parameter("opacity", 0.0)
+	mat.set_shader_parameter("radius", 0.0)
+	mat.set_shader_parameter("edge_uv", Vector2((PAD + INSET) / W, (PAD + INSET) / H))
+	mat.set_shader_parameter("glow_color", Vector4(_glow_color.r, _glow_color.g, _glow_color.b, 1.0))
+	glow.material = mat
+	glow.position = Vector2(-PAD, -PAD)
+	glow.size = Vector2(W, H)
 	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	glow.modulate     = Color(1, 1, 1, 0)
 	add_child(glow)
 	move_child(glow, 0)
-	_glow_panel = glow
+	_glow_rect = glow
+	_glow_mat = mat
 
 func show_glow() -> void:
-	if _glow_panel:
-		_glow_panel.modulate = Color(1, 1, 1, 1)
+	if _glow_mat:
+		_glow_mat.set_shader_parameter("opacity", 1.0)
+		_glow_mat.set_shader_parameter("radius", 1.0)
 
 func hide_glow() -> void:
-	if _glow_panel:
-		_glow_panel.modulate = Color(1, 1, 1, 0)
+	if _glow_mat:
+		_glow_mat.set_shader_parameter("opacity", 0.0)
+		_glow_mat.set_shader_parameter("radius", 0.0)
 
 func set_glow_color(color: Color) -> void:
-	if not _glow_panel:
-		return
-	var sb := _glow_panel.get_theme_stylebox("panel") as StyleBoxFlat
-	if sb:
-		sb.shadow_color = Color(color.r, color.g, color.b, sb.shadow_color.a)
+	_glow_color = color
+	if _glow_mat:
+		_glow_mat.set_shader_parameter("glow_color", Vector4(color.r, color.g, color.b, 1.0))
 
 func tween_glow(alpha: float, duration: float) -> void:
-	if not _glow_panel:
+	if not _glow_mat:
 		return
 	if _glow_tween and _glow_tween.is_valid():
 		_glow_tween.kill()
-	_glow_tween = create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	_glow_tween.tween_property(_glow_panel, "modulate:a", alpha, duration)
+	var entering := alpha > 0.0
+	_glow_tween = SacredTheme.tween_glow_material(self, _glow_mat, alpha, 1.0 if entering else 0.0, duration, not entering)
 
 func setup(card: Resource, mode: int) -> void:
 	_card = card
@@ -164,8 +169,7 @@ func _gui_input(event: InputEvent) -> void:
 			card_drag_moved.emit(_card, get_global_mouse_position())
 
 func _on_mouse_entered() -> void:
-	if not _disabled:
-		card_hovered.emit(_card)
+	card_hovered.emit(_card)
 
 func _on_mouse_exited() -> void:
 	card_unhovered.emit(_card)

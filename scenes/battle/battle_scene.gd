@@ -68,13 +68,8 @@ var _debug_grid_visible: bool = false
 var _debug_grid_nodes: Array = []
 var _debug_token_hero_idx: int = 0
 
-var _deck_viewer:       CanvasLayer     = null
-var _deck_group:        Control         = null
-var _deck_overlay:      Control         = null
-var _deck_card_tweens:  Dictionary      = {}
-var _deck_card_parents: Dictionary      = {}
-var _card_scroll_map:   Dictionary      = {}
-var _active_scroll:     ScrollContainer = null
+var _deck_viewer: CanvasLayer = null
+var _deck_group:  Control     = null
 
 
 const STATUS_EMOJI := {
@@ -1741,15 +1736,6 @@ func _refresh_synergy_hud() -> void:
 	_refresh_hud()
 
 func _input(event: InputEvent) -> void:
-	if _active_scroll != null and event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			_active_scroll.scroll_vertical -= 40
-			get_viewport().set_input_as_handled()
-			return
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			_active_scroll.scroll_vertical += 40
-			get_viewport().set_input_as_handled()
-			return
 	# 패배 화면 입력 대기 → 메인메뉴
 	if _defeat_awaiting_input:
 		var accepted := false
@@ -1793,7 +1779,6 @@ func _show_deck_viewer_in_battle() -> void:
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	canvas.add_child(overlay)
-	_deck_overlay = overlay
 
 	var bg_rect := ColorRect.new()
 	bg_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1936,8 +1921,9 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.vertical_scroll_mode   = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	scroll.vertical_scroll_mode   = ScrollContainer.SCROLL_MODE_AUTO
 	clip_box.add_child(scroll)
+	SacredTheme.style_sacred_scrollbar(scroll)
 
 	var grid := GridContainer.new()
 	grid.columns = 2
@@ -1953,12 +1939,12 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		grid.add_child(empty_lbl)
 		return
 
-	# 컬럼 너비 추정: 패널 1300, 마진 48, HBox sep 8×4, 구분선 2×2 → 각 컬럼 ≈ 405px
-	# 카드 2장 + h_sep 10 = 405 → 각 카드 197px
 	var card_w := 197.0
 	var card_scale := card_w / 140.0
 	var card_h := 200.0 * card_scale
 	var base_scale := Vector2(card_scale, card_scale)
+	# pivot(70,200) 기준 스케일로 비주얼이 래퍼 좌·상단 밖으로 밀리는 만큼 보정
+	var base_pos := Vector2(70.0 * (card_scale - 1.0), 200.0 * (card_scale - 1.0))
 
 	for card_res in cards:
 		var wrapper := Control.new()
@@ -1967,62 +1953,14 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		grid.add_child(wrapper)
 
 		var card_node: CardScene = CARD_SCENE.instantiate()
-		card_node.position     = Vector2(0.0, 0.0)
+		card_node.position     = base_pos
 		card_node.pivot_offset = Vector2(70.0, 200.0)
 		card_node.scale        = base_scale
-		card_node.set_meta("_base_scale", base_scale)
-		card_node.set_meta("_base_pos",   Vector2(0.0, 0.0))
 		card_node.setup(card_res, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 
-		var captured_node: CardScene = card_node
-		card_node.card_hovered.connect(func(_c): _show_deck_card_hover(captured_node))
-		card_node.card_unhovered.connect(func(_c): _clear_deck_card_hover(captured_node))
-		_card_scroll_map[card_node] = scroll
-
-func _show_deck_card_hover(node: CardScene) -> void:
-	if node in _deck_card_tweens:
-		_deck_card_tweens[node].kill()
-	_active_scroll = _card_scroll_map.get(node, null)
-	if _deck_overlay and node.get_parent() != _deck_overlay:
-		_deck_card_parents[node] = node.get_parent()
-		node.reparent(_deck_overlay, true)
-	node.z_index = 50
-	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
-	_deck_card_tweens[node] = tw
-
-func _clear_deck_card_hover(node: CardScene) -> void:
-	if node in _deck_card_tweens:
-		_deck_card_tweens[node].kill()
-	var base_scale: Vector2 = node.get_meta("_base_scale", Vector2(0.975, 0.975))
-	var base_pos: Vector2   = node.get_meta("_base_pos",   Vector2(-1.75, -5.0))
-	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", base_scale, 0.16)
-	tw.tween_callback(func():
-		if not is_instance_valid(node):
-			return
-		node.z_index = 0
-		if node in _deck_card_parents:
-			var orig: Node = _deck_card_parents[node]
-			_deck_card_parents.erase(node)
-			if is_instance_valid(orig):
-				node.reparent(orig, false)
-				node.position = base_pos
-				node.scale    = base_scale
-	)
-	_deck_card_tweens[node] = tw
-
 func _close_deck_viewer() -> void:
 	if _deck_viewer != null:
-		for tw in _deck_card_tweens.values():
-			if tw.is_valid():
-				tw.kill()
-		_deck_card_tweens.clear()
-		_deck_card_parents.clear()
-		_card_scroll_map.clear()
-		_active_scroll = null
-		_deck_overlay  = null
 		var viewer := _deck_viewer
 		var group  := _deck_group
 		_deck_viewer = null
@@ -2166,6 +2104,8 @@ func _make_border_rects(x: int, y: int, w: int, h: int, color: Color) -> Array:
 
 func _card_target_type(card: Resource) -> String:
 	# "enemy" / "ally" / "none"
+	if card.card_type == CardResource.CardType.POWER:
+		return "none"
 	for effect in card.effects:
 		match effect.effect_type:
 			EffectRes.EffectType.DAMAGE:

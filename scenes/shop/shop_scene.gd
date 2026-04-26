@@ -622,12 +622,20 @@ func _show_remove_panel(price: int) -> void:
 	scroll.clip_contents = true
 	clip_box.add_child(scroll)
 	_remove_scroll = scroll
+	SacredTheme.style_sacred_scrollbar(scroll)
+
+	var margin_c := MarginContainer.new()
+	margin_c.add_theme_constant_override("margin_left", 12)
+	margin_c.add_theme_constant_override("margin_top", 12)
+	margin_c.add_theme_constant_override("margin_right", 12)
+	margin_c.add_theme_constant_override("margin_bottom", 12)
+	scroll.add_child(margin_c)
 
 	var grid := GridContainer.new()
 	grid.columns = 8
 	grid.add_theme_constant_override("h_separation", 10)
 	grid.add_theme_constant_override("v_separation", 10)
-	scroll.add_child(grid)
+	margin_c.add_child(grid)
 
 	for card in full_deck:
 		var captured_card: Resource = card
@@ -862,12 +870,20 @@ func _show_upgrade_panel(price: int) -> void:
 	scroll.clip_contents = true
 	clip_box.add_child(scroll)
 	_upgrade_scroll = scroll
+	SacredTheme.style_sacred_scrollbar(scroll)
+
+	var margin_c := MarginContainer.new()
+	margin_c.add_theme_constant_override("margin_left", 12)
+	margin_c.add_theme_constant_override("margin_top", 12)
+	margin_c.add_theme_constant_override("margin_right", 12)
+	margin_c.add_theme_constant_override("margin_bottom", 12)
+	scroll.add_child(margin_c)
 
 	var grid := GridContainer.new()
 	grid.columns = 8
 	grid.add_theme_constant_override("h_separation", 10)
 	grid.add_theme_constant_override("v_separation", 10)
-	scroll.add_child(grid)
+	margin_c.add_child(grid)
 
 	for card in upgradeable:
 		var captured_card: Resource = card

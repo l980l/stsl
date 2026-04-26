@@ -368,6 +368,7 @@ func _show_deck_viewer() -> void:
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	clip_box.add_child(scroll)
 	_deck_scroll = scroll
+	SacredTheme.style_sacred_scrollbar(scroll)
 
 	var grid := GridContainer.new()
 	grid.columns = 8

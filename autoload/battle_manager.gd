@@ -58,6 +58,8 @@ signal active_powers_changed()
 signal enemy_counter_changed(enemy_index: int)
 
 func setup_battle(enemies: Array) -> void:
+	if deck_mgr != null:
+		deck_mgr.consolidate_for_battle()
 	_enemies = enemies.duplicate()
 	_enemy_hp.clear()
 	_enemy_alive.clear()
