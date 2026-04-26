@@ -2103,6 +2103,8 @@ func _make_border_rects(x: int, y: int, w: int, h: int, color: Color) -> Array:
 
 func _card_target_type(card: Resource) -> String:
 	# "enemy" / "ally" / "none"
+	if card.card_type == CardResource.CardType.POWER:
+		return "none"
 	for effect in card.effects:
 		match effect.effect_type:
 			EffectRes.EffectType.DAMAGE:
