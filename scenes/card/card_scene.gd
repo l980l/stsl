@@ -164,8 +164,7 @@ func _gui_input(event: InputEvent) -> void:
 			card_drag_moved.emit(_card, get_global_mouse_position())
 
 func _on_mouse_entered() -> void:
-	if not _disabled:
-		card_hovered.emit(_card)
+	card_hovered.emit(_card)
 
 func _on_mouse_exited() -> void:
 	card_unhovered.emit(_card)

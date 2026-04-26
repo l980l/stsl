@@ -67,6 +67,9 @@ func display_text() -> String:
 		EffectType.APPLY_STATUS:
 			if status_type == "poison":
 				return TranslationServer.translate("effect.apply_status_poison.text") % [tr("status.poison.name"), value * 10]
+			if status_type.begins_with("power."):
+				var fmt: String = TranslationServer.translate(status_type + ".label")
+				return fmt % value if fmt.contains("%") else fmt
 			var st_key: String = _STATUS_NAME_KEYS.get(status_type, "")
 			var st_name: String = tr(st_key) if st_key else status_type
 			return "%s %d" % [st_name, value]
