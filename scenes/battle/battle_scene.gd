@@ -42,6 +42,9 @@ var _end_turn_btn: Button
 var _message_label: Label
 var _relic_container: FlowContainer
 var _selected_card: Resource = null
+var _lose_played: bool = false
+var _defeat_layer: CanvasLayer = null
+var _defeat_awaiting_input: bool = false
 
 var _drag_card: Resource = null
 var _drag_no_chevron: bool = false
@@ -285,8 +288,8 @@ func _build_ui() -> void:
 	_refresh_hud()
 
 	_active_powers_box = VBoxContainer.new()
-	_active_powers_box.position = Vector2(20, 800)
-	_active_powers_box.custom_minimum_size = Vector2(300, 0)
+	_active_powers_box.position = Vector2(16, 858)
+	_active_powers_box.custom_minimum_size = Vector2(200, 0)
 	_active_powers_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_active_powers_box)
 
@@ -1219,6 +1222,40 @@ func _open_enemy_hp_dialog(index: int) -> void:
 	spin.get_line_edit().grab_focus()
 	spin.get_line_edit().select_all()
 
+func _open_hero_slot_hp_dialog(hero_id: String) -> void:
+	var cur_hp: int = TeamManager.get_current_hp(hero_id)
+	var hero_res = TeamManager.get_hero(hero_id)
+	var max_hp: int = hero_res.max_hp if hero_res else 9999
+	var hero_name: String = tr(hero_res.hero_name) if hero_res else hero_id
+	var dlg := AcceptDialog.new()
+	dlg.title = "%s HP 설정 (현재: %d / %d)" % [hero_name, cur_hp, max_hp]
+	dlg.add_cancel_button("취소")
+	var spin := SpinBox.new()
+	spin.min_value = 0
+	spin.max_value = max_hp
+	spin.value = cur_hp
+	spin.step = 1
+	dlg.add_child(spin)
+	dlg.min_size = Vector2i(340, 100)
+	dlg.confirmed.connect(func():
+		var val: int = int(spin.value)
+		if val <= 0:
+			if TeamManager.is_alive(hero_id):
+				TeamManager.take_damage(hero_id, TeamManager.get_current_hp(hero_id))
+		elif not TeamManager.is_alive(hero_id):
+			TeamManager.revive(hero_id, val)
+		else:
+			TeamManager._hero_hp[hero_id] = val
+			TeamManager.hero_healed.emit(hero_id, 0)
+		_message_label.text = "[DEBUG] %s HP → %d" % [hero_name, val]
+		dlg.queue_free()
+	)
+	dlg.canceled.connect(func(): dlg.queue_free())
+	add_child(dlg)
+	dlg.popup_centered()
+	spin.get_line_edit().grab_focus()
+	spin.get_line_edit().select_all()
+
 func _on_end_turn_pressed() -> void:
 	_selected_card = null
 	_message_label.text = ""
@@ -1374,11 +1411,25 @@ func _on_enemy_died(index: int) -> void:
 
 func _on_hero_died(hero_id: String) -> void:
 	_update_hero_ui(hero_id)
+	# 패널 흰 섬광 → 회색 페이드
+	for entry in _hero_nodes:
+		if entry["hero_id"] != hero_id:
+			continue
+		var panel: ColorRect = entry["panel"]
+		panel.modulate = Color(1.5, 1.5, 1.5)
+		var tw := panel.create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		tw.tween_property(panel, "modulate", Color(0.4, 0.4, 0.4), 0.5)
+		break
+	# 스프라이트: death 애니메이션 없으면 코드 페이드아웃
 	var char_node = _hero_char_nodes.get(hero_id)
-	if char_node and char_node.has_node("AnimationPlayer"):
-		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-		if ap.has_animation("death"):
-			ap.play("death")
+	if char_node:
+		if char_node.has_node("AnimationPlayer"):
+			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+			if ap.has_animation("death"):
+				ap.play("death")
+				return
+		var tw2: Tween = char_node.create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+		tw2.tween_property(char_node, "modulate:a", 0.0, 0.6)
 
 func _on_hero_revived(hero_id: String) -> void:
 	# 해당 영웅 슬롯을 다시 표시하고 HP/상태 갱신
@@ -1413,12 +1464,87 @@ func _on_battle_won() -> void:
 	GameManager.complete_battle(true)
 
 func _on_battle_lost() -> void:
-	_message_label.text = tr("battle.msg_defeat")
+	if _lose_played:
+		return
+	_lose_played = true
 	_end_turn_btn.disabled = true
 	_selected_card = null
 	for entry in _enemy_nodes:
 		entry["btn"].disabled = true
-	GameManager.complete_battle(false)
+	# 영웅 사망 트윈이 보이도록 대기
+	await get_tree().create_tween().tween_interval(0.6).finished
+	# 화면 어두워지기 + 패배 라벨 페이드인
+	await _play_defeat_overlay()
+	# 라벨 잠시 머무름
+	await get_tree().create_tween().tween_interval(0.6).finished
+	# 세이브·상태 정리 (씬 전환 제외)
+	GameManager.pending_enemies.clear()
+	GameManager.run_won = false
+	GameManager.run_ended.emit(false)
+	var sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
+	if sm:
+		sm.clear_save()
+	GameManager.change_state(GameManager.GameState.GAME_OVER)
+	# 힌트 라벨 추가 후 입력 대기
+	_show_defeat_continue_hint()
+	_defeat_awaiting_input = true
+
+func _play_defeat_overlay() -> Signal:
+	var layer := CanvasLayer.new()
+	layer.layer = 100
+	layer.name = "_DefeatOverlay"
+	add_child(layer)
+	_defeat_layer = layer
+
+	var dim := ColorRect.new()
+	dim.color = Color(0.0, 0.0, 0.0, 0.0)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	layer.add_child(dim)
+
+	var lbl := Label.new()
+	lbl.text = tr("battle.msg_defeat")
+	lbl.theme_type_variation = "TitleLabel"
+	lbl.add_theme_font_size_override("font_size", 72)
+	lbl.add_theme_color_override("font_color", SacredPalette.BLOOD_300)
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	lbl.offset_left  = -400.0
+	lbl.offset_right =  400.0
+	lbl.offset_top   =  -60.0
+	lbl.offset_bottom =  60.0
+	lbl.modulate.a = 0.0
+	lbl.scale = Vector2(1.2, 1.2)
+	layer.add_child(lbl)
+
+	var tw := layer.create_tween().set_parallel(true)
+	tw.tween_property(dim, "color:a", 0.65, 0.6)
+	tw.tween_property(lbl, "modulate:a", 1.0, 0.5).set_delay(0.2)
+	tw.tween_property(lbl, "scale", Vector2(1.0, 1.0), 0.5) \
+		.set_delay(0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	return tw.finished
+
+func _show_defeat_continue_hint() -> void:
+	if not is_instance_valid(_defeat_layer):
+		return
+	var hint := Label.new()
+	hint.text = tr("ui.defeat.continue_hint")
+	hint.add_theme_font_size_override("font_size", 20)
+	hint.add_theme_color_override("font_color", Color(0.75, 0.75, 0.75))
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	hint.offset_left  = -300.0
+	hint.offset_right =  300.0
+	hint.offset_top   =   60.0
+	hint.offset_bottom = 100.0
+	hint.modulate.a = 0.0
+	_defeat_layer.add_child(hint)
+	hint.create_tween().tween_property(hint, "modulate:a", 0.7, 0.6)
+
+func _go_to_main_menu() -> void:
+	_defeat_awaiting_input = false
+	get_tree().change_scene_to_file("res://scenes/main_menu/main_menu_scene.tscn")
 
 # ─────────────────────────────────────────────
 # 카드 효과 텍스트 헬퍼
@@ -1544,18 +1670,40 @@ func _on_active_powers_changed() -> void:
 	for power_key in powers:
 		var power: Dictionary = powers[power_key]
 		var base_key: String = power_key.split(":")[0] if ":" in power_key else power_key
-		var label_key: String = base_key + ".label"
 		var v: int = power.get("value", 0)
-		var lbl := Label.new()
-		var fmt: String = tr(label_key)
-		lbl.text = fmt % v if fmt.contains("%") else fmt
-		lbl.add_theme_font_size_override("font_size", 14)
-		lbl.modulate = Color(0.7, 0.4, 0.9)
-		lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-		var desc_fmt: String = tr(base_key + ".desc")
-		if desc_fmt != base_key + ".desc":
-			lbl.tooltip_text = desc_fmt % v if desc_fmt.contains("%d") else desc_fmt
-		_active_powers_box.add_child(lbl)
+		_active_powers_box.add_child(_make_power_item(base_key, v))
+
+func _make_power_item(base_key: String, v: int) -> Control:
+	var hbox := HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 4)
+	hbox.custom_minimum_size = Vector2(0, 24)
+	hbox.mouse_filter = Control.MOUSE_FILTER_STOP
+	var desc_fmt: String = tr(base_key + ".desc")
+	if desc_fmt != base_key + ".desc":
+		hbox.tooltip_text = desc_fmt % v if desc_fmt.contains("%d") else desc_fmt
+
+	var tex: Texture2D = IconUtils.get_power_icon(base_key)
+	if tex != null:
+		var icon := TextureRect.new()
+		icon.texture = tex
+		icon.custom_minimum_size = Vector2(22, 22)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		hbox.add_child(icon)
+
+	var lbl := Label.new()
+	var label_fmt: String = tr(base_key + ".label")
+	lbl.text = label_fmt % v if label_fmt.contains("%") else label_fmt
+	lbl.theme_type_variation = "EyebrowLabel"
+	lbl.add_theme_font_size_override("font_size", 11)
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	lbl.modulate = Color(0.75, 0.45, 1.0)
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hbox.add_child(lbl)
+	return hbox
 
 func _on_status_applied(target: String, status_type: String, _stacks: int) -> void:
 	if target.begins_with("enemy_"):
@@ -1602,6 +1750,29 @@ func _input(event: InputEvent) -> void:
 			_active_scroll.scroll_vertical += 40
 			get_viewport().set_input_as_handled()
 			return
+	# 패배 화면 입력 대기 → 메인메뉴
+	if _defeat_awaiting_input:
+		var accepted := false
+		if event is InputEventMouseButton and event.pressed:
+			accepted = true
+		elif event is InputEventKey and event.pressed and not event.echo:
+			accepted = true
+		if accepted:
+			get_viewport().set_input_as_handled()
+			_go_to_main_menu()
+			return
+	# [DEBUG] 히어로 패널 클릭 → HP 설정
+	if _debug_hp_target_mode and OS.is_debug_build() \
+			and event is InputEventMouseButton \
+			and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		for entry in _hero_nodes:
+			var panel: ColorRect = entry["panel"]
+			if panel.get_global_rect().has_point(event.global_position):
+				_debug_hp_target_mode = false
+				_message_label.text = ""
+				_open_hero_slot_hp_dialog(entry["hero_id"])
+				get_viewport().set_input_as_handled()
+				return
 	# 드래그 처리는 card_scene 시그널(_on_card_drag_*)로 위임됨
 	if event is InputEventKey and event.keycode == KEY_ESCAPE and event.pressed:
 		if _deck_viewer != null:
@@ -1664,6 +1835,24 @@ func _show_deck_viewer_in_battle() -> void:
 	group.add_child(bracket_host)
 	SacredTheme.add_corner_brackets(bracket_host, SacredPalette.BRASS_700, 20, 8, 2)
 
+	var hl := TextureRect.new()
+	hl.texture = SacredTheme.make_top_fade_tex()
+	hl.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	hl.stretch_mode = TextureRect.STRETCH_SCALE
+	hl.position = Vector2(panel_x, panel_y)
+	hl.size = Vector2(_DECK_W, 80)
+	hl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hl)
+
+	var hdiv := TextureRect.new()
+	hdiv.texture = SacredTheme.make_center_bright_h_tex()
+	hdiv.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	hdiv.stretch_mode = TextureRect.STRETCH_SCALE
+	hdiv.position = Vector2(panel_x + 24, panel_y + 58)
+	hdiv.size = Vector2(_DECK_W - 48, 2)
+	hdiv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hdiv)
+
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 24)
 	margin.add_theme_constant_override("margin_right", 24)
@@ -1690,21 +1879,25 @@ func _show_deck_viewer_in_battle() -> void:
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_close_deck_viewer)
 	group.add_child(close_btn)
-	close_btn.position = Vector2(panel_x + _DECK_W - 56, panel_y + 20)
+	close_btn.position = Vector2(panel_x + _DECK_W - 56, panel_y + 16)
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
 	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", 16)
+	columns.add_theme_constant_override("separation", 8)
 	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vbox.add_child(columns)
 
 	var draw_cards := DeckManager.draw_pile.duplicate()
 	draw_cards.shuffle()
-	var discard_cards := DeckManager.discard_pile.duplicate()
+	var discard_cards  := DeckManager.discard_pile.duplicate()
+	var exhaust_cards  := DeckManager.exhaust_pile.duplicate()
 
-	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw") + " (%d)" % draw_cards.size(), draw_cards)
+	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw")    + " (%d)" % draw_cards.size(),    draw_cards)
+	_add_v_divider(columns)
 	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
+	_add_v_divider(columns)
+	_add_deck_column(columns, tr("ui.battle.deck_viewer.exhaust") + " (%d)" % exhaust_cards.size(), exhaust_cards)
 
 	_deck_group  = group
 	_deck_viewer = canvas
@@ -1712,6 +1905,16 @@ func _show_deck_viewer_in_battle() -> void:
 	tw.tween_property(group, "scale", Vector2.ONE, 0.15)
 	tw.parallel().tween_property(group, "modulate:a", 1.0, 0.15)
 
+
+func _add_v_divider(parent: HBoxContainer) -> void:
+	var div := TextureRect.new()
+	div.texture = SacredTheme.make_center_bright_v_tex()
+	div.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	div.stretch_mode = TextureRect.STRETCH_SCALE
+	div.custom_minimum_size = Vector2(2, 0)
+	div.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	div.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(div)
 
 func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> void:
 	var col := VBoxContainer.new()
@@ -1732,10 +1935,12 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode   = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	clip_box.add_child(scroll)
 
 	var grid := GridContainer.new()
-	grid.columns = 4
+	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 10)
 	grid.add_theme_constant_override("v_separation", 10)
 	scroll.add_child(grid)
@@ -1748,16 +1953,25 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		grid.add_child(empty_lbl)
 		return
 
+	# 컬럼 너비 추정: 패널 1300, 마진 48, HBox sep 8×4, 구분선 2×2 → 각 컬럼 ≈ 405px
+	# 카드 2장 + h_sep 10 = 405 → 각 카드 197px
+	var card_w := 197.0
+	var card_scale := card_w / 140.0
+	var card_h := 200.0 * card_scale
+	var base_scale := Vector2(card_scale, card_scale)
+
 	for card_res in cards:
 		var wrapper := Control.new()
-		wrapper.custom_minimum_size = Vector2(137, 195)
+		wrapper.custom_minimum_size = Vector2(card_w, card_h)
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
 		grid.add_child(wrapper)
 
 		var card_node: CardScene = CARD_SCENE.instantiate()
-		card_node.position     = Vector2(-1.75, -5.0)
+		card_node.position     = Vector2(0.0, 0.0)
 		card_node.pivot_offset = Vector2(70.0, 200.0)
-		card_node.scale        = Vector2(0.975, 0.975)
+		card_node.scale        = base_scale
+		card_node.set_meta("_base_scale", base_scale)
+		card_node.set_meta("_base_pos",   Vector2(0.0, 0.0))
 		card_node.setup(card_res, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 
@@ -1781,8 +1995,10 @@ func _show_deck_card_hover(node: CardScene) -> void:
 func _clear_deck_card_hover(node: CardScene) -> void:
 	if node in _deck_card_tweens:
 		_deck_card_tweens[node].kill()
+	var base_scale: Vector2 = node.get_meta("_base_scale", Vector2(0.975, 0.975))
+	var base_pos: Vector2   = node.get_meta("_base_pos",   Vector2(-1.75, -5.0))
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
+	tw.tween_property(node, "scale", base_scale, 0.16)
 	tw.tween_callback(func():
 		if not is_instance_valid(node):
 			return
@@ -1792,8 +2008,8 @@ func _clear_deck_card_hover(node: CardScene) -> void:
 			_deck_card_parents.erase(node)
 			if is_instance_valid(orig):
 				node.reparent(orig, false)
-				node.position = Vector2(-1.75, -5.0)
-				node.scale    = Vector2(0.975, 0.975)
+				node.position = base_pos
+				node.scale    = base_scale
 	)
 	_deck_card_tweens[node] = tw
 
@@ -1835,7 +2051,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		elif event.keycode == KEY_H and event.shift_pressed:
 			_debug_hp_target_mode = not _debug_hp_target_mode
 			if _debug_hp_target_mode:
-				_message_label.text = "[DEBUG] 적을 클릭해 HP를 설정하세요 (다시 Shift+H 취소)"
+				_message_label.text = "[DEBUG] 적 또는 영웅 슬롯을 클릭해 HP를 설정하세요 (다시 Shift+H 취소)"
 			else:
 				_message_label.text = ""
 		elif event.keycode == KEY_G and event.shift_pressed:

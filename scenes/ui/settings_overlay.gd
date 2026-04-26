@@ -68,7 +68,7 @@ func _ready() -> void:
 	SacredTheme.add_corner_brackets($Panel)
 
 	var panel_hl := TextureRect.new()
-	panel_hl.texture = _make_top_gradient_tex(0.18)
+	panel_hl.texture = SacredTheme.make_top_fade_tex()
 	panel_hl.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	panel_hl.stretch_mode = TextureRect.STRETCH_SCALE
 	panel_hl.set_anchors_preset(Control.PRESET_TOP_WIDE)
@@ -80,7 +80,7 @@ func _ready() -> void:
 	var panel := $Panel as Panel
 	var div_y := 68.0
 	var div_line := TextureRect.new()
-	div_line.texture = _make_h_center_gradient(0.75)
+	div_line.texture = SacredTheme.make_center_bright_h_tex()
 	div_line.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	div_line.stretch_mode = TextureRect.STRETCH_SCALE
 	div_line.offset_left   = 48.0
@@ -165,31 +165,6 @@ func _refresh_seg() -> void:
 		var btn: Button = _seg_buttons[k]
 		_apply_seg_style(btn, k == nearest_key)
 
-func _make_top_gradient_tex(top_alpha: float) -> GradientTexture2D:
-	var g := Gradient.new()
-	var c := SacredPalette.BRASS_300
-	g.set_color(0, Color(c.r, c.g, c.b, top_alpha))
-	g.set_color(1, Color(c.r, c.g, c.b, 0.0))
-	var tex := GradientTexture2D.new()
-	tex.gradient = g
-	tex.fill = GradientTexture2D.FILL_LINEAR
-	tex.fill_from = Vector2(0.5, 0.0)
-	tex.fill_to   = Vector2(0.5, 1.0)
-	return tex
-
-func _make_h_center_gradient(alpha: float) -> GradientTexture2D:
-	var g := Gradient.new()
-	var c := SacredPalette.BRASS_300
-	g.set_color(0, Color(c.r, c.g, c.b, 0.0))
-	g.set_color(1, Color(c.r, c.g, c.b, 0.0))
-	g.add_point(0.5, Color(c.r, c.g, c.b, alpha))
-	var tex := GradientTexture2D.new()
-	tex.gradient = g
-	tex.fill = GradientTexture2D.FILL_LINEAR
-	tex.fill_from = Vector2(0.0, 0.5)
-	tex.fill_to   = Vector2(1.0, 0.5)
-	return tex
-
 func _apply_seg_style(btn: Button, is_active: bool) -> void:
 	var hl: Node = btn.get_node_or_null("_hl")
 	if hl:
@@ -263,7 +238,7 @@ func _build_cursor_row() -> void:
 		# _hl은 미리 생성해 두고 visibility로 토글
 		var hl := TextureRect.new()
 		hl.name = "_hl"
-		hl.texture = _make_top_gradient_tex(0.30)
+		hl.texture = SacredTheme.make_top_fade_tex(SacredPalette.BRASS_300, 0.30)
 		hl.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		hl.stretch_mode = TextureRect.STRETCH_SCALE
 		hl.mouse_filter = Control.MOUSE_FILTER_IGNORE

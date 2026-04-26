@@ -86,6 +86,10 @@ func get_energy_icon() -> Texture2D:
 func get_counter_icon() -> Texture2D:
 	return _load("res://assets/art/ui/clock.svg")
 
+func get_power_icon(base_key: String) -> Texture2D:
+	var fname := base_key.replace(".", "_")
+	return _load(STATUS_DIR + fname + ".svg")
+
 func _strip(key: String) -> String:
 	var parts := key.split(".")
 	return parts[1] if parts.size() >= 2 else key

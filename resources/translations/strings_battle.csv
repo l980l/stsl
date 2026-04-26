@@ -26,3 +26,13 @@ battle.counter.tooltip.format,[%s] 카운터 %d회 달성 시: %s,[%s] On %d cou
 battle.drag_dead_ally,사망한 영웅,Dead Ally,Héros mort,Eroe morto,Héroe muerto,死亡した英雄,Νεκρός Ήρωας,已死亡英雄
 battle.cancel_use,사용 취소,Cancel Use,Annuler,Annulla,Cancelar,使用取消,Ακύρωση,取消使用
 battle.counter.label,%d/%d,%d/%d,%d/%d,%d/%d,%d/%d,%d/%d,%d/%d,%d/%d
+power.poison_per_turn.label,독 ×%d/턴,Poison ×%d/Turn,Poison ×%d/Tour,Veleno ×%d/Turno,Veneno ×%d/Turno,毒 ×%d/ターン,Δηλητήριο ×%d/Γύρο,毒 ×%d/回合
+power.poison_per_turn.desc,플레이어 턴 시작마다 모든 적에게 독 %d 적용,Apply %d Poison to all enemies each player turn,Applique %d Poison à tous les ennemis chaque tour,Applica %d Veleno a tutti i nemici ogni turno,Aplica %d Veneno a todos los enemigos cada turno,毎ターン全敵に毒 %d 適用,Εφαρμόζει %d Δηλητήριο σε όλους τους εχθρούς κάθε γύρο,每回合对所有敌人施加 %d 中毒
+power.block_per_turn.label,방어 +%d/턴,Block +%d/Turn,Bloc +%d/Tour,Blocco +%d/Turno,Bloqueo +%d/Turno,ブロック +%d/ターン,Μπλοκ +%d/Γύρο,格挡 +%d/回合
+power.block_per_turn.desc,플레이어 턴 시작마다 방어도 %d 획득,Gain %d Block at the start of each player turn,Gagnez %d Bloc au début de chaque tour du joueur,Ottieni %d Blocco all'inizio di ogni turno del giocatore,Obtén %d Bloqueo al inicio de cada turno del jugador,ターン開始時にブロック %d 獲得,Αποκτάτε %d Μπλοκ στην αρχή κάθε γύρου,每回合开始时获得 %d 格挡
+power.heal_team_per_turn.label,팀 치유 +%d/턴,Heal +%d/Turn,Soin +%d/Tour,Cura +%d/Turno,Curar +%d/Turno,チーム回復 +%d/ターン,Θεραπεία +%d/Γύρο,治疗 +%d/回合
+power.heal_team_per_turn.desc,플레이어 턴 시작마다 모든 영웅 %d HP 회복,Restore %d HP to all heroes each player turn,Restaure %d PV à tous les héros chaque tour,Restaura %d PV a tutti gli eroi ogni turno,Restaura %d PV a todos los héroes cada turno,毎ターン全英雄 %d HP 回復,Αποκαθιστά %d HP σε όλους τους ήρωες,每回合为所有英雄恢复 %d HP
+power.draw_per_turn.label,드로우 +%d/턴,Draw +%d/Turn,Piocher +%d/Tour,Pescare +%d/Turno,Robar +%d/Turno,ドロー +%d/ターン,Ανάληψη +%d/Γύρο,抽牌 +%d/回合
+power.draw_per_turn.desc,플레이어 턴 시작마다 카드 %d장 추가 드로우,Draw %d additional cards each player turn,Piochez %d cartes supplémentaires chaque tour,Pesca %d carte aggiuntive ogni turno,Roba %d cartas adicionales cada turno,毎ターン %d 枚追加ドロー,Ανασύρετε %d επιπλέον κάρτες κάθε γύρο,每回合额外抽 %d 张牌
+power.counter_per_attack.label,반격 %d%%,Counter %d%%,Contre %d%%,Contromossa %d%%,Contraataque %d%%,カウンター %d%%,Αντεπίθεση %d%%,反击 %d%%
+power.counter_per_attack.desc,공격받을 때 현재 방어도의 %d%%를 피해로 반사,Reflect %d%% of current Block as damage when attacked,Réfléchissez %d%% du Bloc actuel comme dégâts,Riflette il %d%% del Blocco attuale come danno,Refleja el %d%% del Bloqueo como daño al ser atacado,攻撃受け時に現在のブロックの %d%% を反射,Αντανακλά %d%% του Μπλοκ ως ζημιά,受攻击时将当前格挡的 %d%% 反射为伤害

@@ -312,6 +312,24 @@ func _show_deck_viewer() -> void:
 	group.add_child(panel_brackets)
 	SacredTheme.add_corner_brackets(panel_brackets)
 
+	var hl := TextureRect.new()
+	hl.texture = SacredTheme.make_top_fade_tex()
+	hl.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	hl.stretch_mode = TextureRect.STRETCH_SCALE
+	hl.position = panel.position
+	hl.size = Vector2(1300, 80)
+	hl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hl)
+
+	var hdiv := TextureRect.new()
+	hdiv.texture = SacredTheme.make_center_bright_h_tex()
+	hdiv.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	hdiv.stretch_mode = TextureRect.STRETCH_SCALE
+	hdiv.position = Vector2(panel.position.x + 20, panel.position.y + 62)
+	hdiv.size = Vector2(1300 - 40, 2)
+	hdiv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hdiv)
+
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 20)
 	margin.add_theme_constant_override("margin_right", 20)
@@ -338,7 +356,7 @@ func _show_deck_viewer() -> void:
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_deck_viewer)
 	group.add_child(close_btn)
-	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 700) / 2.0 + 20)
+	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 700) / 2.0 + 12)
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
