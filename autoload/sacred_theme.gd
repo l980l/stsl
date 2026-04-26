@@ -609,6 +609,13 @@ func style_sacred_scrollbar(scroll: ScrollContainer) -> void:
 	var vsb: VScrollBar = scroll.get_v_scroll_bar()
 	vsb.custom_minimum_size = Vector2(2, 0)
 
+	# 화살표 버튼 숨김 — 1×1 투명 텍스처로 대체해 버튼 영역 0px
+	var empty_img := Image.create(1, 1, false, Image.FORMAT_RGBA8)
+	empty_img.fill(Color(0, 0, 0, 0))
+	var empty_tex := ImageTexture.create_from_image(empty_img)
+	for icon_name: String in ["increment", "decrement", "increment_highlight", "decrement_highlight"]:
+		vsb.add_theme_icon_override(icon_name, empty_tex)
+
 	var track := StyleBoxFlat.new()
 	track.bg_color = SacredPalette.BRASS_700
 	track.set_content_margin_all(0)
@@ -619,7 +626,7 @@ func style_sacred_scrollbar(scroll: ScrollContainer) -> void:
 	var dh := 16
 	var expand := (dw - 2) / 2.0  # 6px 양쪽 확장으로 마름모를 트랙 중앙에 정렬
 
-	for state in ["grabber", "grabber_highlight", "grabber_pressed"]:
+	for state: String in ["grabber", "grabber_highlight", "grabber_pressed"]:
 		var bright: bool = state != "grabber"
 		var sbt := StyleBoxTexture.new()
 		sbt.texture = _make_diamond_tex(dw, dh, bright)
