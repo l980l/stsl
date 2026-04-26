@@ -1,7 +1,7 @@
 # autoload/debug_manager.gd
 extends Node
 
-const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 승리\n[Shift+I]  무적 토글 (영웅 피해 차단)\n[Shift+E]  무한 코스트 토글\n[Shift+D]  카드 1장 드로우\n[Shift+H]  적 HP 설정 → 적 클릭\n[Shift+G]  그리드 토글\n[Shift+O]  더미 몬스터 추가\n[Shift+S]  더미 소환수 추가 (1번 영웅)\n── 전체 공통 ──\n[Shift+T]  번역 키 표시 토글\n[Shift+B]  영웅 HP 조정\n[Shift+W]  현재 챕터 즉시 클리어\n[Shift+F]  현재 Act 클리어 → 다음 Act 진입\n[Shift+P]  파티에 영웅 추가\n[Shift+A]  카드 추가 창\n[Shift+R]  덱 편집기 (카드 제거)\n[Shift+U]  카드 강화\n[Shift+N]  영웅 즉시 해금 창\n[Shift+L]  렐릭 추가 창\n[Shift+X]  렐릭 제거 창\n[Shift+C]  목록 고정/해제\n── 씬 이동 ──\n[Shift+M]  몬스터 선택 전투\n[Shift+V]  이벤트 씬 입장\n[Space+S]  상점 즉시 입장\n[Space+G]  골드 추가 창\n[Space+L]  레이블 렉트 표시 토글\n[Space+R]  휴식 씬 입장\n[Space+P]  프레임 스파이크 프로파일러 토글"
+const _SHORTCUT_TEXT = "── 전투 전용 ──\n[Shift+Q]  전투 즉시 승리\n[Shift+I]  무적 토글 (영웅 피해 차단)\n[Shift+E]  무한 코스트 토글\n[Shift+D]  카드 1장 드로우\n[Shift+H]  적 HP 설정 → 적 클릭\n[Shift+G]  그리드 토글\n[Shift+O]  더미 몬스터 추가\n[Shift+S]  더미 소환수 추가 (1번 영웅)\n── 전체 공통 ──\n[Shift+T]  번역 키 표시 토글\n[Shift+B]  영웅 HP 조정\n[Shift+W]  현재 챕터 즉시 클리어\n[Shift+F]  현재 Act 클리어 → 다음 Act 진입\n[Shift+P]  파티에 영웅 추가\n[Shift+A]  카드 추가 창\n[Shift+R]  덱 편집기 (카드 제거)\n[Shift+U]  카드 강화\n[Shift+N]  영웅 즉시 해금 창\n[Shift+L]  렐릭 추가 창\n[Shift+X]  렐릭 제거 창\n[Shift+C]  목록 고정/해제\n── 씬 이동 ──\n[Shift+M]  몬스터 선택 전투\n[Shift+V]  이벤트 씬 입장\n[Space+S]  상점 즉시 입장\n[Space+G]  골드 추가 창\n[Space+L]  레이블 렉트 표시 토글\n[Space+B]  버튼 렉트 표시 토글\n[Space+R]  휴식 씬 입장\n[Space+P]  프레임 스파이크 프로파일러 토글"
 
 var _pinned_label: Label = null
 var _hover_lbl: Label = null
@@ -10,6 +10,8 @@ var _saved_translations: Array = []
 var _space_held: bool = false
 var _label_rect_layer: CanvasLayer = null
 var _label_rects_active: bool = false
+var _button_rect_layer: CanvasLayer = null
+var _button_rects_active: bool = false
 
 const _SPIKE_BUFFER_FRAMES: int = 60
 const _SPIKE_THRESHOLD_MS: float = 33.3
@@ -94,6 +96,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				return
 			KEY_L:
 				_toggle_label_rects()
+				return
+			KEY_B:
+				_toggle_button_rects()
 				return
 			KEY_R:
 				GameManager._request_scene("res://scenes/rest/rest_scene.tscn")
@@ -639,6 +644,50 @@ func _toggle_label_rects() -> void:
 	_label_rect_layer.layer = 99
 	add_child(_label_rect_layer)
 	_collect_label_rects(get_tree().root, _label_rect_layer)
+
+func _toggle_button_rects() -> void:
+	_button_rects_active = not _button_rects_active
+	if _button_rect_layer:
+		_button_rect_layer.queue_free()
+		_button_rect_layer = null
+	if not _button_rects_active:
+		return
+	_button_rect_layer = CanvasLayer.new()
+	_button_rect_layer.layer = 99
+	add_child(_button_rect_layer)
+	_collect_button_rects(get_tree().root, _button_rect_layer)
+
+func _collect_button_rects(node: Node, layer: CanvasLayer) -> void:
+	if node == self:
+		return
+	if node is BaseButton:
+		var rect: Rect2 = (node as BaseButton).get_global_rect()
+		var p := rect.position
+		var s := rect.size
+		var fill := ColorRect.new()
+		fill.position = p
+		fill.size = s
+		fill.color = Color(0.2, 0.8, 1.0, 0.06)
+		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		layer.add_child(fill)
+		var border := Line2D.new()
+		border.add_point(p)
+		border.add_point(p + Vector2(s.x, 0.0))
+		border.add_point(p + s)
+		border.add_point(p + Vector2(0.0, s.y))
+		border.add_point(p)
+		border.width = 1.0
+		border.default_color = Color(0.2, 0.8, 1.0, 0.9)
+		layer.add_child(border)
+		var info := Label.new()
+		info.text = "(%.0f, %.0f)  %.0f×%.0f" % [p.x, p.y, s.x, s.y]
+		info.position = Vector2(p.x, p.y - 14.0)
+		info.add_theme_font_size_override("font_size", 10)
+		info.add_theme_color_override("font_color", Color(0.2, 0.8, 1.0))
+		info.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		layer.add_child(info)
+	for child in node.get_children():
+		_collect_button_rects(child, layer)
 
 func _collect_label_rects(node: Node, layer: CanvasLayer) -> void:
 	if node == self:
