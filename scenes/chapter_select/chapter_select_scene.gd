@@ -206,28 +206,37 @@ func _make_chapter_card(chapter: Dictionary, idx: int) -> void:
 	card.add_child(eyebrow)
 
 	# ── 챕터 이름 ──
+	var name_box := Control.new()
+	name_box.position = Vector2(20, 340)
+	name_box.size = Vector2(card_w - 40, 60)
+	name_box.clip_contents = true
+	name_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(name_box)
 	var name_lbl := Label.new()
 	name_lbl.theme_type_variation = "TitleLabel"
 	name_lbl.add_theme_font_size_override("font_size", 26)
 	name_lbl.text = tr(chapter["name_key"])
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_lbl.clip_text = true
-	name_lbl.position = Vector2(20, 340)
-	name_lbl.size = Vector2(card_w - 40, 60)
 	name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(name_lbl)
+	name_box.add_child(name_lbl)
+	name_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	LabelUtils.fit_text(name_lbl, 26, 14)
 
 	# ── 설명 ──
+	var desc_box := Control.new()
+	desc_box.position = Vector2(20, 408)
+	desc_box.size = Vector2(card_w - 40, 90)
+	desc_box.clip_contents = true
+	desc_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(desc_box)
 	var desc_lbl := Label.new()
 	desc_lbl.theme_type_variation = "SubLabel"
 	desc_lbl.text = tr(chapter["desc_key"])
 	desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	desc_lbl.clip_contents = true
-	desc_lbl.position = Vector2(20, 408)
-	desc_lbl.size = Vector2(card_w - 40, 90)
+	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
 	desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(desc_lbl)
+	desc_box.add_child(desc_lbl)
+	desc_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	LabelUtils.fit_text(desc_lbl, 13, 10)
 
 	# ── 잠금 힌트 ──

@@ -19,6 +19,7 @@ var _relic_container: FlowContainer
 var _map_scroll:        ScrollContainer = null
 var _map_content:       Control         = null
 var _deck_viewer:       CanvasLayer     = null
+var _deck_group:        Control         = null
 var _deck_overlay:      Control         = null
 var _deck_scroll:       ScrollContainer = null
 var _deck_card_tweens:  Dictionary      = {}
@@ -289,17 +290,26 @@ func _show_deck_viewer() -> void:
 	)
 	overlay.add_child(bg_rect)
 
+	var group := Control.new()
+	group.set_anchors_preset(Control.PRESET_FULL_RECT)
+	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.pivot_offset = Vector2(960, 540)
+	group.scale = Vector2(0.9, 0.9)
+	group.modulate.a = 0.0
+	overlay.add_child(group)
+	_deck_group = group
+
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(1300, 700)
 	panel.position = Vector2((1920 - 1300) / 2.0, (1080 - 700) / 2.0)
-	overlay.add_child(panel)
+	group.add_child(panel)
 
 	# PanelContainer는 자식 레이아웃을 강제하므로 브라켓을 sibling Control에 배치
 	var panel_brackets := Control.new()
 	panel_brackets.position = panel.position
 	panel_brackets.size = Vector2(1300, 700)
 	panel_brackets.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	overlay.add_child(panel_brackets)
+	group.add_child(panel_brackets)
 	SacredTheme.add_corner_brackets(panel_brackets)
 
 	var margin := MarginContainer.new()
@@ -327,7 +337,7 @@ func _show_deck_viewer() -> void:
 	close_btn.add_theme_font_size_override("font_size", 20)
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_deck_viewer)
-	overlay.add_child(close_btn)
+	group.add_child(close_btn)
 	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 700) / 2.0 + 20)
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
@@ -365,6 +375,9 @@ func _show_deck_viewer() -> void:
 		card_node.card_unhovered.connect(func(_c): _clear_deck_card_hover(captured_node))
 
 	_deck_viewer = canvas
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(group, "scale", Vector2.ONE, 0.15)
+	tw.parallel().tween_property(group, "modulate:a", 1.0, 0.15)
 
 func _show_deck_card_hover(node: CardScene) -> void:
 	if node in _deck_card_tweens:
@@ -404,5 +417,14 @@ func _hide_deck_viewer() -> void:
 		_active_scroll = null
 		_deck_scroll   = null
 		_deck_overlay  = null
-		_deck_viewer.queue_free()
+		var viewer := _deck_viewer
+		var group  := _deck_group
 		_deck_viewer = null
+		_deck_group  = null
+		if is_instance_valid(group):
+			var tw := create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+			tw.tween_property(group, "scale", Vector2(0.9, 0.9), 0.12)
+			tw.parallel().tween_property(group, "modulate:a", 0.0, 0.12)
+			tw.tween_callback(func(): if is_instance_valid(viewer): viewer.queue_free())
+		else:
+			if is_instance_valid(viewer): viewer.queue_free()

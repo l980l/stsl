@@ -663,7 +663,8 @@ func _collect_label_rects(node: Node, layer: CanvasLayer) -> void:
 		border.default_color = Color(1.0, 1.0, 0.0, 0.9)
 		layer.add_child(border)
 		var info := Label.new()
-		info.text = "(%.0f, %.0f)  %.0f×%.0f" % [p.x, p.y, s.x, s.y]
+		var fs: int = (node as Label).get_theme_font_size("font_size")
+		info.text = "(%.0f, %.0f)  %.0f×%.0f  fs=%d" % [p.x, p.y, s.x, s.y, fs]
 		info.position = Vector2(p.x, p.y - 14.0)
 		info.add_theme_font_size_override("font_size", 10)
 		info.add_theme_color_override("font_color", Color(1.0, 1.0, 0.0))

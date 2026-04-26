@@ -27,6 +27,10 @@ var _cached_halo_shader: Shader = null
 var _cached_line_shader: Shader = null
 var _cached_btn_glow_shader: Shader = null
 var _country_font_cache: Dictionary = {}
+var _cursor_base_image: Image = null
+
+const _CURSOR_DEFAULT := 32
+const _SETTINGS_PATH  := "user://settings.cfg"
 
 func _ready() -> void:
 	theme = load("res://resources/theme/global_theme.tres")
@@ -34,8 +38,31 @@ func _ready() -> void:
 	_setup_buttons()
 	_setup_panels()
 	_setup_labels()
-	var cursor_tex := load("res://assets/art/ui/cursor.svg")
-	Input.set_custom_mouse_cursor(cursor_tex, Input.CURSOR_ARROW, Vector2(32, 32))
+	_setup_cursor()
+
+func _setup_cursor() -> void:
+	if _cursor_base_image == null:
+		_cursor_base_image = (load("res://assets/art/ui/cursor.svg") as Texture2D).get_image()
+	apply_cursor_size(load_cursor_size())
+
+func apply_cursor_size(px: int) -> void:
+	if _cursor_base_image == null:
+		_cursor_base_image = (load("res://assets/art/ui/cursor.svg") as Texture2D).get_image()
+	var img := _cursor_base_image.duplicate() as Image
+	img.resize(px, px, Image.INTERPOLATE_LANCZOS)
+	Input.set_custom_mouse_cursor(ImageTexture.create_from_image(img), Input.CURSOR_ARROW, Vector2(px * 0.5, px * 0.5))
+
+func load_cursor_size() -> int:
+	var cfg := ConfigFile.new()
+	if cfg.load(_SETTINGS_PATH) == OK:
+		return int(cfg.get_value("cursor", "size", _CURSOR_DEFAULT))
+	return _CURSOR_DEFAULT
+
+func save_cursor_size(px: int) -> void:
+	var cfg := ConfigFile.new()
+	cfg.load(_SETTINGS_PATH)
+	cfg.set_value("cursor", "size", px)
+	cfg.save(_SETTINGS_PATH)
 
 # ── 폰트 ──────────────────────────────────────────────────────────────
 

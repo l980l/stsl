@@ -54,6 +54,7 @@ var _drag_t_offset: float = 0.0
 
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
+var _popup_stack: Dictionary = {}
 var _token_tile_nodes: Dictionary = {}
 var _synergy_box: FlowContainer = null
 var _active_powers_box: VBoxContainer = null
@@ -64,6 +65,7 @@ var _debug_grid_nodes: Array = []
 var _debug_token_hero_idx: int = 0
 
 var _deck_viewer:       CanvasLayer     = null
+var _deck_group:        Control         = null
 var _deck_overlay:      Control         = null
 var _deck_card_tweens:  Dictionary      = {}
 var _deck_card_parents: Dictionary      = {}
@@ -1016,38 +1018,55 @@ func _refresh_all_hero_ui() -> void:
 		if entry["hero_id"] != "":
 			_update_hero_ui(entry["hero_id"])
 
-func _spawn_damage_popup(world_pos: Vector2, amount: int, fully_blocked: bool) -> void:
-	var lbl := Label.new()
-	if fully_blocked:
-		lbl.text = tr("battle.popup_block")
-		lbl.modulate = Color(0.4, 0.8, 1.0)
-	else:
-		lbl.text = str(amount)
-		lbl.modulate = Color(1.0, 0.2, 0.2)
-	lbl.add_theme_font_size_override("font_size", 28)
-	var offset := Vector2(randf_range(-30.0, 30.0), randf_range(-20.0, 20.0))
-	lbl.position = world_pos + offset
-	lbl.z_index = 20
-	add_child(lbl)
-	var tw := create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(lbl, "position:y", world_pos.y - 60.0, 0.8)
-	tw.tween_property(lbl, "modulate:a", 0.0, 0.8)
-	tw.chain().tween_callback(lbl.queue_free)
+const _POPUP_FONT := preload("res://assets/fonts/IMFellEnglish-Italic.ttf")
 
-func _spawn_heal_popup(world_pos: Vector2, amount: int) -> void:
+const _STATUS_POPUP_INFO := {
+	"weak":          ["Weak",          Color(1.00, 0.55, 0.10)],
+	"vulnerable":    ["Vulnerable",    Color(0.80, 0.30, 1.00)],
+	"poison":        ["Poison",        Color(0.40, 1.00, 0.20)],
+	"strength":      ["Strength",      Color(1.00, 0.85, 0.10)],
+	"charm":         ["Charm",         Color(1.00, 0.40, 0.85)],
+	"enthrall":      ["Enthralled",    Color(0.70, 0.20, 1.00)],
+	"taunt":         ["Taunt",         Color(1.00, 0.45, 0.10)],
+	"morale":        ["Morale",        Color(1.00, 0.95, 0.20)],
+	"counter_block": ["Counter Block", Color(0.40, 0.85, 1.00)],
+}
+
+func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int, stack_key: String) -> void:
+	var count: int = _popup_stack.get(stack_key, 0)
+	_popup_stack[stack_key] = count + 1
 	var lbl := Label.new()
-	lbl.text = "+" + str(amount)
-	lbl.modulate = Color(0.2, 1.0, 0.4)
-	lbl.add_theme_font_size_override("font_size", 28)
-	lbl.position = world_pos
+	lbl.text = text
+	lbl.modulate = color
+	lbl.add_theme_font_override("font", _POPUP_FONT)
+	lbl.add_theme_font_size_override("font_size", font_size)
+	var spawn_pos := Vector2(base_pos.x + randf_range(-15.0, 15.0), base_pos.y + count * 32.0)
+	lbl.position = spawn_pos
 	lbl.z_index = 20
 	add_child(lbl)
 	var tw := create_tween()
 	tw.set_parallel(true)
-	tw.tween_property(lbl, "position:y", world_pos.y - 60.0, 0.8)
+	tw.tween_property(lbl, "position:y", spawn_pos.y - 60.0, 0.8)
 	tw.tween_property(lbl, "modulate:a", 0.0, 0.8)
-	tw.chain().tween_callback(lbl.queue_free)
+	tw.chain().tween_callback(func() -> void:
+		lbl.queue_free()
+		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
+	)
+
+func _spawn_damage_popup(world_pos: Vector2, amount: int, fully_blocked: bool, stack_key: String) -> void:
+	if fully_blocked:
+		_spawn_popup(world_pos, "Block", Color(0.4, 0.8, 1.0), 28, stack_key)
+	else:
+		_spawn_popup(world_pos, str(amount), Color(1.0, 0.2, 0.2), 28, stack_key)
+
+func _spawn_heal_popup(world_pos: Vector2, amount: int, stack_key: String) -> void:
+	_spawn_popup(world_pos, "+" + str(amount), Color(0.2, 1.0, 0.4), 28, stack_key)
+
+func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: String) -> void:
+	if not _STATUS_POPUP_INFO.has(status_type):
+		return
+	var info: Array = _STATUS_POPUP_INFO[status_type]
+	_spawn_popup(world_pos, info[0], info[1], 22, stack_key)
 
 func _on_hero_healed(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)
@@ -1055,7 +1074,7 @@ func _on_hero_healed(hero_id: String, amount: int) -> void:
 		if entry["hero_id"] == hero_id and entry["panel"].visible:
 			var panel: ColorRect = entry["panel"]
 			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
-			_spawn_heal_popup(popup_pos, amount)
+			_spawn_heal_popup(popup_pos, amount, hero_id)
 			break
 
 func _on_hero_damaged(hero_id: String, amount: int) -> void:
@@ -1064,7 +1083,7 @@ func _on_hero_damaged(hero_id: String, amount: int) -> void:
 		if entry["hero_id"] == hero_id and entry["panel"].visible:
 			var panel: ColorRect = entry["panel"]
 			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
-			_spawn_damage_popup(popup_pos, amount, amount == 0)
+			_spawn_damage_popup(popup_pos, amount, amount == 0, hero_id)
 			break
 	# hurt 애니메이션 트리거
 	var char_node = _hero_char_nodes.get(hero_id)
@@ -1078,7 +1097,7 @@ func _on_enemy_damaged(index: int, amount: int) -> void:
 	if index < _enemy_nodes.size() and _enemy_nodes[index]["panel"].visible:
 		var panel: ColorRect = _enemy_nodes[index]["panel"]
 		var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
-		_spawn_damage_popup(popup_pos, amount, amount == 0)
+		_spawn_damage_popup(popup_pos, amount, amount == 0, "enemy_%d" % index)
 	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
 	if char_node and char_node.has_node("AnimationPlayer"):
 		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
@@ -1278,12 +1297,20 @@ func _on_active_powers_changed() -> void:
 			lbl.tooltip_text = desc_fmt % v if desc_fmt.contains("%d") else desc_fmt
 		_active_powers_box.add_child(lbl)
 
-func _on_status_applied(target: String, _status_type: String, _stacks: int) -> void:
+func _on_status_applied(target: String, status_type: String, _stacks: int) -> void:
 	if target.begins_with("enemy_"):
 		var idx := target.substr(6).to_int()
 		_refresh_status_icons_enemy(idx)
+		if idx < _enemy_nodes.size() and _enemy_nodes[idx]["panel"].visible:
+			var panel: ColorRect = _enemy_nodes[idx]["panel"]
+			_spawn_status_popup(panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0), status_type, target)
 	else:
 		_refresh_status_icons_hero(target)
+		for entry in _hero_nodes:
+			if entry["hero_id"] == target and entry["panel"].visible:
+				var panel: ColorRect = entry["panel"]
+				_spawn_status_popup(panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0), status_type, target)
+				break
 
 func _refresh_debug_badge() -> void:
 	if _debug_badge == null:
@@ -1351,6 +1378,14 @@ func _show_deck_viewer_in_battle() -> void:
 	var panel_x: float = (WINDOW_W - _DECK_W) / 2.0
 	var panel_y: float = (WINDOW_H - _DECK_H) / 2.0
 
+	var group := Control.new()
+	group.set_anchors_preset(Control.PRESET_FULL_RECT)
+	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.pivot_offset = Vector2(960, 540)
+	group.scale = Vector2(0.9, 0.9)
+	group.modulate.a = 0.0
+	overlay.add_child(group)
+
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(_DECK_W, _DECK_H)
 	panel.position = Vector2(panel_x, panel_y)
@@ -1359,14 +1394,14 @@ func _show_deck_viewer_in_battle() -> void:
 	panel_style.border_color = SacredPalette.BRASS_700
 	panel_style.set_border_width_all(1)
 	panel.add_theme_stylebox_override("panel", panel_style)
-	overlay.add_child(panel)
+	group.add_child(panel)
 
-	# 코너 브라켓은 overlay 위 별도 Control에 올려 PanelContainer 레이아웃 간섭 방지
+	# 코너 브라켓은 group 위 별도 Control에 올려 PanelContainer 레이아웃 간섭 방지
 	var bracket_host := Control.new()
 	bracket_host.position = Vector2(panel_x, panel_y)
 	bracket_host.size = Vector2(_DECK_W, _DECK_H)
 	bracket_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	overlay.add_child(bracket_host)
+	group.add_child(bracket_host)
 	SacredTheme.add_corner_brackets(bracket_host, SacredPalette.BRASS_700, 20, 8, 2)
 
 	var margin := MarginContainer.new()
@@ -1394,7 +1429,7 @@ func _show_deck_viewer_in_battle() -> void:
 	close_btn.add_theme_font_size_override("font_size", 20)
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_close_deck_viewer)
-	overlay.add_child(close_btn)
+	group.add_child(close_btn)
 	close_btn.position = Vector2(panel_x + _DECK_W - 56, panel_y + 20)
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
@@ -1411,7 +1446,11 @@ func _show_deck_viewer_in_battle() -> void:
 	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw") + " (%d)" % draw_cards.size(), draw_cards)
 	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
 
+	_deck_group  = group
 	_deck_viewer = canvas
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(group, "scale", Vector2.ONE, 0.15)
+	tw.parallel().tween_property(group, "modulate:a", 1.0, 0.15)
 
 
 func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> void:
@@ -1508,8 +1547,17 @@ func _close_deck_viewer() -> void:
 		_card_scroll_map.clear()
 		_active_scroll = null
 		_deck_overlay  = null
-		_deck_viewer.queue_free()
+		var viewer := _deck_viewer
+		var group  := _deck_group
 		_deck_viewer = null
+		_deck_group  = null
+		if is_instance_valid(group):
+			var tw := create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+			tw.tween_property(group, "scale", Vector2(0.9, 0.9), 0.12)
+			tw.parallel().tween_property(group, "modulate:a", 0.0, 0.12)
+			tw.tween_callback(func(): if is_instance_valid(viewer): viewer.queue_free())
+		else:
+			if is_instance_valid(viewer): viewer.queue_free()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

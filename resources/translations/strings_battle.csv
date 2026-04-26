@@ -4,7 +4,6 @@ battle.token_tooltip,다음 턴 시작 시 상대를 공격합니다,Attacks opp
 battle.token_soldier,병사,Soldier,Soldat,Soldato,Soldado,兵士,Στρατιώτης,士兵
 battle.msg_player_turn,플레이어 턴,Player Turn,Tour du Joueur,Turno Giocatore,Turno del Jugador,プレイヤーターン,Γύρος Παίκτη,玩家回合
 battle.msg_enemy_turn,적 턴...,Enemy Turn...,Tour de l'Ennemi...,Turno Nemico...,Turno del Enemigo...,敵ターン...,Γύρος Εχθρού...,敌人回合...
-battle.popup_block,BLOCK,BLOCK,BLOCAGE,BLOCCO,BLOQUEO,ブロック,ΜΠΛΟΚ,格挡
 battle.msg_victory,🏆 승리!,🏆 Victory!,🏆 Victoire !,🏆 Vittoria!,🏆 ¡Victoria!,🏆 勝利！,🏆 Νίκη!,🏆 胜利！
 battle.msg_defeat,💀 패배...,💀 Defeat...,💀 Défaite...,💀 Sconfitta...,💀 Derrota...,💀 敗北...,💀 Ήττα...,💀 失败...
 battle.drag_enemy,적을 선택하세요 ▶,Select Enemy ▶,Choisir l'ennemi ▶,Seleziona Nemico ▶,Seleccionar Enemigo ▶,敵を選択してください ▶,Επιλογή Εχθρού ▶,选择敌人 ▶

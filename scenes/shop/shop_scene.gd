@@ -15,8 +15,10 @@ const SVC_PANEL_H   := 110
 const SVC_PANEL_GAP := 20
 
 var _inventory:           Dictionary  = {}
-var _remove_layer:        CanvasLayer = null
-var _upgrade_layer:       CanvasLayer = null
+var _remove_layer:        CanvasLayer     = null
+var _upgrade_layer:       CanvasLayer     = null
+var _remove_group:        Control         = null
+var _upgrade_group:       Control         = null
 var _remove_overlay:      Control         = null
 var _upgrade_overlay:     Control         = null
 var _remove_scroll:       ScrollContainer = null
@@ -535,10 +537,19 @@ func _show_remove_panel(price: int) -> void:
 	)
 	overlay.add_child(dim)
 
+	var group := Control.new()
+	group.set_anchors_preset(Control.PRESET_FULL_RECT)
+	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.pivot_offset = Vector2(960, 540)
+	group.scale = Vector2(0.9, 0.9)
+	group.modulate.a = 0.0
+	overlay.add_child(group)
+	_remove_group = group
+
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(1300, 600)
 	panel.position = Vector2((1920 - 1300) / 2.0, (1080 - 600) / 2.0)
-	overlay.add_child(panel)
+	group.add_child(panel)
 
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left",   20)
@@ -565,7 +576,7 @@ func _show_remove_panel(price: int) -> void:
 	close_btn.add_theme_font_size_override("font_size", 20)
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_remove_panel)
-	overlay.add_child(close_btn)
+	group.add_child(close_btn)
 	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 600) / 2.0 + 20)
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
@@ -627,6 +638,10 @@ func _show_remove_panel(price: int) -> void:
 	spc_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	confirm_row.add_child(spc_r)
 
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(group, "scale", Vector2.ONE, 0.15)
+	tw.parallel().tween_property(group, "modulate:a", 1.0, 0.15)
+
 func _show_remove_card_hover(node: CardScene) -> void:
 	if node in _remove_card_tweens:
 		_remove_card_tweens[node].kill()
@@ -665,14 +680,23 @@ func _hide_remove_panel() -> void:
 				tw.kill()
 		_remove_card_tweens.clear()
 		_remove_card_parents.clear()
-		_remove_layer.queue_free()
-		_remove_layer   = null
 		_remove_overlay = null
 		_remove_scroll  = null
 		_active_scroll  = null
 		_selected_remove_card = null
 		_selected_remove_node = null
 		_confirm_remove_btn   = null
+		var layer := _remove_layer
+		var group := _remove_group
+		_remove_layer = null
+		_remove_group = null
+		if is_instance_valid(group):
+			var tw := create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+			tw.tween_property(group, "scale", Vector2(0.9, 0.9), 0.12)
+			tw.parallel().tween_property(group, "modulate:a", 0.0, 0.12)
+			tw.tween_callback(func(): if is_instance_valid(layer): layer.queue_free())
+		else:
+			if is_instance_valid(layer): layer.queue_free()
 
 func _on_select_remove_card(card: Resource, node: CardScene) -> void:
 	if is_instance_valid(_selected_remove_node):
@@ -735,10 +759,19 @@ func _show_upgrade_panel(price: int) -> void:
 	)
 	overlay.add_child(dim)
 
+	var group := Control.new()
+	group.set_anchors_preset(Control.PRESET_FULL_RECT)
+	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.pivot_offset = Vector2(960, 540)
+	group.scale = Vector2(0.9, 0.9)
+	group.modulate.a = 0.0
+	overlay.add_child(group)
+	_upgrade_group = group
+
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(1300, 600)
 	panel.position = Vector2((1920 - 1300) / 2.0, (1080 - 600) / 2.0)
-	overlay.add_child(panel)
+	group.add_child(panel)
 
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left",   20)
@@ -765,7 +798,7 @@ func _show_upgrade_panel(price: int) -> void:
 	close_btn.add_theme_font_size_override("font_size", 20)
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_upgrade_panel)
-	overlay.add_child(close_btn)
+	group.add_child(close_btn)
 	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 600) / 2.0 + 20)
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
@@ -827,6 +860,10 @@ func _show_upgrade_panel(price: int) -> void:
 	spc_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	confirm_row.add_child(spc_r)
 
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(group, "scale", Vector2.ONE, 0.15)
+	tw.parallel().tween_property(group, "modulate:a", 1.0, 0.15)
+
 func _show_upgrade_card_hover(node: CardScene) -> void:
 	if node in _upgrade_card_tweens:
 		_upgrade_card_tweens[node].kill()
@@ -865,14 +902,23 @@ func _hide_upgrade_panel() -> void:
 				tw.kill()
 		_upgrade_card_tweens.clear()
 		_upgrade_card_parents.clear()
-		_upgrade_layer.queue_free()
-		_upgrade_layer   = null
 		_upgrade_overlay = null
 		_upgrade_scroll  = null
 		_active_scroll   = null
 		_selected_upgrade_card = null
 		_selected_upgrade_node = null
 		_confirm_upgrade_btn   = null
+		var layer := _upgrade_layer
+		var group := _upgrade_group
+		_upgrade_layer = null
+		_upgrade_group = null
+		if is_instance_valid(group):
+			var tw := create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+			tw.tween_property(group, "scale", Vector2(0.9, 0.9), 0.12)
+			tw.parallel().tween_property(group, "modulate:a", 0.0, 0.12)
+			tw.tween_callback(func(): if is_instance_valid(layer): layer.queue_free())
+		else:
+			if is_instance_valid(layer): layer.queue_free()
 
 func _on_select_upgrade_card(card: Resource, node: CardScene) -> void:
 	if is_instance_valid(_selected_upgrade_node):
