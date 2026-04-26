@@ -155,6 +155,16 @@ func remove_from_deck(card: Resource) -> bool:
 		return true
 	return false
 
+func consolidate_for_battle() -> void:
+	draw_pile.append_array(hand)
+	draw_pile.append_array(discard_pile)
+	draw_pile.append_array(exhaust_pile)
+	hand.clear()
+	discard_pile.clear()
+	exhaust_pile.clear()
+	draw_pile.shuffle()
+	hand_changed.emit()
+
 func clear() -> void:
 	draw_pile.clear()
 	hand.clear()
