@@ -25,3 +25,5 @@ battle.counter.effect.debuff,%s에게 %s %d 부여,%s: %s %d,%s : %s %d,%s: %s %
 battle.counter.effect.buff,%s +%d 부여,Grant %s +%d,Accorde %s +%d,Concede %s +%d,Concede %s +%d,%s +%d 付与,%s +%d χάρισε,%s +%d 赋予
 battle.counter.tooltip.format,[%s] 카운터 %d회 달성 시: %s,[%s] On %d counters: %s,[%s] À %d compteurs: %s,[%s] A %d contatori: %s,[%s] A %d contadores: %s,[%s] %d カウンター時: %s,[%s] Στους %d μετρητές: %s,[%s] %d计数时: %s
 battle.drag_dead_ally,사망한 영웅,Dead Ally,Héros mort,Eroe morto,Héroe muerto,死亡した英雄,Νεκρός Ήρωας,已死亡英雄
+battle.cancel_use,사용 취소,Cancel Use,Annuler,Annulla,Cancelar,使用取消,Ακύρωση,取消使用
+battle.counter.label,%d/%d,%d/%d,%d/%d,%d/%d,%d/%d,%d/%d,%d/%d,%d/%d

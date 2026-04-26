@@ -5,6 +5,8 @@ const STATUS_DIR := "res://assets/art/ui/status/"
 const SYNERGY_DIR := "res://assets/art/ui/synergy/"
 const RELIC_DIR := "res://assets/art/ui/relic/"
 const MAP_DIR := "res://assets/art/ui/map/"
+const INTENT_DIR := "res://assets/art/ui/intent/"
+const HUD_DIR := "res://assets/art/ui/hud/"
 
 const _ROOM_ICON_FILES := {
 	0: "icon_room_battle",
@@ -51,6 +53,38 @@ func get_relic_icon(name_key: String) -> Texture2D:
 	if ResourceLoader.exists(svg_path):
 		return _load(svg_path)
 	return _load(RELIC_DIR + fname + ".png")
+
+const _INTENT_ICON_FILES := {
+	0: "attack",
+	1: "buff",
+	2: "debuff",
+	3: "power",
+	4: "prepare",
+}
+
+const _CARD_TYPE_ICON_FILES := {
+	0: "attack",
+	1: "skill",
+	2: "power",
+}
+
+func get_intent_icon(action_type: int) -> Texture2D:
+	var fname: String = _INTENT_ICON_FILES.get(action_type, "")
+	if fname == "":
+		return null
+	return _load(INTENT_DIR + fname + ".svg")
+
+func get_card_type_icon(card_type: int) -> Texture2D:
+	var fname: String = _CARD_TYPE_ICON_FILES.get(card_type, "")
+	if fname == "":
+		return null
+	return _load(INTENT_DIR + fname + ".svg")
+
+func get_energy_icon() -> Texture2D:
+	return _load(HUD_DIR + "energy.svg")
+
+func get_counter_icon() -> Texture2D:
+	return _load("res://assets/art/ui/clock.svg")
 
 func _strip(key: String) -> String:
 	var parts := key.split(".")

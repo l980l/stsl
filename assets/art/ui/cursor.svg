@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- 4방향 뾰족한 별 (Gemini 스타일) -->
+  <path d="M 32,2 C 28,18 18,28 2,32 C 18,36 28,46 32,62 C 36,46 46,36 62,32 C 46,28 36,18 32,2 Z"
+        fill="white" stroke="#222" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>

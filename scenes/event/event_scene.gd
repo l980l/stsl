@@ -6,10 +6,15 @@ extends Node2D
 @onready var choices_container: HBoxContainer = $VBoxContainer/ChoicesContainer
 
 func _ready() -> void:
+	$BG.color = SacredPalette.INK_1000
 	var event: Resource = GameManager.pending_event
 	if event == null:
 		GameManager._request_scene("res://scenes/map/map_scene.tscn")
 		return
+	name_label.theme_type_variation = "TitleLabel"
+	desc_label.theme_type_variation = "SubLabel"
+	($VBoxContainer as VBoxContainer).add_theme_constant_override("separation", 40)
+	(choices_container as HBoxContainer).add_theme_constant_override("separation", 32)
 	name_label.text = tr(event.event_name)
 	desc_label.text = tr(event.description)
 	LabelUtils.fit_text(name_label, 36, 20)
@@ -19,9 +24,11 @@ func _ready() -> void:
 		btn.text = tr(choice.label)
 		btn.add_theme_font_size_override("font_size", 18)
 		btn.custom_minimum_size = Vector2(300, 50)
+		btn.theme_type_variation = "PrimaryButton"
 		LabelUtils.fit_text(btn, 18, 12)
 		btn.pressed.connect(_on_choice_selected.bind(choice))
 		choices_container.add_child(btn)
+		SacredTheme.animate_button(btn)
 
 func _on_choice_selected(choice: Resource) -> void:
 	_apply_choice(choice)

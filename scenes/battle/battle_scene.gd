@@ -1,12 +1,13 @@
-﻿# scenes/battle/battle_scene.gd
+# scenes/battle/battle_scene.gd
 extends Node2D
 
 const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
-const ARROW_CHEVRON_TEX := preload("res://assets/art/ui/arrow_chevron.png")
-const ARROW_HEAD_TEX    := preload("res://assets/art/ui/arrow_head.png")
+const ARROW_CHEVRON_TEX := preload("res://assets/art/ui/arrow_chevron.svg")
+const ARROW_HEAD_TEX    := preload("res://assets/art/ui/arrow_head.svg")
+const CURSOR_TEX        := preload("res://assets/art/ui/cursor.svg")
 
 const WINDOW_W := 1920
 const WINDOW_H := 1080
@@ -43,6 +44,8 @@ var _relic_container: FlowContainer
 var _selected_card: Resource = null
 
 var _drag_card: Resource = null
+var _drag_no_chevron: bool = false
+var _drag_cancel_ready: bool = false
 var _drag_chevrons: Array = []
 var _drag_arrow_head: Sprite2D = null
 var _drag_start_pos: Vector2 = Vector2.ZERO
@@ -98,7 +101,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if _drag_card != null and not _drag_chevrons.is_empty():
-		_drag_t_offset = fmod(_drag_t_offset + delta * 0.15, 1.0)
+		_drag_t_offset = fmod(_drag_t_offset + delta * 0.165, 1.0)
 		_update_drag_chevrons()
 
 func _build_debug_tooltip() -> void:
@@ -111,46 +114,162 @@ func _build_debug_tooltip() -> void:
 func _build_ui() -> void:
 	# 배경
 	var bg := ColorRect.new()
-	bg.color = Color(0.08, 0.08, 0.12)
+	bg.color = SacredPalette.INK_1000
 	bg.position = Vector2.ZERO
 	bg.size = Vector2(WINDOW_W, WINDOW_H)
 	add_child(bg)
 
-	# 상단 메시지 레이블
+	# 상단 배너 (eyebrow + 메시지 + gradient 구분선)
+	var banner := Control.new()
+	banner.position = Vector2(WINDOW_W / 2.0 - 300, 0)
+	banner.size = Vector2(600, 72)
+	banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(banner)
+
+	var banner_eyebrow := Label.new()
+	banner_eyebrow.theme_type_variation = "EyebrowLabel"
+	banner_eyebrow.text = "— ACT %d · FLOOR %d —" % [GameManager.current_act, GameManager.current_floor]
+	banner_eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	banner_eyebrow.position = Vector2(0, 6)
+	banner_eyebrow.size = Vector2(600, 18)
+	banner_eyebrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner.add_child(banner_eyebrow)
+
+	var msg_bg_grad := Gradient.new()
+	msg_bg_grad.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	msg_bg_grad.colors = PackedColorArray([
+		Color.TRANSPARENT,
+		Color(0.0, 0.0, 0.0, 0.65),
+		Color.TRANSPARENT])
+	var msg_bg_tex := GradientTexture1D.new()
+	msg_bg_tex.gradient = msg_bg_grad
+	var msg_bg := TextureRect.new()
+	msg_bg.texture = msg_bg_tex
+	msg_bg.position = Vector2(0, 18)
+	msg_bg.size = Vector2(600, 48)
+	msg_bg.stretch_mode = TextureRect.STRETCH_SCALE
+	msg_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner.add_child(msg_bg)
+
 	_message_label = Label.new()
-	_message_label.position = Vector2(WINDOW_W / 2.0 - 300, 16)
-	_message_label.size = Vector2(600, 50)
+	_message_label.theme_type_variation = "TitleLabel"
 	_message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_message_label.add_theme_font_size_override("font_size", 26)
-	add_child(_message_label)
+	_message_label.position = Vector2(0, 24)
+	_message_label.size = Vector2(600, 36)
+	banner.add_child(_message_label)
 
-	# 에너지 레이블
+	var banner_grad := Gradient.new()
+	banner_grad.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	banner_grad.colors = PackedColorArray([
+		Color.TRANSPARENT,
+		Color(SacredPalette.BRASS_500.r, SacredPalette.BRASS_500.g, SacredPalette.BRASS_500.b, 0.5),
+		Color.TRANSPARENT])
+	var banner_grad_tex := GradientTexture1D.new()
+	banner_grad_tex.gradient = banner_grad
+	var banner_rule := TextureRect.new()
+	banner_rule.texture = banner_grad_tex
+	banner_rule.position = Vector2(0, 63)
+	banner_rule.size = Vector2(600, 2)
+	banner_rule.stretch_mode = TextureRect.STRETCH_SCALE
+	banner_rule.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner.add_child(banner_rule)
+
+	var banner_cutout := ColorRect.new()
+	banner_cutout.color = SacredPalette.INK_1000
+	banner_cutout.size = Vector2(20, 14)
+	banner_cutout.position = Vector2(290, 56)
+	banner_cutout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner.add_child(banner_cutout)
+
+	var banner_diamond := Label.new()
+	banner_diamond.text = "✦"
+	banner_diamond.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+	banner_diamond.add_theme_font_size_override("font_size", 10)
+	banner_diamond.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	banner_diamond.position = Vector2(0, 57)
+	banner_diamond.size = Vector2(600, 12)
+	banner_diamond.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner.add_child(banner_diamond)
+
+	# 에너지 — 아이콘 + 숫자만, 핸드 구분선 높이에 맞춤
+	var energy_hbox := HBoxContainer.new()
+	energy_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	energy_hbox.add_theme_constant_override("separation", 14)
+	energy_hbox.position = Vector2(WINDOW_W - 200, BOTTOM_Y - 26)
+	energy_hbox.size = Vector2(180, 32)
+	add_child(energy_hbox)
+
+	var energy_icon := TextureRect.new()
+	energy_icon.texture = IconUtils.get_energy_icon()
+	energy_icon.custom_minimum_size = Vector2(24, 24)
+	energy_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	energy_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	energy_icon.modulate = SacredPalette.BRASS_300
+	energy_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	energy_hbox.add_child(energy_icon)
+
 	_energy_label = Label.new()
-	_energy_label.position = Vector2(WINDOW_W - 220, BOTTOM_Y - 34)
-	_energy_label.size = Vector2(200, 30)
+	_energy_label.theme_type_variation = "EyebrowLabel"
 	_energy_label.add_theme_font_size_override("font_size", 22)
-	_energy_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_energy_label.text = "⚡ 0 / 3"
-	add_child(_energy_label)
+	_energy_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_energy_label.text = "0/3"
+	energy_hbox.add_child(_energy_label)
 
-	# 턴 종료 버튼
+	# 턴 종료 버튼 (Standard)
 	_end_turn_btn = Button.new()
-	_end_turn_btn.position = Vector2(WINDOW_W - 220, BOTTOM_Y + 16)
-	_end_turn_btn.size = Vector2(200, 60)
+	_end_turn_btn.position = Vector2(WINDOW_W - 214, BOTTOM_Y + 16)
+	_end_turn_btn.size = Vector2(200, 54)
 	_end_turn_btn.text = tr("battle.btn_end_turn")
-	_end_turn_btn.add_theme_font_size_override("font_size", 22)
+	_end_turn_btn.add_theme_font_size_override("font_size", 18)
 	_end_turn_btn.disabled = true
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
 	add_child(_end_turn_btn)
+	SacredTheme.animate_button(_end_turn_btn)
 
-	# 덱 보기 버튼 (End Turn 아래)
+	# 덱 보기 버튼 (Standard)
 	var deck_btn := Button.new()
-	deck_btn.position = Vector2(WINDOW_W - 220, BOTTOM_Y + 84)
-	deck_btn.size = Vector2(200, 60)
+	deck_btn.position = Vector2(WINDOW_W - 214, BOTTOM_Y + 78)
+	deck_btn.size = Vector2(200, 54)
 	deck_btn.text = tr("ui.battle.btn_deck_view")
 	deck_btn.add_theme_font_size_override("font_size", 18)
 	deck_btn.pressed.connect(_show_deck_viewer_in_battle)
 	add_child(deck_btn)
+	SacredTheme.animate_button(deck_btn)
+
+	# 핸드존 구분선 — gradient rule + ✦ 다이아몬드
+	var hand_grad := Gradient.new()
+	hand_grad.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	hand_grad.colors = PackedColorArray([
+		Color.TRANSPARENT,
+		Color(SacredPalette.BRASS_500.r, SacredPalette.BRASS_500.g, SacredPalette.BRASS_500.b, 0.45),
+		Color.TRANSPARENT])
+	var hand_grad_tex := GradientTexture1D.new()
+	hand_grad_tex.gradient = hand_grad
+	var hand_rule := TextureRect.new()
+	hand_rule.texture = hand_grad_tex
+	hand_rule.position = Vector2(60, BOTTOM_Y - 10)
+	hand_rule.size = Vector2(WINDOW_W - 320, 2)
+	hand_rule.stretch_mode = TextureRect.STRETCH_SCALE
+	hand_rule.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(hand_rule)
+
+	var hand_cutout := ColorRect.new()
+	hand_cutout.color = SacredPalette.INK_1000
+	hand_cutout.size = Vector2(20, 14)
+	hand_cutout.position = Vector2(WINDOW_W / 2.0 - 10, BOTTOM_Y - 17)
+	hand_cutout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(hand_cutout)
+
+	var hand_diamond := Label.new()
+	hand_diamond.text = "✦"
+	hand_diamond.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+	hand_diamond.add_theme_font_size_override("font_size", 10)
+	hand_diamond.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hand_diamond.position = Vector2(0, BOTTOM_Y - 17)
+	hand_diamond.size = Vector2(WINDOW_W, 12)
+	hand_diamond.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(hand_diamond)
 
 	# HUD 바 — 시너지 + 릴릭 아이콘, 메시지 레이블 아래
 	_relic_container = FlowContainer.new()
@@ -187,6 +306,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
 	add_child(panel)
+	SacredTheme.add_corner_brackets(panel, SacredPalette.BRASS_500, 16, 2, 1)
 
 	var bar_w: float = 211.0
 	var _bar_h: float = 12.0
@@ -194,6 +314,7 @@ func _make_hero_slot(index: int) -> Dictionary:
 
 	var name_lbl := _make_label(Vector2(bar_x, pos.y + 4), Vector2(bar_w, 22), 16)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.theme_type_variation = "AccentLabel"
 	name_lbl.z_index = 1
 	name_lbl.visible = false
 
@@ -204,12 +325,14 @@ func _make_hero_slot(index: int) -> Dictionary:
 	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 22), Vector2(bar_w, 24), 12)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hp_lbl.theme_type_variation = "EyebrowLabel"
 	hp_lbl.z_index = 1
 	hp_lbl.visible = false
 
 	var block_lbl := _make_label(Vector2(bar_x, pos.y + 22), Vector2(bar_w, 24), 12)
 	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	block_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	block_lbl.theme_type_variation = "EyebrowLabel"
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 	block_lbl.z_index = 2
 	block_lbl.visible = false
@@ -236,12 +359,14 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
 	add_child(panel)
+	SacredTheme.add_corner_brackets(panel, SacredPalette.BRASS_500, 16, 2, 1)
 
 	var bar_w: float = 211.0
 	var _bar_h: float = 12.0
 	var bar_x: float = pos.x + (SLOT_W - bar_w) / 2.0
 
 	var intent_lbl := _make_label(Vector2(pos.x, pos.y + 4), Vector2(SLOT_W, 22), 18)
+	intent_lbl.theme_type_variation = "EyebrowLabel"
 	intent_lbl.modulate = Color(1.0, 0.8, 0.2)
 	intent_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	intent_lbl.z_index = 1
@@ -258,6 +383,7 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 
 	var name_lbl := _make_label(Vector2(bar_x, pos.y + 28), Vector2(bar_w, 18), 14)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.theme_type_variation = "AccentLabel"
 	name_lbl.z_index = 1
 
 	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 48), bar_w)
@@ -266,11 +392,13 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 42), Vector2(bar_w, 24), 12)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hp_lbl.theme_type_variation = "EyebrowLabel"
 	hp_lbl.z_index = 1
 
 	var block_lbl := _make_label(Vector2(bar_x, pos.y + 42), Vector2(bar_w, 24), 12)
 	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	block_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	block_lbl.theme_type_variation = "EyebrowLabel"
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
 	block_lbl.z_index = 2
 
@@ -352,14 +480,14 @@ func _make_hp_bar(pos: Vector2, width: float) -> Control:
 	var bg := ColorRect.new()
 	bg.position = Vector2.ZERO
 	bg.size = Vector2(width, 12)
-	bg.color = Color(0.15, 0.15, 0.15)
+	bg.color = SacredPalette.INK_700
 	wrapper.add_child(bg)
 
 	var fill := ColorRect.new()
 	fill.name = "Fill"
 	fill.position = Vector2.ZERO
 	fill.size = Vector2(width, 12)
-	fill.color = Color(0.8, 0.15, 0.15)
+	fill.color = SacredPalette.BLOOD_500
 	wrapper.add_child(fill)
 
 	add_child(wrapper)
@@ -637,6 +765,7 @@ func _update_enemy_ui(index: int) -> void:
 	# 의도 표시
 	var intent: Resource = BattleManager.get_enemy_current_intent(index)
 	if intent != null:
+		entry["intent_lbl"].modulate = _intent_color(intent.action_type)
 		match intent.action_type:
 			IntentRes.ActionType.ATTACK:
 				entry["intent_lbl"].text = _trf("battle.intent.attack", intent.value)
@@ -657,6 +786,23 @@ func _update_enemy_ui(index: int) -> void:
 		entry["intent_lbl"].text = tr("battle.intent.dead")
 
 	_refresh_status_icons_enemy(index)
+
+func _drag_hint_text() -> String:
+	if _drag_card == null:
+		return ""
+	match _card_target_type(_drag_card):
+		"enemy":    return tr("battle.drag_enemy")
+		"ally":     return tr("battle.drag_ally")
+		"dead_ally": return tr("battle.drag_dead_ally")
+		_:          return tr("battle.drag_release")
+
+func _intent_color(action_type: int) -> Color:
+	match action_type:
+		IntentRes.ActionType.ATTACK:  return Color(1.0, 0.35, 0.35)
+		IntentRes.ActionType.BUFF:    return Color(0.4, 0.85, 1.0)
+		IntentRes.ActionType.DEBUFF:  return Color(0.75, 0.4, 1.0)
+		IntentRes.ActionType.PREPARE: return Color(0.75, 0.75, 0.75)
+		_:                            return Color(1.0, 0.8, 0.2)
 
 # ─────────────────────────────────────────────
 # 카드 핸드 (Task 3에서 구현)
@@ -717,17 +863,21 @@ func _on_card_drag_started(card: Resource, screen_pos: Vector2) -> void:
 	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
 		return
 	_drag_start_pos = screen_pos
+	_drag_no_chevron = _card_target_type(card) == "none"
 	for btn in _card_buttons:
 		if is_instance_valid(btn) and btn.get_meta("_card_res", null) == card:
-			_drag_start_pos = btn.get_meta("_fan_title_pos", screen_pos)
+			_drag_start_pos = btn.get_meta("_fan_center", screen_pos)
 			btn.modulate = Color(1.0, 1.0, 1.0, 0.4)
 			break
+	_drag_cancel_ready = false
+	get_tree().create_timer(0.25).timeout.connect(func(): _drag_cancel_ready = true)
 	_start_drag(card)
 	_create_drag_arrow(screen_pos)
 
 func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
 	_drag_end_pos = screen_pos
 	_update_drag_arrow(screen_pos)
+	_message_label.text = tr("battle.cancel_use") if _drag_cancel_ready and screen_pos.y >= BOTTOM_Y else _drag_hint_text()
 
 func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 	if _drag_card != null:
@@ -816,7 +966,7 @@ func _on_end_turn_pressed() -> void:
 func _on_player_turn_started() -> void:
 	_end_turn_btn.disabled = false
 	_message_label.text = tr("battle.msg_player_turn")
-	_energy_label.text = "⚡ %d / %d" % [DeckManager.current_energy, DeckManager.MAX_ENERGY]
+	_energy_label.text = "%d/%d" % [DeckManager.current_energy, DeckManager.MAX_ENERGY]
 	# 영웅 블록 UI 갱신 (start_player_turn이 블록 초기화했으므로)
 	for entry in _hero_nodes:
 		var hid: String = entry["hero_id"]
@@ -842,7 +992,7 @@ func _on_enemy_turn_started() -> void:
 			entry["btn"].disabled = true
 
 func _on_energy_changed(new_energy: int) -> void:
-	_energy_label.text = "⚡ %d / %d" % [new_energy, DeckManager.MAX_ENERGY]
+	_energy_label.text = "%d / %d" % [new_energy, DeckManager.MAX_ENERGY]
 	# 카드 노드 활성/비활성 갱신
 	var hand: Array = DeckManager.hand
 	for i in range(min(_card_buttons.size(), hand.size())):
@@ -1021,6 +1171,7 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 			lbl.text = "%d/%d" % [val * 10, dur]
 		else:
 			lbl.text = "%d" % val
+		lbl.theme_type_variation = "EyebrowLabel"
 		lbl.add_theme_font_size_override("font_size", 11)
 		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -1030,19 +1181,20 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 		return hbox
 
 	# 아이콘 없으면 이모지 fallback
-	var lbl := Label.new()
+	var fallback_lbl := Label.new()
 	if key == "poison_dmg":
 		var dur: int = status.get("poison_dur", 0)
-		lbl.text = "☠%d/%d" % [val * 10, dur]
+		fallback_lbl.text = "☠%d/%d" % [val * 10, dur]
 	else:
-		lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
-	lbl.tooltip_text = tooltip
-	lbl.add_theme_font_size_override("font_size", 12)
-	lbl.custom_minimum_size = Vector2(0, 18)
-	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-	return lbl
+		fallback_lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
+	fallback_lbl.theme_type_variation = "EyebrowLabel"
+	fallback_lbl.tooltip_text = tooltip
+	fallback_lbl.add_theme_font_size_override("font_size", 12)
+	fallback_lbl.custom_minimum_size = Vector2(0, 18)
+	fallback_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	fallback_lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	fallback_lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+	return fallback_lbl
 
 func _refresh_status_icons_hero(hero_id: String) -> void:
 	var box: HBoxContainer = _hero_status_containers.get(hero_id)
@@ -1067,6 +1219,31 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		return
 	for child in box.get_children():
 		child.queue_free()
+	# 카드 카운터를 먼저 표시 (발동 순서 고정)
+	var cinfo: Dictionary = BattleManager.get_enemy_counter(index)
+	if not cinfo.is_empty():
+		var hbox := HBoxContainer.new()
+		hbox.custom_minimum_size = Vector2(0, 18)
+		hbox.tooltip_text = _counter_tooltip_text(cinfo)
+		hbox.mouse_filter = Control.MOUSE_FILTER_STOP
+		var icon_tex := IconUtils.get_counter_icon()
+		if icon_tex != null:
+			var icon := TextureRect.new()
+			icon.texture = icon_tex
+			icon.custom_minimum_size = Vector2(20, 20)
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.modulate = Color(1.0, 0.75, 0.3)
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			hbox.add_child(icon)
+		var lbl := Label.new()
+		lbl.text = _trf("battle.counter.label", [cinfo["count"], cinfo["threshold"]])
+		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lbl.modulate = Color(1.0, 0.75, 0.3)
+		hbox.add_child(lbl)
+		box.add_child(hbox)
 	var status: Dictionary = BattleManager.get_enemy_status(index)
 	for key in status:
 		if key == "poison_dur":
@@ -1075,26 +1252,6 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		if val <= 0:
 			continue
 		box.add_child(_make_status_label(key, val, status))
-	# 카드 카운터가 있으면 상태 아이콘 영역에 버프처럼 표시
-	var cinfo: Dictionary = BattleManager.get_enemy_counter(index)
-	if not cinfo.is_empty():
-		var ct: int = int(cinfo.get("card_type", -1))
-		var label_key: String = ""
-		match ct:
-			CardResource.CardType.ATTACK: label_key = "enemy.counter.attack.label"
-			CardResource.CardType.SKILL:  label_key = "enemy.counter.skill.label"
-			CardResource.CardType.POWER:  label_key = "enemy.counter.power.label"
-		if label_key != "":
-			var lbl := Label.new()
-			lbl.text = _trf(label_key, [cinfo["count"], cinfo["threshold"]])
-			lbl.tooltip_text = _counter_tooltip_text(cinfo)
-			lbl.add_theme_font_size_override("font_size", 12)
-			lbl.custom_minimum_size = Vector2(0, 18)
-			lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-			lbl.modulate = Color(1.0, 0.75, 0.3)
-			box.add_child(lbl)
 
 func _on_morale_changed(hero_id: String, _new_value: int) -> void:
 	_update_hero_ui(hero_id)
@@ -1189,17 +1346,34 @@ func _show_deck_viewer_in_battle() -> void:
 	)
 	overlay.add_child(bg_rect)
 
+	const _DECK_W := 1300.0
+	const _DECK_H := 680.0
+	var panel_x: float = (WINDOW_W - _DECK_W) / 2.0
+	var panel_y: float = (WINDOW_H - _DECK_H) / 2.0
+
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(1300, 680)
-	panel.size = Vector2(1300, 680)
-	panel.position = Vector2((WINDOW_W - 1300) / 2.0, (WINDOW_H - 680) / 2.0)
+	panel.custom_minimum_size = Vector2(_DECK_W, _DECK_H)
+	panel.position = Vector2(panel_x, panel_y)
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = SacredPalette.INK_900
+	panel_style.border_color = SacredPalette.BRASS_700
+	panel_style.set_border_width_all(1)
+	panel.add_theme_stylebox_override("panel", panel_style)
 	overlay.add_child(panel)
 
+	# 코너 브라켓은 overlay 위 별도 Control에 올려 PanelContainer 레이아웃 간섭 방지
+	var bracket_host := Control.new()
+	bracket_host.position = Vector2(panel_x, panel_y)
+	bracket_host.size = Vector2(_DECK_W, _DECK_H)
+	bracket_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(bracket_host)
+	SacredTheme.add_corner_brackets(bracket_host, SacredPalette.BRASS_700, 20, 8, 2)
+
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 20)
-	margin.add_theme_constant_override("margin_right", 20)
-	margin.add_theme_constant_override("margin_top", 14)
-	margin.add_theme_constant_override("margin_bottom", 14)
+	margin.add_theme_constant_override("margin_left", 24)
+	margin.add_theme_constant_override("margin_right", 24)
+	margin.add_theme_constant_override("margin_top", 18)
+	margin.add_theme_constant_override("margin_bottom", 18)
 	margin.clip_children = Control.CLIP_CHILDREN_ONLY
 	panel.add_child(margin)
 
@@ -1209,7 +1383,9 @@ func _show_deck_viewer_in_battle() -> void:
 
 	var title_lbl := Label.new()
 	title_lbl.text = tr("ui.battle.btn_deck_view")
+	title_lbl.theme_type_variation = "TitleLabel"
 	title_lbl.add_theme_font_size_override("font_size", 22)
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(title_lbl)
 
 	var close_btn := Button.new()
@@ -1219,7 +1395,7 @@ func _show_deck_viewer_in_battle() -> void:
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_close_deck_viewer)
 	overlay.add_child(close_btn)
-	close_btn.position = Vector2((WINDOW_W - 1300) / 2.0 + 1300 - 56, (WINDOW_H - 680) / 2.0 + 20)
+	close_btn.position = Vector2(panel_x + _DECK_W - 56, panel_y + 20)
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
@@ -1246,7 +1422,8 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 
 	var lbl := Label.new()
 	lbl.text = header
-	lbl.add_theme_font_size_override("font_size", 18)
+	lbl.theme_type_variation = "AccentLabel"
+	lbl.add_theme_font_size_override("font_size", 15)
 	col.add_child(lbl)
 
 	var clip_box := Control.new()
@@ -1267,7 +1444,8 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 	if cards.is_empty():
 		var empty_lbl := Label.new()
 		empty_lbl.text = tr("ui.battle.deck_viewer.empty")
-		empty_lbl.add_theme_font_size_override("font_size", 16)
+		empty_lbl.theme_type_variation = "SubLabel"
+		empty_lbl.add_theme_font_size_override("font_size", 15)
 		grid.add_child(empty_lbl)
 		return
 
@@ -1488,6 +1666,7 @@ func _card_target_type(card: Resource) -> String:
 	return "none"
 
 func _start_drag(card: Resource) -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	_reset_hand_fan()
 	_drag_card = card
 	_selected_card = null
@@ -1554,6 +1733,7 @@ func _finish_drag(drop_pos: Vector2) -> void:
 			_cleanup_drag()
 
 func _cleanup_drag() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	for spr in _drag_chevrons:
 		if is_instance_valid(spr):
 			spr.queue_free()
@@ -1570,7 +1750,7 @@ func _cleanup_drag() -> void:
 				btn.set_disabled(not DeckManager.can_play(card_res))
 	_drag_card = null
 	_selected_card = null
-	_message_label.text = ""
+	_message_label.text = tr("battle.msg_player_turn") if BattleManager.is_player_turn else ""
 	for entry in _enemy_nodes:
 		if entry["panel"].visible:
 			entry["panel"].color = Color(0, 0, 0, 0)
@@ -1582,62 +1762,67 @@ func _create_drag_arrow(start_pos: Vector2) -> void:
 	_drag_end_pos = start_pos
 	_drag_t_offset = 0.0
 
-	for i in range(8):
-		var chev := Sprite2D.new()
-		chev.texture = ARROW_CHEVRON_TEX
-		chev.scale = Vector2(0.15, 0.15)
-		chev.modulate = Color(1.0, 1.0, 1.0, 0.0)
-		chev.z_index = 5
-		add_child(chev)
-		_drag_chevrons.append(chev)
+	if not _drag_no_chevron:
+		for i in range(8):
+			var chev := Sprite2D.new()
+			chev.texture = ARROW_CHEVRON_TEX
+			chev.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+			chev.scale = Vector2(0.15 if i % 2 == 0 else -0.15, 0.15)
+			chev.modulate = Color(1.0, 1.0, 1.0, 0.0)
+			chev.z_index = 5
+			add_child(chev)
+			_drag_chevrons.append(chev)
 
 	_drag_arrow_head = Sprite2D.new()
 	_drag_arrow_head.texture = ARROW_HEAD_TEX
-	_drag_arrow_head.scale = Vector2(0.2, 0.2)
+	_drag_arrow_head.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	_drag_arrow_head.scale = Vector2(0.5, 0.5)
 	_drag_arrow_head.modulate = Color.WHITE
 	_drag_arrow_head.z_index = 6
 	add_child(_drag_arrow_head)
 
 	_update_drag_arrow(start_pos)
 
+const _ARROW_GOLD := Color(0.788, 0.659, 0.298)   # #c9a84c
+const _ARROW_GRAY := Color(0.45, 0.45, 0.45)
+
 func _drag_arrow_color(pos: Vector2) -> Color:
 	if _drag_card == null:
-		return Color.WHITE
+		return _ARROW_GOLD
 	if pos.y >= BOTTOM_Y:
-		return Color(1.0, 0.25, 0.25)
+		return _ARROW_GRAY
 	match _card_target_type(_drag_card):
 		"enemy":
 			for i in range(_enemy_nodes.size()):
 				var panel: ColorRect = _enemy_nodes[i]["panel"]
 				if panel.visible and BattleManager.is_enemy_alive(i) \
 						and panel.get_global_rect().has_point(pos):
-					return Color(0.3, 1.0, 0.4)
-			return Color(1.0, 0.25, 0.25)
+					return _ARROW_GOLD
+			return _ARROW_GRAY
 		"ally":
 			for entry in _hero_nodes:
 				if entry["panel"].visible and TeamManager.is_alive(entry["hero_id"]) \
 						and entry["panel"].get_global_rect().has_point(pos):
-					return Color(0.3, 1.0, 0.4)
-			return Color(1.0, 0.25, 0.25)
+					return _ARROW_GOLD
+			return _ARROW_GRAY
 		"dead_ally":
 			for entry in _hero_nodes:
 				if entry["panel"].visible and not TeamManager.is_alive(entry["hero_id"]) \
 						and entry["panel"].get_global_rect().has_point(pos):
-					return Color(0.3, 1.0, 0.4)
-			return Color(1.0, 0.25, 0.25)
+					return _ARROW_GOLD
+			return _ARROW_GRAY
 		"none":
-			return Color(0.3, 1.0, 0.4)
-	return Color.WHITE
+			return _ARROW_GOLD
+	return _ARROW_GOLD
 
 func _update_drag_arrow(end_pos: Vector2) -> void:
 	if _drag_arrow_head == null:
 		return
 	var start := _drag_start_pos
-	var ctrl := (start + end_pos) * 0.5 + Vector2(0, -200.0)
+	var _ctrl := (start + end_pos) * 0.5 + Vector2(0, -200.0)
 	var base := _drag_arrow_color(end_pos)
-	var tangent_end := (end_pos - ctrl).normalized()
-	_drag_arrow_head.position = end_pos
-	_drag_arrow_head.rotation = tangent_end.angle()
+	_drag_arrow_head.position = end_pos.round()
+
 	_drag_arrow_head.modulate = base
 
 func _update_drag_chevrons() -> void:
@@ -1649,12 +1834,14 @@ func _update_drag_chevrons() -> void:
 	var base := _drag_arrow_color(end_pos)
 	var n := _drag_chevrons.size()
 	for i in range(n):
-		var t_raw := fmod(_drag_t_offset + float(i) / float(n), 1.0)
-		var t := t_raw * 0.88
-		var p := (1-t)*(1-t)*start + 2*(1-t)*t*ctrl + t*t*end_pos
-		var tangent := (2.0*(1-t)*(ctrl - start) + 2.0*t*(end_pos - ctrl)).normalized()
-		var alpha := sin(PI * t_raw)
+		var t_raw: float = fmod(_drag_t_offset + float(i) / float(n), 1.0)
+		var t: float = t_raw * 0.88
+		var p: Vector2 = (1.0-t)*(1.0-t)*start + 2.0*(1.0-t)*t*ctrl + t*t*end_pos
+		var tangent: Vector2 = (2.0*(1.0-t)*(ctrl - start) + 2.0*t*(end_pos - ctrl)).normalized()
+		var alpha: float = t_raw
+		var scale_factor: float = lerp(0.08, 0.5, t_raw)
 		var chev: Sprite2D = _drag_chevrons[i]
-		chev.position = p
+		chev.position = p.round()
 		chev.rotation = tangent.angle()
+		chev.scale = Vector2(scale_factor, scale_factor)
 		chev.modulate = Color(base.r, base.g, base.b, alpha)

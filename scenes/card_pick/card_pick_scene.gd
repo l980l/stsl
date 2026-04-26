@@ -19,7 +19,7 @@ func _ready() -> void:
 
 func _build_ui() -> void:
 	var bg := ColorRect.new()
-	bg.color = Color(0.05, 0.05, 0.1)
+	bg.color = SacredPalette.INK_1000
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
@@ -27,6 +27,7 @@ func _build_ui() -> void:
 	_title_label.text = tr("ui.card_pick.title") % [_picked_count, _pick_max]
 	_title_label.position = Vector2(660, 100)
 	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_title_label.theme_type_variation = "TitleLabel"
 	_title_label.add_theme_font_size_override("font_size", 32)
 	add_child(_title_label)
 	_title_label.size = Vector2(600, 60)
@@ -46,11 +47,13 @@ func _build_ui() -> void:
 	var skip_btn := Button.new()
 	skip_btn.position = Vector2(880, 680)
 	skip_btn.text = tr("ui.card_pick.btn_skip")
+	skip_btn.theme_type_variation = "VowButton"
 	skip_btn.add_theme_font_size_override("font_size", 18)
 	skip_btn.pressed.connect(_on_skip)
 	add_child(skip_btn)
 	skip_btn.size = Vector2(160, 50)
 	LabelUtils.fit_text(skip_btn, 18, 12)
+	SacredTheme.animate_button(skip_btn)
 
 func _on_card_selected(card: Resource, node) -> void:
 	DeckManager.add_card_to_deck(card)

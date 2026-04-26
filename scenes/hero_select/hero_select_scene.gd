@@ -104,6 +104,7 @@ func _build_ui() -> void:
 
 		var name_lbl := Label.new()
 		name_lbl.theme_type_variation = "AccentLabel"
+		name_lbl.add_theme_font_override("font", SacredTheme.get_hero_font(hid))
 		name_lbl.text = "%s\nHP %d" % [tr(info.get("name", hid) as String), info.get("hp", 0) as int]
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_lbl.custom_minimum_size = Vector2(0, 70)

@@ -48,9 +48,14 @@ QUALITY_PREFIX = (
 SIMPLICITY_SUFFIX = ""
 
 CATEGORY_CONFIG = {
-    "status":  {"subdir": "status",  "width": 256, "height": 256},
-    "synergy": {"subdir": "synergy", "width": 256, "height": 256},
-    "relic":   {"subdir": "relic",   "width": 256, "height": 256},
+    "status":         {"subdir": "status",    "width": 256, "height": 256},
+    "synergy":        {"subdir": "synergy",   "width": 256, "height": 256},
+    "relic":          {"subdir": "relic",     "width": 256, "height": 256},
+    "map_node":       {"subdir": "map_node",  "width": 256, "height": 256},
+    "intent":         {"subdir": "intent",    "width": 256, "height": 256},
+    "energy_orb":     {"subdir": "hud",       "width": 256, "height": 256},
+    "hp_bar":         {"subdir": "hud",       "width": 512, "height": 128},
+    "portrait_frame": {"subdir": "hud",       "width": 256, "height": 256},
 }
 
 # 마크다운 섹션 헤더 → 카테고리 매핑
@@ -58,6 +63,11 @@ SECTION_TO_CATEGORY = {
     "상태이상 아이콘": "status",
     "시너지 아이콘":   "synergy",
     "렐릭 아이콘":     "relic",
+    "맵 노드 아이콘":  "map_node",
+    "의도 아이콘":     "intent",
+    "에너지 오브":     "energy_orb",
+    "HP 바":          "hp_bar",
+    "초상화 프레임":   "portrait_frame",
 }
 
 
@@ -262,7 +272,10 @@ def build_gmic_workflow(template: dict, prompt_text: str, icon_id: str,
 
 def main():
     parser = argparse.ArgumentParser(description="STSL 아이콘 일괄 생성 (ComfyUI API)")
-    parser.add_argument("--category", choices=["status", "synergy", "relic", "all"],
+    parser.add_argument("--category",
+                        choices=["status", "synergy", "relic",
+                                 "map_node", "intent", "energy_orb", "hp_bar", "portrait_frame",
+                                 "all"],
                         default="all", help="생성할 카테고리 (기본: all)")
     parser.add_argument("--comfy-url", default=DEFAULT_COMFY_URL,
                         help=f"ComfyUI 주소 (기본: {DEFAULT_COMFY_URL})")
