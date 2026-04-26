@@ -59,7 +59,10 @@ func play_card(card: Resource) -> bool:
 		current_energy -= effective_cost
 	energy_changed.emit(current_energy)
 	hand.erase(card)
-	discard_pile.append(card)
+	if card.get("card_type") == 2:  # CardType.POWER — 전투 중 소멸
+		exhaust_pile.append(card)
+	else:
+		discard_pile.append(card)
 	card_played.emit(card)
 	hand_changed.emit()
 	return true

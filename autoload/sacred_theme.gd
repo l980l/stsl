@@ -523,6 +523,56 @@ func make_halo() -> ColorRect:
 	halo.material = mat
 	return halo
 
+# ── 그라데이션 텍스처 헬퍼 ────────────────────────────────────────────────
+# 팝업 헤더 하이라이트·구분선·컬럼 구분선에 공통 사용
+
+func make_top_fade_tex(color: Color = SacredPalette.BRASS_300, top_alpha: float = 0.18) -> GradientTexture2D:
+	var g := Gradient.new()
+	g.set_color(0, Color(color.r, color.g, color.b, top_alpha))
+	g.set_color(1, Color(color.r, color.g, color.b, 0.0))
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.fill = GradientTexture2D.FILL_LINEAR
+	tex.fill_from = Vector2(0.5, 0.0)
+	tex.fill_to   = Vector2(0.5, 1.0)
+	return tex
+
+func make_center_bright_h_tex(color: Color = SacredPalette.BRASS_300, mid_alpha: float = 0.75) -> GradientTexture2D:
+	var g := Gradient.new()
+	g.set_color(0, Color(color.r, color.g, color.b, 0.0))
+	g.set_color(1, Color(color.r, color.g, color.b, 0.0))
+	g.add_point(0.5, Color(color.r, color.g, color.b, mid_alpha))
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.fill = GradientTexture2D.FILL_LINEAR
+	tex.fill_from = Vector2(0.0, 0.5)
+	tex.fill_to   = Vector2(1.0, 0.5)
+	return tex
+
+func make_center_bright_v_tex(color: Color = SacredPalette.BRASS_300, mid_alpha: float = 0.5) -> GradientTexture2D:
+	var g := Gradient.new()
+	g.set_color(0, Color(color.r, color.g, color.b, 0.0))
+	g.set_color(1, Color(color.r, color.g, color.b, 0.0))
+	g.add_point(0.5, Color(color.r, color.g, color.b, mid_alpha))
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.fill = GradientTexture2D.FILL_LINEAR
+	tex.fill_from = Vector2(0.5, 0.0)
+	tex.fill_to   = Vector2(0.5, 1.0)
+	return tex
+
+func make_top_ellipse_bloom(focus_y: float = 0.0) -> ColorRect:
+	var sh := Shader.new()
+	sh.code = "shader_type canvas_item;\nuniform float opacity : hint_range(0.0, 1.0) = 1.0;\nuniform float focus_y : hint_range(0.0, 1.0) = 0.0;\nvoid fragment() {\n\tvec2 focus = vec2(0.5, focus_y);\n\tfloat d = length((UV - focus) * vec2(1.0, 2.5));\n\tfloat a = smoothstep(0.7, 0.0, d) * 0.18 * opacity;\n\tCOLOR = vec4(0.722, 0.565, 0.165, a);\n}\n"
+	var rect := ColorRect.new()
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var mat := ShaderMaterial.new()
+	mat.shader = sh
+	mat.set_shader_parameter("opacity", 1.0)
+	mat.set_shader_parameter("focus_y", focus_y)
+	rect.material = mat
+	return rect
+
 # ── 모달 dim 배경 (CanvasLayer에 반투명 차폐막 추가) ────────────────────
 # 클릭 차단 포함. CanvasLayer.add_child 전에 호출해야 z 순서가 맞다.
 

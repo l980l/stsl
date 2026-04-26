@@ -829,6 +829,9 @@ func _apply_penalty_effect(relic: Resource) -> void:
 			if not living.is_empty():
 				var target = living[randi() % living.size()]
 				tm.take_damage(target.hero_id, relic.penalty_value)
+				var _bm_pe := _get_bm()
+				if _bm_pe:
+					_bm_pe._check_lose_condition()
 		_:
 			push_warning("_apply_penalty_effect: 미처리 penalty_effect_type = %d" % relic.penalty_effect_type)
 
@@ -884,6 +887,9 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 				if not living.is_empty():
 					var target = living[randi() % living.size()]
 					tm.take_damage(target.hero_id, value)
+					var _bm_re := _get_bm()
+					if _bm_re:
+						_bm_re._check_lose_condition()
 
 func _build_relic_pool() -> Array:
 	return _RelicData.build_pool()

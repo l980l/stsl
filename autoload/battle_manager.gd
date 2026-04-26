@@ -469,6 +469,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.SACRIFICE_HP:
 				if team_mgr:
 					team_mgr.take_damage(card.owner_id, effect.value)
+					_check_lose_condition()
 			EffectRes.EffectType.COST_ZERO_TURN:
 				if deck_mgr:
 					deck_mgr.pending_all_cost_zero = true
@@ -686,6 +687,7 @@ func _phase_enemy_post() -> bool:
 		if dmg > 0 and dur > 0:
 			_tick_hero_poison(hero.hero_id)
 			did_work = true
+	_check_lose_condition()
 	return did_work
 
 func _execute_intent(enemy_index: int, intent: Resource) -> void:

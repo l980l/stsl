@@ -73,6 +73,11 @@ func _build_ui() -> void:
 	bg.size     = Vector2(1920, 1080)
 	add_child(bg)
 
+	var bloom := SacredTheme.make_top_ellipse_bloom()
+	bloom.position = Vector2.ZERO
+	bloom.size     = Vector2(1920, 400)
+	add_child(bloom)
+
 	var eyebrow := Label.new()
 	eyebrow.theme_type_variation   = "EyebrowLabel"
 	eyebrow.text                   = "— MARKET —"
@@ -93,12 +98,21 @@ func _build_ui() -> void:
 	var gold_lbl := Label.new()
 	gold_lbl.name = "GoldLabel"
 	gold_lbl.theme_type_variation = "EyebrowLabel"
-	gold_lbl.add_theme_font_size_override("font_size", 42)
-	gold_lbl.text     = tr("ui.shop.gold_label") % GameManager.gold
-	gold_lbl.position = Vector2(30, 20)
-	gold_lbl.size     = Vector2(380, 60)
+	gold_lbl.add_theme_font_size_override("font_size", 21)
+	gold_lbl.text     = "⛬ %dg" % GameManager.gold
+	gold_lbl.position = Vector2(30, 22)
+	gold_lbl.size     = Vector2(200, 32)
 	add_child(gold_lbl)
-	LabelUtils.fit_text(gold_lbl, 42, 24)
+	LabelUtils.fit_text(gold_lbl, 21, 13)
+
+	var title_div := TextureRect.new()
+	title_div.texture = SacredTheme.make_center_bright_h_tex()
+	title_div.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	title_div.stretch_mode = TextureRect.STRETCH_SCALE
+	title_div.position = Vector2(360, 100)
+	title_div.size = Vector2(1200, 2)
+	title_div.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(title_div)
 
 	_build_card_section()
 	_build_relic_section()
@@ -124,7 +138,7 @@ func _build_card_section() -> void:
 	sec_lbl.theme_type_variation = "EyebrowLabel"
 	sec_lbl.text                 = "— Cards —"
 	sec_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sec_lbl.position             = Vector2(460, 120)
+	sec_lbl.position             = Vector2(460, 140)
 	sec_lbl.size                 = Vector2(1000, 26)
 	add_child(sec_lbl)
 
@@ -140,7 +154,7 @@ func _build_card_section() -> void:
 		var cx := start_x + i * (CARD_W + CARD_GAP)
 
 		var node: CardScene = CARD_SCENE.instantiate()
-		node.position     = Vector2(cx, 150)
+		node.position     = Vector2(cx, 172)
 		node.pivot_offset = Vector2(CARD_W / 2.0, CARD_H)
 		node.setup(card, CardScene.Mode.REWARD)
 		add_child(node)
@@ -151,7 +165,7 @@ func _build_card_section() -> void:
 
 		var btn := Button.new()
 		btn.text     = tr("ui.shop.btn_buy") % price
-		btn.position = Vector2(cx, 368)
+		btn.position = Vector2(cx, 390)
 		btn.size     = Vector2(CARD_W, 36)
 		btn.add_theme_font_size_override("font_size", 13)
 		var captured_card := card
@@ -551,6 +565,24 @@ func _show_remove_panel(price: int) -> void:
 	panel.position = Vector2((1920 - 1300) / 2.0, (1080 - 600) / 2.0)
 	group.add_child(panel)
 
+	var hl := TextureRect.new()
+	hl.texture = SacredTheme.make_top_fade_tex()
+	hl.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	hl.stretch_mode = TextureRect.STRETCH_SCALE
+	hl.position = panel.position
+	hl.size = Vector2(1300, 80)
+	hl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hl)
+
+	var hdiv := TextureRect.new()
+	hdiv.texture = SacredTheme.make_center_bright_h_tex()
+	hdiv.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	hdiv.stretch_mode = TextureRect.STRETCH_SCALE
+	hdiv.position = Vector2(panel.position.x + 20, panel.position.y + 60)
+	hdiv.size = Vector2(1260, 2)
+	hdiv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hdiv)
+
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left",   20)
 	margin.add_theme_constant_override("margin_right",  20)
@@ -577,7 +609,7 @@ func _show_remove_panel(price: int) -> void:
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_remove_panel)
 	group.add_child(close_btn)
-	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 600) / 2.0 + 20)
+	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 600) / 2.0 + 12)
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
@@ -721,7 +753,7 @@ func _on_confirm_remove() -> void:
 func _refresh_gold_label() -> void:
 	var lbl := get_node_or_null("GoldLabel")
 	if lbl:
-		lbl.text = tr("ui.shop.gold_label") % GameManager.gold
+		lbl.text = "⛬ %dg" % GameManager.gold
 
 func _refresh_upgrade_btn() -> void:
 	if not is_instance_valid(_upgrade_btn_ref):
@@ -773,6 +805,24 @@ func _show_upgrade_panel(price: int) -> void:
 	panel.position = Vector2((1920 - 1300) / 2.0, (1080 - 600) / 2.0)
 	group.add_child(panel)
 
+	var hl := TextureRect.new()
+	hl.texture = SacredTheme.make_top_fade_tex()
+	hl.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	hl.stretch_mode = TextureRect.STRETCH_SCALE
+	hl.position = panel.position
+	hl.size = Vector2(1300, 80)
+	hl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hl)
+
+	var hdiv := TextureRect.new()
+	hdiv.texture = SacredTheme.make_center_bright_h_tex()
+	hdiv.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	hdiv.stretch_mode = TextureRect.STRETCH_SCALE
+	hdiv.position = Vector2(panel.position.x + 20, panel.position.y + 60)
+	hdiv.size = Vector2(1260, 2)
+	hdiv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hdiv)
+
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left",   20)
 	margin.add_theme_constant_override("margin_right",  20)
@@ -799,7 +849,7 @@ func _show_upgrade_panel(price: int) -> void:
 	close_btn.custom_minimum_size = Vector2(40, 40)
 	close_btn.pressed.connect(_hide_upgrade_panel)
 	group.add_child(close_btn)
-	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 600) / 2.0 + 20)
+	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 600) / 2.0 + 12)
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
