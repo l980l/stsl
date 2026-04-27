@@ -34,6 +34,7 @@ const _CURSOR_DEFAULT := 32
 const _SETTINGS_PATH  := "user://settings.cfg"
 
 func _ready() -> void:
+	RenderingServer.set_default_clear_color(Color.BLACK)
 	theme = load("res://resources/theme/global_theme.tres")
 	_setup_fonts()
 	_setup_buttons()
