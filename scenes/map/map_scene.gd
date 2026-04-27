@@ -61,6 +61,27 @@ func _build_ui() -> void:
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
+	# 타이틀 블룸 — 세로 타원형, 중심 (960, 39)
+	var bloom_g := Gradient.new()
+	var bc := SacredPalette.BRASS_300
+	bloom_g.set_color(0, Color(bc.r, bc.g, bc.b, 0.11))
+	bloom_g.set_color(1, Color(bc.r, bc.g, bc.b, 0.0))
+	var bloom_tex := GradientTexture2D.new()
+	bloom_tex.gradient  = bloom_g
+	bloom_tex.fill      = GradientTexture2D.FILL_RADIAL
+	bloom_tex.fill_from = Vector2(0.5, 0.5)
+	bloom_tex.fill_to   = Vector2(1.0, 0.5)
+	bloom_tex.width  = 64
+	bloom_tex.height = 64
+	var bloom := TextureRect.new()
+	bloom.texture      = bloom_tex
+	bloom.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
+	bloom.stretch_mode = TextureRect.STRETCH_SCALE
+	bloom.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bloom.size     = Vector2(760, 780)       # 세로가 더 긴 타원
+	bloom.position = Vector2(960 - 380, 39 - 260)  # 타이틀 중심 정렬
+	add_child(bloom)
+
 	var title := Label.new()
 	title.theme_type_variation = "TitleLabel"
 	title.text = _trf("ui.map.act_title", GameManager.current_act)
