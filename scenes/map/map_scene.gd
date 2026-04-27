@@ -61,25 +61,10 @@ func _build_ui() -> void:
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
-	# 타이틀 블룸 — 세로 타원형, 중심 (960, 39)
-	var bloom_g := Gradient.new()
-	var bc := SacredPalette.BRASS_300
-	bloom_g.set_color(0, Color(bc.r, bc.g, bc.b, 0.11))
-	bloom_g.set_color(1, Color(bc.r, bc.g, bc.b, 0.0))
-	var bloom_tex := GradientTexture2D.new()
-	bloom_tex.gradient  = bloom_g
-	bloom_tex.fill      = GradientTexture2D.FILL_RADIAL
-	bloom_tex.fill_from = Vector2(0.5, 0.5)
-	bloom_tex.fill_to   = Vector2(1.0, 0.5)
-	bloom_tex.width  = 64
-	bloom_tex.height = 64
-	var bloom := TextureRect.new()
-	bloom.texture      = bloom_tex
-	bloom.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
-	bloom.stretch_mode = TextureRect.STRETCH_SCALE
-	bloom.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bloom.size     = Vector2(760, 780)       # 세로가 더 긴 타원
-	bloom.position = Vector2(960 - 380, 39 - 260)  # 타이틀 중심 정렬
+	# 상단 블룸
+	var bloom := SacredTheme.make_top_ellipse_bloom(0.0)
+	bloom.position = Vector2.ZERO
+	bloom.size = Vector2(1920, 560)
 	add_child(bloom)
 
 	var title := Label.new()
@@ -99,6 +84,16 @@ func _build_ui() -> void:
 	_relic_container.add_theme_constant_override("v_separation", 4)
 	add_child(_relic_container)
 	_refresh_relics()
+
+	# 타이틀~스크롤 구분선
+	var div_line := TextureRect.new()
+	div_line.texture = SacredTheme.make_center_bright_h_tex()
+	div_line.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	div_line.stretch_mode = TextureRect.STRETCH_SCALE
+	div_line.position = Vector2(64, 146)
+	div_line.size = Vector2(1920 - 128, 2)
+	div_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(div_line)
 
 	# 맵 스크롤 영역
 	var content_h := MAP_PAD_TOP + (MapGenerator.FLOORS - 1) * FLOOR_GAP + NODE_SIZE + MAP_PAD_BOT
