@@ -535,7 +535,7 @@ func _show_confirm_popup() -> void:
 
 	var btn_ok := Button.new()
 	btn_ok.text = "확인"
-	btn_ok.theme_type_variation = "PrimaryButton"
+	btn_ok.theme_type_variation = "VowButton"
 	if mono_font:
 		btn_ok.add_theme_font_override("font", mono_font)
 	btn_ok.add_theme_font_size_override("font_size", 13)
@@ -547,7 +547,7 @@ func _show_confirm_popup() -> void:
 
 	var btn_cancel := Button.new()
 	btn_cancel.text = "취소"
-	btn_cancel.theme_type_variation = "VowButton"
+	btn_cancel.theme_type_variation = "PrimaryButton"
 	if mono_font:
 		btn_cancel.add_theme_font_override("font", mono_font)
 	btn_cancel.add_theme_font_size_override("font_size", 13)
