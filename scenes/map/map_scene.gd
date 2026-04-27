@@ -25,6 +25,7 @@ var _deck_scroll:       ScrollContainer = null
 var _deck_card_tweens:  Dictionary      = {}
 var _deck_card_parents: Dictionary      = {}
 var _active_scroll:     ScrollContainer = null
+var _confirm_popup:     CanvasLayer     = null
 
 func _trf(key: String, args) -> String:
 	var s := tr(key)
@@ -49,9 +50,13 @@ func _input(ev: InputEvent) -> void:
 			return
 
 func _unhandled_input(ev: InputEvent) -> void:
-	if _deck_viewer and ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
-		_hide_deck_viewer()
-		get_viewport().set_input_as_handled()
+	if ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
+		if _confirm_popup:
+			_close_confirm_popup()
+			get_viewport().set_input_as_handled()
+		elif _deck_viewer:
+			_hide_deck_viewer()
+			get_viewport().set_input_as_handled()
 
 func _build_ui() -> void:
 	# 배경
@@ -70,11 +75,11 @@ func _build_ui() -> void:
 	var title := Label.new()
 	title.theme_type_variation = "TitleLabel"
 	title.text = _trf("ui.map.act_title", GameManager.current_act)
-	title.position = Vector2(760, 14)
-	title.size = Vector2(400, 50)
+	title.position = Vector2(760, 45)
+	title.size = Vector2(400, 54)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
-	LabelUtils.fit_text(title, 32, 18)
+	LabelUtils.fit_text(title, 40, 22)
 
 	# 릴릭 표시
 	_relic_container = FlowContainer.new()
@@ -131,6 +136,17 @@ func _build_ui() -> void:
 	deck_btn.size = Vector2(160, 40)
 	LabelUtils.fit_text(deck_btn, 16, 12)
 	SacredTheme.animate_button(deck_btn)
+
+	var btn_back := Button.new()
+	btn_back.theme_type_variation = "VowButton"
+	btn_back.text = tr("ui.chapter_select.back")
+	btn_back.position = Vector2(60, 960)
+	btn_back.size = Vector2(200, 52)
+	btn_back.add_theme_font_size_override("font_size", 14)
+	btn_back.pressed.connect(_on_back_pressed)
+	add_child(btn_back)
+	LabelUtils.fit_text(btn_back, 14, 11)
+	SacredTheme.animate_button(btn_back)
 
 func _draw_connections() -> void:
 	for node in GameManager.run_map:
@@ -463,3 +479,107 @@ func _hide_deck_viewer() -> void:
 			tw.tween_callback(func(): if is_instance_valid(viewer): viewer.queue_free())
 		else:
 			if is_instance_valid(viewer): viewer.queue_free()
+
+func _on_back_pressed() -> void:
+	_show_confirm_popup()
+
+func _show_confirm_popup() -> void:
+	if _confirm_popup:
+		return
+	_confirm_popup = CanvasLayer.new()
+	_confirm_popup.layer = 50
+	add_child(_confirm_popup)
+
+	# 반투명 오버레이
+	var overlay := ColorRect.new()
+	overlay.color = Color(0.0, 0.0, 0.0, 0.55)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	_confirm_popup.add_child(overlay)
+
+	# 팝업 패널
+	var PW := 580.0
+	var PH := 220.0
+	var panel := Panel.new()
+	var ps := StyleBoxFlat.new()
+	ps.bg_color = SacredPalette.INK_900
+	ps.border_color = SacredPalette.BRASS_500
+	ps.set_border_width_all(1)
+	panel.add_theme_stylebox_override("panel", ps)
+	panel.position = Vector2((1920.0 - PW) * 0.5, (1080.0 - PH) * 0.5)
+	panel.size = Vector2(PW, PH)
+	panel.pivot_offset = Vector2(PW * 0.5, PH * 0.5)
+	_confirm_popup.add_child(panel)
+	SacredTheme.add_corner_brackets(panel)
+
+	# 메시지
+	var msg := Label.new()
+	msg.text = "진행상황이 초기화됩니다.\n정말 뒤로가시겠습니까?"
+	msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	msg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	msg.position = Vector2(40.0, 36.0)
+	msg.size = Vector2(PW - 80.0, 96.0)
+	msg.add_theme_font_size_override("font_size", 20)
+	msg.add_theme_color_override("font_color", SacredPalette.BONE_100)
+	panel.add_child(msg)
+	LabelUtils.fit_text(msg, 20, 14)
+
+	# 버튼 행
+	var mono_font := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
+	var BTN_Y := PH - 72.0
+	var BTN_W := 200.0
+	var BTN_H := 46.0
+	var GAP   := 24.0
+	var total := BTN_W * 2.0 + GAP
+	var bx    := (PW - total) * 0.5
+
+	var btn_ok := Button.new()
+	btn_ok.text = "확인"
+	btn_ok.theme_type_variation = "PrimaryButton"
+	if mono_font:
+		btn_ok.add_theme_font_override("font", mono_font)
+	btn_ok.add_theme_font_size_override("font_size", 13)
+	btn_ok.position = Vector2(bx, BTN_Y)
+	btn_ok.size = Vector2(BTN_W, BTN_H)
+	btn_ok.pressed.connect(_on_confirm_back)
+	panel.add_child(btn_ok)
+	SacredTheme.animate_button(btn_ok)
+
+	var btn_cancel := Button.new()
+	btn_cancel.text = "취소"
+	btn_cancel.theme_type_variation = "VowButton"
+	if mono_font:
+		btn_cancel.add_theme_font_override("font", mono_font)
+	btn_cancel.add_theme_font_size_override("font_size", 13)
+	btn_cancel.position = Vector2(bx + BTN_W + GAP, BTN_Y)
+	btn_cancel.size = Vector2(BTN_W, BTN_H)
+	btn_cancel.pressed.connect(_close_confirm_popup)
+	panel.add_child(btn_cancel)
+	SacredTheme.animate_button(btn_cancel)
+
+	# 팝업 열기 트윈
+	panel.modulate.a = 0.0
+	panel.scale = Vector2(0.95, 0.95)
+	var tw := create_tween().set_parallel(true)
+	tw.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(panel, "modulate:a", 1.0, 0.20)
+	tw.tween_property(panel, "scale", Vector2(1.0, 1.0), 0.18)
+
+func _close_confirm_popup() -> void:
+	if not _confirm_popup:
+		return
+	var popup := _confirm_popup
+	_confirm_popup = null
+	var panel: Panel = popup.get_child(1) as Panel
+	if is_instance_valid(panel):
+		var tw := create_tween().set_parallel(true)
+		tw.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tw.tween_property(panel, "modulate:a", 0.0, 0.15)
+		tw.tween_property(panel, "scale", Vector2(0.95, 0.95), 0.15)
+		tw.chain().tween_callback(func(): if is_instance_valid(popup): popup.queue_free())
+	else:
+		popup.queue_free()
+
+func _on_confirm_back() -> void:
+	GameManager.reset()
+	get_tree().change_scene_to_file("res://scenes/chapter_select/chapter_select_scene.tscn")
