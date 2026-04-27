@@ -143,6 +143,22 @@ func _build_ui() -> void:
 		if not inactive:
 			SacredTheme.animate_button(btn)
 
+	# 뒤로 버튼 — 리크루트 모드에서는 숨김 (보스 클리어 후 진행 중)
+	if not is_recruit:
+		var btn_back := Button.new()
+		btn_back.theme_type_variation = "VowButton"
+		btn_back.text = tr("ui.chapter_select.back")
+		btn_back.position = Vector2(60, 960)
+		btn_back.size = Vector2(200, 52)
+		btn_back.add_theme_font_size_override("font_size", 14)
+		btn_back.pressed.connect(_on_back)
+		add_child(btn_back)
+		LabelUtils.fit_text(btn_back, 14, 11)
+		SacredTheme.animate_button(btn_back)
+
+func _on_back() -> void:
+	get_tree().change_scene_to_file("res://scenes/chapter_select/chapter_select_scene.tscn")
+
 func _on_hero_selected(hero_id: String) -> void:
 	if GameManager.pending_boss_recruit:
 		GameManager.complete_hero_recruit(hero_id)
