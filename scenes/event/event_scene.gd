@@ -383,11 +383,11 @@ func _cost_tags(choice: Resource) -> Array:
 func _play_open() -> void:
 	if _popup_tween:
 		_popup_tween.kill()
-	_frame.modulate.a = 0.0
+	modulate.a = 0.0
 	_frame.scale = Vector2(0.97, 0.97)
 	_popup_tween = create_tween().set_parallel(true)
 	_popup_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_popup_tween.tween_property(_frame, "modulate:a", 1.0, 0.30)
+	_popup_tween.tween_property(self, "modulate:a", 1.0, 0.30)
 	_popup_tween.tween_property(_frame, "scale", Vector2(1.0, 1.0), 0.28)
 
 func _play_close(callback: Callable) -> void:
@@ -395,7 +395,7 @@ func _play_close(callback: Callable) -> void:
 		_popup_tween.kill()
 	_popup_tween = create_tween().set_parallel(true)
 	_popup_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	_popup_tween.tween_property(_frame, "modulate:a", 0.0, 0.20)
+	_popup_tween.tween_property(self, "modulate:a", 0.0, 0.22)
 	_popup_tween.tween_property(_frame, "scale", Vector2(0.97, 0.97), 0.20)
 	_popup_tween.chain().tween_callback(callback)
 
