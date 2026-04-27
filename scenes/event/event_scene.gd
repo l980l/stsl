@@ -78,7 +78,7 @@ func _build_illo(frame: Panel, event: Resource) -> void:
 	# 이벤트 플레이트 배지 (상단 중앙)
 	var mono_font := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
 	var plate_lbl := Label.new()
-	plate_lbl.text = "—  " + tr(event.event_name) + "  —"
+	plate_lbl.text = "— Event · " + tr(event.event_name) + " —"
 	if mono_font:
 		plate_lbl.add_theme_font_override("font", mono_font)
 	plate_lbl.add_theme_font_size_override("font_size", 11)
@@ -191,7 +191,7 @@ func _build_choices(frame: Panel, event: Resource) -> void:
 	# 선택 영역 전체 VBox
 	var area := VBoxContainer.new()
 	area.position = Vector2(56.0, ILLO_H + CHOICE_PAD)
-	area.size = Vector2(FRAME_W - 112.0, FRAME_H - ILLO_H - CHOICE_PAD - 8.0)
+	area.size = Vector2(FRAME_W - 112.0, FRAME_H - ILLO_H - CHOICE_PAD - 34.0)
 	area.add_theme_constant_override("separation", 12)
 	frame.add_child(area)
 
