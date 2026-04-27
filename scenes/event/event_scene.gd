@@ -12,12 +12,16 @@ const ILLO_H     := 680.0
 const NARR_H     := 270.0
 const CHOICE_PAD := 24.0
 
+var _frame: Panel = null
+var _popup_tween: Tween = null
+
 func _ready() -> void:
 	var event: Resource = GameManager.pending_event
 	if event == null:
 		GameManager._request_scene("res://scenes/map/map_scene.tscn")
 		return
 	_build_ui(event)
+	_play_open()
 
 func _build_ui(event: Resource) -> void:
 	($BG as ColorRect).color = SacredPalette.INK_1000
@@ -37,8 +41,10 @@ func _build_ui(event: Resource) -> void:
 	frame.add_theme_stylebox_override("panel", frame_style)
 	frame.position = Vector2(FRAME_L, FRAME_T)
 	frame.size = Vector2(FRAME_W, FRAME_H)
+	frame.pivot_offset = Vector2(FRAME_W * 0.5, FRAME_H * 0.5)
 	add_child(frame)
 	SacredTheme.add_corner_brackets(frame)
+	_frame = frame
 
 	_build_illo(frame, event)
 	_build_choices(frame, event)
@@ -374,9 +380,30 @@ func _cost_tags(choice: Resource) -> Array:
 			tags.append({"text": "영웅 합류", "color": SacredPalette.BRASS_300})
 	return tags
 
+func _play_open() -> void:
+	if _popup_tween:
+		_popup_tween.kill()
+	_frame.modulate.a = 0.0
+	_frame.scale = Vector2(0.97, 0.97)
+	_popup_tween = create_tween().set_parallel(true)
+	_popup_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_popup_tween.tween_property(_frame, "modulate:a", 1.0, 0.30)
+	_popup_tween.tween_property(_frame, "scale", Vector2(1.0, 1.0), 0.28)
+
+func _play_close(callback: Callable) -> void:
+	if _popup_tween:
+		_popup_tween.kill()
+	_popup_tween = create_tween().set_parallel(true)
+	_popup_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_popup_tween.tween_property(_frame, "modulate:a", 0.0, 0.20)
+	_popup_tween.tween_property(_frame, "scale", Vector2(0.97, 0.97), 0.20)
+	_popup_tween.chain().tween_callback(callback)
+
 func _on_choice_selected(choice: Resource) -> void:
-	_apply_choice(choice)
-	GameManager.complete_event()
+	_play_close(func():
+		_apply_choice(choice)
+		GameManager.complete_event()
+	)
 
 func _apply_choice(choice: Resource) -> void:
 	match choice.effect_type:
