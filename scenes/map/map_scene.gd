@@ -148,6 +148,124 @@ func _build_ui() -> void:
 	LabelUtils.fit_text(btn_back, 14, 11)
 	SacredTheme.animate_button(btn_back)
 
+	_build_party_panel()
+
+func _build_party_panel() -> void:
+	var tm := get_node_or_null("/root/TeamManager")
+	if tm == null or (tm as Object).get("heroes") == null or tm.heroes.is_empty():
+		return
+
+	var mono_font := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
+	var hdr := Label.new()
+	hdr.text = "— PARTY —"
+	if mono_font:
+		hdr.add_theme_font_override("font", mono_font)
+	hdr.add_theme_font_size_override("font_size", 11)
+	hdr.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+	hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hdr.position = Vector2(1610, 492)
+	hdr.size = Vector2(260, 20)
+	add_child(hdr)
+
+	var panel_x := 1600.0
+	var panel_y := 518.0
+	var bar_w   := 260.0
+
+	var party_vbox := VBoxContainer.new()
+	party_vbox.add_theme_constant_override("separation", 18)
+	party_vbox.position = Vector2(panel_x, panel_y)
+	party_vbox.size = Vector2(bar_w, 400)
+	add_child(party_vbox)
+
+	for hero in tm.heroes:
+		var cur_hp: int = tm.get_current_hp(hero.hero_id) if tm.has_method("get_current_hp") else hero.max_hp
+		var ratio: float = float(cur_hp) / float(hero.max_hp)
+
+		var hero_col := VBoxContainer.new()
+		hero_col.add_theme_constant_override("separation", 4)
+		party_vbox.add_child(hero_col)
+
+		var name_lbl := Label.new()
+		name_lbl.text = tr(hero.hero_name)
+		name_lbl.add_theme_font_size_override("font_size", 14)
+		name_lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+		hero_col.add_child(name_lbl)
+
+		var bar := _make_map_hp_bar(bar_w, ratio)
+		hero_col.add_child(bar)
+
+		var hp_lbl := Label.new()
+		hp_lbl.text = "%d / %d" % [cur_hp, hero.max_hp]
+		hp_lbl.add_theme_font_size_override("font_size", 12)
+		var hp_color: Color
+		if ratio <= 0.15:
+			hp_color = SacredPalette.BLOOD_300
+		elif ratio <= 0.5:
+			hp_color = SacredPalette.BLOOD_400
+		else:
+			hp_color = SacredPalette.BONE_300
+		hp_lbl.add_theme_color_override("font_color", hp_color)
+		hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		hero_col.add_child(hp_lbl)
+
+func _make_map_hp_bar(bar_w: float, ratio: float) -> Control:
+	var height := 12.0
+	var P := SacredPalette
+
+	var outer := Panel.new()
+	outer.custom_minimum_size = Vector2(bar_w, height)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = P.INK_1000
+	sb.border_color = P.BRASS_700
+	sb.set_border_width_all(1)
+	outer.add_theme_stylebox_override("panel", sb)
+
+	var inner_w := bar_w - 2.0
+	var inner_h := height - 2.0
+
+	var g := Gradient.new()
+	if ratio <= 0.15:
+		g.set_color(0, P.BLOOD_500); g.set_offset(0, 0.0)
+		g.set_color(1, P.BLOOD_300); g.set_offset(1, 1.0)
+	elif ratio <= 0.5:
+		g.set_color(0, P.BLOOD_600); g.set_offset(0, 0.0)
+		g.set_color(1, P.BLOOD_400); g.set_offset(1, 1.0)
+	else:
+		g.set_color(0, P.BLOOD_700); g.set_offset(0, 0.0)
+		g.set_color(1, P.BLOOD_400); g.set_offset(1, 1.0)
+		g.add_point(0.6, P.BLOOD_500)
+	var tex := GradientTexture1D.new()
+	tex.gradient = g
+
+	var fill_w := maxf(ratio * inner_w, 1.0 if ratio > 0.0 else 0.0)
+	var fill := TextureRect.new()
+	fill.position     = Vector2(1.0, 1.0)
+	fill.texture      = tex
+	fill.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
+	fill.stretch_mode = TextureRect.STRETCH_SCALE
+	fill.size         = Vector2(fill_w, inner_h)
+	fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	outer.add_child(fill)
+
+	var hg := Gradient.new()
+	hg.set_color(0, Color(1.0, 0.92, 0.82, 0.18))
+	hg.set_color(1, Color(1.0, 0.92, 0.82, 0.0))
+	var hg_tex := GradientTexture2D.new()
+	hg_tex.gradient  = hg
+	hg_tex.fill      = GradientTexture2D.FILL_LINEAR
+	hg_tex.fill_from = Vector2(0.5, 0.0)
+	hg_tex.fill_to   = Vector2(0.5, 0.5)
+	hg_tex.width = 4; hg_tex.height = 16
+	var highlight := TextureRect.new()
+	highlight.texture      = hg_tex
+	highlight.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
+	highlight.stretch_mode = TextureRect.STRETCH_SCALE
+	highlight.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	highlight.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fill.add_child(highlight)
+
+	return outer
+
 func _draw_connections() -> void:
 	for node in GameManager.run_map:
 		var from := _node_center(node)
@@ -582,4 +700,4 @@ func _close_confirm_popup() -> void:
 
 func _on_confirm_back() -> void:
 	GameManager.reset()
-	get_tree().change_scene_to_file("res://scenes/chapter_select/chapter_select_scene.tscn")
+	SceneTransition.go("res://scenes/chapter_select/chapter_select_scene.tscn")

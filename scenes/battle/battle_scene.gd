@@ -1539,7 +1539,7 @@ func _show_defeat_continue_hint() -> void:
 
 func _go_to_main_menu() -> void:
 	_defeat_awaiting_input = false
-	get_tree().change_scene_to_file("res://scenes/main_menu/main_menu_scene.tscn")
+	SceneTransition.go("res://scenes/main_menu/main_menu_scene.tscn")
 
 # ─────────────────────────────────────────────
 # 카드 효과 텍스트 헬퍼

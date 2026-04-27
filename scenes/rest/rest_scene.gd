@@ -1,6 +1,8 @@
 # scenes/rest/rest_scene.gd
 extends Node2D
 
+const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+
 const ROMAN      := ["I", "II", "III"]
 const FRAME_L    := 80.0
 const FRAME_T    := 80.0
@@ -13,9 +15,36 @@ const CHOICE_PAD := 24.0
 var _frame: Panel = null
 var _popup_tween: Tween = null
 
+var _upgrade_layer:         CanvasLayer     = null
+var _upgrade_group:         Control         = null
+var _upgrade_overlay:       Control         = null
+var _upgrade_scroll:        ScrollContainer = null
+var _upgrade_card_parents:  Dictionary      = {}
+var _upgrade_card_tweens:   Dictionary      = {}
+var _selected_upgrade_card: Resource        = null
+var _selected_upgrade_node: Node            = null
+var _confirm_upgrade_btn:   Button          = null
+
 func _ready() -> void:
 	_build_ui()
 	_play_open()
+
+func _input(ev: InputEvent) -> void:
+	if _upgrade_scroll == null:
+		return
+	if ev is InputEventMouseButton:
+		if ev.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_upgrade_scroll.scroll_vertical -= 40
+			get_viewport().set_input_as_handled()
+		elif ev.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_upgrade_scroll.scroll_vertical += 40
+			get_viewport().set_input_as_handled()
+
+func _unhandled_input(ev: InputEvent) -> void:
+	if ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
+		if _upgrade_layer:
+			_hide_upgrade_panel()
+			get_viewport().set_input_as_handled()
 
 func _build_ui() -> void:
 	var bg := ColorRect.new()
@@ -238,6 +267,7 @@ func _build_choices(frame: Panel) -> void:
 			"tags": [{"text": "+30% HP", "color": SacredPalette.BRASS_300}],
 			"disabled": false,
 			"leave": false,
+			"close_anim": true,
 			"action": _on_heal_pressed,
 		},
 		{
@@ -246,6 +276,7 @@ func _build_choices(frame: Panel) -> void:
 			"tags": [{"text": "카드 강화", "color": SacredPalette.BRASS_300 if can_upgrade else SacredPalette.BONE_400}],
 			"disabled": not can_upgrade,
 			"leave": false,
+			"close_anim": false,
 			"action": _on_upgrade_pressed,
 		},
 		{
@@ -254,6 +285,7 @@ func _build_choices(frame: Panel) -> void:
 			"tags": [],
 			"disabled": false,
 			"leave": true,
+			"close_anim": true,
 			"action": _on_leave_pressed,
 		},
 	]
@@ -404,27 +436,27 @@ func _build_choice_card(row: HBoxContainer, ch: Dictionary) -> void:
 		tw.tween_property(cap_accent, "modulate:a", 0.0, 0.18)
 	)
 	btn.pressed.connect(func():
-		_play_close(ch["action"])
+		if ch.get("close_anim", true):
+			_play_close(ch["action"])
+		else:
+			ch["action"].call()
 	)
 
 func _play_open() -> void:
 	if _popup_tween:
 		_popup_tween.kill()
-	modulate.a = 0.0
 	_frame.scale = Vector2(0.97, 0.97)
-	_popup_tween = create_tween().set_parallel(true)
+	_popup_tween = create_tween()
 	_popup_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_popup_tween.tween_property(self, "modulate:a", 1.0, 0.30)
 	_popup_tween.tween_property(_frame, "scale", Vector2(1.0, 1.0), 0.28)
 
 func _play_close(callback: Callable) -> void:
 	if _popup_tween:
 		_popup_tween.kill()
-	_popup_tween = create_tween().set_parallel(true)
+	_popup_tween = create_tween()
 	_popup_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	_popup_tween.tween_property(self, "modulate:a", 0.0, 0.22)
 	_popup_tween.tween_property(_frame, "scale", Vector2(0.97, 0.97), 0.20)
-	_popup_tween.chain().tween_callback(callback)
+	callback.call()
 
 func _has_upgradeable_cards() -> bool:
 	var all: Array = DeckManager.draw_pile.duplicate()
@@ -451,7 +483,235 @@ func _on_heal_pressed() -> void:
 	GameManager.complete_rest()
 
 func _on_upgrade_pressed() -> void:
-	GameManager.enter_card_upgrade()
+	_show_upgrade_panel()
 
 func _on_leave_pressed() -> void:
+	GameManager.complete_rest()
+
+func _show_upgrade_panel() -> void:
+	if _upgrade_layer:
+		_hide_upgrade_panel()
+		return
+	var all_cards: Array = DeckManager.get_full_deck()
+	var upgradeable: Array = all_cards.filter(func(c: Resource) -> bool:
+		return c.upgrade_level < c.max_upgrade_level()
+	)
+	if upgradeable.is_empty():
+		return
+
+	_upgrade_layer = CanvasLayer.new()
+	_upgrade_layer.layer = 10
+	add_child(_upgrade_layer)
+
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_upgrade_layer.add_child(overlay)
+	_upgrade_overlay = overlay
+
+	var dim := ColorRect.new()
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.color = Color(0.0, 0.0, 0.0, 0.72)
+	dim.gui_input.connect(func(ev: InputEvent) -> void:
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			_hide_upgrade_panel()
+	)
+	overlay.add_child(dim)
+
+	var group := Control.new()
+	group.set_anchors_preset(Control.PRESET_FULL_RECT)
+	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.pivot_offset = Vector2(960.0, 540.0)
+	group.scale        = Vector2(0.9, 0.9)
+	group.modulate.a   = 0.0
+	overlay.add_child(group)
+	_upgrade_group = group
+
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(1300.0, 600.0)
+	panel.position = Vector2((1920.0 - 1300.0) * 0.5, (1080.0 - 600.0) * 0.5)
+	group.add_child(panel)
+
+	var hl := TextureRect.new()
+	hl.texture      = SacredTheme.make_top_fade_tex()
+	hl.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
+	hl.stretch_mode = TextureRect.STRETCH_SCALE
+	hl.position     = panel.position
+	hl.size         = Vector2(1300.0, 80.0)
+	hl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hl)
+
+	var hdiv := TextureRect.new()
+	hdiv.texture      = SacredTheme.make_center_bright_h_tex()
+	hdiv.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
+	hdiv.stretch_mode = TextureRect.STRETCH_SCALE
+	hdiv.position     = Vector2(panel.position.x + 20.0, panel.position.y + 60.0)
+	hdiv.size         = Vector2(1260.0, 2.0)
+	hdiv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hdiv)
+
+	var marg := MarginContainer.new()
+	marg.add_theme_constant_override("margin_left",   20)
+	marg.add_theme_constant_override("margin_right",  20)
+	marg.add_theme_constant_override("margin_top",    14)
+	marg.add_theme_constant_override("margin_bottom", 14)
+	marg.clip_children = Control.CLIP_CHILDREN_ONLY
+	panel.add_child(marg)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	marg.add_child(vbox)
+
+	var title_lbl := Label.new()
+	title_lbl.theme_type_variation = "TitleLabel"
+	title_lbl.text = tr("ui.rest.upgrade_prompt")
+	title_lbl.add_theme_font_size_override("font_size", 20)
+	vbox.add_child(title_lbl)
+	LabelUtils.fit_text(title_lbl, 20, 14)
+
+	var close_btn := Button.new()
+	close_btn.theme_type_variation = "IconButton"
+	close_btn.text = "✕"
+	close_btn.add_theme_font_size_override("font_size", 20)
+	close_btn.custom_minimum_size = Vector2(40.0, 40.0)
+	close_btn.pressed.connect(_hide_upgrade_panel)
+	group.add_child(close_btn)
+	close_btn.position = Vector2(panel.position.x + 1244.0, panel.position.y + 12.0)
+	close_btn.size     = Vector2(40.0, 40.0)
+	SacredTheme.animate_button(close_btn)
+
+	var clip_box := Control.new()
+	clip_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(clip_box)
+
+	var scroll := ScrollContainer.new()
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scroll.clip_contents = true
+	clip_box.add_child(scroll)
+	_upgrade_scroll = scroll
+	SacredTheme.style_sacred_scrollbar(scroll)
+
+	var margin_c := MarginContainer.new()
+	margin_c.add_theme_constant_override("margin_left",   12)
+	margin_c.add_theme_constant_override("margin_top",    12)
+	margin_c.add_theme_constant_override("margin_right",  12)
+	margin_c.add_theme_constant_override("margin_bottom", 12)
+	scroll.add_child(margin_c)
+
+	var grid := GridContainer.new()
+	grid.columns = 8
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 10)
+	margin_c.add_child(grid)
+
+	for card in upgradeable:
+		var captured_card: Resource = card
+		var wrapper := Control.new()
+		wrapper.custom_minimum_size = Vector2(137.0, 195.0)
+		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
+		grid.add_child(wrapper)
+		var card_node: CardScene = CARD_SCENE.instantiate()
+		card_node.position     = Vector2(-1.75, -5.0)
+		card_node.pivot_offset = Vector2(70.0, 200.0)
+		card_node.scale        = Vector2(0.975, 0.975)
+		card_node.setup(card, CardScene.Mode.REWARD)
+		wrapper.add_child(card_node)
+		var captured_node: CardScene = card_node
+		card_node.card_hovered.connect(func(_c): _show_upgrade_card_hover(captured_node))
+		card_node.card_unhovered.connect(func(_c): _clear_upgrade_card_hover(captured_node))
+		card_node.gui_input.connect(func(ev: InputEvent):
+			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+				_on_select_upgrade_card(captured_card, captured_node)
+		)
+
+	var confirm_row := HBoxContainer.new()
+	vbox.add_child(confirm_row)
+	var spc_l := Control.new()
+	spc_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	confirm_row.add_child(spc_l)
+	var confirm_btn := Button.new()
+	confirm_btn.text = tr("ui.shop.btn_confirm_upgrade")
+	confirm_btn.custom_minimum_size = Vector2(200.0, 44.0)
+	confirm_btn.add_theme_font_size_override("font_size", 16)
+	confirm_btn.disabled = true
+	confirm_btn.pressed.connect(_on_confirm_upgrade)
+	confirm_row.add_child(confirm_btn)
+	_confirm_upgrade_btn = confirm_btn
+	SacredTheme.animate_button(confirm_btn)
+	var spc_r := Control.new()
+	spc_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	confirm_row.add_child(spc_r)
+
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(group, "scale", Vector2.ONE, 0.15)
+	tw.parallel().tween_property(group, "modulate:a", 1.0, 0.15)
+
+func _hide_upgrade_panel() -> void:
+	if _upgrade_layer == null:
+		return
+	for tw in _upgrade_card_tweens.values():
+		if tw.is_valid():
+			tw.kill()
+	_upgrade_card_tweens.clear()
+	_upgrade_card_parents.clear()
+	_upgrade_overlay       = null
+	_upgrade_scroll        = null
+	_selected_upgrade_card = null
+	_selected_upgrade_node = null
+	_confirm_upgrade_btn   = null
+	var layer := _upgrade_layer
+	var group := _upgrade_group
+	_upgrade_layer = null
+	_upgrade_group = null
+	if is_instance_valid(group):
+		var tw := create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+		tw.tween_property(group, "scale", Vector2(0.9, 0.9), 0.12)
+		tw.parallel().tween_property(group, "modulate:a", 0.0, 0.12)
+		tw.tween_callback(func(): if is_instance_valid(layer): layer.queue_free())
+	else:
+		if is_instance_valid(layer): layer.queue_free()
+
+func _show_upgrade_card_hover(node: CardScene) -> void:
+	if node in _upgrade_card_tweens:
+		_upgrade_card_tweens[node].kill()
+	if _upgrade_overlay and node.get_parent() != _upgrade_overlay:
+		_upgrade_card_parents[node] = node.get_parent()
+		node.reparent(_upgrade_overlay, true)
+	node.z_index = 50
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
+	_upgrade_card_tweens[node] = tw
+
+func _clear_upgrade_card_hover(node: CardScene) -> void:
+	if node in _upgrade_card_tweens:
+		_upgrade_card_tweens[node].kill()
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
+	tw.tween_callback(func():
+		if not is_instance_valid(node):
+			return
+		node.z_index = 0
+		if node in _upgrade_card_parents:
+			var orig: Node = _upgrade_card_parents[node]
+			_upgrade_card_parents.erase(node)
+			if is_instance_valid(orig):
+				node.reparent(orig, false)
+				node.position = Vector2(-1.75, -5.0)
+				node.scale    = Vector2(0.975, 0.975)
+	)
+	_upgrade_card_tweens[node] = tw
+
+func _on_select_upgrade_card(card: Resource, node: CardScene) -> void:
+	if is_instance_valid(_selected_upgrade_node):
+		(_selected_upgrade_node as CardScene).tween_glow(0.0, 0.12)
+	_selected_upgrade_card = card
+	_selected_upgrade_node = node
+	node.tween_glow(1.0, 0.15)
+	if is_instance_valid(_confirm_upgrade_btn):
+		_confirm_upgrade_btn.disabled = false
+
+func _on_confirm_upgrade() -> void:
+	if _selected_upgrade_card == null:
+		return
+	GameManager.upgrade_card(_selected_upgrade_card)
+	_hide_upgrade_panel()
 	GameManager.complete_rest()

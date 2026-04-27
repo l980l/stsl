@@ -29,6 +29,7 @@ LocaleManager="*res://autoload/locale_manager.gd"
 IconUtils="*res://autoload/icon_utils.gd"
 SacredPalette="*res://autoload/sacred_palette.gd"
 SacredTheme="*res://autoload/sacred_theme.gd"
+SceneTransition="*res://autoload/scene_transition.gd"
 
 [display]
 

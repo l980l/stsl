@@ -82,8 +82,8 @@ func _build_ui() -> void:
 
 func _on_new_game() -> void:
 	SaveManager.clear_save()
-	get_tree().change_scene_to_file("res://scenes/chapter_select/chapter_select_scene.tscn")
+	SceneTransition.go("res://scenes/chapter_select/chapter_select_scene.tscn")
 
 func _on_continue() -> void:
 	SaveManager.load_save()
-	get_tree().change_scene_to_file("res://scenes/map/map_scene.tscn")
+	SceneTransition.go("res://scenes/map/map_scene.tscn")

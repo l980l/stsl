@@ -1,7 +1,6 @@
 # scenes/event/event_scene.gd
 extends Node2D
 
-const EventChoiceResource = preload("res://resources/event_choice_resource.gd")
 
 const ROMAN      := ["I", "II", "III", "IV", "V"]
 const FRAME_L    := 80.0
@@ -383,21 +382,18 @@ func _cost_tags(choice: Resource) -> Array:
 func _play_open() -> void:
 	if _popup_tween:
 		_popup_tween.kill()
-	modulate.a = 0.0
 	_frame.scale = Vector2(0.97, 0.97)
-	_popup_tween = create_tween().set_parallel(true)
+	_popup_tween = create_tween()
 	_popup_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_popup_tween.tween_property(self, "modulate:a", 1.0, 0.30)
 	_popup_tween.tween_property(_frame, "scale", Vector2(1.0, 1.0), 0.28)
 
 func _play_close(callback: Callable) -> void:
 	if _popup_tween:
 		_popup_tween.kill()
-	_popup_tween = create_tween().set_parallel(true)
+	_popup_tween = create_tween()
 	_popup_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	_popup_tween.tween_property(self, "modulate:a", 0.0, 0.22)
 	_popup_tween.tween_property(_frame, "scale", Vector2(0.97, 0.97), 0.20)
-	_popup_tween.chain().tween_callback(callback)
+	callback.call()
 
 func _on_choice_selected(choice: Resource) -> void:
 	_play_close(func():

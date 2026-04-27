@@ -2,7 +2,7 @@
 extends Node
 
 const SETTINGS_PATH := "user://settings.cfg"
-const LOCALES: Array[String] = ["ko", "en", "fr", "it", "es", "ja", "el", "zh"]
+const LOCALES: Array[String] = ["el", "en", "es", "fr", "it", "ja", "ko", "zh"]
 const DISPLAY_NAMES := {
 	"ko": "한국어",
 	"en": "English",

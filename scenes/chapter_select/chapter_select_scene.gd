@@ -21,13 +21,18 @@ func _build_ui() -> void:
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
+	var bloom := SacredTheme.make_top_ellipse_bloom(0.31, Vector2(2.0, 0.8))
+	bloom.position = Vector2.ZERO
+	bloom.size = Vector2(1920, 820)
+	add_child(bloom)
+
 	# 상단 eyebrow
 	var eyebrow := Label.new()
 	eyebrow.theme_type_variation = "EyebrowLabel"
 	eyebrow.text = "— THE PILGRIMAGE —"
 	eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	eyebrow.position = Vector2(660, 100)
-	eyebrow.size = Vector2(600, 30)
+	eyebrow.position = Vector2(660, 80)
+	eyebrow.size = Vector2(600, 24)
 	add_child(eyebrow)
 
 	# 타이틀
@@ -42,12 +47,21 @@ func _build_ui() -> void:
 	add_child(title)
 	LabelUtils.fit_text(title, 56, 28)
 
+	var div := TextureRect.new()
+	div.texture = SacredTheme.make_center_bright_h_tex()
+	div.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	div.stretch_mode = TextureRect.STRETCH_SCALE
+	div.position = Vector2(580, 226)
+	div.size = Vector2(760, 1)
+	div.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(div)
+
 	# 서브 타이틀
 	var sub := Label.new()
 	sub.theme_type_variation = "SubLabel"
 	sub.text = "Each verdict opens the next door."
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sub.position = Vector2(660, 218)
+	sub.position = Vector2(660, 244)
 	sub.size = Vector2(600, 30)
 	add_child(sub)
 
@@ -69,7 +83,7 @@ func _build_ui() -> void:
 func _make_chapter_card(chapter: Dictionary, idx: int) -> void:
 	var P := SacredPalette
 	var card_x := 300 + idx * 700
-	var card_y := 280
+	var card_y := 300
 	var card_w  := 600
 	var card_h  := 560
 
@@ -272,21 +286,21 @@ func _hover_card(card: Button, entering: bool) -> void:
 	yt.tween_property(card, "position:y", target_y, 0.18)
 	card.set_meta("_ytween", yt)
 
-	# halo 트윈 — shader opacity uniform을 tween_method로 직접 제어
+	# halo 트윈 — opacity + radius 동시 트윈 (안→밖 wave)
 	for child in card.get_children():
 		if child.get_meta("_halo", false):
 			if child.has_meta("_htween"): child.get_meta("_htween").kill()
 			var mat := child.material as ShaderMaterial
-			var cur: float = mat.get_shader_parameter("opacity") if mat else 0.0
-			var target := 1.0 if entering else 0.0
-			var ht := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
-			ht.tween_method(func(v: float): mat.set_shader_parameter("opacity", v), cur, target, 0.25)
-			child.set_meta("_htween", ht)
+			if mat:
+				var target_op := 1.0 if entering else 0.0
+				var target_r := 1.0 if entering else 0.0
+				var ht := SacredTheme.tween_glow_material(self, mat, target_op, target_r, 0.25, not entering)
+				child.set_meta("_htween", ht)
 			break
 
 func _on_chapter_selected(chapter_id: int) -> void:
 	GameManager.current_chapter = chapter_id
-	get_tree().change_scene_to_file("res://scenes/hero_select/hero_select_scene.tscn")
+	SceneTransition.go("res://scenes/hero_select/hero_select_scene.tscn")
 
 func _on_back() -> void:
-	get_tree().change_scene_to_file("res://scenes/main_menu/main_menu_scene.tscn")
+	SceneTransition.go("res://scenes/main_menu/main_menu_scene.tscn")

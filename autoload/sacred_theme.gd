@@ -581,15 +581,16 @@ func make_center_bright_v_tex(color: Color = SacredPalette.BRASS_300, mid_alpha:
 	tex.fill_to   = Vector2(0.5, 1.0)
 	return tex
 
-func make_top_ellipse_bloom(focus_y: float = 0.0) -> ColorRect:
+func make_top_ellipse_bloom(focus_y: float = 0.0, aspect: Vector2 = Vector2(1.0, 2.5)) -> ColorRect:
 	var sh := Shader.new()
-	sh.code = "shader_type canvas_item;\nuniform float opacity : hint_range(0.0, 1.0) = 1.0;\nuniform float focus_y : hint_range(0.0, 1.0) = 0.0;\nvoid fragment() {\n\tvec2 focus = vec2(0.5, focus_y);\n\tfloat d = length((UV - focus) * vec2(1.0, 2.5));\n\tfloat a = smoothstep(0.7, 0.0, d) * 0.18 * opacity;\n\tCOLOR = vec4(0.722, 0.565, 0.165, a);\n}\n"
+	sh.code = "shader_type canvas_item;\nuniform float opacity : hint_range(0.0, 1.0) = 1.0;\nuniform float focus_y : hint_range(0.0, 1.0) = 0.0;\nuniform vec2 aspect = vec2(1.0, 2.5);\nvoid fragment() {\n\tvec2 focus = vec2(0.5, focus_y);\n\tfloat d = length((UV - focus) * aspect);\n\tfloat a = smoothstep(0.7, 0.0, d) * 0.18 * opacity;\n\tCOLOR = vec4(0.722, 0.565, 0.165, a);\n}\n"
 	var rect := ColorRect.new()
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var mat := ShaderMaterial.new()
 	mat.shader = sh
 	mat.set_shader_parameter("opacity", 1.0)
 	mat.set_shader_parameter("focus_y", focus_y)
+	mat.set_shader_parameter("aspect", aspect)
 	rect.material = mat
 	return rect
 

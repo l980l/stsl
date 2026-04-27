@@ -67,6 +67,10 @@ var pending_boss_upgrade: bool = false  # 보스 후 카드 강화 대기 여부
 var pending_boss_recruit: bool = false  # 보스 후 영웅 영입 대기 여부
 var _last_boss_enemy_id: String = ""    # 직전 보스 enemy_id (해금 훅용)
 var _last_elite_solo: bool = false      # 직전 엘리트 전투가 1:1 이었는지 (해금 훅용)
+# 보상 씬 TALLY 표시용 — complete_battle에서 채워짐
+var last_battle_turns: int = 0
+var last_battle_damage: int = 0
+var last_battle_gold: int = 0
 # ─────────────────────────────────────────────────────
 
 signal state_changed(new_state: GameState)
@@ -214,6 +218,11 @@ func enter_node(node_id: int) -> void:
 func complete_battle(won: bool) -> void:
 	pending_enemies.clear()
 	if won:
+		# BattleManager 통계 캡처 (씬 전환 전)
+		var bm = _get_bm()
+		last_battle_turns  = int(bm.turn_count)  if bm else 0
+		last_battle_damage = int(bm.damage_taken_this_battle) if bm else 0
+		last_battle_gold = 0
 		var RelicRes = load("res://resources/relic_resource.gd")
 		trigger_relics(RelicRes.TriggerType.BATTLE_WIN)
 		card_rewards = _generate_card_rewards()
@@ -224,7 +233,8 @@ func complete_battle(won: bool) -> void:
 			match node.room_type:
 				_MapNodeRes.RoomType.ELITE:
 					card_rewards_pick_count = 2
-					add_gold(randi_range(20, 25))
+					last_battle_gold = randi_range(20, 25)
+					add_gold(last_battle_gold)
 					if pm:
 						pm.increment_flag("elite_kills_total")
 						if _last_elite_solo:
@@ -232,7 +242,8 @@ func complete_battle(won: bool) -> void:
 						pm.check_unlock_conditions()
 				_MapNodeRes.RoomType.BOSS:
 					card_rewards_pick_count = 2
-					add_gold(40)
+					last_battle_gold = 40
+					add_gold(last_battle_gold)
 					var relic := get_random_relic()
 					if relic:
 						add_relic(relic)
@@ -247,7 +258,8 @@ func complete_battle(won: bool) -> void:
 						add_relic(secret_relic)
 				_:
 					card_rewards_pick_count = 1
-					add_gold(randi_range(10, 15))
+					last_battle_gold = randi_range(10, 15)
+					add_gold(last_battle_gold)
 		change_state(GameState.CARD_PICK)
 		_request_scene("res://scenes/card_pick/card_pick_scene.tscn")
 	else:
@@ -768,7 +780,7 @@ func _request_scene(path: String) -> void:
 			var _sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
 			if _sm:
 				_sm.save()
-		get_tree().change_scene_to_file(path)
+		SceneTransition.go(path)
 
 # ── 릴릭 시스템 ─────────────────────────────────
 
