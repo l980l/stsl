@@ -31,6 +31,11 @@ func _build_ui(event: Resource) -> void:
 	bloom.size = Vector2(1920.0, 560.0)
 	add_child(bloom)
 
+	var crosshatch := SacredTheme.make_crosshatch_overlay()
+	crosshatch.position = Vector2.ZERO
+	crosshatch.size = Vector2(1920, 1080)
+	add_child(crosshatch)
+
 	# 이벤트 프레임
 	var frame_style := StyleBoxFlat.new()
 	frame_style.bg_color = Color(0.078, 0.059, 0.047, 0.92)
@@ -197,7 +202,7 @@ func _build_choices(frame: Panel, event: Resource) -> void:
 	# "— 선택하라 —" 헤더
 	var mono_font := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
 	var hdr := Label.new()
-	hdr.text = "— 선택하라 —"
+	hdr.text = tr("ui.event.choose_header")
 	if mono_font:
 		hdr.add_theme_font_override("font", mono_font)
 	hdr.add_theme_font_size_override("font_size", 11)
@@ -359,24 +364,24 @@ func _build_choice_card(row: HBoxContainer, idx: int, choice: Resource) -> void:
 func _cost_tags(choice: Resource) -> Array:
 	var tags: Array = []
 	if choice.cost_gold > 0:
-		tags.append({"text": "−%d 코인" % choice.cost_gold, "color": SacredPalette.BONE_300})
+		tags.append({"text": tr("ui.event.tag.cost_gold") % choice.cost_gold, "color": SacredPalette.BONE_300})
 	if choice.cost_hp > 0:
-		tags.append({"text": "−%d HP" % choice.cost_hp, "color": SacredPalette.BLOOD_400})
+		tags.append({"text": tr("ui.event.tag.cost_hp") % choice.cost_hp, "color": SacredPalette.BLOOD_400})
 	match choice.effect_type:
 		EventChoiceResource.EffectType.GOLD:
-			tags.append({"text": "+%d 코인" % choice.value, "color": SacredPalette.BRASS_300})
+			tags.append({"text": tr("ui.event.tag.gain_gold") % choice.value, "color": SacredPalette.BRASS_300})
 		EventChoiceResource.EffectType.HEAL:
-			tags.append({"text": "+%d HP" % choice.value, "color": SacredPalette.BRASS_300})
+			tags.append({"text": tr("ui.event.tag.gain_hp") % choice.value, "color": SacredPalette.BRASS_300})
 		EventChoiceResource.EffectType.DRAW_UP:
-			tags.append({"text": "드로우 +%d" % choice.value, "color": SacredPalette.BRASS_300})
+			tags.append({"text": tr("ui.event.tag.draw_up") % choice.value, "color": SacredPalette.BRASS_300})
 		EventChoiceResource.EffectType.REMOVE_CARD:
-			tags.append({"text": "카드 제거", "color": SacredPalette.BONE_300})
+			tags.append({"text": tr("ui.event.tag.remove_card"), "color": SacredPalette.BONE_300})
 		EventChoiceResource.EffectType.ADD_RELIC:
-			tags.append({"text": "렐릭 획득", "color": SacredPalette.BRASS_300})
+			tags.append({"text": tr("ui.event.tag.add_relic"), "color": SacredPalette.BRASS_300})
 		EventChoiceResource.EffectType.ADD_RELIC_GAMBLE:
-			tags.append({"text": "렐릭 도박", "color": SacredPalette.BONE_300})
+			tags.append({"text": tr("ui.event.tag.relic_gamble"), "color": SacredPalette.BONE_300})
 		EventChoiceResource.EffectType.ADD_HERO:
-			tags.append({"text": "영웅 합류", "color": SacredPalette.BRASS_300})
+			tags.append({"text": tr("ui.event.tag.add_hero"), "color": SacredPalette.BRASS_300})
 	return tags
 
 func _play_open() -> void:

@@ -26,6 +26,11 @@ func _build_ui() -> void:
 	bloom.size = Vector2(1920, 820)
 	add_child(bloom)
 
+	var crosshatch := SacredTheme.make_crosshatch_overlay()
+	crosshatch.position = Vector2.ZERO
+	crosshatch.size = Vector2(1920, 1080)
+	add_child(crosshatch)
+
 	# 상단 eyebrow
 	var eyebrow := Label.new()
 	eyebrow.theme_type_variation = "EyebrowLabel"

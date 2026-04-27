@@ -72,6 +72,11 @@ func _build_ui() -> void:
 	bloom.size = Vector2(1920, 560)
 	add_child(bloom)
 
+	var crosshatch := SacredTheme.make_crosshatch_overlay()
+	crosshatch.position = Vector2.ZERO
+	crosshatch.size = Vector2(1920, 1080)
+	add_child(crosshatch)
+
 	var title := Label.new()
 	title.theme_type_variation = "TitleLabel"
 	title.text = _trf("ui.map.act_title", GameManager.current_act)

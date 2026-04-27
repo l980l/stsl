@@ -102,3 +102,14 @@ ui.battle.deck_viewer.draw,드로우 파일,Draw Pile,Pioche,Pesca,Robo,ドロ�
 ui.battle.deck_viewer.discard,버린 덱,Discard Pile,Défausse,Scarto,Descarte,捨て山,Σωρός Απόρριψης,弃牌堆
 ui.battle.deck_viewer.exhaust,소멸,Exhausted,Épuisé,Esaurite,Agotadas,消滅,Εξάντληση,消耗
 ui.battle.deck_viewer.empty,(비어 있음),(Empty),(Vide),(Vuoto),(Vacío),(空),(Κενό),(空)
+
+ui.event.choose_header,— 선택하라 —,— Choose —,— Choisir —,— Scegli —,— Elegir —,— 選択せよ —,— Επίλεξε —,— 选择 —
+ui.event.tag.cost_gold,−0 코인,−0 Coin,−0 Pièce,−0 Moneta,−0 Moneda,−0 コイン,−0 Νόμισμα,−0 金币
+ui.event.tag.cost_hp,−0 HP,−0 HP,−0 PV,−0 PF,−0 PS,−0 HP,−0 ΖΩΗ,−0 血量
+ui.event.tag.gain_gold,+0 코인,+0 Coin,+0 Pièce,+0 Moneta,+0 Moneda,+0 コイン,+0 Νόμισμα,+0 金币
+ui.event.tag.gain_hp,+0 HP,+0 HP,+0 PV,+0 PF,+0 PS,+0 HP,+0 ΖΩΗ,+0 血量
+ui.event.tag.draw_up,드로우 +0,Draw +0,Piocher +0,Pescare +0,Robar +0,ドロー +0,Ανάληψη +0,抽牌 +0
+ui.event.tag.remove_card,카드 제거,Remove Card,Retirer Carte,Rimuovi Carta,Eliminar Carta,カード除去,Αφαίρεση Κάρτας,移除卡牌
+ui.event.tag.add_relic,렐릭 획득,Gain Relic,Obtenir Relique,Ottieni Reliquia,Obtener Reliquia,遺物獲得,Απόκτηση Λειψάνου,获得遗物
+ui.event.tag.relic_gamble,렐릭 도박,Relic Gamble,Pari Relique,Scommessa Reliquia,Apostar Reliquia,遺物ギャンブル,Τζόγος Λειψάνου,遗物赌注
+ui.event.tag.add_hero,영웅 합류,Hero Joins,Héros Rejoint,Eroe Si Unisce,Héroe Se Une,英雄加入,Ήρωας Εντάσσεται,英雄加入

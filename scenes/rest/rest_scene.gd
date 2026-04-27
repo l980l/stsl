@@ -57,6 +57,11 @@ func _build_ui() -> void:
 	bloom.size = Vector2(1920.0, 560.0)
 	add_child(bloom)
 
+	var crosshatch := SacredTheme.make_crosshatch_overlay()
+	crosshatch.position = Vector2.ZERO
+	crosshatch.size = Vector2(1920, 1080)
+	add_child(crosshatch)
+
 	var frame_style := StyleBoxFlat.new()
 	frame_style.bg_color = Color(0.078, 0.059, 0.047, 0.92)
 	frame_style.border_color = SacredPalette.BRASS_500

@@ -594,6 +594,35 @@ func make_top_ellipse_bloom(focus_y: float = 0.0, aspect: Vector2 = Vector2(1.0,
 	rect.material = mat
 	return rect
 
+func make_crosshatch_overlay(opacity: float = 1.0, line_alpha: float = 0.025,
+		period: float = 36.0) -> ColorRect:
+	var sh := Shader.new()
+	sh.code = "shader_type canvas_item;\n" \
+		+ "uniform float opacity : hint_range(0.0, 1.0) = 1.0;\n" \
+		+ "uniform float line_alpha : hint_range(0.0, 0.2) = 0.025;\n" \
+		+ "uniform float period : hint_range(8.0, 96.0) = 36.0;\n" \
+		+ "uniform vec2 node_size = vec2(1920.0, 1080.0);\n" \
+		+ "uniform vec4 line_color : source_color = vec4(0.831, 0.663, 0.282, 1.0);\n" \
+		+ "void fragment() {\n" \
+		+ "    vec2 p = UV * node_size;\n" \
+		+ "    float h = period * 0.5;\n" \
+		+ "    float d1 = mod(p.x + p.y, period);\n" \
+		+ "    float d2 = mod(p.x - p.y, period);\n" \
+		+ "    float a1 = smoothstep(h - 0.5, h, d1) - smoothstep(h + 1.0, h + 1.5, d1);\n" \
+		+ "    float a2 = smoothstep(h - 0.5, h, d2) - smoothstep(h + 1.0, h + 1.5, d2);\n" \
+		+ "    float a = max(a1, a2) * line_alpha * opacity;\n" \
+		+ "    COLOR = vec4(line_color.rgb, a);\n" \
+		+ "}\n"
+	var rect := ColorRect.new()
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var mat := ShaderMaterial.new()
+	mat.shader = sh
+	mat.set_shader_parameter("opacity", opacity)
+	mat.set_shader_parameter("line_alpha", line_alpha)
+	mat.set_shader_parameter("period", period)
+	rect.material = mat
+	return rect
+
 # ── 모달 dim 배경 (CanvasLayer에 반투명 차폐막 추가) ────────────────────
 # 클릭 차단 포함. CanvasLayer.add_child 전에 호출해야 z 순서가 맞다.
 
