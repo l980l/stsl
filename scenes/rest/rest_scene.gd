@@ -1,80 +1,467 @@
 # scenes/rest/rest_scene.gd
 extends Node2D
 
+const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+
+const ROMAN      := ["I", "II", "III"]
+const FRAME_L    := 80.0
+const FRAME_T    := 80.0
+const FRAME_W    := 1920.0 - FRAME_L * 2.0
+const FRAME_H    := 1080.0 - FRAME_T - 40.0
+const ILLO_H     := 680.0
+const NARR_H     := 270.0
+const CHOICE_PAD := 24.0
+
+var _frame: Panel = null
+var _popup_tween: Tween = null
+
+var _upgrade_layer:         CanvasLayer     = null
+var _upgrade_group:         Control         = null
+var _upgrade_overlay:       Control         = null
+var _upgrade_scroll:        ScrollContainer = null
+var _upgrade_card_parents:  Dictionary      = {}
+var _upgrade_card_tweens:   Dictionary      = {}
+var _selected_upgrade_card: Resource        = null
+var _selected_upgrade_node: Node            = null
+var _confirm_upgrade_btn:   Button          = null
+
 func _ready() -> void:
 	_build_ui()
+	_play_open()
+
+func _input(ev: InputEvent) -> void:
+	if _upgrade_scroll == null:
+		return
+	if ev is InputEventMouseButton:
+		if ev.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_upgrade_scroll.scroll_vertical -= 40
+			get_viewport().set_input_as_handled()
+		elif ev.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_upgrade_scroll.scroll_vertical += 40
+			get_viewport().set_input_as_handled()
+
+func _unhandled_input(ev: InputEvent) -> void:
+	if ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
+		if _upgrade_layer:
+			_hide_upgrade_panel()
+			get_viewport().set_input_as_handled()
 
 func _build_ui() -> void:
-	var P := SacredPalette
-
 	var bg := ColorRect.new()
-	bg.color = P.INK_1000
-	bg.size = Vector2(1920, 1080)
+	bg.color = SacredPalette.INK_1000
+	bg.size = Vector2(1920.0, 1080.0)
 	add_child(bg)
 
-	var eyebrow := Label.new()
-	eyebrow.theme_type_variation = "EyebrowLabel"
-	eyebrow.text = "— Event —"
-	eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	eyebrow.position = Vector2(760, 82)
-	eyebrow.size = Vector2(400, 24)
-	add_child(eyebrow)
+	var bloom := SacredTheme.make_top_ellipse_bloom(0.0)
+	bloom.position = Vector2.ZERO
+	bloom.size = Vector2(1920.0, 560.0)
+	add_child(bloom)
 
-	var title := Label.new()
-	title.theme_type_variation = "TitleLabel"
-	title.text = tr("ui.rest.title")
-	title.position = Vector2(760, 110)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(title)
-	title.size = Vector2(400, 60)
-	LabelUtils.fit_text(title, 36, 22)
+	var crosshatch := SacredTheme.make_crosshatch_overlay()
+	crosshatch.position = Vector2.ZERO
+	crosshatch.size = Vector2(1920, 1080)
+	add_child(crosshatch)
 
+	var frame_style := StyleBoxFlat.new()
+	frame_style.bg_color = Color(0.078, 0.059, 0.047, 0.92)
+	frame_style.border_color = SacredPalette.BRASS_500
+	frame_style.set_border_width_all(1)
+	var frame := Panel.new()
+	frame.add_theme_stylebox_override("panel", frame_style)
+	frame.position = Vector2(FRAME_L, FRAME_T)
+	frame.size = Vector2(FRAME_W, FRAME_H)
+	frame.pivot_offset = Vector2(FRAME_W * 0.5, FRAME_H * 0.5)
+	add_child(frame)
+	SacredTheme.add_corner_brackets(frame)
+	_frame = frame
+
+	_build_illo(frame)
+	_build_choices(frame)
+
+func _build_illo(frame: Panel) -> void:
+	var illo := Control.new()
+	illo.position = Vector2.ZERO
+	illo.size = Vector2(FRAME_W, ILLO_H)
+	illo.clip_contents = true
+	frame.add_child(illo)
+
+	# 중앙 금빛 환경광
+	var cg := Gradient.new()
+	var bc := SacredPalette.BRASS_300
+	cg.set_color(0, Color(bc.r, bc.g, bc.b, 0.17))
+	cg.set_color(1, Color(bc.r, bc.g, bc.b, 0.0))
+	var cg_tex := GradientTexture2D.new()
+	cg_tex.gradient = cg
+	cg_tex.fill = GradientTexture2D.FILL_RADIAL
+	cg_tex.fill_from = Vector2(0.5, 0.35)
+	cg_tex.fill_to   = Vector2(1.0, 0.35)
+	cg_tex.width = 64; cg_tex.height = 64
+	var amb := TextureRect.new()
+	amb.texture = cg_tex
+	amb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	amb.stretch_mode = TextureRect.STRETCH_SCALE
+	amb.size = Vector2(FRAME_W, ILLO_H)
+	amb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	illo.add_child(amb)
+
+	# 플레이트 배지
+	var mono_font := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
+	var plate_lbl := Label.new()
+	plate_lbl.text = "— Rest · " + tr("ui.rest.title") + " —"
+	if mono_font:
+		plate_lbl.add_theme_font_override("font", mono_font)
+	plate_lbl.add_theme_font_size_override("font_size", 11)
+	plate_lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+	plate_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	plate_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var plate_style := StyleBoxFlat.new()
+	plate_style.bg_color = Color(0.027, 0.020, 0.012, 0.80)
+	plate_style.border_color = SacredPalette.BRASS_500
+	plate_style.set_border_width_all(1)
+	plate_style.content_margin_left = 24.0
+	plate_style.content_margin_right = 24.0
+	plate_style.content_margin_top = 7.0
+	plate_style.content_margin_bottom = 7.0
+	plate_lbl.add_theme_stylebox_override("normal", plate_style)
+	plate_lbl.size = Vector2(480.0, 32.0)
+	plate_lbl.position = Vector2((FRAME_W - 480.0) * 0.5, 24.0)
+	illo.add_child(plate_lbl)
+
+	# 하단 비네트
+	var vg := Gradient.new()
+	vg.set_color(0, Color(0.027, 0.020, 0.012, 0.0))
+	vg.set_color(1, Color(0.027, 0.020, 0.012, 0.96))
+	vg.add_point(0.52, Color(0.027, 0.020, 0.012, 0.0))
+	vg.add_point(0.76, Color(0.027, 0.020, 0.012, 0.72))
+	var vg_tex := GradientTexture2D.new()
+	vg_tex.gradient = vg
+	vg_tex.fill = GradientTexture2D.FILL_LINEAR
+	vg_tex.fill_from = Vector2(0.5, 0.0)
+	vg_tex.fill_to   = Vector2(0.5, 1.0)
+	var vig := TextureRect.new()
+	vig.texture = vg_tex
+	vig.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	vig.stretch_mode = TextureRect.STRETCH_SCALE
+	vig.size = Vector2(FRAME_W, ILLO_H)
+	vig.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	illo.add_child(vig)
+
+	# Narration 블록
+	var pad_x := 120.0
+	var narr := VBoxContainer.new()
+	narr.add_theme_constant_override("separation", 12)
+	narr.position = Vector2(pad_x, ILLO_H - NARR_H - 20.0)
+	narr.size = Vector2(FRAME_W - pad_x * 2.0, NARR_H)
+	illo.add_child(narr)
+
+	# 타이틀
+	var title_lbl := Label.new()
+	title_lbl.theme_type_variation = "TitleLabel"
+	title_lbl.text = tr("ui.rest.title")
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	narr.add_child(title_lbl)
+	LabelUtils.fit_text(title_lbl, 60, 30)
+
+	# 구분선 + ✦
+	var div_row := HBoxContainer.new()
+	div_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	div_row.add_theme_constant_override("separation", 12)
+	div_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	narr.add_child(div_row)
+
+	var line_l := TextureRect.new()
+	line_l.texture = SacredTheme.make_center_bright_h_tex()
+	line_l.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	line_l.stretch_mode = TextureRect.STRETCH_SCALE
+	line_l.custom_minimum_size = Vector2(120.0, 1.0)
+	line_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line_l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	line_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	div_row.add_child(line_l)
+
+	var gem := Label.new()
+	gem.text = "✦"
+	gem.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+	gem.add_theme_font_size_override("font_size", 13)
+	div_row.add_child(gem)
+
+	var line_r := TextureRect.new()
+	line_r.texture = SacredTheme.make_center_bright_h_tex()
+	line_r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	line_r.stretch_mode = TextureRect.STRETCH_SCALE
+	line_r.custom_minimum_size = Vector2(120.0, 1.0)
+	line_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line_r.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	line_r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	div_row.add_child(line_r)
+
+	# 영웅 HP 현황
 	var tm := _get_tm()
-	if tm:
-		for i in range(tm.heroes.size()):
-			var hero: Resource = tm.heroes[i]
-			var current_hp: int = tm.get_current_hp(hero.hero_id) if tm.has_method("get_current_hp") else hero.max_hp
-			var lbl := Label.new()
-			lbl.theme_type_variation = "SubLabel"
-			lbl.add_theme_font_size_override("font_size", 26)
-			lbl.text = tr("ui.rest.hero_hp_format") % [tr(hero.hero_name), current_hp, hero.max_hp]
-			lbl.position = Vector2(660, 250 + i * 50)
-			lbl.size = Vector2(600, 40)
-			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			add_child(lbl)
+	if tm and tm.heroes.size() > 0:
+		var hp_box := HBoxContainer.new()
+		hp_box.alignment = BoxContainer.ALIGNMENT_CENTER
+		hp_box.add_theme_constant_override("separation", 48)
+		hp_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		narr.add_child(hp_box)
 
-	var heal_btn := Button.new()
-	heal_btn.theme_type_variation = "PrimaryButton"
-	heal_btn.text = tr("ui.rest.btn_heal")
-	heal_btn.position = Vector2(760, 490)
-	heal_btn.pressed.connect(_on_heal_pressed)
-	add_child(heal_btn)
-	heal_btn.size = Vector2(400, 55)
-	LabelUtils.fit_text(heal_btn, 20, 12)
-	SacredTheme.animate_button(heal_btn)
+		for hero in tm.heroes:
+			var cur_hp: int = tm.get_current_hp(hero.hero_id) if tm.has_method("get_current_hp") else hero.max_hp
+			var ratio: float = float(cur_hp) / float(hero.max_hp)
+			var hp_color: Color = SacredPalette.BLOOD_300 if ratio <= 0.3 else SacredPalette.BONE_200
 
-	var upgrade_btn := Button.new()
-	upgrade_btn.theme_type_variation = "PrimaryButton"
-	upgrade_btn.text = tr("ui.rest.btn_upgrade")
-	upgrade_btn.position = Vector2(760, 555)
-	upgrade_btn.pressed.connect(_on_upgrade_pressed)
-	add_child(upgrade_btn)
-	upgrade_btn.size = Vector2(400, 55)
-	LabelUtils.fit_text(upgrade_btn, 20, 12)
-	if not _has_upgradeable_cards():
-		upgrade_btn.disabled = true
-	else:
-		SacredTheme.animate_button(upgrade_btn)
+			var hero_col := VBoxContainer.new()
+			hero_col.add_theme_constant_override("separation", 6)
+			hp_box.add_child(hero_col)
 
-	var leave_btn := Button.new()
-	leave_btn.theme_type_variation = "VowButton"
-	leave_btn.text = tr("ui.rest.btn_leave")
-	leave_btn.position = Vector2(760, 625)
-	leave_btn.pressed.connect(_on_leave_pressed)
-	add_child(leave_btn)
-	leave_btn.size = Vector2(400, 55)
-	LabelUtils.fit_text(leave_btn, 20, 12)
-	SacredTheme.animate_button(leave_btn)
+			var name_lbl := Label.new()
+			name_lbl.text = tr(hero.hero_name)
+			name_lbl.add_theme_font_size_override("font_size", 16)
+			name_lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+			name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			hero_col.add_child(name_lbl)
+
+			var hp_lbl := Label.new()
+			hp_lbl.text = tr("ui.rest.hero_hp_format") % [tr(hero.hero_name), cur_hp, hero.max_hp]
+			# hero_hp_format는 이름 포함이므로 이름만 따로 표시
+			hp_lbl.text = "%d / %d" % [cur_hp, hero.max_hp]
+			hp_lbl.add_theme_font_size_override("font_size", 22)
+			hp_lbl.add_theme_color_override("font_color", hp_color)
+			hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			hero_col.add_child(hp_lbl)
+
+func _build_choices(frame: Panel) -> void:
+	# 구분선
+	var sep := TextureRect.new()
+	sep.texture = SacredTheme.make_center_bright_h_tex()
+	sep.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	sep.stretch_mode = TextureRect.STRETCH_SCALE
+	sep.position = Vector2(0.0, ILLO_H)
+	sep.size = Vector2(FRAME_W, 1.0)
+	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.add_child(sep)
+
+	var area := VBoxContainer.new()
+	area.position = Vector2(56.0, ILLO_H + CHOICE_PAD)
+	area.size = Vector2(FRAME_W - 112.0, FRAME_H - ILLO_H - CHOICE_PAD - 34.0)
+	area.add_theme_constant_override("separation", 12)
+	frame.add_child(area)
+
+	var mono_font := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
+	var hdr := Label.new()
+	hdr.text = "— 선택하라 —"
+	if mono_font:
+		hdr.add_theme_font_override("font", mono_font)
+	hdr.add_theme_font_size_override("font_size", 11)
+	hdr.add_theme_color_override("font_color", SacredPalette.BRASS_400)
+	hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	area.add_child(hdr)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	area.add_child(row)
+
+	var can_upgrade := _has_upgradeable_cards()
+
+	var choices := [
+		{
+			"roman": "I",
+			"label": tr("ui.rest.btn_heal"),
+			"tags": [{"text": "+30% HP", "color": SacredPalette.BRASS_300}],
+			"disabled": false,
+			"leave": false,
+			"close_anim": true,
+			"action": _on_heal_pressed,
+		},
+		{
+			"roman": "II",
+			"label": tr("ui.rest.btn_upgrade"),
+			"tags": [{"text": "카드 강화", "color": SacredPalette.BRASS_300 if can_upgrade else SacredPalette.BONE_400}],
+			"disabled": not can_upgrade,
+			"leave": false,
+			"close_anim": false,
+			"action": _on_upgrade_pressed,
+		},
+		{
+			"roman": "III",
+			"label": tr("ui.rest.btn_leave"),
+			"tags": [],
+			"disabled": false,
+			"leave": true,
+			"close_anim": true,
+			"action": _on_leave_pressed,
+		},
+	]
+
+	for ch in choices:
+		_build_choice_card(row, ch)
+
+func _build_choice_card(row: HBoxContainer, ch: Dictionary) -> void:
+	var is_leave:    bool = ch["leave"]
+	var is_disabled: bool = ch["disabled"]
+
+	var border_col: Color = SacredPalette.BRASS_700 if not is_leave else SacredPalette.INK_600
+	var base_style := StyleBoxFlat.new()
+	base_style.bg_color = Color(0.027, 0.020, 0.012, 0.55) if not is_leave else Color(0.078, 0.078, 0.11, 0.40)
+	base_style.border_color = border_col
+	base_style.set_border_width_all(1)
+
+	var hover_style := StyleBoxFlat.new()
+	hover_style.bg_color = Color(0.09, 0.068, 0.040, 0.60) if not is_leave else Color(0.10, 0.10, 0.16, 0.55)
+	hover_style.border_color = SacredPalette.BRASS_400 if not is_leave else SacredPalette.BONE_400
+	hover_style.set_border_width_all(1)
+
+	var accent_col: Color = SacredPalette.BRASS_400 if not is_leave else SacredPalette.BONE_400
+
+	var card := Panel.new()
+	card.add_theme_stylebox_override("panel", base_style)
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card.custom_minimum_size = Vector2(0.0, 100.0)
+	if is_disabled:
+		card.modulate.a = 0.45
+	row.add_child(card)
+
+	var accent := ColorRect.new()
+	accent.color = accent_col
+	accent.set_anchors_preset(Control.PRESET_LEFT_WIDE)
+	accent.offset_right = 3.0
+	accent.modulate.a = 0.0
+	card.add_child(accent)
+
+	var inner := HBoxContainer.new()
+	inner.add_theme_constant_override("separation", 0)
+	inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	card.add_child(inner)
+
+	var num_box := CenterContainer.new()
+	num_box.custom_minimum_size = Vector2(70.0, 0.0)
+	num_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	inner.add_child(num_box)
+
+	var italic_font := load("res://assets/fonts/IMFellEnglish-Italic.ttf") as Font
+	var num_lbl := Label.new()
+	num_lbl.text = ch["roman"]
+	if italic_font:
+		num_lbl.add_theme_font_override("font", italic_font)
+	num_lbl.add_theme_font_size_override("font_size", 30)
+	num_lbl.add_theme_color_override("font_color",
+		SacredPalette.BRASS_300 if not is_leave else SacredPalette.BONE_400)
+	num_box.add_child(num_lbl)
+
+	var vdiv := ColorRect.new()
+	vdiv.color = border_col
+	vdiv.custom_minimum_size = Vector2(1.0, 0.0)
+	vdiv.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	inner.add_child(vdiv)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 18)
+	margin.add_theme_constant_override("margin_right", 18)
+	margin.add_theme_constant_override("margin_top", 14)
+	margin.add_theme_constant_override("margin_bottom", 14)
+	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	margin.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	inner.add_child(margin)
+
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 6)
+	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	margin.add_child(content)
+
+	var sp_top := Control.new()
+	sp_top.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.add_child(sp_top)
+
+	var reg_font := load("res://assets/fonts/IMFellEnglish-Regular.ttf") as Font
+	var verb_lbl := Label.new()
+	verb_lbl.text = ch["label"]
+	if reg_font:
+		verb_lbl.add_theme_font_override("font", reg_font)
+	verb_lbl.add_theme_font_size_override("font_size", 20)
+	verb_lbl.add_theme_color_override("font_color",
+		SacredPalette.BONE_100 if not is_leave else SacredPalette.BONE_300)
+	verb_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	verb_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_child(verb_lbl)
+	LabelUtils.fit_text(verb_lbl, 20, 13)
+
+	var tags: Array = ch["tags"]
+	if not tags.is_empty():
+		var mono_font := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
+		var tag_row := HBoxContainer.new()
+		tag_row.add_theme_constant_override("separation", 6)
+		content.add_child(tag_row)
+		for tag in tags:
+			var t := Label.new()
+			t.text = tag["text"]
+			if mono_font:
+				t.add_theme_font_override("font", mono_font)
+			t.add_theme_font_size_override("font_size", 10)
+			t.add_theme_color_override("font_color", tag["color"] as Color)
+			var ts := StyleBoxFlat.new()
+			ts.bg_color = Color(0.027, 0.020, 0.012, 0.70)
+			ts.border_color = tag["color"] as Color
+			ts.set_border_width_all(1)
+			ts.content_margin_left = 8.0; ts.content_margin_right = 8.0
+			ts.content_margin_top = 3.0;  ts.content_margin_bottom = 3.0
+			t.add_theme_stylebox_override("normal", ts)
+			tag_row.add_child(t)
+
+	var sp_bot := Control.new()
+	sp_bot.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.add_child(sp_bot)
+
+	if is_disabled:
+		return
+
+	var btn := Button.new()
+	btn.flat = true
+	btn.focus_mode = Control.FOCUS_NONE
+	var empty := StyleBoxEmpty.new()
+	btn.add_theme_stylebox_override("normal", empty)
+	btn.add_theme_stylebox_override("hover", empty)
+	btn.add_theme_stylebox_override("pressed", empty)
+	btn.add_theme_stylebox_override("focus", empty)
+	btn.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	card.add_child(btn)
+
+	var cap_card   := card
+	var cap_accent := accent
+	btn.mouse_entered.connect(func():
+		cap_card.add_theme_stylebox_override("panel", hover_style)
+		var tw := cap_card.create_tween()
+		tw.tween_property(cap_accent, "modulate:a", 1.0, 0.18)
+	)
+	btn.mouse_exited.connect(func():
+		cap_card.add_theme_stylebox_override("panel", base_style)
+		var tw := cap_card.create_tween()
+		tw.tween_property(cap_accent, "modulate:a", 0.0, 0.18)
+	)
+	btn.pressed.connect(func():
+		if ch.get("close_anim", true):
+			_play_close(ch["action"])
+		else:
+			ch["action"].call()
+	)
+
+func _play_open() -> void:
+	if _popup_tween:
+		_popup_tween.kill()
+	_frame.scale = Vector2(0.97, 0.97)
+	_popup_tween = create_tween()
+	_popup_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_popup_tween.tween_property(_frame, "scale", Vector2(1.0, 1.0), 0.28)
+
+func _play_close(callback: Callable) -> void:
+	if _popup_tween:
+		_popup_tween.kill()
+	_popup_tween = create_tween()
+	_popup_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_popup_tween.tween_property(_frame, "scale", Vector2(0.97, 0.97), 0.20)
+	callback.call()
 
 func _has_upgradeable_cards() -> bool:
 	var all: Array = DeckManager.draw_pile.duplicate()
@@ -101,7 +488,235 @@ func _on_heal_pressed() -> void:
 	GameManager.complete_rest()
 
 func _on_upgrade_pressed() -> void:
-	GameManager.enter_card_upgrade()
+	_show_upgrade_panel()
 
 func _on_leave_pressed() -> void:
+	GameManager.complete_rest()
+
+func _show_upgrade_panel() -> void:
+	if _upgrade_layer:
+		_hide_upgrade_panel()
+		return
+	var all_cards: Array = DeckManager.get_full_deck()
+	var upgradeable: Array = all_cards.filter(func(c: Resource) -> bool:
+		return c.upgrade_level < c.max_upgrade_level()
+	)
+	if upgradeable.is_empty():
+		return
+
+	_upgrade_layer = CanvasLayer.new()
+	_upgrade_layer.layer = 10
+	add_child(_upgrade_layer)
+
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_upgrade_layer.add_child(overlay)
+	_upgrade_overlay = overlay
+
+	var dim := ColorRect.new()
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.color = Color(0.0, 0.0, 0.0, 0.72)
+	dim.gui_input.connect(func(ev: InputEvent) -> void:
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			_hide_upgrade_panel()
+	)
+	overlay.add_child(dim)
+
+	var group := Control.new()
+	group.set_anchors_preset(Control.PRESET_FULL_RECT)
+	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.pivot_offset = Vector2(960.0, 540.0)
+	group.scale        = Vector2(0.9, 0.9)
+	group.modulate.a   = 0.0
+	overlay.add_child(group)
+	_upgrade_group = group
+
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(1300.0, 600.0)
+	panel.position = Vector2((1920.0 - 1300.0) * 0.5, (1080.0 - 600.0) * 0.5)
+	group.add_child(panel)
+
+	var hl := TextureRect.new()
+	hl.texture      = SacredTheme.make_top_fade_tex()
+	hl.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
+	hl.stretch_mode = TextureRect.STRETCH_SCALE
+	hl.position     = panel.position
+	hl.size         = Vector2(1300.0, 80.0)
+	hl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hl)
+
+	var hdiv := TextureRect.new()
+	hdiv.texture      = SacredTheme.make_center_bright_h_tex()
+	hdiv.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
+	hdiv.stretch_mode = TextureRect.STRETCH_SCALE
+	hdiv.position     = Vector2(panel.position.x + 20.0, panel.position.y + 60.0)
+	hdiv.size         = Vector2(1260.0, 2.0)
+	hdiv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_child(hdiv)
+
+	var marg := MarginContainer.new()
+	marg.add_theme_constant_override("margin_left",   20)
+	marg.add_theme_constant_override("margin_right",  20)
+	marg.add_theme_constant_override("margin_top",    14)
+	marg.add_theme_constant_override("margin_bottom", 14)
+	marg.clip_children = Control.CLIP_CHILDREN_ONLY
+	panel.add_child(marg)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	marg.add_child(vbox)
+
+	var title_lbl := Label.new()
+	title_lbl.theme_type_variation = "TitleLabel"
+	title_lbl.text = tr("ui.rest.upgrade_prompt")
+	title_lbl.add_theme_font_size_override("font_size", 20)
+	vbox.add_child(title_lbl)
+	LabelUtils.fit_text(title_lbl, 20, 14)
+
+	var close_btn := Button.new()
+	close_btn.theme_type_variation = "IconButton"
+	close_btn.text = "✕"
+	close_btn.add_theme_font_size_override("font_size", 20)
+	close_btn.custom_minimum_size = Vector2(40.0, 40.0)
+	close_btn.pressed.connect(_hide_upgrade_panel)
+	group.add_child(close_btn)
+	close_btn.position = Vector2(panel.position.x + 1244.0, panel.position.y + 12.0)
+	close_btn.size     = Vector2(40.0, 40.0)
+	SacredTheme.animate_button(close_btn)
+
+	var clip_box := Control.new()
+	clip_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(clip_box)
+
+	var scroll := ScrollContainer.new()
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scroll.clip_contents = true
+	clip_box.add_child(scroll)
+	_upgrade_scroll = scroll
+	SacredTheme.style_sacred_scrollbar(scroll)
+
+	var margin_c := MarginContainer.new()
+	margin_c.add_theme_constant_override("margin_left",   12)
+	margin_c.add_theme_constant_override("margin_top",    12)
+	margin_c.add_theme_constant_override("margin_right",  12)
+	margin_c.add_theme_constant_override("margin_bottom", 12)
+	scroll.add_child(margin_c)
+
+	var grid := GridContainer.new()
+	grid.columns = 8
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 10)
+	margin_c.add_child(grid)
+
+	for card in upgradeable:
+		var captured_card: Resource = card
+		var wrapper := Control.new()
+		wrapper.custom_minimum_size = Vector2(137.0, 195.0)
+		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
+		grid.add_child(wrapper)
+		var card_node: CardScene = CARD_SCENE.instantiate()
+		card_node.position     = Vector2(-1.75, -5.0)
+		card_node.pivot_offset = Vector2(70.0, 200.0)
+		card_node.scale        = Vector2(0.975, 0.975)
+		card_node.setup(card, CardScene.Mode.REWARD)
+		wrapper.add_child(card_node)
+		var captured_node: CardScene = card_node
+		card_node.card_hovered.connect(func(_c): _show_upgrade_card_hover(captured_node))
+		card_node.card_unhovered.connect(func(_c): _clear_upgrade_card_hover(captured_node))
+		card_node.gui_input.connect(func(ev: InputEvent):
+			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+				_on_select_upgrade_card(captured_card, captured_node)
+		)
+
+	var confirm_row := HBoxContainer.new()
+	vbox.add_child(confirm_row)
+	var spc_l := Control.new()
+	spc_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	confirm_row.add_child(spc_l)
+	var confirm_btn := Button.new()
+	confirm_btn.text = tr("ui.shop.btn_confirm_upgrade")
+	confirm_btn.custom_minimum_size = Vector2(200.0, 44.0)
+	confirm_btn.add_theme_font_size_override("font_size", 16)
+	confirm_btn.disabled = true
+	confirm_btn.pressed.connect(_on_confirm_upgrade)
+	confirm_row.add_child(confirm_btn)
+	_confirm_upgrade_btn = confirm_btn
+	SacredTheme.animate_button(confirm_btn)
+	var spc_r := Control.new()
+	spc_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	confirm_row.add_child(spc_r)
+
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(group, "scale", Vector2.ONE, 0.15)
+	tw.parallel().tween_property(group, "modulate:a", 1.0, 0.15)
+
+func _hide_upgrade_panel() -> void:
+	if _upgrade_layer == null:
+		return
+	for tw in _upgrade_card_tweens.values():
+		if tw.is_valid():
+			tw.kill()
+	_upgrade_card_tweens.clear()
+	_upgrade_card_parents.clear()
+	_upgrade_overlay       = null
+	_upgrade_scroll        = null
+	_selected_upgrade_card = null
+	_selected_upgrade_node = null
+	_confirm_upgrade_btn   = null
+	var layer := _upgrade_layer
+	var group := _upgrade_group
+	_upgrade_layer = null
+	_upgrade_group = null
+	if is_instance_valid(group):
+		var tw := create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+		tw.tween_property(group, "scale", Vector2(0.9, 0.9), 0.12)
+		tw.parallel().tween_property(group, "modulate:a", 0.0, 0.12)
+		tw.tween_callback(func(): if is_instance_valid(layer): layer.queue_free())
+	else:
+		if is_instance_valid(layer): layer.queue_free()
+
+func _show_upgrade_card_hover(node: CardScene) -> void:
+	if node in _upgrade_card_tweens:
+		_upgrade_card_tweens[node].kill()
+	if _upgrade_overlay and node.get_parent() != _upgrade_overlay:
+		_upgrade_card_parents[node] = node.get_parent()
+		node.reparent(_upgrade_overlay, true)
+	node.z_index = 50
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
+	_upgrade_card_tweens[node] = tw
+
+func _clear_upgrade_card_hover(node: CardScene) -> void:
+	if node in _upgrade_card_tweens:
+		_upgrade_card_tweens[node].kill()
+	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
+	tw.tween_callback(func():
+		if not is_instance_valid(node):
+			return
+		node.z_index = 0
+		if node in _upgrade_card_parents:
+			var orig: Node = _upgrade_card_parents[node]
+			_upgrade_card_parents.erase(node)
+			if is_instance_valid(orig):
+				node.reparent(orig, false)
+				node.position = Vector2(-1.75, -5.0)
+				node.scale    = Vector2(0.975, 0.975)
+	)
+	_upgrade_card_tweens[node] = tw
+
+func _on_select_upgrade_card(card: Resource, node: CardScene) -> void:
+	if is_instance_valid(_selected_upgrade_node):
+		(_selected_upgrade_node as CardScene).tween_glow(0.0, 0.12)
+	_selected_upgrade_card = card
+	_selected_upgrade_node = node
+	node.tween_glow(1.0, 0.15)
+	if is_instance_valid(_confirm_upgrade_btn):
+		_confirm_upgrade_btn.disabled = false
+
+func _on_confirm_upgrade() -> void:
+	if _selected_upgrade_card == null:
+		return
+	GameManager.upgrade_card(_selected_upgrade_card)
+	_hide_upgrade_panel()
 	GameManager.complete_rest()

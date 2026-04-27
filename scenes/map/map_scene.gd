@@ -25,6 +25,7 @@ var _deck_scroll:       ScrollContainer = null
 var _deck_card_tweens:  Dictionary      = {}
 var _deck_card_parents: Dictionary      = {}
 var _active_scroll:     ScrollContainer = null
+var _confirm_popup:     CanvasLayer     = null
 
 func _trf(key: String, args) -> String:
 	var s := tr(key)
@@ -49,9 +50,13 @@ func _input(ev: InputEvent) -> void:
 			return
 
 func _unhandled_input(ev: InputEvent) -> void:
-	if _deck_viewer and ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
-		_hide_deck_viewer()
-		get_viewport().set_input_as_handled()
+	if ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
+		if _confirm_popup:
+			_close_confirm_popup()
+			get_viewport().set_input_as_handled()
+		elif _deck_viewer:
+			_hide_deck_viewer()
+			get_viewport().set_input_as_handled()
 
 func _build_ui() -> void:
 	# 배경
@@ -61,14 +66,25 @@ func _build_ui() -> void:
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
+	# 상단 블룸
+	var bloom := SacredTheme.make_top_ellipse_bloom(0.0)
+	bloom.position = Vector2.ZERO
+	bloom.size = Vector2(1920, 560)
+	add_child(bloom)
+
+	var crosshatch := SacredTheme.make_crosshatch_overlay()
+	crosshatch.position = Vector2.ZERO
+	crosshatch.size = Vector2(1920, 1080)
+	add_child(crosshatch)
+
 	var title := Label.new()
 	title.theme_type_variation = "TitleLabel"
 	title.text = _trf("ui.map.act_title", GameManager.current_act)
-	title.position = Vector2(760, 14)
-	title.size = Vector2(400, 50)
+	title.position = Vector2(760, 45)
+	title.size = Vector2(400, 54)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
-	LabelUtils.fit_text(title, 32, 18)
+	LabelUtils.fit_text(title, 40, 22)
 
 	# 릴릭 표시
 	_relic_container = FlowContainer.new()
@@ -78,6 +94,16 @@ func _build_ui() -> void:
 	_relic_container.add_theme_constant_override("v_separation", 4)
 	add_child(_relic_container)
 	_refresh_relics()
+
+	# 타이틀~스크롤 구분선
+	var div_line := TextureRect.new()
+	div_line.texture = SacredTheme.make_center_bright_h_tex()
+	div_line.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	div_line.stretch_mode = TextureRect.STRETCH_SCALE
+	div_line.position = Vector2(64, 146)
+	div_line.size = Vector2(1920 - 128, 2)
+	div_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(div_line)
 
 	# 맵 스크롤 영역
 	var content_h := MAP_PAD_TOP + (MapGenerator.FLOORS - 1) * FLOOR_GAP + NODE_SIZE + MAP_PAD_BOT
@@ -115,6 +141,135 @@ func _build_ui() -> void:
 	deck_btn.size = Vector2(160, 40)
 	LabelUtils.fit_text(deck_btn, 16, 12)
 	SacredTheme.animate_button(deck_btn)
+
+	var btn_back := Button.new()
+	btn_back.theme_type_variation = "VowButton"
+	btn_back.text = tr("ui.chapter_select.back")
+	btn_back.position = Vector2(60, 960)
+	btn_back.size = Vector2(200, 52)
+	btn_back.add_theme_font_size_override("font_size", 14)
+	btn_back.pressed.connect(_on_back_pressed)
+	add_child(btn_back)
+	LabelUtils.fit_text(btn_back, 14, 11)
+	SacredTheme.animate_button(btn_back)
+
+	_build_party_panel()
+
+func _build_party_panel() -> void:
+	var tm := get_node_or_null("/root/TeamManager")
+	if tm == null or (tm as Object).get("heroes") == null or tm.heroes.is_empty():
+		return
+
+	var mono_font := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
+	var hdr := Label.new()
+	hdr.text = "— PARTY —"
+	if mono_font:
+		hdr.add_theme_font_override("font", mono_font)
+	hdr.add_theme_font_size_override("font_size", 11)
+	hdr.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+	hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hdr.position = Vector2(1610, 492)
+	hdr.size = Vector2(260, 20)
+	add_child(hdr)
+
+	var panel_x := 1600.0
+	var panel_y := 518.0
+	var bar_w   := 260.0
+
+	var party_vbox := VBoxContainer.new()
+	party_vbox.add_theme_constant_override("separation", 18)
+	party_vbox.position = Vector2(panel_x, panel_y)
+	party_vbox.size = Vector2(bar_w, 400)
+	add_child(party_vbox)
+
+	for hero in tm.heroes:
+		var cur_hp: int = tm.get_current_hp(hero.hero_id) if tm.has_method("get_current_hp") else hero.max_hp
+		var ratio: float = float(cur_hp) / float(hero.max_hp)
+
+		var hero_col := VBoxContainer.new()
+		hero_col.add_theme_constant_override("separation", 4)
+		party_vbox.add_child(hero_col)
+
+		var name_lbl := Label.new()
+		name_lbl.text = tr(hero.hero_name)
+		name_lbl.add_theme_font_size_override("font_size", 14)
+		name_lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+		hero_col.add_child(name_lbl)
+
+		var bar := _make_map_hp_bar(bar_w, ratio)
+		hero_col.add_child(bar)
+
+		var hp_lbl := Label.new()
+		hp_lbl.text = "%d / %d" % [cur_hp, hero.max_hp]
+		hp_lbl.add_theme_font_size_override("font_size", 12)
+		var hp_color: Color
+		if ratio <= 0.15:
+			hp_color = SacredPalette.BLOOD_300
+		elif ratio <= 0.5:
+			hp_color = SacredPalette.BLOOD_400
+		else:
+			hp_color = SacredPalette.BONE_300
+		hp_lbl.add_theme_color_override("font_color", hp_color)
+		hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		hero_col.add_child(hp_lbl)
+
+func _make_map_hp_bar(bar_w: float, ratio: float) -> Control:
+	var height := 12.0
+	var P := SacredPalette
+
+	var outer := Panel.new()
+	outer.custom_minimum_size = Vector2(bar_w, height)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = P.INK_1000
+	sb.border_color = P.BRASS_700
+	sb.set_border_width_all(1)
+	outer.add_theme_stylebox_override("panel", sb)
+
+	var inner_w := bar_w - 2.0
+	var inner_h := height - 2.0
+
+	var g := Gradient.new()
+	if ratio <= 0.15:
+		g.set_color(0, P.BLOOD_500); g.set_offset(0, 0.0)
+		g.set_color(1, P.BLOOD_300); g.set_offset(1, 1.0)
+	elif ratio <= 0.5:
+		g.set_color(0, P.BLOOD_600); g.set_offset(0, 0.0)
+		g.set_color(1, P.BLOOD_400); g.set_offset(1, 1.0)
+	else:
+		g.set_color(0, P.BLOOD_700); g.set_offset(0, 0.0)
+		g.set_color(1, P.BLOOD_400); g.set_offset(1, 1.0)
+		g.add_point(0.6, P.BLOOD_500)
+	var tex := GradientTexture1D.new()
+	tex.gradient = g
+
+	var fill_w := maxf(ratio * inner_w, 1.0 if ratio > 0.0 else 0.0)
+	var fill := TextureRect.new()
+	fill.position     = Vector2(1.0, 1.0)
+	fill.texture      = tex
+	fill.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
+	fill.stretch_mode = TextureRect.STRETCH_SCALE
+	fill.size         = Vector2(fill_w, inner_h)
+	fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	outer.add_child(fill)
+
+	var hg := Gradient.new()
+	hg.set_color(0, Color(1.0, 0.92, 0.82, 0.18))
+	hg.set_color(1, Color(1.0, 0.92, 0.82, 0.0))
+	var hg_tex := GradientTexture2D.new()
+	hg_tex.gradient  = hg
+	hg_tex.fill      = GradientTexture2D.FILL_LINEAR
+	hg_tex.fill_from = Vector2(0.5, 0.0)
+	hg_tex.fill_to   = Vector2(0.5, 0.5)
+	hg_tex.width = 4; hg_tex.height = 16
+	var highlight := TextureRect.new()
+	highlight.texture      = hg_tex
+	highlight.expand_mode  = TextureRect.EXPAND_IGNORE_SIZE
+	highlight.stretch_mode = TextureRect.STRETCH_SCALE
+	highlight.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	highlight.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fill.add_child(highlight)
+
+	return outer
 
 func _draw_connections() -> void:
 	for node in GameManager.run_map:
@@ -447,3 +602,107 @@ func _hide_deck_viewer() -> void:
 			tw.tween_callback(func(): if is_instance_valid(viewer): viewer.queue_free())
 		else:
 			if is_instance_valid(viewer): viewer.queue_free()
+
+func _on_back_pressed() -> void:
+	_show_confirm_popup()
+
+func _show_confirm_popup() -> void:
+	if _confirm_popup:
+		return
+	_confirm_popup = CanvasLayer.new()
+	_confirm_popup.layer = 50
+	add_child(_confirm_popup)
+
+	# 반투명 오버레이
+	var overlay := ColorRect.new()
+	overlay.color = Color(0.0, 0.0, 0.0, 0.55)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	_confirm_popup.add_child(overlay)
+
+	# 팝업 패널
+	var PW := 580.0
+	var PH := 220.0
+	var panel := Panel.new()
+	var ps := StyleBoxFlat.new()
+	ps.bg_color = SacredPalette.INK_900
+	ps.border_color = SacredPalette.BRASS_500
+	ps.set_border_width_all(1)
+	panel.add_theme_stylebox_override("panel", ps)
+	panel.position = Vector2((1920.0 - PW) * 0.5, (1080.0 - PH) * 0.5)
+	panel.size = Vector2(PW, PH)
+	panel.pivot_offset = Vector2(PW * 0.5, PH * 0.5)
+	_confirm_popup.add_child(panel)
+	SacredTheme.add_corner_brackets(panel)
+
+	# 메시지
+	var msg := Label.new()
+	msg.text = "진행상황이 초기화됩니다.\n정말 뒤로가시겠습니까?"
+	msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	msg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	msg.position = Vector2(40.0, 36.0)
+	msg.size = Vector2(PW - 80.0, 96.0)
+	msg.add_theme_font_size_override("font_size", 20)
+	msg.add_theme_color_override("font_color", SacredPalette.BONE_100)
+	panel.add_child(msg)
+	LabelUtils.fit_text(msg, 20, 14)
+
+	# 버튼 행
+	var mono_font := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
+	var BTN_Y := PH - 72.0
+	var BTN_W := 200.0
+	var BTN_H := 46.0
+	var GAP   := 24.0
+	var total := BTN_W * 2.0 + GAP
+	var bx    := (PW - total) * 0.5
+
+	var btn_ok := Button.new()
+	btn_ok.text = "확인"
+	btn_ok.theme_type_variation = "VowButton"
+	if mono_font:
+		btn_ok.add_theme_font_override("font", mono_font)
+	btn_ok.add_theme_font_size_override("font_size", 13)
+	btn_ok.position = Vector2(bx, BTN_Y)
+	btn_ok.size = Vector2(BTN_W, BTN_H)
+	btn_ok.pressed.connect(_on_confirm_back)
+	panel.add_child(btn_ok)
+	SacredTheme.animate_button(btn_ok)
+
+	var btn_cancel := Button.new()
+	btn_cancel.text = "취소"
+	btn_cancel.theme_type_variation = "PrimaryButton"
+	if mono_font:
+		btn_cancel.add_theme_font_override("font", mono_font)
+	btn_cancel.add_theme_font_size_override("font_size", 13)
+	btn_cancel.position = Vector2(bx + BTN_W + GAP, BTN_Y)
+	btn_cancel.size = Vector2(BTN_W, BTN_H)
+	btn_cancel.pressed.connect(_close_confirm_popup)
+	panel.add_child(btn_cancel)
+	SacredTheme.animate_button(btn_cancel)
+
+	# 팝업 열기 트윈
+	panel.modulate.a = 0.0
+	panel.scale = Vector2(0.95, 0.95)
+	var tw := create_tween().set_parallel(true)
+	tw.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(panel, "modulate:a", 1.0, 0.20)
+	tw.tween_property(panel, "scale", Vector2(1.0, 1.0), 0.18)
+
+func _close_confirm_popup() -> void:
+	if not _confirm_popup:
+		return
+	var popup := _confirm_popup
+	_confirm_popup = null
+	var panel: Panel = popup.get_child(1) as Panel
+	if is_instance_valid(panel):
+		var tw := create_tween().set_parallel(true)
+		tw.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tw.tween_property(panel, "modulate:a", 0.0, 0.15)
+		tw.tween_property(panel, "scale", Vector2(0.95, 0.95), 0.15)
+		tw.chain().tween_callback(func(): if is_instance_valid(popup): popup.queue_free())
+	else:
+		popup.queue_free()
+
+func _on_confirm_back() -> void:
+	GameManager.reset()
+	SceneTransition.go("res://scenes/chapter_select/chapter_select_scene.tscn")

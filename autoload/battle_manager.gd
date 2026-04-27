@@ -30,6 +30,10 @@ var _last_attacker: Dictionary = {}
 
 var debug_hero_invincible: bool = false
 
+# 전투 통계 (보상 씬에서 TALLY 표시용)
+var turn_count: int = 0
+var damage_taken_this_battle: int = 0
+
 # 영웅 상태 (HP는 TeamManager가 관리)
 var _hero_block: Dictionary = {}
 var _hero_status: Dictionary = {}
@@ -60,6 +64,8 @@ signal enemy_counter_changed(enemy_index: int)
 func setup_battle(enemies: Array) -> void:
 	if deck_mgr != null:
 		deck_mgr.consolidate_for_battle()
+	turn_count = 0
+	damage_taken_this_battle = 0
 	_enemies = enemies.duplicate()
 	_enemy_hp.clear()
 	_enemy_alive.clear()
@@ -101,6 +107,7 @@ func setup_battle(enemies: Array) -> void:
 func start_player_turn() -> void:
 	if not is_battle_active:
 		return
+	turn_count += 1
 	var pre_did: bool = _phase_player_pre()
 	if pre_did and turn_interval > 0.0:
 		await get_tree().create_timer(turn_interval).timeout
@@ -535,6 +542,7 @@ func _deal_damage_to_hero(hero_id: String, amount: int) -> void:
 	_hero_block[hero_id] = block - absorbed
 	amount -= absorbed
 	if amount > 0:
+		damage_taken_this_battle += amount
 		team_mgr.take_damage(hero_id, amount)
 		var _gm_hd = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
 		if _gm_hd and _gm_hd.is_inside_tree():
@@ -882,6 +890,8 @@ func clear() -> void:
 	_last_attacker.clear()
 	is_battle_active = false
 	is_player_turn = false
+	turn_count = 0
+	damage_taken_this_battle = 0
 
 func _on_hero_revived_clear_state(hero_id: String) -> void:
 	# 부활 시 블록·상태 초기화 (사망 전 독/출혈/블록 제거)

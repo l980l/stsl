@@ -50,4 +50,4 @@ func _build_ui() -> void:
 	SacredTheme.animate_button(btn)
 
 func _on_main_menu() -> void:
-	get_tree().change_scene_to_file("res://scenes/main_menu/main_menu_scene.tscn")
+	SceneTransition.go("res://scenes/main_menu/main_menu_scene.tscn")

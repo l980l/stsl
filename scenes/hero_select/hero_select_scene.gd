@@ -23,19 +23,33 @@ func _build_ui() -> void:
 				owned_ids.append(h.hero_id)
 
 	var bg := ColorRect.new()
-	bg.color = P.INK_1000
+	bg.color = P.INK_900
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
+
+	var bloom := SacredTheme.make_top_ellipse_bloom(0.18, Vector2(2.0, 0.8))
+	bloom.position = Vector2.ZERO
+	bloom.size = Vector2(1920, 720)
+	add_child(bloom)
+
+	var crosshatch := SacredTheme.make_crosshatch_overlay()
+	crosshatch.position = Vector2.ZERO
+	crosshatch.size = Vector2(1920, 1080)
+	add_child(crosshatch)
 
 	var root_vbox := VBoxContainer.new()
 	root_vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(root_vbox)
 
+	var top_spacer := Control.new()
+	top_spacer.custom_minimum_size = Vector2(0, 26)
+	root_vbox.add_child(top_spacer)
+
 	var eyebrow := Label.new()
 	eyebrow.theme_type_variation = "EyebrowLabel"
 	eyebrow.text = "— RECRUIT —" if is_recruit else "— CHOOSE YOUR HERO —"
 	eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	eyebrow.custom_minimum_size = Vector2(0, 28)
+	eyebrow.custom_minimum_size = Vector2(0, 26)
 	root_vbox.add_child(eyebrow)
 
 	var title := Label.new()
@@ -45,6 +59,23 @@ func _build_ui() -> void:
 	title.custom_minimum_size = Vector2(0, 60)
 	root_vbox.add_child(title)
 	LabelUtils.fit_text(title, 36, 22)
+
+	var div_gap1 := Control.new()
+	div_gap1.custom_minimum_size = Vector2(0, 10)
+	root_vbox.add_child(div_gap1)
+
+	var div := TextureRect.new()
+	div.texture = SacredTheme.make_center_bright_h_tex()
+	div.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	div.stretch_mode = TextureRect.STRETCH_SCALE
+	div.custom_minimum_size = Vector2(0, 1)
+	div.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	div.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root_vbox.add_child(div)
+
+	var div_gap2 := Control.new()
+	div_gap2.custom_minimum_size = Vector2(0, 18)
+	root_vbox.add_child(div_gap2)
 
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -143,9 +174,25 @@ func _build_ui() -> void:
 		if not inactive:
 			SacredTheme.animate_button(btn)
 
+	# 뒤로 버튼 — 리크루트 모드에서는 숨김 (보스 클리어 후 진행 중)
+	if not is_recruit:
+		var btn_back := Button.new()
+		btn_back.theme_type_variation = "VowButton"
+		btn_back.text = tr("ui.chapter_select.back")
+		btn_back.position = Vector2(60, 960)
+		btn_back.size = Vector2(200, 52)
+		btn_back.add_theme_font_size_override("font_size", 14)
+		btn_back.pressed.connect(_on_back)
+		add_child(btn_back)
+		LabelUtils.fit_text(btn_back, 14, 11)
+		SacredTheme.animate_button(btn_back)
+
+func _on_back() -> void:
+	SceneTransition.go("res://scenes/chapter_select/chapter_select_scene.tscn")
+
 func _on_hero_selected(hero_id: String) -> void:
 	if GameManager.pending_boss_recruit:
 		GameManager.complete_hero_recruit(hero_id)
 	else:
 		GameManager.start_run(hero_id, GameManager.current_chapter)
-		get_tree().change_scene_to_file("res://scenes/map/map_scene.tscn")
+		SceneTransition.go("res://scenes/map/map_scene.tscn")

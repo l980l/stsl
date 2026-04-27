@@ -34,6 +34,7 @@ const _CURSOR_DEFAULT := 32
 const _SETTINGS_PATH  := "user://settings.cfg"
 
 func _ready() -> void:
+	RenderingServer.set_default_clear_color(SacredPalette.INK_1000)
 	theme = load("res://resources/theme/global_theme.tres")
 	_setup_fonts()
 	_setup_buttons()
@@ -580,15 +581,45 @@ func make_center_bright_v_tex(color: Color = SacredPalette.BRASS_300, mid_alpha:
 	tex.fill_to   = Vector2(0.5, 1.0)
 	return tex
 
-func make_top_ellipse_bloom(focus_y: float = 0.0) -> ColorRect:
+func make_top_ellipse_bloom(focus_y: float = 0.0, aspect: Vector2 = Vector2(1.0, 2.5)) -> ColorRect:
 	var sh := Shader.new()
-	sh.code = "shader_type canvas_item;\nuniform float opacity : hint_range(0.0, 1.0) = 1.0;\nuniform float focus_y : hint_range(0.0, 1.0) = 0.0;\nvoid fragment() {\n\tvec2 focus = vec2(0.5, focus_y);\n\tfloat d = length((UV - focus) * vec2(1.0, 2.5));\n\tfloat a = smoothstep(0.7, 0.0, d) * 0.18 * opacity;\n\tCOLOR = vec4(0.722, 0.565, 0.165, a);\n}\n"
+	sh.code = "shader_type canvas_item;\nuniform float opacity : hint_range(0.0, 1.0) = 1.0;\nuniform float focus_y : hint_range(0.0, 1.0) = 0.0;\nuniform vec2 aspect = vec2(1.0, 2.5);\nvoid fragment() {\n\tvec2 focus = vec2(0.5, focus_y);\n\tfloat d = length((UV - focus) * aspect);\n\tfloat a = smoothstep(0.7, 0.0, d) * 0.18 * opacity;\n\tCOLOR = vec4(0.722, 0.565, 0.165, a);\n}\n"
 	var rect := ColorRect.new()
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var mat := ShaderMaterial.new()
 	mat.shader = sh
 	mat.set_shader_parameter("opacity", 1.0)
 	mat.set_shader_parameter("focus_y", focus_y)
+	mat.set_shader_parameter("aspect", aspect)
+	rect.material = mat
+	return rect
+
+func make_crosshatch_overlay(opacity: float = 1.0, line_alpha: float = 0.025,
+		period: float = 36.0) -> ColorRect:
+	var sh := Shader.new()
+	sh.code = "shader_type canvas_item;\n" \
+		+ "uniform float opacity : hint_range(0.0, 1.0) = 1.0;\n" \
+		+ "uniform float line_alpha : hint_range(0.0, 0.2) = 0.025;\n" \
+		+ "uniform float period : hint_range(8.0, 96.0) = 36.0;\n" \
+		+ "uniform vec2 node_size = vec2(1920.0, 1080.0);\n" \
+		+ "uniform vec4 line_color : source_color = vec4(0.831, 0.663, 0.282, 1.0);\n" \
+		+ "void fragment() {\n" \
+		+ "    vec2 p = UV * node_size;\n" \
+		+ "    float h = period * 0.5;\n" \
+		+ "    float d1 = mod(p.x + p.y, period);\n" \
+		+ "    float d2 = mod(p.x - p.y, period);\n" \
+		+ "    float a1 = smoothstep(h - 0.5, h, d1) - smoothstep(h + 1.0, h + 1.5, d1);\n" \
+		+ "    float a2 = smoothstep(h - 0.5, h, d2) - smoothstep(h + 1.0, h + 1.5, d2);\n" \
+		+ "    float a = max(a1, a2) * line_alpha * opacity;\n" \
+		+ "    COLOR = vec4(line_color.rgb, a);\n" \
+		+ "}\n"
+	var rect := ColorRect.new()
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var mat := ShaderMaterial.new()
+	mat.shader = sh
+	mat.set_shader_parameter("opacity", opacity)
+	mat.set_shader_parameter("line_alpha", line_alpha)
+	mat.set_shader_parameter("period", period)
 	rect.material = mat
 	return rect
 

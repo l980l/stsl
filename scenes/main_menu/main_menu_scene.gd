@@ -13,6 +13,11 @@ func _build_ui() -> void:
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
+	var crosshatch := SacredTheme.make_crosshatch_overlay()
+	crosshatch.position = Vector2.ZERO
+	crosshatch.size = Vector2(1920, 1080)
+	add_child(crosshatch)
+
 	# 상단 금빛 수평선 장식
 	var top_line := ColorRect.new()
 	top_line.color = P.BRASS_700
@@ -82,8 +87,8 @@ func _build_ui() -> void:
 
 func _on_new_game() -> void:
 	SaveManager.clear_save()
-	get_tree().change_scene_to_file("res://scenes/chapter_select/chapter_select_scene.tscn")
+	SceneTransition.go("res://scenes/chapter_select/chapter_select_scene.tscn")
 
 func _on_continue() -> void:
 	SaveManager.load_save()
-	get_tree().change_scene_to_file("res://scenes/map/map_scene.tscn")
+	SceneTransition.go("res://scenes/map/map_scene.tscn")
