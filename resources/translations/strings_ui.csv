@@ -1,115 +1,119 @@
-keys,ko,en,fr,it,es,ja,el,zh
-ui.main_menu.title,STSL,STSL,STSL,STSL,STSL,STSL,STSL,STSL
-ui.main_menu.new_game,새 게임,New Game,Nouvelle Partie,Nuova Partita,Nueva Partida,新しいゲーム,Νέο Παιχνίδι,新游戏
-ui.main_menu.continue,이어하기,Continue,Continuer,Continua,Continuar,続ける,Συνέχεια,继续
-ui.main_menu.language_label,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言
-ui.chapter_select.title,챕터 선택,Select Chapter,Choisir un Chapitre,Seleziona Capitolo,Seleccionar Capítulo,チャプター選択,Επιλογή Κεφαλαίου,选择章节
-ui.chapter_select.eyebrow,챕터를 선택하세요.,Select a Chapter,Choisissez un Chapitre,Seleziona un Capitolo,Selecciona un Capítulo,チャプターを選択してください,Επιλέξτε Κεφάλαιο,请选择章节
-ui.chapter_select.back,뒤로,Back,Retour,Indietro,Volver,戻る,Πίσω,返回
-ui.chapter_select.start,챕터 시작,Start Chapter,Commencer,Inizia Capitolo,Iniciar Capítulo,チャプター開始,Έναρξη Κεφαλαίου,开始章节
-ui.chapter_select.locked,잠금,Locked,Verrouillé,Bloccato,Bloqueado,ロック中,Κλειδωμένο,已锁定
-ui.chapter_select.unlock_hint,이전 챕터를 클리어하면 해금됩니다.,Clear the previous chapter to unlock.,Terminez le chapitre précédent pour déverrouiller.,Completa il capitolo precedente per sbloccare.,Completa el capítulo anterior para desbloquear.,前のチャプターをクリアして解放してください。,Ολοκληρώστε το προηγούμενο κεφάλαιο για να ξεκλειδώσετε.,通关前一章节即可解锁。
-"ui.chapter_select.chapter1.name","챕터 1 — 지중해, 북방 신화","Chapter 1 — Mediterranean & Nordic Myths","Chapitre 1 — Mythes Méditerranéens & Nordiques","Capitolo 1 — Miti Mediterranei e Nordici","Capítulo 1 — Mitos Mediterráneos y Nórdicos","チャプター1 — 地中海・北欧神話","Κεφάλαιο 1 — Μεσογειακοί & Βορειακοί Μύθοι","第1章 — 地中海·北欧神话"
-"ui.chapter_select.chapter1.desc","그리스, 이집트, 북유럽 신화의 적이 각 Act에 랜덤 배정됩니다.","Enemies from Greek, Egyptian, and Norse mythology are randomly assigned to each Act.","Les ennemis des mythologies grecque, égyptienne et nordique sont assignés aléatoirement à chaque Acte.","I nemici delle mitologie greca, egizia e norrena sono assegnati casualmente a ogni Atto.","Los enemigos de las mitologías griega, egipcia y nórdica se asignan aleatoriamente a cada Acto.","ギリシャ・エジプト・北欧神話の敵が各アクトにランダム配置されます。","Εχθροί από την ελληνική, αιγυπτιακή και σκανδιναβική μυθολογία ανατίθενται τυχαία σε κάθε Πράξη.","希腊、埃及和北欧神话的敌人将随机分配到每个幕次。"
-"ui.chapter_select.chapter2.name","챕터 2 — 동아시아 신화","Chapter 2 — East Asian Myths","Chapitre 2 — Mythes d'Asie de l'Est","Capitolo 2 — Miti dell'Asia Orientale","Capítulo 2 — Mitos del Este Asiático","チャプター2 — 東アジア神話","Κεφάλαιο 2 — Μύθοι Ανατολικής Ασίας","第2章 — 东亚神话"
-"ui.chapter_select.chapter2.desc","한국, 중국, 일본 신화의 적이 각 Act에 랜덤 배정됩니다.","Enemies from Korean, Chinese, and Japanese mythology are randomly assigned to each Act.","Les ennemis des mythologies coréenne, chinoise et japonaise sont assignés aléatoirement à chaque Acte.","I nemici delle mitologie coreana, cinese e giapponese sono assegnati casualmente a ogni Atto.","Los enemigos de las mitologías coreana, china y japonesa se asignan aleatoriamente a cada Acto.","韓国・中国・日本神話の敵が各アクトにランダム配置されます。","Εχθροί από την κορεατική, κινεζική και ιαπωνική μυθολογία ανατίθενται τυχαία σε κάθε Πράξη.","韩国、中国和日本神话的敌人将随机分配到每个幕次。"
-ui.hero_select.title_start,시작 영웅 선택,Select Starting Hero,Choisir le héros de départ,Seleziona l'eroe iniziale,Seleccionar héroe inicial,開始英雄選択,Επιλογή Αρχικού Ήρωα,选择初始英雄
-ui.hero_select.eyebrow,영웅을 선택하세요.,Select a Hero,Choisissez un Héros,Seleziona un Eroe,Selecciona un Héroe,英雄を選択してください,Επιλέξτε Ήρωα,请选择英雄
-ui.hero_select.title_recruit,영웅 영입,Recruit Hero,Recruter un héros,Recluta Eroe,Reclutar héroe,英雄を仲間にする,Στρατολόγηση Ήρωα,招募英雄
-ui.hero_select.already_owned,이미 보유,Already Owned,Déjà possédé,Già posseduto,Ya lo tienes,所有済み,Ήδη στην κατοχή,已拥有
-ui.hero_select.locked,잠김,Locked,Verrouillé,Bloccato,Bloqueado,ロック中,Κλειδωμένο,已锁定
-ui.map.btn_deck,덱 보기,View Deck,Voir le deck,Visualizza Deck,Ver mazo,デッキ表示,Προβολή Τράπουλας,查看卡组
-ui.map.btn_close,닫기,Close,Fermer,Chiudi,Cerrar,閉じる,Κλείσιμο,关闭
-ui.map.room_battle,전투,Battle,Combat,Battaglia,Batalla,戦闘,Μάχη,战斗
-ui.map.room_elite,정예,Elite,Élite,Elite,Élite,エリート,Ελίτ,精英
-ui.map.room_rest,휴식,Rest,Repos,Riposo,Descanso,休憩,Ανάπαυση,休息
-ui.map.room_shop,상점,Shop,Boutique,Negozio,Tienda,ショップ,Κατάστημα,商店
-ui.map.room_boss,보스,Boss,Boss,Boss,Jefe,ボス,Αρχηγός,首领
-ui.shop.title,상점,Shop,Boutique,Negozio,Tienda,ショップ,Κατάστημα,商店
-ui.shop.relic_empty,릴릭 없음,No Relics,Aucune relique,Nessuna Reliquia,Sin reliquias,レリックなし,Χωρίς Κειμήλια,无遗物
-ui.shop.sec_service,기타 서비스,Other Services,Autres services,Altri Servizi,Otros servicios,その他サービス,Άλλες Υπηρεσίες,其他服务
-ui.shop.btn_exit,나가기,Exit,Quitter,Esci,Salir,戻る,Έξοδος,退出
-ui.shop.btn_purchased,구매 완료,Purchased,Acheté,Acquistato,Comprado,購入済み,Αγοράστηκε,已购买
-ui.shop.btn_removed,제거 완료,Removed,Retiré,Rimosso,Eliminado,削除済み,Αφαιρέθηκε,已移除
-ui.rest.title,휴식,Rest,Repos,Riposo,Descanso,休憩,Ανάπαυση,休息
-ui.rest.btn_heal,회복,Heal,Soigner,Cura,Curar,回復,Θεραπεία,恢复
-ui.rest.btn_upgrade,카드 강화,Upgrade Cards,Améliorer cartes,Potenzia Carte,Mejorar cartas,カード強化,Αναβάθμιση Καρτών,强化卡牌
-ui.rest.btn_leave,떠나기,Leave,Partir,Lascia,Irse,去る,Αναχώρηση,离开
-ui.rest.upgrade_prompt,강화할 카드를 선택하시오,Select a Card to Upgrade,Choisir une carte à améliorer,Seleziona carta da potenziare,Elige carta a mejorar,強化するカードを選択,Επίλεξε κάρτα για αναβάθμιση,选择要强化的卡牌
-ui.card_pick.title,카드를 선택하세요 (%d/%d),Select Cards (%d/%d),Choisir des cartes (%d/%d),Seleziona Carte (%d/%d),Seleccionar cartas (%d/%d),カードを選択してください (%d/%d),Επιλογή Καρτών (%d/%d),请选择卡牌 (%d/%d)
-ui.card_pick.btn_skip,건너뛰기,Skip,Passer,Salta,Omitir,スキップ,Παράλειψη,跳过
-ui.reward.eyebrow,전투 종료,Battle Ended,Combat Terminé,Battaglia Finita,Batalla Terminada,戦闘終了,Μάχη Τέλος,战斗结束
-ui.reward.title,전리품과 은총,Of Spoils & Grace,Des Dépouilles et de la Grâce,Di Bottino e Grazia,De Botín y Gracia,戦利品と恩寵,Λάφυρα και Χάρη,战利品与恩典
-ui.reward.subtitle,성소가 잠들었다. 함께 가져갈 것을 고르라.,The sanctuary is undone. Choose what shall be borne onward.,Le sanctuaire s'est tu. Choisissez ce que vous emporterez.,Il santuario è caduto. Scegli cosa portare avanti.,El santuario ha caído. Elige qué llevar adelante.,聖域が倒れた。持ち去るものを選べ。,Το ιερό έπεσε. Επέλεξε τι θα πάρεις μαζί σου.,圣所已倒。选择带走之物。
-ui.reward.tally.turns,— 턴 —,— TURNS —,— TOURS —,— TURNI —,— TURNOS —,— ターン —,— ΓΥΡΟΙ —,— 回合 —
-ui.reward.tally.damage,— 받은 피해 —,— DAMAGE TAKEN —,— DÉGÂTS SUBIS —,— DANNO SUBITO —,— DAÑO RECIBIDO —,— 受けたダメージ —,— ΖΗΜΙΆ ΛΗΦΘΕΊΣΑ —,— 承受伤害 —
-ui.reward.tally.gold,— 획득 금화 —,— COIN GAINED —,— PIÈCES GAGNÉES —,— MONETE GUADAGNATE —,— MONEDAS GANADAS —,— 獲得コイン —,— ΝΟΜΊΣΜΑΤΑ ΚΕΡΔΉΘΗΚΑΝ —,— 获得金币 —
-ui.reward.section.card_index,— I —,— I —,— I —,— I —,— I —,— I —,— I —,— I —
-ui.reward.section.card_title,카드를 한 장 골라 덱에 더하라,Choose a Card to add to your deck,Choisissez une Carte à ajouter à votre deck,Scegli una Carta da aggiungere al tuo mazzo,Elige una Carta para añadir a tu mazo,カードを1枚選んでデッキに加えよ,Επέλεξε μια Κάρτα για την τράπουλά σου,选择一张卡牌加入你的牌组
-ui.reward.rarity.common,평범,Common,Commun,Comune,Común,コモン,Κοινό,普通
-ui.reward.rarity.uncommon,비범,Uncommon,Peu commun,Non comune,Poco común,アンコモン,Ασυνήθιστο,非凡
-ui.reward.rarity.rare,희귀,Rare,Rare,Raro,Raro,レア,Σπάνιο,稀有
-ui.reward.rarity.legendary,전설,Legendary,Légendaire,Leggendario,Legendario,レジェンダリー,Θρυλικό,传说
-ui.reward.rarity.divine,신성,Divine,Divin,Divino,Divino,ディバイン,Θείο,神圣
-ui.reward.btn_take,선택,Take this,Prendre,Prendi,Tomar,選ぶ,Πάρε αυτό,选择
-ui.reward.btn_skip,지나친다 — 받지 않음,Skip — Take none,Passer — Ne rien prendre,Salta — Non prendere,Pasar — No tomar,スキップ — 何も取らない,Παράλειψη — Μη πάρεις τίποτα,跳过 — 不选取
-ui.reward.progress,— %d / %d 선택됨 —,— %d / %d CHOSEN —,— %d / %d CHOISI —,— %d / %d SCELTO —,— %d / %d ELEGIDO —,— %d / %d 選択済み —,— %d / %d ΕΠΙΛΕΓΜΈΝΟ —,— %d / %d 已选择 —
-ui.card_upgrade.title,카드 강화,Card Upgrade,Amélioration,Potenziamento,Mejora de carta,カード強化,Αναβάθμιση Κάρτας,强化卡牌
-ui.card_upgrade.btn_skip,건너뛰기,Skip,Passer,Salta,Omitir,スキップ,Παράλειψη,跳过
-ui.game_over.victory,승리!,Victory!,Victoire !,Vittoria!,¡Victoria!,勝利！,Νίκη!,胜利！
-ui.game_over.defeat,패배...,Defeat...,Défaite...,Sconfitta...,Derrota...,敗北...,Ήττα...,失败...
-ui.game_over.btn_main_menu,메인 메뉴,Main Menu,Menu Principal,Menu Principale,Menú Principal,メインメニュー,Κύριο Μενού,主菜单
-ui.defeat.continue_hint,클릭하여 메인메뉴로,Click to return to Main Menu,Cliquez pour revenir au menu,Clicca per il menu principale,Haz clic para el menú principal,クリックでメインメニューへ,Κλικ για Κύριο Μενού,点击返回主菜单
-ui.hero_unlock.message,새 영웅 해금: %s,New Hero Unlocked: %s,Nouveau héros débloqué : %s,Nuovo Eroe Sbloccato: %s,Nuevo héroe desbloqueado: %s,新しい英雄を解放: %s,Νέος Ήρωας Ξεκλειδώθηκε: %s,新英雄解锁: %s
-ui.settings.title,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置
-ui.settings.language,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言
-ui.settings.cursor_size,커서 크기,Cursor Size,Taille du curseur,Dimensione cursore,Tamaño cursor,カーソルサイズ,Μέγεθος δρομέα,光标大小
-ui.settings.btn_defaults,초기화,Restore Defaults,Restaurer,Ripristina,Restablecer,初期化,Επαναφορά,恢复默认
-ui.settings.btn_cancel,취소,Cancel,Annuler,Annulla,Cancelar,キャンセル,Άκυρο,取消
-ui.settings.btn_apply,적용,Apply,Appliquer,Applica,Aplicar,適用,Εφαρμογή,应用
-ui.common.btn_settings,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置
-ui.map.room_event,이벤트,Event,Événement,Evento,Evento,イベント,Γεγονός,事件
-ui.map.room_type.secret,비밀,Secret,Secret,Segreto,Secreto,秘密,Μυστικό,秘密
-ui.map.act_title,Act %d,Act %d,Acte %d,Atto %d,Acto %d,アクト %d,Πράξη %d,幕 %d
-ui.map.floor_label,현재 층: %d / 9,Floor: %d / 9,Étage : %d / 9,Piano: %d / 9,Piso: %d / 9,フロア: %d / 9,Όροφος: %d / 9,楼层: %d / 9
-ui.map.deck_list_title,덱 목록 (%d장),Deck (%d cards),Deck (%d cartes),Mazzo (%d carte),Mazo (%d cartas),デッキ (%d枚),Τράπουλα (%d φύλλα),卡组 (%d张)
-ui.map.deck_card_format,[%d코스트] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s)
-ui.shop.gold_label,보유 골드: %d,Gold: %d,Or : %d,Oro: %d,Oro: %d,ゴールド: %d,Χρυσός: %d,金币: %d
-ui.shop.card_section,카드 (%d 골드),Cards (%d Gold),Cartes (%d Or),Carte (%d Oro),Cartas (%d Oro),カード (%d G),Κάρτες (%d Χρ.),卡牌 (%d金)
-ui.shop.relic_section,릴릭 (%d 골드),Relic (%d Gold),Relique (%d Or),Reliquia (%d Oro),Reliquia (%d Oro),レリック (%d G),Κειμήλιο (%d Χρ.),遗物 (%d金)
-ui.shop.btn_buy,구매 (%d 골드),Buy (%d Gold),Acheter (%d Or),Acquista (%d Oro),Comprar (%d Oro),購入 (%d G),Αγορά (%d Χρ.),购买 (%d金)
-ui.shop.card_owner_cost,[%s] 비용 %d,[%s] Cost %d,[%s] Coût %d,[%s] Costo %d,[%s] Coste %d,[%s] %d コスト,[%s] Κόστος %d,[%s] 费用 %d
-ui.shop.btn_heal,회복 %dHP (%d 골드),Heal %dHP (%d Gold),Soigner %dPV (%d Or),Cura %dPS (%d Oro),Curar %dPV (%d Oro),回復 %dHP (%d G),Θεραπεία %dHP (%d Χρ.),恢复 %dHP (%d金)
-ui.shop.btn_remove_card,카드 제거 (%d 골드),Remove Card (%d Gold),Retirer carte (%d Or),Rimuovi carta (%d Oro),Quitar carta (%d Oro),カード除去 (%d G),Αφαίρεση Κάρτας (%d Χρ.),移除卡牌 (%d金)
-ui.shop.remove_prompt,제거할 카드를 선택하세요 (%d 골드),Select card to remove (%d Gold),Choisir une carte à retirer (%d Or),Seleziona carta da rimuovere (%d Oro),Elige carta a eliminar (%d Oro),除去するカードを選択 (%d G),Επίλεξε κάρτα για αφαίρεση (%d Χρ.),选择要移除的卡牌 (%d金)
-ui.shop.upgrade_prompt,강화할 카드를 선택하세요 (%d 골드),Select card to upgrade (%d Gold),Choisir une carte à améliorer (%d Or),Seleziona carta da potenziare (%d Oro),Elige carta a mejorar (%d Oro),強化するカードを選択 (%d G),Επίλεξε κάρτα για αναβάθμιση (%d Χρ.),选择要强化的卡牌 (%d金)
-ui.shop.btn_confirm_remove,제거 확인,Confirm Remove,Confirmer Retrait,Conferma Rimozione,Confirmar Eliminación,除去確認,Επιβεβαίωση Αφαίρεσης,确认移除
-ui.shop.btn_confirm_upgrade,강화 확인,Confirm Upgrade,Confirmer Amélioration,Conferma Potenziamento,Confirmar Mejora,強化確認,Επιβεβαίωση Αναβάθμισης,确认强化
-ui.shop.svc_heal_name,체력 회복,Heal HP,Soigner PV,Cura PS,Curar PV,HP回復,Θεραπεία HP,恢复HP
-ui.shop.svc_heal_desc,파티 전원 HP +%d,Party HP +%d,PV du groupe +%d,PS del gruppo +%d,PV del grupo +%d,パーティ全員 HP+%d,Ομάδα HP +%d,队伍全员 HP+%d
-ui.shop.svc_remove_name,카드 제거,Remove Card,Retirer Carte,Rimuovi Carta,Quitar Carta,カード除去,Αφαίρεση Κάρτας,移除卡牌
-ui.shop.svc_remove_desc,덱에서 카드 1장 제거,Remove 1 card from deck,Retirer 1 carte du deck,Rimuovi 1 carta dal mazzo,Quita 1 carta del mazo,デッキから1枚除去,Αφαίρεσε 1 φύλλο από τράπουλα,从卡组移除1张牌
-ui.shop.svc_upgrade_name,카드 강화,Upgrade Card,Améliorer Carte,Potenzia Carta,Mejorar Carta,カード強化,Αναβάθμιση Κάρτας,强化卡牌
-ui.shop.svc_upgrade_desc,덱의 카드 1장 강화,Upgrade 1 card in deck,Améliorer 1 carte du deck,Potenzia 1 carta nel mazzo,Mejora 1 carta del mazo,デッキの1枚を強化,Αναβάθμισε 1 φύλλο στην τράπουλα,强化卡组中1张牌
-ui.shop.card_name_cost,%s (비용 %d),%s (Cost %d),%s (Coût %d),%s (Costo %d),%s (Coste %d),%s (%d コスト),%s (Κόστος %d),%s (费用 %d)
-ui.rest.hero_hp_format,%s HP: %d / %d,%s HP: %d / %d,%s PV: %d / %d,%s PS: %d / %d,%s PV: %d / %d,%s HP: %d / %d,%s HP: %d / %d,%s HP: %d / %d
-"ui.game_over.stats","도달 층: %d / 9\n보유 골드: %d","Floor: %d / 9\nGold: %d","Étage: %d / 9\nOr: %d","Piano: %d / 9\nOro: %d","Piso: %d / 9\nOro: %d","フロア: %d / 9\nゴールド: %d","Όροφος: %d / 9\nΧρυσός: %d","楼层: %d / 9\n金币: %d"
-ui.hero_select.unlock_condition_none,해금 조건 미달성,Unlock condition not met,Condition non remplie,Condizione non soddisfatta,Condición no cumplida,解放条件未達成,Η συνθήκη δεν εκπληρώθηκε,未满足解锁条件
-ui.hero_select.btn_recruit,%s 영입,Recruit %s,Recruter %s,Recluta %s,Reclutar %s,%s を仲間に,Στράτευσε %s,招募 %s
-ui.hero_select.btn_select,%s 선택,Select %s,Choisir %s,Scegli %s,Elegir %s,%s を選択,Επίλεξε %s,选择 %s
-ui.battle.btn_deck_view,덱 보기,View Deck,Voir Deck,Visualizza Mazzo,Ver Mazo,デッキ表示,Προβολή Τράπουλας,查看卡组
-ui.battle.deck_viewer.draw,드로우 파일,Draw Pile,Pioche,Pesca,Robo,ドロー山,Στοίβα Ανάληψης,抽牌堆
-ui.battle.deck_viewer.discard,버린 덱,Discard Pile,Défausse,Scarto,Descarte,捨て山,Σωρός Απόρριψης,弃牌堆
-ui.battle.deck_viewer.exhaust,소멸,Exhausted,Épuisé,Esaurite,Agotadas,消滅,Εξάντληση,消耗
-ui.battle.deck_viewer.empty,(비어 있음),(Empty),(Vide),(Vuoto),(Vacío),(空),(Κενό),(空)
-
-ui.event.choose_header,— 선택하라 —,— Choose —,— Choisir —,— Scegli —,— Elegir —,— 選択せよ —,— Επίλεξε —,— 选择 —
-ui.event.tag.cost_gold,−0 코인,−0 Coin,−0 Pièce,−0 Moneta,−0 Moneda,−0 コイン,−0 Νόμισμα,−0 金币
-ui.event.tag.cost_hp,−0 HP,−0 HP,−0 PV,−0 PF,−0 PS,−0 HP,−0 ΖΩΗ,−0 血量
-ui.event.tag.gain_gold,+0 코인,+0 Coin,+0 Pièce,+0 Moneta,+0 Moneda,+0 コイン,+0 Νόμισμα,+0 金币
-ui.event.tag.gain_hp,+0 HP,+0 HP,+0 PV,+0 PF,+0 PS,+0 HP,+0 ΖΩΗ,+0 血量
-ui.event.tag.draw_up,드로우 +0,Draw +0,Piocher +0,Pescare +0,Robar +0,ドロー +0,Ανάληψη +0,抽牌 +0
-ui.event.tag.remove_card,카드 제거,Remove Card,Retirer Carte,Rimuovi Carta,Eliminar Carta,カード除去,Αφαίρεση Κάρτας,移除卡牌
-ui.event.tag.add_relic,렐릭 획득,Gain Relic,Obtenir Relique,Ottieni Reliquia,Obtener Reliquia,遺物獲得,Απόκτηση Λειψάνου,获得遗物
-ui.event.tag.relic_gamble,렐릭 도박,Relic Gamble,Pari Relique,Scommessa Reliquia,Apostar Reliquia,遺物ギャンブル,Τζόγος Λειψάνου,遗物赌注
-ui.event.tag.add_hero,영웅 합류,Hero Joins,Héros Rejoint,Eroe Si Unisce,Héroe Se Une,英雄加入,Ήρωας Εντάσσεται,英雄加入
+keys,ko,en,fr,it,es,ja,el,zh,zh_TW
+ui.main_menu.title,STSL,STSL,STSL,STSL,STSL,STSL,STSL,STSL,STSL
+ui.main_menu.new_game,새 게임,New Game,Nouvelle Partie,Nuova Partita,Nueva Partida,新しいゲーム,Νέο Παιχνίδι,新游戏,新游戏
+ui.main_menu.continue,이어하기,Continue,Continuer,Continua,Continuar,続ける,Συνέχεια,继续,继续
+ui.main_menu.language_label,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言,语言
+ui.chapter_select.title,챕터 선택,Select Chapter,Choisir un Chapitre,Seleziona Capitolo,Seleccionar Capítulo,チャプター選択,Επιλογή Κεφαλαίου,选择章节,选择章节
+ui.chapter_select.eyebrow,챕터를 선택하세요.,Select a Chapter,Choisissez un Chapitre,Seleziona un Capitolo,Selecciona un Capítulo,チャプターを選択してください,Επιλέξτε Κεφάλαιο,请选择章节,请选择章节
+ui.chapter_select.back,뒤로,Back,Retour,Indietro,Volver,戻る,Πίσω,返回,返回
+ui.chapter_select.start,챕터 시작,Start Chapter,Commencer,Inizia Capitolo,Iniciar Capítulo,チャプター開始,Έναρξη Κεφαλαίου,开始章节,开始章节
+ui.chapter_select.locked,잠금,Locked,Verrouillé,Bloccato,Bloqueado,ロック中,Κλειδωμένο,已锁定,已锁定
+ui.chapter_select.unlock_hint,이전 챕터를 클리어하면 해금됩니다.,Clear the previous chapter to unlock.,Terminez le chapitre précédent pour déverrouiller.,Completa il capitolo precedente per sbloccare.,Completa el capítulo anterior para desbloquear.,前のチャプターをクリアして解放してください。,Ολοκληρώστε το προηγούμενο κεφάλαιο για να ξεκλειδώσετε.,通关前一章节即可解锁。,通关前一章节即可解锁。
+ui.chapter_select.chapter1.name,"챕터 1 — 지중해, 북방 신화",Chapter 1 — Mediterranean & Nordic Myths,Chapitre 1 — Mythes Méditerranéens & Nordiques,Capitolo 1 — Miti Mediterranei e Nordici,Capítulo 1 — Mitos Mediterráneos y Nórdicos,チャプター1 — 地中海・北欧神話,Κεφάλαιο 1 — Μεσογειακοί & Βορειακοί Μύθοι,第1章 — 地中海·北欧神话,第1章 — 地中海·北欧神话
+ui.chapter_select.chapter1.desc,"그리스, 이집트, 북유럽 신화의 적이 각 Act에 랜덤 배정됩니다.","Enemies from Greek, Egyptian, and Norse mythology are randomly assigned to each Act.","Les ennemis des mythologies grecque, égyptienne et nordique sont assignés aléatoirement à chaque Acte.","I nemici delle mitologie greca, egizia e norrena sono assegnati casualmente a ogni Atto.","Los enemigos de las mitologías griega, egipcia y nórdica se asignan aleatoriamente a cada Acto.",ギリシャ・エジプト・北欧神話の敵が各アクトにランダム配置されます。,"Εχθροί από την ελληνική, αιγυπτιακή και σκανδιναβική μυθολογία ανατίθενται τυχαία σε κάθε Πράξη.",希腊、埃及和北欧神话的敌人将随机分配到每个幕次。,希腊、埃及和北欧神话的敌人将随机分配到每个幕次。
+ui.chapter_select.chapter2.name,챕터 2 — 동아시아 신화,Chapter 2 — East Asian Myths,Chapitre 2 — Mythes d'Asie de l'Est,Capitolo 2 — Miti dell'Asia Orientale,Capítulo 2 — Mitos del Este Asiático,チャプター2 — 東アジア神話,Κεφάλαιο 2 — Μύθοι Ανατολικής Ασίας,第2章 — 东亚神话,第2章 — 东亚神话
+ui.chapter_select.chapter2.desc,"한국, 중국, 일본 신화의 적이 각 Act에 랜덤 배정됩니다.","Enemies from Korean, Chinese, and Japanese mythology are randomly assigned to each Act.","Les ennemis des mythologies coréenne, chinoise et japonaise sont assignés aléatoirement à chaque Acte.","I nemici delle mitologie coreana, cinese e giapponese sono assegnati casualmente a ogni Atto.","Los enemigos de las mitologías coreana, china y japonesa se asignan aleatoriamente a cada Acto.",韓国・中国・日本神話の敵が各アクトにランダム配置されます。,"Εχθροί από την κορεατική, κινεζική και ιαπωνική μυθολογία ανατίθενται τυχαία σε κάθε Πράξη.",韩国、中国和日本神话的敌人将随机分配到每个幕次。,韩国、中国和日本神话的敌人将随机分配到每个幕次。
+ui.hero_select.title_start,시작 영웅 선택,Select Starting Hero,Choisir le héros de départ,Seleziona l'eroe iniziale,Seleccionar héroe inicial,開始英雄選択,Επιλογή Αρχικού Ήρωα,选择初始英雄,选择初始英雄
+ui.hero_select.eyebrow,영웅을 선택하세요.,Select a Hero,Choisissez un Héros,Seleziona un Eroe,Selecciona un Héroe,英雄を選択してください,Επιλέξτε Ήρωα,请选择英雄,请选择英雄
+ui.hero_select.title_recruit,영웅 영입,Recruit Hero,Recruter un héros,Recluta Eroe,Reclutar héroe,英雄を仲間にする,Στρατολόγηση Ήρωα,招募英雄,招募英雄
+ui.hero_select.already_owned,이미 보유,Already Owned,Déjà possédé,Già posseduto,Ya lo tienes,所有済み,Ήδη στην κατοχή,已拥有,已拥有
+ui.hero_select.locked,잠김,Locked,Verrouillé,Bloccato,Bloqueado,ロック中,Κλειδωμένο,已锁定,已锁定
+ui.map.btn_deck,덱 보기,View Deck,Voir le deck,Visualizza Deck,Ver mazo,デッキ表示,Προβολή Τράπουλας,查看卡组,查看卡组
+ui.map.btn_close,닫기,Close,Fermer,Chiudi,Cerrar,閉じる,Κλείσιμο,关闭,关闭
+ui.map.room_battle,전투,Battle,Combat,Battaglia,Batalla,戦闘,Μάχη,战斗,战斗
+ui.map.room_elite,정예,Elite,Élite,Elite,Élite,エリート,Ελίτ,精英,精英
+ui.map.room_rest,휴식,Rest,Repos,Riposo,Descanso,休憩,Ανάπαυση,休息,休息
+ui.map.room_shop,상점,Shop,Boutique,Negozio,Tienda,ショップ,Κατάστημα,商店,商店
+ui.map.room_boss,보스,Boss,Boss,Boss,Jefe,ボス,Αρχηγός,首领,首领
+ui.shop.title,상점,Shop,Boutique,Negozio,Tienda,ショップ,Κατάστημα,商店,商店
+ui.shop.relic_empty,릴릭 없음,No Relics,Aucune relique,Nessuna Reliquia,Sin reliquias,レリックなし,Χωρίς Κειμήλια,无遗物,无遗物
+ui.shop.sec_service,기타 서비스,Other Services,Autres services,Altri Servizi,Otros servicios,その他サービス,Άλλες Υπηρεσίες,其他服务,其他服务
+ui.shop.btn_exit,나가기,Exit,Quitter,Esci,Salir,戻る,Έξοδος,退出,退出
+ui.shop.btn_purchased,구매 완료,Purchased,Acheté,Acquistato,Comprado,購入済み,Αγοράστηκε,已购买,已购买
+ui.shop.btn_removed,제거 완료,Removed,Retiré,Rimosso,Eliminado,削除済み,Αφαιρέθηκε,已移除,已移除
+ui.rest.title,휴식,Rest,Repos,Riposo,Descanso,休憩,Ανάπαυση,休息,休息
+ui.rest.btn_heal,회복,Heal,Soigner,Cura,Curar,回復,Θεραπεία,恢复,恢复
+ui.rest.btn_upgrade,카드 강화,Upgrade Cards,Améliorer cartes,Potenzia Carte,Mejorar cartas,カード強化,Αναβάθμιση Καρτών,强化卡牌,强化卡牌
+ui.rest.btn_leave,떠나기,Leave,Partir,Lascia,Irse,去る,Αναχώρηση,离开,离开
+ui.rest.upgrade_prompt,강화할 카드를 선택하시오,Select a Card to Upgrade,Choisir une carte à améliorer,Seleziona carta da potenziare,Elige carta a mejorar,強化するカードを選択,Επίλεξε κάρτα για αναβάθμιση,选择要强化的卡牌,选择要强化的卡牌
+ui.card_pick.title,카드를 선택하세요 (%d/%d),Select Cards (%d/%d),Choisir des cartes (%d/%d),Seleziona Carte (%d/%d),Seleccionar cartas (%d/%d),カードを選択してください (%d/%d),Επιλογή Καρτών (%d/%d),请选择卡牌 (%d/%d),请选择卡牌 (%d/%d)
+ui.card_pick.btn_skip,건너뛰기,Skip,Passer,Salta,Omitir,スキップ,Παράλειψη,跳过,跳过
+ui.reward.eyebrow,전투 종료,Battle Ended,Combat Terminé,Battaglia Finita,Batalla Terminada,戦闘終了,Μάχη Τέλος,战斗结束,战斗结束
+ui.reward.title,전리품과 은총,Of Spoils & Grace,Des Dépouilles et de la Grâce,Di Bottino e Grazia,De Botín y Gracia,戦利品と恩寵,Λάφυρα και Χάρη,战利品与恩典,战利品与恩典
+ui.reward.subtitle,성소가 잠들었다. 함께 가져갈 것을 고르라.,The sanctuary is undone. Choose what shall be borne onward.,Le sanctuaire s'est tu. Choisissez ce que vous emporterez.,Il santuario è caduto. Scegli cosa portare avanti.,El santuario ha caído. Elige qué llevar adelante.,聖域が倒れた。持ち去るものを選べ。,Το ιερό έπεσε. Επέλεξε τι θα πάρεις μαζί σου.,圣所已倒。选择带走之物。,圣所已倒。选择带走之物。
+ui.reward.tally.turns,— 턴 —,— TURNS —,— TOURS —,— TURNI —,— TURNOS —,— ターン —,— ΓΥΡΟΙ —,— 回合 —,— 回合 —
+ui.reward.tally.damage,— 받은 피해 —,— DAMAGE TAKEN —,— DÉGÂTS SUBIS —,— DANNO SUBITO —,— DAÑO RECIBIDO —,— 受けたダメージ —,— ΖΗΜΙΆ ΛΗΦΘΕΊΣΑ —,— 承受伤害 —,— 承受伤害 —
+ui.reward.tally.gold,— 획득 금화 —,— COIN GAINED —,— PIÈCES GAGNÉES —,— MONETE GUADAGNATE —,— MONEDAS GANADAS —,— 獲得コイン —,— ΝΟΜΊΣΜΑΤΑ ΚΕΡΔΉΘΗΚΑΝ —,— 获得金币 —,— 获得金币 —
+ui.reward.section.card_index,— I —,— I —,— I —,— I —,— I —,— I —,— I —,— I —,— I —
+ui.reward.section.card_title,카드를 한 장 골라 덱에 더하라,Choose a Card to add to your deck,Choisissez une Carte à ajouter à votre deck,Scegli una Carta da aggiungere al tuo mazzo,Elige una Carta para añadir a tu mazo,カードを1枚選んでデッキに加えよ,Επέλεξε μια Κάρτα για την τράπουλά σου,选择一张卡牌加入你的牌组,选择一张卡牌加入你的牌组
+ui.reward.rarity.common,평범,Common,Commun,Comune,Común,コモン,Κοινό,普通,普通
+ui.reward.rarity.uncommon,비범,Uncommon,Peu commun,Non comune,Poco común,アンコモン,Ασυνήθιστο,非凡,非凡
+ui.reward.rarity.rare,희귀,Rare,Rare,Raro,Raro,レア,Σπάνιο,稀有,稀有
+ui.reward.rarity.legendary,전설,Legendary,Légendaire,Leggendario,Legendario,レジェンダリー,Θρυλικό,传说,传说
+ui.reward.rarity.divine,신성,Divine,Divin,Divino,Divino,ディバイン,Θείο,神圣,神圣
+ui.reward.btn_take,선택,Take this,Prendre,Prendi,Tomar,選ぶ,Πάρε αυτό,选择,选择
+ui.reward.btn_skip,지나친다 — 받지 않음,Skip — Take none,Passer — Ne rien prendre,Salta — Non prendere,Pasar — No tomar,スキップ — 何も取らない,Παράλειψη — Μη πάρεις τίποτα,跳过 — 不选取,跳过 — 不选取
+ui.reward.progress,— %d / %d 선택됨 —,— %d / %d CHOSEN —,— %d / %d CHOISI —,— %d / %d SCELTO —,— %d / %d ELEGIDO —,— %d / %d 選択済み —,— %d / %d ΕΠΙΛΕΓΜΈΝΟ —,— %d / %d 已选择 —,— %d / %d 已选择 —
+ui.card_upgrade.title,카드 강화,Card Upgrade,Amélioration,Potenziamento,Mejora de carta,カード強化,Αναβάθμιση Κάρτας,强化卡牌,强化卡牌
+ui.card_upgrade.btn_skip,건너뛰기,Skip,Passer,Salta,Omitir,スキップ,Παράλειψη,跳过,跳过
+ui.game_over.victory,승리!,Victory!,Victoire !,Vittoria!,¡Victoria!,勝利！,Νίκη!,胜利！,胜利！
+ui.game_over.defeat,패배...,Defeat...,Défaite...,Sconfitta...,Derrota...,敗北...,Ήττα...,失败...,失败...
+ui.game_over.btn_main_menu,메인 메뉴,Main Menu,Menu Principal,Menu Principale,Menú Principal,メインメニュー,Κύριο Μενού,主菜单,主菜单
+ui.defeat.continue_hint,클릭하여 메인메뉴로,Click to return to Main Menu,Cliquez pour revenir au menu,Clicca per il menu principale,Haz clic para el menú principal,クリックでメインメニューへ,Κλικ για Κύριο Μενού,点击返回主菜单,点击返回主菜单
+ui.hero_unlock.message,새 영웅 해금: %s,New Hero Unlocked: %s,Nouveau héros débloqué : %s,Nuovo Eroe Sbloccato: %s,Nuevo héroe desbloqueado: %s,新しい英雄を解放: %s,Νέος Ήρωας Ξεκλειδώθηκε: %s,新英雄解锁: %s,新英雄解锁: %s
+ui.settings.title,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置,设置
+ui.settings.language,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言,语言
+ui.settings.cursor_size,커서 크기,Cursor Size,Taille du curseur,Dimensione cursore,Tamaño cursor,カーソルサイズ,Μέγεθος δρομέα,光标大小,光标大小
+ui.settings.btn_defaults,초기화,Restore Defaults,Restaurer,Ripristina,Restablecer,初期化,Επαναφορά,恢复默认,恢复默认
+ui.settings.btn_cancel,취소,Cancel,Annuler,Annulla,Cancelar,キャンセル,Άκυρο,取消,取消
+ui.settings.btn_apply,적용,Apply,Appliquer,Applica,Aplicar,適用,Εφαρμογή,应用,应用
+ui.common.btn_settings,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置,设置
+ui.map.room_event,이벤트,Event,Événement,Evento,Evento,イベント,Γεγονός,事件,事件
+ui.map.room_type.secret,비밀,Secret,Secret,Segreto,Secreto,秘密,Μυστικό,秘密,秘密
+ui.map.act_title,Act %d,Act %d,Acte %d,Atto %d,Acto %d,アクト %d,Πράξη %d,幕 %d,幕 %d
+ui.map.floor_label,현재 층: %d / 9,Floor: %d / 9,Étage : %d / 9,Piano: %d / 9,Piso: %d / 9,フロア: %d / 9,Όροφος: %d / 9,楼层: %d / 9,楼层: %d / 9
+ui.map.deck_list_title,덱 목록 (%d장),Deck (%d cards),Deck (%d cartes),Mazzo (%d carte),Mazo (%d cartas),デッキ (%d枚),Τράπουλα (%d φύλλα),卡组 (%d张),卡组 (%d张)
+ui.map.deck_card_format,[%d코스트] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s),[%d] %s (%s)
+ui.map.confirm_back.message,진행상황이 초기화됩니다.\n정말 뒤로가시겠습니까?,Progress will be reset.\nAre you sure you want to go back?,La progression sera réinitialisée.\nVoulez-vous vraiment revenir ?,I progressi verranno reimpostati.\nSei sicuro di voler tornare indietro?,El progreso se reiniciará.\n¿Estás seguro de que quieres volver?,進行状況がリセットされます。\n本当に戻りますか？,Η πρόοδος θα επαναφερθεί.\nΕίστε σίγουροι ότι θέλετε να επιστρέψετε;,进度将被重置。\n确定要返回吗？,進度將被重置。\n確定要返回嗎？
+ui.map.confirm_back.ok,확인,Confirm,Confirmer,Conferma,Confirmar,確認,Επιβεβαίωση,确认,確認
+ui.map.confirm_back.cancel,취소,Cancel,Annuler,Annulla,Cancelar,キャンセル,Άκυρο,取消,取消
+ui.shop.gold_label,보유 골드: %d,Gold: %d,Or : %d,Oro: %d,Oro: %d,ゴールド: %d,Χρυσός: %d,金币: %d,金币: %d
+ui.shop.card_section,카드 (%d 골드),Cards (%d Gold),Cartes (%d Or),Carte (%d Oro),Cartas (%d Oro),カード (%d G),Κάρτες (%d Χρ.),卡牌 (%d金),卡牌 (%d金)
+ui.shop.relic_section,릴릭 (%d 골드),Relic (%d Gold),Relique (%d Or),Reliquia (%d Oro),Reliquia (%d Oro),レリック (%d G),Κειμήλιο (%d Χρ.),遗物 (%d金),遗物 (%d金)
+ui.shop.btn_buy,구매 (%d 골드),Buy (%d Gold),Acheter (%d Or),Acquista (%d Oro),Comprar (%d Oro),購入 (%d G),Αγορά (%d Χρ.),购买 (%d金),购买 (%d金)
+ui.shop.btn_buy_simple,구매,Buy,Acheter,Acquista,Comprar,購入,Αγορά,购买,購買
+ui.shop.card_owner_cost,[%s] 비용 %d,[%s] Cost %d,[%s] Coût %d,[%s] Costo %d,[%s] Coste %d,[%s] %d コスト,[%s] Κόστος %d,[%s] 费用 %d,[%s] 费用 %d
+ui.shop.btn_heal,회복 %dHP (%d 골드),Heal %dHP (%d Gold),Soigner %dPV (%d Or),Cura %dPS (%d Oro),Curar %dPV (%d Oro),回復 %dHP (%d G),Θεραπεία %dHP (%d Χρ.),恢复 %dHP (%d金),恢复 %dHP (%d金)
+ui.shop.btn_remove_card,카드 제거 (%d 골드),Remove Card (%d Gold),Retirer carte (%d Or),Rimuovi carta (%d Oro),Quitar carta (%d Oro),カード除去 (%d G),Αφαίρεση Κάρτας (%d Χρ.),移除卡牌 (%d金),移除卡牌 (%d金)
+ui.shop.remove_prompt,제거할 카드를 선택하세요 (%d 골드),Select card to remove (%d Gold),Choisir une carte à retirer (%d Or),Seleziona carta da rimuovere (%d Oro),Elige carta a eliminar (%d Oro),除去するカードを選択 (%d G),Επίλεξε κάρτα για αφαίρεση (%d Χρ.),选择要移除的卡牌 (%d金),选择要移除的卡牌 (%d金)
+ui.shop.upgrade_prompt,강화할 카드를 선택하세요 (%d 골드),Select card to upgrade (%d Gold),Choisir une carte à améliorer (%d Or),Seleziona carta da potenziare (%d Oro),Elige carta a mejorar (%d Oro),強化するカードを選択 (%d G),Επίλεξε κάρτα για αναβάθμιση (%d Χρ.),选择要强化的卡牌 (%d金),选择要强化的卡牌 (%d金)
+ui.shop.btn_confirm_remove,제거 확인,Confirm Remove,Confirmer Retrait,Conferma Rimozione,Confirmar Eliminación,除去確認,Επιβεβαίωση Αφαίρεσης,确认移除,确认移除
+ui.shop.btn_confirm_upgrade,강화 확인,Confirm Upgrade,Confirmer Amélioration,Conferma Potenziamento,Confirmar Mejora,強化確認,Επιβεβαίωση Αναβάθμισης,确认强化,确认强化
+ui.shop.svc_heal_name,체력 회복,Heal HP,Soigner PV,Cura PS,Curar PV,HP回復,Θεραπεία HP,恢复HP,恢复HP
+ui.shop.svc_heal_desc,파티 전원 HP +%d,Party HP +%d,PV du groupe +%d,PS del gruppo +%d,PV del grupo +%d,パーティ全員 HP+%d,Ομάδα HP +%d,队伍全员 HP+%d,队伍全员 HP+%d
+ui.shop.svc_remove_name,카드 제거,Remove Card,Retirer Carte,Rimuovi Carta,Quitar Carta,カード除去,Αφαίρεση Κάρτας,移除卡牌,移除卡牌
+ui.shop.svc_remove_desc,덱에서 카드 1장 제거,Remove 1 card from deck,Retirer 1 carte du deck,Rimuovi 1 carta dal mazzo,Quita 1 carta del mazo,デッキから1枚除去,Αφαίρεσε 1 φύλλο από τράπουλα,从卡组移除1张牌,从卡组移除1张牌
+ui.shop.svc_upgrade_name,카드 강화,Upgrade Card,Améliorer Carte,Potenzia Carta,Mejorar Carta,カード強化,Αναβάθμιση Κάρτας,强化卡牌,强化卡牌
+ui.shop.svc_upgrade_desc,덱의 카드 1장 강화,Upgrade 1 card in deck,Améliorer 1 carte du deck,Potenzia 1 carta nel mazzo,Mejora 1 carta del mazo,デッキの1枚を強化,Αναβάθμισε 1 φύλλο στην τράπουλα,强化卡组中1张牌,强化卡组中1张牌
+ui.shop.card_name_cost,%s (비용 %d),%s (Cost %d),%s (Coût %d),%s (Costo %d),%s (Coste %d),%s (%d コスト),%s (Κόστος %d),%s (费用 %d),%s (费用 %d)
+ui.rest.hero_hp_format,%s HP: %d / %d,%s HP: %d / %d,%s PV: %d / %d,%s PS: %d / %d,%s PV: %d / %d,%s HP: %d / %d,%s HP: %d / %d,%s HP: %d / %d,%s HP: %d / %d
+ui.game_over.stats,도달 층: %d / 9\n보유 골드: %d,Floor: %d / 9\nGold: %d,Étage: %d / 9\nOr: %d,Piano: %d / 9\nOro: %d,Piso: %d / 9\nOro: %d,フロア: %d / 9\nゴールド: %d,Όροφος: %d / 9\nΧρυσός: %d,楼层: %d / 9\n金币: %d,楼层: %d / 9\n金币: %d
+ui.hero_select.unlock_condition_none,해금 조건 미달성,Unlock condition not met,Condition non remplie,Condizione non soddisfatta,Condición no cumplida,解放条件未達成,Η συνθήκη δεν εκπληρώθηκε,未满足解锁条件,未满足解锁条件
+ui.hero_select.btn_recruit,%s 영입,Recruit %s,Recruter %s,Recluta %s,Reclutar %s,%s を仲間に,Στράτευσε %s,招募 %s,招募 %s
+ui.hero_select.btn_select,%s 선택,Select %s,Choisir %s,Scegli %s,Elegir %s,%s を選択,Επίλεξε %s,选择 %s,选择 %s
+ui.battle.btn_deck_view,덱 보기,View Deck,Voir Deck,Visualizza Mazzo,Ver Mazo,デッキ表示,Προβολή Τράπουλας,查看卡组,查看卡组
+ui.battle.deck_viewer.draw,드로우 파일,Draw Pile,Pioche,Pesca,Robo,ドロー山,Στοίβα Ανάληψης,抽牌堆,抽牌堆
+ui.battle.deck_viewer.discard,버린 덱,Discard Pile,Défausse,Scarto,Descarte,捨て山,Σωρός Απόρριψης,弃牌堆,弃牌堆
+ui.battle.deck_viewer.exhaust,소멸,Exhausted,Épuisé,Esaurite,Agotadas,消滅,Εξάντληση,消耗,消耗
+ui.battle.deck_viewer.empty,(비어 있음),(Empty),(Vide),(Vuoto),(Vacío),(空),(Κενό),(空),(空)
+""
+ui.event.choose_header,— 선택하라 —,— Choose —,— Choisir —,— Scegli —,— Elegir —,— 選択せよ —,— Επίλεξε —,— 选择 —,— 选择 —
+ui.event.tag.cost_gold,−0 코인,−0 Coin,−0 Pièce,−0 Moneta,−0 Moneda,−0 コイン,−0 Νόμισμα,−0 金币,−0 金币
+ui.event.tag.cost_hp,−0 HP,−0 HP,−0 PV,−0 PF,−0 PS,−0 HP,−0 ΖΩΗ,−0 血量,−0 血量
+ui.event.tag.gain_gold,+0 코인,+0 Coin,+0 Pièce,+0 Moneta,+0 Moneda,+0 コイン,+0 Νόμισμα,+0 金币,+0 金币
+ui.event.tag.gain_hp,+0 HP,+0 HP,+0 PV,+0 PF,+0 PS,+0 HP,+0 ΖΩΗ,+0 血量,+0 血量
+ui.event.tag.draw_up,드로우 +0,Draw +0,Piocher +0,Pescare +0,Robar +0,ドロー +0,Ανάληψη +0,抽牌 +0,抽牌 +0
+ui.event.tag.remove_card,카드 제거,Remove Card,Retirer Carte,Rimuovi Carta,Eliminar Carta,カード除去,Αφαίρεση Κάρτας,移除卡牌,移除卡牌
+ui.event.tag.add_relic,렐릭 획득,Gain Relic,Obtenir Relique,Ottieni Reliquia,Obtener Reliquia,遺物獲得,Απόκτηση Λειψάνου,获得遗物,获得遗物
+ui.event.tag.relic_gamble,렐릭 도박,Relic Gamble,Pari Relique,Scommessa Reliquia,Apostar Reliquia,遺物ギャンブル,Τζόγος Λειψάνου,遗物赌注,遗物赌注
+ui.event.tag.add_hero,영웅 합류,Hero Joins,Héros Rejoint,Eroe Si Unisce,Héroe Se Une,英雄加入,Ήρωας Εντάσσεται,英雄加入,英雄加入

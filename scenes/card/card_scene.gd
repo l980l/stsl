@@ -28,6 +28,7 @@ var _glow_tween: Tween = null
 
 func _ready() -> void:
 	$Container/CostLabel.theme_type_variation = "AccentLabel"
+	$Container/CostLabel.add_theme_font_override("font", load("res://assets/fonts/Cinzel-Regular.ttf"))
 	$Container/CostLabel.add_theme_color_override("font_color", Color.WHITE)
 	$Container/CostLabel.add_theme_color_override("font_outline_color", Color.BLACK)
 	$Container/CostLabel.add_theme_constant_override("outline_size", 30)

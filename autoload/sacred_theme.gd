@@ -19,7 +19,48 @@ const _COUNTRY_FONTS := {
 	"france":   "CinzelDecorative-Regular.ttf",
 	"egypt":    "CinzelDecorative-Regular.ttf",
 	"mongolia": "Cinzel-Bold.ttf",
-	# japan/korea: Cinzel-Regular로 fallback (CJK 글리프는 NotoSansCJK로 렌더)
+}
+
+# 역할별 라틴 폰트 기본값 (en/fr/it/es/de 등 라틴 계열 공통)
+const _LATIN_FONTS := {
+	"display": "Cinzel-Regular.ttf",
+	"ui":      "Inter-Regular.ttf",
+	"mono":    "SpaceMono-Regular.ttf",
+	"italic":  "IMFellEnglish-Italic.ttf",
+}
+
+# 로케일별 역할 폰트 — 파일이 없으면 _LATIN_FONTS로 자동 fallback
+const _LOCALE_FONTS := {
+	"ko": {
+		"display": "ko/GowunBatang-Bold.ttf",
+		"ui":      "ko/Pretendard-Regular.otf",
+		"mono":    "ko/D2Coding.ttf",
+		"italic":  "ko/Hahmlet-Medium.ttf",
+	},
+	"ja": {
+		"display": "ja/ZenOldMincho-Bold.ttf",
+		"ui":      "ja/NotoSansJP-Regular.ttf",
+		"mono":    "ja/HackGen-Regular.ttf",
+		"italic":  "ja/HinaMincho-Regular.ttf",
+	},
+	"zh": {
+		"display": "zh_SC/SourceHanSerifSC-Bold.otf",
+		"ui":      "zh_SC/NotoSansSC-Regular.ttf",
+		"mono":    "zh_SC/SarasaMonoSC-Regular.ttf",
+		"italic":  "zh_SC/LXGWWenKai-Regular.ttf",
+	},
+	"zh_TW": {
+		"display": "zh_TC/SourceHanSerifTC-Bold.otf",
+		"ui":      "zh_TC/NotoSansTC-Regular.ttf",
+		"mono":    "zh_TC/SarasaMonoTC-Regular.ttf",
+		"italic":  "zh_TC/LXGWWenKaiTC-Regular.ttf",
+	},
+	"el": {
+		"display": "el/CormorantGaramond-Bold.ttf",
+		# ui: Inter 재사용 (이미 Greek 글리프 포함)
+		"mono":    "el/JetBrainsMono-Regular.ttf",
+		"italic":  "el/EBGaramond-Italic.ttf",
+	},
 }
 
 var theme: Theme
@@ -41,6 +82,11 @@ func _ready() -> void:
 	_setup_panels()
 	_setup_labels()
 	_setup_cursor()
+	LocaleManager.locale_changed.connect(_on_locale_changed)
+
+func _on_locale_changed(_locale: String) -> void:
+	_setup_fonts()
+	theme.changed.emit()
 
 func _setup_cursor() -> void:
 	if _cursor_base_image == null:
@@ -79,24 +125,52 @@ func _make_font(primary_file: String) -> Font:
 	if primary == null:
 		return load(_NOTO_PATH) as Font
 
-	var noto: Font = load(_NOTO_PATH) if ResourceLoader.exists(_NOTO_PATH) else null
-	var noto_cjk: Font = load(_NOTO_CJK) if ResourceLoader.exists(_NOTO_CJK) else null
+	var v := FontVariation.new()
+	v.base_font = primary
+	var fallbacks: Array[Font] = []
+	if ResourceLoader.exists(_NOTO_PATH):
+		fallbacks.append(load(_NOTO_PATH) as Font)
+	if ResourceLoader.exists(_NOTO_CJK):
+		fallbacks.append(load(_NOTO_CJK) as Font)
+	v.fallbacks = fallbacks
+	return v
+
+func _make_font_for_role(role: String) -> Font:
+	var locale := LocaleManager.current_locale
+	var locale_map: Dictionary = _LOCALE_FONTS.get(locale, {})
+	var locale_file: String = locale_map.get(role, "")
+	var latin_file: String = _LATIN_FONTS.get(role, "")
+
+	var primary: FontFile = null
+	var using_locale_font := false
+	if locale_file != "":
+		primary = _load_font(locale_file)
+		if primary != null:
+			using_locale_font = true
+	if primary == null and latin_file != "":
+		primary = _load_font(latin_file)
+	if primary == null:
+		return load(_NOTO_PATH) as Font
 
 	var v := FontVariation.new()
 	v.base_font = primary
 	var fallbacks: Array[Font] = []
-	if noto:
-		fallbacks.append(noto)
-	if noto_cjk:
-		fallbacks.append(noto_cjk)
+	if using_locale_font and latin_file != "":
+		var latin := _load_font(latin_file)
+		if latin:
+			fallbacks.append(latin)
+	if ResourceLoader.exists(_NOTO_PATH):
+		fallbacks.append(load(_NOTO_PATH) as Font)
+	if ResourceLoader.exists(_NOTO_CJK):
+		fallbacks.append(load(_NOTO_CJK) as Font)
 	v.fallbacks = fallbacks
 	return v
 
 func _setup_fonts() -> void:
-	var font_display := _make_font("Cinzel-Regular.ttf")
-	var font_ui      := _make_font("Inter-Regular.ttf")
-	var font_mono    := _make_font("SpaceMono-Regular.ttf")
-	var font_italic  := _make_font("IMFellEnglish-Italic.ttf")
+	var font_display := _make_font_for_role("display")
+	var font_ui      := _make_font_for_role("ui")
+	var font_mono    := _make_font_for_role("mono")
+	var font_italic  := _make_font_for_role("italic")
 
 	# 전역 기본폰트
 	theme.default_font = font_ui

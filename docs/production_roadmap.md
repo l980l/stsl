@@ -1,6 +1,6 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-04-25 v6)
+> 작성일: 2026-04-17 (최종 동기화: 2026-04-27 v7)
 > 기준: 챕터 1·2 완성 + 영웅 6인 + 번역 인프라 + 덱뷰어 완성 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
@@ -27,7 +27,12 @@
 **번역 인프라 구축 완료** (PR #73): CSV 기반 다국어 번역 파일 9종(`strings_battle/card/ui/enemy/status/relic/synergy/event/hero.csv`), Godot 번역 등록 + `autoload/locale_manager.gd` 싱글턴, NotoSansCJK·NotoNaskhArabic 폰트 fallback 체인. 한국어·영어(전투/인텐트) 완료.
 **덱 뷰어 완성** (PR #73): 덱·버린카드 2열 그리드, 카드 호버 확대 툴팁, 툴팁 깜빡임 완전 수정(mouse_filter 재귀 IGNORE). 버튼 위치 턴 종료 아래로 이동.
 **적 카드 카운터 개선** (PR #73): 발동 후 count 리셋, repeat 재발동 버그 수정, 툴팁 번역키화, UI를 상태 아이콘 영역으로 통합. 1145 테스트 통과.
-**전투 UX 개선** (PR #79, #80, #81): 핸드 부채꼴 레이아웃 + 호버 확대(PR #79), 드래그 화살표 베지어 곡선·유효성 색상·흐름 애니메이션(PR #80), 슬롯 위치 Marker2D 기반(에디터 드래그로 조정)·소환 영역 6개 단일 열·더미 몬스터/소환수 디버그 키 Shift+O·S(PR #81). 1080 테스트 통과 (tr() 기반 이름 조회 회귀 39건 별도 추적 중).
+**전투 UX 개선** (PR #79, #80, #81): 핸드 부채꼴 레이아웃 + 호버 확대(PR #79), 드래그 화살표 베지어 곡선·유효성 색상·흐름 애니메이션(PR #80), 슬롯 위치 Marker2D 기반(에디터 드래그로 조정)·소환 영역 6개 단일 열·더미 몬스터/소환수 디버그 키 Shift+O·S(PR #81). 1080 테스트 통과.
+**상태이상·시너지·렐릭 아이콘 UI** (PR #85): 전투 HUD 좌측에 아이콘 패널 신설 — SVG 아이콘 기반 상태이상·시너지·렐릭 툴팁 표시.
+**Sacred UI 디자인 시스템** (PR #86~#88): `SacredPalette`(색상 팔레트) + `SacredTheme`(헬퍼·폰트·버튼 애니메이션) 오토로드 신설. TitleLabel·SubLabel·EyebrowLabel·AccentLabel·PrimaryButton·VowButton·ChapterButton·IconButton 테마 변형 8종. Cinzel·IMFell English·Inter·SpaceMono 커스텀 폰트. 4방향 별 커서 SVG. 엘립스 블룸 셰이더·격자(crosshatch) 오버레이 셰이더. 메인메뉴·챕터선택·영웅선택·맵·휴식·상점·이벤트·카드픽 8개 씬 전면 적용.
+**맵 아이콘·알고리즘** (PR #88): Slay-the-Spire 방식 맵 생성 알고리즘 + 15×7 좌표계 + 룸 아이콘 7종 SVG(`IconUtils.get_room_icon()`).
+**전투 UI 보완** (PR #89~#91): Enthrall 상태이상 아이콘·번역 추가, 카운터 아이콘 시계 SVG + 발동 순서 고정, HP바 8px halo bloom, 팝업 트윈 개선, 설정 오버레이 커서 크기 세그먼트 컨트롤(S/M/L/XL)·취소/적용/초기화 버튼 추가.
+**이벤트 씬 i18n·격자 패턴** (PR #92): 이벤트 선택지 하드코딩 한국어 → tr() 교체(10개 번역 키 신설, 8언어), 8개 씬 격자 배경 오버레이 셰이더 적용.
 
 ---
 
@@ -178,6 +183,8 @@
   - Shift+N(영웅 즉시 해금) / Shift+L(렐릭 추가) / Shift+X(렐릭 제거) / Shift+V(이벤트 씬 입장) PR #61
   - ✅ Shift+M(몬스터 선택 전투) / Shift+B(영웅 HP 조정 다이얼로그) / Shift+T(번역 키 표시 토글) PR #73
   - ✅ Shift+O(더미 몬스터 추가) / Shift+S(더미 소환수 토큰, 영웅 순환) PR #81 — 전투 씬 레이아웃 테스트용
+  - ✅ Space+L(레이블 렉트 표시 토글) / Space+B(버튼 렉트 표시 토글) — 위치 디버그 PR #88~#89
+  - ✅ Space+P(프레임 스파이크 프로파일러 토글) — dt·fps·draw·nodes·mem 로그 기록 PR #89
   - `OS.is_debug_build()` 게이트 → 릴리스 빌드 영향 0
   - `autoload/debug_manager.gd` 싱글턴 (CanvasLayer로 전 씬 오버레이)
 
@@ -416,12 +423,23 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - 🔲 카드 프레임 디자인 (일반 / 강화)
 
 ### 7-4. UI 폴리싱
-- 🔶 전투 인터랙션 폴리싱: 부채꼴 핸드(PR #79), 드래그 화살표 베지어(PR #80), 슬롯 Marker2D(PR #81) 완료 — 그래픽 에셋 연결 전 UX 기반 마련
-- 🔲 전투 화면: HP바, 에너지, 인텐트 아이콘 실제 그래픽 적용
-- 🔲 맵 화면: 노드 아이콘, 경로선, 배경
-- 🔲 카드 픽 / 상점 / 휴식 / 이벤트 화면 배경
+- ✅ 전투 인터랙션 폴리싱: 부채꼴 핸드(PR #79), 드래그 화살표 베지어(PR #80), 슬롯 Marker2D(PR #81) 완료
+- ✅ 상태이상·시너지·렐릭 아이콘 UI (PR #85): 전투 HUD SVG 아이콘 기반 패널 + 툴팁
+- ✅ **Sacred UI 디자인 시스템** (PR #86~#88):
+  - `autoload/sacred_theme.gd` — 팔레트·테마·셰이더·커서·폰트 통합 관리
+  - Theme variation 8종: TitleLabel / SubLabel / EyebrowLabel / AccentLabel / PrimaryButton / VowButton / ChapterButton / IconButton
+  - 커스텀 폰트: Cinzel(타이틀) / IMFell English(플레이버) / Inter(UI 본문) / SpaceMono(고정폭)
+  - 4방향 별 커서 SVG (64px), 커서 크기 S/M/L/XL 실시간 변경
+  - `make_top_ellipse_bloom()` — 상단 골든 그라데이션 블룸 셰이더
+  - `make_crosshatch_overlay()` — ±45° 황동색 격자 셰이더 (UV 기반, 해상도 독립)
+  - 적용 씬 8개: main_menu / chapter_select / hero_select / map / rest / shop / event / card_pick
+- ✅ 맵 화면 룸 아이콘 (PR #88): 7종 SVG + `IconUtils.get_room_icon()` + 15×7 좌표계
+- ✅ 카드 픽 / 상점 / 휴식 / 이벤트 화면 배경 (Sacred UI 적용 완료)
+- ✅ HP바 bloom halo (PR #90): fill 자식 이동 + 8px halo 공식
+- 🔲 전투 화면: 에너지·인텐트 실제 그래픽 아이콘 (현재 텍스트 폴백)
+- 🔲 맵 화면: 경로선·배경 그래픽
 - 🔲 게임 오버 / 클리어 화면 연출
-- 🔲 상태이상 아이콘 실제 이미지 (현재 이모지 텍스트)
+- ✅ 상태이상 아이콘 (PR #85): SVG 아이콘 기반 HUD 표시 완료
 
 ### 7-7. 카드 폴리싱 — 미구현 효과
 - 🔲 치명타(Critical Hit) 시스템: 특정 카드/렐릭이 일정 확률로 피해 ×1.5~2.0, HP 바 crit 비주얼 트리거
@@ -431,7 +449,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 ### 7-5. 애니메이션 / 이펙트
 - 🔲 카드 사용 시 이펙트 (공격 임팩트, 독 스플래시, 방어막)
 - 🔲 히트 스톱 (공격 시 0.1초 정지)
-- 🔲 씬 전환 페이드 인/아웃
+- ✅ 씬 전환 페이드 인/아웃 (`autoload/scene_transition.gd` + CanvasLayer 검정 오버레이)
 - 🔲 페이즈 전환 연출 (보스 분노 이펙트)
 
 ### 7-6. 오디오
@@ -508,8 +526,9 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - ✅ `autoload/locale_manager.gd` 싱글턴 — 언어 전환 인터페이스 (`set_locale()`)
 - ✅ NotoSansCJK-Regular.ttc / NotoNaskhArabic-Regular.ttf 폰트 fallback 체인 (한·중·일·아랍 지원)
 - 🔶 `resources/data/*.gd` 문자열 → 번역 키로 교체 (전투·카드·상태이상 완료, 이벤트·이름 일부 미완)
-- 🔶 UI 레이블 `tr()` 래핑 (battle_scene·card_scene 완료, shop/map/menu 미완)
-- 🔲 설정 화면에 언어 선택 UI 추가 (locale_manager 구현됨, UI 연결 미완)
+- ✅ UI 레이블 `tr()` 래핑 (battle_scene·card_scene·shop·map·menu·event·card_pick·rest·hero_select·chapter_select 완료 PR #86~#92)
+- ✅ 설정 화면 언어 선택 UI + 커서 크기 세그먼트 컨트롤 + 취소/적용/초기화 버튼 (PR #91)
+- ✅ `strings_ui.csv` 이벤트 선택지 키 10종 추가 (PR #92): `ui.event.choose_header`, `ui.event.tag.*` 8개
 
 ### 8.5-2. 지원 언어 번역 작업
 - 🔶 한국어 — 전투·카드·상태이상·인텐트 완료. 이벤트·렐릭·영웅 설명 미완
@@ -530,7 +549,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - 🔲 자막 토글 (보이스·효과음 자막)
 - 🔲 폰트 크기 옵션 (작게 / 보통 / 크게)
 - 🔲 키 리바인딩 (선택)
-- 🔲 마우스 커서 확대 옵션 (모바일·접근성)
+- ✅ 마우스 커서 확대 옵션 — 설정 오버레이에서 S/M/L/XL 4단계 실시간 변경 (PR #91)
 
 > **배경:** 스팀은 접근성 옵션을 권장 태그로 노출. 모바일 스토어는 점차 의무화 추세. 출시 전 최소한의 옵션 확보 필요.
 
@@ -601,7 +620,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-04-25 v8. PR #82 로드맵 v5 동기화 + 출시 준비 항목 보강(M8-6/8-7/8.6/9-5/9-6/M10). 1080 테스트 통과 (이름 조회 회귀 39건 추적 중).
+> 최종 갱신: 2026-04-27 v9. PR #85~#92 반영 — Sacred UI 디자인 시스템·맵 아이콘·알고리즘·이벤트 i18n·격자 셰이더·설정 오버레이 개선.
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -616,6 +635,13 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 시스템 완성 M6 (덱뷰어·부활·도발·비밀룸 4종 엔진 구현) | Plan 28, PR #73 완료. 게임 루프 깊이 |
 | ✅ 완료 | 번역 인프라 구축 (M8.5-1) | PR #73. CSV 9종·locale_manager·폰트 fallback |
 | ✅ 완료 | 전투 UX 기반 폴리싱 (M7 전 단계) | PR #79~#81. 핸드 부채꼴·드래그 화살표·슬롯 Marker2D화 |
+| ✅ 완료 | 상태이상·시너지·렐릭 아이콘 UI (M7-4) | PR #85. 전투 HUD SVG 아이콘 패널 + 툴팁 |
+| ✅ 완료 | Sacred UI 디자인 시스템 (M7-4) | PR #86~#88. SacredPalette·SacredTheme·폰트·셰이더·커서. 8개 씬 전면 적용 |
+| ✅ 완료 | 맵 룸 아이콘·알고리즘 (M7-4) | PR #88. STS 알고리즘·15×7 좌표계·룸 아이콘 7종 SVG |
+| ✅ 완료 | 전투 UI 보완 + HP bar bloom (M7-4) | PR #89~#91. Enthrall 아이콘·카운터 아이콘·HP halo·커서 설정 |
+| ✅ 완료 | 씬 전환 페이드 인/아웃 (M7-5) | SceneTransition 오토로드 (PR #86) |
+| ✅ 완료 | 설정 UI + 커서 크기 옵션 (M8.5·M8.6) | PR #91. 세그먼트 S/M/L/XL·취소/적용/초기화·언어 선택 UI |
+| ✅ 완료 | 이벤트 선택지 i18n (M8.5) | PR #92. 하드코딩 한국어 → tr() 10개 키 신설, 8언어 |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
 | 🟢 장기 | 비주얼 (M7-1~7-5) 캐릭터·카드 아트, 이펙트 | 몰입감 |
 | 🟢 장기 | 오디오 임포트 및 AudioManager (M7-6) | 몰입감 |

@@ -176,38 +176,63 @@ func _build_section_header(sx: float, sw: float, cx: float) -> void:
 	var row_w: float = 1080.0
 	var row_x: float = cx - row_w * 0.5
 
+	# HBoxContainer: 텍스트 블록 중앙 고정 + 양쪽 가로선이 텍스트 길이에 맞게 자동 조절
+	var row_hbox := HBoxContainer.new()
+	row_hbox.position = Vector2(row_x, row_y)
+	row_hbox.size = Vector2(row_w, 26.0)
+	row_hbox.add_theme_constant_override("separation", 0)
+	add_child(row_hbox)
+
 	var line_l := TextureRect.new()
 	line_l.texture = SacredTheme.make_center_bright_h_tex(P.BRASS_700, 0.75)
 	line_l.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	line_l.stretch_mode = TextureRect.STRETCH_SCALE
-	line_l.position = Vector2(row_x, row_y + 12.0)
-	line_l.size = Vector2(260.0, 1.0)
-	add_child(line_l)
+	line_l.custom_minimum_size = Vector2(40.0, 1.0)
+	line_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line_l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	line_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row_hbox.add_child(line_l)
+
+	var pad_l := Control.new()
+	pad_l.custom_minimum_size = Vector2(16.0, 0.0)
+	row_hbox.add_child(pad_l)
 
 	var idx_lbl := Label.new()
 	idx_lbl.text = tr("ui.reward.section.card_index")
 	idx_lbl.theme_type_variation = "EyebrowLabel"
 	idx_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	idx_lbl.position = Vector2(row_x + 272.0, row_y + 5.0)
-	idx_lbl.size = Vector2(54.0, 16.0)
-	add_child(idx_lbl)
+	idx_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	idx_lbl.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	idx_lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row_hbox.add_child(idx_lbl)
+
+	var pad_mid := Control.new()
+	pad_mid.custom_minimum_size = Vector2(10.0, 0.0)
+	row_hbox.add_child(pad_mid)
 
 	var sec_title := Label.new()
 	sec_title.text = tr("ui.reward.section.card_title")
 	sec_title.theme_type_variation = "AccentLabel"
 	sec_title.add_theme_font_size_override("font_size", 19)
-	sec_title.position = Vector2(row_x + 334.0, row_y + 1.0)
-	sec_title.size = Vector2(460.0, 26.0)
-	add_child(sec_title)
-	LabelUtils.fit_text(sec_title, 19, 13)
+	sec_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	sec_title.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	sec_title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row_hbox.add_child(sec_title)
+	LabelUtils.fit_text(sec_title, 19, 13, 480.0)
+
+	var pad_r := Control.new()
+	pad_r.custom_minimum_size = Vector2(16.0, 0.0)
+	row_hbox.add_child(pad_r)
 
 	var line_r := TextureRect.new()
 	line_r.texture = SacredTheme.make_center_bright_h_tex(P.BRASS_700, 0.75)
 	line_r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	line_r.stretch_mode = TextureRect.STRETCH_SCALE
-	line_r.position = Vector2(row_x + row_w - 260.0, row_y + 12.0)
-	line_r.size = Vector2(260.0, 1.0)
-	add_child(line_r)
+	line_r.custom_minimum_size = Vector2(40.0, 1.0)
+	line_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line_r.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	line_r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row_hbox.add_child(line_r)
 
 func _build_card_grid(cx: float) -> void:
 	var P := SacredPalette

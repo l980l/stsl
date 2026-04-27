@@ -107,16 +107,9 @@ func _build_ui() -> void:
 		var is_locked: bool = (not is_recruit) and pm != null and not pm.is_hero_unlocked(hid)
 		var inactive: bool = already_owned or is_locked
 
-		var tooltip: String = info.get("desc", "") as String
-		if is_locked:
-			var unlock_desc_key: String = info.get("unlock_description", "") as String
-			var unlock_desc: String = tr(unlock_desc_key) if unlock_desc_key != "" else ""
-			tooltip += "\n\n🔒 " + (unlock_desc if unlock_desc != "" else tr("ui.hero_select.unlock_condition_none"))
-
 		# 카드 패널 (Sacred 톤 StyleBox)
 		var panel := PanelContainer.new()
 		panel.custom_minimum_size = Vector2(CARD_W, CARD_H)
-		panel.tooltip_text = tooltip
 		panel.mouse_filter = Control.MOUSE_FILTER_STOP
 		panel.clip_contents = false
 		var style := StyleBoxFlat.new()

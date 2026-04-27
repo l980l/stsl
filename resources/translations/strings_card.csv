@@ -1,519 +1,519 @@
-﻿﻿keys,ko,en,fr,it,es,ja,el,zh
-effect.damage.text,피해 %d%s%s,Deal %d%s%s damage,Inflige %d%s%s dégâts,Infligge %d%s%s danni,Inflige %d%s%s de daño,%d%s%sダメージ,Προκάλεσε %d%s%s ζημιά,造成 %d%s%s 伤害
-effect.block.text,방어 %d,Gain %d Block,Gagne %d d'Armure,Ottieni %d Scudo,Gana %d de Escudo,ブロック %d,Κέρδισε %d Άμυνα,获得 %d 护甲
-effect.block_all.text,전체 방어 %d,Gain %d Block to all,Gagne %d d'Armure à tous,Ottieni %d Scudo a tutti,Gana %d de Escudo a todos,全員にブロック %d,Κέρδισε %d Άμυνα για όλους,全体获得 %d 护甲
-effect.formation_block.text,영웅수×%d 방어,Gain %d Block per Hero,Gagne %d d'Armure par Héros,Ottieni %d Scudo per Eroe,Gana %d de Escudo por Héroe,英雄数×%d ブ록,Κέρδισε %d Άμυνα ανά Ήρωα,英雄数×%d 护甲
-effect.draw.text,드로우 %d,Draw %d,Piochez %d,Pesca %d,Roba %d,ドロー %d,Τράβηξε %d,抽 %d 张牌
-effect.energy.text,에너지 +%d,Gain %d Energy,Gagne %d Énergie,Guadagna %d Energia,Gana %d de Energía,エネルギー +%d,Κέρδισε %d Ενέργεια,能量 +%d
-effect.heal.text,회복 %d,Heal %d,Soigne %d,Cura %d,Cura %d,回復 %d,Θεράπευσε %d,恢复 %d
-effect.heal_all.text,전체 회복 %d,Heal all for %d,Soigne tous pour %d,Cura tutti di %d,Cura a todos por %d,全員回復 %d,Θεράπευσε όλους για %d,全体恢复 %d
-effect.gain_morale.text,사기 +%d,Gain %d Morale,Gagne %d Moral,Guadagna %d Morale,Gana %d de Moral,士気 +%d,Κέρδισε %d Ηθικό,士气 +%d
-effect.consume_morale.text,사기→피해 %d,Morale -> %d Damage,Moral -> %d Dégâts,Morale -> %d Danni,Moral -> %d Daño,士気→ダメージ %d,Ηθικό -> %d Ζημιά,士气→伤害 %d
-effect.poison_burst.text,독 즉발,Trigger Poison,Déclenche le Poison,Attiva Veleno,Detona Veneno,毒即発,Ενεργοποίηση Δηλητηρίου,毒性爆发
-effect.counter_block.text,방어도×%d%%,%d%% of Block,%d%% de l'Armure,%d%% dello Scudo,%d%% del Escudo,ブロック×%d%%,%d%% της Άμυνας,护甲×%d%%
-effect.cost_next.text,다음 비용 -%d,Next cost -%d,Coût suivant -%d,Prossimo costo -%d,Siguiente coste -%d,次のコスト -%d,Επόμενο κόστος -%d,下一次费用 -%d
-effect.conditional_dmg.text,%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s)
-effect.summon_token.text,병사 소환 %d,Summon %d Soldiers,Invoque %d Soldats,Evoca %d Soldati,Invoca %d Soldados,兵士召喚 %d,Κάλεσε %d Στρατιώτες,召唤 %d 士兵
-effect.charm.text,매혹 %d,Charm %d,Charme %d,Fascino %d,Encanto %d,魅惑 %d,Γοητεία %d,魅惑 %d
-effect.revive.text,부활 %d%%,Revive with %d%% HP,Ressuscite avec %d%% PV,Rianima con %d%% PS,Revive con %d%% PV,復活 %d%%,Αναβίωση με %d%% HP,复活 %d%%
-effect.sacrifice_hp.text,자기 HP -%d,Lose %d HP,Perds %d PV,Perdi %d PS,Pierde %d PV,自己HP -%d,Χάσε %d HP,自身生命 -%d
-effect.cost_zero_turn.text,이번 턴 코스트 0,Cost 0 this turn,Coût 0 ce tour,Costo 0 questo turno,Coste 0 este turno,このターンコスト0,Κόστος 0 αυτόν τον γύρο,本回合费用为0
-effect.block_per_cards_played.text,카드수×%d 방어,%d Block per card played,%d Armure par carte jouée,%d Scudo per carta giocata,%d Escudo por carta jugada,카드数×%d ブ록,%d Άμυνα ανά παιγμένο φύλλο,牌数×%d 护甲
-effect.on_kill_draw.text,처치시 드로우 %d,Draw %d on kill,Piochez %d par élimination,Pesca %d all'uccisione,Roba %d al matar,撃破時ドロー %d,Τράβηξε %d κατά την εξόντωση,击杀时抽 %d 张牌
-effect.purge_status.text,디버프 제거,Remove debuffs,Retire les malus,Rimuovi debuff,Elimina penalizaciones,デバフ除去,Αφαίρεση εξασθενήσεων,移除负面状态
-effect.per_draw_dmg.text,드로우수×%d 피해,%d damage per draw,%d dégâts par pioche,%d danni per pesca,%d daño por robo,ドロー数×%d ダメージ,%d ζημιά ανά τράβηγμα,抽牌数×%d 伤害
-effect.apply_status_poison.text,%s %d 데미지,%s %d damage,%s %d dégâts,%s %d danni,%s %d de daño,%s %d ダメージ,%s %d ζημιά,%s %d 伤害
-effect.aoe_suffix, (전체), (All), (Tous), (Tutti), (Todos), (全体), (Όλοι), (全体)
-card.napoleon.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击
-card.napoleon.strike.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御
-card.napoleon.defend.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.swift_advance.name,신속 기동,Swift Advance,Avance rapide,Avanzata rapida,Avance rápido,神速起動,Ταχεία Προέλαση,神速机动
-card.napoleon.swift_advance.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.line_reform.name,전열 재편,Line Reform,Réforme de ligne,Riforma della linea,Reforma de línea,戦列再編,Ανασυγκρότηση Γραμμής,阵列重组
-card.napoleon.line_reform.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.hussar_charge.name,경기병 돌격,Hussar Charge,Charge de hussards,Carica degli ussari,Carga de húsares,軽騎兵突撃,Έφοδος Ουσάρων,轻骑兵突击
-card.napoleon.hussar_charge.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.grand_armee_shield.name,그랑다르메의 방패,Grand Armée Shield,Bouclier de la Grande Armée,Scudo della Grande Armée,Escudo de la Grande Armée,グランダルメの盾,Ασπίδα της Μεγάλης Στρατιάς,大军团之盾
-card.napoleon.grand_armee_shield.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.salvo.name,살보 사격,Salvo Fire,Feu de salve,Fuoco di salva,Fuego de salva,サルボ射撃,Πυρά Ομοβροντίας,齐射
-card.napoleon.salvo.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.marshal_appointment.name,원수 서임,Marshal Appointment,Nomination de maréchal,Nomina di maresciallo,Nombramiento de mariscal,元帥叙任,Διορισμός Στρατάρχη,元帅任命
-card.napoleon.marshal_appointment.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.arcole_breakthrough.name,아르콜레 돌파,Arcole Breakthrough,Percée d'Arcole,Svolta di Arcole,Ruptura de Arcole,アルコレ突破,Διάσπαση στο Αρκόλε,阿尔科莱突破
-card.napoleon.arcole_breakthrough.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.artillery_volley.name,포병 일제사격,Artillery Volley,Volée d'artillerie,Volata d'artiglieria,Volea de artillería,砲兵一斉射撃,Ομοβροντία Πυροβολικού,炮兵齐射
-card.napoleon.artillery_volley.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.jena_surprise.name,예나의 기습,Jena Surprise,Surprise d'Iéna,Sorpresa di Jena,Sorpresa de Jena,イエナの奇襲,Αιφνιδιασμός της Ιένας,耶拿奇袭
-card.napoleon.jena_surprise.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.borodino_bombardment.name,보로디노 포격,Borodino Bombardment,Bombardement de Borodino,Bombardamento di Borodino,Bombardeo de Borodino,ボロジノ砲撃,Βομβαρδισμός του Μποροντίνο,博罗季诺炮击
-card.napoleon.borodino_bombardment.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.total_assault_order.name,총공세 명령,Total Assault Order,Ordre d'assaut total,Ordine d'assalto totale,Orden de asalto total,総攻勢命令,Διαταγή Γενικής Εφόδου,总攻命令
-card.napoleon.total_assault_order.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.emperors_command.name,황제의 명령,Emperor's Command,Commandement de l'Empereur,Comando dell'Imperatore,Mando del Emperador,皇帝の命令,Διαταγή του Αυτοκράτορα,皇帝的命令
-card.napoleon.emperors_command.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.emperors_spirit.name,황제의 기개,Emperor's Spirit,Esprit de l'Empereur,Spirito dell'Imperatore,Espíritu del Emperador,皇帝の気概,Πνεύμα του Αυτοκράτορα,皇帝的气概
-card.napoleon.emperors_spirit.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.advance_order.name,전진 명령,Advance Order,Ordre d'avance,Ordine di avanzata,Orden de avance,前進命令,Διαταγή Προέλασης,前进命令
-card.napoleon.advance_order.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.trench_construction.name,참호 구축,Trench Construction,Construction de tranchées,Costruzione di trincee,Construcción de trincheras,塹壕構築,Κατασκευή Χαρακωμάτων,堑壕修筑
-card.napoleon.trench_construction.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.scout_patrol.name,척후 정찰,Scout Patrol,Patrouille d'éclaireurs,Pattuglia di ricognizione,Patrulla de exploradores,斥候偵察,Περίπολος Αναγνώρισης,斥候侦察
-card.napoleon.scout_patrol.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.drum_beat.name,북소리,Drum Beat,Battement de tambour,Battito del tamburo,Toque de tambor,太鼓の音,Χτύπος Τυμπάνου,鼓声
-card.napoleon.drum_beat.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.charge_bugle.name,진격 나팔,Charge Bugle,Clairon de charge,Clarino di carica,Corneta de carga,進撃ラッパ,Σάλπιγγα Εφόδου,进军号角
-card.napoleon.charge_bugle.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.cavalry_threat.name,기병 위협,Cavalry Threat,Menace de cavalerie,Minaccia di cavalleria,Amenaza de caballería,騎兵の脅威,Απειλή Ιππικού,骑兵威胁
-card.napoleon.cavalry_threat.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.guard_charge.name,근위대 돌격,Guard Charge,Charge de la garde,Carica della guardia,Carga de la guardia,近衛兵突撃,Έφοδος Φρουράς,近卫队突击
-card.napoleon.guard_charge.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.breakthrough_advance.name,전선 돌파,Breakthrough Advance,Avance de percée,Avanzata di svolta,Avance de ruptura,戦線突破,Διάσπαση Μετώπου,战线突破
-card.napoleon.breakthrough_advance.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.commanders_eye.name,지휘관의 눈,Commander's Eye,Oeil du commandant,Occhio del comandante,Ojo del comandante,指揮官の目,Μάτι του Διοικητή,指挥官之眼
-card.napoleon.commanders_eye.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.supply_line_secured.name,보급선 확보,Supply Line Secured,Ligne de ravitaillement sécurisée,Linea di rifornimento assicurata,Línea de suministros asegurada,補給線確保,Εξασφάλιση Γραμμής Εφοδιασμού,确保补给线
-card.napoleon.supply_line_secured.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.artillery_gather.name,포병 집결,Artillery Gather,Rassemblement d'artillerie,Raduno d'artiglieria,Reunión de artillería,砲兵集結,Συγκέντρωση Πυροβολικού,炮兵集结
-card.napoleon.artillery_gather.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.mobile_firing.name,기동 사격,Mobile Firing,Tir mobile,Fuoco mobile,Fuego móvil,機動射撃,Κινητά Πυρά,机动射击
-card.napoleon.mobile_firing.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.bridgehead_capture.name,교두보 점령,Bridgehead Capture,Capture de tête de pont,Cattura della testa di ponte,Captura de cabeza de puente,橋頭堡占領,Κατάληψη Προγεφυρώματος,占领桥头堡
-card.napoleon.bridgehead_capture.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.imperial_artillery.name,황실 포병대,Imperial Artillery,Artillerie impériale,Artiglieria imperiale,Artillería imperial,皇室砲兵隊,Αυτοκρατορικό Πυροβολικό,皇室炮兵队
-card.napoleon.imperial_artillery.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.imperial_infantry_call.name,제국 보병 소집,Imperial Infantry Call,Appel de l'infanterie impériale,Chiamata della fanteria imperiale,Llamada de infantería imperial,帝国歩兵召集,Κλήση Αυτοκρατορικού Πεζικού,帝国步兵集结
-card.napoleon.imperial_infantry_call.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.austerlitz_maneuver.name,아우스터리츠 기동,Austerlitz Maneuver,Manoeuvre d'Austerlitz,Manovra di Austerlitz,Maniobra de Austerlitz,アウステルリッツ起動,Ελιγμός του Άουστερλιτς,奥斯特里茨机动
-card.napoleon.austerlitz_maneuver.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.waterloo_resolve.name,워털루 이전의 결의,Waterloo Resolve,Résolution de Waterloo,Risoluzione di Waterloo,Resolución de Waterloo,ワーテルローの決意,Απόφαση του Βατερλώ,滑铁卢的决心
-card.napoleon.waterloo_resolve.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.eagle_standard.name,독수리 군기,Eagle Standard,Aigle impériale,Aquila imperiale,Águila imperial,鷲の軍旗,Αετός-Λάβαρο,鹰旗
-card.napoleon.eagle_standard.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.victory_proclamation.name,승리의 포고,Victory Proclamation,Proclamation de victoire,Proclamazione di vittoria,Proclamación de victoria,勝利の布告,Διακήρυξη Νίκης,胜利宣言
-card.napoleon.victory_proclamation.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.great_army_siege.name,대육군 포위전,Great Army Siege,Siège de la Grande Armée,Assedio della Grande Armée,Asedio de la Gran Armada,大陸軍包囲戦,Πολιορκία της Μεγάλης Στρατιάς,大军团围攻战
-card.napoleon.great_army_siege.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.napoleon.emperors_encirclement.name,황제의 포위령,Emperor's Encirclement,Encerclement de l'Empereur,Accerchiamento dell'Imperatore,Cercado del Emperador,皇帝の包囲令,Κυκλωτική Κίνηση του Αυτοκράτορα,皇帝的包围令
-card.napoleon.emperors_encirclement.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.one_man_army.name,일기당천,One Man Army,Un homme à lui seul une armée,Esercito di un solo uomo,Ejército de un solo hombre,一騎当千,Στρατός ενός Ανδρός,一骑当千
-card.napoleon.one_man_army.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.strategic_retreat.name,전략적 후퇴,Strategic Retreat,Retraite stratégique,Ritirata strategica,Retirada estratégica,戦略的後退,Στρατηγική Υποχώρηση,战略性撤退
-card.napoleon.strategic_retreat.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥
-card.napoleon.emperors_assault.name,황제의 돌격,Emperor's Assault,Assaut de l'Empereur,Assalto dell'Imperatore,Asalto del Emperador,皇帝の突撃,Έφοδος του Αυτοκράτορα,皇帝的突击
-card.napoleon.emperors_assault.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击
-card.napoleon.empire_glory.name,제국의 영광,Empire Glory,Gloire de l'Empire,Gloria dell'Impero,Gloria del Imperio,帝国の栄光,Δόξα της Αυτοκρατορίας,帝国荣光
-card.napoleon.empire_glory.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团
-card.cleopatra.venom_needle.name,독침,Venom Needle,Aiguille de venin,Ago avvelenato,Aguja de veneno,毒針,Βελόνα Δηλητηρίου,毒针
-card.cleopatra.venom_needle.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.royal_guard.name,왕실 방어,Royal Guard,Garde royale,Guardia reale,Guardia real,王室防衛,Βασιλική Φρουρά,王室防御
-card.cleopatra.royal_guard.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.poison_seed.name,독의 씨앗,Poison Seed,Graine de poison,Seme del veleno,Semilla de veneno,毒の種,Σπόρος Δηλητηρίου,毒之种
-card.cleopatra.poison_seed.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.isis_blessing.name,이시스의 가호,Isis' Blessing,Bénédiction d'Isis,Benedizione di Iside,Bendición de Isis,イシスの加護,Ευλογία της Ίσιδας,伊西斯的加护
-card.cleopatra.isis_blessing.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.asp_fang.name,아스프의 독니,Asp Fang,Croc d'aspic,Zanna d'aspide,Colmillo de áspid,アスプの毒牙,Δόντι της Ασπίδας,阿斯普毒牙
-card.cleopatra.asp_fang.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.desert_poison_dance.name,사막의 독무,Desert Poison Dance,Danse du poison du désert,Danza del veleno del deserto,Danza del veneno del desierto,砂漠の毒舞,Χορός του Δηλητηρίου της Ερήμου,沙漠毒舞
-card.cleopatra.desert_poison_dance.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.cursed_gaze.name,저주의 시선,Cursed Gaze,Regard maudit,Sguardo maledetto,Mirada maldita,呪いの視線,Καταραμένο Βλέμμα,诅咒之视
-card.cleopatra.cursed_gaze.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.temptation.name,유혹,Temptation,Tentation,Tentazione,Tentación,誘惑,Πειρασμός,诱惑
-card.cleopatra.temptation.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.nile_mist.name,나일의 안개,Nile Mist,Brume du Nil,Nebbia del Nilo,Niebla del Nilo,ナイルの霧,Ομίχλη του Νείλου,尼罗河之雾
-card.cleopatra.nile_mist.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.serpent_grasp.name,독사의 마수,Serpent Grasp,Emprise du serpent,Presa del serpente,Agarre de serpiente,毒蛇の魔手,Άρπαγμα του Φιδιού,毒蛇魔手
-card.cleopatra.serpent_grasp.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.pharaoh_poison.name,파라오의 독,Pharaoh's Poison,Poison du Pharaon,Veleno del Faraone,Veneno del Faraón,ファラオの毒,Δηλητήριο του Φαραώ,法老的毒
-card.cleopatra.pharaoh_poison.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.ramesses_shield.name,람세스의 방패,Ramesses' Shield,Bouclier de Ramsès,Scudo di Ramsete,Escudo de Ramsés,ラムセスの盾,Ασπίδα του Ραμσή,拉美西斯之盾
-card.cleopatra.ramesses_shield.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.nile_fury.name,나일의 분노,Nile Fury,Fureur du Nil,Furia del Nilo,Furia del Nilo,ナイルの憤怒,Οργή του Νείλου,尼罗河之怒
-card.cleopatra.nile_fury.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.pharaoh_decree.name,파라오의 명,Pharaoh's Decree,Décret du Pharaon,Editto del Faraone,Decreto del Faraón,ファラオの命,Διάταγμα του Φαραώ,法老之命
-card.cleopatra.pharaoh_decree.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.cleopatras_kiss.name,클레오파트라의 입맞춤,Cleopatra's Kiss,Baiser de Cléopâtre,Bacio di Cleopatra,Beso de Cleopatra,クレオパトラの接吻,Φιλί της Κλεοπάτρας,克利奥帕特拉之吻
-card.cleopatra.cleopatras_kiss.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.poison_fog_spray.name,독안개 살포,Poison Fog Spray,Pulvérisation de brume empoisonnée,Spruzzo di nebbia velenosa,Aerosol de niebla venenosa,毒霧散布,Ψεκασμός Δηλητηριώδους Ομίχλης,喷洒毒雾
-card.cleopatra.poison_fog_spray.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.wax_trap.name,밀납의 덫,Wax Trap,Piège de cire,Trappola di cera,Trampa de cera,蜜蝋の罠,Παγίδα Κεριού,蜡之陷阱
-card.cleopatra.wax_trap.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.sandstorm.name,모래 폭풍,Sandstorm,Tempête de sable,Tempesta di sabbia,Tormenta de arena,砂嵐,Αμμοθύελλα,沙尘暴
-card.cleopatra.sandstorm.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.nile_blessing.name,나일의 축복,Nile Blessing,Bénédiction du Nil,Benedizione del Nilo,Bendición del Nilo,ナイル의 祝福,Ευλογία του Νείλου,尼罗河的祝福
-card.cleopatra.nile_blessing.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.snake_gaze.name,뱀의 눈빛,Snake Gaze,Regard du serpent,Sguardo del serpente,Mirada de serpiente,蛇の眼差し,Βλέμμα του Φιδιού,蛇之注视
-card.cleopatra.snake_gaze.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.double_fang.name,이중 독니,Double Fang,Double croc,Zanna doppia,Colmillo doble,二重毒牙,Διπλό Δόντι,双重毒牙
-card.cleopatra.double_fang.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.tempting_eye.name,유혹의 눈길,Tempting Eye,Oeil tentateur,Occhio tentatore,Ojo tentador,誘惑の眼差し,Δελεαστικό Μάτι,诱惑之眼
-card.cleopatra.tempting_eye.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.poison_feast.name,독의 향연,Poison Feast,Festin de poison,Banchetto del veleno,Festín de veneno,毒の饗宴,Γιορτή του Δηλητηρίου,毒之飨宴
-card.cleopatra.poison_feast.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.pharaoh_curse.name,파라오의 저주,Pharaoh's Curse,Malédiction du Pharaon,Maledizione del Faraone,Maldición del Faraón,ファラオの呪い,Κατάρα του Φαραώ,法老的诅咒
-card.cleopatra.pharaoh_curse.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.nile_flow.name,나일의 흐름,Nile Flow,Courant du Nil,Flusso del Nilo,Flujo del Nilo,ナイルの流,Ροή του Νείλου,尼罗河之流
-card.cleopatra.nile_flow.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.snake_poison_dance.name,뱀의 독무,Snake Poison Dance,Danse du venin du serpent,Danza del veleno del serpente,Danza del veneno de serpiente,蛇の毒舞,Χορός του Δηλητηρίου του Φιδιού,蛇之毒舞
-card.cleopatra.snake_poison_dance.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.charming_language.name,매혹의 언어,Charming Language,Langage charmant,Linguaggio affascinante,Lenguaje encantador,魅惑の言語,Γοητευτική Γλώσσα,魅惑语言
-card.cleopatra.charming_language.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.desert_recipe.name,사막의 약법,Desert Recipe,Recette du désert,Ricetta del deserto,Receta del desierto,砂漠の薬法,Συνταγή της Ερήμου,沙漠药方
-card.cleopatra.desert_recipe.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.poison_judgment.name,독의 심판,Poison Judgment,Jugement du poison,Giudizio del veleno,Juicio de veneno,毒の審판,Κρίση του Δηλητηρίου,毒之审判
-card.cleopatra.poison_judgment.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.isis_fury.name,이시스의 분노,Isis' Fury,Fureur d'Isis,Furia di Iside,Furia de Isis,イシ스의 憤怒,Οργή της Ίσιδας,伊西斯之怒
-card.cleopatra.isis_fury.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.poison_ritual.name,독살의 의식,Poison Ritual,Rituel d'empoisonnement,Rituale di avvelenamento,Ritual de envenenamiento,毒殺の儀式,Τελετουργικό Δηλητηρίασης,毒杀仪式
-card.cleopatra.poison_ritual.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.queens_embrace.name,여왕의 포옹,Queen's Embrace,Étreinte de la reine,Abbraccio della regina,Abrazo de la reina,女王の抱擁,Αγκαλιά της Βασίλισσας,女王的拥抱
-card.cleopatra.queens_embrace.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.curse_brand.name,저주의 낙인,Curse Brand,Marque de malédiction,Marchio della maledizione,Marca de maldición,呪いの烙印,Στίγμα της Κατάρας,诅咒烙印
-card.cleopatra.curse_brand.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.nile_doom.name,나일의 파멸,Nile Doom,Destin du Nil,Rovina del Nilo,Ruina del Nilo,ナイルの破滅,Όλεθρος του Νείλου,尼罗河的毁灭
-card.cleopatra.nile_doom.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.charming_assault.name,매혹의 강습,Charming Assault,Assaut charmant,Assalto affascinante,Asalto encantador,魅惑の強襲,Γοητευτική Έφοδος,魅惑强袭
-card.cleopatra.charming_assault.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控
-card.cleopatra.pharaoh_fury.name,파라오의 분노,Pharaoh's Fury,Fureur du Pharaon,Furia del Faraone,Furia del Faraón,ファラオの憤怒,Οργή του Φαραώ,法老之怒
-card.cleopatra.pharaoh_fury.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.curse_crossroads.name,저주의 교차로,Curse Crossroads,Carrefour des malédictions,Incrocio delle maledizioni,Encrucijada de maldiciones,呪いの十字路,Σταυροδρόμι της Κατάρας,诅咒的交汇
-card.cleopatra.curse_crossroads.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.poison_throne.name,독의 왕좌,Poison Throne,Trône de poison,Trono del veleno,Trono de veneno,毒の王座,Θρόνος του Δηλητηρίου,毒之王座
-card.cleopatra.poison_throne.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀
-card.cleopatra.isis_judgment.name,이시스의 심판,Isis' Judgment,Jugement d'Isis,Giudizio di Iside,Juicio de Isis,イシスの審판,Κρίση της Ίσιδας,伊西斯的审判
-card.cleopatra.isis_judgment.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.cleopatra.sekhmet_curse.name,세케메트의 저주,Sekhmet's Curse,Malédiction de Sekhmet,Maledizione di Sekhmet,Maldición de Sekhmet,セケメトの呪い,Κατάρα της Σεχμέτ,塞赫美特的诅咒
-card.cleopatra.sekhmet_curse.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒
-card.yi_sun_sin.shield.name,방패,Shield,Bouclier,Scudo,Escudo,盾,Ασπίδα,盾牌
-card.yi_sun_sin.shield.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.counter_strike.name,역공,Counter Strike,Contre-attaque,Contrattacco,Contraataque,逆攻,Αντεπίθεση,反击
-card.yi_sun_sin.counter_strike.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.turtle_ship_charge.name,거북선 돌격,Turtle Ship Charge,Charge du bateau-tortue,Carica della nave tartaruga,Carga del barco tortuga,亀甲船突撃,Έφοδος Πλοίου-Χελώνας,龟船突击
-card.yi_sun_sin.turtle_ship_charge.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.counter.name,반격,Counter,Contre,Contrattacco,Contraatacar,反撃,Ανταπόδοση,反击
-card.yi_sun_sin.counter.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.iron_armor.name,철갑,Iron Armor,Armure de fer,Armatura di ferro,Armadura de hierro,鉄甲,Σιδερένια Θωράκιση,铁甲
-card.yi_sun_sin.iron_armor.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.turtle_shield.name,거북선 방패,Turtle Shield,Bouclier du bateau-tortue,Scudo della nave tartaruga,Escudo del barco tortuga,亀甲船の盾,Ασπίδα του Πλοίου-Χελώνας,龟船之盾
-card.yi_sun_sin.turtle_shield.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.crane_wing.name,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.crane_wing.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.formation_boost.name,진형 강화,Formation Boost,Renfort de formation,Potenziamento della formazione,Mejora de formación,陣形強化,Ενίσχυση Σχηματισμού,加强阵型
-card.yi_sun_sin.formation_boost.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.naval_training.name,수군 훈련,Naval Training,Entraînement naval,Addestramento navale,Entrenamiento naval,水軍訓練,Ναυτική Εκπαίδευση,水师训练
-card.yi_sun_sin.naval_training.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.hansan_victory.name,한산대첩,Hansan Victory,Victoire de Hansan,Vittoria di Hansan,Victoria de Hansan,閑山大捷,Νίκη του Χανσάν,闲山大捷
-card.yi_sun_sin.hansan_victory.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.strict_training.name,엄정한 훈련,Strict Training,Entraînement strict,Addestramento rigoroso,Entrenamiento estricto,厳正な訓練,Αυστηρή Εκπαίδευση,严正训练
-card.yi_sun_sin.strict_training.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.last_stand.name,배수진,Last Stand,Dernier combat,Ultima difesa,Última defensa,背水の陣,Έσχατη Άμυνα,背水一战
-card.yi_sun_sin.last_stand.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.death_or_glory.name,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.death_or_glory.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.indomitable.name,불굴,Indomitable,Indomptable,Indomabile,Indomable,不屈,Αδάμαστος,不屈
-card.yi_sun_sin.indomitable.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.naval_maneuver.name,해군 기동,Naval Maneuver,Manoeuvre navale,Manovra navale,Maniobra naval,海軍機動,Ναυτικός Ελιγμός,海军机动
-card.yi_sun_sin.naval_maneuver.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.noryang_battle.name,노량 해전,Noryang Battle,Bataille de Noryang,Battaglia di Noryang,Batalla de Noryang,露梁海戦,Ναυμαχία του Νοριάνγκ,露梁海战
-card.yi_sun_sin.noryang_battle.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.crane_wing_complete.name,학익진 완성,Crane Wing Complete,Aile de grue achevée,Ala di gru completa,Ala de grulla completa,鶴翼の陣完成,Ολοκλήρωση Σχηματισμού Γερανού,鹤翼阵成
-card.yi_sun_sin.crane_wing_complete.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.armor_upgrade.name,장갑 강화,Armor Upgrade,Amélioration d'armure,Potenziamento armatura,Mejora de armadura,装甲強化,Αναβάθμιση Θωράκισης,加强装甲
-card.yi_sun_sin.armor_upgrade.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.consecutive_defense.name,연속 방어,Consecutive Defense,Défense consécutive,Difesa consecutiva,Defensa consecutiva,連続防御,Συνεχόμενη Άμυνα,连续防御
-card.yi_sun_sin.consecutive_defense.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.iron_wall.name,철벽,Iron Wall,Mur de fer,Muro di ferro,Muro de hierro,鉄壁,Σιδερένιο Τείχος,铁壁
-card.yi_sun_sin.iron_wall.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.charge_stance.name,돌격 태세,Charge Stance,Posture de charge,Posizione di carica,Postura de carga,突撃態勢,Στάση Εφόδου,突击态势
-card.yi_sun_sin.charge_stance.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.cannon_fire.name,함포 사격,Cannon Fire,Feu de canon,Fuoco di cannone,Fuego de cañón,艦砲射撃,Πυρά Κανονιών,舰炮轰击
-card.yi_sun_sin.cannon_fire.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.shield_guard.name,방패막이,Shield Guard,Garde au bouclier,Guardia con lo scudo,Protección con escudo,盾ガード,Προστασία με Ασπίδα,盾挡
-card.yi_sun_sin.shield_guard.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.counter_stance.name,반격 태세,Counter Stance,Posture de contre,Posizione di contrattacco,Postura de contraataque,反撃態勢,Στάση Ανταπόδοσης,反击态势
-card.yi_sun_sin.counter_stance.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.fleet_rally.name,함대 결집,Fleet Rally,Ralliement de la flotte,Raduno della flotta,Reunión de la flota,艦隊結集,Συγκέντρωση Στόλου,舰队集结
-card.yi_sun_sin.fleet_rally.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船
-card.yi_sun_sin.morale_boost.name,사기 고취,Morale Boost,Regain de moral,Incentivo al morale,Mejora de moral,士気高揚,Ενίσχυση Ηθικού,鼓舞士气
-card.yi_sun_sin.morale_boost.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.discipline.name,군기 진작,Discipline,Discipline,Disciplina,Disciplina,軍紀振興,Πειθαρχία,振奋军纪
-card.yi_sun_sin.discipline.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.hold_formation.name,진형 사수,Hold Formation,Maintenir la formation,Mantieni la formazione,Mantener formación,陣形死守,Διατήρηση Σχηματισμού,坚守阵型
-card.yi_sun_sin.hold_formation.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.regroup.name,전열 정비,Regroup,Regroupement,Raggruppamento,Reagrupar,戦列整備,Ανασύνταξη,整顿阵列
-card.yi_sun_sin.regroup.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.fleet_command.name,함대 지휘,Fleet Command,Commandement de la flotte,Comando della flotta,Mando de la flota,艦隊指揮,Διοίκηση Στόλου,舰队指挥
-card.yi_sun_sin.fleet_command.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.volley_fire.name,일제 사격,Volley Fire,Feu de volée,Fuoco di volata,Fuego de volea,一斉射撃,Ομοβροντία,一齐射击
-card.yi_sun_sin.volley_fire.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.command_instinct.name,지휘 본능,Command Instinct,Instinct de commandement,Istinto di comando,Instinto de mando,指揮本能,Ένστικτο Διοίκησης,指挥本能
-card.yi_sun_sin.command_instinct.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.formation_bond.name,진형 결속,Formation Bond,Lien de formation,Legame di formazione,Vínculo de formación,陣形結束,Δεσμός Σχηματισμού,阵型团结
-card.yi_sun_sin.formation_bond.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵
-card.yi_sun_sin.decisive_strike.name,사지결단,Decisive Strike,Frappe décisive,Colpo decisivo,Golpe decisivo,四肢決断,Αποφασιστικό Χτύπημα,决死一战
-card.yi_sun_sin.decisive_strike.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.all_in.name,이판사판,All In,Tout pour le tout,Tutto per tutto,Todo o nada,一か八か,Τα Παίζω Όλα,孤注一掷
-card.yi_sun_sin.all_in.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.miraculous_recovery.name,기사회생,Miraculous Recovery,Récupération miraculeuse,Ritorno alla vita,Recupero milagroso,起死回生,Θαυματουργή Ανάρρωση,死里逃生
-card.yi_sun_sin.miraculous_recovery.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.crisis_breakthrough.name,위기 돌파,Crisis Breakthrough,Percée de crise,Svolta nella crisi,Ruptura de crisis,危機突破,Διάσπαση Κρίσης,突破危机
-card.yi_sun_sin.crisis_breakthrough.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.death_charge.name,사즉생 돌격,Death Charge,Charge mortelle,Carica mortale,Carga de muerte,死即生突撃,Έφοδος Θανάτου,死中求生突击
-card.yi_sun_sin.death_charge.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.bloody_battle.name,혈전,Bloody Battle,Bataille sanglante,Battaglia sanguinosa,Batalla sangrienta,血戦,Αιματηρή Μάχη,血战
-card.yi_sun_sin.bloody_battle.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.war_drum.name,독전,War Drum,Tambour de guerre,Tamburo di guerra,Tambor de guerra,督戦,Τύμπανο Πολέμου,督战
-card.yi_sun_sin.war_drum.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.warriors_resolve.name,전사의 각오,Warrior's Resolve,Résolution du guerrier,Risoluzione del guerriero,Resolución del guerrero,戦士の覚悟,Απόφαση του Πολεμιστή,战士的觉悟
-card.yi_sun_sin.warriors_resolve.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.yi_sun_sin.phoenix.name,불사조,Phoenix,Phénix,Fenice,Fénix,不死鳥,Φοίνικας,不死鸟
-card.yi_sun_sin.phoenix.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生
-card.joan_of_arc.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击
-card.joan_of_arc.strike.archetype,신성,,,,,,,
-card.joan_of_arc.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御
-card.joan_of_arc.defend.archetype,신성,,,,,,,
-card.joan_of_arc.holy_touch.name,성녀의 손길,Holy Touch,Toucher sacré,Tocco sacro,Toque sagrado,聖女の導き,Άγιο Άγγιγμα,圣女之抚
-card.joan_of_arc.holy_touch.archetype,신성,,,,,,,
-card.joan_of_arc.blessing_of_light.name,축복의 빛,Blessing of Light,Bénédiction de lumière,Benedizione della luce,Bendición de luz,祝福の光,Ευλογία του Φωτός,祝福之光
-card.joan_of_arc.blessing_of_light.archetype,신성,,,,,,,
-card.joan_of_arc.hymn.name,성가,Hymn,Hymne,Inno,Himno,聖歌,Ύμνος,圣歌
-card.joan_of_arc.hymn.archetype,신성,,,,,,,
-card.joan_of_arc.purifying_flame.name,정화의 불꽃,Purifying Flame,Flamme purificatrice,Fiamma purificatrice,Llama purificadora,浄化の炎,Φλόγα Εξαγνισμού,净化之火
-card.joan_of_arc.purifying_flame.archetype,신성,,,,,,,
-card.joan_of_arc.self_sacrifice.name,자기희생,Self-Sacrifice,Sacrifice de soi,Autosacrificio,Sacrificio personal,自己犠牲,Αυτοθυσία,自我牺牲
-card.joan_of_arc.self_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.orleans_charge.name,오를레앙의 돌격,Orleans Charge,Charge d'Orléans,Carica di Orléans,Carga de Orleans,オルレアンの突撃,Έφοδος της Ορλεάνης,奥尔良突击
-card.joan_of_arc.orleans_charge.archetype,신성,,,,,,,
-card.joan_of_arc.miracle_revive.name,기적의 부활,Miracle Revive,Résurrection miraculeuse,Rianimazione miracolosa,Resurrección milagrosa,奇跡の復活,Θαυματουργή Αναβίωση,奇迹复活
-card.joan_of_arc.miracle_revive.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.divine_protection.name,신의 가호,Divine Protection,Protection divine,Protezione divina,Protección divina,神の加護,Θεία Προστασία,神之加护
-card.joan_of_arc.divine_protection.archetype,신성,,,,,,,
-card.joan_of_arc.holy_fury.name,성스러운 분노,Holy Fury,Fureur sacrée,Furia sacra,Furia sagrada,聖なる憤怒,Θεία Οργή,神圣之怒
-card.joan_of_arc.holy_fury.archetype,신성,,,,,,,
-card.joan_of_arc.martyrs_will.name,순교의 의지,Martyr's Will,Volonté du martyr,Volontà del martire,Voluntad del mártir,殉教の意志,Θέληση του Μάρτυρα,殉教之志
-card.joan_of_arc.martyrs_will.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.knights_oath.name,기사단의 맹세,Knight's Oath,Serment de chevalier,Giuramento del cavaliere,Juramento del caballero,騎士団の誓い,Όρκος των Ιπποτών,骑士团誓言
-card.joan_of_arc.knights_oath.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.flag_of_orleans.name,신국의 깃발,Flag of Orleans,Bannière de Dieu,Bandiera di Dio,Bandera de Dios,神国の旗,Σημαία της Ορλεάνης,神国之旗
-card.joan_of_arc.flag_of_orleans.archetype,신성,,,,,,,
-card.joan_of_arc.saints_flame.name,성녀의 화염,Saint's Flame,Flamme de la sainte,Fiamma della santa,Llama de la santa,聖女の火焔,Φλόγα της Αγίας,圣女之焰
-card.joan_of_arc.saints_flame.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.holy_light.name,성스러운 빛,Holy Light,Lumière sacrée,Luce sacra,Luz sagrada,聖なる光,Άγιο Φως,神圣之光
-card.joan_of_arc.holy_light.archetype,신성,,,,,,,
-card.joan_of_arc.communion.name,성찬,Communion,Communion,Comunione,Comunión,聖餐,Θεία Κοινωνία,圣餐
-card.joan_of_arc.communion.archetype,신성,,,,,,,
-card.joan_of_arc.revive_spark.name,부활의 불씨,Revive Spark,Étincelle de résurrection,Scintilla di rinascita,Chispa de resurrección,復活の火種,Σπίθα Αναβίωσης,复活火种
-card.joan_of_arc.revive_spark.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.divine_providence.name,신의 섭리,Divine Providence,Providence divine,Provvidenza divina,Providencia divina,神の摂理,Θεία Πρόνοια,神之摄理
-card.joan_of_arc.divine_providence.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.small_sacrifice.name,작은 희생,Small Sacrifice,Petit sacrifice,Piccolo sacrificio,Pequeño sacrificio,小さな犠牲,Μικρή Θυσία,微小的牺牲
-card.joan_of_arc.small_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.sacrifice_cry.name,희생의 함성,Sacrifice Cry,Cri de sacrifice,Grido di sacrificio,Grito de sacrificio,犠牲の叫び,Κραυγή Θυσίας,牺牲之吼
-card.joan_of_arc.sacrifice_cry.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.angel_wings.name,천사의 날개,Angel Wings,Ailes d'ange,Ali d'angelo,Alas de ángel,天使の翼,Φτερά Αγγέλου,天使之翼
-card.joan_of_arc.angel_wings.archetype,신성,,,,,,,
-card.joan_of_arc.second_chance.name,두 번째 기회,Second Chance,Deuxième chance,Seconda occasione,Segunda oportunidad,二度目の機会,Δεύτερη Ευκαιρία,第二次机会
-card.joan_of_arc.second_chance.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.revive_scroll.name,부활의 서,Revive Scroll,Parchemin de résurrection,Pergamena della rinascita,Pergamino de resurrección,復活の書,Πάπυρος Αναβίωσης,复活之书
-card.joan_of_arc.revive_scroll.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.light_of_hope.name,희망의 빛,Light of Hope,Lumière d'espoir,Luce di speranza,Luz de esperanza,希望の光,Φως της Ελπίδας,希望之光
-card.joan_of_arc.light_of_hope.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.holy_charge.name,신성 충전,Holy Charge,Charge sacrée,Carica sacra,Carga sagrada,神聖充電,Θεία Φόρτιση,神圣充能
-card.joan_of_arc.holy_charge.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.blade_of_justice.name,정의의 칼날,Blade of Justice,Lame de justice,Lama della giustizia,Hoja de justicia,正義の刃,Λεπίδα της Δικαιοσύνης,正义之刃
-card.joan_of_arc.blade_of_justice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.martyrdom_steps.name,순교의 발걸음,Martyrdom Steps,Pas du martyre,Passi del martirio,Pasos del martirio,殉教の足音,Βήματα Μαρτυρίου,殉教脚步
-card.joan_of_arc.martyrdom_steps.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.altar_flame.name,제단의 불꽃,Altar Flame,Flamme de l'autel,Fiamma dell'altare,Llama del altar,祭壇の炎,Φλόγα του Βωμού,祭坛之火
-card.joan_of_arc.altar_flame.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.holy_rage.name,신성한 격노,Holy Rage,Rage sacrée,Rabbia sacra,Ira sagrada,神聖な激怒,Θεία Μανία,神圣激怒
-card.joan_of_arc.holy_rage.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.holy_purification.name,신성한 정화,Holy Purification,Purification sacrée,Purificazione sacra,Purificación sagrada,神聖な浄化,Θείος Εξαγνισμός,神圣净化
-card.joan_of_arc.holy_purification.archetype,신성,,,,,,,
-card.joan_of_arc.knights_guard.name,기사의 수호,Knight's Guard,Garde du chevalier,Guardia del cavaliere,Guardia del caballero,騎士の守護,Φρουρά του Ιππότη,骑士守护
-card.joan_of_arc.knights_guard.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.martyrs_legacy.name,순교자의 유산,Martyr's Legacy,Héritage du martyr,Eredità del martire,Legado del mártir,殉教者の遺産,Κληρονομιά του Μάρτυρα,殉教者遗产
-card.joan_of_arc.martyrs_legacy.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.revive_ritual.name,부활의 의식,Revive Ritual,Rituel de résurrection,Rituale di rinascita,Ritual de resurrección,復活の儀式,Τελετουργικό Αναβίωσης,复活仪式
-card.joan_of_arc.revive_ritual.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.miracle_chain.name,기적의 연쇄,Miracle Chain,Chaîne de miracles,Catena di miracoli,Cadena de milagros,奇跡の連鎖,Αλυσίδα Θαυμάτων,奇迹连锁
-card.joan_of_arc.miracle_chain.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.last_shield.name,최후의 방패,Last Shield,Dernier bouclier,Ultimo scudo,Último escudo,最後の盾,Έσχατη Ασπίδα,最后之盾
-card.joan_of_arc.last_shield.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.purifying_sacrifice.name,정화의 희생,Purifying Sacrifice,Sacrifice purificateur,Sacrificio purificatore,Sacrificio purificador,浄化の犠牲,Θυσία Εξαγνισμού,净化牺牲
-card.joan_of_arc.purifying_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.saints_vow.name,성녀의 맹약,Saint's Vow,Voeu de la sainte,Voto della santa,Voto de la santa,성녀의 맹약,Όρκος της Αγίας,圣女盟约
-card.joan_of_arc.saints_vow.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.joan_of_arc.joan_return.name,잔 다르크의 귀환,Joan's Return,Retour de Jeanne,Ritorno di Giovanna,Regreso de Juana,ジャンヌ・ダルクの帰還,Επιστροφή της Ιωάννας,贞德回归
-card.joan_of_arc.joan_return.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活
-card.joan_of_arc.holy_war.name,성전,Holy War,Guerre sainte,Guerra santa,Guerra santa,聖戦,Ιερός Πόλεμος,圣战
-card.joan_of_arc.holy_war.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教
-card.genghis_khan.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击
-card.genghis_khan.strike.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御
-card.genghis_khan.defend.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.cavalry_charge.name,기마 돌격,Cavalry Charge,Charge de cavalerie,Carica di cavalleria,Carga de caballería,騎馬突撃,Έφοδος Ιππικού,骑马突击
-card.genghis_khan.cavalry_charge.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.scout.name,정찰,Scout,Éclaireur,Esploratore,Explorador,偵察,Αναγνώριση,侦察
-card.genghis_khan.scout.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.arrow_volley.name,화살 세례,Arrow Volley,Volée de flèches,Volata di frecce,Volea de flechas,矢の洗礼,Ομοβροντία Βελών,箭雨
-card.genghis_khan.arrow_volley.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.ambush.name,기습,Ambush,Embuscade,Imboscata,Emboscada,奇襲,Ενέδρα,奇袭
-card.genghis_khan.ambush.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.supply_cut.name,보급선 차단,Supply Cut,Coupure de ravitaillement,Taglio dei rifornimenti,Corte de suministros,補給線遮断,Διακοπή Εφοδιασμού,切断补给线
-card.genghis_khan.supply_cut.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.encirclement.name,포위 전술,Encirclement,Encerclement,Accerchiamento,Cercado,包囲戦術,Τακτική Κύκλωσης,包围战术
-card.genghis_khan.encirclement.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.mingens_order.name,천호장의 령,Mingan's Order,Ordre du Mingan,Ordine del Mingan,Orden de Mingan,千戸長の令,Διαταγή του Μινγκάν,千户长之令
-card.genghis_khan.mingens_order.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.poison_arrow.name,독화살,Poison Arrow,Flèche empoisonnée,Freccia avvelenata,Flecha venenosa,毒矢,Δηλητηριώδες Βέλος,毒箭
-card.genghis_khan.poison_arrow.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.steppe_storm.name,초원의 폭풍,Steppe Storm,Tempête de la steppe,Tempesta della steppa,Tormenta de la estepa,草原の嵐,Καταιγίδα της Στέπας,草原风暴
-card.genghis_khan.steppe_storm.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.conquerors_ambition.name,정복자의 야망,Conqueror's Ambition,Ambition du conquérant,Ambizione del conquistatore,Ambición del conquistador,征服者の野望,Φιλοδοξία του Κατακτητή,征服者的野心
-card.genghis_khan.conquerors_ambition.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.long_march.name,만리 원정,Long March,Longue marche,Lunga marcia,Larga marcha,万里の遠征,Μεγάλη Πορεία,万里远征
-card.genghis_khan.long_march.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.great_khans_command.name,대칸의 명령,Great Khan's Command,Commandement du Grand Khan,Comando del Gran Khan,Mando del Gran Khan,大ハンの命令,Διαταγή του Μεγάλου Χαν,大汗的命令
-card.genghis_khan.great_khans_command.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.genghis_fury.name,징기스의 분노,Genghis' Fury,Fureur de Gengis,Furia di Gengis,Furia de Gengis,チンギスの憤怒,Οργή του Τζένγκις,成吉思汗之怒
-card.genghis_khan.genghis_fury.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.light_cavalry_sprint.name,경기병 질주,Light Cavalry Sprint,Sprint de la cavalerie légère,Sprint della cavalleria leggera,Sprint de caballería ligera,軽騎兵疾走,Ταχεία Έφοδος Ελαφρού Ιππικού,轻骑兵疾驰
-card.genghis_khan.light_cavalry_sprint.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.swift_raid.name,급습,Swift Raid,Raid rapide,Incursione rapida,Incursión rápida,急襲,Ταχεία Επιδρομή,急袭
-card.genghis_khan.swift_raid.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.loot.name,노획,Loot,Butin,Bottino,Botín,捕獲,Λάφυρα,虏获
-card.genghis_khan.loot.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.victory_spoils.name,승리의 전리품,Victory Spoils,Butin de victoire,Bottino di vittoria,Botín de victoria,勝利の戦利品,Λάφυρα Νίκης,胜利战利品
-card.genghis_khan.victory_spoils.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.cavalry_assault.name,기병대 습격,Cavalry Assault,Assaut de cavalerie,Assalto di cavalleria,Asalto de caballería,騎兵隊襲撃,Επίθεση Ιππικού,骑兵队突袭
-card.genghis_khan.cavalry_assault.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.rear_disruption.name,후방 교란,Rear Disruption,Perturbation arrière,Disturbo alle retrovie,Disrupción trasera,後方撹乱,Αναταραχή στα Μετόπισθεν,后方骚扰
-card.genghis_khan.rear_disruption.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.cavalry_crossing.name,기마 도하,Cavalry Crossing,Traversée à cheval,Attraversamento a cavallo,Cruce a caballo,騎馬渡河,Διάβαση Ιππικού,骑马渡河
-card.genghis_khan.cavalry_crossing.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.lightning_sprint.name,낙뢰 질주,Lightning Sprint,Sprint éclair,Sprint fulmineo,Sprint relámpago,落雷疾走,Ταχύτητα Αστραπής,落雷疾驰
-card.genghis_khan.lightning_sprint.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.execution_ground.name,처형대,Execution Ground,Lieu d'exécution,Luogo d'esecuzione,Patíbulo,処刑台,Τόπος Εκτέλεσης,处刑台
-card.genghis_khan.execution_ground.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.spoils_distribution.name,전리품 배분,Spoils Distribution,Distribution du butin,Distribuzione del bottino,Distribución de botín,戦利品配分,Διανομή Λαφύρων,战利品分配
-card.genghis_khan.spoils_distribution.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.plunder_flame.name,약탈의 불길,Plunder Flame,Flamme du pillage,Fiamma del saccheggio,Llama de saqueo,略奪の炎,Φλόγα της Λεηλασίας,掠夺之火
-card.genghis_khan.plunder_flame.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.rapid_fire.name,연사,Rapid Fire,Tir rapide,Fuoco rapido,Fuego rápido,連射,Ταχεία Πυροδότηση,连射
-card.genghis_khan.rapid_fire.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.wind_legion.name,바람의 군단,Wind Legion,Légion du vent,Legione del vento,Legión del viento,風の軍団,Λεγεώνα του Ανέμου,风之军团
-card.genghis_khan.wind_legion.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.cavalry_encirclement.name,기병 포위망,Cavalry Encirclement,Encerclement de cavalerie,Accerchiamento di cavalleria,Cerco de caballería,騎兵包囲網,Κυκλωτική Κίνηση Ιππικού,骑兵包围网
-card.genghis_khan.cavalry_encirclement.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.iron_breakthrough.name,무간 돌파,Iron Breakthrough,Percée de fer,Svolta di ferro,Ruptura de hierro,無間突破,Σιδερένια Διάσπαση,无间突破
-card.genghis_khan.iron_breakthrough.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.desert_cavalry.name,사막 기마,Desert Cavalry,Cavalerie du désert,Cavalleria del deserto,Caballería del desierto,砂漠騎馬,Ιππικό της Ερήμου,沙漠骑马
-card.genghis_khan.desert_cavalry.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动
-card.genghis_khan.territory_expansion.name,영토 확장,Territory Expansion,Expansion de territoire,Espansione del territorio,Expansión de territorio,領土拡張,Επέκταση Εδαφών,领土扩张
-card.genghis_khan.territory_expansion.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.red_horizon.name,붉은 지평선,Red Horizon,Horizon rouge,Orizzonte rosso,Horizonte rojo,赤い地平線,Κόκκινος Ορίζοντας,红色地平线
-card.genghis_khan.red_horizon.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.genghis_territory.name,징기스의 영토,Genghis' Territory,Territoire de Gengis,Territorio di Gengis,Territorio de Gengis,チンギスの領土,Εδάφη του Τζένγκις,成吉思汗的领土
-card.genghis_khan.genghis_territory.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.submission.name,굴복,Submission,Soumission,Sottomissione,Sumisión,屈服,Υποταγή,屈服
-card.genghis_khan.submission.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.poison_arrow_rain.name,독 화살비,Poison Arrow Rain,Pluie de flèches empoisonnées,Pioggia di frecce avvelenate,Lluvia de flechas venenosas,毒矢の雨,Βροχή Δηλητηριωδών Βελών,毒箭雨
-card.genghis_khan.poison_arrow_rain.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.thousand_mile_army.name,천리 원정군,Thousand Mile Army,Armée des mille lieues,Esercito delle mille miglia,Ejército de mil millas,千里遠征軍,Στρατός των Χιλίων Μιλίων,千里远征军
-card.genghis_khan.thousand_mile_army.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.steppe_terror.name,대초원의 위협,Steppe Terror,Terreur de la steppe,Terrore della steppa,Terror de la estepa,大草原の脅威,Τρόμος της Στέπας,大草原的威胁
-card.genghis_khan.steppe_terror.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵
-card.genghis_khan.war_tribute.name,전쟁의 대가,War Tribute,Tribut de guerre,Tributo di guerra,Tributo de guerra,戦争の代価,Φόρος Πολέμου,战争的代价
-card.genghis_khan.war_tribute.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.genghis_khan.great_steppe_siege.name,대초원의 포위,Great Steppe Siege,Siège de la grande steppe,Assedio della grande steppa,Asedio de la gran estepa,大草原の包囲,Πολιορκία της Μεγάλης Στέπας,大草原的围攻
-card.genghis_khan.great_steppe_siege.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺
-card.musashi.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击
-card.musashi.strike.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御
-card.musashi.defend.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.niten_slash.name,이도 베기,Niten Slash,Entaille Niten,Taglio Niten,Tajo Niten,二刀斬り,Χτύπημα Νίτεν,双刀斩
-card.musashi.niten_slash.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.sword_study.name,검기 수련,Sword Study,Étude de l'épée,Studio della spada,Estudio de la espada,剣気修練,Μελέτη του Σπαθιού,剑气修炼
-card.musashi.sword_study.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.two_sword_form.name,쌍도류 격,Two Sword Form,Forme à deux épées,Stile a due spade,Forma de dos espadas,双刀流撃,Μορφή Δύο Σπαθιών,双刀击
-card.musashi.two_sword_form.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.shield_break.name,방패 격파,Shield Break,Brise-bouclier,Rompiscudo,Rompeescudos,盾撃破,Θραύση Ασπίδας,破盾
-card.musashi.shield_break.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.meditation.name,명상,Meditation,Méditation,Meditazione,Meditación,瞑想,Διαλογισμός,冥想
-card.musashi.meditation.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.blood_path.name,혈로 개척,Blood Path,Chemin de sang,Sentiero di sangue,Senda de sangre,血路開拓,Μονοπάτι Αίματος,血路开辟
-card.musashi.blood_path.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.rapid_strike.name,연격,Rapid Strike,Frappe rapide,Colpo rapido,Golpe rápido,連撃,Ταχεία Επίθεση,连击
-card.musashi.rapid_strike.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.empty_state.name,무아지경,Empty State,État de vide,Stato di vuoto,Estado de vacío,無我夢中,Κατάσταση Κενού,无我之境
-card.musashi.empty_state.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.single_cut.name,일도양단,Single Cut,Coupe unique,Taglio singolo,Corte único,一刀両断,Μονό Χτύπημα,一刀两断
-card.musashi.single_cut.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.afterimage_cut.name,잔영 참,Afterimage Cut,Coupe d'image rémanente,Taglio dell'immagine residua,Corte de imagen residual,残影斬,Χτύπημα Μετα단ίδας,残影斩
-card.musashi.afterimage_cut.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.strategy_path.name,병법의 길,Strategy Path,Voie de la stratégie,Via della strategia,Senda de la estrategia,兵法の道,Μονοπάτι της Στρατηγικής,兵法之道
-card.musashi.strategy_path.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.five_rings_sword.name,오륜의 검,Five Rings Sword,Épée des cinq anneaux,Spada dei cinque anelli,Espada de los cinco anillos,五輪の剣,Σπαθί των Πέντε Δακτυλίων,五轮之剑
-card.musashi.five_rings_sword.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.mushin_blade.name,무심검(無心劍),Mushin Blade,Lame Mushin,Lama Mushin,Hoja Mushin,無心剣,Λεπίδα Μουσίν,无心剑
-card.musashi.mushin_blade.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.niten_slash2.name,이도 참격,Niten Slash,Entaille Niten,Taglio Niten,Tajo Niten,二刀斬撃,Χτύπημα Νίτεν,双刀斩击
-card.musashi.niten_slash2.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.whirlwind_cut.name,선풍참,Whirlwind Cut,Coupe tourbillon,Taglio vorticoso,Corte torbellino,旋風斬,Χτύπημα Στροβίλου,旋风斩
-card.musashi.whirlwind_cut.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.peak_aim.name,정점의 겨냥,Peak Aim,Visée suprême,Mira massima,Mira máxima,頂点の狙い,Στόχευση Κορυφής,顶点瞄准
-card.musashi.peak_aim.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.courage.name,담력,Courage,Courage,Coraggio,Coraje,胆力,Θάρρος,胆识
-card.musashi.courage.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.void_sword.name,공허의 검,Void Sword,Épée du vide,Spada del vuoto,Espada del vacío,空虚の剣,Σπαθί του Κενού,虚空之剑
-card.musashi.void_sword.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.release.name,내려놓음,Release,Relâchement,Rilascio,Liberación,解き放ち,Απελευθέρωση,放下
-card.musashi.release.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.sword_extreme.name,도류 극의,Sword Extreme,Extrême de l'épée,Estremo della spada,Extremo de la espada,刀流極意,Τελειότητα του Σπαθιού,刀流极意
-card.musashi.sword_extreme.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.flying_swallow.name,비연참,Flying Swallow,Hirondelle volante,Rondine volante,Golondrina voladora,飛燕斬,Χτύπημα του Ιπτάμενου Χελιδονιού,飞燕斩
-card.musashi.flying_swallow.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.asura_cut.name,수라 참,Asura Cut,Coupe d'Asura,Taglio di Asura,Corte de Asura,修羅斬,Χτύπημα του Ασούρα,修罗斩
-card.musashi.asura_cut.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.battle_gaze.name,결전의 눈빛,Battle Gaze,Regard de bataille,Sguardo di battaglia,Mirada de batalla,決戦の眼差し,Βλέμμα Μάχης,决战注视
-card.musashi.battle_gaze.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.torrent.name,격류,Torrent,Torrent,Torrente,Torrente,激流,Χείμαρρος,格流
-card.musashi.torrent.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.zen_realm.name,선의 경지,Zen Realm,Royaume Zen,Reame Zen,Reino Zen,禅の境地,Σφαίρα Ζεν,禅之境界
-card.musashi.zen_realm.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.empty_guard.name,공수처,Empty Guard,Garde vide,Guardia vuota,Guardia vacía,空守り,Κενή Φρουρά,空守处
-card.musashi.empty_guard.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.detach.name,탈속,Detach,Détachement,Distacco,Desapego,脱俗,Απόσπαση,脱俗
-card.musashi.detach.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.fierce_niten.name,맹렬한 이도,Fierce Niten,Féroce Niten,Feroce Niten,Feroz Niten,猛烈な二刀,Άγριο Νίτεν,猛烈双刀
-card.musashi.fierce_niten.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.twin_dragon.name,쌍룡섬,Twin Dragon,Dragon jumeau,Drago gemello,Dragón gemelo,双龍閃,Δίδυμος Δράκος,双龙闪
-card.musashi.twin_dragon.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.thousand_mile_cut.name,천리 베기,Thousand Mile Cut,Coupe des mille lieues,Taglio delle mille miglia,Corte de mil millas,千里斬り,Χτύπημα των Χιλίων Μιλίων,千里斩
-card.musashi.thousand_mile_cut.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流
-card.musashi.peerless_cut.name,무쌍 베기,Peerless Cut,Coupe sans pareille,Taglio senza pari,Corte sin igual,無双斬り,Ασυναγώνιστο Χτύπημα,无双斩
-card.musashi.peerless_cut.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.forward_cut.name,선검후참,Forward Cut,Coupe avant,Taglio in avanti,Corte hacia adelante,先剣後斬,Πρόσθιο Χτύπημα,先剑后斩
-card.musashi.forward_cut.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.final_duel.name,마지막 결투,Final Duel,Duel final,Duello finale,Duelo final,最後の決闘,Τελική Μονομαχία,最终决斗
-card.musashi.final_duel.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.void_void.name,허허실실,Void Void,Vide du vide,Vuoto del vuoto,Vacío del vacío,虚虚実実,Κενό του Κενού,虚虚实实
-card.musashi.void_void.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.clear_wind.name,청풍명월,Clear Wind,Vent clair,Vento chiaro,Viento claro,清風明月,Καθαρός Άνεμος,清风明月
-card.musashi.clear_wind.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.undying.name,불생불멸,Undying,Immortel,Immortale,Inmortal,不生不滅,Αθάνατος,不生不灭
-card.musashi.undying.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card.musashi.spirit_sword.name,영혼의 검,Spirit Sword,Épée de l'esprit,Spada dello spirito,Espada del espíritu,魂の剣,Σπαθί του Πνεύματος,灵魂之剑
-card.musashi.spirit_sword.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗
-card.musashi.five_rings_realm.name,오륜의 경지,Five Rings Realm,Royaume des cinq anneaux,Reame dei cinque anelli,Reino de los cinco anillos,五輪の境地,Σφαίρα των Πέντε Δακτυλίων,五轮境界
-card.musashi.five_rings_realm.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心
-card_type.attack.name,공격,Attack,Attaque,Attacco,Ataque,攻撃,Επίθεση,攻击
-card_type.skill.name,기술,Skill,Compétence,Abilità,Habilidad,技術,Τεχνική,技术
-card_type.power.name,권능,Power,Pouvoir,Potere,Poder,権能,Δύναμη,能力
-card.joan_of_arc.choir.name,성가대,Choir,Chœur,Coro,Coro,聖歌隊,Χορωδία,圣咏团
-card.joan_of_arc.choir.archetype,(권능),(Power),(Pouvoir),(Potere),(Poder),(権能),(Δύναμη),(能力)
-card.genghis_khan.steppe_lord.name,초원의 군주,Steppe Lord,Seigneur de la steppe,Signore della steppa,Señor de la estepa,草原の君主,Άρχοντας της Στέπας,草原之主
-card.genghis_khan.steppe_lord.archetype,(권능),(Power),(Pouvoir),(Potere),(Poder),(権能),(Δύναμη),(能力)
-card.musashi.sword_enlightenment.name,검의 깨달음,Sword Enlightenment,Éveil à l'épée,Risveglio della spada,Iluminación de la espada,剣の悟り,Φώτιση του Σπαθιού,剑之觉悟
-card.musashi.sword_enlightenment.archetype,(권능),(Power),(Pouvoir),(Potere),(Poder),(権能),(Δύναμη),(能力)
+﻿keys,ko,en,fr,it,es,ja,el,zh,zh_TW
+effect.damage.text,피해 %d%s%s,Deal %d%s%s damage,Inflige %d%s%s dégâts,Infligge %d%s%s danni,Inflige %d%s%s de daño,%d%s%sダメージ,Προκάλεσε %d%s%s ζημιά,造成 %d%s%s 伤害,造成 %d%s%s 伤害
+effect.block.text,방어 %d,Gain %d Block,Gagne %d d'Armure,Ottieni %d Scudo,Gana %d de Escudo,ブロック %d,Κέρδισε %d Άμυνα,获得 %d 护甲,获得 %d 护甲
+effect.block_all.text,전체 방어 %d,Gain %d Block to all,Gagne %d d'Armure à tous,Ottieni %d Scudo a tutti,Gana %d de Escudo a todos,全員にブロック %d,Κέρδισε %d Άμυνα για όλους,全体获得 %d 护甲,全体获得 %d 护甲
+effect.formation_block.text,영웅수×%d 방어,Gain %d Block per Hero,Gagne %d d'Armure par Héros,Ottieni %d Scudo per Eroe,Gana %d de Escudo por Héroe,英雄数×%d ブ록,Κέρδισε %d Άμυνα ανά Ήρωα,英雄数×%d 护甲,英雄数×%d 护甲
+effect.draw.text,드로우 %d,Draw %d,Piochez %d,Pesca %d,Roba %d,ドロー %d,Τράβηξε %d,抽 %d 张牌,抽 %d 张牌
+effect.energy.text,에너지 +%d,Gain %d Energy,Gagne %d Énergie,Guadagna %d Energia,Gana %d de Energía,エネルギー +%d,Κέρδισε %d Ενέργεια,能量 +%d,能量 +%d
+effect.heal.text,회복 %d,Heal %d,Soigne %d,Cura %d,Cura %d,回復 %d,Θεράπευσε %d,恢复 %d,恢复 %d
+effect.heal_all.text,전체 회복 %d,Heal all for %d,Soigne tous pour %d,Cura tutti di %d,Cura a todos por %d,全員回復 %d,Θεράπευσε όλους για %d,全体恢复 %d,全体恢复 %d
+effect.gain_morale.text,사기 +%d,Gain %d Morale,Gagne %d Moral,Guadagna %d Morale,Gana %d de Moral,士気 +%d,Κέρδισε %d Ηθικό,士气 +%d,士气 +%d
+effect.consume_morale.text,사기→피해 %d,Morale -> %d Damage,Moral -> %d Dégâts,Morale -> %d Danni,Moral -> %d Daño,士気→ダメージ %d,Ηθικό -> %d Ζημιά,士气→伤害 %d,士气→伤害 %d
+effect.poison_burst.text,독 즉발,Trigger Poison,Déclenche le Poison,Attiva Veleno,Detona Veneno,毒即発,Ενεργοποίηση Δηλητηρίου,毒性爆发,毒性爆发
+effect.counter_block.text,방어도×%d%%,%d%% of Block,%d%% de l'Armure,%d%% dello Scudo,%d%% del Escudo,ブロック×%d%%,%d%% της Άμυνας,护甲×%d%%,护甲×%d%%
+effect.cost_next.text,다음 비용 -%d,Next cost -%d,Coût suivant -%d,Prossimo costo -%d,Siguiente coste -%d,次のコスト -%d,Επόμενο κόστος -%d,下一次费用 -%d,下一次费用 -%d
+effect.conditional_dmg.text,%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s)
+effect.summon_token.text,병사 소환 %d,Summon %d Soldiers,Invoque %d Soldats,Evoca %d Soldati,Invoca %d Soldados,兵士召喚 %d,Κάλεσε %d Στρατιώτες,召唤 %d 士兵,召唤 %d 士兵
+effect.charm.text,매혹 %d,Charm %d,Charme %d,Fascino %d,Encanto %d,魅惑 %d,Γοητεία %d,魅惑 %d,魅惑 %d
+effect.revive.text,부활 %d%%,Revive with %d%% HP,Ressuscite avec %d%% PV,Rianima con %d%% PS,Revive con %d%% PV,復活 %d%%,Αναβίωση με %d%% HP,复活 %d%%,复活 %d%%
+effect.sacrifice_hp.text,자기 HP -%d,Lose %d HP,Perds %d PV,Perdi %d PS,Pierde %d PV,自己HP -%d,Χάσε %d HP,自身生命 -%d,自身生命 -%d
+effect.cost_zero_turn.text,이번 턴 코스트 0,Cost 0 this turn,Coût 0 ce tour,Costo 0 questo turno,Coste 0 este turno,このターンコスト0,Κόστος 0 αυτόν τον γύρο,本回合费用为0,本回合费用为0
+effect.block_per_cards_played.text,카드수×%d 방어,%d Block per card played,%d Armure par carte jouée,%d Scudo per carta giocata,%d Escudo por carta jugada,카드数×%d ブ록,%d Άμυνα ανά παιγμένο φύλλο,牌数×%d 护甲,牌数×%d 护甲
+effect.on_kill_draw.text,처치시 드로우 %d,Draw %d on kill,Piochez %d par élimination,Pesca %d all'uccisione,Roba %d al matar,撃破時ドロー %d,Τράβηξε %d κατά την εξόντωση,击杀时抽 %d 张牌,击杀时抽 %d 张牌
+effect.purge_status.text,디버프 제거,Remove debuffs,Retire les malus,Rimuovi debuff,Elimina penalizaciones,デバフ除去,Αφαίρεση εξασθενήσεων,移除负面状态,移除负面状态
+effect.per_draw_dmg.text,드로우수×%d 피해,%d damage per draw,%d dégâts par pioche,%d danni per pesca,%d daño por robo,ドロー数×%d ダメージ,%d ζημιά ανά τράβηγμα,抽牌数×%d 伤害,抽牌数×%d 伤害
+effect.apply_status_poison.text,%s %d 데미지,%s %d damage,%s %d dégâts,%s %d danni,%s %d de daño,%s %d ダメージ,%s %d ζημιά,%s %d 伤害,%s %d 伤害
+effect.aoe_suffix, (전체), (All), (Tous), (Tutti), (Todos), (全体), (Όλοι), (全体), (全体)
+card.napoleon.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击,打击
+card.napoleon.strike.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
+card.napoleon.defend.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.swift_advance.name,신속 기동,Swift Advance,Avance rapide,Avanzata rapida,Avance rápido,神速起動,Ταχεία Προέλαση,神速机动,神速机动
+card.napoleon.swift_advance.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.line_reform.name,전열 재편,Line Reform,Réforme de ligne,Riforma della linea,Reforma de línea,戦列再編,Ανασυγκρότηση Γραμμής,阵列重组,阵列重组
+card.napoleon.line_reform.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.hussar_charge.name,경기병 돌격,Hussar Charge,Charge de hussards,Carica degli ussari,Carga de húsares,軽騎兵突撃,Έφοδος Ουσάρων,轻骑兵突击,轻骑兵突击
+card.napoleon.hussar_charge.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.grand_armee_shield.name,그랑다르메의 방패,Grand Armée Shield,Bouclier de la Grande Armée,Scudo della Grande Armée,Escudo de la Grande Armée,グランダルメの盾,Ασπίδα της Μεγάλης Στρατιάς,大军团之盾,大军团之盾
+card.napoleon.grand_armee_shield.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.salvo.name,살보 사격,Salvo Fire,Feu de salve,Fuoco di salva,Fuego de salva,サルボ射撃,Πυρά Ομοβροντίας,齐射,齐射
+card.napoleon.salvo.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.marshal_appointment.name,원수 서임,Marshal Appointment,Nomination de maréchal,Nomina di maresciallo,Nombramiento de mariscal,元帥叙任,Διορισμός Στρατάρχη,元帅任命,元帅任命
+card.napoleon.marshal_appointment.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.arcole_breakthrough.name,아르콜레 돌파,Arcole Breakthrough,Percée d'Arcole,Svolta di Arcole,Ruptura de Arcole,アルコレ突破,Διάσπαση στο Αρκόλε,阿尔科莱突破,阿尔科莱突破
+card.napoleon.arcole_breakthrough.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.artillery_volley.name,포병 일제사격,Artillery Volley,Volée d'artillerie,Volata d'artiglieria,Volea de artillería,砲兵一斉射撃,Ομοβροντία Πυροβολικού,炮兵齐射,炮兵齐射
+card.napoleon.artillery_volley.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.jena_surprise.name,예나의 기습,Jena Surprise,Surprise d'Iéna,Sorpresa di Jena,Sorpresa de Jena,イエナの奇襲,Αιφνιδιασμός της Ιένας,耶拿奇袭,耶拿奇袭
+card.napoleon.jena_surprise.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.borodino_bombardment.name,보로디노 포격,Borodino Bombardment,Bombardement de Borodino,Bombardamento di Borodino,Bombardeo de Borodino,ボロジノ砲撃,Βομβαρδισμός του Μποροντίνο,博罗季诺炮击,博罗季诺炮击
+card.napoleon.borodino_bombardment.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.total_assault_order.name,총공세 명령,Total Assault Order,Ordre d'assaut total,Ordine d'assalto totale,Orden de asalto total,総攻勢命令,Διαταγή Γενικής Εφόδου,总攻命令,总攻命令
+card.napoleon.total_assault_order.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.emperors_command.name,황제의 명령,Emperor's Command,Commandement de l'Empereur,Comando dell'Imperatore,Mando del Emperador,皇帝の命令,Διαταγή του Αυτοκράτορα,皇帝的命令,皇帝的命令
+card.napoleon.emperors_command.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.emperors_spirit.name,황제의 기개,Emperor's Spirit,Esprit de l'Empereur,Spirito dell'Imperatore,Espíritu del Emperador,皇帝の気概,Πνεύμα του Αυτοκράτορα,皇帝的气概,皇帝的气概
+card.napoleon.emperors_spirit.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.advance_order.name,전진 명령,Advance Order,Ordre d'avance,Ordine di avanzata,Orden de avance,前進命令,Διαταγή Προέλασης,前进命令,前进命令
+card.napoleon.advance_order.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.trench_construction.name,참호 구축,Trench Construction,Construction de tranchées,Costruzione di trincee,Construcción de trincheras,塹壕構築,Κατασκευή Χαρακωμάτων,堑壕修筑,堑壕修筑
+card.napoleon.trench_construction.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.scout_patrol.name,척후 정찰,Scout Patrol,Patrouille d'éclaireurs,Pattuglia di ricognizione,Patrulla de exploradores,斥候偵察,Περίπολος Αναγνώρισης,斥候侦察,斥候侦察
+card.napoleon.scout_patrol.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.drum_beat.name,북소리,Drum Beat,Battement de tambour,Battito del tamburo,Toque de tambor,太鼓の音,Χτύπος Τυμπάνου,鼓声,鼓声
+card.napoleon.drum_beat.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.charge_bugle.name,진격 나팔,Charge Bugle,Clairon de charge,Clarino di carica,Corneta de carga,進撃ラッパ,Σάλπιγγα Εφόδου,进军号角,进军号角
+card.napoleon.charge_bugle.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.cavalry_threat.name,기병 위협,Cavalry Threat,Menace de cavalerie,Minaccia di cavalleria,Amenaza de caballería,騎兵の脅威,Απειλή Ιππικού,骑兵威胁,骑兵威胁
+card.napoleon.cavalry_threat.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.guard_charge.name,근위대 돌격,Guard Charge,Charge de la garde,Carica della guardia,Carga de la guardia,近衛兵突撃,Έφοδος Φρουράς,近卫队突击,近卫队突击
+card.napoleon.guard_charge.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.breakthrough_advance.name,전선 돌파,Breakthrough Advance,Avance de percée,Avanzata di svolta,Avance de ruptura,戦線突破,Διάσπαση Μετώπου,战线突破,战线突破
+card.napoleon.breakthrough_advance.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.commanders_eye.name,지휘관의 눈,Commander's Eye,Oeil du commandant,Occhio del comandante,Ojo del comandante,指揮官の目,Μάτι του Διοικητή,指挥官之眼,指挥官之眼
+card.napoleon.commanders_eye.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.supply_line_secured.name,보급선 확보,Supply Line Secured,Ligne de ravitaillement sécurisée,Linea di rifornimento assicurata,Línea de suministros asegurada,補給線確保,Εξασφάλιση Γραμμής Εφοδιασμού,确保补给线,确保补给线
+card.napoleon.supply_line_secured.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.artillery_gather.name,포병 집결,Artillery Gather,Rassemblement d'artillerie,Raduno d'artiglieria,Reunión de artillería,砲兵集結,Συγκέντρωση Πυροβολικού,炮兵集结,炮兵集结
+card.napoleon.artillery_gather.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.mobile_firing.name,기동 사격,Mobile Firing,Tir mobile,Fuoco mobile,Fuego móvil,機動射撃,Κινητά Πυρά,机动射击,机动射击
+card.napoleon.mobile_firing.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.bridgehead_capture.name,교두보 점령,Bridgehead Capture,Capture de tête de pont,Cattura della testa di ponte,Captura de cabeza de puente,橋頭堡占領,Κατάληψη Προγεφυρώματος,占领桥头堡,占领桥头堡
+card.napoleon.bridgehead_capture.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.imperial_artillery.name,황실 포병대,Imperial Artillery,Artillerie impériale,Artiglieria imperiale,Artillería imperial,皇室砲兵隊,Αυτοκρατορικό Πυροβολικό,皇室炮兵队,皇室炮兵队
+card.napoleon.imperial_artillery.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.imperial_infantry_call.name,제국 보병 소집,Imperial Infantry Call,Appel de l'infanterie impériale,Chiamata della fanteria imperiale,Llamada de infantería imperial,帝国歩兵召集,Κλήση Αυτοκρατορικού Πεζικού,帝国步兵集结,帝国步兵集结
+card.napoleon.imperial_infantry_call.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.austerlitz_maneuver.name,아우스터리츠 기동,Austerlitz Maneuver,Manoeuvre d'Austerlitz,Manovra di Austerlitz,Maniobra de Austerlitz,アウステルリッツ起動,Ελιγμός του Άουστερλιτς,奥斯特里茨机动,奥斯特里茨机动
+card.napoleon.austerlitz_maneuver.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.waterloo_resolve.name,워털루 이전의 결의,Waterloo Resolve,Résolution de Waterloo,Risoluzione di Waterloo,Resolución de Waterloo,ワーテルローの決意,Απόφαση του Βατερλώ,滑铁卢的决心,滑铁卢的决心
+card.napoleon.waterloo_resolve.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.eagle_standard.name,독수리 군기,Eagle Standard,Aigle impériale,Aquila imperiale,Águila imperial,鷲の軍旗,Αετός-Λάβαρο,鹰旗,鹰旗
+card.napoleon.eagle_standard.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.victory_proclamation.name,승리의 포고,Victory Proclamation,Proclamation de victoire,Proclamazione di vittoria,Proclamación de victoria,勝利の布告,Διακήρυξη Νίκης,胜利宣言,胜利宣言
+card.napoleon.victory_proclamation.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.great_army_siege.name,대육군 포위전,Great Army Siege,Siège de la Grande Armée,Assedio della Grande Armée,Asedio de la Gran Armada,大陸軍包囲戦,Πολιορκία της Μεγάλης Στρατιάς,大军团围攻战,大军团围攻战
+card.napoleon.great_army_siege.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.emperors_encirclement.name,황제의 포위령,Emperor's Encirclement,Encerclement de l'Empereur,Accerchiamento dell'Imperatore,Cercado del Emperador,皇帝の包囲令,Κυκλωτική Κίνηση του Αυτοκράτορα,皇帝的包围令,皇帝的包围令
+card.napoleon.emperors_encirclement.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.one_man_army.name,일기당천,One Man Army,Un homme à lui seul une armée,Esercito di un solo uomo,Ejército de un solo hombre,一騎当千,Στρατός ενός Ανδρός,一骑当千,一骑当千
+card.napoleon.one_man_army.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.strategic_retreat.name,전략적 후퇴,Strategic Retreat,Retraite stratégique,Ritirata strategica,Retirada estratégica,戦略的後退,Στρατηγική Υποχώρηση,战略性撤退,战略性撤退
+card.napoleon.strategic_retreat.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.emperors_assault.name,황제의 돌격,Emperor's Assault,Assaut de l'Empereur,Assalto dell'Imperatore,Asalto del Emperador,皇帝の突撃,Έφοδος του Αυτοκράτορα,皇帝的突击,皇帝的突击
+card.napoleon.emperors_assault.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.empire_glory.name,제국의 영광,Empire Glory,Gloire de l'Empire,Gloria dell'Impero,Gloria del Imperio,帝国の栄光,Δόξα της Αυτοκρατορίας,帝国荣光,帝国荣光
+card.napoleon.empire_glory.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.cleopatra.venom_needle.name,독침,Venom Needle,Aiguille de venin,Ago avvelenato,Aguja de veneno,毒針,Βελόνα Δηλητηρίου,毒针,毒针
+card.cleopatra.venom_needle.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.royal_guard.name,왕실 방어,Royal Guard,Garde royale,Guardia reale,Guardia real,王室防衛,Βασιλική Φρουρά,王室防御,王室防御
+card.cleopatra.royal_guard.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.poison_seed.name,독의 씨앗,Poison Seed,Graine de poison,Seme del veleno,Semilla de veneno,毒の種,Σπόρος Δηλητηρίου,毒之种,毒之种
+card.cleopatra.poison_seed.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.isis_blessing.name,이시스의 가호,Isis' Blessing,Bénédiction d'Isis,Benedizione di Iside,Bendición de Isis,イシスの加護,Ευλογία της Ίσιδας,伊西斯的加护,伊西斯的加护
+card.cleopatra.isis_blessing.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.asp_fang.name,아스프의 독니,Asp Fang,Croc d'aspic,Zanna d'aspide,Colmillo de áspid,アスプの毒牙,Δόντι της Ασπίδας,阿斯普毒牙,阿斯普毒牙
+card.cleopatra.asp_fang.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.desert_poison_dance.name,사막의 독무,Desert Poison Dance,Danse du poison du désert,Danza del veleno del deserto,Danza del veneno del desierto,砂漠の毒舞,Χορός του Δηλητηρίου της Ερήμου,沙漠毒舞,沙漠毒舞
+card.cleopatra.desert_poison_dance.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.cursed_gaze.name,저주의 시선,Cursed Gaze,Regard maudit,Sguardo maledetto,Mirada maldita,呪いの視線,Καταραμένο Βλέμμα,诅咒之视,诅咒之视
+card.cleopatra.cursed_gaze.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.temptation.name,유혹,Temptation,Tentation,Tentazione,Tentación,誘惑,Πειρασμός,诱惑,诱惑
+card.cleopatra.temptation.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.nile_mist.name,나일의 안개,Nile Mist,Brume du Nil,Nebbia del Nilo,Niebla del Nilo,ナイルの霧,Ομίχλη του Νείλου,尼罗河之雾,尼罗河之雾
+card.cleopatra.nile_mist.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.serpent_grasp.name,독사의 마수,Serpent Grasp,Emprise du serpent,Presa del serpente,Agarre de serpiente,毒蛇の魔手,Άρπαγμα του Φιδιού,毒蛇魔手,毒蛇魔手
+card.cleopatra.serpent_grasp.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.pharaoh_poison.name,파라오의 독,Pharaoh's Poison,Poison du Pharaon,Veleno del Faraone,Veneno del Faraón,ファラオの毒,Δηλητήριο του Φαραώ,法老的毒,法老的毒
+card.cleopatra.pharaoh_poison.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.ramesses_shield.name,람세스의 방패,Ramesses' Shield,Bouclier de Ramsès,Scudo di Ramsete,Escudo de Ramsés,ラムセスの盾,Ασπίδα του Ραμσή,拉美西斯之盾,拉美西斯之盾
+card.cleopatra.ramesses_shield.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.nile_fury.name,나일의 분노,Nile Fury,Fureur du Nil,Furia del Nilo,Furia del Nilo,ナイルの憤怒,Οργή του Νείλου,尼罗河之怒,尼罗河之怒
+card.cleopatra.nile_fury.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.pharaoh_decree.name,파라오의 명,Pharaoh's Decree,Décret du Pharaon,Editto del Faraone,Decreto del Faraón,ファラオの命,Διάταγμα του Φαραώ,法老之命,法老之命
+card.cleopatra.pharaoh_decree.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.cleopatras_kiss.name,클레오파트라의 입맞춤,Cleopatra's Kiss,Baiser de Cléopâtre,Bacio di Cleopatra,Beso de Cleopatra,クレオパトラの接吻,Φιλί της Κλεοπάτρας,克利奥帕特拉之吻,克利奥帕特拉之吻
+card.cleopatra.cleopatras_kiss.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.poison_fog_spray.name,독안개 살포,Poison Fog Spray,Pulvérisation de brume empoisonnée,Spruzzo di nebbia velenosa,Aerosol de niebla venenosa,毒霧散布,Ψεκασμός Δηλητηριώδους Ομίχλης,喷洒毒雾,喷洒毒雾
+card.cleopatra.poison_fog_spray.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.wax_trap.name,밀납의 덫,Wax Trap,Piège de cire,Trappola di cera,Trampa de cera,蜜蝋の罠,Παγίδα Κεριού,蜡之陷阱,蜡之陷阱
+card.cleopatra.wax_trap.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.sandstorm.name,모래 폭풍,Sandstorm,Tempête de sable,Tempesta di sabbia,Tormenta de arena,砂嵐,Αμμοθύελλα,沙尘暴,沙尘暴
+card.cleopatra.sandstorm.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.nile_blessing.name,나일의 축복,Nile Blessing,Bénédiction du Nil,Benedizione del Nilo,Bendición del Nilo,ナイル의 祝福,Ευλογία του Νείλου,尼罗河的祝福,尼罗河的祝福
+card.cleopatra.nile_blessing.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.snake_gaze.name,뱀의 눈빛,Snake Gaze,Regard du serpent,Sguardo del serpente,Mirada de serpiente,蛇の眼差し,Βλέμμα του Φιδιού,蛇之注视,蛇之注视
+card.cleopatra.snake_gaze.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.double_fang.name,이중 독니,Double Fang,Double croc,Zanna doppia,Colmillo doble,二重毒牙,Διπλό Δόντι,双重毒牙,双重毒牙
+card.cleopatra.double_fang.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.tempting_eye.name,유혹의 눈길,Tempting Eye,Oeil tentateur,Occhio tentatore,Ojo tentador,誘惑の眼差し,Δελεαστικό Μάτι,诱惑之眼,诱惑之眼
+card.cleopatra.tempting_eye.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.poison_feast.name,독의 향연,Poison Feast,Festin de poison,Banchetto del veleno,Festín de veneno,毒の饗宴,Γιορτή του Δηλητηρίου,毒之飨宴,毒之飨宴
+card.cleopatra.poison_feast.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.pharaoh_curse.name,파라오의 저주,Pharaoh's Curse,Malédiction du Pharaon,Maledizione del Faraone,Maldición del Faraón,ファラオの呪い,Κατάρα του Φαραώ,法老的诅咒,法老的诅咒
+card.cleopatra.pharaoh_curse.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.nile_flow.name,나일의 흐름,Nile Flow,Courant du Nil,Flusso del Nilo,Flujo del Nilo,ナイルの流,Ροή του Νείλου,尼罗河之流,尼罗河之流
+card.cleopatra.nile_flow.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.snake_poison_dance.name,뱀의 독무,Snake Poison Dance,Danse du venin du serpent,Danza del veleno del serpente,Danza del veneno de serpiente,蛇の毒舞,Χορός του Δηλητηρίου του Φιδιού,蛇之毒舞,蛇之毒舞
+card.cleopatra.snake_poison_dance.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.charming_language.name,매혹의 언어,Charming Language,Langage charmant,Linguaggio affascinante,Lenguaje encantador,魅惑の言語,Γοητευτική Γλώσσα,魅惑语言,魅惑语言
+card.cleopatra.charming_language.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.desert_recipe.name,사막의 약법,Desert Recipe,Recette du désert,Ricetta del deserto,Receta del desierto,砂漠の薬法,Συνταγή της Ερήμου,沙漠药方,沙漠药方
+card.cleopatra.desert_recipe.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.poison_judgment.name,독의 심판,Poison Judgment,Jugement du poison,Giudizio del veleno,Juicio de veneno,毒の審판,Κρίση του Δηλητηρίου,毒之审判,毒之审判
+card.cleopatra.poison_judgment.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.isis_fury.name,이시스의 분노,Isis' Fury,Fureur d'Isis,Furia di Iside,Furia de Isis,イシ스의 憤怒,Οργή της Ίσιδας,伊西斯之怒,伊西斯之怒
+card.cleopatra.isis_fury.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.poison_ritual.name,독살의 의식,Poison Ritual,Rituel d'empoisonnement,Rituale di avvelenamento,Ritual de envenenamiento,毒殺の儀式,Τελετουργικό Δηλητηρίασης,毒杀仪式,毒杀仪式
+card.cleopatra.poison_ritual.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.queens_embrace.name,여왕의 포옹,Queen's Embrace,Étreinte de la reine,Abbraccio della regina,Abrazo de la reina,女王の抱擁,Αγκαλιά της Βασίλισσας,女王的拥抱,女王的拥抱
+card.cleopatra.queens_embrace.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.curse_brand.name,저주의 낙인,Curse Brand,Marque de malédiction,Marchio della maledizione,Marca de maldición,呪いの烙印,Στίγμα της Κατάρας,诅咒烙印,诅咒烙印
+card.cleopatra.curse_brand.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.nile_doom.name,나일의 파멸,Nile Doom,Destin du Nil,Rovina del Nilo,Ruina del Nilo,ナイルの破滅,Όλεθρος του Νείλου,尼罗河的毁灭,尼罗河的毁灭
+card.cleopatra.nile_doom.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.charming_assault.name,매혹의 강습,Charming Assault,Assaut charmant,Assalto affascinante,Asalto encantador,魅惑の強襲,Γοητευτική Έφοδος,魅惑强袭,魅惑强袭
+card.cleopatra.charming_assault.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.pharaoh_fury.name,파라오의 분노,Pharaoh's Fury,Fureur du Pharaon,Furia del Faraone,Furia del Faraón,ファラオの憤怒,Οργή του Φαραώ,法老之怒,法老之怒
+card.cleopatra.pharaoh_fury.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.curse_crossroads.name,저주의 교차로,Curse Crossroads,Carrefour des malédictions,Incrocio delle maledizioni,Encrucijada de maldiciones,呪いの十字路,Σταυροδρόμι της Κατάρας,诅咒的交汇,诅咒的交汇
+card.cleopatra.curse_crossroads.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.poison_throne.name,독의 왕좌,Poison Throne,Trône de poison,Trono del veleno,Trono de veneno,毒の王座,Θρόνος του Δηλητηρίου,毒之王座,毒之王座
+card.cleopatra.poison_throne.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.isis_judgment.name,이시스의 심판,Isis' Judgment,Jugement d'Isis,Giudizio di Iside,Juicio de Isis,イシスの審판,Κρίση της Ίσιδας,伊西斯的审判,伊西斯的审判
+card.cleopatra.isis_judgment.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.sekhmet_curse.name,세케메트의 저주,Sekhmet's Curse,Malédiction de Sekhmet,Maledizione di Sekhmet,Maldición de Sekhmet,セケメトの呪い,Κατάρα της Σεχμέτ,塞赫美特的诅咒,塞赫美特的诅咒
+card.cleopatra.sekhmet_curse.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.yi_sun_sin.shield.name,방패,Shield,Bouclier,Scudo,Escudo,盾,Ασπίδα,盾牌,盾牌
+card.yi_sun_sin.shield.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.counter_strike.name,역공,Counter Strike,Contre-attaque,Contrattacco,Contraataque,逆攻,Αντεπίθεση,反击,反击
+card.yi_sun_sin.counter_strike.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.turtle_ship_charge.name,거북선 돌격,Turtle Ship Charge,Charge du bateau-tortue,Carica della nave tartaruga,Carga del barco tortuga,亀甲船突撃,Έφοδος Πλοίου-Χελώνας,龟船突击,龟船突击
+card.yi_sun_sin.turtle_ship_charge.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.counter.name,반격,Counter,Contre,Contrattacco,Contraatacar,反撃,Ανταπόδοση,反击,反击
+card.yi_sun_sin.counter.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.iron_armor.name,철갑,Iron Armor,Armure de fer,Armatura di ferro,Armadura de hierro,鉄甲,Σιδερένια Θωράκιση,铁甲,铁甲
+card.yi_sun_sin.iron_armor.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.turtle_shield.name,거북선 방패,Turtle Shield,Bouclier du bateau-tortue,Scudo della nave tartaruga,Escudo del barco tortuga,亀甲船の盾,Ασπίδα του Πλοίου-Χελώνας,龟船之盾,龟船之盾
+card.yi_sun_sin.turtle_shield.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.crane_wing.name,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.crane_wing.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.formation_boost.name,진형 강화,Formation Boost,Renfort de formation,Potenziamento della formazione,Mejora de formación,陣形強化,Ενίσχυση Σχηματισμού,加强阵型,加强阵型
+card.yi_sun_sin.formation_boost.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.naval_training.name,수군 훈련,Naval Training,Entraînement naval,Addestramento navale,Entrenamiento naval,水軍訓練,Ναυτική Εκπαίδευση,水师训练,水师训练
+card.yi_sun_sin.naval_training.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.hansan_victory.name,한산대첩,Hansan Victory,Victoire de Hansan,Vittoria di Hansan,Victoria de Hansan,閑山大捷,Νίκη του Χανσάν,闲山大捷,闲山大捷
+card.yi_sun_sin.hansan_victory.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.strict_training.name,엄정한 훈련,Strict Training,Entraînement strict,Addestramento rigoroso,Entrenamiento estricto,厳正な訓練,Αυστηρή Εκπαίδευση,严正训练,严正训练
+card.yi_sun_sin.strict_training.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.last_stand.name,배수진,Last Stand,Dernier combat,Ultima difesa,Última defensa,背水の陣,Έσχατη Άμυνα,背水一战,背水一战
+card.yi_sun_sin.last_stand.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.death_or_glory.name,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.death_or_glory.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.indomitable.name,불굴,Indomitable,Indomptable,Indomabile,Indomable,不屈,Αδάμαστος,不屈,不屈
+card.yi_sun_sin.indomitable.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.naval_maneuver.name,해군 기동,Naval Maneuver,Manoeuvre navale,Manovra navale,Maniobra naval,海軍機動,Ναυτικός Ελιγμός,海军机动,海军机动
+card.yi_sun_sin.naval_maneuver.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.noryang_battle.name,노량 해전,Noryang Battle,Bataille de Noryang,Battaglia di Noryang,Batalla de Noryang,露梁海戦,Ναυμαχία του Νοριάνγκ,露梁海战,露梁海战
+card.yi_sun_sin.noryang_battle.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.crane_wing_complete.name,학익진 완성,Crane Wing Complete,Aile de grue achevée,Ala di gru completa,Ala de grulla completa,鶴翼の陣完成,Ολοκλήρωση Σχηματισμού Γερανού,鹤翼阵成,鹤翼阵成
+card.yi_sun_sin.crane_wing_complete.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.armor_upgrade.name,장갑 강화,Armor Upgrade,Amélioration d'armure,Potenziamento armatura,Mejora de armadura,装甲強化,Αναβάθμιση Θωράκισης,加强装甲,加强装甲
+card.yi_sun_sin.armor_upgrade.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.consecutive_defense.name,연속 방어,Consecutive Defense,Défense consécutive,Difesa consecutiva,Defensa consecutiva,連続防御,Συνεχόμενη Άμυνα,连续防御,连续防御
+card.yi_sun_sin.consecutive_defense.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.iron_wall.name,철벽,Iron Wall,Mur de fer,Muro di ferro,Muro de hierro,鉄壁,Σιδερένιο Τείχος,铁壁,铁壁
+card.yi_sun_sin.iron_wall.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.charge_stance.name,돌격 태세,Charge Stance,Posture de charge,Posizione di carica,Postura de carga,突撃態勢,Στάση Εφόδου,突击态势,突击态势
+card.yi_sun_sin.charge_stance.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.cannon_fire.name,함포 사격,Cannon Fire,Feu de canon,Fuoco di cannone,Fuego de cañón,艦砲射撃,Πυρά Κανονιών,舰炮轰击,舰炮轰击
+card.yi_sun_sin.cannon_fire.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.shield_guard.name,방패막이,Shield Guard,Garde au bouclier,Guardia con lo scudo,Protección con escudo,盾ガード,Προστασία με Ασπίδα,盾挡,盾挡
+card.yi_sun_sin.shield_guard.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.counter_stance.name,반격 태세,Counter Stance,Posture de contre,Posizione di contrattacco,Postura de contraataque,反撃態勢,Στάση Ανταπόδοσης,反击态势,反击态势
+card.yi_sun_sin.counter_stance.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.fleet_rally.name,함대 결집,Fleet Rally,Ralliement de la flotte,Raduno della flotta,Reunión de la flota,艦隊結集,Συγκέντρωση Στόλου,舰队集结,舰队集结
+card.yi_sun_sin.fleet_rally.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.morale_boost.name,사기 고취,Morale Boost,Regain de moral,Incentivo al morale,Mejora de moral,士気高揚,Ενίσχυση Ηθικού,鼓舞士气,鼓舞士气
+card.yi_sun_sin.morale_boost.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.discipline.name,군기 진작,Discipline,Discipline,Disciplina,Disciplina,軍紀振興,Πειθαρχία,振奋军纪,振奋军纪
+card.yi_sun_sin.discipline.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.hold_formation.name,진형 사수,Hold Formation,Maintenir la formation,Mantieni la formazione,Mantener formación,陣形死守,Διατήρηση Σχηματισμού,坚守阵型,坚守阵型
+card.yi_sun_sin.hold_formation.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.regroup.name,전열 정비,Regroup,Regroupement,Raggruppamento,Reagrupar,戦列整備,Ανασύνταξη,整顿阵列,整顿阵列
+card.yi_sun_sin.regroup.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.fleet_command.name,함대 지휘,Fleet Command,Commandement de la flotte,Comando della flotta,Mando de la flota,艦隊指揮,Διοίκηση Στόλου,舰队指挥,舰队指挥
+card.yi_sun_sin.fleet_command.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.volley_fire.name,일제 사격,Volley Fire,Feu de volée,Fuoco di volata,Fuego de volea,一斉射撃,Ομοβροντία,一齐射击,一齐射击
+card.yi_sun_sin.volley_fire.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.command_instinct.name,지휘 본능,Command Instinct,Instinct de commandement,Istinto di comando,Instinto de mando,指揮本能,Ένστικτο Διοίκησης,指挥本能,指挥本能
+card.yi_sun_sin.command_instinct.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.formation_bond.name,진형 결속,Formation Bond,Lien de formation,Legame di formazione,Vínculo de formación,陣形結束,Δεσμός Σχηματισμού,阵型团结,阵型团结
+card.yi_sun_sin.formation_bond.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.decisive_strike.name,사지결단,Decisive Strike,Frappe décisive,Colpo decisivo,Golpe decisivo,四肢決断,Αποφασιστικό Χτύπημα,决死一战,决死一战
+card.yi_sun_sin.decisive_strike.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.all_in.name,이판사판,All In,Tout pour le tout,Tutto per tutto,Todo o nada,一か八か,Τα Παίζω Όλα,孤注一掷,孤注一掷
+card.yi_sun_sin.all_in.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.miraculous_recovery.name,기사회생,Miraculous Recovery,Récupération miraculeuse,Ritorno alla vita,Recupero milagroso,起死回生,Θαυματουργή Ανάρρωση,死里逃生,死里逃生
+card.yi_sun_sin.miraculous_recovery.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.crisis_breakthrough.name,위기 돌파,Crisis Breakthrough,Percée de crise,Svolta nella crisi,Ruptura de crisis,危機突破,Διάσπαση Κρίσης,突破危机,突破危机
+card.yi_sun_sin.crisis_breakthrough.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.death_charge.name,사즉생 돌격,Death Charge,Charge mortelle,Carica mortale,Carga de muerte,死即生突撃,Έφοδος Θανάτου,死中求生突击,死中求生突击
+card.yi_sun_sin.death_charge.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.bloody_battle.name,혈전,Bloody Battle,Bataille sanglante,Battaglia sanguinosa,Batalla sangrienta,血戦,Αιματηρή Μάχη,血战,血战
+card.yi_sun_sin.bloody_battle.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.war_drum.name,독전,War Drum,Tambour de guerre,Tamburo di guerra,Tambor de guerra,督戦,Τύμπανο Πολέμου,督战,督战
+card.yi_sun_sin.war_drum.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.warriors_resolve.name,전사의 각오,Warrior's Resolve,Résolution du guerrier,Risoluzione del guerriero,Resolución del guerrero,戦士の覚悟,Απόφαση του Πολεμιστή,战士的觉悟,战士的觉悟
+card.yi_sun_sin.warriors_resolve.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.phoenix.name,불사조,Phoenix,Phénix,Fenice,Fénix,不死鳥,Φοίνικας,不死鸟,不死鸟
+card.yi_sun_sin.phoenix.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.joan_of_arc.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击,打击
+card.joan_of_arc.strike.archetype,신성,,,,,,,,
+card.joan_of_arc.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
+card.joan_of_arc.defend.archetype,신성,,,,,,,,
+card.joan_of_arc.holy_touch.name,성녀의 손길,Holy Touch,Toucher sacré,Tocco sacro,Toque sagrado,聖女の導き,Άγιο Άγγιγμα,圣女之抚,圣女之抚
+card.joan_of_arc.holy_touch.archetype,신성,,,,,,,,
+card.joan_of_arc.blessing_of_light.name,축복의 빛,Blessing of Light,Bénédiction de lumière,Benedizione della luce,Bendición de luz,祝福の光,Ευλογία του Φωτός,祝福之光,祝福之光
+card.joan_of_arc.blessing_of_light.archetype,신성,,,,,,,,
+card.joan_of_arc.hymn.name,성가,Hymn,Hymne,Inno,Himno,聖歌,Ύμνος,圣歌,圣歌
+card.joan_of_arc.hymn.archetype,신성,,,,,,,,
+card.joan_of_arc.purifying_flame.name,정화의 불꽃,Purifying Flame,Flamme purificatrice,Fiamma purificatrice,Llama purificadora,浄化の炎,Φλόγα Εξαγνισμού,净化之火,净化之火
+card.joan_of_arc.purifying_flame.archetype,신성,,,,,,,,
+card.joan_of_arc.self_sacrifice.name,자기희생,Self-Sacrifice,Sacrifice de soi,Autosacrificio,Sacrificio personal,自己犠牲,Αυτοθυσία,自我牺牲,自我牺牲
+card.joan_of_arc.self_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.orleans_charge.name,오를레앙의 돌격,Orleans Charge,Charge d'Orléans,Carica di Orléans,Carga de Orleans,オルレアンの突撃,Έφοδος της Ορλεάνης,奥尔良突击,奥尔良突击
+card.joan_of_arc.orleans_charge.archetype,신성,,,,,,,,
+card.joan_of_arc.miracle_revive.name,기적의 부활,Miracle Revive,Résurrection miraculeuse,Rianimazione miracolosa,Resurrección milagrosa,奇跡の復活,Θαυματουργή Αναβίωση,奇迹复活,奇迹复活
+card.joan_of_arc.miracle_revive.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.divine_protection.name,신의 가호,Divine Protection,Protection divine,Protezione divina,Protección divina,神の加護,Θεία Προστασία,神之加护,神之加护
+card.joan_of_arc.divine_protection.archetype,신성,,,,,,,,
+card.joan_of_arc.holy_fury.name,성스러운 분노,Holy Fury,Fureur sacrée,Furia sacra,Furia sagrada,聖なる憤怒,Θεία Οργή,神圣之怒,神圣之怒
+card.joan_of_arc.holy_fury.archetype,신성,,,,,,,,
+card.joan_of_arc.martyrs_will.name,순교의 의지,Martyr's Will,Volonté du martyr,Volontà del martire,Voluntad del mártir,殉教の意志,Θέληση του Μάρτυρα,殉教之志,殉教之志
+card.joan_of_arc.martyrs_will.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.knights_oath.name,기사단의 맹세,Knight's Oath,Serment de chevalier,Giuramento del cavaliere,Juramento del caballero,騎士団の誓い,Όρκος των Ιπποτών,骑士团誓言,骑士团誓言
+card.joan_of_arc.knights_oath.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.flag_of_orleans.name,신국의 깃발,Flag of Orleans,Bannière de Dieu,Bandiera di Dio,Bandera de Dios,神国の旗,Σημαία της Ορλεάνης,神国之旗,神国之旗
+card.joan_of_arc.flag_of_orleans.archetype,신성,,,,,,,,
+card.joan_of_arc.saints_flame.name,성녀의 화염,Saint's Flame,Flamme de la sainte,Fiamma della santa,Llama de la santa,聖女の火焔,Φλόγα της Αγίας,圣女之焰,圣女之焰
+card.joan_of_arc.saints_flame.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.holy_light.name,성스러운 빛,Holy Light,Lumière sacrée,Luce sacra,Luz sagrada,聖なる光,Άγιο Φως,神圣之光,神圣之光
+card.joan_of_arc.holy_light.archetype,신성,,,,,,,,
+card.joan_of_arc.communion.name,성찬,Communion,Communion,Comunione,Comunión,聖餐,Θεία Κοινωνία,圣餐,圣餐
+card.joan_of_arc.communion.archetype,신성,,,,,,,,
+card.joan_of_arc.revive_spark.name,부활의 불씨,Revive Spark,Étincelle de résurrection,Scintilla di rinascita,Chispa de resurrección,復活の火種,Σπίθα Αναβίωσης,复活火种,复活火种
+card.joan_of_arc.revive_spark.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.divine_providence.name,신의 섭리,Divine Providence,Providence divine,Provvidenza divina,Providencia divina,神の摂理,Θεία Πρόνοια,神之摄理,神之摄理
+card.joan_of_arc.divine_providence.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.small_sacrifice.name,작은 희생,Small Sacrifice,Petit sacrifice,Piccolo sacrificio,Pequeño sacrificio,小さな犠牲,Μικρή Θυσία,微小的牺牲,微小的牺牲
+card.joan_of_arc.small_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.sacrifice_cry.name,희생의 함성,Sacrifice Cry,Cri de sacrifice,Grido di sacrificio,Grito de sacrificio,犠牲の叫び,Κραυγή Θυσίας,牺牲之吼,牺牲之吼
+card.joan_of_arc.sacrifice_cry.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.angel_wings.name,천사의 날개,Angel Wings,Ailes d'ange,Ali d'angelo,Alas de ángel,天使の翼,Φτερά Αγγέλου,天使之翼,天使之翼
+card.joan_of_arc.angel_wings.archetype,신성,,,,,,,,
+card.joan_of_arc.second_chance.name,두 번째 기회,Second Chance,Deuxième chance,Seconda occasione,Segunda oportunidad,二度目の機会,Δεύτερη Ευκαιρία,第二次机会,第二次机会
+card.joan_of_arc.second_chance.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.revive_scroll.name,부활의 서,Revive Scroll,Parchemin de résurrection,Pergamena della rinascita,Pergamino de resurrección,復活の書,Πάπυρος Αναβίωσης,复活之书,复活之书
+card.joan_of_arc.revive_scroll.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.light_of_hope.name,희망의 빛,Light of Hope,Lumière d'espoir,Luce di speranza,Luz de esperanza,希望の光,Φως της Ελπίδας,希望之光,希望之光
+card.joan_of_arc.light_of_hope.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.holy_charge.name,신성 충전,Holy Charge,Charge sacrée,Carica sacra,Carga sagrada,神聖充電,Θεία Φόρτιση,神圣充能,神圣充能
+card.joan_of_arc.holy_charge.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.blade_of_justice.name,정의의 칼날,Blade of Justice,Lame de justice,Lama della giustizia,Hoja de justicia,正義の刃,Λεπίδα της Δικαιοσύνης,正义之刃,正义之刃
+card.joan_of_arc.blade_of_justice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.martyrdom_steps.name,순교의 발걸음,Martyrdom Steps,Pas du martyre,Passi del martirio,Pasos del martirio,殉教の足音,Βήματα Μαρτυρίου,殉教脚步,殉教脚步
+card.joan_of_arc.martyrdom_steps.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.altar_flame.name,제단의 불꽃,Altar Flame,Flamme de l'autel,Fiamma dell'altare,Llama del altar,祭壇の炎,Φλόγα του Βωμού,祭坛之火,祭坛之火
+card.joan_of_arc.altar_flame.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.holy_rage.name,신성한 격노,Holy Rage,Rage sacrée,Rabbia sacra,Ira sagrada,神聖な激怒,Θεία Μανία,神圣激怒,神圣激怒
+card.joan_of_arc.holy_rage.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.holy_purification.name,신성한 정화,Holy Purification,Purification sacrée,Purificazione sacra,Purificación sagrada,神聖な浄化,Θείος Εξαγνισμός,神圣净化,神圣净化
+card.joan_of_arc.holy_purification.archetype,신성,,,,,,,,
+card.joan_of_arc.knights_guard.name,기사의 수호,Knight's Guard,Garde du chevalier,Guardia del cavaliere,Guardia del caballero,騎士の守護,Φρουρά του Ιππότη,骑士守护,骑士守护
+card.joan_of_arc.knights_guard.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.martyrs_legacy.name,순교자의 유산,Martyr's Legacy,Héritage du martyr,Eredità del martire,Legado del mártir,殉教者の遺産,Κληρονομιά του Μάρτυρα,殉教者遗产,殉教者遗产
+card.joan_of_arc.martyrs_legacy.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.revive_ritual.name,부활의 의식,Revive Ritual,Rituel de résurrection,Rituale di rinascita,Ritual de resurrección,復活の儀式,Τελετουργικό Αναβίωσης,复活仪式,复活仪式
+card.joan_of_arc.revive_ritual.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.miracle_chain.name,기적의 연쇄,Miracle Chain,Chaîne de miracles,Catena di miracoli,Cadena de milagros,奇跡の連鎖,Αλυσίδα Θαυμάτων,奇迹连锁,奇迹连锁
+card.joan_of_arc.miracle_chain.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.last_shield.name,최후의 방패,Last Shield,Dernier bouclier,Ultimo scudo,Último escudo,最後の盾,Έσχατη Ασπίδα,最后之盾,最后之盾
+card.joan_of_arc.last_shield.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.purifying_sacrifice.name,정화의 희생,Purifying Sacrifice,Sacrifice purificateur,Sacrificio purificatore,Sacrificio purificador,浄化の犠牲,Θυσία Εξαγνισμού,净化牺牲,净化牺牲
+card.joan_of_arc.purifying_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.saints_vow.name,성녀의 맹약,Saint's Vow,Voeu de la sainte,Voto della santa,Voto de la santa,성녀의 맹약,Όρκος της Αγίας,圣女盟约,圣女盟约
+card.joan_of_arc.saints_vow.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.joan_of_arc.joan_return.name,잔 다르크의 귀환,Joan's Return,Retour de Jeanne,Ritorno di Giovanna,Regreso de Juana,ジャンヌ・ダルクの帰還,Επιστροφή της Ιωάννας,贞德回归,贞德回归
+card.joan_of_arc.joan_return.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
+card.joan_of_arc.holy_war.name,성전,Holy War,Guerre sainte,Guerra santa,Guerra santa,聖戦,Ιερός Πόλεμος,圣战,圣战
+card.joan_of_arc.holy_war.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
+card.genghis_khan.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击,打击
+card.genghis_khan.strike.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
+card.genghis_khan.defend.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.cavalry_charge.name,기마 돌격,Cavalry Charge,Charge de cavalerie,Carica di cavalleria,Carga de caballería,騎馬突撃,Έφοδος Ιππικού,骑马突击,骑马突击
+card.genghis_khan.cavalry_charge.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.scout.name,정찰,Scout,Éclaireur,Esploratore,Explorador,偵察,Αναγνώριση,侦察,侦察
+card.genghis_khan.scout.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.arrow_volley.name,화살 세례,Arrow Volley,Volée de flèches,Volata di frecce,Volea de flechas,矢の洗礼,Ομοβροντία Βελών,箭雨,箭雨
+card.genghis_khan.arrow_volley.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.ambush.name,기습,Ambush,Embuscade,Imboscata,Emboscada,奇襲,Ενέδρα,奇袭,奇袭
+card.genghis_khan.ambush.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.supply_cut.name,보급선 차단,Supply Cut,Coupure de ravitaillement,Taglio dei rifornimenti,Corte de suministros,補給線遮断,Διακοπή Εφοδιασμού,切断补给线,切断补给线
+card.genghis_khan.supply_cut.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.encirclement.name,포위 전술,Encirclement,Encerclement,Accerchiamento,Cercado,包囲戦術,Τακτική Κύκλωσης,包围战术,包围战术
+card.genghis_khan.encirclement.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.mingens_order.name,천호장의 령,Mingan's Order,Ordre du Mingan,Ordine del Mingan,Orden de Mingan,千戸長の令,Διαταγή του Μινγκάν,千户长之令,千户长之令
+card.genghis_khan.mingens_order.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.poison_arrow.name,독화살,Poison Arrow,Flèche empoisonnée,Freccia avvelenata,Flecha venenosa,毒矢,Δηλητηριώδες Βέλος,毒箭,毒箭
+card.genghis_khan.poison_arrow.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.steppe_storm.name,초원의 폭풍,Steppe Storm,Tempête de la steppe,Tempesta della steppa,Tormenta de la estepa,草原の嵐,Καταιγίδα της Στέπας,草原风暴,草原风暴
+card.genghis_khan.steppe_storm.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.conquerors_ambition.name,정복자의 야망,Conqueror's Ambition,Ambition du conquérant,Ambizione del conquistatore,Ambición del conquistador,征服者の野望,Φιλοδοξία του Κατακτητή,征服者的野心,征服者的野心
+card.genghis_khan.conquerors_ambition.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.long_march.name,만리 원정,Long March,Longue marche,Lunga marcia,Larga marcha,万里の遠征,Μεγάλη Πορεία,万里远征,万里远征
+card.genghis_khan.long_march.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.great_khans_command.name,대칸의 명령,Great Khan's Command,Commandement du Grand Khan,Comando del Gran Khan,Mando del Gran Khan,大ハンの命令,Διαταγή του Μεγάλου Χαν,大汗的命令,大汗的命令
+card.genghis_khan.great_khans_command.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.genghis_fury.name,징기스의 분노,Genghis' Fury,Fureur de Gengis,Furia di Gengis,Furia de Gengis,チンギスの憤怒,Οργή του Τζένγκις,成吉思汗之怒,成吉思汗之怒
+card.genghis_khan.genghis_fury.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.light_cavalry_sprint.name,경기병 질주,Light Cavalry Sprint,Sprint de la cavalerie légère,Sprint della cavalleria leggera,Sprint de caballería ligera,軽騎兵疾走,Ταχεία Έφοδος Ελαφρού Ιππικού,轻骑兵疾驰,轻骑兵疾驰
+card.genghis_khan.light_cavalry_sprint.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.swift_raid.name,급습,Swift Raid,Raid rapide,Incursione rapida,Incursión rápida,急襲,Ταχεία Επιδρομή,急袭,急袭
+card.genghis_khan.swift_raid.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.loot.name,노획,Loot,Butin,Bottino,Botín,捕獲,Λάφυρα,虏获,虏获
+card.genghis_khan.loot.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.victory_spoils.name,승리의 전리품,Victory Spoils,Butin de victoire,Bottino di vittoria,Botín de victoria,勝利の戦利品,Λάφυρα Νίκης,胜利战利品,胜利战利品
+card.genghis_khan.victory_spoils.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.cavalry_assault.name,기병대 습격,Cavalry Assault,Assaut de cavalerie,Assalto di cavalleria,Asalto de caballería,騎兵隊襲撃,Επίθεση Ιππικού,骑兵队突袭,骑兵队突袭
+card.genghis_khan.cavalry_assault.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.rear_disruption.name,후방 교란,Rear Disruption,Perturbation arrière,Disturbo alle retrovie,Disrupción trasera,後方撹乱,Αναταραχή στα Μετόπισθεν,后方骚扰,后方骚扰
+card.genghis_khan.rear_disruption.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.cavalry_crossing.name,기마 도하,Cavalry Crossing,Traversée à cheval,Attraversamento a cavallo,Cruce a caballo,騎馬渡河,Διάβαση Ιππικού,骑马渡河,骑马渡河
+card.genghis_khan.cavalry_crossing.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.lightning_sprint.name,낙뢰 질주,Lightning Sprint,Sprint éclair,Sprint fulmineo,Sprint relámpago,落雷疾走,Ταχύτητα Αστραπής,落雷疾驰,落雷疾驰
+card.genghis_khan.lightning_sprint.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.execution_ground.name,처형대,Execution Ground,Lieu d'exécution,Luogo d'esecuzione,Patíbulo,処刑台,Τόπος Εκτέλεσης,处刑台,处刑台
+card.genghis_khan.execution_ground.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.spoils_distribution.name,전리품 배분,Spoils Distribution,Distribution du butin,Distribuzione del bottino,Distribución de botín,戦利品配分,Διανομή Λαφύρων,战利品分配,战利品分配
+card.genghis_khan.spoils_distribution.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.plunder_flame.name,약탈의 불길,Plunder Flame,Flamme du pillage,Fiamma del saccheggio,Llama de saqueo,略奪の炎,Φλόγα της Λεηλασίας,掠夺之火,掠夺之火
+card.genghis_khan.plunder_flame.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.rapid_fire.name,연사,Rapid Fire,Tir rapide,Fuoco rapido,Fuego rápido,連射,Ταχεία Πυροδότηση,连射,连射
+card.genghis_khan.rapid_fire.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.wind_legion.name,바람의 군단,Wind Legion,Légion du vent,Legione del vento,Legión del viento,風の軍団,Λεγεώνα του Ανέμου,风之军团,风之军团
+card.genghis_khan.wind_legion.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.cavalry_encirclement.name,기병 포위망,Cavalry Encirclement,Encerclement de cavalerie,Accerchiamento di cavalleria,Cerco de caballería,騎兵包囲網,Κυκλωτική Κίνηση Ιππικού,骑兵包围网,骑兵包围网
+card.genghis_khan.cavalry_encirclement.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.iron_breakthrough.name,무간 돌파,Iron Breakthrough,Percée de fer,Svolta di ferro,Ruptura de hierro,無間突破,Σιδερένια Διάσπαση,无间突破,无间突破
+card.genghis_khan.iron_breakthrough.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.desert_cavalry.name,사막 기마,Desert Cavalry,Cavalerie du désert,Cavalleria del deserto,Caballería del desierto,砂漠騎馬,Ιππικό της Ερήμου,沙漠骑马,沙漠骑马
+card.genghis_khan.desert_cavalry.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
+card.genghis_khan.territory_expansion.name,영토 확장,Territory Expansion,Expansion de territoire,Espansione del territorio,Expansión de territorio,領土拡張,Επέκταση Εδαφών,领土扩张,领土扩张
+card.genghis_khan.territory_expansion.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.red_horizon.name,붉은 지평선,Red Horizon,Horizon rouge,Orizzonte rosso,Horizonte rojo,赤い地平線,Κόκκινος Ορίζοντας,红色地平线,红色地平线
+card.genghis_khan.red_horizon.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.genghis_territory.name,징기스의 영토,Genghis' Territory,Territoire de Gengis,Territorio di Gengis,Territorio de Gengis,チンギスの領土,Εδάφη του Τζένγκις,成吉思汗的领土,成吉思汗的领土
+card.genghis_khan.genghis_territory.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.submission.name,굴복,Submission,Soumission,Sottomissione,Sumisión,屈服,Υποταγή,屈服,屈服
+card.genghis_khan.submission.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.poison_arrow_rain.name,독 화살비,Poison Arrow Rain,Pluie de flèches empoisonnées,Pioggia di frecce avvelenate,Lluvia de flechas venenosas,毒矢の雨,Βροχή Δηλητηριωδών Βελών,毒箭雨,毒箭雨
+card.genghis_khan.poison_arrow_rain.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.thousand_mile_army.name,천리 원정군,Thousand Mile Army,Armée des mille lieues,Esercito delle mille miglia,Ejército de mil millas,千里遠征軍,Στρατός των Χιλίων Μιλίων,千里远征军,千里远征军
+card.genghis_khan.thousand_mile_army.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.steppe_terror.name,대초원의 위협,Steppe Terror,Terreur de la steppe,Terrore della steppa,Terror de la estepa,大草原の脅威,Τρόμος της Στέπας,大草原的威胁,大草原的威胁
+card.genghis_khan.steppe_terror.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
+card.genghis_khan.war_tribute.name,전쟁의 대가,War Tribute,Tribut de guerre,Tributo di guerra,Tributo de guerra,戦争の代価,Φόρος Πολέμου,战争的代价,战争的代价
+card.genghis_khan.war_tribute.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.great_steppe_siege.name,대초원의 포위,Great Steppe Siege,Siège de la grande steppe,Assedio della grande steppa,Asedio de la gran estepa,大草原の包囲,Πολιορκία της Μεγάλης Στέπας,大草原的围攻,大草原的围攻
+card.genghis_khan.great_steppe_siege.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.musashi.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击,打击
+card.musashi.strike.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
+card.musashi.defend.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.niten_slash.name,이도 베기,Niten Slash,Entaille Niten,Taglio Niten,Tajo Niten,二刀斬り,Χτύπημα Νίτεν,双刀斩,双刀斩
+card.musashi.niten_slash.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.sword_study.name,검기 수련,Sword Study,Étude de l'épée,Studio della spada,Estudio de la espada,剣気修練,Μελέτη του Σπαθιού,剑气修炼,剑气修炼
+card.musashi.sword_study.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.two_sword_form.name,쌍도류 격,Two Sword Form,Forme à deux épées,Stile a due spade,Forma de dos espadas,双刀流撃,Μορφή Δύο Σπαθιών,双刀击,双刀击
+card.musashi.two_sword_form.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.shield_break.name,방패 격파,Shield Break,Brise-bouclier,Rompiscudo,Rompeescudos,盾撃破,Θραύση Ασπίδας,破盾,破盾
+card.musashi.shield_break.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.meditation.name,명상,Meditation,Méditation,Meditazione,Meditación,瞑想,Διαλογισμός,冥想,冥想
+card.musashi.meditation.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.blood_path.name,혈로 개척,Blood Path,Chemin de sang,Sentiero di sangue,Senda de sangre,血路開拓,Μονοπάτι Αίματος,血路开辟,血路开辟
+card.musashi.blood_path.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.rapid_strike.name,연격,Rapid Strike,Frappe rapide,Colpo rapido,Golpe rápido,連撃,Ταχεία Επίθεση,连击,连击
+card.musashi.rapid_strike.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.empty_state.name,무아지경,Empty State,État de vide,Stato di vuoto,Estado de vacío,無我夢中,Κατάσταση Κενού,无我之境,无我之境
+card.musashi.empty_state.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.single_cut.name,일도양단,Single Cut,Coupe unique,Taglio singolo,Corte único,一刀両断,Μονό Χτύπημα,一刀两断,一刀两断
+card.musashi.single_cut.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.afterimage_cut.name,잔영 참,Afterimage Cut,Coupe d'image rémanente,Taglio dell'immagine residua,Corte de imagen residual,残影斬,Χτύπημα Μετα단ίδας,残影斩,残影斩
+card.musashi.afterimage_cut.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.strategy_path.name,병법의 길,Strategy Path,Voie de la stratégie,Via della strategia,Senda de la estrategia,兵法の道,Μονοπάτι της Στρατηγικής,兵法之道,兵法之道
+card.musashi.strategy_path.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.five_rings_sword.name,오륜의 검,Five Rings Sword,Épée des cinq anneaux,Spada dei cinque anelli,Espada de los cinco anillos,五輪の剣,Σπαθί των Πέντε Δακτυλίων,五轮之剑,五轮之剑
+card.musashi.five_rings_sword.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.mushin_blade.name,무심검(無心劍),Mushin Blade,Lame Mushin,Lama Mushin,Hoja Mushin,無心剣,Λεπίδα Μουσίν,无心剑,无心剑
+card.musashi.mushin_blade.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.niten_slash2.name,이도 참격,Niten Slash,Entaille Niten,Taglio Niten,Tajo Niten,二刀斬撃,Χτύπημα Νίτεν,双刀斩击,双刀斩击
+card.musashi.niten_slash2.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.whirlwind_cut.name,선풍참,Whirlwind Cut,Coupe tourbillon,Taglio vorticoso,Corte torbellino,旋風斬,Χτύπημα Στροβίλου,旋风斩,旋风斩
+card.musashi.whirlwind_cut.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.peak_aim.name,정점의 겨냥,Peak Aim,Visée suprême,Mira massima,Mira máxima,頂点の狙い,Στόχευση Κορυφής,顶点瞄准,顶点瞄准
+card.musashi.peak_aim.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.courage.name,담력,Courage,Courage,Coraggio,Coraje,胆力,Θάρρος,胆识,胆识
+card.musashi.courage.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.void_sword.name,공허의 검,Void Sword,Épée du vide,Spada del vuoto,Espada del vacío,空虚の剣,Σπαθί του Κενού,虚空之剑,虚空之剑
+card.musashi.void_sword.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.release.name,내려놓음,Release,Relâchement,Rilascio,Liberación,解き放ち,Απελευθέρωση,放下,放下
+card.musashi.release.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.sword_extreme.name,도류 극의,Sword Extreme,Extrême de l'épée,Estremo della spada,Extremo de la espada,刀流極意,Τελειότητα του Σπαθιού,刀流极意,刀流极意
+card.musashi.sword_extreme.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.flying_swallow.name,비연참,Flying Swallow,Hirondelle volante,Rondine volante,Golondrina voladora,飛燕斬,Χτύπημα του Ιπτάμενου Χελιδονιού,飞燕斩,飞燕斩
+card.musashi.flying_swallow.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.asura_cut.name,수라 참,Asura Cut,Coupe d'Asura,Taglio di Asura,Corte de Asura,修羅斬,Χτύπημα του Ασούρα,修罗斩,修罗斩
+card.musashi.asura_cut.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.battle_gaze.name,결전의 눈빛,Battle Gaze,Regard de bataille,Sguardo di battaglia,Mirada de batalla,決戦の眼差し,Βλέμμα Μάχης,决战注视,决战注视
+card.musashi.battle_gaze.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.torrent.name,격류,Torrent,Torrent,Torrente,Torrente,激流,Χείμαρρος,格流,格流
+card.musashi.torrent.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.zen_realm.name,선의 경지,Zen Realm,Royaume Zen,Reame Zen,Reino Zen,禅の境地,Σφαίρα Ζεν,禅之境界,禅之境界
+card.musashi.zen_realm.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.empty_guard.name,공수처,Empty Guard,Garde vide,Guardia vuota,Guardia vacía,空守り,Κενή Φρουρά,空守处,空守处
+card.musashi.empty_guard.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.detach.name,탈속,Detach,Détachement,Distacco,Desapego,脱俗,Απόσπαση,脱俗,脱俗
+card.musashi.detach.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.fierce_niten.name,맹렬한 이도,Fierce Niten,Féroce Niten,Feroce Niten,Feroz Niten,猛烈な二刀,Άγριο Νίτεν,猛烈双刀,猛烈双刀
+card.musashi.fierce_niten.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.twin_dragon.name,쌍룡섬,Twin Dragon,Dragon jumeau,Drago gemello,Dragón gemelo,双龍閃,Δίδυμος Δράκος,双龙闪,双龙闪
+card.musashi.twin_dragon.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.thousand_mile_cut.name,천리 베기,Thousand Mile Cut,Coupe des mille lieues,Taglio delle mille miglia,Corte de mil millas,千里斬り,Χτύπημα των Χιλίων Μιλίων,千里斩,千里斩
+card.musashi.thousand_mile_cut.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.peerless_cut.name,무쌍 베기,Peerless Cut,Coupe sans pareille,Taglio senza pari,Corte sin igual,無双斬り,Ασυναγώνιστο Χτύπημα,无双斩,无双斩
+card.musashi.peerless_cut.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.forward_cut.name,선검후참,Forward Cut,Coupe avant,Taglio in avanti,Corte hacia adelante,先剣後斬,Πρόσθιο Χτύπημα,先剑后斩,先剑后斩
+card.musashi.forward_cut.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.final_duel.name,마지막 결투,Final Duel,Duel final,Duello finale,Duelo final,最後の決闘,Τελική Μονομαχία,最终决斗,最终决斗
+card.musashi.final_duel.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.void_void.name,허허실실,Void Void,Vide du vide,Vuoto del vuoto,Vacío del vacío,虚虚実実,Κενό του Κενού,虚虚实实,虚虚实实
+card.musashi.void_void.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.clear_wind.name,청풍명월,Clear Wind,Vent clair,Vento chiaro,Viento claro,清風明月,Καθαρός Άνεμος,清风明月,清风明月
+card.musashi.clear_wind.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.undying.name,불생불멸,Undying,Immortel,Immortale,Inmortal,不生不滅,Αθάνατος,不生不灭,不生不灭
+card.musashi.undying.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.spirit_sword.name,영혼의 검,Spirit Sword,Épée de l'esprit,Spada dello spirito,Espada del espíritu,魂の剣,Σπαθί του Πνεύματος,灵魂之剑,灵魂之剑
+card.musashi.spirit_sword.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.five_rings_realm.name,오륜의 경지,Five Rings Realm,Royaume des cinq anneaux,Reame dei cinque anelli,Reino de los cinco anillos,五輪の境地,Σφαίρα των Πέντε Δακτυλίων,五轮境界,五轮境界
+card.musashi.five_rings_realm.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card_type.attack.name,공격,Attack,Attaque,Attacco,Ataque,攻撃,Επίθεση,攻击,攻击
+card_type.skill.name,기술,Skill,Compétence,Abilità,Habilidad,技術,Τεχνική,技术,技术
+card_type.power.name,권능,Power,Pouvoir,Potere,Poder,権能,Δύναμη,能力,能力
+card.joan_of_arc.choir.name,성가대,Choir,Chœur,Coro,Coro,聖歌隊,Χορωδία,圣咏团,圣咏团
+card.joan_of_arc.choir.archetype,(권능),(Power),(Pouvoir),(Potere),(Poder),(権能),(Δύναμη),(能力),(能力)
+card.genghis_khan.steppe_lord.name,초원의 군주,Steppe Lord,Seigneur de la steppe,Signore della steppa,Señor de la estepa,草原の君主,Άρχοντας της Στέπας,草原之主,草原之主
+card.genghis_khan.steppe_lord.archetype,(권능),(Power),(Pouvoir),(Potere),(Poder),(権能),(Δύναμη),(能力),(能力)
+card.musashi.sword_enlightenment.name,검의 깨달음,Sword Enlightenment,Éveil à l'épée,Risveglio della spada,Iluminación de la espada,剣の悟り,Φώτιση του Σπαθιού,剑之觉悟,剑之觉悟
+card.musashi.sword_enlightenment.archetype,(권능),(Power),(Pouvoir),(Potere),(Poder),(権能),(Δύναμη),(能力),(能力)

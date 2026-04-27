@@ -40,6 +40,8 @@ func _ready() -> void:
 	_lang_lbl.theme_type_variation = "SubLabel"
 	LabelUtils.fit_text(_lang_lbl, 18, 12)
 
+	_style_option_button()
+
 	_btn_close.theme_type_variation = "IconButton"
 	_btn_close.text = "✕"
 	_btn_close.alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -247,6 +249,50 @@ func _build_cursor_row() -> void:
 		hl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 	_refresh_seg()
+
+func _style_option_button() -> void:
+	var P := SacredPalette
+
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = P.INK_900
+	normal.border_color = P.BRASS_700
+	normal.set_border_width_all(1)
+	normal.set_content_margin(SIDE_LEFT, 10)
+	normal.set_content_margin(SIDE_RIGHT, 10)
+	normal.set_content_margin(SIDE_TOP, 6)
+	normal.set_content_margin(SIDE_BOTTOM, 6)
+
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.border_color = P.BRASS_500
+	hover.bg_color = Color(P.INK_900.r, P.INK_900.g, P.INK_900.b, 0.9)
+
+	var focus := normal.duplicate() as StyleBoxFlat
+	focus.border_color = P.BRASS_500
+
+	_lang_opt.add_theme_stylebox_override("normal", normal)
+	_lang_opt.add_theme_stylebox_override("hover", hover)
+	_lang_opt.add_theme_stylebox_override("pressed", hover)
+	_lang_opt.add_theme_stylebox_override("focus", focus)
+	_lang_opt.add_theme_color_override("font_color", P.BONE_100)
+	_lang_opt.add_theme_color_override("font_hover_color", P.BRASS_300)
+	_lang_opt.add_theme_color_override("font_pressed_color", P.BRASS_300)
+
+	var popup := _lang_opt.get_popup()
+	var popup_panel := StyleBoxFlat.new()
+	popup_panel.bg_color = P.INK_1000
+	popup_panel.border_color = P.BRASS_700
+	popup_panel.set_border_width_all(1)
+	popup.add_theme_stylebox_override("panel", popup_panel)
+
+	var popup_hover := StyleBoxFlat.new()
+	popup_hover.bg_color = Color(P.BRASS_700.r, P.BRASS_700.g, P.BRASS_700.b, 0.35)
+	popup_hover.border_color = Color.TRANSPARENT
+	popup_hover.set_border_width_all(0)
+	popup.add_theme_stylebox_override("hover", popup_hover)
+
+	popup.add_theme_color_override("font_color", P.BONE_100)
+	popup.add_theme_color_override("font_hover_color", P.BRASS_300)
+	popup.add_theme_font_size_override("font_size", 14)
 
 func _unhandled_input(ev: InputEvent) -> void:
 	if visible and ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:

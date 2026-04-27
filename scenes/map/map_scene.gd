@@ -637,7 +637,7 @@ func _show_confirm_popup() -> void:
 
 	# 메시지
 	var msg := Label.new()
-	msg.text = "진행상황이 초기화됩니다.\n정말 뒤로가시겠습니까?"
+	msg.text = tr("ui.map.confirm_back.message")
 	msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	msg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	msg.position = Vector2(40.0, 36.0)
@@ -657,7 +657,7 @@ func _show_confirm_popup() -> void:
 	var bx    := (PW - total) * 0.5
 
 	var btn_ok := Button.new()
-	btn_ok.text = "확인"
+	btn_ok.text = tr("ui.map.confirm_back.ok")
 	btn_ok.theme_type_variation = "VowButton"
 	if mono_font:
 		btn_ok.add_theme_font_override("font", mono_font)
@@ -669,7 +669,7 @@ func _show_confirm_popup() -> void:
 	SacredTheme.animate_button(btn_ok)
 
 	var btn_cancel := Button.new()
-	btn_cancel.text = "취소"
+	btn_cancel.text = tr("ui.map.confirm_back.cancel")
 	btn_cancel.theme_type_variation = "PrimaryButton"
 	if mono_font:
 		btn_cancel.add_theme_font_override("font", mono_font)

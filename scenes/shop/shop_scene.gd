@@ -126,7 +126,7 @@ func _build_ui() -> void:
 	var exit_btn := Button.new()
 	exit_btn.theme_type_variation = "VowButton"
 	exit_btn.text = tr("ui.shop.btn_exit")
-	exit_btn.position = Vector2(860, 910)
+	exit_btn.position = Vector2(860, 928)
 	exit_btn.add_theme_font_size_override("font_size", 20)
 	exit_btn.pressed.connect(_on_exit)
 	add_child(exit_btn)
@@ -143,7 +143,7 @@ func _build_card_section() -> void:
 	sec_lbl.theme_type_variation = "EyebrowLabel"
 	sec_lbl.text                 = "— Cards —"
 	sec_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sec_lbl.position             = Vector2(460, 140)
+	sec_lbl.position             = Vector2(460, 142)
 	sec_lbl.size                 = Vector2(1000, 26)
 	add_child(sec_lbl)
 
@@ -159,7 +159,7 @@ func _build_card_section() -> void:
 		var cx := start_x + i * (CARD_W + CARD_GAP)
 
 		var node: CardScene = CARD_SCENE.instantiate()
-		node.position     = Vector2(cx, 172)
+		node.position     = Vector2(cx, 174)
 		node.pivot_offset = Vector2(CARD_W / 2.0, CARD_H)
 		node.setup(card, CardScene.Mode.REWARD)
 		add_child(node)
@@ -168,9 +168,18 @@ func _build_card_section() -> void:
 		node.mouse_entered.connect(func(): _show_card_hover(captured_node))
 		node.mouse_exited.connect(func():  _clear_card_hover(captured_node))
 
+		var price_lbl := Label.new()
+		price_lbl.text                 = "⛬ %dg" % price
+		price_lbl.theme_type_variation = "EyebrowLabel"
+		price_lbl.add_theme_font_size_override("font_size", 16)
+		price_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		price_lbl.position             = Vector2(cx, 382)
+		price_lbl.size                 = Vector2(CARD_W, 20)
+		add_child(price_lbl)
+
 		var btn := Button.new()
-		btn.text     = tr("ui.shop.btn_buy") % price
-		btn.position = Vector2(cx, 390)
+		btn.text     = tr("ui.shop.btn_buy_simple")
+		btn.position = Vector2(cx, 408)
 		btn.size     = Vector2(CARD_W, 36)
 		btn.add_theme_font_size_override("font_size", 13)
 		var captured_card := card
@@ -208,7 +217,7 @@ func _build_relic_section() -> void:
 	sec_lbl.theme_type_variation = "EyebrowLabel"
 	sec_lbl.text                 = "— Relics —"
 	sec_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sec_lbl.position             = Vector2(460, 444)
+	sec_lbl.position             = Vector2(460, 484)
 	sec_lbl.size                 = Vector2(1000, 26)
 	add_child(sec_lbl)
 
@@ -216,7 +225,7 @@ func _build_relic_section() -> void:
 		var empty_lbl := Label.new()
 		empty_lbl.theme_type_variation = "SubLabel"
 		empty_lbl.text                 = tr("ui.shop.relic_empty")
-		empty_lbl.position             = Vector2(660, 440)
+		empty_lbl.position             = Vector2(660, 480)
 		empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		empty_lbl.size                 = Vector2(600, 40)
 		add_child(empty_lbl)
@@ -229,7 +238,7 @@ func _build_relic_section() -> void:
 	for i in range(n):
 		var relic: Resource = relics[i]
 		var px := start_x + i * (RELIC_PANEL_W + RELIC_PANEL_GAP)
-		var py := 470
+		var py := 510
 		var hero_col: Color = _hero_color(relic.owner_hero_id)
 
 		# 패널 (INK_900 배경)
@@ -328,7 +337,7 @@ func _build_relic_section() -> void:
 
 		# 구매 버튼
 		var btn := Button.new()
-		btn.text     = "구매"
+		btn.text     = tr("ui.shop.btn_buy_simple")
 		btn.position = Vector2(260, 140)
 		btn.size     = Vector2(124, 38)
 		btn.add_theme_font_size_override("font_size", 14)
@@ -349,7 +358,7 @@ func _build_service_section() -> void:
 	sec_lbl.theme_type_variation = "EyebrowLabel"
 	sec_lbl.text                 = "— " + tr("ui.shop.sec_service") + " —"
 	sec_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sec_lbl.position             = Vector2(460, 710)
+	sec_lbl.position             = Vector2(460, 750)
 	sec_lbl.size                 = Vector2(1000, 26)
 	add_child(sec_lbl)
 
@@ -391,7 +400,7 @@ func _build_service_section() -> void:
 	var n := services.size()
 	var total_w := n * SVC_PANEL_W + (n - 1) * SVC_PANEL_GAP
 	var start_x: int = int((1920 - total_w) / 2.0)
-	var sy      := 738
+	var sy      := 778
 
 	for i in range(n):
 		var svc:    Dictionary = services[i]
@@ -466,7 +475,7 @@ func _build_service_section() -> void:
 
 		# 구매 버튼
 		var btn := Button.new()
-		btn.text     = "구매"
+		btn.text     = tr("ui.shop.btn_buy_simple")
 		btn.position = Vector2(260, 60)
 		btn.size     = Vector2(108, 35)
 		btn.add_theme_font_size_override("font_size", 14)

@@ -217,25 +217,33 @@ func _build_ui() -> void:
 	_energy_label.text = "0/3"
 	energy_hbox.add_child(_energy_label)
 
-	# 턴 종료 버튼 (Standard)
+	# 턴 종료 버튼 — Control wrapper로 감싸 크기 고정
+	var end_btn_wrap := Control.new()
+	end_btn_wrap.position = Vector2(WINDOW_W - 214, BOTTOM_Y + 16)
+	end_btn_wrap.size = Vector2(200, 54)
+	add_child(end_btn_wrap)
 	_end_turn_btn = Button.new()
-	_end_turn_btn.position = Vector2(WINDOW_W - 214, BOTTOM_Y + 16)
-	_end_turn_btn.size = Vector2(200, 54)
 	_end_turn_btn.text = tr("battle.btn_end_turn")
 	_end_turn_btn.add_theme_font_size_override("font_size", 18)
 	_end_turn_btn.disabled = true
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
-	add_child(_end_turn_btn)
+	end_btn_wrap.add_child(_end_turn_btn)
+	_end_turn_btn.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	LabelUtils.fit_text(_end_turn_btn, 18, 12, 168.0)
 	SacredTheme.animate_button(_end_turn_btn)
 
-	# 덱 보기 버튼 (Standard)
+	# 덱 보기 버튼 — Control wrapper로 감싸 크기 고정
+	var deck_wrap := Control.new()
+	deck_wrap.position = Vector2(WINDOW_W - 214, BOTTOM_Y + 78)
+	deck_wrap.size = Vector2(200, 54)
+	add_child(deck_wrap)
 	var deck_btn := Button.new()
-	deck_btn.position = Vector2(WINDOW_W - 214, BOTTOM_Y + 78)
-	deck_btn.size = Vector2(200, 54)
 	deck_btn.text = tr("ui.battle.btn_deck_view")
 	deck_btn.add_theme_font_size_override("font_size", 18)
 	deck_btn.pressed.connect(_show_deck_viewer_in_battle)
-	add_child(deck_btn)
+	deck_wrap.add_child(deck_btn)
+	deck_btn.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	LabelUtils.fit_text(deck_btn, 18, 12, 168.0)
 	SacredTheme.animate_button(deck_btn)
 
 	# 핸드존 구분선 — gradient rule + ✦ 다이아몬드
