@@ -106,7 +106,17 @@ ui.battle.deck_viewer.draw,드로우 파일,Draw Pile,Pioche,Pesca,Robo,ドロ�
 ui.battle.deck_viewer.discard,버린 덱,Discard Pile,Défausse,Scarto,Descarte,捨て山,Σωρός Απόρριψης,弃牌堆,弃牌堆
 ui.battle.deck_viewer.exhaust,소멸,Exhausted,Épuisé,Esaurite,Agotadas,消滅,Εξάντληση,消耗,消耗
 ui.battle.deck_viewer.empty,(비어 있음),(Empty),(Vide),(Vuoto),(Vacío),(空),(Κενό),(空),(空)
-""
+ui.chapter_clear.eyebrow,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —
+ui.chapter_clear.title_chapter,챕터 %s 완수,Chapter %s Complete,Chapitre %s Terminé,Capitolo %s Completato,Capítulo %s Completado,チャプター%s 完了,Κεφάλαιο %s Ολοκληρώθηκε,第%s章 完成,第%s章 完成
+ui.chapter_clear.title_all_complete,순례 완수,Pilgrimage Complete,Pèlerinage Accompli,Pellegrinaggio Compiuto,Peregrinaje Completado,巡礼完遂,Το Προσκύνημα Ολοκληρώθηκε,朝圣完成,朝聖完成
+ui.chapter_clear.subtitle_next,다음 문이 열렸다.,The next door has opened.,La prochaine porte s'est ouverte.,La prossima porta si è aperta.,La siguiente puerta se ha abierto.,次の扉が開いた。,Η επόμενη πόρτα άνοιξε.,下一扇门已开启。,下一扇門已開啟。
+"ui.chapter_clear.subtitle_all_complete","모든 길의 끝에서, 새로운 시작이 기다린다.","At the end of every road, a new beginning awaits.","Au bout de chaque route, un nouveau départ attend.","Alla fine di ogni strada, un nuovo inizio attende.","Al final de cada camino, un nuevo comienzo espera.",すべての道の終わりに、新たな始まりが待っている。,"Στο τέλος κάθε δρόμου, μια νέα αρχή περιμένει.","在每条路的尽头，新的开始在等待。","在每條路的盡頭，新的開始在等待。"
+ui.chapter_clear.stat_floor,최종 층,Final Floor,Étage Final,Piano Finale,Piso Final,最終フロア,Τελικό Επίπεδο,最终楼层,最終樓層
+ui.chapter_clear.stat_gold,획득 골드,Gold Earned,Or Gagné,Oro Guadagnato,Oro Ganado,獲得ゴールド,Χρυσός Αποκτηθείς,获得金币,獲得金幣
+ui.chapter_clear.stat_relics,보유 렐릭,Relics Held,Reliques Obtenues,Reliquie Ottenute,Reliquias Obtenidas,所持レリック,Αντικείμενα στην Κατοχή,持有遗物,持有遺物
+ui.chapter_clear.stat_survivors,생존 영웅,Heroes Standing,Héros Survivants,Eroi Sopravvissuti,Héroes Supervivientes,生存英雄,Επιζώντες Ήρωες,存活英雄,存活英雄
+ui.chapter_clear.btn_next_chapter,다음 챕터로,Next Chapter,Chapitre Suivant,Capitolo Successivo,Siguiente Capítulo,次のチャプターへ,Επόμενο Κεφάλαιο,下一章,下一章
+ui.chapter_clear.btn_main_menu,메인 메뉴,Main Menu,Menu Principal,Menu Principale,Menú Principal,メインメニュー,Κεντρικό Μενού,主菜单,主選單
 ui.event.choose_header,— 선택하라 —,— Choose —,— Choisir —,— Scegli —,— Elegir —,— 選択せよ —,— Επίλεξε —,— 选择 —,— 选择 —
 ui.event.tag.cost_gold,−0 코인,−0 Coin,−0 Pièce,−0 Moneta,−0 Moneda,−0 コイン,−0 Νόμισμα,−0 金币,−0 金币
 ui.event.tag.cost_hp,−0 HP,−0 HP,−0 PV,−0 PF,−0 PS,−0 HP,−0 ΖΩΗ,−0 血量,−0 血量

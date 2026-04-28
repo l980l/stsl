@@ -15,7 +15,7 @@ enemy.greek.erinyes,에리니에스,Erinyes,Erinyes,Erinni,Erinias,エリニュ�
 enemy.greek.hades,하데스,Hades,Hadès,Ade,Hades,ハデス,Άδης,哈迪斯,哈迪斯
 enemy.greek.ares_hound,아레스의 사냥개,Hound of Ares,Chien d'Arès,Levriero di Ares,Sabueso de Ares,アレスの猟犬,Σκύλος του Άρη,阿瑞斯之犬,阿瑞斯之犬
 enemy.greek.poseidon_apostle,포세이돈 사도,Apostle of Poseidon,Apôtre de Poséidon,Apostolo di Poseidone,Apóstol de Poseidón,ポセイドンの使徒,Απόστολος του Ποσειδώνα,波塞冬使者,波塞冬使者
-enemy.greek.hephaestus_automaton,헤파이스토스 자동기계,Hephaestus Automaton,Automate d'Héphaïstos,Automa di Efesto,Autómata de Hefesto,ヘファイ스트スの自動機械,Αυτόματο του Ηφαίστου,赫菲斯托斯机关人,赫菲斯托斯机关人
+enemy.greek.hephaestus_automaton,헤파이스토스 자동기계,Hephaestus Automaton,Automate d'Héphaïstos,Automa di Efesto,Autómata de Hefesto,ヘファイストスの自動機械,Αυτόματο του Ηφαίστου,赫菲斯托斯机关人,赫菲斯托斯机关人
 enemy.greek.kronos,크로노스,Kronos,Cronos,Crono,Cronos,クロノス,Κρόνος,克洛诺斯,克洛诺斯
 enemy.egyptian.sand_scout,사막 척후병,Sand Scout,Éclaireur des sables,Esploratore delle Sabbie,Explorador de Arena,砂漠の斥候,Πρόσκοπος της Άμμου,沙漠斥候,沙漠斥候
 enemy.egyptian.desert_scorpion,사막 전갈,Desert Scorpion,Scorpion du désert,Scorpione del Deserto,Escorpión del Desierto,砂漠のサソリ,Σκορπιός της Ερήμου,沙漠蝎子,沙漠蝎子
@@ -33,7 +33,7 @@ enemy.egyptian.ba_bird,바 새,Ba Bird,Oiseau Ba,Uccello Ba,Pájaro Ba,バーの
 enemy.egyptian.osiris,오시리스,Osiris,Osiris,Osiride,Osiris,オシリス,Όσιρις,奥西里斯,奥西里斯
 enemy.egyptian.apophis_serpent,아포피스의 뱀,Serpent of Apophis,Serpent d'Apophis,Serpente di Apophis,Serpiente de Apofis,アポフィスの蛇,Φίδι του Άποφι,阿波菲斯之蛇,阿波菲斯之蛇
 enemy.egyptian.set_tempest,세트의 폭풍,Tempest of Set,Tempête de Seth,Tempesta di Seth,Tempestad de Seth,セトの嵐,Καταιγίδα του Σεθ,赛特风暴,赛特风暴
-enemy.egyptian.isis_phantom,이시스의 환영,Phantom of Isis,Fantôme d'Isis,Fantasma di Iside,Fantasma de Isis,イ시스의 幻影,Φάντασμα της Ίσιδας,伊西斯幻影,伊西斯幻影
+enemy.egyptian.isis_phantom,이시스의 환영,Phantom of Isis,Fantôme d'Isis,Fantasma di Iside,Fantasma de Isis,イシスの幻影,Φάντασμα της Ίσιδας,伊西斯幻影,伊西斯幻影
 enemy.egyptian.ra_horakhty,라-호라크티,Ra-Horakhty,Rê-Horakhty,Ra-Horakhty,Ra-Horajti,ラー・ホルアクティ,Ρα-Ωράχτι,拉-霍拉克提,拉-霍拉克提
 enemy.norse.draugr,드라우그르,Draugr,Draugr,Draugr,Draugr,ドラウグル,Ντράουγκρ,尸鬼,尸鬼
 enemy.norse.urdr_spider,우르드의 거미,Urdr's Spider,Araignée d'Urd,Ragno di Urdr,Araña de Urd,ウルズの蜘蛛,Αράχνη της Ούρντ,兀儿德之蛛,兀儿德之蛛
@@ -44,7 +44,7 @@ enemy.norse.garlarr_snake,갸르라르 뱀,Garlarr Snake,Serpent Garlarr,Serpent
 enemy.norse.nidhogg_larva,니드호그 유충,Nidhogg Larva,Larve de Nidhogg,Larva di Nidhogg,Larva de Nidhogg,ニーズヘッグの幼虫,Λάρβα του Νίντχογκ,尼德霍格幼虫,尼德霍格幼虫
 enemy.norse.skoll,스콜 늑대,Sköll Wolf,Loup Sköll,Lupo Sköll,Lobo Sköll,スコルの狼,Λύκος Σκολ,斯库尔狼,斯库尔狼
 enemy.norse.hrimthurs_scout,서리 거인 척후,Hrimthurs Scout,Éclaireur Hrimthurs,Esploratore Hrimthurs,Explorador Hrimthurs,霜の巨人の斥候,Πρόσκοπος Χρίμθουρς,霜巨人斥候,霜巨人斥候
-enemy.norse.fjorgynn,피요르기닌,Fjörgyn,Fjörgyn,Fjörgyn,Fjörgyn,フィヨルギュン,Φιοργκύν,费욜균,费욜균
+enemy.norse.fjorgynn,피요르기닌,Fjörgyn,Fjörgyn,Fjörgyn,Fjörgyn,フィヨルギュン,Φιοργκύν,费约尔根,費約根
 enemy.norse.troll_warrior,트롤 전사,Troll Warrior,Guerrier Troll,Guerriero Troll,Guerrero Troll,トロール戦士,Πολεμιστής Τρολ,巨魔战士,巨魔战士
 enemy.norse.norn,운명의 여신 노른,Norn of Fate,Norne du Destin,Norna del Destino,Norna del Destino,運命の女神ノルン,Νόρνα του Πεπρωμένου,命运女神诺恩,命运女神诺恩
 enemy.norse.vanir_elf,바나헤임 엘프,Vanaheim Elf,Elfe de Vanaheim,Elfo di Vanaheim,Elfo de Vanaheim,ヴァナヘイムのエルフ,Ξωτικό του Βάναχαϊμ,华纳海姆精灵,华纳海姆精灵
@@ -58,7 +58,7 @@ enemy.korean.cheoyong,처용,Cheoyong,Cheoyong,Cheoyong,Cheoyong,処容,Τσεο
 enemy.korean.dokkaebi,도깨비,Dokkaebi,Dokkaebi,Dokkaebi,Dokkaebi,トッケビ,Ντοκάεμπι,独角鬼,独角鬼
 enemy.korean.three_legged_crow,삼족오,Three-Legged Crow,Corbeau à trois pattes,Corvo a tre zampe,Cuervo de tres patas,三足烏,Τρίποδο Κοράκι,三足乌,三足乌
 enemy.korean.gumiho,구미호,Gumiho (Nine-Tailed Fox),Gumiho (Renard à neuf queues),Gumiho (Volpe a nove code),Gumiho (Zorro de nueve colas),九尾の狐,Γκουμιχό,九尾狐,九尾狐
-enemy.korean.bulgasari,불가사리,Bulgasari,Bulgasari,Bulgasari,Bulgasari,プルガサ리,Μπουλγκασάρι,不可杀,不可杀
+enemy.korean.bulgasari,불가사리,Bulgasari,Bulgasari,Bulgasari,Bulgasari,プルガサリ,Μπουλγκασάρι,不可杀,不可杀
 enemy.korean.haechi,해치,Haechi,Haechi,Haechi,Haechi,ヘチ,Χαέτσι,獬豸,獬豸
 enemy.korean.jangseung,장승,Jangseung,Jangseung,Jangseung,Jangseung,チャンスン,Τζανγκσεόνγκ,长丞,长丞
 enemy.korean.haemosu,해모수,Haemosu,Haemosu,Haemosu,Haemosu,ヘモス,Χεμοσού,解慕漱,解慕漱
@@ -86,7 +86,7 @@ enemy.japanese.yasha,야샤,Yasha,Yasha,Yasha,Yasha,夜叉,Γιάσα,夜叉,夜
 enemy.japanese.nureriyon,누레리온,Nurarihyon,Nurarihyon,Nurarihyon,Nurarihyon,ぬらりひょん,Νουραριχιόν,滑瓢,滑瓢
 enemy.japanese.shuten_doji,슈텐도지,Shuten-doji,Shuten-doji,Shuten-doji,Shuten-doji,酒呑童子,Σούτεν-ντότζι,酒吞童子,酒吞童子
 enemy.japanese.iwato_guardian,아마노이와토 수문장,Amano-Iwato Guardian,Gardien d'Amano-Iwato,Guardiano di Amano-Iwato,Guardián de Amano-Iwato,天岩戸の守衛,Φύλακας του Αμάνο-Ιουάτο,天岩户守门人,天岩户守门人
-enemy.japanese.susanoo_blade,스사노오의 검,Blade of Susanoo,Lame de Susanoo,Lama di Susanoo,Filo de Susanoo,スサ노オの剣,Λεπίδα του Σουσανόο,素盏呜尊之剑,素盏呜尊之剑
+enemy.japanese.susanoo_blade,스사노오의 검,Blade of Susanoo,Lame de Susanoo,Lama di Susanoo,Filo de Susanoo,スサノオの剣,Λεπίδα του Σουσανόο,素盏呜尊之剑,素盏呜尊之剑
 enemy.japanese.blizzard_queen,유키온나의 여왕,Blizzard Queen,Reine du blizzard,Regina della Tormenta,Reina de la Ventisca,雪女の女王,Βασίλισσα της Χιονοθύελλας,雪女之女王,雪女之女王
 enemy.japanese.yamata_no_orochi,야마타노오로치,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi,八岐大蛇,Γιαμάτα νο Ορότσι,八岐大蛇,八岐大蛇
 enemy.chinese.yaksha,야차,Yaksha,Yaksha,Yaksha,Yaksha,夜叉,Γιάκσα,夜叉,夜叉

@@ -2,7 +2,7 @@
 effect.damage.text,피해 %d%s%s,Deal %d%s%s damage,Inflige %d%s%s dégâts,Infligge %d%s%s danni,Inflige %d%s%s de daño,%d%s%sダメージ,Προκάλεσε %d%s%s ζημιά,造成 %d%s%s 伤害,造成 %d%s%s 伤害
 effect.block.text,방어 %d,Gain %d Block,Gagne %d d'Armure,Ottieni %d Scudo,Gana %d de Escudo,ブロック %d,Κέρδισε %d Άμυνα,获得 %d 护甲,获得 %d 护甲
 effect.block_all.text,전체 방어 %d,Gain %d Block to all,Gagne %d d'Armure à tous,Ottieni %d Scudo a tutti,Gana %d de Escudo a todos,全員にブロック %d,Κέρδισε %d Άμυνα για όλους,全体获得 %d 护甲,全体获得 %d 护甲
-effect.formation_block.text,영웅수×%d 방어,Gain %d Block per Hero,Gagne %d d'Armure par Héros,Ottieni %d Scudo per Eroe,Gana %d de Escudo por Héroe,英雄数×%d ブ록,Κέρδισε %d Άμυνα ανά Ήρωα,英雄数×%d 护甲,英雄数×%d 护甲
+effect.formation_block.text,영웅수×%d 방어,Gain %d Block per Hero,Gagne %d d'Armure par Héros,Ottieni %d Scudo per Eroe,Gana %d de Escudo por Héroe,英雄数×%d ブロック,Κέρδισε %d Άμυνα ανά Ήρωα,英雄数×%d 护甲,英雄数×%d 护甲
 effect.draw.text,드로우 %d,Draw %d,Piochez %d,Pesca %d,Roba %d,ドロー %d,Τράβηξε %d,抽 %d 张牌,抽 %d 张牌
 effect.energy.text,에너지 +%d,Gain %d Energy,Gagne %d Énergie,Guadagna %d Energia,Gana %d de Energía,エネルギー +%d,Κέρδισε %d Ενέργεια,能量 +%d,能量 +%d
 effect.heal.text,회복 %d,Heal %d,Soigne %d,Cura %d,Cura %d,回復 %d,Θεράπευσε %d,恢复 %d,恢复 %d
@@ -18,13 +18,13 @@ effect.charm.text,매혹 %d,Charm %d,Charme %d,Fascino %d,Encanto %d,魅惑 %d,�
 effect.revive.text,부활 %d%%,Revive with %d%% HP,Ressuscite avec %d%% PV,Rianima con %d%% PS,Revive con %d%% PV,復活 %d%%,Αναβίωση με %d%% HP,复活 %d%%,复活 %d%%
 effect.sacrifice_hp.text,자기 HP -%d,Lose %d HP,Perds %d PV,Perdi %d PS,Pierde %d PV,自己HP -%d,Χάσε %d HP,自身生命 -%d,自身生命 -%d
 effect.cost_zero_turn.text,이번 턴 코스트 0,Cost 0 this turn,Coût 0 ce tour,Costo 0 questo turno,Coste 0 este turno,このターンコスト0,Κόστος 0 αυτόν τον γύρο,本回合费用为0,本回合费用为0
-effect.block_per_cards_played.text,카드수×%d 방어,%d Block per card played,%d Armure par carte jouée,%d Scudo per carta giocata,%d Escudo por carta jugada,카드数×%d ブ록,%d Άμυνα ανά παιγμένο φύλλο,牌数×%d 护甲,牌数×%d 护甲
+effect.block_per_cards_played.text,카드수×%d 방어,%d Block per card played,%d Armure par carte jouée,%d Scudo per carta giocata,%d Escudo por carta jugada,カード数×%d ブロック,%d Άμυνα ανά παιγμένο φύλλο,牌数×%d 护甲,牌数×%d 护甲
 effect.on_kill_draw.text,처치시 드로우 %d,Draw %d on kill,Piochez %d par élimination,Pesca %d all'uccisione,Roba %d al matar,撃破時ドロー %d,Τράβηξε %d κατά την εξόντωση,击杀时抽 %d 张牌,击杀时抽 %d 张牌
 effect.purge_status.text,디버프 제거,Remove debuffs,Retire les malus,Rimuovi debuff,Elimina penalizaciones,デバフ除去,Αφαίρεση εξασθενήσεων,移除负面状态,移除负面状态
 effect.per_draw_dmg.text,드로우수×%d 피해,%d damage per draw,%d dégâts par pioche,%d danni per pesca,%d daño por robo,ドロー数×%d ダメージ,%d ζημιά ανά τράβηγμα,抽牌数×%d 伤害,抽牌数×%d 伤害
 effect.apply_status_poison.text,%s %d 데미지,%s %d damage,%s %d dégâts,%s %d danni,%s %d de daño,%s %d ダメージ,%s %d ζημιά,%s %d 伤害,%s %d 伤害
 effect.aoe_suffix, (전체), (All), (Tous), (Tutti), (Todos), (全体), (Όλοι), (全体), (全体)
-card.napoleon.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击,打击
+card.napoleon.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライク,Χτύπημα,打击,打击
 card.napoleon.strike.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
 card.napoleon.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
 card.napoleon.defend.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
@@ -140,7 +140,7 @@ card.cleopatra.wax_trap.name,밀납의 덫,Wax Trap,Piège de cire,Trappola di c
 card.cleopatra.wax_trap.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.sandstorm.name,모래 폭풍,Sandstorm,Tempête de sable,Tempesta di sabbia,Tormenta de arena,砂嵐,Αμμοθύελλα,沙尘暴,沙尘暴
 card.cleopatra.sandstorm.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
-card.cleopatra.nile_blessing.name,나일의 축복,Nile Blessing,Bénédiction du Nil,Benedizione del Nilo,Bendición del Nilo,ナイル의 祝福,Ευλογία του Νείλου,尼罗河的祝福,尼罗河的祝福
+card.cleopatra.nile_blessing.name,나일의 축복,Nile Blessing,Bénédiction du Nil,Benedizione del Nilo,Bendición del Nilo,ナイルの祝福,Ευλογία του Νείλου,尼罗河的祝福,尼罗河的祝福
 card.cleopatra.nile_blessing.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.snake_gaze.name,뱀의 눈빛,Snake Gaze,Regard du serpent,Sguardo del serpente,Mirada de serpiente,蛇の眼差し,Βλέμμα του Φιδιού,蛇之注视,蛇之注视
 card.cleopatra.snake_gaze.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
@@ -160,9 +160,9 @@ card.cleopatra.charming_language.name,매혹의 언어,Charming Language,Langage
 card.cleopatra.charming_language.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.desert_recipe.name,사막의 약법,Desert Recipe,Recette du désert,Ricetta del deserto,Receta del desierto,砂漠の薬法,Συνταγή της Ερήμου,沙漠药方,沙漠药方
 card.cleopatra.desert_recipe.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
-card.cleopatra.poison_judgment.name,독의 심판,Poison Judgment,Jugement du poison,Giudizio del veleno,Juicio de veneno,毒の審판,Κρίση του Δηλητηρίου,毒之审判,毒之审判
+card.cleopatra.poison_judgment.name,독의 심판,Poison Judgment,Jugement du poison,Giudizio del veleno,Juicio de veneno,毒の審判,Κρίση του Δηλητηρίου,毒之审判,毒之审判
 card.cleopatra.poison_judgment.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
-card.cleopatra.isis_fury.name,이시스의 분노,Isis' Fury,Fureur d'Isis,Furia di Iside,Furia de Isis,イシ스의 憤怒,Οργή της Ίσιδας,伊西斯之怒,伊西斯之怒
+card.cleopatra.isis_fury.name,이시스의 분노,Isis' Fury,Fureur d'Isis,Furia di Iside,Furia de Isis,イシスの憤怒,Οργή της Ίσιδας,伊西斯之怒,伊西斯之怒
 card.cleopatra.isis_fury.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
 card.cleopatra.poison_ritual.name,독살의 의식,Poison Ritual,Rituel d'empoisonnement,Rituale di avvelenamento,Ritual de envenenamiento,毒殺の儀式,Τελετουργικό Δηλητηρίασης,毒杀仪式,毒杀仪式
 card.cleopatra.poison_ritual.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
@@ -180,7 +180,7 @@ card.cleopatra.curse_crossroads.name,저주의 교차로,Curse Crossroads,Carref
 card.cleopatra.curse_crossroads.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
 card.cleopatra.poison_throne.name,독의 왕좌,Poison Throne,Trône de poison,Trono del veleno,Trono de veneno,毒の王座,Θρόνος του Δηλητηρίου,毒之王座,毒之王座
 card.cleopatra.poison_throne.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
-card.cleopatra.isis_judgment.name,이시스의 심판,Isis' Judgment,Jugement d'Isis,Giudizio di Iside,Juicio de Isis,イシスの審판,Κρίση της Ίσιδας,伊西斯的审判,伊西斯的审判
+card.cleopatra.isis_judgment.name,이시스의 심판,Isis' Judgment,Jugement d'Isis,Giudizio di Iside,Juicio de Isis,イシスの審判,Κρίση της Ίσιδας,伊西斯的审判,伊西斯的审判
 card.cleopatra.isis_judgment.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
 card.cleopatra.sekhmet_curse.name,세케메트의 저주,Sekhmet's Curse,Malédiction de Sekhmet,Maledizione di Sekhmet,Maldición de Sekhmet,セケメトの呪い,Κατάρα της Σεχμέτ,塞赫美特的诅咒,塞赫美特的诅咒
 card.cleopatra.sekhmet_curse.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
@@ -268,7 +268,7 @@ card.yi_sun_sin.warriors_resolve.name,전사의 각오,Warrior's Resolve,Résolu
 card.yi_sun_sin.warriors_resolve.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
 card.yi_sun_sin.phoenix.name,불사조,Phoenix,Phénix,Fenice,Fénix,不死鳥,Φοίνικας,不死鸟,不死鸟
 card.yi_sun_sin.phoenix.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
-card.joan_of_arc.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击,打击
+card.joan_of_arc.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライク,Χτύπημα,打击,打击
 card.joan_of_arc.strike.archetype,신성,,,,,,,,
 card.joan_of_arc.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
 card.joan_of_arc.defend.archetype,신성,,,,,,,,
@@ -348,7 +348,7 @@ card.joan_of_arc.joan_return.name,잔 다르크의 귀환,Joan's Return,Retour d
 card.joan_of_arc.joan_return.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.holy_war.name,성전,Holy War,Guerre sainte,Guerra santa,Guerra santa,聖戦,Ιερός Πόλεμος,圣战,圣战
 card.joan_of_arc.holy_war.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
-card.genghis_khan.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击,打击
+card.genghis_khan.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライク,Χτύπημα,打击,打击
 card.genghis_khan.strike.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
 card.genghis_khan.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
 card.genghis_khan.defend.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
@@ -428,7 +428,7 @@ card.genghis_khan.war_tribute.name,전쟁의 대가,War Tribute,Tribut de guerre
 card.genghis_khan.war_tribute.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
 card.genghis_khan.great_steppe_siege.name,대초원의 포위,Great Steppe Siege,Siège de la grande steppe,Assedio della grande steppa,Asedio de la gran estepa,大草原の包囲,Πολιορκία της Μεγάλης Στέπας,大草原的围攻,大草原的围攻
 card.genghis_khan.great_steppe_siege.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
-card.musashi.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライ크,Χτύπημα,打击,打击
+card.musashi.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライク,Χτύπημα,打击,打击
 card.musashi.strike.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
 card.musashi.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
 card.musashi.defend.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
