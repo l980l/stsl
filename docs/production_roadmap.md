@@ -618,6 +618,45 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ---
 
+## Milestone 11 — 포스트런치 엔드게임 (출시 후)
+
+> **배경:** MVP 출시 이후 숙련 플레이어의 장기 리플레이어빌리티 확보. Slay the Spire의 Ascension 시스템 같은 다회차 난이도 단계가 표준 해법.
+> 출시 차단 요소는 아니지만, 출시 후 첫 메이저 업데이트의 핵심 컨텐츠 후보.
+
+### 11-1. Ascension(승천) 시스템
+
+**핵심 설계 (사전 조사 2026-04-28):**
+- **진척도 단위:** 챕터별 (`chapter_ascension_max[chapter] = int`). 영웅별 진척도는 stsl 챕터 분리 구조에 맞지 않아 채택 안 함.
+- **단계 수:** 10단계 (A1~A10). 슬더스 20단계는 stsl 컨텐츠 풀(2챕터·6영웅)에 과함.
+- **모디파이어 누적 방식:** A_N 클리어 → A_(N+1) 해금. 단계마다 모디파이어 1개씩 추가.
+- **모디파이어 카테고리 후보:** 적 HP/공격력 단계 증가, 휴식 회복량 차감, 카드 보상 풀 축소, 시작 HP 차감, 시작 덱 저주 카드 추가, Act 1 엘리트 +1, 보스 HP +20% 등.
+
+**통합 후크 지점 (실제 구현 시):**
+- `autoload/progress_manager.gd` — `chapter_ascension_max` 필드 + JSON v2 마이그레이션
+- `autoload/game_manager.gd:start_run()` — `ascension: int` 인자 추가
+- `autoload/game_manager.gd:_apply_act_difficulty()` — 기존 Act 배율과 ASC 곱셈자 합성
+- `autoload/game_manager.gd:_end_run_won()` — ASC 클리어 기록·다음 단계 해금
+- `autoload/ascension_modifiers.gd` — 신규 정적 모디파이어 모음
+- `scenes/chapter_select/` — 챕터 카드에 ASC 선택 위젯
+- `scenes/chapter_clear/` — ASC 클리어 통계 행 + "다음 ASC 도전" 버튼
+- `scenes/ui/ascension_unlock_toast.tscn` — `hero_unlock_toast` 패턴 복제
+- `resources/translations/strings_ui.csv` — `ui.ascension.*` 키 9언어
+
+**작업 항목:**
+- 🔲 11-1-1. ProgressManager 확장 + JSON v2 마이그레이션
+- 🔲 11-1-2. AscensionModifiers 정적 모듈 + 모디파이어 10종 정의
+- 🔲 11-1-3. start_run / _apply_act_difficulty / 보상 함수 4곳 후크
+- 🔲 11-1-4. 챕터 선택·클리어 화면 UI
+- 🔲 11-1-5. ASC 해금 토스트
+- 🔲 11-1-6. 번역 키 9언어 (모디파이어 설명 10종)
+- 🔲 11-1-7. 단위 테스트 (모디파이어 함수 + 진척도 갱신)
+
+### 11-2. (TBD) 데일리 챌린지 / 시드 공유 등 추가 엔드게임 컨텐츠
+
+후보 — 미정.
+
+---
+
 ## 우선순위 요약
 
 > 최종 갱신: 2026-04-27 v9. PR #85~#92 반영 — Sacred UI 디자인 시스템·맵 아이콘·알고리즘·이벤트 i18n·격자 셰이더·설정 오버레이 개선.
