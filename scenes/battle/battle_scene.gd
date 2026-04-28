@@ -120,6 +120,21 @@ func _build_ui() -> void:
 	bg.size = Vector2(WINDOW_W, WINDOW_H)
 	add_child(bg)
 
+	const _BG_MAP := {1: "mediterranean", 2: "eastasia"}
+	var bg_id: String = _BG_MAP.get(GameManager.current_chapter, "")
+	if bg_id != "":
+		var bg_path := "res://assets/art/backgrounds/%s.png" % bg_id
+		if ResourceLoader.exists(bg_path):
+			var bg_tex := TextureRect.new()
+			bg_tex.texture = load(bg_path)
+			bg_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			bg_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			bg_tex.position = Vector2.ZERO
+			bg_tex.size = Vector2(WINDOW_W, WINDOW_H)
+			bg_tex.modulate = Color(1, 1, 1, 0.55)
+			bg_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			add_child(bg_tex)
+
 	# 상단 배너 (eyebrow + 메시지 + gradient 구분선)
 	var banner := Control.new()
 	banner.position = Vector2(WINDOW_W / 2.0 - 300, 0)
