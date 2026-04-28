@@ -27,6 +27,16 @@ enum EffectType {
 	ON_KILL_DRAW,    # 적 처치 시 DRAW n (칭기즈칸 붉은 지평선)
 	PURGE_STATUS,    # 아군 디버프(POISON/WEAK/VULNERABLE) 제거. target=SINGLE/ALL
 	PER_DRAW_DMG,    # 이번 턴 드로우 카드 수 × value 데미지 (칭기즈칸 사막 기마)
+	DAMAGE_PER_BLOCK,     # caster 현재 BLOCK × value/100 데미지
+	DAMAGE_PER_DEAD_ALLY, # 사망 아군 수 × value 데미지
+	DOUBLE_NEXT_DAMAGE,   # 다음 DAMAGE 효과 ×2 (power 슬롯 등록)
+	EXHAUST_DRAW,         # 손패 1장 소진 → DRAW value장 + 에너지 +1
+	MORALE_TO_BLOCK,      # caster morale × value BLOCK
+	DAMAGE_PER_HAND_SIZE, # 손패 1장당 value 데미지
+	DAMAGE_PER_TOKEN,     # caster 살아있는 토큰 수 × value 데미지
+	HEAL_PER_DEAD_ALLY,   # 사망 아군 수 × value HP 회복. target=SINGLE/ALL
+	ENERGY_TO_DAMAGE,     # 남은 에너지 × value 데미지 + 에너지 소진
+	STATUS_DOUBLE,        # 대상 적 weak/vulnerable/poison/charm 스택 ×2
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
@@ -101,4 +111,14 @@ func display_text() -> String:
 		EffectType.ON_KILL_DRAW:        return TranslationServer.translate("effect.on_kill_draw.text") % value
 		EffectType.PURGE_STATUS:        return TranslationServer.translate("effect.purge_status.text")
 		EffectType.PER_DRAW_DMG:        return TranslationServer.translate("effect.per_draw_dmg.text") % value
+		EffectType.DAMAGE_PER_BLOCK:     return TranslationServer.translate("effect.damage_per_block.text") % value
+		EffectType.DAMAGE_PER_DEAD_ALLY: return TranslationServer.translate("effect.damage_per_dead_ally.text") % value
+		EffectType.DOUBLE_NEXT_DAMAGE:   return TranslationServer.translate("effect.double_next_damage.text")
+		EffectType.EXHAUST_DRAW:         return TranslationServer.translate("effect.exhaust_draw.text") % value
+		EffectType.MORALE_TO_BLOCK:      return TranslationServer.translate("effect.morale_to_block.text") % value
+		EffectType.DAMAGE_PER_HAND_SIZE: return TranslationServer.translate("effect.damage_per_hand_size.text") % value
+		EffectType.DAMAGE_PER_TOKEN:     return TranslationServer.translate("effect.damage_per_token.text") % value
+		EffectType.HEAL_PER_DEAD_ALLY:   return TranslationServer.translate("effect.heal_per_dead_ally.text") % value
+		EffectType.ENERGY_TO_DAMAGE:     return TranslationServer.translate("effect.energy_to_damage.text") % value
+		EffectType.STATUS_DOUBLE:        return TranslationServer.translate("effect.status_double.text")
 	return ""

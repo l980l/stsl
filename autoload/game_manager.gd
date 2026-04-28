@@ -410,7 +410,7 @@ func _end_run_won() -> void:
 		_pm.mark_chapter_cleared(current_chapter)
 		_pm.check_unlock_conditions()
 	change_state(GameState.GAME_OVER)
-	_request_scene("res://scenes/game_over/game_over_scene.tscn")
+	_request_scene("res://scenes/chapter_clear/chapter_clear_scene.tscn")
 
 func upgrade_card(card: Resource) -> void:
 	if not card.can_upgrade():
@@ -780,7 +780,9 @@ func _request_scene(path: String) -> void:
 			var _sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
 			if _sm:
 				_sm.save()
-		SceneTransition.go(path)
+		var _st := get_node_or_null("/root/SceneTransition")
+		if _st:
+			_st.go(path)
 
 # ── 릴릭 시스템 ─────────────────────────────────
 

@@ -29,6 +29,8 @@ static func pool() -> Array:
 		_nile_doom(), _charming_assault(), _pharaoh_fury(),
 		_curse_crossroads(), _poison_throne(), _isis_judgment(),
 		_sekhmet_curse(),
+		# M6-5c 신규
+		_venom_bloom(),
 	]
 
 # ─────────────────────────────────────────
@@ -620,3 +622,15 @@ static func _sekhmet_curse() -> Resource:
 	e3.effect_type = EffRes.EffectType.APPLY_STATUS
 	e3.status_type = "poison"; e3.value = 4; e3.base_value = 4; e3.target = "ALL"
 	c.effects = [e1, e2, e3]; return c
+
+static func _venom_bloom() -> Resource:
+	# 독의 증식 — RARE, 2코, 기술: 대상 적 디버프 스택 ×2
+	var c := CardRes.new()
+	c.card_name = "card.cleopatra.venom_bloom.name"; c.owner_id = "cleopatra"
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.cleopatra.venom_bloom.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.STATUS_DOUBLE
+	e.value = 0; e.base_value = 0; e.target = "SINGLE"
+	c.effects = [e]; return c

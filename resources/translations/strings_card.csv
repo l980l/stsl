@@ -517,3 +517,33 @@ card.genghis_khan.steppe_lord.name,초원의 군주,Steppe Lord,Seigneur de la s
 card.genghis_khan.steppe_lord.archetype,(권능),(Power),(Pouvoir),(Potere),(Poder),(権能),(Δύναμη),(能力),(能力)
 card.musashi.sword_enlightenment.name,검의 깨달음,Sword Enlightenment,Éveil à l'épée,Risveglio della spada,Iluminación de la espada,剣の悟り,Φώτιση του Σπαθιού,剑之觉悟,剑之觉悟
 card.musashi.sword_enlightenment.archetype,(권능),(Power),(Pouvoir),(Potere),(Poder),(権能),(Δύναμη),(能力),(能力)
+effect.damage_per_block.text,방어도×%d%% 피해,%d%% of Block as damage,%d%% de l'Armure en dégâts,%d%% dello Scudo in danni,%d%% del Escudo en daño,ブロック×%d%%ダメージ,%d%% της Άμυνας ως ζημιά,护甲×%d%%伤害,護甲×%d%%傷害
+effect.damage_per_dead_ally.text,사망 아군×%d 피해,%d damage per dead ally,%d dégâts par allié mort,%d danni per alleato morto,%d daño por aliado muerto,死亡した仲間×%d ダメージ,%d ζημιά ανά νεκρό σύμμαχο,每位阵亡盟友%d伤害,每位陣亡盟友%d傷害
+effect.double_next_damage.text,다음 피해 ×2,Next damage ×2,Prochain dégât ×2,Prossimo danno ×2,Próximo daño ×2,次のダメージ ×2,Επόμενη ζημιά ×2,下次伤害×2,下次傷害×2
+effect.exhaust_draw.text,소진→드로우 %d+에너지+1,Exhaust→Draw %d+Energy+1,Épuise→Pioche %d+Énergie+1,Esaurisci→Pesca %d+Energia+1,Agota→Roba %d+Energía+1,消耗→ドロー %d+エナジー+1,Εξαντλεί→Τράβηξε %d+Ενέργεια+1,消耗→抽%d张+能量+1,消耗→抽%d張+能量+1
+effect.morale_to_block.text,사기×%d 방어,Morale×%d Block,Moral×%d Armure,Morale×%d Scudo,Moral×%d Escudo,士気×%d ブロック,Ηθικό×%d Άμυνα,士气×%d护甲,士氣×%d護甲
+effect.damage_per_hand_size.text,손패×%d 피해,Hand size×%d damage,Taille de main×%d dégâts,Taglia mano×%d danni,Tamaño de mano×%d daño,手札数×%d ダメージ,Χέρι×%d ζημιά,手牌数×%d伤害,手牌數×%d傷害
+effect.damage_per_token.text,토큰×%d 피해,Token×%d damage,Jeton×%d dégâts,Token×%d danni,Ficha×%d daño,トークン×%d ダメージ,Μάρκα×%d ζημιά,令牌×%d伤害,令牌×%d傷害
+effect.heal_per_dead_ally.text,사망 아군×%d 회복,%d heal per dead ally,%d soin par allié mort,%d cura per alleato morto,%d cura por aliado muerto,死亡した仲間×%d 回復,%d θεραπεία ανά νεκρό σύμμαχο,每位阵亡盟友%d恢复,每位陣亡盟友%d恢復
+effect.energy_to_damage.text,에너지×%d 피해,Energy×%d damage,Énergie×%d dégâts,Energia×%d danni,Energía×%d daño,エナジー×%d ダメージ,Ενέργεια×%d ζημιά,能量×%d伤害,能量×%d傷害
+effect.status_double.text,디버프 스택 ×2,Double debuff stacks,Double les malus,Raddoppia i debuff,Duplica penalizaciones,デバフスタック ×2,Διπλασιάζει τα debuffs,负面状态×2,負面狀態×2
+card.musashi.steel_strike.name,강철 일격,Steel Strike,Frappe d'acier,Colpo d'acciaio,Golpe de acero,鋼鉄の一撃,Χτύπημα Χάλυβα,钢铁一击,鋼鐵一擊
+card.musashi.steel_strike.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,雙刀流
+card.musashi.thousand_cuts.name,만 번의 베기,Thousand Cuts,Mille coupures,Mille tagli,Mil cortes,万剣の斬り,Χίλιες Κοπές,千刀斩,千刀斬
+card.musashi.thousand_cuts.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,雙刀流
+card.joan_of_arc.martyr_wrath.name,순교자의 분노,Martyr's Wrath,Colère du martyr,Ira del martire,Ira del mártir,殉教者の怒り,Οργή Μάρτυρα,殉道者之怒,殉道者之怒
+card.joan_of_arc.martyr_wrath.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
+card.joan_of_arc.dead_blessing.name,망자의 축복,Dead Blessing,Bénédiction des morts,Benedizione dei caduti,Bendición de los muertos,亡者の祝福,Ευλογία Νεκρών,亡者祝福,亡者祝福
+card.joan_of_arc.dead_blessing.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
+card.genghis_khan.soul_strike.name,영혼 베기,Soul Strike,Frappe de l'âme,Colpo dell'anima,Golpe del alma,魂の一撃,Χτύπημα Ψυχής,灵魂一击,靈魂一擊
+card.genghis_khan.soul_strike.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,機動
+card.genghis_khan.berserk_blow.name,광폭한 일격,Berserk Blow,Coup berserk,Colpo berserk,Golpe berserk,狂暴の一撃,Χτύπημα Μανίας,狂暴一击,狂暴一擊
+card.genghis_khan.berserk_blow.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,機動
+card.napoleon.legion_charge.name,군단의 진격,Legion Charge,Charge de la légion,Carica della legione,Carga de la legión,軍団の突進,돌격 Λεγεώνας,军团冲锋,軍團衝鋒
+card.napoleon.legion_charge.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,軍團
+card.napoleon.glory_shout.name,영광의 함성,Glory Shout,Cri de gloire,Grido di gloria,Grito de gloria,栄光の叫び,Κραυγή Δόξας,荣耀呐喊,榮耀吶喊
+card.napoleon.glory_shout.archetype,사기,Morale,Moral,Morale,Moral,士気,Ηθικό,士气,士氣
+card.cleopatra.venom_bloom.name,독의 증식,Venom Bloom,Floraison vénéneuse,Fioritura velenosa,Floración venenosa,毒の増殖,Ανθός Δηλητηρίου,毒性增殖,毒性增殖
+card.cleopatra.venom_bloom.archetype,독,Poison,Poison,Veleno,Veneno,毒,Δηλητήριο,毒,毒
+card.yi_sun_sin.discard_focus.name,결단의 정리,Discard Focus,Concentration et défausse,Concentrazione e scarto,Concentración y descarte,決断の整理,Ανασύνταξη Εστίασης,弃牌聚焦,棄牌聚焦
+card.yi_sun_sin.discard_focus.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龜船

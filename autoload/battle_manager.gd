@@ -291,6 +291,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
 				if owner_status.get("weak", 0) > 0:
 					dmg = int(dmg * 0.75)
+				# DOUBLE_NEXT_DAMAGE power 소비 — 이 DAMAGE 효과 한 번만 적용 후 소멸
+				var _dnd_key: String = "power.double_next_damage:" + card.owner_id
+				if _active_powers.has(_dnd_key):
+					dmg *= 2
+					_active_powers.erase(_dnd_key)
+					active_powers_changed.emit()
 				for _hit in range(effect.hit_count):
 					if effect.target == "ALL":
 						for i in range(_enemies.size()):
@@ -510,6 +516,76 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				if target_enemy_index >= 0 and _cards_drawn_this_turn > 0:
 					var dmg: int = _cards_drawn_this_turn * effect.value
 					_deal_damage_to_enemy(target_enemy_index, dmg)
+			EffectRes.EffectType.DAMAGE_PER_BLOCK:
+				var block: int = _hero_block.get(card.owner_id, 0)
+				var dmg: int = int(block * effect.value / 100.0)
+				if target_enemy_index >= 0 and dmg > 0:
+					_deal_damage_to_enemy(target_enemy_index, dmg)
+			EffectRes.EffectType.DAMAGE_PER_DEAD_ALLY:
+				if target_enemy_index >= 0 and team_mgr:
+					var dead_count: int = 0
+					for h in team_mgr.heroes:
+						if not team_mgr.is_alive(h.hero_id):
+							dead_count += 1
+					if dead_count > 0:
+						_deal_damage_to_enemy(target_enemy_index, dead_count * effect.value)
+			EffectRes.EffectType.DOUBLE_NEXT_DAMAGE:
+				_register_power("power.double_next_damage", card.owner_id, 1)
+			EffectRes.EffectType.EXHAUST_DRAW:
+				if deck_mgr and not deck_mgr.hand.is_empty():
+					deck_mgr.exhaust_card(deck_mgr.hand[deck_mgr.hand.size() - 1])
+					deck_mgr.draw_cards(effect.value)
+					_cards_drawn_this_turn += effect.value
+					deck_mgr.current_energy += 1
+					deck_mgr.energy_changed.emit(deck_mgr.current_energy)
+			EffectRes.EffectType.MORALE_TO_BLOCK:
+				var morale: int = _hero_status.get(card.owner_id, {}).get("morale", 0)
+				if morale > 0:
+					_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + morale * effect.value
+			EffectRes.EffectType.DAMAGE_PER_HAND_SIZE:
+				if target_enemy_index >= 0 and deck_mgr:
+					var hand_size: int = deck_mgr.hand.size()
+					if hand_size > 0:
+						_deal_damage_to_enemy(target_enemy_index, hand_size * effect.value)
+			EffectRes.EffectType.DAMAGE_PER_TOKEN:
+				if target_enemy_index >= 0:
+					var tokens: int = _hero_status.get(card.owner_id, {}).get("tokens", 0)
+					if tokens > 0:
+						_deal_damage_to_enemy(target_enemy_index, tokens * effect.value)
+			EffectRes.EffectType.HEAL_PER_DEAD_ALLY:
+				if team_mgr:
+					var dead_count: int = 0
+					for h in team_mgr.heroes:
+						if not team_mgr.is_alive(h.hero_id):
+							dead_count += 1
+					if dead_count > 0:
+						var heal_amt: int = dead_count * effect.value
+						if effect.target == "ALL":
+							for hero in team_mgr.heroes:
+								team_mgr.heal(hero.hero_id, heal_amt)
+						else:
+							team_mgr.heal(card.owner_id, heal_amt)
+			EffectRes.EffectType.ENERGY_TO_DAMAGE:
+				if target_enemy_index >= 0 and deck_mgr:
+					var energy: int = deck_mgr.current_energy
+					if energy > 0:
+						_deal_damage_to_enemy(target_enemy_index, energy * effect.value)
+						deck_mgr.current_energy = 0
+						deck_mgr.energy_changed.emit(0)
+			EffectRes.EffectType.STATUS_DOUBLE:
+				var sd_targets: Array = []
+				if effect.target == "ALL":
+					for i in range(_enemies.size()):
+						if _enemy_alive[i]:
+							sd_targets.append(i)
+				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+					sd_targets = [target_enemy_index]
+				for i in sd_targets:
+					for key in ["weak", "vulnerable", "poison_dmg", "charm"]:
+						var cur: int = _enemy_status[i].get(key, 0)
+						if cur > 0:
+							_enemy_status[i][key] = cur * 2
+							status_applied.emit(str(i), key, cur)
 	_apply_synergy_bonus(card, target_enemy_index)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
@@ -1017,7 +1093,7 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 
 func get_active_synergies() -> Array:
 	if team_mgr == null:
-		team_mgr = TeamManager
+		return []
 	var synergies: Array = []
 	var n: bool = team_mgr.is_alive("napoleon")
 	var y: bool = team_mgr.is_alive("yi_sun_sin")

@@ -31,6 +31,8 @@ static func pool() -> Array:
 		_thousand_mile_army(), _steppe_terror(), _war_tribute(),
 		_great_steppe_siege(),
 		_steppe_lord(),
+		# M6-5c 신규
+		_soul_strike(), _berserk_blow(),
 	]
 
 # ─────────────────────────────────────────
@@ -604,4 +606,28 @@ static func _steppe_lord() -> Resource:
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.draw_per_turn"
 	e.value = 1; e.base_value = 1
+	c.effects = [e]; return c
+
+static func _soul_strike() -> Resource:
+	# 영혼 베기 — UNCOMMON, 1코, 기술: 다음 피해 효과 ×2
+	var c := CardRes.new()
+	c.card_name = "card.genghis_khan.soul_strike.name"; c.owner_id = "genghis_khan"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.genghis_khan.soul_strike.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.DOUBLE_NEXT_DAMAGE
+	e.value = 0; e.base_value = 0
+	c.effects = [e]; return c
+
+static func _berserk_blow() -> Resource:
+	# 광폭한 일격 — RARE, 0코, 공격: 남은 에너지 × 6 피해 + 에너지 소진 (placeholder)
+	var c := CardRes.new()
+	c.card_name = "card.genghis_khan.berserk_blow.name"; c.owner_id = "genghis_khan"
+	c.cost = 0; c.card_type = CardRes.CardType.ATTACK
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.archetype = "card.genghis_khan.berserk_blow.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.ENERGY_TO_DAMAGE
+	e.value = 6; e.base_value = 6; e.target = "SINGLE"
 	c.effects = [e]; return c

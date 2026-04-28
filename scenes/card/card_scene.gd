@@ -53,7 +53,9 @@ func _create_glow_rect() -> void:
 	const H := 200.0 + PAD * 2.0
 	var glow := ColorRect.new()
 	var mat := ShaderMaterial.new()
-	mat.shader = SacredTheme._get_card_glow_shader()
+	var _theme := get_node_or_null("/root/SacredTheme")
+	if _theme:
+		mat.shader = _theme._get_card_glow_shader()
 	mat.set_shader_parameter("opacity", 0.0)
 	mat.set_shader_parameter("radius", 0.0)
 	mat.set_shader_parameter("edge_uv", Vector2((PAD + INSET) / W, (PAD + INSET) / H))
@@ -88,7 +90,9 @@ func tween_glow(alpha: float, duration: float) -> void:
 	if _glow_tween and _glow_tween.is_valid():
 		_glow_tween.kill()
 	var entering := alpha > 0.0
-	_glow_tween = SacredTheme.tween_glow_material(self, _glow_mat, alpha, 1.0 if entering else 0.0, duration, not entering)
+	var _theme2 := get_node_or_null("/root/SacredTheme")
+	if _theme2:
+		_glow_tween = _theme2.tween_glow_material(self, _glow_mat, alpha, 1.0 if entering else 0.0, duration, not entering)
 
 func setup(card: Resource, mode: int) -> void:
 	_card = card

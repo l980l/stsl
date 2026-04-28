@@ -27,6 +27,27 @@ func run_all() -> Dictionary:
 	test_conditional_dmg_dead_ally_count()
 	test_effect_condition_skip_when_false()
 	test_effect_condition_apply_when_true()
+	# M6-5c 신규 10종
+	test_damage_per_block_happy()
+	test_damage_per_block_zero_block()
+	test_damage_per_dead_ally_happy()
+	test_damage_per_dead_ally_no_dead()
+	test_double_next_damage_happy()
+	test_double_next_damage_no_power()
+	test_exhaust_draw_happy()
+	test_exhaust_draw_empty_hand()
+	test_morale_to_block_happy()
+	test_morale_to_block_no_morale()
+	test_damage_per_hand_size_happy()
+	test_damage_per_hand_size_empty_hand()
+	test_damage_per_token_happy()
+	test_damage_per_token_no_tokens()
+	test_heal_per_dead_ally_happy()
+	test_heal_per_dead_ally_no_dead()
+	test_energy_to_damage_happy()
+	test_energy_to_damage_no_energy()
+	test_status_double_happy()
+	test_status_double_no_status()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -272,3 +293,305 @@ func test_effect_condition_apply_when_true() -> void:
 	eff.condition = "hand_size_0"
 	bm._apply_card_effects(_make_card("musashi", [eff]), 0)
 	_assert(bm._hero_block.get("musashi", 0) == 100, "condition=hand_size_0: 핸드 비어있음 → BLOCK 100 발동")
+
+# ─────────────────────────────────────────────────
+# M6-5c 신규 10종
+# ─────────────────────────────────────────────────
+
+# 6. DAMAGE_PER_BLOCK
+func test_damage_per_block_happy() -> void:
+	print("[TestCardEffectsEngine] test_damage_per_block_happy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("musashi", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 블록 200, value=100 → 200 * 100 / 100 = 200 피해
+	bm._hero_block["musashi"] = 200
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE_PER_BLOCK
+	eff.value = 100; eff.base_value = 100; eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("musashi", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 300, "DAMAGE_PER_BLOCK: 블록 200 × 100% = 200 피해 (500→300)")
+
+func test_damage_per_block_zero_block() -> void:
+	print("[TestCardEffectsEngine] test_damage_per_block_zero_block")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("musashi", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 블록 0 → 피해 없음
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE_PER_BLOCK
+	eff.value = 100; eff.base_value = 100; eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("musashi", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 500, "DAMAGE_PER_BLOCK: 블록 0 → 피해 없음")
+
+# 7. DAMAGE_PER_DEAD_ALLY
+func test_damage_per_dead_ally_happy() -> void:
+	print("[TestCardEffectsEngine] test_damage_per_dead_ally_happy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 1000))
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	bm.team_mgr.add_hero(_make_hero("musashi", 100))
+	bm.setup_battle([_make_enemy(500)])
+	# 아군 2명 사망
+	bm.team_mgr.take_damage("napoleon", 100)
+	bm.team_mgr.take_damage("musashi", 100)
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE_PER_DEAD_ALLY
+	eff.value = 12; eff.base_value = 12; eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("joan_of_arc", [eff]), 0)
+	# 사망 2 × 12 = 24 피해
+	_assert(bm.get_enemy_hp(0) == 476, "DAMAGE_PER_DEAD_ALLY: 사망 2 × 12 = 24 피해 (500→476)")
+
+func test_damage_per_dead_ally_no_dead() -> void:
+	print("[TestCardEffectsEngine] test_damage_per_dead_ally_no_dead")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 1000))
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 모두 생존 → 피해 없음
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE_PER_DEAD_ALLY
+	eff.value = 12; eff.base_value = 12; eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("joan_of_arc", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 500, "DAMAGE_PER_DEAD_ALLY: 사망 아군 없음 → 피해 없음")
+
+# 8. DOUBLE_NEXT_DAMAGE
+func test_double_next_damage_happy() -> void:
+	print("[TestCardEffectsEngine] test_double_next_damage_happy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# DOUBLE_NEXT_DAMAGE 등록
+	var eff_dnd := EffectRes.new()
+	eff_dnd.effect_type = EffectRes.EffectType.DOUBLE_NEXT_DAMAGE
+	eff_dnd.value = 0
+	bm._apply_card_effects(_make_card("genghis_khan", [eff_dnd]), -1)
+	# 파워 등록 확인
+	_assert(bm._active_powers.has("power.double_next_damage:genghis_khan"), "DOUBLE_NEXT_DAMAGE: 파워 슬롯 등록됨")
+	# 다음 DAMAGE 50 → ×2 = 100 피해
+	var eff_dmg := EffectRes.new()
+	eff_dmg.effect_type = EffectRes.EffectType.DAMAGE
+	eff_dmg.value = 50; eff_dmg.base_value = 50; eff_dmg.target = "SINGLE"
+	bm._apply_card_effects(_make_card("genghis_khan", [eff_dmg]), 0)
+	_assert(bm.get_enemy_hp(0) == 400, "DOUBLE_NEXT_DAMAGE: 50 × 2 = 100 피해 (500→400)")
+	# 파워 소비 후 사라졌는지 확인
+	_assert(not bm._active_powers.has("power.double_next_damage:genghis_khan"), "DOUBLE_NEXT_DAMAGE: 파워 1회 소비 후 제거됨")
+
+func test_double_next_damage_no_power() -> void:
+	print("[TestCardEffectsEngine] test_double_next_damage_no_power")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 파워 없이 DAMAGE → 배율 없음
+	var eff_dmg := EffectRes.new()
+	eff_dmg.effect_type = EffectRes.EffectType.DAMAGE
+	eff_dmg.value = 50; eff_dmg.base_value = 50; eff_dmg.target = "SINGLE"
+	bm._apply_card_effects(_make_card("genghis_khan", [eff_dmg]), 0)
+	_assert(bm.get_enemy_hp(0) == 450, "DOUBLE_NEXT_DAMAGE: 파워 없으면 배율 미적용 (500→450)")
+
+# 9. EXHAUST_DRAW
+func test_exhaust_draw_happy() -> void:
+	print("[TestCardEffectsEngine] test_exhaust_draw_happy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	var dummy_card := CardRes.new(); dummy_card.card_name = "dummy"; dummy_card.cost = 0; dummy_card.effects = []
+	# 핸드 3장, 드로우 파일 3장
+	for _i in range(3):
+		bm.deck_mgr.hand.append(dummy_card)
+		bm.deck_mgr.draw_pile.append(dummy_card)
+	var energy_before: int = bm.deck_mgr.current_energy
+	# EXHAUST_DRAW value=2 → 손패 1장 소진, 2장 드로우, 에너지 +1
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.EXHAUST_DRAW
+	eff.value = 2; eff.base_value = 2
+	bm._apply_card_effects(_make_card("yi_sun_sin", [eff]), -1)
+	# 핸드: 3 - 1 + 2 = 4
+	_assert(bm.deck_mgr.hand.size() == 4, "EXHAUST_DRAW: 핸드 3→4 (1장 소진 + 2장 드로우)")
+	_assert(bm.deck_mgr.exhaust_pile.size() == 1, "EXHAUST_DRAW: exhaust_pile에 1장 이동됨")
+	_assert(bm.deck_mgr.current_energy == energy_before + 1, "EXHAUST_DRAW: 에너지 +1")
+
+func test_exhaust_draw_empty_hand() -> void:
+	print("[TestCardEffectsEngine] test_exhaust_draw_empty_hand")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 핸드 비어있음 → 전체 효과 스킵
+	bm.deck_mgr.hand.clear()
+	var energy_before: int = bm.deck_mgr.current_energy
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.EXHAUST_DRAW
+	eff.value = 2; eff.base_value = 2
+	bm._apply_card_effects(_make_card("yi_sun_sin", [eff]), -1)
+	_assert(bm.deck_mgr.hand.size() == 0, "EXHAUST_DRAW: 핸드 비어있으면 핸드 변화 없음")
+	_assert(bm.deck_mgr.current_energy == energy_before, "EXHAUST_DRAW: 핸드 비어있으면 에너지 변화 없음")
+
+# 10. MORALE_TO_BLOCK
+func test_morale_to_block_happy() -> void:
+	print("[TestCardEffectsEngine] test_morale_to_block_happy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 사기 5, value=1 → 블록 5
+	bm._hero_status["napoleon"] = {"morale": 5}
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.MORALE_TO_BLOCK
+	eff.value = 1; eff.base_value = 1; eff.target = "SELF"
+	bm._apply_card_effects(_make_card("napoleon", [eff]), -1)
+	_assert(bm._hero_block.get("napoleon", 0) == 5, "MORALE_TO_BLOCK: 사기 5 × 1 = 블록 5")
+
+func test_morale_to_block_no_morale() -> void:
+	print("[TestCardEffectsEngine] test_morale_to_block_no_morale")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 사기 0 → 블록 없음
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.MORALE_TO_BLOCK
+	eff.value = 1; eff.base_value = 1; eff.target = "SELF"
+	bm._apply_card_effects(_make_card("napoleon", [eff]), -1)
+	_assert(bm._hero_block.get("napoleon", 0) == 0, "MORALE_TO_BLOCK: 사기 0 → 블록 없음")
+
+# 11. DAMAGE_PER_HAND_SIZE
+func test_damage_per_hand_size_happy() -> void:
+	print("[TestCardEffectsEngine] test_damage_per_hand_size_happy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("musashi", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 핸드 3장, value=4 → 12 피해
+	var dummy_card := CardRes.new(); dummy_card.card_name = "dummy"; dummy_card.cost = 0; dummy_card.effects = []
+	for _i in range(3):
+		bm.deck_mgr.hand.append(dummy_card)
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE_PER_HAND_SIZE
+	eff.value = 4; eff.base_value = 4; eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("musashi", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 488, "DAMAGE_PER_HAND_SIZE: 핸드 3 × 4 = 12 피해 (500→488)")
+
+func test_damage_per_hand_size_empty_hand() -> void:
+	print("[TestCardEffectsEngine] test_damage_per_hand_size_empty_hand")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("musashi", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 핸드 비어있음 → 피해 없음
+	bm.deck_mgr.hand.clear()
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE_PER_HAND_SIZE
+	eff.value = 4; eff.base_value = 4; eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("musashi", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 500, "DAMAGE_PER_HAND_SIZE: 핸드 0 → 피해 없음")
+
+# 12. DAMAGE_PER_TOKEN
+func test_damage_per_token_happy() -> void:
+	print("[TestCardEffectsEngine] test_damage_per_token_happy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 토큰 3, value=5 → 15 피해
+	bm._hero_status["napoleon"] = {"tokens": 3}
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE_PER_TOKEN
+	eff.value = 5; eff.base_value = 5; eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("napoleon", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 485, "DAMAGE_PER_TOKEN: 토큰 3 × 5 = 15 피해 (500→485)")
+
+func test_damage_per_token_no_tokens() -> void:
+	print("[TestCardEffectsEngine] test_damage_per_token_no_tokens")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 토큰 0 → 피해 없음
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.DAMAGE_PER_TOKEN
+	eff.value = 5; eff.base_value = 5; eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("napoleon", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 500, "DAMAGE_PER_TOKEN: 토큰 0 → 피해 없음")
+
+# 13. HEAL_PER_DEAD_ALLY
+func test_heal_per_dead_ally_happy() -> void:
+	print("[TestCardEffectsEngine] test_heal_per_dead_ally_happy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 1000))
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	bm.setup_battle([_make_enemy(500)])
+	# 나폴레옹 사망, 잔다르크 HP 감소
+	bm.team_mgr.take_damage("napoleon", 100)
+	bm.team_mgr.take_damage("joan_of_arc", 200)
+	var joan_hp_before: int = bm.team_mgr.get_current_hp("joan_of_arc")
+	# HEAL_PER_DEAD_ALLY value=8, 사망 1 → 회복 8
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.HEAL_PER_DEAD_ALLY
+	eff.value = 8; eff.base_value = 8; eff.target = "SELF"
+	bm._apply_card_effects(_make_card("joan_of_arc", [eff]), -1)
+	_assert(bm.team_mgr.get_current_hp("joan_of_arc") == joan_hp_before + 8, "HEAL_PER_DEAD_ALLY: 사망 1 × 8 = 8 회복")
+
+func test_heal_per_dead_ally_no_dead() -> void:
+	print("[TestCardEffectsEngine] test_heal_per_dead_ally_no_dead")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 1000))
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	bm.team_mgr.take_damage("joan_of_arc", 200)
+	var joan_hp_before: int = bm.team_mgr.get_current_hp("joan_of_arc")
+	# 사망 아군 없음 → 회복 없음
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.HEAL_PER_DEAD_ALLY
+	eff.value = 8; eff.base_value = 8; eff.target = "SELF"
+	bm._apply_card_effects(_make_card("joan_of_arc", [eff]), -1)
+	_assert(bm.team_mgr.get_current_hp("joan_of_arc") == joan_hp_before, "HEAL_PER_DEAD_ALLY: 사망 아군 없음 → 회복 없음")
+
+# 14. ENERGY_TO_DAMAGE
+func test_energy_to_damage_happy() -> void:
+	print("[TestCardEffectsEngine] test_energy_to_damage_happy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 에너지 3, value=6 → 18 피해, 에너지 0
+	bm.deck_mgr.current_energy = 3
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.ENERGY_TO_DAMAGE
+	eff.value = 6; eff.base_value = 6; eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("genghis_khan", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 482, "ENERGY_TO_DAMAGE: 에너지 3 × 6 = 18 피해 (500→482)")
+	_assert(bm.deck_mgr.current_energy == 0, "ENERGY_TO_DAMAGE: 사용 후 에너지 0")
+
+func test_energy_to_damage_no_energy() -> void:
+	print("[TestCardEffectsEngine] test_energy_to_damage_no_energy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 에너지 0 → 피해 없음
+	bm.deck_mgr.current_energy = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.ENERGY_TO_DAMAGE
+	eff.value = 6; eff.base_value = 6; eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("genghis_khan", [eff]), 0)
+	_assert(bm.get_enemy_hp(0) == 500, "ENERGY_TO_DAMAGE: 에너지 0 → 피해 없음")
+
+# 15. STATUS_DOUBLE
+func test_status_double_happy() -> void:
+	print("[TestCardEffectsEngine] test_status_double_happy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 적에게 상태이상 설정
+	bm._enemy_status[0] = {"poison_dmg": 4, "weak": 2, "vulnerable": 0, "charm": 0}
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.STATUS_DOUBLE
+	eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("cleopatra", [eff]), 0)
+	_assert(bm._enemy_status[0].get("poison_dmg", 0) == 8, "STATUS_DOUBLE: poison_dmg 4 → 8")
+	_assert(bm._enemy_status[0].get("weak", 0) == 4, "STATUS_DOUBLE: weak 2 → 4")
+	_assert(bm._enemy_status[0].get("vulnerable", 0) == 0, "STATUS_DOUBLE: vulnerable 0은 변화 없음")
+
+func test_status_double_no_status() -> void:
+	print("[TestCardEffectsEngine] test_status_double_no_status")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 상태이상 없음 → 크래시 없이 통과
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.STATUS_DOUBLE
+	eff.target = "SINGLE"
+	bm._apply_card_effects(_make_card("cleopatra", [eff]), 0)
+	_assert(bm._enemy_status[0].get("poison_dmg", 0) == 0, "STATUS_DOUBLE: 상태이상 없으면 크래시 없이 0 유지")
