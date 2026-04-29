@@ -58,8 +58,6 @@ var _drag_t_offset: float = 0.0
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _circle_tex: ImageTexture = null
-var _glow_tex_h: GradientTexture2D = null
-var _glow_tex_v: GradientTexture2D = null
 var _last_card_play_pos: Vector2 = Vector2.ZERO
 var _popup_stack: Dictionary = {}
 var _grad_cache: Dictionary = {}
@@ -1468,56 +1466,39 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
 	)
 
-func _get_bracket_glow_tex(horizontal: bool) -> GradientTexture2D:
-	if horizontal and _glow_tex_h != null: return _glow_tex_h
-	if not horizontal and _glow_tex_v != null: return _glow_tex_v
-	var grad := Gradient.new()
-	grad.colors = PackedColorArray([Color(1,1,1,0), Color(1,1,1,1), Color(1,1,1,0)])
-	grad.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
-	var tex := GradientTexture2D.new()
-	tex.gradient = grad
-	tex.fill = GradientTexture2D.FILL_LINEAR
-	if horizontal:
-		tex.fill_from = Vector2(0.5, 0.0)
-		tex.fill_to   = Vector2(0.5, 1.0)
-		tex.width = 32
-		tex.height = 16
-		_glow_tex_h = tex
-	else:
-		tex.fill_from = Vector2(0.0, 0.5)
-		tex.fill_to   = Vector2(1.0, 0.5)
-		tex.width = 16
-		tex.height = 32
-		_glow_tex_v = tex
-	return tex
-
 func _start_target_bloom(panel: ColorRect, bloom_color: Color) -> void:
+	var panel_center := panel.size * 0.5
 	for child in panel.get_children():
 		if not child.get_meta("_corner_bracket", false):
 			continue
 		var br: ColorRect = child
+		var dir := ((br.position + br.size * 0.5) - panel_center).normalized()
+		var orig_pos := br.position
 		br.modulate = bloom_color
-		var is_h: bool = br.size.x > br.size.y
-		var glow_w: float = br.size.x + (4.0 if is_h else 14.0)
-		var glow_h: float = br.size.y + (14.0 if is_h else 4.0)
-		var tr := TextureRect.new()
-		tr.texture = _get_bracket_glow_tex(is_h)
-		tr.size = Vector2(glow_w, glow_h)
-		tr.position = br.position + br.size * 0.5 - Vector2(glow_w, glow_h) * 0.5
-		tr.modulate = Color(bloom_color.r, bloom_color.g, bloom_color.b, 0.0)
-		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		tr.set_meta("_corner_glow", true)
-		panel.add_child(tr)
-		var tw := tr.create_tween().set_loops()
-		tw.tween_property(tr, "modulate:a", 0.85, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tw.tween_property(tr, "modulate:a", 0.0,  0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		br.set_meta("_bloom_orig_pos", orig_pos)
+		var tw_p := br.create_tween().set_loops()
+		tw_p.tween_property(br, "position", orig_pos + dir * 5.0, 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw_p.tween_property(br, "position", orig_pos,              0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		br.set_meta("_bloom_tween_p", tw_p)
+		var tw_c := br.create_tween().set_loops()
+		tw_c.tween_property(br, "modulate:a", 0.2, 0.35).set_trans(Tween.TRANS_SINE)
+		tw_c.tween_property(br, "modulate:a", 1.0, 0.35).set_trans(Tween.TRANS_SINE)
+		br.set_meta("_bloom_tween_c", tw_c)
 
 func _stop_target_bloom(panel: ColorRect) -> void:
 	for child in panel.get_children():
-		if child.get_meta("_corner_bracket", false):
-			child.modulate = Color.WHITE
-		elif child.get_meta("_corner_glow", false):
-			child.queue_free()
+		if not child.get_meta("_corner_bracket", false):
+			continue
+		var br: ColorRect = child
+		for key in ["_bloom_tween_p", "_bloom_tween_c"]:
+			if br.has_meta(key):
+				var tw: Tween = br.get_meta(key)
+				if tw and tw.is_valid(): tw.kill()
+				br.remove_meta(key)
+		br.modulate = Color.WHITE
+		if br.has_meta("_bloom_orig_pos"):
+			br.position = br.get_meta("_bloom_orig_pos")
+			br.remove_meta("_bloom_orig_pos")
 
 func _make_circle_texture() -> ImageTexture:
 	var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
