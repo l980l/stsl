@@ -1507,7 +1507,7 @@ func _make_circle_texture() -> ImageTexture:
 			img.set_pixel(x, y, Color(1, 1, 1, a))
 	return ImageTexture.create_from_image(img)
 
-func _spawn_impact_particles(pos: Vector2, amount: int) -> void:
+func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false) -> void:
 	if amount <= 0:
 		return
 	if _circle_tex == null:
@@ -1527,7 +1527,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int) -> void:
 	p.lifetime = 0.35
 	p.one_shot = true
 	p.explosiveness = 1.0
-	p.direction = Vector2(-1, 0)
+	p.direction = Vector2(1 if flipped else -1, 0)
 	p.spread = 80.0
 	p.gravity = Vector2(0, 200)
 	p.initial_velocity_min = 120.0 + speed_bonus
@@ -1564,7 +1564,7 @@ func _on_hero_damaged(hero_id: String, amount: int) -> void:
 	if char_node:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
-		_spawn_impact_particles(char_node.position, amount)
+		_spawn_impact_particles(char_node.position, amount, true)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):
