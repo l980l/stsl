@@ -58,6 +58,7 @@ var _drag_t_offset: float = 0.0
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _circle_tex: ImageTexture = null
+var _last_card_play_pos: Vector2 = Vector2.ZERO
 var _popup_stack: Dictionary = {}
 var _grad_cache: Dictionary = {}
 var _token_tile_nodes: Dictionary = {}
@@ -1332,6 +1333,7 @@ func _on_enemy_turn_started() -> void:
 	_end_turn_btn.disabled = true
 	_selected_card = null
 	_message_label.text = tr("battle.msg_enemy_turn")
+	_last_card_play_pos = Vector2.ZERO
 	# 적 클릭 버튼 비활성
 	for entry in _enemy_nodes:
 		if entry["panel"].visible and not entry["btn"].disabled:
@@ -1464,6 +1466,37 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
 	)
 
+func _start_target_bloom(panel: ColorRect, bloom_color: Color) -> void:
+	var center := panel.size * 0.5
+	for child in panel.get_children():
+		if not child.get_meta("_corner_bracket", false):
+			continue
+		var br: ColorRect = child
+		var br_center := br.position + br.size * 0.5
+		var dir := (br_center - center).normalized()
+		var orig_pos := br.position
+		br.modulate = bloom_color
+		br.set_meta("_bloom_orig_pos", orig_pos)
+		var tw := br.create_tween().set_loops()
+		tw.tween_property(br, "position", orig_pos + dir * 6.0, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw.tween_property(br, "position", orig_pos, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		br.set_meta("_bloom_tween", tw)
+
+func _stop_target_bloom(panel: ColorRect) -> void:
+	for child in panel.get_children():
+		if not child.get_meta("_corner_bracket", false):
+			continue
+		var br: ColorRect = child
+		if br.has_meta("_bloom_tween"):
+			var tw: Tween = br.get_meta("_bloom_tween")
+			if tw and tw.is_valid():
+				tw.kill()
+			br.remove_meta("_bloom_tween")
+		br.modulate = Color.WHITE
+		if br.has_meta("_bloom_orig_pos"):
+			br.position = br.get_meta("_bloom_orig_pos")
+			br.remove_meta("_bloom_orig_pos")
+
 func _make_circle_texture() -> ImageTexture:
 	var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
 	var center := Vector2(3.5, 3.5)
@@ -1547,7 +1580,8 @@ func _on_enemy_damaged(index: int, amount: int) -> void:
 	if char_node:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
-		_spawn_impact_particles(char_node.position, amount)
+		var spark_pos: Vector2 = _last_card_play_pos if _last_card_play_pos != Vector2.ZERO else char_node.position
+		_spawn_impact_particles(spark_pos, amount)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):
@@ -2390,17 +2424,17 @@ func _start_drag(card: Resource) -> void:
 			_message_label.text = tr("battle.drag_enemy")
 			for i in range(_enemy_nodes.size()):
 				if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
-					_enemy_nodes[i]["panel"].color = Color(0.35, 0.12, 0.12)
+					_start_target_bloom(_enemy_nodes[i]["panel"], Color(2.0, 0.6, 0.3))
 		"ally":
 			_message_label.text = tr("battle.drag_ally")
 			for entry in _hero_nodes:
 				if entry["panel"].visible:
-					entry["panel"].color = Color(0.12, 0.25, 0.12)
+					_start_target_bloom(entry["panel"], Color(0.4, 2.0, 0.6))
 		"dead_ally":
 			_message_label.text = tr("battle.drag_dead_ally")
 			for entry in _hero_nodes:
 				if entry["panel"].visible and not TeamManager.is_alive(entry["hero_id"]):
-					entry["panel"].color = Color(0.25, 0.12, 0.35)
+					_start_target_bloom(entry["panel"], Color(1.0, 0.4, 2.0))
 		"none":
 			_message_label.text = tr("battle.drag_release")
 
@@ -2415,6 +2449,7 @@ func _finish_drag(drop_pos: Vector2) -> void:
 				if not panel.visible or not BattleManager.is_enemy_alive(i):
 					continue
 				if panel.get_global_rect().has_point(drop_pos):
+					_last_card_play_pos = drop_pos
 					BattleManager.play_card(_drag_card, i)
 					_cleanup_drag()
 					return
@@ -2427,6 +2462,7 @@ func _finish_drag(drop_pos: Vector2) -> void:
 				if not TeamManager.is_alive(hero_id):
 					continue
 				if entry["panel"].get_global_rect().has_point(drop_pos):
+					_last_card_play_pos = drop_pos
 					BattleManager.play_card(_drag_card, -1, hero_id)
 					_cleanup_drag()
 					return
@@ -2439,6 +2475,7 @@ func _finish_drag(drop_pos: Vector2) -> void:
 				if TeamManager.is_alive(hero_id):
 					continue
 				if entry["panel"].get_global_rect().has_point(drop_pos):
+					_last_card_play_pos = drop_pos
 					BattleManager.play_card(_drag_card, -1, hero_id)
 					_cleanup_drag()
 					return
@@ -2467,10 +2504,10 @@ func _cleanup_drag() -> void:
 	_message_label.text = tr("battle.msg_player_turn") if BattleManager.is_player_turn else ""
 	for entry in _enemy_nodes:
 		if entry["panel"].visible:
-			entry["panel"].color = Color(0, 0, 0, 0)
+			_stop_target_bloom(entry["panel"])
 	for entry in _hero_nodes:
 		if entry["panel"].visible:
-			entry["panel"].color = Color(0, 0, 0, 0)
+			_stop_target_bloom(entry["panel"])
 
 func _create_drag_arrow(start_pos: Vector2) -> void:
 	_drag_end_pos = start_pos
