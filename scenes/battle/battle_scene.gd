@@ -1361,6 +1361,36 @@ func _refresh_all_hero_ui() -> void:
 		if entry["hero_id"] != "":
 			_update_hero_ui(entry["hero_id"])
 
+const _HIT_FLASH_COLOR := Color(2.0, 0.6, 0.6, 1.0)
+
+func _play_hit_flash(node: Node2D) -> void:
+	if node == null: return
+	var prev: Tween = node.get_meta("_flash_tween", null)
+	if prev and prev.is_valid(): prev.kill()
+	node.modulate = Color.WHITE
+	var tw := create_tween().set_parallel(false)
+	tw.tween_property(node, "modulate", _HIT_FLASH_COLOR, 0.04)
+	tw.tween_property(node, "modulate", Color.WHITE, 0.08)
+	node.set_meta("_flash_tween", tw)
+
+func _play_hit_shake(node: Node2D, amount: int) -> void:
+	if node == null or amount <= 0: return
+	var prev: Tween = node.get_meta("_shake_tween", null)
+	if prev and prev.is_valid():
+		prev.kill()
+		node.position = node.get_meta("_shake_orig_pos", node.position)
+	var mag: float = 6.0
+	if amount >= 100: mag = 20.0
+	elif amount >= 30: mag = 12.0
+	var orig: Vector2 = node.position
+	node.set_meta("_shake_orig_pos", orig)
+	var tw := create_tween()
+	tw.tween_property(node, "position", orig + Vector2(-mag, 0), 0.04)
+	tw.tween_property(node, "position", orig + Vector2(mag * 0.7, 0), 0.06)
+	tw.tween_property(node, "position", orig + Vector2(-mag * 0.4, 0), 0.06)
+	tw.tween_property(node, "position", orig, 0.08)
+	node.set_meta("_shake_tween", tw)
+
 const _POPUP_FONT := preload("res://assets/fonts/IMFellEnglish-Italic.ttf")
 
 const _STATUS_POPUP_INFO := {
@@ -1428,12 +1458,15 @@ func _on_hero_damaged(hero_id: String, amount: int) -> void:
 			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
 			_spawn_damage_popup(popup_pos, amount, amount == 0, hero_id)
 			break
-	# hurt 애니메이션 트리거
+	# hurt 애니메이션 + hit 이펙트
 	var char_node = _hero_char_nodes.get(hero_id)
-	if char_node and char_node.has_node("AnimationPlayer"):
-		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-		if ap.has_animation("hurt"):
-			ap.play("hurt")
+	if char_node:
+		_play_hit_flash(char_node)
+		_play_hit_shake(char_node, amount)
+		if char_node.has_node("AnimationPlayer"):
+			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+			if ap.has_animation("hurt"):
+				ap.play("hurt")
 
 func _on_enemy_damaged(index: int, amount: int) -> void:
 	_update_enemy_ui(index)
@@ -1442,10 +1475,13 @@ func _on_enemy_damaged(index: int, amount: int) -> void:
 		var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
 		_spawn_damage_popup(popup_pos, amount, amount == 0, "enemy_%d" % index)
 	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
-	if char_node and char_node.has_node("AnimationPlayer"):
-		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-		if ap.has_animation("hurt"):
-			ap.play("hurt")
+	if char_node:
+		_play_hit_flash(char_node)
+		_play_hit_shake(char_node, amount)
+		if char_node.has_node("AnimationPlayer"):
+			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+			if ap.has_animation("hurt"):
+				ap.play("hurt")
 
 func _on_enemy_died(index: int) -> void:
 	_update_enemy_ui(index)

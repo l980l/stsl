@@ -22,12 +22,11 @@ func _build_animations() -> void:
 func _make_idle() -> Animation:
 	var a := Animation.new()
 	a.loop_mode = Animation.LOOP_LINEAR
-	a.length = 1.2
+	a.length = 1.0
 	var t := a.add_track(Animation.TYPE_VALUE)
 	a.track_set_path(t, "Body:position")
 	a.track_insert_key(t, 0.0, Vector2.ZERO)
-	a.track_insert_key(t, 0.6, Vector2(0, -8))
-	a.track_insert_key(t, 1.2, Vector2.ZERO)
+	a.track_insert_key(t, 1.0, Vector2.ZERO)
 	return a
 
 func _make_attack() -> Animation:
