@@ -47,6 +47,7 @@ static func _strike() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _defend() -> Resource:
@@ -75,6 +76,7 @@ static func _swift_advance() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.GAIN_MORALE
 	eb.value = 1; eb.base_value = 1
@@ -102,6 +104,7 @@ static func _hussar_charge() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 120; ea.base_value = 120; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.GAIN_MORALE
 	eb.value = 1; eb.base_value = 1
@@ -129,6 +132,7 @@ static func _salvo() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
+	ea.damage_type = "projectile"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.ENERGY
 	eb.value = 1; eb.base_value = 1
@@ -159,6 +163,7 @@ static func _arcole_breakthrough() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.BLOCK
 	eb.value = 80; eb.base_value = 80; eb.target = "SELF"
@@ -174,6 +179,7 @@ static func _artillery_volley() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 80; e.base_value = 80; e.target = "ALL"
+	e.damage_type = "explosive"
 	c.effects = [e]; return c
 
 static func _jena_surprise() -> Resource:
@@ -186,6 +192,7 @@ static func _jena_surprise() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "poison"; eb.value = 3; eb.base_value = 3; eb.target = "SINGLE"
@@ -203,6 +210,7 @@ static func _borodino_bombardment() -> Resource:
 	e.value = 140; e.base_value = 140
 	e.bonus_value = 200; e.base_bonus_value = 200
 	e.status_type = "has_morale"; e.target = "SINGLE"
+	e.damage_type = "explosive"
 	c.effects = [e]; return c
 
 static func _total_assault_order() -> Resource:
@@ -230,6 +238,7 @@ static func _emperors_command() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "ALL"
+	ea.damage_type = "explosive"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.GAIN_MORALE
 	eb.value = 2; eb.base_value = 2
@@ -246,6 +255,7 @@ static func _emperors_spirit() -> Resource:
 	ea.effect_type = EffRes.EffectType.CONSUME_MORALE
 	ea.value = 3; ea.base_value = 3
 	ea.bonus_value = 300; ea.base_bonus_value = 300; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "weak"; eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"
@@ -265,6 +275,7 @@ static func _advance_order() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.GAIN_MORALE
 	eb.value = 1; eb.base_value = 1
@@ -334,6 +345,7 @@ static func _cavalry_threat() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 static func _guard_charge() -> Resource:
@@ -349,6 +361,7 @@ static func _guard_charge() -> Resource:
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DAMAGE
 	eb.value = 80; eb.base_value = 80; eb.target = "SINGLE"
+	eb.damage_type = "blunt"
 	c.effects = [ea, eb]; return c
 
 static func _breakthrough_advance() -> Resource:
@@ -361,6 +374,7 @@ static func _breakthrough_advance() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 110; ea.base_value = 110; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.COST_NEXT
 	eb.value = 1; eb.base_value = 1
@@ -421,6 +435,7 @@ static func _mobile_firing() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
+	ea.damage_type = "projectile"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.GAIN_MORALE
 	eb.value = 1; eb.base_value = 1
@@ -451,6 +466,7 @@ static func _imperial_artillery() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
+	ea.damage_type = "explosive"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.GAIN_MORALE
 	eb.value = 1; eb.base_value = 1
@@ -478,6 +494,7 @@ static func _austerlitz_maneuver() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.BLOCK
 	eb.value = 60; eb.base_value = 60; eb.target = "SELF"
@@ -528,6 +545,7 @@ static func _victory_proclamation() -> Resource:
 	e.value = 100; e.base_value = 100
 	e.bonus_value = 150; e.base_bonus_value = 150
 	e.status_type = "has_morale_2"; e.target = "SINGLE"
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 static func _great_army_siege() -> Resource:
@@ -540,6 +558,7 @@ static func _great_army_siege() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 80; e.base_value = 80; e.target = "ALL"
+	e.damage_type = "explosive"
 	c.effects = [e]; return c
 
 static func _emperors_encirclement() -> Resource:
@@ -568,6 +587,7 @@ static func _one_man_army() -> Resource:
 	ea.effect_type = EffRes.EffectType.CONSUME_MORALE
 	ea.value = 1; ea.base_value = 1
 	ea.bonus_value = 150; ea.base_bonus_value = 150; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.ENERGY
 	eb.value = 1; eb.base_value = 1
@@ -602,6 +622,7 @@ static func _emperors_assault() -> Resource:
 	ea.effect_type = EffRes.EffectType.CONSUME_MORALE
 	ea.value = 2; ea.base_value = 2
 	ea.bonus_value = 250; ea.base_bonus_value = 250; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.BLOCK
 	eb.value = 100; eb.base_value = 100; eb.target = "SELF"
@@ -629,6 +650,7 @@ static func _legion_charge() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_TOKEN
 	e.value = 5; e.base_value = 5; e.target = "SINGLE"
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 static func _glory_shout() -> Resource:

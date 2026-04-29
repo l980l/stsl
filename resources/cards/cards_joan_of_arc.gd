@@ -44,6 +44,7 @@ static func _strike() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
+	e.damage_type = "divine"
 	c.effects = [e]; return c
 
 static func _defend() -> Resource:
@@ -134,6 +135,7 @@ static func _orleans_charge() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 120; e.base_value = 120; e.target = "SINGLE"
+	e.damage_type = "divine"
 	c.effects = [e]; return c
 
 static func _miracle_revive() -> Resource:
@@ -173,6 +175,7 @@ static func _holy_fury() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "ALL"
+	e.damage_type = "divine"
 	c.effects = [e]; return c
 
 static func _martyrs_will() -> Resource:
@@ -230,6 +233,7 @@ static func _saints_flame() -> Resource:
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DAMAGE
 	eb.value = 250; eb.base_value = 250; eb.target = "ALL"
+	eb.damage_type = "divine"
 	c.effects = [ea, eb]; return c
 
 # ─────────────────────────────────────────
@@ -407,6 +411,7 @@ static func _blade_of_justice() -> Resource:
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DAMAGE
 	eb.value = 180; eb.base_value = 180; eb.target = "SINGLE"
+	eb.damage_type = "divine"
 	c.effects = [ea, eb]; return c
 
 static func _martyrdom_steps() -> Resource:
@@ -452,6 +457,7 @@ static func _holy_rage() -> Resource:
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DAMAGE
 	eb.value = 200; eb.base_value = 200; eb.target = "ALL"
+	eb.damage_type = "divine"
 	c.effects = [ea, eb]; return c
 
 # ── RARE 9장 ──
@@ -642,6 +648,7 @@ static func _martyr_wrath() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_DEAD_ALLY
 	e.value = 12; e.base_value = 12; e.target = "SINGLE"
+	e.damage_type = "divine"
 	c.effects = [e]; return c
 
 static func _dead_blessing() -> Resource:

@@ -446,7 +446,7 @@ func test_exhaust_draw_happy() -> void:
 	bm._apply_card_effects(_make_card("yi_sun_sin", [eff]), -1)
 	_assert(not bm._pending_discard_pick.is_empty(), "DISCARD_PICK_DRAW: 모달 대기 상태 등록됨")
 	# resolve_pending_discard_pick 호출 시뮬레이션 (버리기 버튼 클릭)
-	var picked := bm.deck_mgr.hand[0]
+	var picked = bm.deck_mgr.hand[0]
 	var hand_before: int = bm.deck_mgr.hand.size()
 	var energy_before: int = bm.deck_mgr.current_energy
 	bm.resolve_pending_discard_pick(picked)

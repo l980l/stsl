@@ -58,6 +58,7 @@ var _drag_t_offset: float = 0.0
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _circle_tex: ImageTexture = null
+var _slash_tex: ImageTexture = null
 var _last_card_play_pos: Vector2 = Vector2.ZERO
 var _popup_stack: Dictionary = {}
 var _grad_cache: Dictionary = {}
@@ -1520,35 +1521,93 @@ func _make_circle_texture() -> ImageTexture:
 			img.set_pixel(x, y, Color(1, 1, 1, a))
 	return ImageTexture.create_from_image(img)
 
-func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false) -> void:
+func _make_slash_texture() -> ImageTexture:
+	var img := Image.create(12, 2, false, Image.FORMAT_RGBA8)
+	for x in range(12):
+		var a: float = 1.0 - absf(float(x) - 5.5) / 5.5
+		img.set_pixel(x, 0, Color(1, 1, 1, a))
+		img.set_pixel(x, 1, Color(1, 1, 1, a))
+	return ImageTexture.create_from_image(img)
+
+func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, dtype: String = "") -> void:
 	if amount <= 0:
 		return
 	if _circle_tex == null:
 		_circle_tex = _make_circle_texture()
+	if _slash_tex == null:
+		_slash_tex = _make_slash_texture()
 	var count: int = 8
-	var speed_bonus: float = 0.0
+	var speed_min: float = 120.0
+	var speed_max: float = 280.0
 	if amount >= 100:
-		count = 22
-		speed_bonus = 50.0
+		count = 22; speed_min += 50.0; speed_max += 50.0
 	elif amount >= 30:
 		count = 14
+	var spread: float = 80.0
+	var grav: Vector2 = Vector2(0, 200)
+	var lt: float = 0.35
+	var scale_min: float = 0.6
+	var scale_max: float = 1.2
+	var tex: ImageTexture = _circle_tex
+	var col_a := Color(1.0, 1.0, 0.9, 1.0)
+	var col_b := Color(1.0, 0.6, 0.1, 0.0)
+	match dtype:
+		"slash":
+			tex = _slash_tex
+			spread = 60.0; grav = Vector2.ZERO; lt = 0.25
+			scale_min = 0.4; scale_max = 0.9
+			col_a = Color(1.0, 1.0, 1.0, 1.0); col_b = Color(0.75, 0.88, 1.0, 0.0)
+			speed_min = 180.0; speed_max = 360.0
+		"blunt":
+			spread = 120.0; grav = Vector2(0, 320); lt = 0.5
+			scale_min = 0.8; scale_max = 1.8
+			col_a = Color(0.72, 0.55, 0.34, 1.0); col_b = Color(0.42, 0.36, 0.27, 0.0)
+			speed_min = 80.0; speed_max = 180.0
+		"projectile":
+			tex = _slash_tex
+			spread = 10.0; grav = Vector2(0, 50); lt = 0.2
+			scale_min = 0.25; scale_max = 0.5
+			count = mini(count, 6)
+			col_a = Color(1.0, 1.0, 1.0, 1.0); col_b = Color(0.78, 0.78, 0.78, 0.0)
+			speed_min = 300.0; speed_max = 550.0
+		"explosive":
+			spread = 160.0; grav = Vector2(0, 80); lt = 0.6
+			scale_min = 1.0; scale_max = 2.5
+			count = maxi(count, 14)
+			col_a = Color(1.0, 0.48, 0.08, 1.0); col_b = Color(0.1, 0.08, 0.07, 0.0)
+			speed_min = 100.0; speed_max = 240.0
+		"poison":
+			spread = 70.0; grav = Vector2(0, -80); lt = 0.8
+			scale_min = 0.35; scale_max = 0.75
+			col_a = Color(0.28, 1.0, 0.18, 1.0); col_b = Color(0.08, 0.4, 0.04, 0.0)
+			speed_min = 45.0; speed_max = 110.0
+		"divine":
+			spread = 360.0; grav = Vector2(0, -150); lt = 0.6
+			scale_min = 0.6; scale_max = 1.5
+			col_a = Color(1.0, 0.94, 0.45, 1.0); col_b = Color(1.0, 1.0, 1.0, 0.0)
+			speed_min = 100.0; speed_max = 240.0
+		"curse":
+			spread = 360.0; grav = Vector2(0, -30); lt = 0.7
+			scale_min = 0.35; scale_max = 0.9
+			col_a = Color(0.6, 0.08, 0.9, 1.0); col_b = Color(0.15, 0.02, 0.25, 0.0)
+			speed_min = 60.0; speed_max = 150.0
 	var grad := Gradient.new()
-	grad.set_color(0, Color(1.0, 1.0, 0.9, 1.0))
-	grad.set_color(1, Color(1.0, 0.6, 0.1, 0.0))
+	grad.set_color(0, col_a)
+	grad.set_color(1, col_b)
 	var p := CPUParticles2D.new()
 	p.amount = count
-	p.lifetime = 0.35
+	p.lifetime = lt
 	p.one_shot = true
 	p.explosiveness = 1.0
-	p.direction = Vector2(1 if flipped else -1, 0)
-	p.spread = 80.0
-	p.gravity = Vector2(0, 200)
-	p.initial_velocity_min = 120.0 + speed_bonus
-	p.initial_velocity_max = 280.0 + speed_bonus
-	p.scale_amount_min = 0.6
-	p.scale_amount_max = 1.2
+	p.direction = Vector2(1.0 if flipped else -1.0, 0)
+	p.spread = spread
+	p.gravity = grav
+	p.initial_velocity_min = speed_min
+	p.initial_velocity_max = speed_max
+	p.scale_amount_min = scale_min
+	p.scale_amount_max = scale_max
 	p.color_ramp = grad
-	p.texture = _circle_tex
+	p.texture = tex
 	p.position = pos
 	p.z_index = 15
 	p.emitting = true
@@ -1564,7 +1623,7 @@ func _on_hero_healed(hero_id: String, amount: int) -> void:
 			_spawn_heal_popup(popup_pos, amount, hero_id)
 			break
 
-func _on_hero_damaged(hero_id: String, amount: int) -> void:
+func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	_update_hero_ui(hero_id)
 	for entry in _hero_nodes:
 		if entry["hero_id"] == hero_id and entry["panel"].visible:
@@ -1578,13 +1637,13 @@ func _on_hero_damaged(hero_id: String, amount: int) -> void:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
 		var hero_spark_pos: Vector2 = char_node.position + Vector2(randf_range(-28.0, 28.0), randf_range(-80.0, -30.0))
-		_spawn_impact_particles(hero_spark_pos, amount, true)
+		_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):
 				ap.play("hurt")
 
-func _on_enemy_damaged(index: int, amount: int) -> void:
+func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 	_update_enemy_ui(index)
 	if index < _enemy_nodes.size() and _enemy_nodes[index]["panel"].visible:
 		var panel: ColorRect = _enemy_nodes[index]["panel"]
@@ -1595,7 +1654,7 @@ func _on_enemy_damaged(index: int, amount: int) -> void:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
 		var spark_pos: Vector2 = _last_card_play_pos if _last_card_play_pos != Vector2.ZERO else char_node.position
-		_spawn_impact_particles(spark_pos, amount)
+		_spawn_impact_particles(spark_pos, amount, false, dtype)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):

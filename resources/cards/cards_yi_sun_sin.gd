@@ -99,6 +99,7 @@ static func _counter_strike() -> Resource:
 	e1.effect_type = EffRes.EffectType.BLOCK; e1.value = 30; e1.base_value = 30
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.DAMAGE; e2.value = 30; e2.base_value = 30; e2.target = "SINGLE"
+	e2.damage_type = "slash"
 	c.effects = [e1, e2]; return c
 
 # ───────────────────────────────────────────
@@ -115,8 +116,10 @@ static func _turtle_ship_charge() -> Resource:
 	c.archetype = "card.yi_sun_sin.turtle_ship_charge.archetype"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DAMAGE; e1.value = 120; e1.base_value = 120; e1.target = "SINGLE"
+	e1.damage_type = "blunt"
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.COUNTER_BLOCK; e2.value = 60; e2.base_value = 60; e2.target = "SINGLE"
+	e2.damage_type = "blunt"
 	c.effects = [e1, e2]; return c
 
 # #2 반격 — UNCOMMON, cost 1, ATTACK, 거북선
@@ -129,6 +132,7 @@ static func _counter() -> Resource:
 	c.archetype = "card.yi_sun_sin.counter.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.COUNTER_BLOCK; e.value = 100; e.base_value = 100; e.target = "SINGLE"
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 # #3 철갑 — RARE, cost 2, SKILL, 거북선
@@ -203,6 +207,7 @@ static func _hansan_victory() -> Resource:
 	c.archetype = "card.yi_sun_sin.hansan_victory.archetype"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DAMAGE; e1.value = 100; e1.base_value = 100; e1.target = "ALL"
+	e1.damage_type = "explosive"
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.BLOCK_ALL; e2.value = 80; e2.base_value = 80
 	c.effects = [e1, e2]; return c
@@ -248,6 +253,7 @@ static func _death_or_glory() -> Resource:
 	e.value = 100; e.base_value = 100
 	e.bonus_value = 200; e.base_bonus_value = 200
 	e.status_type = "low_hp"; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 # #12 불굴 — UNCOMMON, cost 2, SKILL, 필사즉생
@@ -286,6 +292,7 @@ static func _noryang_battle() -> Resource:
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 250; e.base_value = 250; e.target = "SINGLE"
 	e.bonus_value = 120; e.base_bonus_value = 120  # 2강: 공격 후 BLOCK 120
+	e.damage_type = "explosive"
 	c.effects = [e]; return c
 
 # #15 학익진 완성 — DIVINE, cost 2, SKILL, 학익진
@@ -360,10 +367,12 @@ static func _charge_stance() -> Resource:
 	c.archetype = "card.yi_sun_sin.charge_stance.archetype"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DAMAGE; e1.value = 100; e1.base_value = 100; e1.target = "SINGLE"
+	e1.damage_type = "blunt"
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.COUNTER_BLOCK
 	e2.value = 50; e2.base_value = 50
 	e2.status_type = "block_threshold_150"
+	e2.damage_type = "blunt"
 	c.effects = [e1, e2]; return c
 
 # #20 함포 사격 — UNCOMMON, cost 2, ATTACK, 거북선
@@ -376,8 +385,10 @@ static func _cannon_fire() -> Resource:
 	c.archetype = "card.yi_sun_sin.cannon_fire.archetype"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DAMAGE; e1.value = 110; e1.base_value = 110; e1.target = "SINGLE"
+	e1.damage_type = "explosive"
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.COUNTER_BLOCK; e2.value = 40; e2.base_value = 40; e2.target = "SINGLE"
+	e2.damage_type = "explosive"
 	c.effects = [e1, e2]; return c
 
 # #21 방패막이 — COMMON, cost 0, SKILL, 거북선
@@ -419,6 +430,7 @@ static func _fleet_rally() -> Resource:
 	e1.effect_type = EffRes.EffectType.BLOCK; e1.value = 120; e1.base_value = 120
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.COUNTER_BLOCK; e2.value = 80; e2.base_value = 80; e2.target = "SINGLE"
+	e2.damage_type = "blunt"
 	c.effects = [e1, e2]; return c
 
 # #24 사기 고취 — UNCOMMON, cost 1, SKILL, 학익진
@@ -501,6 +513,7 @@ static func _volley_fire() -> Resource:
 	c.archetype = "card.yi_sun_sin.volley_fire.archetype"
 	var e1 := EffRes.new()
 	e1.effect_type = EffRes.EffectType.DAMAGE; e1.value = 80; e1.base_value = 80; e1.target = "ALL"
+	e1.damage_type = "explosive"
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.BLOCK_ALL; e2.value = 60; e2.base_value = 60
 	c.effects = [e1, e2]; return c
@@ -546,6 +559,7 @@ static func _decisive_strike() -> Resource:
 	e.value = 80; e.base_value = 80
 	e.bonus_value = 150; e.base_bonus_value = 150
 	e.status_type = "low_hp"; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 # #33 이판사판 — UNCOMMON, cost 1, ATTACK, 필사즉생
@@ -560,6 +574,7 @@ static func _all_in() -> Resource:
 	e1.effect_type = EffRes.EffectType.HEAL; e1.value = -60; e1.base_value = -60; e1.target = "SELF"
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.DAMAGE; e2.value = 130; e2.base_value = 130; e2.target = "SINGLE"
+	e2.damage_type = "slash"
 	c.effects = [e1, e2]; return c
 
 # #34 기사회생 — COMMON, cost 1, SKILL, 필사즉생
@@ -588,6 +603,7 @@ static func _crisis_breakthrough() -> Resource:
 	e.value = 120; e.base_value = 120
 	e.bonus_value = 200; e.base_bonus_value = 200
 	e.status_type = "very_low_hp"; e.target = "SINGLE"
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 # #36 사즉생 돌격 — UNCOMMON, cost 2, ATTACK, 필사즉생
@@ -602,6 +618,7 @@ static func _death_charge() -> Resource:
 	e1.effect_type = EffRes.EffectType.HEAL; e1.value = -50; e1.base_value = -50; e1.target = "SELF"
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.DAMAGE; e2.value = 160; e2.base_value = 160; e2.target = "SINGLE"
+	e2.damage_type = "blunt"
 	var e3 := EffRes.new()
 	e3.effect_type = EffRes.EffectType.BLOCK; e3.value = 50; e3.base_value = 50
 	c.effects = [e1, e2, e3]; return c
@@ -620,6 +637,7 @@ static func _bloody_battle() -> Resource:
 	e1.value = 70; e1.base_value = 70
 	e1.bonus_value = 120; e1.base_bonus_value = 120
 	e1.status_type = "low_hp"; e1.target = "SINGLE"
+	e1.damage_type = "slash"
 	var e2 := EffRes.new()
 	e2.effect_type = EffRes.EffectType.BLOCK; e2.value = 40; e2.base_value = 40
 	c.effects = [e1, e2]; return c
@@ -639,6 +657,7 @@ static func _war_drum() -> Resource:
 	e2.effect_type = EffRes.EffectType.CONSUME_MORALE
 	e2.value = 1; e2.base_value = 1
 	e2.bonus_value = 120; e2.base_bonus_value = 120; e2.target = "SINGLE"
+	e2.damage_type = "blunt"
 	c.effects = [e1, e2]; return c
 
 # #39 전사의 각오 — RARE, cost 2, POWER, 필사즉생

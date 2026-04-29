@@ -47,6 +47,7 @@ static func _strike() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _defend() -> Resource:
@@ -74,6 +75,7 @@ static func _niten_slash() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 60; e.base_value = 60; e.target = "SINGLE"; e.hit_count = 2
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _sword_study() -> Resource:
@@ -98,6 +100,7 @@ static func _two_sword_form() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 65; e.base_value = 65; e.target = "SINGLE"; e.hit_count = 2
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _shield_break() -> Resource:
@@ -110,6 +113,7 @@ static func _shield_break() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 120; ea.base_value = 120; ea.target = "SINGLE"
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"; eb.status_type = "vulnerable"
@@ -142,6 +146,7 @@ static func _blood_path() -> Resource:
 	e.value = 100; e.base_value = 100
 	e.bonus_value = 180; e.base_bonus_value = 180
 	e.target = "SINGLE"; e.status_type = "enemy_count_1"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _rapid_strike() -> Resource:
@@ -154,6 +159,7 @@ static func _rapid_strike() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 55; ea.base_value = 55; ea.target = "SINGLE"; ea.hit_count = 2
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"; eb.status_type = "poison"
@@ -192,6 +198,7 @@ static func _single_cut() -> Resource:
 	e.value = 160; e.base_value = 160
 	e.bonus_value = 280; e.base_bonus_value = 280
 	e.target = "SINGLE"; e.status_type = "enemy_count_1"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _afterimage_cut() -> Resource:
@@ -204,6 +211,7 @@ static func _afterimage_cut() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 50; ea.base_value = 50; ea.target = "SINGLE"; ea.hit_count = 2
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.BLOCK
 	eb.value = 60; eb.base_value = 60; eb.target = "SELF"
@@ -231,6 +239,7 @@ static func _five_rings_sword() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 90; e.base_value = 90; e.target = "SINGLE"; e.hit_count = 2
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _mushin_blade() -> Resource:
@@ -245,6 +254,7 @@ static func _mushin_blade() -> Resource:
 	e.value = 150; e.base_value = 150
 	e.bonus_value = 350; e.base_bonus_value = 350
 	e.target = "SINGLE"; e.status_type = "hand_size_0"
+	e.damage_type = "divine"
 	c.effects = [e]; return c
 
 # ─────────────────────────────────────────
@@ -261,6 +271,7 @@ static func _niten_slash2() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 60; e.base_value = 60; e.target = "SINGLE"; e.hit_count = 2
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _whirlwind_cut() -> Resource:
@@ -273,6 +284,7 @@ static func _whirlwind_cut() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 55; ea.base_value = 55; ea.target = "SINGLE"; ea.hit_count = 2
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.BLOCK
 	eb.value = 40; eb.base_value = 40; eb.target = "SELF"
@@ -290,6 +302,7 @@ static func _peak_aim() -> Resource:
 	e.value = 90; e.base_value = 90
 	e.bonus_value = 140; e.base_bonus_value = 140
 	e.target = "SINGLE"; e.status_type = "enemy_count_1"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _courage() -> Resource:
@@ -316,6 +329,7 @@ static func _void_sword() -> Resource:
 	e.value = 100; e.base_value = 100
 	e.bonus_value = 200; e.base_bonus_value = 200
 	e.target = "SINGLE"; e.status_type = "hand_size_0"
+	e.damage_type = "divine"
 	c.effects = [e]; return c
 
 static func _release() -> Resource:
@@ -340,6 +354,7 @@ static func _sword_extreme() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 65; ea.base_value = 65; ea.target = "SINGLE"; ea.hit_count = 2
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"; eb.status_type = "vulnerable"
@@ -355,6 +370,7 @@ static func _flying_swallow() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 70; ea.base_value = 70; ea.target = "SINGLE"; ea.hit_count = 2
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.ENERGY
 	eb.value = 1; eb.base_value = 1
@@ -372,6 +388,7 @@ static func _asura_cut() -> Resource:
 	e.value = 100; e.base_value = 100
 	e.bonus_value = 160; e.base_bonus_value = 160
 	e.target = "SINGLE"; e.status_type = "enemy_count_1"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _battle_gaze() -> Resource:
@@ -406,6 +423,7 @@ static func _torrent() -> Resource:
 	ea.value = 100; ea.base_value = 100
 	ea.bonus_value = 170; ea.base_bonus_value = 170
 	ea.target = "SINGLE"; ea.status_type = "enemy_count_1"
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"; eb.status_type = "vulnerable"
@@ -465,6 +483,7 @@ static func _fierce_niten() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 75; ea.base_value = 75; ea.target = "SINGLE"; ea.hit_count = 2
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"; eb.status_type = "poison"
@@ -480,6 +499,7 @@ static func _twin_dragon() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"; ea.hit_count = 2
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.BLOCK
 	eb.value = 80; eb.base_value = 80; eb.target = "SELF"
@@ -495,6 +515,7 @@ static func _thousand_mile_cut() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 65; ea.base_value = 65; ea.target = "SINGLE"; ea.hit_count = 2
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 1; eb.base_value = 1
@@ -512,6 +533,7 @@ static func _peerless_cut() -> Resource:
 	ea.value = 120; ea.base_value = 120
 	ea.bonus_value = 200; ea.base_bonus_value = 200
 	ea.target = "SINGLE"; ea.status_type = "enemy_count_1"
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"; eb.status_type = "weak"
@@ -537,6 +559,7 @@ static func _forward_cut() -> Resource:
 	ec.value = 110; ec.base_value = 110
 	ec.bonus_value = 180; ec.base_bonus_value = 180
 	ec.target = "SINGLE"; ec.status_type = "enemy_count_1"
+	ec.damage_type = "slash"
 	c.effects = [ea, eb, ec]; return c
 
 static func _final_duel() -> Resource:
@@ -551,6 +574,7 @@ static func _final_duel() -> Resource:
 	ea.value = 160; ea.base_value = 160
 	ea.bonus_value = 300; ea.base_bonus_value = 300
 	ea.target = "SINGLE"; ea.status_type = "enemy_count_1"
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"; eb.status_type = "vulnerable"
@@ -593,6 +617,7 @@ static func _clear_wind() -> Resource:
 	ea.value = 120; ea.base_value = 120
 	ea.bonus_value = 250; ea.base_bonus_value = 250
 	ea.target = "SINGLE"; ea.status_type = "hand_size_0"
+	ea.damage_type = "divine"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"; eb.status_type = "poison"
@@ -634,6 +659,7 @@ static func _spirit_sword() -> Resource:
 	e.value = 140; e.base_value = 140
 	e.bonus_value = 260; e.base_bonus_value = 260
 	e.target = "SINGLE"; e.status_type = "enemy_count_1"
+	e.damage_type = "divine"
 	c.effects = [e]; return c
 
 static func _five_rings_realm() -> Resource:
@@ -675,6 +701,7 @@ static func _steel_strike() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_BLOCK
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _thousand_cuts() -> Resource:
@@ -687,4 +714,5 @@ static func _thousand_cuts() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_HAND_SIZE
 	e.value = 4; e.base_value = 4; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c

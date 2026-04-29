@@ -48,6 +48,7 @@ enum EffectType {
 @export var base_bonus_value: int = 0       # bonus_value의 0강 기준값.
 @export var hit_count: int = 1              # DAMAGE 히트 횟수 (이도류, 징기스의 분노)
 @export var condition: String = ""  # 빈 문자열=무조건 발동. "hand_size_0"등 조건 키 설정 시 조건 불충족이면 이 효과 스킵
+@export var damage_type: String = ""  # DAMAGE 계열 시각 타입. "" → slash fallback. slash/blunt/projectile/explosive/poison/divine/curse
 
 const _STATUS_NAME_KEYS := {
 	"weak":       "status.weak.name",

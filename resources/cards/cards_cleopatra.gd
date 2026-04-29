@@ -47,6 +47,7 @@ static func _venom_needle() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
+	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "poison"; eb.value = 3; eb.base_value = 3; eb.target = "SINGLE"
@@ -78,6 +79,7 @@ static func _poison_seed() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
+	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "poison"; eb.value = 2; eb.base_value = 2; eb.target = "ALL"
@@ -120,6 +122,7 @@ static func _desert_poison_dance() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 60; ea.base_value = 60; ea.target = "ALL"
+	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "poison"; eb.value = 3; eb.base_value = 3; eb.target = "ALL"
@@ -176,6 +179,7 @@ static func _serpent_grasp() -> Resource:
 	e.value = 80; e.base_value = 80
 	e.bonus_value = 160; e.base_bonus_value = 160
 	e.status_type = "has_poison"; e.target = "SINGLE"
+	e.damage_type = "poison"
 	c.effects = [e]; return c
 
 static func _pharaoh_poison() -> Resource:
@@ -188,6 +192,7 @@ static func _pharaoh_poison() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 120; ea.base_value = 120; ea.target = "SINGLE"
+	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "poison"; eb.value = 5; eb.base_value = 5; eb.target = "SINGLE"
@@ -218,6 +223,7 @@ static func _nile_fury() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.POISON_BURST
 	e.value = 300; e.base_value = 300; e.target = "SINGLE"
+	e.damage_type = "poison"
 	c.effects = [e]; return c
 
 static func _pharaoh_decree() -> Resource:
@@ -264,6 +270,7 @@ static func _poison_fog_spray() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 60; ea.base_value = 60; ea.target = "SINGLE"
+	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "poison"; eb.value = 2; eb.base_value = 2; eb.target = "ALL"
@@ -327,6 +334,7 @@ static func _double_fang() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
+	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "poison"; eb.value = 8; eb.base_value = 8; eb.target = "SINGLE"
@@ -357,6 +365,7 @@ static func _poison_feast() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
+	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "poison"; eb.value = 3; eb.base_value = 3; eb.target = "SINGLE"
@@ -446,6 +455,7 @@ static func _poison_judgment() -> Resource:
 	e.value = 70; e.base_value = 70
 	e.bonus_value = 140; e.base_bonus_value = 140
 	e.status_type = "has_poison_5"; e.target = "SINGLE"
+	e.damage_type = "poison"
 	c.effects = [e]; return c
 
 static func _isis_fury() -> Resource:
@@ -458,6 +468,7 @@ static func _isis_fury() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 130; ea.base_value = 130; ea.target = "SINGLE"
+	ea.damage_type = "curse"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "weak"; eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"
@@ -481,6 +492,7 @@ static func _poison_ritual() -> Resource:
 	e2.value = 50; e2.base_value = 50  # +0.5 배율 = 50 (100 단위)
 	e2.status_type = "burst_bonus"     # 영구 보너스 마커
 	e2.target = "ALL"
+	e2.damage_type = "poison"
 	c.effects = [e1, e2]; return c
 
 static func _queens_embrace() -> Resource:
@@ -528,6 +540,7 @@ static func _nile_doom() -> Resource:
 	e.value = 100; e.base_value = 100
 	e.bonus_value = 200; e.base_bonus_value = 200
 	e.status_type = "has_poison_10"; e.target = "SINGLE"
+	e.damage_type = "poison"
 	c.effects = [e]; return c
 
 static func _charming_assault() -> Resource:
@@ -543,6 +556,7 @@ static func _charming_assault() -> Resource:
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DAMAGE
 	eb.value = 100; eb.base_value = 100; eb.target = "SINGLE"
+	eb.damage_type = "curse"
 	c.effects = [ea, eb]; return c
 
 static func _pharaoh_fury() -> Resource:
@@ -555,6 +569,7 @@ static func _pharaoh_fury() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 150; ea.base_value = 150; ea.target = "ALL"
+	ea.damage_type = "curse"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "weak"; eb.value = 2; eb.base_value = 2; eb.target = "ALL"
@@ -603,6 +618,7 @@ static func _isis_judgment() -> Resource:
 	e.value = 0; e.base_value = 0
 	e.bonus_value = 180; e.base_bonus_value = 180
 	e.status_type = "has_debuffs_3"; e.target = "SINGLE"
+	e.damage_type = "curse"
 	c.effects = [e]; return c
 
 static func _sekhmet_curse() -> Resource:

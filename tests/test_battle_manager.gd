@@ -319,7 +319,7 @@ func test_hero_damaged_emitted_with_zero_when_fully_blocked() -> void:
 	bm._hero_block["napoleon"] = 10
 
 	var damage_emitted: Array = []
-	bm.hero_damaged.connect(func(id, amt): damage_emitted.append(amt))
+	bm.hero_damaged.connect(func(id, amt, _dtype): damage_emitted.append(amt))
 
 	bm._deal_damage_to_hero("napoleon", 10)
 	_assert(damage_emitted.size() == 1, "블록 완전 흡수 시에도 hero_damaged 발화")
@@ -337,7 +337,7 @@ func test_enemy_damaged_emitted_with_zero_when_fully_blocked() -> void:
 	bm._enemy_block[0] = 10
 
 	var damage_emitted: Array = []
-	bm.enemy_damaged.connect(func(idx, amt): damage_emitted.append(amt))
+	bm.enemy_damaged.connect(func(idx, amt, _dtype): damage_emitted.append(amt))
 
 	bm._deal_damage_to_enemy(0, 10)
 	_assert(damage_emitted.size() == 1, "블록 완전 흡수 시에도 enemy_damaged 발화")

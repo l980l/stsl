@@ -57,8 +57,8 @@ signal battle_lost()
 signal player_turn_started()
 signal enemy_turn_started()
 signal enemy_died(enemy_index: int)
-signal enemy_damaged(enemy_index: int, amount: int)
-signal hero_damaged(hero_id: String, amount: int)
+signal enemy_damaged(enemy_index: int, amount: int, damage_type: String)
+signal hero_damaged(hero_id: String, amount: int, damage_type: String)
 signal status_applied(target: String, status_type: String, stacks: int)
 signal morale_changed(hero_id: String, new_value: int)
 signal active_powers_changed()
@@ -336,11 +336,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if effect.target == "ALL":
 						for i in range(_enemies.size()):
 							if _enemy_alive[i]:
-								_deal_damage_to_enemy(i, dmg)
+								_deal_damage_to_enemy(i, dmg, effect.damage_type)
 								_last_attacker[i] = card.owner_id
 					else:
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-							_deal_damage_to_enemy(target_enemy_index, dmg)
+							_deal_damage_to_enemy(target_enemy_index, dmg, effect.damage_type)
 							_last_attacker[target_enemy_index] = card.owner_id
 			EffectRes.EffectType.BLOCK:
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + effect.value
@@ -399,7 +399,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_hero_status[card.owner_id]["morale"] = new_morale
 					morale_changed.emit(card.owner_id, new_morale)
 					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-						_deal_damage_to_enemy(target_enemy_index, effect.bonus_value)
+						_deal_damage_to_enemy(target_enemy_index, effect.bonus_value, effect.damage_type)
 					# 나폴레옹 × 클레오파트라 시너지: 소모 성공 시에만 charm 부여
 					if card.owner_id == "napoleon" and team_mgr and team_mgr.is_alive("cleopatra"):
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
@@ -412,7 +412,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					var pdmg: int = _enemy_status[target_enemy_index].get("poison_dmg", 0)
 					if pdmg > 0:
 						var burst_dmg: int = pdmg * effect.value / 100 * POISON_DMG_PER_STACK
-						_deal_damage_to_enemy(target_enemy_index, burst_dmg)
+						_deal_damage_to_enemy(target_enemy_index, burst_dmg, effect.damage_type)
 						_enemy_status[target_enemy_index]["poison_dmg"] = 0
 						_enemy_status[target_enemy_index]["poison_dur"] = 0
 			EffectRes.EffectType.COUNTER_BLOCK:
@@ -452,7 +452,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								if not team_mgr.is_alive(h.hero_id):
 									dead_count += 1
 						var total_dmg: int = effect.value + effect.bonus_value * dead_count
-						_deal_damage_to_enemy(target_enemy_index, total_dmg)
+						_deal_damage_to_enemy(target_enemy_index, total_dmg, effect.damage_type)
 					else:
 						var condition_met: bool
 						var es: Dictionary = _enemy_status[target_enemy_index]
@@ -496,7 +496,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							_:
 								condition_met = es.get(effect.status_type, 0) > 0
 						var dmg: int = effect.bonus_value if condition_met else effect.value
-						_deal_damage_to_enemy(target_enemy_index, dmg)
+						_deal_damage_to_enemy(target_enemy_index, dmg, effect.damage_type)
 			EffectRes.EffectType.SUMMON_TOKEN:
 				if not _hero_status.has(card.owner_id):
 					_hero_status[card.owner_id] = {}
@@ -563,7 +563,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						if not team_mgr.is_alive(h.hero_id):
 							dead_count += 1
 					if dead_count > 0:
-						_deal_damage_to_enemy(target_enemy_index, dead_count * effect.value)
+						_deal_damage_to_enemy(target_enemy_index, dead_count * effect.value, effect.damage_type)
 			EffectRes.EffectType.DOUBLE_NEXT_DAMAGE:
 				_active_powers[DND_KEY] = {"value": 1, "owner_id": "__global__", "params": {}}
 				active_powers_changed.emit()
@@ -577,12 +577,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				if target_enemy_index >= 0 and deck_mgr:
 					var hand_size: int = deck_mgr.hand.size()
 					if hand_size > 0:
-						_deal_damage_to_enemy(target_enemy_index, hand_size * effect.value)
+						_deal_damage_to_enemy(target_enemy_index, hand_size * effect.value, effect.damage_type)
 			EffectRes.EffectType.DAMAGE_PER_TOKEN:
 				if target_enemy_index >= 0:
 					var tokens: int = _hero_status.get(card.owner_id, {}).get("tokens", 0)
 					if tokens > 0:
-						_deal_damage_to_enemy(target_enemy_index, tokens * effect.value)
+						_deal_damage_to_enemy(target_enemy_index, tokens * effect.value, effect.damage_type)
 			EffectRes.EffectType.HEAL_PER_DEAD_ALLY:
 				if team_mgr:
 					var dead_count: int = 0
@@ -600,7 +600,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				if target_enemy_index >= 0 and deck_mgr:
 					var energy: int = deck_mgr.current_energy
 					if energy > 0:
-						_deal_damage_to_enemy(target_enemy_index, energy * effect.value)
+						_deal_damage_to_enemy(target_enemy_index, energy * effect.value, effect.damage_type)
 						deck_mgr.current_energy = 0
 						deck_mgr.energy_changed.emit(0)
 			EffectRes.EffectType.STATUS_DOUBLE:
@@ -619,7 +619,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							status_applied.emit("enemy_%d" % i, key, cur * 2)
 	_apply_synergy_bonus(card, target_enemy_index)
 
-func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
+func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "") -> void:
 	if not _enemy_alive[enemy_index]:
 		return
 	amount = _consume_double_next_damage(amount)
@@ -629,7 +629,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
 	_enemy_block[enemy_index] -= absorbed
 	amount -= absorbed
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - amount)
-	enemy_damaged.emit(enemy_index, amount)
+	enemy_damaged.emit(enemy_index, amount, damage_type)
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
 		_kills_this_card += 1
@@ -637,7 +637,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
 	_check_phase_transition(enemy_index)
 	_check_win_condition()
 
-func _deal_damage_to_hero(hero_id: String, amount: int) -> void:
+func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = "") -> void:
 	if debug_hero_invincible:
 		return
 	if team_mgr == null or not team_mgr.is_alive(hero_id):
@@ -657,7 +657,7 @@ func _deal_damage_to_hero(hero_id: String, amount: int) -> void:
 			var RelicRes = load("res://resources/relic_resource.gd")
 			_gm_hd.trigger_relics(RelicRes.TriggerType.ON_HERO_DAMAGED,
 				{"hero_id": hero_id, "amount": amount})
-	hero_damaged.emit(hero_id, amount)
+	hero_damaged.emit(hero_id, amount, damage_type)
 	# 영웅 사망 시 보유 토큰 전멸
 	if not team_mgr.is_alive(hero_id) and _hero_status.has(hero_id):
 		_hero_status[hero_id]["tokens"] = 0
@@ -715,7 +715,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 		return
 	var tick_dmg: int = _consume_double_next_damage(dmg * POISON_DMG_PER_STACK)
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - tick_dmg)
-	enemy_damaged.emit(enemy_index, tick_dmg)
+	enemy_damaged.emit(enemy_index, tick_dmg, "poison")
 	dur -= 1
 	if dur <= 0:
 		_enemy_status[enemy_index]["poison_dmg"] = 0
@@ -1052,7 +1052,7 @@ func _check_phase_transition(enemy_index: int) -> void:
 			var heal_ratio: float = enemy.phase_heal_ratios[current_phase]
 			if heal_ratio > 0.0:
 				_enemy_hp[enemy_index] = int(enemy.max_hp * heal_ratio)
-				enemy_damaged.emit(enemy_index, _enemy_hp[enemy_index])
+				enemy_damaged.emit(enemy_index, _enemy_hp[enemy_index], "")
 
 
 func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
@@ -1236,5 +1236,5 @@ func debug_set_enemy_hp(index: int, hp: int) -> void:
 		_check_win_condition()
 	elif hp > 0 and not _enemy_alive[index]:
 		_enemy_alive[index] = true
-	enemy_damaged.emit(index, 0)
+	enemy_damaged.emit(index, 0, "")
 	_check_phase_transition(index)

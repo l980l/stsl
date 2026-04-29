@@ -48,6 +48,7 @@ static func _strike() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _defend() -> Resource:
@@ -74,6 +75,7 @@ static func _cavalry_charge() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 50; e.base_value = 50; e.target = "ALL"
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 static func _scout() -> Resource:
@@ -96,6 +98,7 @@ static func _arrow_volley() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 55; e.base_value = 55; e.target = "ALL"
+	e.damage_type = "projectile"
 	c.effects = [e]; return c
 
 static func _ambush() -> Resource:
@@ -107,6 +110,7 @@ static func _ambush() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 70; e.base_value = 70; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _supply_cut() -> Resource:
@@ -132,6 +136,7 @@ static func _encirclement() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 60; ea.base_value = 60; ea.target = "ALL"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 1; eb.base_value = 1; eb.target = "ALL"; eb.status_type = "weak"
@@ -157,6 +162,7 @@ static func _poison_arrow() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 60; ea.base_value = 60; ea.target = "ALL"
+	ea.damage_type = "projectile"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 2; eb.base_value = 2; eb.target = "ALL"; eb.status_type = "poison"
@@ -171,6 +177,7 @@ static func _steppe_storm() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 80; e.base_value = 80; e.target = "ALL"
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 static func _conquerors_ambition() -> Resource:
@@ -182,6 +189,7 @@ static func _conquerors_ambition() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 1; eb.base_value = 1
@@ -221,6 +229,7 @@ static func _genghis_fury() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 60; e.base_value = 60; e.target = "ALL"; e.hit_count = 2
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 # ─────────────────────────────────────────
@@ -237,6 +246,7 @@ static func _light_cavalry_sprint() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 1; eb.base_value = 1
@@ -252,6 +262,7 @@ static func _swift_raid() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 60; e.base_value = 60; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _loot() -> Resource:
@@ -291,6 +302,7 @@ static func _cavalry_assault() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 50; e.base_value = 50; e.target = "ALL"
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 static func _rear_disruption() -> Resource:
@@ -303,6 +315,7 @@ static func _rear_disruption() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 45; ea.base_value = 45; ea.target = "ALL"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 1; eb.base_value = 1; eb.target = "ALL"; eb.status_type = "vulnerable"
@@ -333,6 +346,7 @@ static func _lightning_sprint() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 90; ea.base_value = 90; ea.target = "SINGLE"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.COST_NEXT
 	eb.value = 1; eb.base_value = 1
@@ -350,6 +364,7 @@ static func _execution_ground() -> Resource:
 	e.value = 100; e.base_value = 100
 	e.bonus_value = 200; e.base_bonus_value = 200
 	e.status_type = "enemy_hp_below_30"; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _spoils_distribution() -> Resource:
@@ -377,6 +392,7 @@ static func _plunder_flame() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
+	ea.damage_type = "explosive"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 1; eb.base_value = 1
@@ -392,6 +408,7 @@ static func _rapid_fire() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 40; e.base_value = 40; e.target = "ALL"; e.hit_count = 2
+	e.damage_type = "projectile"
 	c.effects = [e]; return c
 
 static func _wind_legion() -> Resource:
@@ -404,6 +421,7 @@ static func _wind_legion() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 55; ea.base_value = 55; ea.target = "ALL"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.ENERGY
 	eb.value = 1; eb.base_value = 1
@@ -419,6 +437,7 @@ static func _cavalry_encirclement() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 60; ea.base_value = 60; ea.target = "ALL"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.BLOCK
 	eb.value = 50; eb.base_value = 50; eb.target = "SELF"
@@ -434,6 +453,7 @@ static func _iron_breakthrough() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "ALL"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 1; eb.base_value = 1; eb.target = "ALL"; eb.status_type = "weak"
@@ -449,6 +469,7 @@ static func _desert_cavalry() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.PER_DRAW_DMG
 	e.value = 30; e.base_value = 30; e.target = "SINGLE"
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 static func _territory_expansion() -> Resource:
@@ -476,6 +497,7 @@ static func _red_horizon() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 110; ea.base_value = 110; ea.target = "SINGLE"
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.ON_KILL_DRAW
 	eb.value = 2; eb.base_value = 2
@@ -511,6 +533,7 @@ static func _submission() -> Resource:
 	ea.value = 100; ea.base_value = 100
 	ea.bonus_value = 160; ea.base_bonus_value = 160
 	ea.status_type = "enemy_hp_below_50"; ea.target = "SINGLE"
+	ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"; eb.status_type = "weak"
@@ -530,6 +553,7 @@ static func _poison_arrow_rain() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 55; ea.base_value = 55; ea.target = "ALL"
+	ea.damage_type = "projectile"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 3; eb.base_value = 3; eb.target = "ALL"; eb.status_type = "poison"
@@ -545,6 +569,7 @@ static func _thousand_mile_army() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 70; e.base_value = 70; e.target = "ALL"; e.hit_count = 2
+	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 static func _steppe_terror() -> Resource:
@@ -557,6 +582,7 @@ static func _steppe_terror() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 65; ea.base_value = 65; ea.target = "ALL"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 1; eb.base_value = 1; eb.target = "ALL"; eb.status_type = "poison"
@@ -575,6 +601,7 @@ static func _war_tribute() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "ALL"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 1; eb.base_value = 1
@@ -590,6 +617,7 @@ static func _great_steppe_siege() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 150; ea.base_value = 150; ea.target = "ALL"
+	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 3; eb.base_value = 3
@@ -630,4 +658,5 @@ static func _berserk_blow() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.ENERGY_TO_DAMAGE
 	e.value = 6; e.base_value = 6; e.target = "SINGLE"
+	e.damage_type = "slash"
 	c.effects = [e]; return c
