@@ -1472,30 +1472,40 @@ func _start_target_bloom(panel: ColorRect, bloom_color: Color) -> void:
 		if not child.get_meta("_corner_bracket", false):
 			continue
 		var br: ColorRect = child
+		var is_h: bool = br.size.x > br.size.y
 		var dir := ((br.position + br.size * 0.5) - panel_center).normalized()
 		var orig_pos := br.position
-		br.modulate = bloom_color
+		br.pivot_offset = br.size * 0.5
 		br.set_meta("_bloom_orig_pos", orig_pos)
+		# 색 깜빡임: 원래 brass 색 ↔ 타겟 색
+		var tw_c := br.create_tween().set_loops()
+		tw_c.tween_property(br, "modulate", bloom_color, 0.35).set_trans(Tween.TRANS_SINE)
+		tw_c.tween_property(br, "modulate", Color.WHITE,  0.35).set_trans(Tween.TRANS_SINE)
+		br.set_meta("_bloom_tween_c", tw_c)
+		# 간격 진동: 코너 바깥으로 5px 왕복
 		var tw_p := br.create_tween().set_loops()
 		tw_p.tween_property(br, "position", orig_pos + dir * 5.0, 0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		tw_p.tween_property(br, "position", orig_pos,              0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		br.set_meta("_bloom_tween_p", tw_p)
-		var tw_c := br.create_tween().set_loops()
-		tw_c.tween_property(br, "modulate:a", 0.2, 0.35).set_trans(Tween.TRANS_SINE)
-		tw_c.tween_property(br, "modulate:a", 1.0, 0.35).set_trans(Tween.TRANS_SINE)
-		br.set_meta("_bloom_tween_c", tw_c)
+		# 두께 2배 진동: H-bar는 y축, V-bar는 x축으로 scale
+		var fat_scale := Vector2(1.0, 2.0) if is_h else Vector2(2.0, 1.0)
+		var tw_s := br.create_tween().set_loops()
+		tw_s.tween_property(br, "scale", fat_scale,      0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw_s.tween_property(br, "scale", Vector2.ONE,    0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		br.set_meta("_bloom_tween_s", tw_s)
 
 func _stop_target_bloom(panel: ColorRect) -> void:
 	for child in panel.get_children():
 		if not child.get_meta("_corner_bracket", false):
 			continue
 		var br: ColorRect = child
-		for key in ["_bloom_tween_p", "_bloom_tween_c"]:
+		for key in ["_bloom_tween_c", "_bloom_tween_p", "_bloom_tween_s"]:
 			if br.has_meta(key):
 				var tw: Tween = br.get_meta(key)
 				if tw and tw.is_valid(): tw.kill()
 				br.remove_meta(key)
 		br.modulate = Color.WHITE
+		br.scale = Vector2.ONE
 		if br.has_meta("_bloom_orig_pos"):
 			br.position = br.get_meta("_bloom_orig_pos")
 			br.remove_meta("_bloom_orig_pos")
