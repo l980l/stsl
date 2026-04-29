@@ -59,6 +59,8 @@ var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _circle_tex: ImageTexture = null
 var _slash_tex: ImageTexture = null
+var _square_tex: ImageTexture = null
+var _star_tex: ImageTexture = null
 var _last_card_play_pos: Vector2 = Vector2.ZERO
 var _popup_stack: Dictionary = {}
 var _grad_cache: Dictionary = {}
@@ -1522,75 +1524,117 @@ func _make_circle_texture() -> ImageTexture:
 	return ImageTexture.create_from_image(img)
 
 func _make_slash_texture() -> ImageTexture:
-	var img := Image.create(12, 2, false, Image.FORMAT_RGBA8)
-	for x in range(12):
-		var a: float = 1.0 - absf(float(x) - 5.5) / 5.5
+	var img := Image.create(14, 2, false, Image.FORMAT_RGBA8)
+	for x in range(14):
+		var a: float = 1.0 - absf(float(x) - 6.5) / 6.5
 		img.set_pixel(x, 0, Color(1, 1, 1, a))
 		img.set_pixel(x, 1, Color(1, 1, 1, a))
+	return ImageTexture.create_from_image(img)
+
+func _make_square_texture() -> ImageTexture:
+	var img := Image.create(6, 6, false, Image.FORMAT_RGBA8)
+	for x in range(6):
+		for y in range(6):
+			img.set_pixel(x, y, Color(1, 1, 1, 1.0))
+	return ImageTexture.create_from_image(img)
+
+func _make_star_texture() -> ImageTexture:
+	var img := Image.create(9, 9, false, Image.FORMAT_RGBA8)
+	for i in range(9):
+		img.set_pixel(i, 4, Color(1, 1, 1, 1.0))
+		img.set_pixel(4, i, Color(1, 1, 1, 1.0))
+	for d in range(-1, 2):
+		img.set_pixel(4 + d, 4 + d, Color(1, 1, 1, 1.0))
+		img.set_pixel(4 - d, 4 + d, Color(1, 1, 1, 1.0))
 	return ImageTexture.create_from_image(img)
 
 func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, dtype: String = "") -> void:
 	if amount <= 0:
 		return
-	if _circle_tex == null:
-		_circle_tex = _make_circle_texture()
-	if _slash_tex == null:
-		_slash_tex = _make_slash_texture()
-	var count: int = 8
-	var speed_min: float = 120.0
-	var speed_max: float = 280.0
-	if amount >= 100:
-		count = 22; speed_min += 50.0; speed_max += 50.0
-	elif amount >= 30:
-		count = 14
-	var spread: float = 80.0
-	var grav: Vector2 = Vector2(0, 200)
-	var lt: float = 0.35
-	var scale_min: float = 0.6
-	var scale_max: float = 1.2
-	var tex: ImageTexture = _circle_tex
-	var col_a := Color(1.0, 1.0, 0.9, 1.0)
-	var col_b := Color(1.0, 0.6, 0.1, 0.0)
+	if _circle_tex == null: _circle_tex = _make_circle_texture()
+	if _slash_tex == null:  _slash_tex  = _make_slash_texture()
+	if _square_tex == null: _square_tex = _make_square_texture()
+	if _star_tex == null:   _star_tex   = _make_star_texture()
+
+	var mag: int = 0 if amount < 30 else (1 if amount < 100 else 2)
+	var count: int
+	var speed_min: float; var speed_max: float
+	var spread: float;    var grav: Vector2
+	var lt: float
+	var scale_min: float; var scale_max: float
+	var tex: ImageTexture
+	var col_a: Color;     var col_b: Color
+	var dir: Vector2 = Vector2(1.0 if flipped else -1.0, 0.0)
+	var radial_min: float = 0.0; var radial_max: float = 0.0
+
 	match dtype:
 		"slash":
+			# 얇은 막대 4~8개 — 수평 고속, 중력 없음, 금방 사라짐
+			count = [4, 6, 8][mag]
+			speed_min = 380.0; speed_max = 680.0
+			spread = 40.0; grav = Vector2.ZERO; lt = 0.18
+			scale_min = 0.5; scale_max = 0.95
 			tex = _slash_tex
-			spread = 60.0; grav = Vector2.ZERO; lt = 0.25
-			scale_min = 0.4; scale_max = 0.9
-			col_a = Color(1.0, 1.0, 1.0, 1.0); col_b = Color(0.75, 0.88, 1.0, 0.0)
-			speed_min = 180.0; speed_max = 360.0
+			col_a = Color(1.0, 1.0, 1.0, 1.0); col_b = Color(0.65, 0.82, 1.0, 0.0)
 		"blunt":
-			spread = 120.0; grav = Vector2(0, 320); lt = 0.5
-			scale_min = 0.8; scale_max = 1.8
-			col_a = Color(0.72, 0.55, 0.34, 1.0); col_b = Color(0.42, 0.36, 0.27, 0.0)
-			speed_min = 80.0; speed_max = 180.0
+			# 굵은 사각 파편 — 느리게 퍼지다가 중력에 뚝 떨어짐
+			count = [12, 17, 22][mag]
+			speed_min = 110.0; speed_max = 230.0
+			spread = 130.0; grav = Vector2(0, 480); lt = 0.55
+			scale_min = 1.5; scale_max = 2.8
+			tex = _square_tex
+			col_a = Color(0.75, 0.57, 0.35, 1.0); col_b = Color(0.28, 0.22, 0.15, 0.0)
 		"projectile":
+			# 점 3~5개 — 극히 좁은 일직선, 고속, 즉시 소멸
+			count = [3, 4, 5][mag]
+			speed_min = 580.0; speed_max = 950.0
+			spread = 5.0; grav = Vector2(0, 120); lt = 0.12
+			scale_min = 0.2; scale_max = 0.45
 			tex = _slash_tex
-			spread = 10.0; grav = Vector2(0, 50); lt = 0.2
-			scale_min = 0.25; scale_max = 0.5
-			count = mini(count, 6)
-			col_a = Color(1.0, 1.0, 1.0, 1.0); col_b = Color(0.78, 0.78, 0.78, 0.0)
-			speed_min = 300.0; speed_max = 550.0
+			col_a = Color(1.0, 1.0, 0.95, 1.0); col_b = Color(0.7, 0.7, 0.65, 0.0)
 		"explosive":
-			spread = 160.0; grav = Vector2(0, 80); lt = 0.6
-			scale_min = 1.0; scale_max = 2.5
-			count = maxi(count, 14)
-			col_a = Color(1.0, 0.48, 0.08, 1.0); col_b = Color(0.1, 0.08, 0.07, 0.0)
-			speed_min = 100.0; speed_max = 240.0
+			# 전방위 대폭발 — 크고 느린 파편, 검은 연기로 페이드
+			count = [18, 24, 32][mag]
+			speed_min = 110.0; speed_max = 270.0
+			spread = 180.0; grav = Vector2(0, 110); lt = 0.8
+			scale_min = 1.6; scale_max = 3.2
+			tex = _circle_tex
+			col_a = Color(1.0, 0.44, 0.04, 1.0); col_b = Color(0.07, 0.05, 0.04, 0.0)
 		"poison":
-			spread = 70.0; grav = Vector2(0, -80); lt = 0.8
-			scale_min = 0.35; scale_max = 0.75
-			col_a = Color(0.28, 1.0, 0.18, 1.0); col_b = Color(0.08, 0.4, 0.04, 0.0)
-			speed_min = 45.0; speed_max = 110.0
+			# 아주 작은 방울 — 초저속으로 위로 둥실 떠오름
+			count = [10, 13, 16][mag]
+			speed_min = 18.0; speed_max = 60.0
+			spread = 50.0; grav = Vector2(0, -55); lt = 1.15
+			scale_min = 0.22; scale_max = 0.52
+			tex = _circle_tex
+			col_a = Color(0.22, 1.0, 0.12, 1.0); col_b = Color(0.04, 0.32, 0.02, 0.0)
+			dir = Vector2(0.0, -1.0)
 		"divine":
-			spread = 360.0; grav = Vector2(0, -150); lt = 0.6
-			scale_min = 0.6; scale_max = 1.5
-			col_a = Color(1.0, 0.94, 0.45, 1.0); col_b = Color(1.0, 1.0, 1.0, 0.0)
-			speed_min = 100.0; speed_max = 240.0
+			# 십자형 별 입자 — 위로 폭발적으로 솟구침, 황금→흰색
+			count = [12, 16, 22][mag]
+			speed_min = 220.0; speed_max = 420.0
+			spread = 75.0; grav = Vector2(0, -200); lt = 0.68
+			scale_min = 0.55; scale_max = 1.2
+			tex = _star_tex
+			col_a = Color(1.0, 0.96, 0.38, 1.0); col_b = Color(1.0, 1.0, 1.0, 0.0)
+			dir = Vector2(0.0, -1.0)
 		"curse":
-			spread = 360.0; grav = Vector2(0, -30); lt = 0.7
-			scale_min = 0.35; scale_max = 0.9
-			col_a = Color(0.6, 0.08, 0.9, 1.0); col_b = Color(0.15, 0.02, 0.25, 0.0)
-			speed_min = 60.0; speed_max = 150.0
+			# 타겟 쪽으로 빨려 들어오는 보라 입자 (radial_accel 음수)
+			count = [10, 14, 18][mag]
+			speed_min = 75.0; speed_max = 170.0
+			spread = 180.0; grav = Vector2(0, -15); lt = 0.82
+			scale_min = 0.32; scale_max = 0.82
+			tex = _circle_tex
+			col_a = Color(0.52, 0.04, 0.88, 1.0); col_b = Color(0.08, 0.0, 0.18, 0.0)
+			radial_min = -130.0; radial_max = -65.0
+		_:
+			count = [8, 14, 22][mag]
+			speed_min = 120.0; speed_max = 280.0
+			spread = 80.0; grav = Vector2(0, 200); lt = 0.35
+			scale_min = 0.6; scale_max = 1.2
+			tex = _circle_tex
+			col_a = Color(1.0, 1.0, 0.9, 1.0); col_b = Color(1.0, 0.6, 0.1, 0.0)
+
 	var grad := Gradient.new()
 	grad.set_color(0, col_a)
 	grad.set_color(1, col_b)
@@ -1599,13 +1643,16 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 	p.lifetime = lt
 	p.one_shot = true
 	p.explosiveness = 1.0
-	p.direction = Vector2(1.0 if flipped else -1.0, 0)
+	p.direction = dir
 	p.spread = spread
 	p.gravity = grav
 	p.initial_velocity_min = speed_min
 	p.initial_velocity_max = speed_max
 	p.scale_amount_min = scale_min
 	p.scale_amount_max = scale_max
+	if radial_min != 0.0:
+		p.radial_accel_min = radial_min
+		p.radial_accel_max = radial_max
 	p.color_ramp = grad
 	p.texture = tex
 	p.position = pos
