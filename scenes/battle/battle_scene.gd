@@ -1488,7 +1488,7 @@ func _start_target_bloom(panel: ColorRect, bloom_color: Color) -> void:
 		tw_p.tween_property(br, "position", orig_pos,              0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		br.set_meta("_bloom_tween_p", tw_p)
 		# 두께 2배 진동: H-bar는 y축, V-bar는 x축으로 scale
-		var fat_scale := Vector2(1.0, 2.0) if is_h else Vector2(2.0, 1.0)
+		var fat_scale := Vector2(1.0, 3.0) if is_h else Vector2(3.0, 1.0)
 		var tw_s := br.create_tween().set_loops()
 		tw_s.tween_property(br, "scale", fat_scale,      0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		tw_s.tween_property(br, "scale", Vector2.ONE,    0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
