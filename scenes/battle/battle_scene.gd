@@ -1489,9 +1489,6 @@ func _spawn_impact_particles(pos: Vector2, amount: int) -> void:
 	var grad := Gradient.new()
 	grad.set_color(0, Color(1.0, 1.0, 0.9, 1.0))
 	grad.set_color(1, Color(1.0, 0.6, 0.1, 0.0))
-	var scale_curve := Curve.new()
-	scale_curve.add_point(Vector2(0.0, 1.0))
-	scale_curve.add_point(Vector2(1.0, 0.0))
 	var p := CPUParticles2D.new()
 	p.amount = count
 	p.lifetime = 0.35
@@ -1504,7 +1501,6 @@ func _spawn_impact_particles(pos: Vector2, amount: int) -> void:
 	p.initial_velocity_max = 280.0 + speed_bonus
 	p.scale_amount_min = 0.6
 	p.scale_amount_max = 1.2
-	p.scale_curve = scale_curve
 	p.color_ramp = grad
 	p.texture = _circle_tex
 	p.position = pos
