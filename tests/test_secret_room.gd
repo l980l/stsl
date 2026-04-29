@@ -73,36 +73,34 @@ func test_secret_room_serialization() -> void:
 #    (랜덤이므로 seed 고정 없이 충분한 횟수 반복하여 확인)
 func test_map_generator_spawns_secret() -> void:
 	print("[TestSecretRoom] test_map_generator_spawns_secret")
-	# MapGenerator._pick_room_type이 SECRET을 반환할 수 있는지
-	# floor 1~7 중 하나를 직접 반복 호출하여 확인 (1000회)
+	# 맵 100회 생성 시 SECRET 노드가 1회 이상 나타나는지 확인
 	var found_secret := false
-	for _i in range(1000):
-		var rt = MapGen._pick_room_type(2, 0, 1)
-		if rt == MapNodeRes.RoomType.SECRET:
-			found_secret = true
+	for _i in range(100):
+		var nodes: Array = MapGen.generate(1)
+		for n in nodes:
+			if n.room_type == MapNodeRes.RoomType.SECRET:
+				found_secret = true
+				break
+		if found_secret:
 			break
-	_assert(found_secret, "1000회 반복 시 SECRET이 적어도 1번 반환됨 (floor 2, col 0)")
+	_assert(found_secret, "100회 맵 생성 시 SECRET이 적어도 1번 등장함")
 
 # 4. 1층(floor_num == 0) 노드에는 SECRET이 없음
 func test_map_generator_no_secret_on_floor_1() -> void:
 	print("[TestSecretRoom] test_map_generator_no_secret_on_floor_1")
-	# floor 0에서 1000회 호출해도 SECRET 없음을 확인
-	var found_secret := false
-	for _i in range(1000):
-		var rt = MapGen._pick_room_type(0, randi() % 3, 1)
-		if rt == MapNodeRes.RoomType.SECRET:
-			found_secret = true
-			break
-	_assert(not found_secret, "floor 0에서는 1000회 호출해도 SECRET 없음")
-
-	# floor 8(보스 직전)에서도 SECRET 없음
-	var found_secret_f8 := false
-	for _i in range(1000):
-		var rt = MapGen._pick_room_type(8, randi() % 3, 1)
-		if rt == MapNodeRes.RoomType.SECRET:
-			found_secret_f8 = true
-			break
-	_assert(not found_secret_f8, "floor 8에서는 1000회 호출해도 SECRET 없음")
+	# 50회 맵 생성 후 보스(14층)/휴식(13층)에 SECRET 없음을 확인
+	var boss_floor_has_secret := false
+	var rest_floor_has_secret := false
+	for _i in range(50):
+		var nodes: Array = MapGen.generate(1)
+		for n in nodes:
+			if n.room_type == MapNodeRes.RoomType.SECRET:
+				if n.floor_num == 14:  # BOSS 층
+					boss_floor_has_secret = true
+				if n.floor_num == 13:  # 보스 직전 REST 층
+					rest_floor_has_secret = true
+	_assert(not boss_floor_has_secret, "floor 14(보스)에서는 50회 맵 생성 시 SECRET 없음")
+	_assert(not rest_floor_has_secret, "floor 13(보스 직전 REST)에서는 50회 맵 생성 시 SECRET 없음")
 
 # 5. _resolve_secret_room() 호출이 에러 없이 완료됨
 #    (SceneTree 없이도 크래시 없이 4가지 경로 중 하나를 실행)

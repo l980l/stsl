@@ -69,6 +69,8 @@ static func pool() -> Array:
 		_war_drum(),            # 38
 		_warriors_resolve(),    # 39
 		_phoenix(),             # 40
+		# M6-5c 신규
+		_discard_focus(),
 	]
 
 # ───────────────────────────────────────────
@@ -669,3 +671,15 @@ static func _phoenix() -> Resource:
 	e2.effect_type = EffRes.EffectType.DRAW; e2.value = 2; e2.base_value = 2
 	e2.status_type = "low_hp"
 	c.effects = [e1, e2]; return c
+
+static func _discard_focus() -> Resource:
+	# 결단의 정리 — UNCOMMON, 0코, 기술: 손패 1장 소진 → DRAW 2장 + 에너지 +1
+	var c := CardRes.new()
+	c.card_name = "card.yi_sun_sin.discard_focus.name"; c.owner_id = "yi_sun_sin"
+	c.cost = 0; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.yi_sun_sin.discard_focus.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.DISCARD_PICK_DRAW
+	e.value = 2; e.base_value = 2
+	c.effects = [e]; return c

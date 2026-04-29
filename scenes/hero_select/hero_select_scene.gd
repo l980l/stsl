@@ -136,11 +136,23 @@ func _build_ui() -> void:
 			name_lbl.modulate = Color(1, 1, 1, 0.45)
 		card_vbox.add_child(name_lbl)
 
-		var illust := ColorRect.new()
-		illust.color = P.INK_1000 if is_locked else P.INK_900
-		illust.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		illust.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		card_vbox.add_child(illust)
+		var illust_path := "res://assets/art/heroes/%s.png" % hid
+		if ResourceLoader.exists(illust_path):
+			var illust := TextureRect.new()
+			illust.texture = load(illust_path)
+			illust.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			illust.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			illust.size_flags_vertical = Control.SIZE_EXPAND_FILL
+			illust.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			if inactive:
+				illust.modulate = Color(1, 1, 1, 0.45)
+			card_vbox.add_child(illust)
+		else:
+			var illust := ColorRect.new()
+			illust.color = P.INK_1000 if is_locked else P.INK_900
+			illust.size_flags_vertical = Control.SIZE_EXPAND_FILL
+			illust.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			card_vbox.add_child(illust)
 
 		var btn := Button.new()
 		btn.custom_minimum_size = Vector2(0, 55)
@@ -164,6 +176,15 @@ func _build_ui() -> void:
 		panel.add_child(bracket_overlay)
 		var bracket_color: Color = P.BRASS_700 if inactive else P.BRASS_500
 		SacredTheme.add_corner_brackets(bracket_overlay, bracket_color, 10, 4)
+		if is_locked:
+			var lock_tex := TextureRect.new()
+			lock_tex.texture = load("res://assets/art/ui/lock_icon.svg")
+			lock_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			lock_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			lock_tex.position = Vector2(CARD_W / 2.0 - 25, 120)
+			lock_tex.size = Vector2(50, 50)
+			lock_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			bracket_overlay.add_child(lock_tex)
 		if not inactive:
 			SacredTheme.animate_button(btn)
 

@@ -30,6 +30,8 @@ static func pool() -> Array:
 		_void_void(), _clear_wind(), _undying(),
 		_spirit_sword(), _five_rings_realm(),
 		_sword_enlightenment(),
+		# M6-5c 신규
+		_steel_strike(), _thousand_cuts(),
 	]
 
 # ─────────────────────────────────────────
@@ -661,4 +663,28 @@ static func _sword_enlightenment() -> Resource:
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.block_per_turn"
 	e.value = 30; e.base_value = 30
+	c.effects = [e]; return c
+
+static func _steel_strike() -> Resource:
+	# 강철 일격 — UNCOMMON, 1코, 공격: BLOCK만큼 피해 (placeholder value=100)
+	var c := CardRes.new()
+	c.card_name = "card.musashi.steel_strike.name"; c.owner_id = "musashi"
+	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
+	c.archetype = "card.musashi.steel_strike.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.DAMAGE_PER_BLOCK
+	e.value = 100; e.base_value = 100; e.target = "SINGLE"
+	c.effects = [e]; return c
+
+static func _thousand_cuts() -> Resource:
+	# 만 번의 베기 — UNCOMMON, 1코, 공격: 손패 1장당 4 피해 (placeholder)
+	var c := CardRes.new()
+	c.card_name = "card.musashi.thousand_cuts.name"; c.owner_id = "musashi"
+	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
+	c.archetype = "card.musashi.thousand_cuts.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.DAMAGE_PER_HAND_SIZE
+	e.value = 4; e.base_value = 4; e.target = "SINGLE"
 	c.effects = [e]; return c

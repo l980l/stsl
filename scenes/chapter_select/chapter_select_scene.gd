@@ -172,39 +172,42 @@ func _make_chapter_card(chapter: Dictionary, idx: int) -> void:
 	status_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.add_child(status_lbl)
 
-	# ── 아치 장식선 ──
-	var arch_panel := Panel.new()
-	arch_panel.position = Vector2(card_w / 2.0 - 140, 55)
-	arch_panel.size = Vector2(280, 200)
-	arch_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var arch_style := StyleBoxEmpty.new()
-	arch_panel.add_theme_stylebox_override("panel", arch_style)
-	card.add_child(arch_panel)
-
-	# ── 크레스트 글리프 ──
-	var crest_lbl := Label.new()
-	crest_lbl.text = crest
-	crest_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	crest_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	crest_lbl.add_theme_font_size_override("font_size", 96)
-	crest_lbl.add_theme_color_override("font_color",
-			P.BRASS_300 if unlocked else P.FG_4)
-	crest_lbl.position = Vector2(0, 60)
-	crest_lbl.size = Vector2(card_w, 220)
-	crest_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(crest_lbl)
+	# ── 크레스트 SVG 맵 (이모지 폴백) ──
+	var crest_svg := "res://assets/art/ui/chapter%d_crest.svg" % chapter["id"]
+	if ResourceLoader.exists(crest_svg):
+		var crest_tex := TextureRect.new()
+		crest_tex.texture = load(crest_svg)
+		crest_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		crest_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		crest_tex.position = Vector2(card_w / 2.0 - 140, 55)
+		crest_tex.size = Vector2(280, 200)
+		crest_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if not unlocked:
+			crest_tex.modulate = Color(1, 1, 1, 0.4)
+		card.add_child(crest_tex)
+	else:
+		var crest_lbl := Label.new()
+		crest_lbl.text = crest
+		crest_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		crest_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		crest_lbl.add_theme_font_size_override("font_size", 96)
+		crest_lbl.add_theme_color_override("font_color",
+				P.BRASS_300 if unlocked else P.FG_4)
+		crest_lbl.position = Vector2(0, 60)
+		crest_lbl.size = Vector2(card_w, 220)
+		crest_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(crest_lbl)
 
 	# ── 잠금 아이콘 (잠긴 경우) ──
 	if not unlocked:
-		var lock_lbl := Label.new()
-		lock_lbl.text = "⛨"
-		lock_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lock_lbl.add_theme_font_size_override("font_size", 32)
-		lock_lbl.add_theme_color_override("font_color", P.BRASS_600)
-		lock_lbl.position = Vector2(card_w / 2.0 - 30, 165)
-		lock_lbl.size = Vector2(60, 50)
-		lock_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		card.add_child(lock_lbl)
+		var lock_tex := TextureRect.new()
+		lock_tex.texture = load("res://assets/art/ui/lock_icon.svg")
+		lock_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		lock_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		lock_tex.position = Vector2(card_w / 2.0 - 30, 158)
+		lock_tex.size = Vector2(60, 60)
+		lock_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(lock_tex)
 
 	# ── 하단 플레이트 구분선 ──
 	var plate_line := ColorRect.new()

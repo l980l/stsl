@@ -139,16 +139,29 @@ func _build_tally(cx: float) -> void:
 		add_child(box)
 		SacredTheme.add_corner_brackets(box, P.BRASS_500, 8, 3)
 
+		var lbl_wrap := Control.new()
+		lbl_wrap.position = Vector2(0.0, 7.0)
+		lbl_wrap.size = Vector2(box_w, 16.0)
+		lbl_wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(lbl_wrap)
+
 		var lbl := Label.new()
 		lbl.text = tr(d["key"])
 		lbl.add_theme_font_override("font", mono_font)
 		lbl.add_theme_font_size_override("font_size", 9)
 		lbl.add_theme_color_override("font_color", P.BONE_400)
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lbl.position = Vector2(0.0, 7.0)
-		lbl.size = Vector2(box_w, 16.0)
+		lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		box.add_child(lbl)
+		lbl_wrap.add_child(lbl)
+		lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		LabelUtils.fit_text(lbl, 9, 7, box_w)
+
+		var num_wrap := Control.new()
+		num_wrap.position = Vector2(0.0, 28.0)
+		num_wrap.size = Vector2(box_w, 28.0)
+		num_wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(num_wrap)
 
 		var num := Label.new()
 		num.text = d["val"]
@@ -156,10 +169,10 @@ func _build_tally(cx: float) -> void:
 		num.add_theme_font_size_override("font_size", 24)
 		num.add_theme_color_override("font_color", P.BONE_100)
 		num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		num.position = Vector2(0.0, 28.0)
-		num.size = Vector2(box_w, 28.0)
 		num.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		box.add_child(num)
+		num_wrap.add_child(num)
+		num.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		LabelUtils.fit_text(num, 24, 14, box_w)
 
 func _build_section_header(sx: float, sw: float, cx: float) -> void:
 	var P := SacredPalette

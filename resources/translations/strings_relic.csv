@@ -20,17 +20,17 @@ relic.serpent_bracelet.desc,전투 시작 시 무작위 적 독 2 (클레오파�
 relic.turtle_ship_model.name,거북선 모형,Turtle Ship Model,Maquette du bateau-tortue,Modello di Nave Tartaruga,Maqueta de Barco Tortuga,亀甲船の模型,Μοντέλο Πλοίου Χελώνα,龟船模型,龟船模型
 relic.turtle_ship_model.desc,플레이어 턴 시작 시 방어도 +2 (이순신 생존 시 +4),Block +2 or +4 if Yi lives,Blocage +2 ou 4 si Yi vit,Difesa +2 o 4 se Yi vive,Defensa +2 o 4 si Yi vive,ターン開始時、防御+2（イ・スンシン生存時4）,+2 ή +4 Άμυνα αν ζει ο Γι,玩家回合开始时护甲 +2（李舜臣存活时 +4）,玩家回合开始时护甲 +2（李舜臣存活时 +4）
 relic.artillery_horn.name,포병 나팔,Artillery Horn,Cor de l'artillerie,Corno dell'Artiglieria,Cuerno de Artillería,砲兵のラッパ,Κέρας του Πυροβολικού,炮兵喇叭,炮兵喇叭
-relic.artillery_horn.desc,플레이어 턴 시작 시 사기 +1 (나폴레옹 생존 시 적용),Morale +1 if Napoleon lives,Morale +1 si Napoléon vit,Morale +1 se Napoleone vive,Moral +1 si Napoleón vive,ターン開始時、士気+1（ナポ레온生存時）,+1 Ηθικό αν ζει ο Ναπολέων,玩家回合开始时士气 +1（拿破仑存活时）,玩家回合开始时士气 +1（拿破仑存活时）
+relic.artillery_horn.desc,플레이어 턴 시작 시 사기 +1 (나폴레옹 생존 시 적용),Morale +1 if Napoleon lives,Morale +1 si Napoléon vit,Morale +1 se Napoleone vive,Moral +1 si Napoleón vive,ターン開始時、士気+1（ナポレオン生存時）,+1 Ηθικό αν ζει ο Ναπολέων,玩家回合开始时士气 +1（拿破仑存活时）,玩家回合开始时士气 +1（拿破仑存活时）
 relic.nanjung_ilgi.name,난중일기,Nanjung Ilgi (War Diary),Nanjung Ilgi (Journal de guerre),Nanjung Ilgi (Diario),Nanjung Ilgi (Diario),乱中日記,Ναντζούνγκ Ίλγκι (Ημερολόγιο),乱中日记,乱中日记
 relic.nanjung_ilgi.desc,전투 승리 시 팀 HP +8 (이순신 생존 시 적용),Team HP +8 if Yi lives,PV +8 si Yi vit,PV +8 se Yi vive,PV +8 si Yi vive,勝利時、チームHP+8（イ・スンシン生存時）,+8 HP αν ζει ο Γι στη νίκη,战斗胜利时全队HP +8（李舜臣存活时）,战斗胜利时全队HP +8（李舜臣存活时）
 relic.pharaoh_seal.name,파라오의 인장,Pharaoh's Seal,Sceau du Pharaon,Sigillo del Faraone,Sello del Faraón,ファラオの印章,Σφραγίδα του Φαραώ,法老印章,法老印章
 relic.pharaoh_seal.desc,플레이어 턴 시작 시 무작위 적 독 +1 (클레오파트라 생존 시 적용),Poison +1 if Cleo lives,Poison +1 si Cléo vit,Veleno +1 se Cleo vive,Veneno +1 si Cleo vive,ターン開始時、毒+1（クレオパトラ生存時）,+1 Δηλητήριο αν ζει η Κλεοπάτρα,玩家回合开始时随机敌方中毒 +1（克利奥帕特拉存活时）,玩家回合开始时随机敌方中毒 +1（克利奥帕特拉存活时）
 relic.devils_contract.name,악마의 계약,Devil's Contract,Contrat du Diable,Contratto del Diavolo,Contrato del Diablo,悪魔の契約,Συμβόλαιο με τον Διάβολο,恶魔契约,恶魔契约
-relic.devils_contract.desc,전투 승리 시 팀 HP +20. 단 매 플레이어 턴 시작 시 무작위 영웅 HP -3,+20 HP on win, but -3 per turn,+20 PV à la fin, -3 par tour,+20 PV alla vittoria, -3 ogni turno,+20 PV al ganar, -3 cada turno,勝利時HP+20、毎ターン開始時ランダムHP-3,+20 HP στη νίκη, -3 HP κάθε γύρο,战胜HP +20，但每回合开始随机英雄HP -3,+20 PV al ganar
+relic.devils_contract.desc,전투 승리 시 팀 HP +20. 단 매 플레이어 턴 시작 시 무작위 영웅 HP -3,"+20 HP on win, but -3 per turn","+20 PV à la fin, -3 par tour","+20 PV alla vittoria, -3 ogni turno","+20 PV al ganar, -3 cada turno",勝利時HP+20、毎ターン開始時ランダムHP-3,"+20 HP στη νίκη, -3 HP κάθε γύρο",战胜HP +20，但每回合开始随机英雄HP -3,战胜HP +20，但每回合开始随机英雄HP -3
 relic.cursed_crown.name,저주받은 왕관,Cursed Crown,Couronne maudite,Corona Maledetta,Corona Maldita,呪われた王冠,Καταραμένο Στέμμα,被诅咒的王冠,被诅咒的王冠
-relic.cursed_crown.desc,최대 HP +25. 단 매 전투 시작 시 무작위 영웅 HP -8,Max HP +25, but -8 at start,PV Max +25, -8 au début,PV Max +25, -8 all'inizio,PV Máx +25, -8 al inicio,最大HP+25、戦闘開始時ランダムHP-8,+25 Μέγιστη HP, -8 HP στην αρχή,最大HP +25，但战斗开始时随机英雄HP -8,PV Máx +25
+relic.cursed_crown.desc,최대 HP +25. 단 매 전투 시작 시 무작위 영웅 HP -8,"Max HP +25, but -8 at start","PV Max +25, -8 au début","PV Max +25, -8 all'inizio","PV Máx +25, -8 al inicio",最大HP+25、戦闘開始時ランダムHP-8,"+25 Μέγιστη HP, -8 HP στην αρχή",最大HP +25，但战斗开始时随机英雄HP -8,最大HP +25，但战斗开始时随机英雄HP -8
 relic.blood_oath.name,피의 서약,Blood Oath,Serment de sang,Giuramento di Sangue,Juramento de Sangre,血の誓約,Όρκος Αίματος,血液誓约,血液誓约
-relic.blood_oath.desc,플레이어 턴 시작 시 에너지 +1. 단 턴 종료 시 무작위 영웅 HP -4,Energy +1, but -4 HP at end,Énergie +1, -4 PV à la fin,Energia +1, -4 PV alla fine,Energía +1, -4 PV al final,ターン開始時エネ+1、終了時ランダムHP-4,+1 Ενέργεια, -4 HP στο τέλος,回合开始能量 +1，但结束时随机英雄HP -4,Energía +1
+relic.blood_oath.desc,플레이어 턴 시작 시 에너지 +1. 단 턴 종료 시 무작위 영웅 HP -4,"Energy +1, but -4 HP at end","Énergie +1, -4 PV à la fin","Energia +1, -4 PV alla fine","Energía +1, -4 PV al final",ターン開始時エネ+1、終了時ランダムHP-4,"+1 Ενέργεια, -4 HP στο τέλος",回合开始能量 +1，但结束时随机英雄HP -4,回合开始能量 +1，但结束时随机英雄HP -4
 relic.tacticians_map.name,전술가의 지도,Tactician's Map,Carte du tacticien,Mappa del Tattico,Mapa del Táctico,戦術家の地図,Χάρτης του Τακτικού,战术家地图,战术家地图
 relic.tacticians_map.desc,전투 시작 시 카드 1장 추가 드로우,Draw 1 extra card at start,Pioche 1 carte bonus au début,Pesca 1 carta extra all'inizio,Roba 1 carta extra al inicio,戦闘開始時、カードを1枚追加で引く,+1 κάρτα στην αρχή της μάχης,战斗开始时额外抽 1 张牌,战斗开始时额外抽 1 张牌
 relic.iron_will.name,강철 의지,Iron Will,Volonté de fer,Volontà di Ferro,Voluntad de Hierro,鋼の意志,Σιδερένια Θέληση,钢铁意志,钢铁意志
@@ -39,9 +39,9 @@ relic.ancient_shield.name,고대의 방패,Ancient Shield,Bouclier antique,Antic
 relic.ancient_shield.desc,전투 시작 시 팀 전체 방어도 +4,Team Block +4 at start,Blocage +4 au début,Difesa +4 all'inizio,Defensa +4 al inicio,戦闘開始時、チーム全体の防御+4,+4 Άμυνα στην ομάδα στην αρχή,战斗开始时全队护甲 +4,战斗开始时全队护甲 +4
 relic.ankh_of_life.name,앙크의 생명,Ankh of Life,Ankh de vie,Ankh della Vita,Ankh de Vida,アンクの命,Άνκχ της Ζωής,安卡生命之符,安卡生命之符
 relic.ankh_of_life.desc,전투 승리 시 팀 전체 HP +12,Team HP +12 on victory,PV +12 après une victoire,PV +12 alla vittoria,PV +12 al ganar,勝利時、チーム全体のHP+12,+12 HP στην ομάδα μετά τη νίκη,战斗胜利时全队HP +12,战斗胜利时全队HP +12
-relic.eye_of_horus.name,호루스의 눈,Eye of Horus,Œil d'Horus,Occhio di Horus,Ojo de Horus,ホル스의目,Μάτι του Ώρου,荷鲁斯之眼,荷鲁斯之眼
+relic.eye_of_horus.name,호루스의 눈,Eye of Horus,Œil d'Horus,Occhio di Horus,Ojo de Horus,ホルスの目,Μάτι του Ώρου,荷鲁斯之眼,荷鲁斯之眼
 relic.eye_of_horus.desc,플레이어 턴 시작 시 카드 1장 드로우. 클레오파트라 생존 시 +2장,Draw 1 or 2 cards if Cleo lives,Pioche 1 ou 2 si Cléo vit,Pesca 1 o 2 se Cleo vive,Roba 1 o 2 si Cleo vive,ターン開始時カード1枚引く（クレオ生存時2）,+1 ή +2 κάρτες αν ζει η Κλεοπάτρα,回合开始抽 1 张牌（克利奥帕特拉存活时 +2）,回合开始抽 1 张牌（克利奥帕特拉存活时 +2）
-relic.scarab_talisman.name,스카라베 부적,Scarab Talisman,Talisman du scarabée,Talismano dello Scarabeo,Talismán de Escarabajo,スカラ베の守護札,Φυλαχτό Σκαραβαίος,圣甲虫护身符,圣甲虫护身符
+relic.scarab_talisman.name,스카라베 부적,Scarab Talisman,Talisman du scarabée,Talismano dello Scarabeo,Talismán de Escarabajo,スカラベの守護札,Φυλαχτό Σκαραβαίος,圣甲虫护身符,圣甲虫护身符
 relic.scarab_talisman.desc,전투 시작 시 팀 전체 방어도 +8,Team Block +8 at start,Blocage +8 au début,Difesa +8 all'inizio,Defensa +8 al inicio,戦闘開始時、チーム全体の防御+8,+8 Άμυνα στην ομάδα στην αρχή,战斗开始时全队护甲 +8,战斗开始时全队护甲 +8
 relic.rune_of_fate.name,운명의 룬,Rune of Fate,Rune du destin,Runa del Destino,Runa del Destino,運命のルーン,Ρούνος του Πεπρωμένου,命运卢恩,命运卢恩
 relic.rune_of_fate.desc,전투 시작 시 카드 2장 추가 드로우,Draw 2 extra cards at start,Pioche 2 bonus au début,Pesca 2 extra all'inizio,Roba 2 extra al inicio,戦闘開始時、カードを2枚追加で引く,+2 κάρτες στην αρχή της μάχης,战斗开始时额外抽 2 张牌,战斗开始时额外抽 2 张牌
@@ -49,7 +49,7 @@ relic.mjolnir_shard.name,묠니르의 파편,Mjolnir Shard,Éclat de Mjölnir,Fr
 relic.mjolnir_shard.desc,전투 시작 시 팀 전체 방어도 +10,Team Block +10 at start,Blocage +10 au début,Difesa +10 all'inizio,Defensa +10 al inicio,戦闘開始時、チーム全体の防御+10,+10 Άμυνα στην ομάδα στην αρχή,战斗开始时全队护甲 +10,战斗开始时全队护甲 +10
 relic.idun_apple.name,이둔의 사과,Idun's Apple,Pomme d'Idunn,Mela di Idun,Manzana de Idun,イズンのリンゴ,Μήλο της Ιντούν,伊登苹果,伊登苹果
 relic.idun_apple.desc,전투 승리 시 팀 전체 HP +15,Team HP +15 on victory,PV +15 après une victoire,PV +15 alla vittoria,PV +15 al ganar,勝利時、チーム全体のHP+15,+15 HP στην ομάδα μετά τη νίκη,战斗胜利时全队HP +15,战斗胜利时全队HP +15
-relic.underworld_talisman.name,저승 부적,Underworld Talisman,Talisman des enfers,Talismano dell'Oltretomba,Talismán del Inframundo,冥界의 護符,Φυλαχτό του Κάτω Κόσμου,阴间护身符,阴间护身符
+relic.underworld_talisman.name,저승 부적,Underworld Talisman,Talisman des enfers,Talismano dell'Oltretomba,Talismán del Inframundo,冥界の護符,Φυλαχτό του Κάτω Κόσμου,阴间护身符,阴间护身符
 relic.underworld_talisman.desc,전투 시작 시 에너지 +1,Energy +1 at start,Énergie +1 au début,Energia +1 all'inizio,Energía +1 al inicio,戦闘開始時、エネルギー+1,+1 Ενέργεια στην αρχή της μάχης,战斗开始时能量 +1,战斗开始时能量 +1
 relic.dokkaebi_hammer_shard.name,도깨비 방망이 파편,Dokkaebi Hammer Shard,Éclat de gourdin Dokkaebi,Frammento di Randello Dokkaebi,Fragmento de Maza Dokkaebi,トッケビの金棒の破片,Θραύσμα του Ροπάλου Ντοκάεμπι,独角鬼大棒碎片,独角鬼大棒碎片
 relic.dokkaebi_hammer_shard.desc,전투 승리 시 팀 사기 +3,Team Morale +3 on victory,Morale +3 après une victoire,Morale +3 alla vittoria,Moral +3 al ganar,勝利時、チーム全体の士気+3,+3 Ηθικό στην ομάδα μετά τη νίκη,战斗胜利时全队士气 +3,战斗胜利时全队士气 +3

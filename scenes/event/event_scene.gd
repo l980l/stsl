@@ -60,6 +60,19 @@ func _build_illo(frame: Panel, event: Resource) -> void:
 	illo.clip_contents = true
 	frame.add_child(illo)
 
+	# 이벤트 일러스트 (event_name 키 → ID 추출: "event.act1.golden_chest.name" → "golden_chest")
+	var parts: PackedStringArray = event.event_name.split(".")
+	if parts.size() >= 3:
+		var illust_path := "res://assets/art/events/%s.png" % parts[2]
+		if ResourceLoader.exists(illust_path):
+			var illo_tex := TextureRect.new()
+			illo_tex.texture = load(illust_path)
+			illo_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			illo_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			illo_tex.size = Vector2(FRAME_W, ILLO_H)
+			illo_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			illo.add_child(illo_tex)
+
 	# 중앙 금빛 환경광
 	var cg := Gradient.new()
 	var bc := SacredPalette.BRASS_300

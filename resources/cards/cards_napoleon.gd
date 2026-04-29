@@ -29,6 +29,8 @@ static func pool() -> Array:
 		_victory_proclamation(), _great_army_siege(), _emperors_encirclement(),
 		_one_man_army(), _strategic_retreat(), _emperors_assault(),
 		_empire_glory(),
+		# M6-5c 신규
+		_legion_charge(), _glory_shout(),
 	]
 
 # ─────────────────────────────────────────
@@ -615,4 +617,28 @@ static func _empire_glory() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.SUMMON_TOKEN
 	e.value = 1; e.base_value = 1
+	c.effects = [e]; return c
+
+static func _legion_charge() -> Resource:
+	# 군단의 진격 — UNCOMMON, 2코, 공격: 토큰 1개당 5 피해 (placeholder)
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.legion_charge.name"; c.owner_id = "napoleon"
+	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
+	c.archetype = "card.napoleon.legion_charge.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.DAMAGE_PER_TOKEN
+	e.value = 5; e.base_value = 5; e.target = "SINGLE"
+	c.effects = [e]; return c
+
+static func _glory_shout() -> Resource:
+	# 영광의 함성 — UNCOMMON, 1코, 기술: 사기 1당 BLOCK +1 (placeholder)
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.glory_shout.name"; c.owner_id = "napoleon"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.napoleon.glory_shout.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.MORALE_TO_BLOCK
+	e.value = 1; e.base_value = 1; e.target = "SELF"
 	c.effects = [e]; return c

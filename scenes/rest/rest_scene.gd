@@ -85,6 +85,17 @@ func _build_illo(frame: Panel) -> void:
 	illo.clip_contents = true
 	frame.add_child(illo)
 
+	# 휴식 씬 일러스트
+	const REST_ILLUST := "res://assets/art/scenes/rest.png"
+	if ResourceLoader.exists(REST_ILLUST):
+		var illo_tex := TextureRect.new()
+		illo_tex.texture = load(REST_ILLUST)
+		illo_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		illo_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		illo_tex.size = Vector2(FRAME_W, ILLO_H)
+		illo_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		illo.add_child(illo_tex)
+
 	# 중앙 금빛 환경광
 	var cg := Gradient.new()
 	var bc := SacredPalette.BRASS_300

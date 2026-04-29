@@ -72,6 +72,13 @@ func exhaust_card(card: Resource) -> void:
 	exhaust_pile.append(card)
 	hand_changed.emit()
 
+func discard_card(card: Resource) -> void:
+	if not hand.has(card):
+		return
+	hand.erase(card)
+	discard_pile.append(card)
+	hand_changed.emit()
+
 func discard_hand() -> void:
 	for card in hand:
 		discard_pile.append(card)

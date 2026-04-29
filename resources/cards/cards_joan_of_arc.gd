@@ -27,6 +27,8 @@ static func pool() -> Array:
 		_holy_purification(), _knights_guard(), _martyrs_legacy(), _revive_ritual(), _miracle_chain(),
 		_last_shield(), _purifying_sacrifice(), _saints_vow(), _joan_return(), _holy_war(),
 		_choir(),
+		# M6-5c 신규
+		_martyr_wrath(), _dead_blessing(),
 	]
 
 # ─────────────────────────────────────────
@@ -628,4 +630,28 @@ static func _choir() -> Resource:
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.heal_team_per_turn"
 	e.value = 20; e.base_value = 20
+	c.effects = [e]; return c
+
+static func _martyr_wrath() -> Resource:
+	# 순교자의 분노 — UNCOMMON, 2코, 공격: 사망 아군 수 × 12 피해 (placeholder)
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.martyr_wrath.name"; c.owner_id = "joan_of_arc"
+	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
+	c.archetype = "card.joan_of_arc.martyr_wrath.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.DAMAGE_PER_DEAD_ALLY
+	e.value = 12; e.base_value = 12; e.target = "SINGLE"
+	c.effects = [e]; return c
+
+static func _dead_blessing() -> Resource:
+	# 망자의 축복 — UNCOMMON, 1코, 기술: 사망 아군 수 × 8 HP 팀 전체 회복 (placeholder)
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.dead_blessing.name"; c.owner_id = "joan_of_arc"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.dead_blessing.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.HEAL_PER_DEAD_ALLY
+	e.value = 8; e.base_value = 8; e.target = "ALL"
 	c.effects = [e]; return c
