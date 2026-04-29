@@ -1585,7 +1585,7 @@ func _on_hero_damaged(hero_id: String, amount: int) -> void:
 	if char_node:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
-		var hero_spark_pos := char_node.position + Vector2(randf_range(-28.0, 28.0), randf_range(-80.0, -30.0))
+		var hero_spark_pos: Vector2 = char_node.position + Vector2(randf_range(-28.0, 28.0), randf_range(-80.0, -30.0))
 		_spawn_impact_particles(hero_spark_pos, amount, true)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
