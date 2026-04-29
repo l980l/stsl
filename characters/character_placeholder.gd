@@ -4,12 +4,38 @@
 # AnimatedSprite2D + 실제 스프라이트로 교체하면 됨
 extends Node2D
 
+const _FLASH_SHADER := """
+shader_type canvas_item;
+uniform vec4 flash_color : source_color = vec4(0.0);
+void fragment() {
+	COLOR.rgb += flash_color.rgb * flash_color.a;
+	COLOR.a = 1.0;
+}
+"""
+
 @onready var body: ColorRect = $Body
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
 
+var _flash_mat: ShaderMaterial = null
+var _flash_tween: Tween = null
+
 func _ready() -> void:
+	var shader := Shader.new()
+	shader.code = _FLASH_SHADER
+	_flash_mat = ShaderMaterial.new()
+	_flash_mat.shader = shader
+	body.material = _flash_mat
 	_build_animations()
 	anim_player.play("idle")
+
+func flash(color: Color, duration: float) -> void:
+	if _flash_tween and _flash_tween.is_valid(): _flash_tween.kill()
+	_flash_mat.set_shader_parameter("flash_color", color)
+	_flash_tween = create_tween()
+	_flash_tween.tween_method(
+		func(a: float) -> void: _flash_mat.set_shader_parameter("flash_color", Color(color.r, color.g, color.b, a)),
+		color.a, 0.0, duration
+	)
 
 func _build_animations() -> void:
 	var lib := AnimationLibrary.new()

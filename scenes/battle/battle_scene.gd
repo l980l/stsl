@@ -1361,24 +1361,23 @@ func _refresh_all_hero_ui() -> void:
 		if entry["hero_id"] != "":
 			_update_hero_ui(entry["hero_id"])
 
-const _HIT_FLASH_COLOR := Color(2.0, 0.6, 0.6, 1.0)
-
 func _play_hit_flash(node: Node2D) -> void:
 	if node == null: return
-	var prev: Tween = node.get_meta("_flash_tween", null)
-	if prev and prev.is_valid(): prev.kill()
-	node.modulate = Color.WHITE
-	var tw := create_tween().set_parallel(false)
-	tw.tween_property(node, "modulate", _HIT_FLASH_COLOR, 0.04)
-	tw.tween_property(node, "modulate", Color.WHITE, 0.08)
-	node.set_meta("_flash_tween", tw)
+	if node.has_method("flash"):
+		node.flash(Color(1.0, 0.2, 0.2, 1.0), 0.18)
+
+func _play_status_flash(node: Node2D, status_color: Color) -> void:
+	if node == null: return
+	if node.has_method("flash"):
+		node.flash(Color(status_color.r, status_color.g, status_color.b, 0.85), 0.45)
 
 func _play_hit_shake(node: Node2D, amount: int) -> void:
 	if node == null or amount <= 0: return
-	var prev: Tween = node.get_meta("_shake_tween", null)
-	if prev and prev.is_valid():
-		prev.kill()
-		node.position = node.get_meta("_shake_orig_pos", node.position)
+	if node.has_meta("_shake_tween"):
+		var prev: Tween = node.get_meta("_shake_tween")
+		if prev and prev.is_valid():
+			prev.kill()
+			node.position = node.get_meta("_shake_orig_pos") if node.has_meta("_shake_orig_pos") else node.position
 	var mag: float = 6.0
 	if amount >= 100: mag = 20.0
 	elif amount >= 30: mag = 12.0
@@ -1390,6 +1389,7 @@ func _play_hit_shake(node: Node2D, amount: int) -> void:
 	tw.tween_property(node, "position", orig + Vector2(-mag * 0.4, 0), 0.06)
 	tw.tween_property(node, "position", orig, 0.08)
 	node.set_meta("_shake_tween", tw)
+
 
 const _POPUP_FONT := preload("res://assets/fonts/IMFellEnglish-Italic.ttf")
 
@@ -1439,7 +1439,29 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 	if not _STATUS_POPUP_INFO.has(status_type):
 		return
 	var info: Array = _STATUS_POPUP_INFO[status_type]
-	_spawn_popup(world_pos, info[0], info[1], 22, stack_key)
+	var count: int = _popup_stack.get(stack_key, 0)
+	_popup_stack[stack_key] = count + 1
+	var lbl := Label.new()
+	lbl.text = info[0]
+	lbl.modulate = info[1]
+	lbl.add_theme_font_override("font", _POPUP_FONT)
+	lbl.add_theme_font_size_override("font_size", 26)
+	var spawn_pos := Vector2(world_pos.x + randf_range(-15.0, 15.0), world_pos.y + count * 32.0)
+	lbl.position = spawn_pos
+	lbl.pivot_offset = Vector2(30, 13)
+	lbl.scale = Vector2.ZERO
+	lbl.z_index = 20
+	add_child(lbl)
+	var tw := create_tween()
+	tw.tween_property(lbl, "scale", Vector2(1.3, 1.3), 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(lbl, "scale", Vector2(1.0, 1.0), 0.08)
+	tw.set_parallel(true)
+	tw.tween_property(lbl, "position:y", spawn_pos.y - 55.0, 0.7).set_delay(0.2)
+	tw.tween_property(lbl, "modulate:a", 0.0, 0.7).set_delay(0.2)
+	tw.chain().tween_callback(func() -> void:
+		lbl.queue_free()
+		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
+	)
 
 func _on_hero_healed(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)
@@ -1792,12 +1814,18 @@ func _make_power_item(base_key: String, v: int) -> Control:
 	return hbox
 
 func _on_status_applied(target: String, status_type: String, _stacks: int) -> void:
+	var flash_color: Color = Color.WHITE
+	if _STATUS_POPUP_INFO.has(status_type):
+		flash_color = _STATUS_POPUP_INFO[status_type][1]
 	if target.begins_with("enemy_"):
 		var idx := target.substr(6).to_int()
 		_refresh_status_icons_enemy(idx)
 		if idx < _enemy_nodes.size() and _enemy_nodes[idx]["panel"].visible:
 			var panel: ColorRect = _enemy_nodes[idx]["panel"]
 			_spawn_status_popup(panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0), status_type, target)
+		var char_node: Node2D = _enemy_char_nodes[idx] if idx < _enemy_char_nodes.size() else null
+		if flash_color != Color.WHITE:
+			_play_status_flash(char_node, flash_color)
 	else:
 		_refresh_status_icons_hero(target)
 		for entry in _hero_nodes:
@@ -1805,6 +1833,9 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 				var panel: ColorRect = entry["panel"]
 				_spawn_status_popup(panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0), status_type, target)
 				break
+		var char_node: Node2D = _hero_char_nodes.get(target)
+		if flash_color != Color.WHITE:
+			_play_status_flash(char_node, flash_color)
 
 func _refresh_debug_badge() -> void:
 	if _debug_badge == null:
