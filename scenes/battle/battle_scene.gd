@@ -58,6 +58,7 @@ var _drag_t_offset: float = 0.0
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
 var _circle_tex: ImageTexture = null
+var _corner_glow_tex: GradientTexture2D = null
 var _last_card_play_pos: Vector2 = Vector2.ZERO
 var _popup_stack: Dictionary = {}
 var _grad_cache: Dictionary = {}
@@ -1466,36 +1467,56 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
 	)
 
+func _get_corner_glow_tex() -> GradientTexture2D:
+	if _corner_glow_tex != null:
+		return _corner_glow_tex
+	var grad := Gradient.new()
+	grad.set_color(0, Color(1, 1, 1, 1))
+	grad.set_color(1, Color(1, 1, 1, 0))
+	var tex := GradientTexture2D.new()
+	tex.gradient = grad
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5)
+	tex.width = 64
+	tex.height = 64
+	_corner_glow_tex = tex
+	return tex
+
 func _start_target_bloom(panel: ColorRect, bloom_color: Color) -> void:
-	var center := panel.size * 0.5
 	for child in panel.get_children():
-		if not child.get_meta("_corner_bracket", false):
-			continue
-		var br: ColorRect = child
-		var br_center := br.position + br.size * 0.5
-		var dir := (br_center - center).normalized()
-		var orig_pos := br.position
-		br.modulate = bloom_color
-		br.set_meta("_bloom_orig_pos", orig_pos)
-		var tw := br.create_tween().set_loops()
-		tw.tween_property(br, "position", orig_pos + dir * 6.0, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tw.tween_property(br, "position", orig_pos, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		br.set_meta("_bloom_tween", tw)
+		if child.get_meta("_corner_bracket", false):
+			child.modulate = bloom_color
+	var tex := _get_corner_glow_tex()
+	var gs := 88.0
+	var half := gs * 0.5
+	var W := panel.size.x
+	var H := panel.size.y
+	for cp in [Vector2(0, 0), Vector2(W, 0), Vector2(0, H), Vector2(W, H)]:
+		var tr := TextureRect.new()
+		tr.texture = tex
+		tr.size = Vector2(gs, gs)
+		tr.position = cp - Vector2(half, half)
+		tr.pivot_offset = Vector2(half, half)
+		tr.modulate = Color(bloom_color.r, bloom_color.g, bloom_color.b, 0.0)
+		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tr.set_meta("_corner_glow", true)
+		panel.add_child(tr)
+		var tw_s := tr.create_tween().set_loops()
+		tw_s.tween_property(tr, "scale", Vector2(1.6, 1.6), 0.7)\
+			.from(Vector2(0.35, 0.35))\
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		var tw_a := tr.create_tween().set_loops()
+		tw_a.tween_property(tr, "modulate:a", 0.0, 0.7)\
+			.from(0.9)\
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 func _stop_target_bloom(panel: ColorRect) -> void:
 	for child in panel.get_children():
-		if not child.get_meta("_corner_bracket", false):
-			continue
-		var br: ColorRect = child
-		if br.has_meta("_bloom_tween"):
-			var tw: Tween = br.get_meta("_bloom_tween")
-			if tw and tw.is_valid():
-				tw.kill()
-			br.remove_meta("_bloom_tween")
-		br.modulate = Color.WHITE
-		if br.has_meta("_bloom_orig_pos"):
-			br.position = br.get_meta("_bloom_orig_pos")
-			br.remove_meta("_bloom_orig_pos")
+		if child.get_meta("_corner_bracket", false):
+			child.modulate = Color.WHITE
+		elif child.get_meta("_corner_glow", false):
+			child.queue_free()
 
 func _make_circle_texture() -> ImageTexture:
 	var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
@@ -1564,7 +1585,8 @@ func _on_hero_damaged(hero_id: String, amount: int) -> void:
 	if char_node:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
-		_spawn_impact_particles(char_node.position, amount, true)
+		var hero_spark_pos := char_node.position + Vector2(randf_range(-28.0, 28.0), randf_range(-80.0, -30.0))
+		_spawn_impact_particles(hero_spark_pos, amount, true)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):
