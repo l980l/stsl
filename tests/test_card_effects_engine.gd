@@ -34,6 +34,8 @@ func run_all() -> Dictionary:
 	test_damage_per_dead_ally_no_dead()
 	test_double_next_damage_happy()
 	test_double_next_damage_no_power()
+	test_double_next_damage_cross_hero()
+	test_double_next_damage_poison_tick()
 	test_exhaust_draw_happy()
 	test_exhaust_draw_empty_hand()
 	test_morale_to_block_happy()
@@ -367,7 +369,7 @@ func test_double_next_damage_happy() -> void:
 	eff_dnd.value = 0
 	bm._apply_card_effects(_make_card("genghis_khan", [eff_dnd]), -1)
 	# 파워 등록 확인
-	_assert(bm._active_powers.has("power.double_next_damage:genghis_khan"), "DOUBLE_NEXT_DAMAGE: 파워 슬롯 등록됨")
+	_assert(bm._active_powers.has("power.double_next_damage:__global__"), "DOUBLE_NEXT_DAMAGE: 글로벌 파워 슬롯 등록됨")
 	# 다음 DAMAGE 50 → ×2 = 100 피해
 	var eff_dmg := EffectRes.new()
 	eff_dmg.effect_type = EffectRes.EffectType.DAMAGE
@@ -375,7 +377,7 @@ func test_double_next_damage_happy() -> void:
 	bm._apply_card_effects(_make_card("genghis_khan", [eff_dmg]), 0)
 	_assert(bm.get_enemy_hp(0) == 400, "DOUBLE_NEXT_DAMAGE: 50 × 2 = 100 피해 (500→400)")
 	# 파워 소비 후 사라졌는지 확인
-	_assert(not bm._active_powers.has("power.double_next_damage:genghis_khan"), "DOUBLE_NEXT_DAMAGE: 파워 1회 소비 후 제거됨")
+	_assert(not bm._active_powers.has("power.double_next_damage:__global__"), "DOUBLE_NEXT_DAMAGE: 파워 1회 소비 후 제거됨")
 
 func test_double_next_damage_no_power() -> void:
 	print("[TestCardEffectsEngine] test_double_next_damage_no_power")
@@ -389,9 +391,46 @@ func test_double_next_damage_no_power() -> void:
 	bm._apply_card_effects(_make_card("genghis_khan", [eff_dmg]), 0)
 	_assert(bm.get_enemy_hp(0) == 450, "DOUBLE_NEXT_DAMAGE: 파워 없으면 배율 미적용 (500→450)")
 
-# 9. EXHAUST_DRAW
+func test_double_next_damage_cross_hero() -> void:
+	print("[TestCardEffectsEngine] test_double_next_damage_cross_hero")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# 징기스칸이 DOUBLE_NEXT_DAMAGE 등록
+	var eff_dnd := EffectRes.new()
+	eff_dnd.effect_type = EffectRes.EffectType.DOUBLE_NEXT_DAMAGE
+	eff_dnd.value = 0
+	bm._apply_card_effects(_make_card("genghis_khan", [eff_dnd]), -1)
+	# 잔다르크 카드의 DAMAGE 50 → 글로벌 파워로 ×2 = 100
+	var eff_dmg := EffectRes.new()
+	eff_dmg.effect_type = EffectRes.EffectType.DAMAGE
+	eff_dmg.value = 50; eff_dmg.base_value = 50; eff_dmg.target = "SINGLE"
+	bm._apply_card_effects(_make_card("joan_of_arc", [eff_dmg]), 0)
+	_assert(bm.get_enemy_hp(0) == 400, "DOUBLE_NEXT_DAMAGE: cross-hero — 잔다르크 50 × 2 = 100 피해 (500→400)")
+	_assert(not bm._active_powers.has("power.double_next_damage:__global__"), "DOUBLE_NEXT_DAMAGE: cross-hero 소비 후 파워 제거됨")
+
+func test_double_next_damage_poison_tick() -> void:
+	print("[TestCardEffectsEngine] test_double_next_damage_poison_tick")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
+	bm.setup_battle([_make_enemy(500)])
+	# poison 2스택 (POISON_DMG_PER_STACK=5이므로 tick_dmg=10)
+	bm._enemy_status[0]["poison_dmg"] = 2
+	bm._enemy_status[0]["poison_dur"] = 3
+	# DOUBLE_NEXT_DAMAGE 등록
+	var eff_dnd := EffectRes.new()
+	eff_dnd.effect_type = EffectRes.EffectType.DOUBLE_NEXT_DAMAGE
+	eff_dnd.value = 0
+	bm._apply_card_effects(_make_card("genghis_khan", [eff_dnd]), -1)
+	# poison tick → 2스택 × 10 = 20, ×2 = 40 피해
+	bm._tick_enemy_poison(0)
+	_assert(bm.get_enemy_hp(0) == 460, "DOUBLE_NEXT_DAMAGE: poison tick 20 × 2 = 40 피해 (500→460)")
+	_assert(not bm._active_powers.has("power.double_next_damage:__global__"), "DOUBLE_NEXT_DAMAGE: poison tick 소비 후 파워 제거됨")
+
+# 9. DISCARD_PICK_DRAW
 func test_exhaust_draw_happy() -> void:
-	print("[TestCardEffectsEngine] test_exhaust_draw_happy")
+	print("[TestCardEffectsEngine] test_discard_pick_draw_happy")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 1000))
 	bm.setup_battle([_make_enemy(500)])
@@ -400,31 +439,35 @@ func test_exhaust_draw_happy() -> void:
 	for _i in range(3):
 		bm.deck_mgr.hand.append(dummy_card)
 		bm.deck_mgr.draw_pile.append(dummy_card)
-	var energy_before: int = bm.deck_mgr.current_energy
-	# EXHAUST_DRAW value=2 → 손패 1장 소진, 2장 드로우, 에너지 +1
+	# DISCARD_PICK_DRAW value=2 → 시그널 emit 후 _pending_discard_pick 등록
 	var eff := EffectRes.new()
-	eff.effect_type = EffectRes.EffectType.EXHAUST_DRAW
+	eff.effect_type = EffectRes.EffectType.DISCARD_PICK_DRAW
 	eff.value = 2; eff.base_value = 2
 	bm._apply_card_effects(_make_card("yi_sun_sin", [eff]), -1)
-	# 핸드: 3 - 1 + 2 = 4
-	_assert(bm.deck_mgr.hand.size() == 4, "EXHAUST_DRAW: 핸드 3→4 (1장 소진 + 2장 드로우)")
-	_assert(bm.deck_mgr.exhaust_pile.size() == 1, "EXHAUST_DRAW: exhaust_pile에 1장 이동됨")
-	_assert(bm.deck_mgr.current_energy == energy_before + 1, "EXHAUST_DRAW: 에너지 +1")
+	_assert(not bm._pending_discard_pick.is_empty(), "DISCARD_PICK_DRAW: 모달 대기 상태 등록됨")
+	# resolve_pending_discard_pick 호출 시뮬레이션 (버리기 버튼 클릭)
+	var picked := bm.deck_mgr.hand[0]
+	var hand_before: int = bm.deck_mgr.hand.size()
+	var energy_before: int = bm.deck_mgr.current_energy
+	bm.resolve_pending_discard_pick(picked)
+	# 핸드: hand_before - 1(버림) + 2(드로우) = hand_before + 1
+	_assert(bm.deck_mgr.hand.size() == hand_before + 1, "DISCARD_PICK_DRAW: 1장 버리고 2장 드로우 (핸드 +1)")
+	_assert(bm.deck_mgr.discard_pile.has(picked), "DISCARD_PICK_DRAW: 선택 카드 discard_pile에 이동됨")
+	_assert(bm.deck_mgr.current_energy == energy_before + 1, "DISCARD_PICK_DRAW: 에너지 +1")
+	_assert(bm._pending_discard_pick.is_empty(), "DISCARD_PICK_DRAW: resolve 후 pending 초기화됨")
 
 func test_exhaust_draw_empty_hand() -> void:
-	print("[TestCardEffectsEngine] test_exhaust_draw_empty_hand")
+	print("[TestCardEffectsEngine] test_discard_pick_draw_empty_hand")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 1000))
 	bm.setup_battle([_make_enemy(500)])
-	# 핸드 비어있음 → 전체 효과 스킵
+	# 핸드 비어있음 → 모달 미표시 (pending 등록 안 됨)
 	bm.deck_mgr.hand.clear()
-	var energy_before: int = bm.deck_mgr.current_energy
 	var eff := EffectRes.new()
-	eff.effect_type = EffectRes.EffectType.EXHAUST_DRAW
+	eff.effect_type = EffectRes.EffectType.DISCARD_PICK_DRAW
 	eff.value = 2; eff.base_value = 2
 	bm._apply_card_effects(_make_card("yi_sun_sin", [eff]), -1)
-	_assert(bm.deck_mgr.hand.size() == 0, "EXHAUST_DRAW: 핸드 비어있으면 핸드 변화 없음")
-	_assert(bm.deck_mgr.current_energy == energy_before, "EXHAUST_DRAW: 핸드 비어있으면 에너지 변화 없음")
+	_assert(bm._pending_discard_pick.is_empty(), "DISCARD_PICK_DRAW: 핸드 비어있으면 pending 등록 안 됨")
 
 # 10. MORALE_TO_BLOCK
 func test_morale_to_block_happy() -> void:

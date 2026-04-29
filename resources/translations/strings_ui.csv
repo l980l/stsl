@@ -106,6 +106,8 @@ ui.battle.deck_viewer.draw,드로우 파일,Draw Pile,Pioche,Pesca,Robo,ドロ�
 ui.battle.deck_viewer.discard,버린 덱,Discard Pile,Défausse,Scarto,Descarte,捨て山,Σωρός Απόρριψης,弃牌堆,弃牌堆
 ui.battle.deck_viewer.exhaust,소멸,Exhausted,Épuisé,Esaurite,Agotadas,消滅,Εξάντληση,消耗,消耗
 ui.battle.deck_viewer.empty,(비어 있음),(Empty),(Vide),(Vuoto),(Vacío),(空),(Κενό),(空),(空)
+ui.battle.modal.discard_pick.title,버릴 카드를 1장 선택하세요,Choose 1 card to discard,Choisissez 1 carte à défausser,Scegli 1 carta da scartare,Elige 1 carta para descartar,捨てるカードを1枚選んでください,Επίλεξε 1 κάρτα για απόρριψη,选择1张要弃置的牌,選擇1張要棄置的牌
+ui.battle.modal.discard_pick.confirm,버리기,Discard,Défausser,Scartare,Descartar,捨てる,Απόρριψη,弃置,棄置
 ui.chapter_clear.eyebrow,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —,— THE PILGRIMAGE —
 ui.chapter_clear.title_chapter,챕터 %s 완수,Chapter %s Complete,Chapitre %s Terminé,Capitolo %s Completato,Capítulo %s Completado,チャプター%s 完了,Κεφάλαιο %s Ολοκληρώθηκε,第%s章 完成,第%s章 完成
 ui.chapter_clear.title_all_complete,순례 완수,Pilgrimage Complete,Pèlerinage Accompli,Pellegrinaggio Compiuto,Peregrinaje Completado,巡礼完遂,Το Προσκύνημα Ολοκληρώθηκε,朝圣完成,朝聖完成
@@ -118,11 +120,11 @@ ui.chapter_clear.stat_survivors,생존 영웅,Heroes Standing,Héros Survivants,
 ui.chapter_clear.btn_next_chapter,다음 챕터로,Next Chapter,Chapitre Suivant,Capitolo Successivo,Siguiente Capítulo,次のチャプターへ,Επόμενο Κεφάλαιο,下一章,下一章
 ui.chapter_clear.btn_main_menu,메인 메뉴,Main Menu,Menu Principal,Menu Principale,Menú Principal,メインメニュー,Κεντρικό Μενού,主菜单,主選單
 ui.event.choose_header,— 선택하라 —,— Choose —,— Choisir —,— Scegli —,— Elegir —,— 選択せよ —,— Επίλεξε —,— 选择 —,— 选择 —
-ui.event.tag.cost_gold,−0 코인,−0 Coin,−0 Pièce,−0 Moneta,−0 Moneda,−0 コイン,−0 Νόμισμα,−0 金币,−0 金币
-ui.event.tag.cost_hp,−0 HP,−0 HP,−0 PV,−0 PF,−0 PS,−0 HP,−0 ΖΩΗ,−0 血量,−0 血量
-ui.event.tag.gain_gold,+0 코인,+0 Coin,+0 Pièce,+0 Moneta,+0 Moneda,+0 コイン,+0 Νόμισμα,+0 金币,+0 金币
-ui.event.tag.gain_hp,+0 HP,+0 HP,+0 PV,+0 PF,+0 PS,+0 HP,+0 ΖΩΗ,+0 血量,+0 血量
-ui.event.tag.draw_up,드로우 +0,Draw +0,Piocher +0,Pescare +0,Robar +0,ドロー +0,Ανάληψη +0,抽牌 +0,抽牌 +0
+ui.event.tag.cost_gold,−%d 코인,−%d Coin,−%d Pièce,−%d Moneta,−%d Moneda,−%d コイン,−%d Νόμισμα,−%d 金币,−%d 金币
+ui.event.tag.cost_hp,−%d HP,−%d HP,−%d PV,−%d PF,−%d PS,−%d HP,−%d ΖΩΗ,−%d 血量,−%d 血量
+ui.event.tag.gain_gold,+%d 코인,+%d Coin,+%d Pièce,+%d Moneta,+%d Moneda,+%d コイン,+%d Νόμισμα,+%d 金币,+%d 金币
+ui.event.tag.gain_hp,+%d HP,+%d HP,+%d PV,+%d PF,+%d PS,+%d HP,+%d ΖΩΗ,+%d 血量,+%d 血量
+ui.event.tag.draw_up,드로우 +%d,Draw +%d,Piocher +%d,Pescare +%d,Robar +%d,ドロー +%d,Ανάληψη +%d,抽牌 +%d,抽牌 +%d
 ui.event.tag.remove_card,카드 제거,Remove Card,Retirer Carte,Rimuovi Carta,Eliminar Carta,カード除去,Αφαίρεση Κάρτας,移除卡牌,移除卡牌
 ui.event.tag.add_relic,렐릭 획득,Gain Relic,Obtenir Relique,Ottieni Reliquia,Obtener Reliquia,遺物獲得,Απόκτηση Λειψάνου,获得遗物,获得遗物
 ui.event.tag.relic_gamble,렐릭 도박,Relic Gamble,Pari Relique,Scommessa Reliquia,Apostar Reliquia,遺物ギャンブル,Τζόγος Λειψάνου,遗物赌注,遗物赌注

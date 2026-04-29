@@ -1,4 +1,4 @@
-﻿keys,ko,en,fr,it,es,ja,el,zh,zh_TW
+keys,ko,en,fr,it,es,ja,el,zh,zh_TW
 effect.damage.text,피해 %d%s%s,Deal %d%s%s damage,Inflige %d%s%s dégâts,Infligge %d%s%s danni,Inflige %d%s%s de daño,%d%s%sダメージ,Προκάλεσε %d%s%s ζημιά,造成 %d%s%s 伤害,造成 %d%s%s 伤害
 effect.block.text,방어 %d,Gain %d Block,Gagne %d d'Armure,Ottieni %d Scudo,Gana %d de Escudo,ブロック %d,Κέρδισε %d Άμυνα,获得 %d 护甲,获得 %d 护甲
 effect.block_all.text,전체 방어 %d,Gain %d Block to all,Gagne %d d'Armure à tous,Ottieni %d Scudo a tutti,Gana %d de Escudo a todos,全員にブロック %d,Κέρδισε %d Άμυνα για όλους,全体获得 %d 护甲,全体获得 %d 护甲
@@ -520,10 +520,10 @@ card.musashi.sword_enlightenment.archetype,(권능),(Power),(Pouvoir),(Potere),(
 effect.damage_per_block.text,방어도×%d%% 피해,%d%% of Block as damage,%d%% de l'Armure en dégâts,%d%% dello Scudo in danni,%d%% del Escudo en daño,ブロック×%d%%ダメージ,%d%% της Άμυνας ως ζημιά,护甲×%d%%伤害,護甲×%d%%傷害
 effect.damage_per_dead_ally.text,사망 아군×%d 피해,%d damage per dead ally,%d dégâts par allié mort,%d danni per alleato morto,%d daño por aliado muerto,死亡した仲間×%d ダメージ,%d ζημιά ανά νεκρό σύμμαχο,每位阵亡盟友%d伤害,每位陣亡盟友%d傷害
 effect.double_next_damage.text,다음 피해 ×2,Next damage ×2,Prochain dégât ×2,Prossimo danno ×2,Próximo daño ×2,次のダメージ ×2,Επόμενη ζημιά ×2,下次伤害×2,下次傷害×2
-effect.exhaust_draw.text,소진→드로우 %d+에너지+1,Exhaust→Draw %d+Energy+1,Épuise→Pioche %d+Énergie+1,Esaurisci→Pesca %d+Energia+1,Agota→Roba %d+Energía+1,消耗→ドロー %d+エナジー+1,Εξαντλεί→Τράβηξε %d+Ενέργεια+1,消耗→抽%d张+能量+1,消耗→抽%d張+能量+1
-effect.morale_to_block.text,사기×%d 방어,Morale×%d Block,Moral×%d Armure,Morale×%d Scudo,Moral×%d Escudo,士気×%d ブロック,Ηθικό×%d Άμυνα,士气×%d护甲,士氣×%d護甲
+effect.discard_pick_draw.text,선택 버리기→드로우 %d+에너지+1,Choose Discard→Draw %d+Energy+1,Choisir Défausse→Pioche %d+Énergie+1,Scegli Scarto→Pesca %d+Energia+1,Elige Descarte→Roba %d+Energía+1,選択捨て→ドロー %d+エナジー+1,Επιλογή Απόρριψης→Τράβηξε %d+Ενέργεια+1,选择弃牌→抽%d张+能量+1,選擇棄牌→抽%d張+能量+1
+effect.morale_to_block.text,사기만큼 방어도를 쌓습니다.,Gain Block equal to Morale.,Gagne une Armure égale au Moral.,Ottieni Scudo pari al Morale.,Gana Escudo igual al Moral.,士気分ブロックを得る。,Κέρδισε Άμυνα ίση με το Ηθικό.,获得等同于士气的护甲。,獲得等同於士氣的護甲。
 effect.damage_per_hand_size.text,손패×%d 피해,Hand size×%d damage,Taille de main×%d dégâts,Taglia mano×%d danni,Tamaño de mano×%d daño,手札数×%d ダメージ,Χέρι×%d ζημιά,手牌数×%d伤害,手牌數×%d傷害
-effect.damage_per_token.text,토큰×%d 피해,Token×%d damage,Jeton×%d dégâts,Token×%d danni,Ficha×%d daño,トークン×%d ダメージ,Μάρκα×%d ζημιά,令牌×%d伤害,令牌×%d傷害
+effect.damage_per_token.text,병사×%d 피해,Soldiers×%d damage,Soldats×%d dégâts,Soldati×%d danni,Soldados×%d daño,兵士×%d ダメージ,Στρατιώτες×%d ζημιά,士兵×%d伤害,士兵×%d傷害
 effect.heal_per_dead_ally.text,사망 아군×%d 회복,%d heal per dead ally,%d soin par allié mort,%d cura per alleato morto,%d cura por aliado muerto,死亡した仲間×%d 回復,%d θεραπεία ανά νεκρό σύμμαχο,每位阵亡盟友%d恢复,每位陣亡盟友%d恢復
 effect.energy_to_damage.text,에너지×%d 피해,Energy×%d damage,Énergie×%d dégâts,Energia×%d danni,Energía×%d daño,エナジー×%d ダメージ,Ενέργεια×%d ζημιά,能量×%d伤害,能量×%d傷害
 effect.status_double.text,디버프 스택 ×2,Double debuff stacks,Double les malus,Raddoppia i debuff,Duplica penalizaciones,デバフスタック ×2,Διπλασιάζει τα debuffs,负面状态×2,負面狀態×2

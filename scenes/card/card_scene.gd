@@ -14,10 +14,14 @@ const DRAG_THRESHOLD := 10.0
 const FRAME_DIR := "res://assets/art/cards/cardframes/"
 const GEM_DIR := "res://assets/art/cards/cardgems/"
 const TYPE_ICON_DIR := "res://assets/art/cards/cardtypes/"
+const DEFAULT_ART := "res://assets/art/cards/illustrations/default_art.png"
+const HERO_ART_DIR := "res://assets/art/heroes/"
 
 var _card: CardResource
 var _mode: int = Mode.HAND
 var _disabled: bool = false
+var _owner_dead: bool = false
+var _pick_selectable: bool = false
 var _press_pos: Vector2
 var _pressing: bool = false
 var _dragging: bool = false
@@ -25,6 +29,7 @@ var _glow_rect: ColorRect = null
 var _glow_mat: ShaderMaterial = null
 var _glow_color: Color = SacredPalette.BRASS_300
 var _glow_tween: Tween = null
+var _dead_overlay: ColorRect = null
 
 func _ready() -> void:
 	$Container/CostLabel.theme_type_variation = "AccentLabel"
@@ -69,9 +74,9 @@ func _create_glow_rect() -> void:
 	_glow_rect = glow
 	_glow_mat = mat
 
-func show_glow() -> void:
+func show_glow(intensity: float = 1.0) -> void:
 	if _glow_mat:
-		_glow_mat.set_shader_parameter("opacity", 1.0)
+		_glow_mat.set_shader_parameter("opacity", intensity)
 		_glow_mat.set_shader_parameter("radius", 1.0)
 
 func hide_glow() -> void:
@@ -106,7 +111,7 @@ func refresh() -> void:
 	$Container/CostLabel.text = str(_card.cost)
 	$Container/TitleLabel.text = tr(_card.card_name)
 	LabelUtils.fit_text($Container/TitleLabel, 50, 28)
-	$Container/ArtRect.texture = _card.art
+	$Container/ArtRect.texture = _card.art if _card.art != null else _resolve_art_texture(_card.owner_id)
 	$Container/RarityGem.texture = _resolve_gem_texture(_card.rarity)
 	$Container/TypeIcon.texture = _resolve_type_icon(_card.card_type)
 	$Container/DescLabel.text = _build_desc()
@@ -136,6 +141,12 @@ func _resolve_type_icon(card_type: int) -> Texture2D:
 	}
 	return load(TYPE_ICON_DIR + NAMES.get(card_type, "card_type_attack.png"))
 
+func _resolve_art_texture(owner_id: String) -> Texture2D:
+	var hero_path := "%s%s.png" % [HERO_ART_DIR, owner_id]
+	if ResourceLoader.exists(hero_path):
+		return load(hero_path)
+	return load(DEFAULT_ART)
+
 func _resolve_frame_texture(owner_id: String) -> Texture2D:
 	var hero_path := "%s%s_frame.png" % [FRAME_DIR, owner_id]
 	if ResourceLoader.exists(hero_path):
@@ -144,16 +155,38 @@ func _resolve_frame_texture(owner_id: String) -> Texture2D:
 
 func set_disabled(v: bool) -> void:
 	_disabled = v
+	if _owner_dead:
+		return
 	if _mode == Mode.HAND:
 		$Container/CostLabel.modulate = Color(1.0, 0.3, 0.3) if v else Color.WHITE
 	else:
 		modulate = Color(0.5, 0.5, 0.5) if v else Color.WHITE
 
+func set_owner_dead(v: bool) -> void:
+	_owner_dead = v
+	if v:
+		if _dead_overlay == null:
+			_dead_overlay = ColorRect.new()
+			_dead_overlay.color = Color(0.75, 0.05, 0.05, 0.55)
+			_dead_overlay.position = Vector2.ZERO
+			_dead_overlay.size = Vector2(140, 200)
+			_dead_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			add_child(_dead_overlay)
+		_dead_overlay.show()
+	else:
+		if _dead_overlay != null:
+			_dead_overlay.hide()
+		modulate = Color.WHITE
+		set_disabled(_disabled)
+
 func set_highlight(v: bool) -> void:
 	modulate = Color(1.2, 1.2, 0.8) if v else Color.WHITE
 
+func set_pick_selectable(v: bool) -> void:
+	_pick_selectable = v
+
 func _gui_input(event: InputEvent) -> void:
-	if _disabled:
+	if (_disabled or _owner_dead) and not _pick_selectable:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:

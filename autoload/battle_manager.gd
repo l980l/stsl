@@ -41,6 +41,9 @@ var _hero_status: Dictionary = {}
 # 지속 효과 (권능 카드): { "<key>": { "value": int, "owner_id": String, "params": Dictionary }, ... }
 var _active_powers: Dictionary = {}
 
+# DISCARD_PICK_DRAW 모달 대기 중 상태 (빈 Dictionary면 대기 없음)
+var _pending_discard_pick: Dictionary = {}
+
 # 이번 플레이어 턴 카드 사용 횟수 (만리 원정용)
 var _cards_played_this_turn: int = 0
 # 적별 카드 타입 카운터: { enemy_index: { "count": int, "fired_count": int } }
@@ -60,6 +63,7 @@ signal status_applied(target: String, status_type: String, stacks: int)
 signal morale_changed(hero_id: String, new_value: int)
 signal active_powers_changed()
 signal enemy_counter_changed(enemy_index: int)
+signal card_pick_requested(action: String, draw_count: int)
 
 func setup_battle(enemies: Array) -> void:
 	if deck_mgr != null:
@@ -200,6 +204,43 @@ func end_player_turn() -> void:
 		return
 	_execute_enemy_turn()
 
+const DND_KEY := "power.double_next_damage:__global__"
+
+func _consume_double_next_damage(amount: int) -> int:
+	if _active_powers.has(DND_KEY):
+		amount *= 2
+		_active_powers.erase(DND_KEY)
+		active_powers_changed.emit()
+	return amount
+
+func _apply_discard_pick_reward(draw_count: int, energy_gain: int) -> void:
+	if not deck_mgr:
+		return
+	deck_mgr.draw_cards(draw_count)
+	_cards_drawn_this_turn += draw_count
+	if energy_gain > 0:
+		deck_mgr.current_energy += energy_gain
+		deck_mgr.energy_changed.emit(deck_mgr.current_energy)
+
+func _trigger_discard_pick(draw_count: int, energy_gain: int) -> void:
+	if not deck_mgr:
+		return
+	if deck_mgr.hand.is_empty():
+		_apply_discard_pick_reward(draw_count, energy_gain)
+	else:
+		_pending_discard_pick = {"draw_count": draw_count, "energy_gain": energy_gain}
+		card_pick_requested.emit("discard", draw_count)
+
+func resolve_pending_discard_pick(picked_card: Resource) -> void:
+	if _pending_discard_pick.is_empty():
+		return
+	var draw_count: int = _pending_discard_pick.get("draw_count", 0)
+	var energy_gain: int = _pending_discard_pick.get("energy_gain", 0)
+	_pending_discard_pick = {}
+	if deck_mgr:
+		deck_mgr.discard_card(picked_card)
+	_apply_discard_pick_reward(draw_count, energy_gain)
+
 func _register_power(key: String, owner_id: String, value: int, params: Dictionary = {}) -> void:
 	var power_key: String = key + ":" + owner_id
 	_active_powers[power_key] = {
@@ -291,12 +332,6 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
 				if owner_status.get("weak", 0) > 0:
 					dmg = int(dmg * 0.75)
-				# DOUBLE_NEXT_DAMAGE power 소비 — 이 DAMAGE 효과 한 번만 적용 후 소멸
-				var _dnd_key: String = "power.double_next_damage:" + card.owner_id
-				if _active_powers.has(_dnd_key):
-					dmg *= 2
-					_active_powers.erase(_dnd_key)
-					active_powers_changed.emit()
 				for _hit in range(effect.hit_count):
 					if effect.target == "ALL":
 						for i in range(_enemies.size()):
@@ -530,14 +565,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if dead_count > 0:
 						_deal_damage_to_enemy(target_enemy_index, dead_count * effect.value)
 			EffectRes.EffectType.DOUBLE_NEXT_DAMAGE:
-				_register_power("power.double_next_damage", card.owner_id, 1)
-			EffectRes.EffectType.EXHAUST_DRAW:
-				if deck_mgr and not deck_mgr.hand.is_empty():
-					deck_mgr.exhaust_card(deck_mgr.hand[deck_mgr.hand.size() - 1])
-					deck_mgr.draw_cards(effect.value)
-					_cards_drawn_this_turn += effect.value
-					deck_mgr.current_energy += 1
-					deck_mgr.energy_changed.emit(deck_mgr.current_energy)
+				_active_powers[DND_KEY] = {"value": 1, "owner_id": "__global__", "params": {}}
+				active_powers_changed.emit()
+			EffectRes.EffectType.DISCARD_PICK_DRAW:
+				_trigger_discard_pick(effect.value, 1)
 			EffectRes.EffectType.MORALE_TO_BLOCK:
 				var morale: int = _hero_status.get(card.owner_id, {}).get("morale", 0)
 				if morale > 0:
@@ -585,12 +616,13 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						var cur: int = _enemy_status[i].get(key, 0)
 						if cur > 0:
 							_enemy_status[i][key] = cur * 2
-							status_applied.emit(str(i), key, cur)
+							status_applied.emit("enemy_%d" % i, key, cur * 2)
 	_apply_synergy_bonus(card, target_enemy_index)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int) -> void:
 	if not _enemy_alive[enemy_index]:
 		return
+	amount = _consume_double_next_damage(amount)
 	if _enemy_status[enemy_index].get("vulnerable", 0) > 0:
 		amount = int(amount * 1.5)
 	var absorbed: int = min(_enemy_block[enemy_index], amount)
@@ -681,7 +713,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 	var dur: int = _enemy_status[enemy_index].get("poison_dur", 0)
 	if dmg <= 0 or dur <= 0:
 		return
-	var tick_dmg: int = dmg * POISON_DMG_PER_STACK
+	var tick_dmg: int = _consume_double_next_damage(dmg * POISON_DMG_PER_STACK)
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - tick_dmg)
 	enemy_damaged.emit(enemy_index, tick_dmg)
 	dur -= 1

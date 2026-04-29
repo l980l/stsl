@@ -70,6 +70,10 @@ var _debug_token_hero_idx: int = 0
 
 var _deck_viewer: CanvasLayer = null
 var _deck_group:  Control     = null
+var _pick_overlay: CanvasLayer = null
+var _picked_card: Resource = null
+var _pick_confirm_btn: Button = null
+var _card_pick_in_progress: bool = false
 
 
 const STATUS_EMOJI := {
@@ -789,6 +793,7 @@ func _connect_signals() -> void:
 	BattleManager.morale_changed.connect(_on_morale_changed)
 	BattleManager.active_powers_changed.connect(_on_active_powers_changed)
 	BattleManager.enemy_counter_changed.connect(_on_enemy_counter_changed)
+	BattleManager.card_pick_requested.connect(_on_card_pick_requested)
 
 # ─────────────────────────────────────────────
 # 배틀 초기화
@@ -1091,6 +1096,13 @@ func _intent_color(action_type: int) -> Color:
 # 카드 핸드 (Task 3에서 구현)
 # ─────────────────────────────────────────────
 
+func _apply_card_state(node: CardScene, card_res: Resource) -> void:
+	if not TeamManager.is_alive(card_res.owner_id):
+		node.set_owner_dead(true)
+	else:
+		node.set_owner_dead(false)
+		node.set_disabled(not DeckManager.can_play(card_res))
+
 func _refresh_hand() -> void:
 	for n in _card_buttons:
 		if is_instance_valid(n):
@@ -1124,7 +1136,7 @@ func _refresh_hand() -> void:
 		node.set_meta("_fan_title_pos", arc_pos + Vector2(0, -70.0 * BASE_CARD_SCALE).rotated(angle))
 		node.set_meta("_card_res", card)
 		node.setup(card, node.Mode.HAND)
-		node.set_disabled(not DeckManager.can_play(card))
+		_apply_card_state(node, card)
 		node.card_clicked.connect(_on_card_clicked)
 		node.card_drag_started.connect(_on_card_drag_started)
 		node.card_drag_moved.connect(_on_card_drag_moved)
@@ -1139,10 +1151,24 @@ func _refresh_hand() -> void:
 # 인터랙션 핸들러 (Task 4~5에서 구현)
 # ─────────────────────────────────────────────
 
-func _on_card_clicked(_card: Resource) -> void:
-	pass  # 드래그 앤 드롭 방식으로만 카드 사용 가능
+func _on_card_clicked(card: Resource) -> void:
+	if not _card_pick_in_progress:
+		return
+	for node in _card_buttons:
+		if is_instance_valid(node):
+			node.hide_glow()
+	_picked_card = card
+	for node in _card_buttons:
+		if is_instance_valid(node) and node.get_meta("_card_res", null) == card:
+			node.set_glow_color(SacredPalette.BRASS_500)
+			node.show_glow(2.2)
+			break
+	if _pick_confirm_btn != null:
+		_pick_confirm_btn.disabled = false
 
 func _on_card_drag_started(card: Resource, screen_pos: Vector2) -> void:
+	if _card_pick_in_progress:
+		return
 	if not BattleManager.is_player_turn or not DeckManager.can_play(card):
 		return
 	_drag_start_pos = screen_pos
@@ -1275,6 +1301,8 @@ func _open_hero_slot_hp_dialog(hero_id: String) -> void:
 	spin.get_line_edit().select_all()
 
 func _on_end_turn_pressed() -> void:
+	if _card_pick_in_progress:
+		return
 	_selected_card = null
 	_message_label.text = ""
 	_end_turn_btn.disabled = true
@@ -1313,7 +1341,7 @@ func _on_energy_changed(new_energy: int) -> void:
 	# 카드 노드 활성/비활성 갱신
 	var hand: Array = DeckManager.hand
 	for i in range(min(_card_buttons.size(), hand.size())):
-		_card_buttons[i].set_disabled(not DeckManager.can_play(hand[i]))
+		_apply_card_state(_card_buttons[i], hand[i])
 
 func _on_card_played(card: Resource) -> void:
 	call_deferred("_refresh_all_hero_ui")
@@ -1429,6 +1457,10 @@ func _on_enemy_died(index: int) -> void:
 
 func _on_hero_died(hero_id: String) -> void:
 	_update_hero_ui(hero_id)
+	var hand: Array = DeckManager.hand
+	for i in range(min(_card_buttons.size(), hand.size())):
+		if hand[i].owner_id == hero_id:
+			_card_buttons[i].set_owner_dead(true)
 	# 패널 흰 섬광 → 회색 페이드
 	for entry in _hero_nodes:
 		if entry["hero_id"] != hero_id:
@@ -1997,6 +2029,77 @@ func _close_deck_viewer() -> void:
 			if is_instance_valid(viewer): viewer.queue_free()
 
 
+# ─────────────────────────────────────────────
+# 버리기 카드 선택 모달
+# ─────────────────────────────────────────────
+
+func _on_card_pick_requested(_action: String, _draw_count: int) -> void:
+	if _card_pick_in_progress or DeckManager.hand.is_empty():
+		return
+	_card_pick_in_progress = true
+	_picked_card = null
+	for node in _card_buttons:
+		if is_instance_valid(node):
+			node.set_disabled(false)
+			node.set_pick_selectable(true)
+	_show_discard_pick_overlay()
+
+func _show_discard_pick_overlay() -> void:
+	var canvas := CanvasLayer.new()
+	canvas.layer = 5
+	add_child(canvas)
+
+	var root := Control.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	canvas.add_child(root)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	root.add_child(vbox)
+	vbox.position = Vector2(WINDOW_W / 2.0 - 100.0, BOTTOM_Y - 360.0)
+
+	var lbl := Label.new()
+	lbl.text = tr("ui.battle.modal.discard_pick.title")
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+	lbl.add_theme_font_size_override("font_size", 18)
+	vbox.add_child(lbl)
+
+	var btn := Button.new()
+	btn.text = tr("ui.battle.modal.discard_pick.confirm")
+	btn.theme_type_variation = "PrimaryButton"
+	btn.custom_minimum_size = Vector2(200, 44)
+	btn.disabled = true
+	btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	vbox.add_child(btn)
+	SacredTheme.animate_button(btn)
+	btn.pressed.connect(_on_pick_confirmed)
+
+	_pick_confirm_btn = btn
+	_pick_overlay = canvas
+
+func _on_pick_confirmed() -> void:
+	if _picked_card == null:
+		return
+	var picked := _picked_card
+	_close_discard_pick_overlay()
+	BattleManager.resolve_pending_discard_pick(picked)
+
+func _close_discard_pick_overlay() -> void:
+	_card_pick_in_progress = false
+	_picked_card = null
+	_pick_confirm_btn = null
+	for node in _card_buttons:
+		if is_instance_valid(node):
+			node.set_pick_selectable(false)
+			node.hide_glow()
+	if _pick_overlay != null:
+		var overlay := _pick_overlay
+		_pick_overlay = null
+		if is_instance_valid(overlay):
+			overlay.queue_free()
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if OS.is_debug_build() and event.pressed and not event.echo:
 		if event.keycode == KEY_Q and event.shift_pressed:
@@ -2143,8 +2246,16 @@ func _card_target_type(card: Resource) -> String:
 			EffectRes.EffectType.COUNTER_BLOCK, \
 			EffectRes.EffectType.CONSUME_MORALE, \
 			EffectRes.EffectType.POISON_BURST, \
-			EffectRes.EffectType.CONDITIONAL_DMG:
+			EffectRes.EffectType.CONDITIONAL_DMG, \
+			EffectRes.EffectType.DAMAGE_PER_BLOCK, \
+			EffectRes.EffectType.DAMAGE_PER_HAND_SIZE, \
+			EffectRes.EffectType.DAMAGE_PER_DEAD_ALLY, \
+			EffectRes.EffectType.ENERGY_TO_DAMAGE, \
+			EffectRes.EffectType.DAMAGE_PER_TOKEN:
 				return "enemy"
+			EffectRes.EffectType.STATUS_DOUBLE:
+				if effect.target != "ALL":
+					return "enemy"
 			EffectRes.EffectType.HEAL:
 				if effect.target == "SINGLE":
 					return "ally"
@@ -2153,6 +2264,8 @@ func _card_target_type(card: Resource) -> String:
 	return "none"
 
 func _start_drag(card: Resource) -> void:
+	if _card_pick_in_progress:
+		return
 	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	_reset_hand_fan()
 	_drag_card = card
@@ -2231,10 +2344,9 @@ func _cleanup_drag() -> void:
 	_drag_t_offset = 0.0
 	for btn in _card_buttons:
 		if is_instance_valid(btn):
-			btn.modulate = Color(1.0, 1.0, 1.0, 1.0)
 			var card_res: Resource = btn.get_meta("_card_res", null)
 			if card_res != null:
-				btn.set_disabled(not DeckManager.can_play(card_res))
+				_apply_card_state(btn, card_res)
 	_drag_card = null
 	_selected_card = null
 	_message_label.text = tr("battle.msg_player_turn") if BattleManager.is_player_turn else ""

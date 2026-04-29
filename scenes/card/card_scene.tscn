@@ -15,6 +15,15 @@ anchors_preset = 0
 scale = Vector2(0.17413, 0.17167)
 mouse_filter = 2
 
+[node name="ArtRect" type="TextureRect" parent="Container" unique_id=1030648202]
+layout_mode = 0
+offset_left = 74.65687
+offset_top = 180.57901
+offset_right = 729.34015
+offset_bottom = 757.26685
+expand_mode = 3
+stretch_mode = 0
+
 [node name="Frame" type="TextureRect" parent="Container" unique_id=1481964751]
 layout_mode = 0
 offset_right = 804.0
@@ -55,14 +64,6 @@ theme_override_constants/outline_size = 11
 theme_override_font_sizes/font_size = 50
 horizontal_alignment = 1
 clip_text = true
-
-[node name="ArtRect" type="TextureRect" parent="Container" unique_id=1030648202]
-layout_mode = 0
-offset_left = 74.65687
-offset_top = 180.57901
-offset_right = 729.34015
-offset_bottom = 757.26685
-expand_mode = 3
 
 [node name="TypeIcon" type="TextureRect" parent="Container" unique_id=-838178284]
 modulate = Color(1, 1, 1, 0.7)

@@ -680,6 +680,6 @@ static func _discard_focus() -> Resource:
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.discard_focus.archetype"
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.EXHAUST_DRAW
+	e.effect_type = EffRes.EffectType.DISCARD_PICK_DRAW
 	e.value = 2; e.base_value = 2
 	c.effects = [e]; return c
