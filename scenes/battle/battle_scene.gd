@@ -57,6 +57,7 @@ var _drag_t_offset: float = 0.0
 
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
+var _circle_tex: ImageTexture = null
 var _popup_stack: Dictionary = {}
 var _grad_cache: Dictionary = {}
 var _token_tile_nodes: Dictionary = {}
@@ -1463,6 +1464,55 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
 	)
 
+func _make_circle_texture() -> ImageTexture:
+	var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
+	var center := Vector2(3.5, 3.5)
+	for x in range(8):
+		for y in range(8):
+			var d: float = Vector2(x, y).distance_to(center)
+			var a: float = clampf(1.0 - d / 3.5, 0.0, 1.0)
+			img.set_pixel(x, y, Color(1, 1, 1, a))
+	return ImageTexture.create_from_image(img)
+
+func _spawn_impact_particles(pos: Vector2, amount: int) -> void:
+	if amount <= 0:
+		return
+	if _circle_tex == null:
+		_circle_tex = _make_circle_texture()
+	var count: int = 8
+	var speed_bonus: float = 0.0
+	if amount >= 100:
+		count = 22
+		speed_bonus = 50.0
+	elif amount >= 30:
+		count = 14
+	var grad := Gradient.new()
+	grad.set_color(0, Color(1.0, 1.0, 0.9, 1.0))
+	grad.set_color(1, Color(1.0, 0.6, 0.1, 0.0))
+	var scale_curve := Curve.new()
+	scale_curve.add_point(Vector2(0.0, 1.0))
+	scale_curve.add_point(Vector2(1.0, 0.0))
+	var p := CPUParticles2D.new()
+	p.amount = count
+	p.lifetime = 0.35
+	p.one_shot = true
+	p.explosiveness = 1.0
+	p.direction = Vector2(-1, 0)
+	p.spread = 80.0
+	p.gravity = Vector2(0, 200)
+	p.initial_velocity_min = 120.0 + speed_bonus
+	p.initial_velocity_max = 280.0 + speed_bonus
+	p.scale_amount_min = 0.6
+	p.scale_amount_max = 1.2
+	p.scale_curve = scale_curve
+	p.color_ramp = grad
+	p.texture = _circle_tex
+	p.position = pos
+	p.z_index = 15
+	p.emitting = true
+	add_child(p)
+	get_tree().create_timer(p.lifetime + 0.5).timeout.connect(p.queue_free)
+
 func _on_hero_healed(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)
 	for entry in _hero_nodes:
@@ -1485,6 +1535,7 @@ func _on_hero_damaged(hero_id: String, amount: int) -> void:
 	if char_node:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
+		_spawn_impact_particles(char_node.position, amount)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):
@@ -1500,6 +1551,7 @@ func _on_enemy_damaged(index: int, amount: int) -> void:
 	if char_node:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
+		_spawn_impact_particles(char_node.position, amount)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):
