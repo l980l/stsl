@@ -2,7 +2,7 @@
 extends Node2D
 
 const _SHADER := preload("res://assets/shaders/shockwave.gdshader")
-const _DURATION := 0.4
+const _DURATION := 0.2
 
 func burst() -> void:
 	if Engine.is_editor_hint():
@@ -16,10 +16,13 @@ func burst() -> void:
 
 	var mat := ShaderMaterial.new()
 	mat.shader = _SHADER
+	var aspect := viewport_size.x / viewport_size.y
 	mat.set_shader_parameter("progress", 0.0)
-	mat.set_shader_parameter("strength", 0.06)
-	mat.set_shader_parameter("thickness", 0.15)
+	mat.set_shader_parameter("strength", 0.05)
+	mat.set_shader_parameter("thickness", 0.025)
 	mat.set_shader_parameter("center", center_uv)
+	mat.set_shader_parameter("aspect_ratio", aspect)
+	mat.set_shader_parameter("max_progress", 0.15)
 
 	var layer := CanvasLayer.new()
 	layer.layer = 10
@@ -31,6 +34,6 @@ func burst() -> void:
 	rect.material = mat
 	layer.add_child(rect)
 
-	var tw := create_tween()
-	tw.tween_method(func(v: float): mat.set_shader_parameter("progress", v), 0.0, 1.0, _DURATION)
+	var tw := get_tree().create_tween()
+	tw.tween_method(func(v: float): mat.set_shader_parameter("progress", v), 0.0, 0.15, _DURATION)
 	tw.tween_callback(layer.queue_free)
