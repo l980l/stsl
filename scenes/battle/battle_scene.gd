@@ -57,11 +57,11 @@ var _drag_t_offset: float = 0.0
 
 var _hero_status_containers: Dictionary = {}
 var _enemy_status_containers: Array = []
-var _circle_tex: ImageTexture = null
-var _slash_tex: ImageTexture = null
-var _square_tex: ImageTexture = null
-var _star_tex: ImageTexture = null
-var _smoke_tex: ImageTexture = null
+var _circle_tex: Texture2D = preload("res://assets/art/particles/circle_128.png")
+var _slash_tex: Texture2D  = preload("res://assets/art/particles/slash_128x16.png")
+var _square_tex: Texture2D = preload("res://assets/art/particles/dust_64.png")
+var _star_tex: Texture2D   = preload("res://assets/art/particles/star_128.png")
+var _smoke_tex: Texture2D  = preload("res://assets/art/particles/smoke_128.png")
 var _additive_mat: CanvasItemMaterial = null
 var _last_card_play_pos: Vector2 = Vector2.ZERO
 var _popup_stack: Dictionary = {}
@@ -1668,12 +1668,6 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 	# 다층 레이어드 임팩트 파티클 — 코어 플래시 + 메인 입자 + 잔해/연기 3층 조합으로 상용 게임 수준 임팩트.
 	if amount <= 0:
 		return
-	if _circle_tex == null: _circle_tex = _make_circle_texture()
-	if _slash_tex == null:  _slash_tex  = _make_slash_texture()
-	if _square_tex == null: _square_tex = _make_square_texture()
-	if _star_tex == null:   _star_tex   = _make_star_texture()
-	if _smoke_tex == null:  _smoke_tex  = _make_smoke_texture()
-
 	var mag: int = 0 if amount < 30 else (1 if amount < 100 else 2)
 	var dx: float = -1.0 if flipped else 1.0
 
@@ -1684,7 +1678,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"count": 1,
 				"lifetime": 0.2,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
-				"scale_min": [6.0, 8.5, 12.0][mag], "scale_max": [7.5, 10.0, 14.0][mag],
+				"scale_min": [1.5, 2.1, 3.0][mag], "scale_max": [1.9, 2.5, 3.5][mag],
 				"texture": _slash_tex,
 				"color_a": Color(2.2, 2.2, 2.2, 1.0),
 				"color_b": Color(0.6, 0.85, 1.0, 0.0),
@@ -1695,7 +1689,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"count": [1, 2, 2][mag],
 				"lifetime": 0.3,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
-				"scale_min": [4.0, 5.5, 8.0][mag], "scale_max": [5.5, 7.5, 10.0][mag],
+				"scale_min": [1.0, 1.4, 2.0][mag], "scale_max": [1.4, 1.9, 2.5][mag],
 				"texture": _slash_tex,
 				"color_a": Color(1.2, 1.5, 2.0, 0.55),
 				"color_b": Color(0.2, 0.4, 0.85, 0.0),
@@ -1706,7 +1700,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			_emit_particle_layer(pos, {
 				"count": 1, "lifetime": 0.12,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
-				"scale_min": 4.5, "scale_max": 5.5,
+				"scale_min": 0.55, "scale_max": 0.7,
 				"texture": _circle_tex,
 				"color_a": Color(2.5, 2.5, 2.5, 0.85),
 				"color_b": Color(0.7, 0.85, 1.0, 0.0),
@@ -1717,7 +1711,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			_emit_particle_layer(pos, {
 				"count": 1, "lifetime": 0.18,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
-				"scale_min": 5.0, "scale_max": 7.0,
+				"scale_min": 0.62, "scale_max": 0.88,
 				"texture": _circle_tex,
 				"color_a": Color(2.0, 1.7, 0.8, 0.85),
 				"color_b": Color(1.0, 0.45, 0.15, 0.0),
@@ -1728,7 +1722,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 180.0,
 				"speed_min": 100.0, "speed_max": 280.0,
 				"gravity": Vector2(0, 420),
-				"scale_min": 3.0, "scale_max": 6.0,
+				"scale_min": 0.38, "scale_max": 0.75,
 				"texture": _circle_tex,
 				"color_a": Color(0.82, 0.65, 0.42, 0.9),
 				"color_mid": Color(0.55, 0.42, 0.28, 0.55),
@@ -1745,7 +1739,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 130.0,
 				"speed_min": 200.0, "speed_max": 380.0,
 				"gravity": Vector2(0, 520),
-				"scale_min": 1.5, "scale_max": 2.8,
+				"scale_min": 0.19, "scale_max": 0.35,
 				"texture": _square_tex,
 				"color_a": Color(0.55, 0.45, 0.32, 1.0),
 				"color_b": Color(0.18, 0.14, 0.10, 0.0),
@@ -1762,9 +1756,9 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"direction": Vector2(dx, 0.0),
 				"spread": 4.0,
 				"speed_min": 1500.0, "speed_max": 1900.0,
-				"scale_min": 2.5, "scale_max": 4.0,
+				"scale_min": 0.62, "scale_max": 1.0,
 				"texture": _slash_tex,
-				"color_a": Color(1.0, 0.95, 0.7, 1.0),
+				"color_a": Color(2.0, 1.9, 1.4, 1.0),
 				"color_b": Color(0.8, 0.6, 0.2, 0.0),
 				"damping_min": 200.0, "damping_max": 400.0,
 				"angle_min": proj_angle - 2.0, "angle_max": proj_angle + 2.0,
@@ -1772,9 +1766,9 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			_emit_particle_layer(pos, {
 				"count": 1, "lifetime": 0.1,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
-				"scale_min": 4.0, "scale_max": 5.5,
+				"scale_min": 0.5, "scale_max": 0.7,
 				"texture": _circle_tex,
-				"color_a": Color(1.0, 1.0, 0.85, 1.0),
+				"color_a": Color(2.5, 2.5, 2.0, 1.0),
 				"color_b": Color(1.0, 0.9, 0.5, 0.0),
 				"delay": 0.18,
 			})
@@ -1785,9 +1779,9 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 70.0,
 				"speed_min": 100.0, "speed_max": 280.0,
 				"gravity": Vector2(0, 220),
-				"scale_min": 1.0, "scale_max": 2.0,
+				"scale_min": 0.13, "scale_max": 0.25,
 				"texture": _circle_tex,
-				"color_a": Color(1.0, 0.9, 0.5, 1.0),
+				"color_a": Color(2.0, 1.8, 1.0, 1.0),
 				"color_b": Color(0.85, 0.3, 0.08, 0.0),
 				"damping_min": 50.0, "damping_max": 120.0,
 				"delay": 0.18,
@@ -1800,7 +1794,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 180.0,
 				"speed_min": 120.0, "speed_max": 360.0,
 				"gravity": Vector2(0, -40),
-				"scale_min": 3.5, "scale_max": 7.0,
+				"scale_min": 0.44, "scale_max": 0.88,
 				"texture": _circle_tex,
 				"color_a": Color(2.5, 1.8, 0.5, 1.0),
 				"color_mid": Color(2.0, 0.6, 0.08, 0.7),
@@ -1810,7 +1804,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			_emit_particle_layer(pos, {
 				"count": 1, "lifetime": 0.3,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
-				"scale_min": 10.0, "scale_max": 14.0,
+				"scale_min": 1.25, "scale_max": 1.75,
 				"texture": _circle_tex,
 				"color_a": Color(3.0, 1.8, 0.4, 1.0),
 				"color_b": Color(1.5, 0.4, 0.08, 0.0),
@@ -1823,7 +1817,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 180.0,
 				"speed_min": 35.0, "speed_max": 140.0,
 				"gravity": Vector2(0, -55),
-				"scale_min": 5.0, "scale_max": 9.0,
+				"scale_min": 0.62, "scale_max": 1.12,
 				"texture": _smoke_tex,
 				"color_a": Color(0.35, 0.28, 0.24, 0.85),
 				"color_b": Color(0.05, 0.04, 0.03, 0.0),
@@ -1841,7 +1835,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 55.0,
 				"speed_min": 25.0, "speed_max": 100.0,
 				"gravity": Vector2(0, -50),
-				"scale_min": 1.8, "scale_max": 3.5,
+				"scale_min": 0.23, "scale_max": 0.44,
 				"texture": _circle_tex,
 				"color_a": Color(0.6, 2.0, 0.4, 0.9),
 				"color_mid": Color(0.18, 0.85, 0.1, 0.5),
@@ -1856,7 +1850,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 130.0,
 				"speed_min": 12.0, "speed_max": 55.0,
 				"gravity": Vector2(0, -22),
-				"scale_min": 0.8, "scale_max": 1.5,
+				"scale_min": 0.10, "scale_max": 0.19,
 				"texture": _circle_tex,
 				"color_a": Color(0.18, 0.55, 0.08, 0.9),
 				"color_b": Color(0.0, 0.18, 0.0, 0.0),
@@ -1868,7 +1862,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			_emit_particle_layer(pos, {
 				"count": 1, "lifetime": 0.2,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
-				"scale_min": 4.0, "scale_max": 5.5,
+				"scale_min": 0.5, "scale_max": 0.69,
 				"texture": _circle_tex,
 				"color_a": Color(0.6, 2.5, 0.4, 0.85),
 				"color_b": Color(0.1, 0.5, 0.0, 0.0),
@@ -1882,7 +1876,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 100.0,
 				"speed_min": 120.0, "speed_max": 320.0,
 				"gravity": Vector2(0, -100),
-				"scale_min": 2.2, "scale_max": 4.5,
+				"scale_min": 0.28, "scale_max": 0.56,
 				"texture": _circle_tex,
 				"color_a": Color(2.0, 1.9, 1.2, 1.0),
 				"color_mid": Color(2.0, 1.5, 0.4, 0.7),
@@ -1896,7 +1890,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 65.0,
 				"speed_min": 75.0, "speed_max": 220.0,
 				"gravity": Vector2(0, -65),
-				"scale_min": 2.5, "scale_max": 5.0,
+				"scale_min": 0.31, "scale_max": 0.63,
 				"texture": _star_tex,
 				"color_a": Color(2.2, 2.0, 0.8, 1.0),
 				"color_b": Color(1.5, 1.5, 1.0, 0.0),
@@ -1906,7 +1900,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			_emit_particle_layer(pos, {
 				"count": 1, "lifetime": 0.22,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
-				"scale_min": 9.0, "scale_max": 12.0,
+				"scale_min": 1.12, "scale_max": 1.5,
 				"texture": _circle_tex,
 				"color_a": Color(3.0, 2.8, 1.8, 1.0),
 				"color_b": Color(1.5, 1.2, 0.4, 0.0),
@@ -1919,7 +1913,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"lifetime": 0.95,
 				"spread": 180.0,
 				"speed_min": 70.0, "speed_max": 200.0,
-				"scale_min": 1.8, "scale_max": 3.5,
+				"scale_min": 0.23, "scale_max": 0.44,
 				"texture": _circle_tex,
 				"color_a": Color(1.5, 0.35, 2.0, 1.0),
 				"color_mid": Color(0.7, 0.08, 1.2, 0.7),
@@ -1936,7 +1930,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 130.0,
 				"speed_min": 25.0, "speed_max": 90.0,
 				"gravity": Vector2(0, -35),
-				"scale_min": 3.5, "scale_max": 6.0,
+				"scale_min": 0.44, "scale_max": 0.75,
 				"texture": _smoke_tex,
 				"color_a": Color(0.22, 0.05, 0.35, 0.75),
 				"color_b": Color(0.02, 0.0, 0.05, 0.0),
@@ -1948,7 +1942,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			_emit_particle_layer(pos, {
 				"count": 1, "lifetime": 0.2,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
-				"scale_min": 5.0, "scale_max": 6.5,
+				"scale_min": 0.62, "scale_max": 0.81,
 				"texture": _circle_tex,
 				"color_a": Color(1.5, 0.3, 2.5, 0.9),
 				"color_b": Color(0.2, 0.0, 0.4, 0.0),
@@ -1962,7 +1956,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"spread": 80.0,
 				"speed_min": 150.0, "speed_max": 320.0,
 				"gravity": Vector2(0, 200),
-				"scale_min": 1.5, "scale_max": 3.0,
+				"scale_min": 0.19, "scale_max": 0.38,
 				"texture": _circle_tex,
 				"color_a": Color(2.2, 2.2, 1.8, 1.0),
 				"color_b": Color(1.5, 0.8, 0.1, 0.0),
@@ -1971,7 +1965,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			_emit_particle_layer(pos, {
 				"count": 1, "lifetime": 0.12,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
-				"scale_min": 5.0, "scale_max": 7.0,
+				"scale_min": 0.62, "scale_max": 0.88,
 				"texture": _circle_tex,
 				"color_a": Color(2.5, 2.2, 1.2, 0.9),
 				"color_b": Color(1.5, 0.8, 0.15, 0.0),
