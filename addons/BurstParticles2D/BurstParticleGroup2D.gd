@@ -68,6 +68,9 @@ func burst():
 			var dur: float = child.get_meta("emission_duration", -1.0)
 			if dur > 0:
 				get_tree().create_timer(dur, false).timeout.connect(func(): child.emitting = false)
+		elif not (child is BurstParticles2D or child is GPUParticles2D) \
+				and child.has_method("burst") and child.is_inside_tree():
+			child.burst()
 
 func _on_child_exited_tree():
 	if get_child_count() == 0 and !Engine.is_editor_hint():

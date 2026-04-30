@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://de84uxqet0bvc"]
 
 [ext_resource type="Script" uid="uid://40nnoas3p4h2" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
-[ext_resource type="Texture2D" uid="uid://ovw18l4dc1fv" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="2_orb"]
+[ext_resource type="Texture2D" uid="uid://crbovyojjwjtt" path="res://addons/kenney_particle_pack/circle_01.png" id="2_e2bun"]
 [ext_resource type="Texture2D" uid="uid://vwe34itxqa37" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb_soft.png" id="3_soft"]
 [ext_resource type="Texture2D" uid="uid://d2lceccxwhwet" path="res://addons/BurstParticles2D/BurstParticles2D-demo/ring.png" id="4_ring"]
 [ext_resource type="Texture2D" uid="uid://bx7xb0o1caqpk" path="res://addons/kenney_particle_pack/star_04.png" id="5_star"]
@@ -106,7 +106,7 @@ script = ExtResource("1_grp")
 material = SubResource("CIM_add")
 emitting = false
 amount = 1
-texture = ExtResource("2_orb")
+texture = ExtResource("2_e2bun")
 lifetime = 0.1
 one_shot = true
 explosiveness = 1.0
@@ -135,6 +135,7 @@ process_material = SubResource("PPM_stars")
 [node name="GoldenAura" type="GPUParticles2D" parent="." unique_id=764671312]
 modulate = Color(1, 1, 1, 0.5)
 material = SubResource("CIM_add")
+emitting = false
 amount = 1
 texture = ExtResource("3_soft")
 lifetime = 0.45

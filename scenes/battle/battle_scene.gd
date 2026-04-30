@@ -1509,19 +1509,6 @@ func _stop_target_bloom(panel: ColorRect) -> void:
 			br.position = br.get_meta("_bloom_orig_pos")
 			br.remove_meta("_bloom_orig_pos")
 
-func _spawn_shockwave(world_pos: Vector2, radius: float = 220.0, duration: float = 0.35) -> void:
-	var rect := ColorRect.new()
-	rect.size = Vector2(radius * 2.0, radius * 2.0)
-	rect.position = world_pos - rect.size * 0.5
-	rect.z_index = 14
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var mat := ShaderMaterial.new()
-	mat.shader = preload("res://assets/shaders/shockwave.gdshader")
-	rect.material = mat
-	add_child(rect)
-	var tw := create_tween()
-	tw.tween_method(func(p: float) -> void: mat.set_shader_parameter("progress", p), 0.0, 1.0, duration)
-	tw.tween_callback(rect.queue_free)
 
 const _VFX_SCENES: Dictionary = {
 	"slash":      preload("res://scenes/vfx/slash_particle.tscn"),
@@ -1544,6 +1531,8 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 	add_child(fx)
 	fx.global_position = pos
 	fx.scale.x = -1.0 if flipped else 1.0
+	if dtype == "slash":
+		fx.rotation = randf_range(0.0, TAU)
 	fx.burst()
 
 func _on_hero_healed(hero_id: String, amount: int) -> void:
@@ -1570,8 +1559,7 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 		_play_hit_shake(char_node, amount)
 		var hero_spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
 		_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
-		if amount >= 100 or dtype == "explosive":
-			_spawn_shockwave(char_node.global_position)
+
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):
@@ -1589,8 +1577,7 @@ func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 		_play_hit_shake(char_node, amount)
 		var spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
 		_spawn_impact_particles(spark_pos, amount, false, dtype)
-		if amount >= 100 or dtype == "explosive":
-			_spawn_shockwave(char_node.global_position)
+
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):

@@ -4,9 +4,10 @@ uniform sampler2D screen_tex : hint_screen_texture, repeat_disable, filter_linea
 uniform float progress : hint_range(0.0, 1.0) = 0.0;
 uniform float strength : hint_range(0.0, 0.15) = 0.05;
 uniform float thickness : hint_range(0.0, 0.5) = 0.18;
+uniform vec2 center = vec2(0.5, 0.5);
 
 void fragment() {
-	vec2 dir = UV - vec2(0.5);
+	vec2 dir = SCREEN_UV - center;
 	float dist = length(dir);
 	float ring = smoothstep(progress - thickness, progress, dist)
 			   * smoothstep(progress + thickness, progress, dist);
