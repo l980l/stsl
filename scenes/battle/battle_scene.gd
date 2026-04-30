@@ -1664,6 +1664,20 @@ func _emit_particle_layer(pos: Vector2, cfg: Dictionary) -> void:
 
 	get_tree().create_timer(p.lifetime + delay + 0.5).timeout.connect(p.queue_free)
 
+func _spawn_shockwave(world_pos: Vector2, radius: float = 220.0, duration: float = 0.35) -> void:
+	var rect := ColorRect.new()
+	rect.size = Vector2(radius * 2.0, radius * 2.0)
+	rect.position = world_pos - rect.size * 0.5
+	rect.z_index = 14
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://assets/shaders/shockwave.gdshader")
+	rect.material = mat
+	add_child(rect)
+	var tw := create_tween()
+	tw.tween_method(func(p: float) -> void: mat.set_shader_parameter("progress", p), 0.0, 1.0, duration)
+	tw.tween_callback(rect.queue_free)
+
 func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, dtype: String = "") -> void:
 	# 다층 레이어드 임팩트 파티클 — 코어 플래시 + 메인 입자 + 잔해/연기 3층 조합으로 상용 게임 수준 임팩트.
 	if amount <= 0:
@@ -1995,6 +2009,8 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 		_play_hit_shake(char_node, amount)
 		var hero_spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
 		_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
+		if amount >= 100 or dtype == "explosive":
+			_spawn_shockwave(char_node.global_position)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):
@@ -2012,6 +2028,8 @@ func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 		_play_hit_shake(char_node, amount)
 		var spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
 		_spawn_impact_particles(spark_pos, amount, false, dtype)
+		if amount >= 100 or dtype == "explosive":
+			_spawn_shockwave(char_node.global_position)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("hurt"):
