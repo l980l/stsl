@@ -1,3 +1,4 @@
+@tool
 extends "res://scenes/vfx/impact_particle_base.gd"
 
 func setup(p_amount: int, p_flipped: bool) -> void:

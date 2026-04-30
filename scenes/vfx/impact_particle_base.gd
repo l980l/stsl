@@ -1,7 +1,10 @@
+@tool
 extends Node2D
 
-@export var amount: int = 50
-@export var flipped: bool = false
+@export var amount: int = 50:
+	set(v): amount = v; if Engine.is_editor_hint(): _refresh_editor()
+@export var flipped: bool = false:
+	set(v): flipped = v; if Engine.is_editor_hint(): _refresh_editor()
 
 static var _additive_mat: CanvasItemMaterial
 
@@ -12,12 +15,19 @@ const _star_tex:   Texture2D = preload("res://assets/art/particles/star_128.png"
 const _smoke_tex:  Texture2D = preload("res://assets/art/particles/smoke_128.png")
 
 func _ready() -> void:
+	_refresh_editor() if Engine.is_editor_hint() else setup(amount, flipped)
+
+func _refresh_editor() -> void:
+	for child in get_children():
+		child.queue_free()
 	setup(amount, flipped)
 
 func setup(_p_amount: int, _p_flipped: bool) -> void:
 	pass
 
 func _schedule_free(delay: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	get_tree().create_timer(delay).timeout.connect(queue_free)
 
 func _spawn_point_light(local_pos: Vector2, color: Color, radius: float, duration: float = 0.4) -> void:
