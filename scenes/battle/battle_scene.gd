@@ -61,6 +61,8 @@ var _circle_tex: ImageTexture = null
 var _slash_tex: ImageTexture = null
 var _square_tex: ImageTexture = null
 var _star_tex: ImageTexture = null
+var _smoke_tex: ImageTexture = null
+var _additive_mat: CanvasItemMaterial = null
 var _last_card_play_pos: Vector2 = Vector2.ZERO
 var _popup_stack: Dictionary = {}
 var _grad_cache: Dictionary = {}
@@ -912,7 +914,7 @@ func _setup_heroes() -> void:
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
 			var slot_pos := _hero_slot_pos(i)
-			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 40.0 * 1.44, slot_pos.y + 88)
+			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
 			char_node.scale = Vector2(1.44, 2.4)
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
@@ -957,7 +959,7 @@ func _setup_enemies() -> void:
 		var slot_pos: Vector2 = _enemy_slot_pos(i, total)
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
-			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0 + 40.0 * 1.44, slot_pos.y + 88)
+			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
 			char_node.scale = Vector2(-1.44, 2.4)
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
@@ -1514,152 +1516,466 @@ func _stop_target_bloom(panel: ColorRect) -> void:
 			br.remove_meta("_bloom_orig_pos")
 
 func _make_circle_texture() -> ImageTexture:
-	var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
-	var center := Vector2(3.5, 3.5)
-	for x in range(8):
-		for y in range(8):
-			var d: float = Vector2(x, y).distance_to(center)
-			var a: float = clampf(1.0 - d / 3.5, 0.0, 1.0)
+	# 16x16 소프트 원 — 가우시안 감쇠로 자연스러운 광점/블롭 느낌
+	var img := Image.create(16, 16, false, Image.FORMAT_RGBA8)
+	var center := Vector2(7.5, 7.5)
+	for x in range(16):
+		for y in range(16):
+			var d: float = Vector2(x, y).distance_to(center) / 7.5
+			var a: float = clampf(1.0 - d * d, 0.0, 1.0)
+			a = pow(a, 1.4)  # 중심부 강조
 			img.set_pixel(x, y, Color(1, 1, 1, a))
 	return ImageTexture.create_from_image(img)
 
 func _make_slash_texture() -> ImageTexture:
-	var img := Image.create(14, 2, false, Image.FORMAT_RGBA8)
-	for x in range(14):
-		var a: float = 1.0 - absf(float(x) - 6.5) / 6.5
-		img.set_pixel(x, 0, Color(1, 1, 1, a))
-		img.set_pixel(x, 1, Color(1, 1, 1, a))
+	# 32x4 가로 스트로크 — 양 끝 페이드(power 1.6) + 세로 페이드로 부드러운 호 느낌
+	var img := Image.create(32, 4, false, Image.FORMAT_RGBA8)
+	for x in range(32):
+		var ax: float = 1.0 - absf(float(x) - 15.5) / 15.5
+		ax = pow(ax, 1.6)
+		for y in range(4):
+			var ay: float = 1.0 - absf(float(y) - 1.5) / 1.5
+			img.set_pixel(x, y, Color(1, 1, 1, ax * ay))
 	return ImageTexture.create_from_image(img)
 
 func _make_square_texture() -> ImageTexture:
-	var img := Image.create(6, 6, false, Image.FORMAT_RGBA8)
-	for x in range(6):
-		for y in range(6):
-			img.set_pixel(x, y, Color(1, 1, 1, 1.0))
+	# 8x8 결정성 노이즈 사각 — 가장자리 1픽셀 페이드, 내부 미세 노이즈로 파편 질감
+	var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 1337
+	for x in range(8):
+		for y in range(8):
+			var edge: int = mini(mini(x, 7 - x), mini(y, 7 - y))
+			var base: float = 1.0 if edge >= 1 else 0.6
+			var noise: float = 0.85 + 0.15 * rng.randf()
+			img.set_pixel(x, y, Color(1, 1, 1, base * noise))
 	return ImageTexture.create_from_image(img)
 
 func _make_star_texture() -> ImageTexture:
-	var img := Image.create(9, 9, false, Image.FORMAT_RGBA8)
-	for i in range(9):
-		img.set_pixel(i, 4, Color(1, 1, 1, 1.0))
-		img.set_pixel(4, i, Color(1, 1, 1, 1.0))
-	for d in range(-1, 2):
-		img.set_pixel(4 + d, 4 + d, Color(1, 1, 1, 1.0))
-		img.set_pixel(4 - d, 4 + d, Color(1, 1, 1, 1.0))
+	# 16x16 4점 별 — 가로/세로 빔 + 중심 코어, 부드러운 페이드
+	var img := Image.create(16, 16, false, Image.FORMAT_RGBA8)
+	var center := Vector2(7.5, 7.5)
+	for x in range(16):
+		for y in range(16):
+			var dx: float = absf(float(x) - center.x)
+			var dy: float = absf(float(y) - center.y)
+			var d: float = Vector2(x, y).distance_to(center)
+			var beam: float = clampf(1.0 - minf(dx, dy) * 0.9, 0.0, 1.0)
+			var ring: float = clampf(1.0 - d / 7.5, 0.0, 1.0)
+			var core: float = clampf(1.0 - d / 3.0, 0.0, 1.0)
+			var a: float = clampf(beam * ring * 0.85 + core, 0.0, 1.0)
+			img.set_pixel(x, y, Color(1, 1, 1, a))
 	return ImageTexture.create_from_image(img)
 
+func _make_smoke_texture() -> ImageTexture:
+	# 16x16 노이즈 연기 — 결정성 노이즈로 솜털 같은 질감
+	var img := Image.create(16, 16, false, Image.FORMAT_RGBA8)
+	var center := Vector2(7.5, 7.5)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4242
+	for x in range(16):
+		for y in range(16):
+			var d: float = Vector2(x, y).distance_to(center) / 7.5
+			var a: float = clampf(1.0 - d, 0.0, 1.0)
+			a = pow(a, 1.2) * (0.6 + 0.4 * rng.randf())
+			img.set_pixel(x, y, Color(1, 1, 1, a))
+	return ImageTexture.create_from_image(img)
+
+func _emit_particle_layer(pos: Vector2, cfg: Dictionary) -> void:
+	var p := GPUParticles2D.new()
+	p.amount = int(cfg.get("count", 8))
+	p.lifetime = float(cfg.get("lifetime", 0.5))
+	p.one_shot = true
+	p.explosiveness = 1.0
+	p.z_index = int(cfg.get("z", 15))
+	p.texture = cfg.get("texture", _circle_tex)
+
+	var mat := ParticleProcessMaterial.new()
+	var dir2: Vector2 = cfg.get("direction", Vector2.RIGHT)
+	mat.direction = Vector3(dir2.x, dir2.y, 0.0)
+	mat.spread = float(cfg.get("spread", 180.0))
+	var grav2: Vector2 = cfg.get("gravity", Vector2.ZERO)
+	mat.gravity = Vector3(grav2.x, grav2.y, 0.0)
+	mat.initial_velocity_min = float(cfg.get("speed_min", 100.0))
+	mat.initial_velocity_max = float(cfg.get("speed_max", 200.0))
+	mat.scale_min = float(cfg.get("scale_min", 1.0))
+	mat.scale_max = float(cfg.get("scale_max", 2.0))
+	mat.radial_accel_min = float(cfg.get("radial_min", 0.0))
+	mat.radial_accel_max = float(cfg.get("radial_max", 0.0))
+	mat.damping_min = float(cfg.get("damping_min", 0.0))
+	mat.damping_max = float(cfg.get("damping_max", 0.0))
+	mat.angular_velocity_min = float(cfg.get("angular_min", 0.0))
+	mat.angular_velocity_max = float(cfg.get("angular_max", 0.0))
+	mat.angle_min = float(cfg.get("angle_min", 0.0))
+	mat.angle_max = float(cfg.get("angle_max", 0.0))
+
+	var grad := Gradient.new()
+	grad.set_color(0, cfg.get("color_a", Color.WHITE))
+	grad.set_color(1, cfg.get("color_b", Color(1, 1, 1, 0)))
+	if cfg.has("color_mid"):
+		grad.add_point(0.5, cfg["color_mid"])
+	var grad_tex := GradientTexture1D.new()
+	grad_tex.gradient = grad
+	mat.color_ramp = grad_tex
+
+	if cfg.get("pulse_scale", false):
+		var sc := Curve.new()
+		sc.add_point(Vector2(0.0, 0.0))
+		sc.add_point(Vector2(0.35, 1.0))
+		sc.add_point(Vector2(1.0, 0.0))
+		var ct := CurveTexture.new()
+		ct.curve = sc
+		mat.set_param_texture(ParticleProcessMaterial.PARAM_SCALE, ct)
+	elif cfg.get("fade_scale", true):
+		var sc := Curve.new()
+		sc.add_point(Vector2(0.0, 1.0))
+		sc.add_point(Vector2(0.7, 0.85))
+		sc.add_point(Vector2(1.0, 0.0))
+		var ct := CurveTexture.new()
+		ct.curve = sc
+		mat.set_param_texture(ParticleProcessMaterial.PARAM_SCALE, ct)
+
+	if cfg.get("turbulence", false):
+		mat.turbulence_enabled = true
+		mat.turbulence_noise_strength = float(cfg.get("turb_strength", 1.5))
+		mat.turbulence_noise_scale = float(cfg.get("turb_scale", 3.0))
+		mat.turbulence_influence_min = float(cfg.get("turb_min", 0.1))
+		mat.turbulence_influence_max = float(cfg.get("turb_max", 0.4))
+
+	p.process_material = mat
+
+	if cfg.get("additive", true):
+		if _additive_mat == null:
+			_additive_mat = CanvasItemMaterial.new()
+			_additive_mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		p.material = _additive_mat
+
+	add_child(p)
+	p.global_position = pos
+
+	var delay: float = float(cfg.get("delay", 0.0))
+	if delay > 0.0:
+		p.emitting = false
+		get_tree().create_timer(delay).timeout.connect(func() -> void:
+			if is_instance_valid(p): p.emitting = true
+		)
+	else:
+		p.emitting = true
+
+	get_tree().create_timer(p.lifetime + delay + 0.5).timeout.connect(p.queue_free)
+
 func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, dtype: String = "") -> void:
+	# 다층 레이어드 임팩트 파티클 — 코어 플래시 + 메인 입자 + 잔해/연기 3층 조합으로 상용 게임 수준 임팩트.
 	if amount <= 0:
 		return
 	if _circle_tex == null: _circle_tex = _make_circle_texture()
 	if _slash_tex == null:  _slash_tex  = _make_slash_texture()
 	if _square_tex == null: _square_tex = _make_square_texture()
 	if _star_tex == null:   _star_tex   = _make_star_texture()
+	if _smoke_tex == null:  _smoke_tex  = _make_smoke_texture()
 
 	var mag: int = 0 if amount < 30 else (1 if amount < 100 else 2)
-	var count: int
-	var speed_min: float; var speed_max: float
-	var spread: float;    var grav: Vector2
-	var lt: float
-	var scale_min: float; var scale_max: float
-	var tex: ImageTexture
-	var col_a: Color;     var col_b: Color
-	var dir: Vector2 = Vector2(1.0 if flipped else -1.0, 0.0)
-	var radial_min: float = 0.0; var radial_max: float = 0.0
+	var dx: float = -1.0 if flipped else 1.0
 
 	match dtype:
 		"slash":
-			# 얇은 막대 4~8개 — 수평 고속, 중력 없음, 금방 사라짐
-			count = [4, 6, 8][mag]
-			speed_min = 380.0; speed_max = 680.0
-			spread = 40.0; grav = Vector2.ZERO; lt = 0.18
-			scale_min = 0.5; scale_max = 0.95
-			tex = _slash_tex
-			col_a = Color(1.0, 1.0, 1.0, 1.0); col_b = Color(0.65, 0.82, 1.0, 0.0)
+			# 칼베기 — 제자리 가로 선형 섬광 (0→MAX→0 pulse) + 잔영 + 코어
+			_emit_particle_layer(pos, {
+				"count": 1,
+				"lifetime": 0.2,
+				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
+				"scale_min": [6.0, 8.5, 12.0][mag], "scale_max": [7.5, 10.0, 14.0][mag],
+				"texture": _slash_tex,
+				"color_a": Color(2.2, 2.2, 2.2, 1.0),
+				"color_b": Color(0.6, 0.85, 1.0, 0.0),
+				"angle_min": -3.0, "angle_max": 3.0,
+				"pulse_scale": true,
+			})
+			_emit_particle_layer(pos, {
+				"count": [1, 2, 2][mag],
+				"lifetime": 0.3,
+				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
+				"scale_min": [4.0, 5.5, 8.0][mag], "scale_max": [5.5, 7.5, 10.0][mag],
+				"texture": _slash_tex,
+				"color_a": Color(1.2, 1.5, 2.0, 0.55),
+				"color_b": Color(0.2, 0.4, 0.85, 0.0),
+				"angle_min": -18.0, "angle_max": 18.0,
+				"pulse_scale": true,
+				"delay": 0.04,
+			})
+			_emit_particle_layer(pos, {
+				"count": 1, "lifetime": 0.12,
+				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
+				"scale_min": 4.5, "scale_max": 5.5,
+				"texture": _circle_tex,
+				"color_a": Color(2.5, 2.5, 2.5, 0.85),
+				"color_b": Color(0.7, 0.85, 1.0, 0.0),
+				"pulse_scale": true,
+			})
 		"blunt":
-			# 굵은 사각 파편 — 느리게 퍼지다가 중력에 뚝 떨어짐
-			count = [12, 17, 22][mag]
-			speed_min = 110.0; speed_max = 230.0
-			spread = 130.0; grav = Vector2(0, 480); lt = 0.55
-			scale_min = 1.5; scale_max = 2.8
-			tex = _square_tex
-			col_a = Color(0.75, 0.57, 0.35, 1.0); col_b = Color(0.28, 0.22, 0.15, 0.0)
+			# 둔타 — 노란 임팩트 코어 + 갈색 흙먼지 + 회전 사각 파편
+			_emit_particle_layer(pos, {
+				"count": 1, "lifetime": 0.18,
+				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
+				"scale_min": 5.0, "scale_max": 7.0,
+				"texture": _circle_tex,
+				"color_a": Color(2.0, 1.7, 0.8, 0.85),
+				"color_b": Color(1.0, 0.45, 0.15, 0.0),
+			})
+			_emit_particle_layer(pos, {
+				"count": [22, 34, 50][mag],
+				"lifetime": 0.65,
+				"spread": 180.0,
+				"speed_min": 100.0, "speed_max": 280.0,
+				"gravity": Vector2(0, 420),
+				"scale_min": 3.0, "scale_max": 6.0,
+				"texture": _circle_tex,
+				"color_a": Color(0.82, 0.65, 0.42, 0.9),
+				"color_mid": Color(0.55, 0.42, 0.28, 0.55),
+				"color_b": Color(0.22, 0.16, 0.10, 0.0),
+				"damping_min": 60.0, "damping_max": 130.0,
+				"turbulence": true, "turb_strength": 1.2, "turb_scale": 2.5,
+				"turb_min": 0.1, "turb_max": 0.3,
+				"additive": false,
+			})
+			_emit_particle_layer(pos, {
+				"count": [6, 10, 14][mag],
+				"lifetime": 0.7,
+				"direction": Vector2(0.0, -1.0),
+				"spread": 130.0,
+				"speed_min": 200.0, "speed_max": 380.0,
+				"gravity": Vector2(0, 520),
+				"scale_min": 1.5, "scale_max": 2.8,
+				"texture": _square_tex,
+				"color_a": Color(0.55, 0.45, 0.32, 1.0),
+				"color_b": Color(0.18, 0.14, 0.10, 0.0),
+				"angular_min": -240.0, "angular_max": 240.0,
+				"additive": false,
+			})
 		"projectile":
-			# 점 3~5개 — 극히 좁은 일직선, 고속, 즉시 소멸
-			count = [3, 4, 5][mag]
-			speed_min = 580.0; speed_max = 950.0
-			spread = 5.0; grav = Vector2(0, 120); lt = 0.12
-			scale_min = 0.2; scale_max = 0.45
-			tex = _slash_tex
-			col_a = Color(1.0, 1.0, 0.95, 1.0); col_b = Color(0.7, 0.7, 0.65, 0.0)
+			# 화살/탄환 — 발사 위치에서 비행 트레일 → 도착 후 임팩트 플래시 + 스파크
+			var launch_pos := pos - Vector2(dx, 0.0) * 400.0
+			var proj_angle := 0.0 if dx > 0.0 else 180.0
+			_emit_particle_layer(launch_pos, {
+				"count": [3, 5, 7][mag],
+				"lifetime": 0.23,
+				"direction": Vector2(dx, 0.0),
+				"spread": 4.0,
+				"speed_min": 1500.0, "speed_max": 1900.0,
+				"scale_min": 2.5, "scale_max": 4.0,
+				"texture": _slash_tex,
+				"color_a": Color(1.0, 0.95, 0.7, 1.0),
+				"color_b": Color(0.8, 0.6, 0.2, 0.0),
+				"damping_min": 200.0, "damping_max": 400.0,
+				"angle_min": proj_angle - 2.0, "angle_max": proj_angle + 2.0,
+			})
+			_emit_particle_layer(pos, {
+				"count": 1, "lifetime": 0.1,
+				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
+				"scale_min": 4.0, "scale_max": 5.5,
+				"texture": _circle_tex,
+				"color_a": Color(1.0, 1.0, 0.85, 1.0),
+				"color_b": Color(1.0, 0.9, 0.5, 0.0),
+				"delay": 0.18,
+			})
+			_emit_particle_layer(pos, {
+				"count": [5, 8, 12][mag],
+				"lifetime": 0.35,
+				"direction": Vector2(-dx, -0.3),
+				"spread": 70.0,
+				"speed_min": 100.0, "speed_max": 280.0,
+				"gravity": Vector2(0, 220),
+				"scale_min": 1.0, "scale_max": 2.0,
+				"texture": _circle_tex,
+				"color_a": Color(1.0, 0.9, 0.5, 1.0),
+				"color_b": Color(0.85, 0.3, 0.08, 0.0),
+				"damping_min": 50.0, "damping_max": 120.0,
+				"delay": 0.18,
+			})
 		"explosive":
-			# 전방위 대폭발 — 크고 느린 파편, 검은 연기로 페이드
-			count = [18, 24, 32][mag]
-			speed_min = 110.0; speed_max = 270.0
-			spread = 180.0; grav = Vector2(0, 110); lt = 0.8
-			scale_min = 1.6; scale_max = 3.2
-			tex = _circle_tex
-			col_a = Color(1.0, 0.44, 0.04, 1.0); col_b = Color(0.07, 0.05, 0.04, 0.0)
+			# 폭발 — 화염 코어 + 충격파 링 + 검은 연기 잔류
+			_emit_particle_layer(pos, {
+				"count": [30, 50, 72][mag],
+				"lifetime": 0.55,
+				"spread": 180.0,
+				"speed_min": 120.0, "speed_max": 360.0,
+				"gravity": Vector2(0, -40),
+				"scale_min": 3.5, "scale_max": 7.0,
+				"texture": _circle_tex,
+				"color_a": Color(2.5, 1.8, 0.5, 1.0),
+				"color_mid": Color(2.0, 0.6, 0.08, 0.7),
+				"color_b": Color(0.3, 0.05, 0.0, 0.0),
+				"damping_min": 80.0, "damping_max": 200.0,
+			})
+			_emit_particle_layer(pos, {
+				"count": 1, "lifetime": 0.3,
+				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
+				"scale_min": 10.0, "scale_max": 14.0,
+				"texture": _circle_tex,
+				"color_a": Color(3.0, 1.8, 0.4, 1.0),
+				"color_b": Color(1.5, 0.4, 0.08, 0.0),
+				"pulse_scale": true,
+			})
+			_emit_particle_layer(pos, {
+				"count": [14, 22, 32][mag],
+				"lifetime": 1.2,
+				"direction": Vector2(0.0, -1.0),
+				"spread": 180.0,
+				"speed_min": 35.0, "speed_max": 140.0,
+				"gravity": Vector2(0, -55),
+				"scale_min": 5.0, "scale_max": 9.0,
+				"texture": _smoke_tex,
+				"color_a": Color(0.35, 0.28, 0.24, 0.85),
+				"color_b": Color(0.05, 0.04, 0.03, 0.0),
+				"turbulence": true, "turb_strength": 2.0, "turb_scale": 1.5,
+				"turb_min": 0.15, "turb_max": 0.5,
+				"additive": false,
+				"delay": 0.07,
+			})
 		"poison":
-			# 아주 작은 방울 — 초저속으로 위로 둥실 떠오름
-			count = [10, 13, 16][mag]
-			speed_min = 18.0; speed_max = 60.0
-			spread = 50.0; grav = Vector2(0, -55); lt = 1.15
-			scale_min = 0.22; scale_max = 0.52
-			tex = _circle_tex
-			col_a = Color(0.22, 1.0, 0.12, 1.0); col_b = Color(0.04, 0.32, 0.02, 0.0)
-			dir = Vector2(0.0, -1.0)
+			# 독 — 위로 떠오르는 녹색 거품 + 미세 입자 + 코어 점멸
+			_emit_particle_layer(pos, {
+				"count": [16, 24, 34][mag],
+				"lifetime": 1.2,
+				"direction": Vector2(0.0, -1.0),
+				"spread": 55.0,
+				"speed_min": 25.0, "speed_max": 100.0,
+				"gravity": Vector2(0, -50),
+				"scale_min": 1.8, "scale_max": 3.5,
+				"texture": _circle_tex,
+				"color_a": Color(0.6, 2.0, 0.4, 0.9),
+				"color_mid": Color(0.18, 0.85, 0.1, 0.5),
+				"color_b": Color(0.05, 0.32, 0.0, 0.0),
+				"turbulence": true, "turb_strength": 1.0, "turb_scale": 3.5,
+				"turb_min": 0.1, "turb_max": 0.35,
+			})
+			_emit_particle_layer(pos, {
+				"count": [12, 18, 26][mag],
+				"lifetime": 1.5,
+				"direction": Vector2(0.0, -1.0),
+				"spread": 130.0,
+				"speed_min": 12.0, "speed_max": 55.0,
+				"gravity": Vector2(0, -22),
+				"scale_min": 0.8, "scale_max": 1.5,
+				"texture": _circle_tex,
+				"color_a": Color(0.18, 0.55, 0.08, 0.9),
+				"color_b": Color(0.0, 0.18, 0.0, 0.0),
+				"turbulence": true, "turb_strength": 0.8, "turb_scale": 4.0,
+				"turb_min": 0.05, "turb_max": 0.25,
+				"additive": false,
+				"delay": 0.05,
+			})
+			_emit_particle_layer(pos, {
+				"count": 1, "lifetime": 0.2,
+				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
+				"scale_min": 4.0, "scale_max": 5.5,
+				"texture": _circle_tex,
+				"color_a": Color(0.6, 2.5, 0.4, 0.85),
+				"color_b": Color(0.1, 0.5, 0.0, 0.0),
+			})
 		"divine":
-			# 십자형 별 입자 — 위로 폭발적으로 솟구침, 황금→흰색
-			count = [12, 16, 22][mag]
-			speed_min = 220.0; speed_max = 420.0
-			spread = 75.0; grav = Vector2(0, -200); lt = 0.68
-			scale_min = 0.55; scale_max = 1.2
-			tex = _star_tex
-			col_a = Color(1.0, 0.96, 0.38, 1.0); col_b = Color(1.0, 1.0, 1.0, 0.0)
-			dir = Vector2(0.0, -1.0)
+			# 신성 — 황금 빛 폭발 + 회전 별 + 큰 코어 플래시
+			_emit_particle_layer(pos, {
+				"count": [20, 32, 48][mag],
+				"lifetime": 0.8,
+				"direction": Vector2(0.0, -1.0),
+				"spread": 100.0,
+				"speed_min": 120.0, "speed_max": 320.0,
+				"gravity": Vector2(0, -100),
+				"scale_min": 2.2, "scale_max": 4.5,
+				"texture": _circle_tex,
+				"color_a": Color(2.0, 1.9, 1.2, 1.0),
+				"color_mid": Color(2.0, 1.5, 0.4, 0.7),
+				"color_b": Color(1.0, 0.55, 0.1, 0.0),
+				"damping_min": 70.0, "damping_max": 150.0,
+			})
+			_emit_particle_layer(pos, {
+				"count": [7, 12, 18][mag],
+				"lifetime": 1.0,
+				"direction": Vector2(0.0, -1.0),
+				"spread": 65.0,
+				"speed_min": 75.0, "speed_max": 220.0,
+				"gravity": Vector2(0, -65),
+				"scale_min": 2.5, "scale_max": 5.0,
+				"texture": _star_tex,
+				"color_a": Color(2.2, 2.0, 0.8, 1.0),
+				"color_b": Color(1.5, 1.5, 1.0, 0.0),
+				"angular_min": -180.0, "angular_max": 180.0,
+				"delay": 0.04,
+			})
+			_emit_particle_layer(pos, {
+				"count": 1, "lifetime": 0.22,
+				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
+				"scale_min": 9.0, "scale_max": 12.0,
+				"texture": _circle_tex,
+				"color_a": Color(3.0, 2.8, 1.8, 1.0),
+				"color_b": Color(1.5, 1.2, 0.4, 0.0),
+				"pulse_scale": true,
+			})
 		"curse":
-			# 타겟 쪽으로 빨려 들어오는 보라 입자 (radial_accel 음수)
-			count = [10, 14, 18][mag]
-			speed_min = 75.0; speed_max = 170.0
-			spread = 180.0; grav = Vector2(0, -15); lt = 0.82
-			scale_min = 0.32; scale_max = 0.82
-			tex = _circle_tex
-			col_a = Color(0.52, 0.04, 0.88, 1.0); col_b = Color(0.08, 0.0, 0.18, 0.0)
-			radial_min = -130.0; radial_max = -65.0
+			# 저주 — 회오리(radial 음수) + 검은 연기 + 코어
+			_emit_particle_layer(pos, {
+				"count": [18, 28, 40][mag],
+				"lifetime": 0.95,
+				"spread": 180.0,
+				"speed_min": 70.0, "speed_max": 200.0,
+				"scale_min": 1.8, "scale_max": 3.5,
+				"texture": _circle_tex,
+				"color_a": Color(1.5, 0.35, 2.0, 1.0),
+				"color_mid": Color(0.7, 0.08, 1.2, 0.7),
+				"color_b": Color(0.05, 0.0, 0.15, 0.0),
+				"radial_min": -180.0, "radial_max": -80.0,
+				"angular_min": -200.0, "angular_max": 200.0,
+				"turbulence": true, "turb_strength": 1.8, "turb_scale": 2.0,
+				"turb_min": 0.15, "turb_max": 0.5,
+			})
+			_emit_particle_layer(pos, {
+				"count": [10, 16, 24][mag],
+				"lifetime": 1.1,
+				"direction": Vector2(0.0, -1.0),
+				"spread": 130.0,
+				"speed_min": 25.0, "speed_max": 90.0,
+				"gravity": Vector2(0, -35),
+				"scale_min": 3.5, "scale_max": 6.0,
+				"texture": _smoke_tex,
+				"color_a": Color(0.22, 0.05, 0.35, 0.75),
+				"color_b": Color(0.02, 0.0, 0.05, 0.0),
+				"turbulence": true, "turb_strength": 1.5, "turb_scale": 2.5,
+				"turb_min": 0.1, "turb_max": 0.4,
+				"additive": false,
+				"delay": 0.05,
+			})
+			_emit_particle_layer(pos, {
+				"count": 1, "lifetime": 0.2,
+				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
+				"scale_min": 5.0, "scale_max": 6.5,
+				"texture": _circle_tex,
+				"color_a": Color(1.5, 0.3, 2.5, 0.9),
+				"color_b": Color(0.2, 0.0, 0.4, 0.0),
+			})
 		_:
-			count = [8, 14, 22][mag]
-			speed_min = 120.0; speed_max = 280.0
-			spread = 80.0; grav = Vector2(0, 200); lt = 0.35
-			scale_min = 0.6; scale_max = 1.2
-			tex = _circle_tex
-			col_a = Color(1.0, 1.0, 0.9, 1.0); col_b = Color(1.0, 0.6, 0.1, 0.0)
-
-	var grad := Gradient.new()
-	grad.set_color(0, col_a)
-	grad.set_color(1, col_b)
-	var p := CPUParticles2D.new()
-	p.amount = count
-	p.lifetime = lt
-	p.one_shot = true
-	p.explosiveness = 1.0
-	p.direction = dir
-	p.spread = spread
-	p.gravity = grav
-	p.initial_velocity_min = speed_min
-	p.initial_velocity_max = speed_max
-	p.scale_amount_min = scale_min
-	p.scale_amount_max = scale_max
-	if radial_min != 0.0:
-		p.radial_accel_min = radial_min
-		p.radial_accel_max = radial_max
-	p.color_ramp = grad
-	p.texture = tex
-	p.position = pos
-	p.z_index = 15
-	p.emitting = true
-	add_child(p)
-	get_tree().create_timer(p.lifetime + 0.5).timeout.connect(p.queue_free)
+			# 기본 — slash 미지정 fallback (흰→황 스파크 + 코어)
+			_emit_particle_layer(pos, {
+				"count": [6, 10, 14][mag],
+				"lifetime": 0.32,
+				"direction": Vector2(dx, 0.0),
+				"spread": 80.0,
+				"speed_min": 150.0, "speed_max": 320.0,
+				"gravity": Vector2(0, 200),
+				"scale_min": 1.5, "scale_max": 3.0,
+				"texture": _circle_tex,
+				"color_a": Color(2.2, 2.2, 1.8, 1.0),
+				"color_b": Color(1.5, 0.8, 0.1, 0.0),
+				"damping_min": 60.0, "damping_max": 140.0,
+			})
+			_emit_particle_layer(pos, {
+				"count": 1, "lifetime": 0.12,
+				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
+				"scale_min": 5.0, "scale_max": 7.0,
+				"texture": _circle_tex,
+				"color_a": Color(2.5, 2.2, 1.2, 0.9),
+				"color_b": Color(1.5, 0.8, 0.15, 0.0),
+			})
 
 func _on_hero_healed(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)
@@ -1683,7 +1999,7 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	if char_node:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
-		var hero_spark_pos: Vector2 = char_node.position + Vector2(randf_range(-28.0, 28.0), randf_range(-80.0, -30.0))
+		var hero_spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
 		_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
@@ -1700,7 +2016,7 @@ func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 	if char_node:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
-		var spark_pos: Vector2 = _last_card_play_pos if _last_card_play_pos != Vector2.ZERO else char_node.position
+		var spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
 		_spawn_impact_particles(spark_pos, amount, false, dtype)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
