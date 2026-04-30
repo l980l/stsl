@@ -32,7 +32,7 @@ def make_slash_blade() -> None:
         edge_fade = math.sin(t_x * math.pi) ** 1.5
         for y in range(H):
             dy = abs(y - cy)
-            blade_r, soft_r = 4.0, 12.0
+            blade_r, soft_r = 1.5, 5.0
             if dy < blade_r:
                 vert = 1.0
             elif dy < soft_r:

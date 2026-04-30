@@ -1,9 +1,88 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
+[ext_resource type="Script" path="res://addons/BurstParticles2D/BurstParticles2D.gd" id="2_bp2d"]
+[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb_soft.png" id="3_soft"]
+[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="4_orb"]
+[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/orb_small.png" id="5_small"]
+
+[sub_resource type="Gradient" id="Grad_e1"]
+offsets = PackedFloat32Array(0, 0.4, 1)
+colors = PackedColorArray(0.8, 0.2, 0.05, 0.0, 1.0, 0.55, 0.1, 0.9, 1.0, 0.95, 0.5, 1.0)
+
+[sub_resource type="GradientTexture1D" id="GT_e1"]
+gradient = SubResource("Grad_e1")
+
+[sub_resource type="Gradient" id="Grad_e2"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.7, 0.3, 0.0, 0.0, 1.0, 0.6, 0.15, 1.0)
+
+[sub_resource type="GradientTexture1D" id="GT_e2"]
+gradient = SubResource("Grad_e2")
+
+[sub_resource type="Gradient" id="Grad_e3"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.9, 0.8, 0.1, 0.0, 1.0, 1.0, 0.7, 1.0)
+
+[sub_resource type="GradientTexture1D" id="GT_e3"]
+gradient = SubResource("Grad_e3")
+
+[sub_resource type="Curve" id="Cv_ps"]
+_data = [Vector2(0, 0), 0.0, 4.0, 0, 0, Vector2(0.35, 1), 0.0, 0.0, 0, 0, Vector2(0.85, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Cv_sh"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Cv_shf"]
+_data = [Vector2(0, 1), 0.0, -2.0, 0, 0, Vector2(0.6, 0), 0.0, 0.0, 0, 0]
+point_count = 2
 
 [node name="ExplosiveParticle" type="Node2D"]
 script = ExtResource("1_grp")
 autostart = true
 repeat = true
 free_when_finished = true
+
+[node name="Blast" type="Node2D" parent="."]
+script = ExtResource("2_bp2d")
+num_particles = 1
+lifetime = 0.5
+repeat = true
+texture = ExtResource("3_soft")
+image_scale = 3.0
+gradient = SubResource("GT_e1")
+blend_mode = 1
+distance = 0.0
+scale_curve = SubResource("Cv_ps")
+
+[node name="Embers" type="Node2D" parent="."]
+script = ExtResource("2_bp2d")
+num_particles = 14
+lifetime = 0.55
+lifetime_randomness = 0.35
+repeat = true
+texture = ExtResource("4_orb")
+image_scale = 0.3
+image_scale_randomness = 0.4
+gradient = SubResource("GT_e2")
+blend_mode = 1
+spread_degrees = 360.0
+distance = 110.0
+distance_randomness = 0.5
+scale_curve = SubResource("Cv_sh")
+
+[node name="Sparks" type="Node2D" parent="."]
+script = ExtResource("2_bp2d")
+num_particles = 6
+lifetime = 0.3
+repeat = true
+texture = ExtResource("5_small")
+image_scale = 0.15
+gradient = SubResource("GT_e3")
+blend_mode = 1
+spread_degrees = 360.0
+distance = 60.0
+distance_randomness = 0.5
+scale_curve = SubResource("Cv_shf")

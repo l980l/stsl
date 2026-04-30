@@ -1,10 +1,12 @@
-[gd_scene format=3 uid="uid://cs2rcfq3h8j7b"]
+[gd_scene format=3 uid="uid://3v6yvfvba04u"]
 
 [ext_resource type="Script" uid="uid://40nnoas3p4h2" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
-[ext_resource type="Script" uid="uid://ct0ifrbjllv7v" path="res://addons/BurstParticles2D/BurstParticles2D.gd" id="2_bp2d"]
+[ext_resource type="Texture2D" uid="uid://ovw18l4dc1fv" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="2_orb"]
 [ext_resource type="Texture2D" uid="uid://ce3hb7yk4kf6y" path="res://addons/BurstParticles2D/extra/impact_ring_192.png" id="3_ring"]
 [ext_resource type="Texture2D" uid="uid://b7uw8gs5wkuhg" path="res://addons/BurstParticles2D/extra/dust_chunk_64.png" id="4_dust"]
-[ext_resource type="Texture2D" uid="uid://ovw18l4dc1fv" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="5_orb"]
+
+[sub_resource type="CanvasItemMaterial" id="CIM_add"]
+blend_mode = 1
 
 [sub_resource type="Gradient" id="Grad_warm"]
 interpolation_mode = 2
@@ -19,23 +21,35 @@ _limits = [0.0, 2.0, 0.0, 1.0]
 _data = [Vector2(0, 0), 0.0, 8.0, 0, 0, Vector2(0.2, 1.2), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 0, 0]
 point_count = 3
 
+[sub_resource type="CurveTexture" id="CT_flash"]
+curve = SubResource("Cv_flash")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_flash"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 98, 0)
+scale_min = 0.7
+scale_max = 0.7
+scale_curve = SubResource("CT_flash")
+color_ramp = SubResource("GT_warm")
+
 [sub_resource type="Curve" id="Cv_expand"]
 _limits = [0.0, 2.0, 0.0, 1.0]
 _data = [Vector2(0, 0), 0.0, 10.0, 0, 0, Vector2(0.2, 1.8), 0.0, 0.0, 0, 0, Vector2(1, 0.8), -1.0, 0.0, 0, 0]
 point_count = 3
 
-[sub_resource type="Curve" id="Cv_coffset"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0.65), 0.0, 0.0, 0, 0]
-point_count = 2
+[sub_resource type="CurveTexture" id="CT_expand"]
+curve = SubResource("Cv_expand")
 
-[sub_resource type="Curve" id="Cv_alpha_out"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
-point_count = 2
+[sub_resource type="ParticleProcessMaterial" id="PPM_ring"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 98, 0)
+scale_curve = SubResource("CT_expand")
+color_ramp = SubResource("GT_warm")
 
 [sub_resource type="Gradient" id="Grad_dust"]
 interpolation_mode = 2
-offsets = PackedFloat32Array(0, 0.13296904, 0.13539654, 0.57253385, 1)
-colors = PackedColorArray(0.45, 0.3, 0.12, 0, 0.8075754, 0.6340102, 0.37327474, 1.0291976, 0.8, 0.62, 0.35, 1, 0.68, 0.58, 0.45, 0.7, 0.55, 0.48, 0.4, 0)
+offsets = PackedFloat32Array(0, 0.13, 0.57, 1)
+colors = PackedColorArray(0.45, 0.3, 0.12, 0, 0.8, 0.62, 0.35, 1, 0.68, 0.58, 0.45, 0.7, 0.55, 0.48, 0.4, 0)
 
 [sub_resource type="GradientTexture1D" id="GT_dust"]
 gradient = SubResource("Grad_dust")
@@ -44,13 +58,26 @@ gradient = SubResource("Grad_dust")
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
 point_count = 2
 
-[sub_resource type="Curve" id="Cv_linger"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.6, 1), 0.0, -3.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
-point_count = 3
+[sub_resource type="CurveTexture" id="CT_shrink"]
+curve = SubResource("Cv_shrink")
 
-[sub_resource type="Curve" id="Cv_gravity"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 2.0, 0.0, 1, 0]
-point_count = 2
+[sub_resource type="ParticleProcessMaterial" id="PPM_dust"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 220.0
+initial_velocity_max = 660.0
+gravity = Vector3(0, 98, 0)
+scale_min = 1.08
+scale_max = 2.52
+scale_curve = SubResource("CT_shrink")
+color_ramp = SubResource("GT_dust")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_glow"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 98, 0)
+scale_min = 0.84
+scale_max = 0.84
+color_ramp = SubResource("GT_warm")
 
 [sub_resource type="Gradient" id="Grad_shard"]
 interpolation_mode = 2
@@ -60,102 +87,62 @@ colors = PackedColorArray(0.72, 0.66, 0.52, 0, 0.95, 0.88, 0.72, 1, 0.8, 0.72, 0
 [sub_resource type="GradientTexture1D" id="GT_shard"]
 gradient = SubResource("Grad_shard")
 
-[sub_resource type="Curve" id="Cv_shard_alpha"]
-_data = [Vector2(0, 0), 0.0, 8.0, 0, 0, Vector2(0.08, 1.0), 0.0, 0.0, 0, 0, Vector2(0.55, 0.85), 0.0, -2.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
-point_count = 4
+[sub_resource type="ParticleProcessMaterial" id="PPM_shards"]
+spread = 180.0
+initial_velocity_min = 400.0
+initial_velocity_max = 900.0
+gravity = Vector3(0, 612, 0)
+scale_min = 0.29
+scale_max = 1.01
+scale_curve = SubResource("CT_shrink")
+color_ramp = SubResource("GT_shard")
 
-[node name="BluntParticle" type="Node2D" unique_id=973235043]
+[node name="BluntParticle" type="Node2D" unique_id=597920319]
 script = ExtResource("1_grp")
 
-[node name="CoreFlash" type="Node2D" parent="." unique_id=240507458]
-script = ExtResource("2_bp2d")
-num_particles = 1
+[node name="CoreFlash" type="GPUParticles2D" parent="." unique_id=859835751]
+material = SubResource("CIM_add")
+emitting = false
+amount = 1
+texture = ExtResource("2_orb")
 lifetime = 0.1
-repeat = true
-texture = ExtResource("5_orb")
-image_scale = 0.7
-gradient = SubResource("GT_warm")
-blend_mode = 1
-distance = 0.0
-scale_curve = SubResource("Cv_flash")
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_flash")
 
-[node name="ImpactRing" type="Node2D" parent="." unique_id=825180472]
+[node name="ImpactRing" type="GPUParticles2D" parent="." unique_id=1167021263]
 modulate = Color(1, 1, 1, 0.85)
-script = ExtResource("2_bp2d")
-num_particles = 1
-lifetime = 0.4
-repeat = true
+material = SubResource("CIM_add")
+amount = 1
 texture = ExtResource("3_ring")
-gradient = SubResource("GT_warm")
-blend_mode = 1
-distance = 0.0
-scale_curve = SubResource("Cv_expand")
-color_offset_curve = SubResource("Cv_coffset")
-alpha_curve = SubResource("Cv_alpha_out")
+lifetime = 0.4
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_ring")
 
-[node name="DustCloud" type="Node2D" parent="." unique_id=899808930]
-script = ExtResource("2_bp2d")
-num_particles = 8
-lifetime = 0.5
-lifetime_randomness = 0.3
-repeat = true
+[node name="DustCloud" type="GPUParticles2D" parent="." unique_id=1947769374]
+material = SubResource("CIM_add")
 texture = ExtResource("4_dust")
-image_scale = 1.8
-image_scale_randomness = 0.4
-gradient = SubResource("GT_dust")
-blend_mode = 1
-distance = 220.0
-distance_randomness = 0.5
-scale_curve = SubResource("Cv_shrink")
-color_offset_curve = SubResource("Cv_coffset")
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_dust")
 
-[node name="Debris" type="Node2D" parent="." unique_id=764183075]
-script = ExtResource("2_bp2d")
-num_particles = 8
-lifetime = 0.8
-lifetime_randomness = 0.35
-repeat = true
-texture = ExtResource("5_orb")
-image_scale = 0.1
-image_scale_randomness = 0.5
-gradient = SubResource("GT_dust")
-blend_mode = 1
-distance = 280.0
-distance_randomness = 0.6
-scale_curve = SubResource("Cv_shrink")
-color_offset_curve = SubResource("Cv_coffset")
-alpha_curve = SubResource("Cv_linger")
-
-[node name="ImpactGlow" type="Node2D" parent="." unique_id=183363767]
+[node name="ImpactGlow" type="GPUParticles2D" parent="." unique_id=371698276]
 modulate = Color(1, 1, 1, 0.5)
-script = ExtResource("2_bp2d")
-num_particles = 1
+material = SubResource("CIM_add")
+amount = 1
+texture = ExtResource("2_orb")
 lifetime = 0.5
-repeat = true
-texture = ExtResource("5_orb")
-image_scale = 0.84
-gradient = SubResource("GT_warm")
-blend_mode = 1
-distance = 0.0
-color_offset_curve = SubResource("Cv_coffset")
-alpha_curve = SubResource("Cv_alpha_out")
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_glow")
 
-[node name="ShardsBurst" type="Node2D" parent="."]
-script = ExtResource("2_bp2d")
-num_particles = 10
-lifetime = 0.7
-lifetime_randomness = 0.35
-repeat = true
+[node name="ShardsBurst" type="GPUParticles2D" parent="." unique_id=362346071]
+material = SubResource("CIM_add")
+amount = 10
 texture = ExtResource("4_dust")
-image_scale = 0.65
-image_scale_randomness = 0.55
-gradient = SubResource("GT_shard")
-blend_mode = 1
-spread_degrees = 360.0
-distance = 560.0
-distance_randomness = 0.3
-offset = Vector2(0, 150)
-offset_curve = SubResource("Cv_gravity")
-scale_curve = SubResource("Cv_shrink")
-color_offset_curve = SubResource("Cv_coffset")
-alpha_curve = SubResource("Cv_shard_alpha")
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_shards")

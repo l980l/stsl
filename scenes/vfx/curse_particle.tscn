@@ -1,9 +1,65 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
+[ext_resource type="Script" path="res://addons/BurstParticles2D/BurstParticles2D.gd" id="2_bp2d"]
+[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="3_orb"]
+[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/orb_small.png" id="4_small"]
+
+[sub_resource type="Gradient" id="Grad_cu1"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.5, 0.05, 0.7, 0.0, 0.85, 0.3, 1.0, 1.0)
+
+[sub_resource type="GradientTexture1D" id="GT_cu1"]
+gradient = SubResource("Grad_cu1")
+
+[sub_resource type="Gradient" id="Grad_cu2"]
+offsets = PackedFloat32Array(0, 0.4, 1)
+colors = PackedColorArray(0.3, 0.0, 0.5, 0.0, 0.65, 0.15, 0.85, 0.8, 0.4, 0.05, 0.6, 0.0)
+
+[sub_resource type="GradientTexture1D" id="GT_cu2"]
+gradient = SubResource("Grad_cu2")
+
+[sub_resource type="Curve" id="Cv_pu"]
+_data = [Vector2(0, 0), 0.0, 6.0, 0, 0, Vector2(0.2, 1), 0.0, 0.0, 0, 0, Vector2(0.75, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Cv_sh"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
 
 [node name="CurseParticle" type="Node2D"]
 script = ExtResource("1_grp")
 autostart = true
 repeat = true
 free_when_finished = true
+
+[node name="Flash" type="Node2D" parent="."]
+script = ExtResource("2_bp2d")
+num_particles = 1
+lifetime = 0.3
+repeat = true
+texture = ExtResource("3_orb")
+image_scale = 1.0
+gradient = SubResource("GT_cu1")
+blend_mode = 1
+distance = 0.0
+scale_curve = SubResource("Cv_pu")
+
+[node name="Swirl" type="Node2D" parent="."]
+script = ExtResource("2_bp2d")
+num_particles = 10
+lifetime = 0.55
+repeat = true
+texture = ExtResource("4_small")
+image_scale = 0.2
+image_scale_randomness = 0.2
+gradient = SubResource("GT_cu2")
+blend_mode = 1
+direction_rotation_degrees = 200.0
+direction_rotation_randomness = 0.3
+randomly_flip_rotation = true
+spread_degrees = 360.0
+distance = 65.0
+distance_randomness = 0.4
+center_concentration = 8.0
+scale_curve = SubResource("Cv_sh")
