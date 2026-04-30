@@ -1539,9 +1539,12 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 		return
 	var scene: PackedScene = _VFX_SCENES.get(dtype, _VFX_DEFAULT)
 	var fx: Node2D = scene.instantiate()
+	fx.autostart = false
+	fx.repeat = false
 	add_child(fx)
 	fx.global_position = pos
-	fx.setup(flipped)
+	fx.scale.x = -1.0 if flipped else 1.0
+	fx.burst()
 
 func _on_hero_healed(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)

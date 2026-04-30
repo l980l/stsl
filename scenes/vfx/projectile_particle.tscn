@@ -1,6 +1,9 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scenes/vfx/projectile_particle.gd" id="1_projectile"]
+[ext_resource type="Script" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
 
 [node name="ProjectileParticle" type="Node2D"]
-script = ExtResource("1_projectile")
+script = ExtResource("1_grp")
+autostart = true
+repeat = true
+free_when_finished = true
