@@ -1,9 +1,161 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://cs2rcfq3h8j7b"]
 
-[ext_resource type="Script" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
+[ext_resource type="Script" uid="uid://40nnoas3p4h2" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
+[ext_resource type="Script" uid="uid://ct0ifrbjllv7v" path="res://addons/BurstParticles2D/BurstParticles2D.gd" id="2_bp2d"]
+[ext_resource type="Texture2D" uid="uid://ce3hb7yk4kf6y" path="res://addons/BurstParticles2D/extra/impact_ring_192.png" id="3_ring"]
+[ext_resource type="Texture2D" uid="uid://b7uw8gs5wkuhg" path="res://addons/BurstParticles2D/extra/dust_chunk_64.png" id="4_dust"]
+[ext_resource type="Texture2D" uid="uid://ovw18l4dc1fv" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="5_orb"]
 
-[node name="BluntParticle" type="Node2D"]
+[sub_resource type="Gradient" id="Grad_warm"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.1, 0.5, 0.78, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 0.95, 0.85, 1, 0.95, 0.65, 0.25, 1, 0.65, 0.4, 0.15, 0.5, 0.35, 0.2, 0.05, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_warm"]
+gradient = SubResource("Grad_warm")
+
+[sub_resource type="Curve" id="Cv_flash"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 8.0, 0, 0, Vector2(0.2, 1.2), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Cv_expand"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 10.0, 0, 0, Vector2(0.2, 1.8), 0.0, 0.0, 0, 0, Vector2(1, 0.8), -1.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Cv_coffset"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0.65), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Cv_alpha_out"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Grad_dust"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.13296904, 0.13539654, 0.57253385, 1)
+colors = PackedColorArray(0.45, 0.3, 0.12, 0, 0.8075754, 0.6340102, 0.37327474, 1.0291976, 0.8, 0.62, 0.35, 1, 0.68, 0.58, 0.45, 0.7, 0.55, 0.48, 0.4, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_dust"]
+gradient = SubResource("Grad_dust")
+
+[sub_resource type="Curve" id="Cv_shrink"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Cv_linger"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.6, 1), 0.0, -3.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Cv_gravity"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 2.0, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Grad_shard"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.1, 0.5, 1)
+colors = PackedColorArray(0.72, 0.66, 0.52, 0, 0.95, 0.88, 0.72, 1, 0.8, 0.72, 0.56, 0.85, 0.52, 0.44, 0.32, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_shard"]
+gradient = SubResource("Grad_shard")
+
+[sub_resource type="Curve" id="Cv_shard_alpha"]
+_data = [Vector2(0, 0), 0.0, 8.0, 0, 0, Vector2(0.08, 1.0), 0.0, 0.0, 0, 0, Vector2(0.55, 0.85), 0.0, -2.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
+point_count = 4
+
+[node name="BluntParticle" type="Node2D" unique_id=973235043]
 script = ExtResource("1_grp")
-autostart = true
+
+[node name="CoreFlash" type="Node2D" parent="." unique_id=240507458]
+script = ExtResource("2_bp2d")
+num_particles = 1
+lifetime = 0.1
 repeat = true
-free_when_finished = true
+texture = ExtResource("5_orb")
+image_scale = 0.7
+gradient = SubResource("GT_warm")
+blend_mode = 1
+distance = 0.0
+scale_curve = SubResource("Cv_flash")
+
+[node name="ImpactRing" type="Node2D" parent="." unique_id=825180472]
+modulate = Color(1, 1, 1, 0.85)
+script = ExtResource("2_bp2d")
+num_particles = 1
+lifetime = 0.4
+repeat = true
+texture = ExtResource("3_ring")
+gradient = SubResource("GT_warm")
+blend_mode = 1
+distance = 0.0
+scale_curve = SubResource("Cv_expand")
+color_offset_curve = SubResource("Cv_coffset")
+alpha_curve = SubResource("Cv_alpha_out")
+
+[node name="DustCloud" type="Node2D" parent="." unique_id=899808930]
+script = ExtResource("2_bp2d")
+num_particles = 8
+lifetime = 0.5
+lifetime_randomness = 0.3
+repeat = true
+texture = ExtResource("4_dust")
+image_scale = 1.8
+image_scale_randomness = 0.4
+gradient = SubResource("GT_dust")
+blend_mode = 1
+distance = 220.0
+distance_randomness = 0.5
+scale_curve = SubResource("Cv_shrink")
+color_offset_curve = SubResource("Cv_coffset")
+
+[node name="Debris" type="Node2D" parent="." unique_id=764183075]
+script = ExtResource("2_bp2d")
+num_particles = 8
+lifetime = 0.8
+lifetime_randomness = 0.35
+repeat = true
+texture = ExtResource("5_orb")
+image_scale = 0.1
+image_scale_randomness = 0.5
+gradient = SubResource("GT_dust")
+blend_mode = 1
+distance = 280.0
+distance_randomness = 0.6
+scale_curve = SubResource("Cv_shrink")
+color_offset_curve = SubResource("Cv_coffset")
+alpha_curve = SubResource("Cv_linger")
+
+[node name="ImpactGlow" type="Node2D" parent="." unique_id=183363767]
+modulate = Color(1, 1, 1, 0.5)
+script = ExtResource("2_bp2d")
+num_particles = 1
+lifetime = 0.5
+repeat = true
+texture = ExtResource("5_orb")
+image_scale = 0.84
+gradient = SubResource("GT_warm")
+blend_mode = 1
+distance = 0.0
+color_offset_curve = SubResource("Cv_coffset")
+alpha_curve = SubResource("Cv_alpha_out")
+
+[node name="ShardsBurst" type="Node2D" parent="."]
+script = ExtResource("2_bp2d")
+num_particles = 10
+lifetime = 0.7
+lifetime_randomness = 0.35
+repeat = true
+texture = ExtResource("4_dust")
+image_scale = 0.65
+image_scale_randomness = 0.55
+gradient = SubResource("GT_shard")
+blend_mode = 1
+spread_degrees = 360.0
+distance = 560.0
+distance_randomness = 0.3
+offset = Vector2(0, 150)
+offset_curve = SubResource("Cv_gravity")
+scale_curve = SubResource("Cv_shrink")
+color_offset_curve = SubResource("Cv_coffset")
+alpha_curve = SubResource("Cv_shard_alpha")
