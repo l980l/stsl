@@ -1541,7 +1541,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 	var fx: Node2D = scene.instantiate()
 	add_child(fx)
 	fx.global_position = pos
-	fx.setup(amount, flipped)
+	fx.setup(flipped)
 
 func _on_hero_healed(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)
