@@ -1702,7 +1702,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			# 칼베기 — 제자리 가로 선형 섬광 (0→MAX→0 pulse) + 잔영 + 코어
 			_emit_particle_layer(pos, {
 				"count": 1,
-				"lifetime": 0.2,
+				"lifetime": 0.45,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
 				"scale_min": [1.5, 2.1, 3.0][mag], "scale_max": [1.9, 2.5, 3.5][mag],
 				"texture": _slash_tex,
@@ -1713,7 +1713,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			})
 			_emit_particle_layer(pos, {
 				"count": [1, 2, 2][mag],
-				"lifetime": 0.3,
+				"lifetime": 0.6,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
 				"scale_min": [1.0, 1.4, 2.0][mag], "scale_max": [1.4, 1.9, 2.5][mag],
 				"texture": _slash_tex,
@@ -1721,10 +1721,10 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"color_b": Color(0.2, 0.4, 0.85, 0.0),
 				"angle_min": -18.0, "angle_max": 18.0,
 				"pulse_scale": true,
-				"delay": 0.04,
+				"delay": 0.06,
 			})
 			_emit_particle_layer(pos, {
-				"count": 1, "lifetime": 0.12,
+				"count": 1, "lifetime": 0.28,
 				"spread": 0.0, "speed_min": 0.0, "speed_max": 0.0,
 				"scale_min": 0.55, "scale_max": 0.7,
 				"texture": _circle_tex,
@@ -1858,8 +1858,8 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"count": [16, 24, 34][mag],
 				"lifetime": 1.2,
 				"direction": Vector2(0.0, -1.0),
-				"spread": 55.0,
-				"speed_min": 25.0, "speed_max": 100.0,
+				"spread": 110.0,
+				"speed_min": 25.0, "speed_max": 120.0,
 				"gravity": Vector2(0, -50),
 				"scale_min": 0.23, "scale_max": 0.44,
 				"texture": _circle_tex,
@@ -1873,8 +1873,8 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"count": [12, 18, 26][mag],
 				"lifetime": 1.5,
 				"direction": Vector2(0.0, -1.0),
-				"spread": 130.0,
-				"speed_min": 12.0, "speed_max": 55.0,
+				"spread": 170.0,
+				"speed_min": 12.0, "speed_max": 65.0,
 				"gravity": Vector2(0, -22),
 				"scale_min": 0.10, "scale_max": 0.19,
 				"texture": _circle_tex,
@@ -1894,14 +1894,14 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"color_b": Color(0.1, 0.5, 0.0, 0.0),
 			})
 		"divine":
-			# 신성 — 황금 빛 폭발 + 회전 별 + 큰 코어 플래시
+			# 신성 — 전방향 황금 빛 폭발 + 회전 별 + 큰 코어 플래시
 			_emit_particle_layer(pos, {
 				"count": [20, 32, 48][mag],
 				"lifetime": 0.8,
-				"direction": Vector2(0.0, -1.0),
-				"spread": 100.0,
+				"direction": Vector2(1.0, 0.0),
+				"spread": 180.0,
 				"speed_min": 120.0, "speed_max": 320.0,
-				"gravity": Vector2(0, -100),
+				"gravity": Vector2(0, -60),
 				"scale_min": 0.28, "scale_max": 0.56,
 				"texture": _circle_tex,
 				"color_a": Color(2.0, 1.9, 1.2, 1.0),
@@ -1912,10 +1912,10 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 			_emit_particle_layer(pos, {
 				"count": [7, 12, 18][mag],
 				"lifetime": 1.0,
-				"direction": Vector2(0.0, -1.0),
-				"spread": 65.0,
+				"direction": Vector2(1.0, 0.0),
+				"spread": 180.0,
 				"speed_min": 75.0, "speed_max": 220.0,
-				"gravity": Vector2(0, -65),
+				"gravity": Vector2(0, -40),
 				"scale_min": 0.31, "scale_max": 0.63,
 				"texture": _star_tex,
 				"color_a": Color(2.2, 2.0, 0.8, 1.0),
