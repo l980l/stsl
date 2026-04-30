@@ -1664,6 +1664,19 @@ func _emit_particle_layer(pos: Vector2, cfg: Dictionary) -> void:
 
 	get_tree().create_timer(p.lifetime + delay + 0.5).timeout.connect(p.queue_free)
 
+func _spawn_point_light(world_pos: Vector2, color: Color, radius: float, duration: float = 0.4) -> void:
+	var light := PointLight2D.new()
+	light.color = color
+	light.energy = 1.5
+	light.texture = _circle_tex
+	light.texture_scale = radius / 128.0
+	light.position = world_pos
+	light.z_index = 14
+	add_child(light)
+	var tw := create_tween()
+	tw.tween_property(light, "energy", 0.0, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_callback(light.queue_free)
+
 func _spawn_shockwave(world_pos: Vector2, radius: float = 220.0, duration: float = 0.35) -> void:
 	var rect := ColorRect.new()
 	rect.size = Vector2(radius * 2.0, radius * 2.0)
@@ -1679,7 +1692,6 @@ func _spawn_shockwave(world_pos: Vector2, radius: float = 220.0, duration: float
 	tw.tween_callback(rect.queue_free)
 
 func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, dtype: String = "") -> void:
-	# 다층 레이어드 임팩트 파티클 — 코어 플래시 + 메인 입자 + 잔해/연기 3층 조합으로 상용 게임 수준 임팩트.
 	if amount <= 0:
 		return
 	var mag: int = 0 if amount < 30 else (1 if amount < 100 else 2)
@@ -1984,6 +1996,21 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 				"color_a": Color(2.5, 2.2, 1.2, 0.9),
 				"color_b": Color(1.5, 0.8, 0.15, 0.0),
 			})
+
+	# dtype별 PointLight2D 발광
+	var _light_color: Color
+	var _light_radius: float
+	var _light_dur: float
+	match dtype:
+		"slash":     _light_color = Color(1.0, 1.0, 1.0); _light_radius = 80.0;  _light_dur = 0.15
+		"projectile":_light_color = Color(1.0, 1.0, 1.0); _light_radius = 60.0;  _light_dur = 0.2
+		"blunt":     _light_color = Color(1.0, 0.85, 0.6);_light_radius = 100.0; _light_dur = 0.3
+		"explosive": _light_color = Color(1.5, 0.7, 0.2); _light_radius = 180.0; _light_dur = 0.5
+		"poison":    _light_color = Color(0.6, 1.5, 0.4); _light_radius = 90.0;  _light_dur = 0.6
+		"divine":    _light_color = Color(1.8, 1.5, 0.7); _light_radius = 200.0; _light_dur = 0.6
+		"curse":     _light_color = Color(1.0, 0.4, 1.5); _light_radius = 120.0; _light_dur = 0.5
+		_:           _light_color = Color(1.2, 1.1, 0.8); _light_radius = 80.0;  _light_dur = 0.2
+	_spawn_point_light(pos, _light_color, _light_radius, _light_dur)
 
 func _on_hero_healed(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)
