@@ -39,6 +39,10 @@ func update_children():
 			child.repeat = repeat
 			child.free_when_finished = free_when_finished
 			child.autostart = autostart
+		elif child is GPUParticles2D:
+			var gpu_lifetime = child.lifetime * (1.0 + child.lifetime_randomness)
+			if gpu_lifetime > lifetime:
+				lifetime = gpu_lifetime
 
 func burst():
 	finished = false
@@ -46,6 +50,8 @@ func burst():
 	for child in get_children():
 		if child is BurstParticles2D and child.is_inside_tree():
 			child.burst()
+		elif child is GPUParticles2D and child.is_inside_tree():
+			child.restart()
 	if is_inside_tree():
 		get_tree().create_timer(lifetime, false).timeout.connect(_finish)
 
