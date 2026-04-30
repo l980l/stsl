@@ -1,9 +1,148 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
+[ext_resource type="Script" path="res://addons/BurstParticles2D/BurstParticles2D.gd" id="2_bp2d"]
+[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/extra/slash_blade_256x48.png" id="3_blade"]
+[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/extra/slash_arc_192x96.png" id="4_arc"]
+[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="5_orb"]
+[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/extra/spark_diamond_24.png" id="6_diamond"]
+
+[sub_resource type="Gradient" id="Grad_steel"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.1, 0.45, 0.72, 1)
+colors = PackedColorArray(1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.72, 0.86, 1.0, 1.0, 0.42, 0.58, 0.95, 0.55, 0.18, 0.30, 0.75, 0.0)
+
+[sub_resource type="GradientTexture1D" id="GT_steel"]
+gradient = SubResource("Grad_steel")
+
+[sub_resource type="Gradient" id="Grad_flash"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.1, 0.7, 1)
+colors = PackedColorArray(1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.7, 1.0, 1.0, 1.0, 0.0)
+
+[sub_resource type="GradientTexture1D" id="GT_flash"]
+gradient = SubResource("Grad_flash")
+
+[sub_resource type="Gradient" id="Grad_spark"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.1, 0.4, 0.7, 1)
+colors = PackedColorArray(1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.95, 0.4, 0.9, 1.0, 0.5, 0.1, 0.6, 0.9, 0.15, 0.05, 0.0)
+
+[sub_resource type="GradientTexture1D" id="GT_spark"]
+gradient = SubResource("Grad_spark")
+
+[sub_resource type="Curve" id="Cv_xblade"]
+max_value = 2.0
+_data = [Vector2(0, 0), 0.0, 10.0, 0, 0, Vector2(0.25, 2.0), 0.0, 0.0, 0, 0, Vector2(1.0, 1.0), -2.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Cv_yblade"]
+_data = [Vector2(0, 0.4), 0.0, 3.5, 0, 0, Vector2(0.3, 1.2), 0.0, 0.0, 0, 0, Vector2(1.0, 0.4), -1.5, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Cv_dblade"]
+_data = [Vector2(0, 0), 0.0, 4.0, 0, 0, Vector2(0.4, 1.0), 0.0, 0.0, 0, 0, Vector2(1.0, 0.8), -0.5, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Cv_aalpha"]
+_data = [Vector2(0, 1.0), 0.0, 0.0, 0, 0, Vector2(1.0, 0.0), -2.0, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Cv_rarc"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1.0, 1.0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Cv_sflash"]
+max_value = 2.0
+_data = [Vector2(0, 0), 0.0, 8.0, 0, 0, Vector2(0.25, 1.2), 0.0, 0.0, 0, 0, Vector2(1.0, 0.0), -2.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Cv_rspark"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1.0, 1.0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Cv_shrink"]
+_data = [Vector2(0, 1.0), 0.0, 0.0, 0, 0, Vector2(1.0, 0.0), -2.0, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Cv_ytrail"]
+_data = [Vector2(0, 0.1), 0.0, 1.5, 0, 0, Vector2(0.4, 0.35), 0.0, 0.0, 0, 0, Vector2(1.0, 0.1), -0.5, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Cv_coffset"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1.0, 0.7), 0.0, 0.0, 0, 0]
+point_count = 2
 
 [node name="SlashParticle" type="Node2D"]
 script = ExtResource("1_grp")
 autostart = true
 repeat = true
 free_when_finished = true
+
+[node name="CoreFlash" type="Node2D" parent="."]
+script = ExtResource("2_bp2d")
+num_particles = 1
+lifetime = 0.08
+repeat = true
+texture = ExtResource("5_orb")
+image_scale = 0.3
+gradient = SubResource("GT_flash")
+blend_mode = 1
+distance = 0.0
+scale_curve = SubResource("Cv_sflash")
+
+[node name="PrimaryBlade" type="Node2D" parent="."]
+script = ExtResource("2_bp2d")
+num_particles = 1
+lifetime = 0.2
+repeat = true
+texture = ExtResource("3_blade")
+image_scale = 2.2
+gradient = SubResource("GT_steel")
+blend_mode = 1
+direction = Vector2(-0.866, 0.5)
+spread_degrees = 0.0
+distance = 0.0
+x_scale_curve = SubResource("Cv_xblade")
+y_scale_curve = SubResource("Cv_yblade")
+color_offset_curve = SubResource("Cv_coffset")
+
+
+[node name="EdgeSparks" type="Node2D" parent="."]
+script = ExtResource("2_bp2d")
+num_particles = 7
+lifetime = 0.32
+lifetime_randomness = 0.25
+repeat = true
+texture = ExtResource("6_diamond")
+image_scale = 2.5
+image_scale_randomness = 0.4
+gradient = SubResource("GT_spark")
+blend_mode = 1
+direction = Vector2(-0.866, 0.5)
+spread_degrees = 360.0
+distance = 200.0
+distance_randomness = 0.5
+randomly_flip_rotation = true
+rotation_curve = SubResource("Cv_rspark")
+scale_curve = SubResource("Cv_shrink")
+color_offset_curve = SubResource("Cv_coffset")
+
+[node name="CutTrail" type="Node2D" parent="."]
+modulate = Color(1, 1, 1, 0.45)
+script = ExtResource("2_bp2d")
+num_particles = 2
+lifetime = 0.35
+lifetime_randomness = 0.15
+repeat = true
+texture = ExtResource("3_blade")
+image_scale = 1.9
+image_scale_randomness = 0.1
+gradient = SubResource("GT_steel")
+blend_mode = 1
+direction = Vector2(-0.866, 0.5)
+spread_degrees = 0.0
+distance = 0.0
+x_scale_curve = SubResource("Cv_xblade")
+y_scale_curve = SubResource("Cv_ytrail")
+color_offset_curve = SubResource("Cv_coffset")
