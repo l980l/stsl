@@ -30,6 +30,7 @@ IconUtils="*res://autoload/icon_utils.gd"
 SacredPalette="*res://autoload/sacred_palette.gd"
 SacredTheme="*res://autoload/sacred_theme.gd"
 SceneTransition="*res://autoload/scene_transition.gd"
+AudioManager="*res://autoload/audio_manager.gd"
 
 [display]
 
