@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cl9t3yb6vpx4a"]
+[gd_scene format=3 uid="uid://cmat3yb6vpx4a"]
 
 [ext_resource type="Script" uid="uid://40nnoas3p4h2" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
 [ext_resource type="Texture2D" uid="uid://ovw18l4dc1fv" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="2_orb"]
