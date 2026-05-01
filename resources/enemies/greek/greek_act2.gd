@@ -14,7 +14,7 @@ static func cerberus(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 170; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "fire"
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 5; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
@@ -85,7 +85,7 @@ static func hades(scene: PackedScene) -> Resource:
 	var p2i2 := IntentRes.new()
 	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 90; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "curse"
 	var p2i3 := IntentRes.new()
-	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 260; p2i3.target = IntentRes.TargetType.ALL; p2i3.damage_type = "curse"
+	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 260; p2i3.target = IntentRes.TargetType.ALL; p2i3.damage_type = "fire"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
 		[p1i1, p1i2, p1i3],

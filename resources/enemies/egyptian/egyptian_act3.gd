@@ -82,7 +82,7 @@ static func ra_horakhty(scene: PackedScene) -> Resource:
 	var p0i3 := IntentRes.new()
 	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 150; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "divine"
 	var p0i4 := IntentRes.new()
-	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 130; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "divine"
+	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 130; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "fire"
 	# 페이즈1 (65% HP 전환): ATK RANDOM / DEBUFF poison ALL / ATK ALL / ATK LOWEST_HP
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "divine"
@@ -90,14 +90,14 @@ static func ra_horakhty(scene: PackedScene) -> Resource:
 	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "poison"; p1i2.value = 6
 	p1i2.target = IntentRes.TargetType.ALL
 	var p1i3 := IntentRes.new()
-	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 200; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "divine"
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 200; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "fire"
 	var p1i4 := IntentRes.new()
 	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 220; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "divine"
 	# 페이즈2 (30% HP 전환): BUFF strength / ATK ALL / DEBUFF vulnerable ALL / ATK LOWEST_HP
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.BUFF; p2i1.status_type = "strength"; p2i1.value = 15
 	var p2i2 := IntentRes.new()
-	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 260; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "divine"
+	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 260; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "fire"
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.DEBUFF; p2i3.status_type = "vulnerable"; p2i3.value = 3
 	p2i3.target = IntentRes.TargetType.ALL

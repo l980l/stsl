@@ -14,7 +14,7 @@ static func minotaur(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 260; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "blunt"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 260; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
 	e.charm_resistance = 1
 	return e
@@ -63,7 +63,7 @@ static func gorgon(scene: PackedScene) -> Resource:
 	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 2; p1i2.status_type = "vulnerable"
 	p1i2.target = IntentRes.TargetType.RANDOM
 	var p1i3 := IntentRes.new()
-	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 160; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "slash"
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 160; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "curse"
 	e.phase_patterns = [[p0i1, p0i2, p0i3, p0i4, p0i5, p0i6], [p1i1, p1i2, p1i3]]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 1

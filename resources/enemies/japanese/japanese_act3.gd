@@ -70,7 +70,7 @@ static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	p0i3.action_type = IntentRes.ActionType.DEBUFF; p0i3.value = 2; p0i3.status_type = "weak"
 	p0i3.target = IntentRes.TargetType.ALL
 	var p0i4 := IntentRes.new()
-	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 140; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "poison"
+	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 140; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "fire"
 	var p0i5 := IntentRes.new()
 	p0i5.action_type = IntentRes.ActionType.BUFF; p0i5.value = 1; p0i5.status_type = "strength"
 	# Phase 1 — 다섯 머리 (공격력 증가)
@@ -82,7 +82,7 @@ static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	p1i3.action_type = IntentRes.ActionType.DEBUFF; p1i3.value = 2; p1i3.status_type = "vulnerable"
 	p1i3.target = IntentRes.TargetType.ALL
 	var p1i4 := IntentRes.new()
-	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 180; p1i4.target = IntentRes.TargetType.ALL; p1i4.damage_type = "poison"
+	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 180; p1i4.target = IntentRes.TargetType.ALL; p1i4.damage_type = "fire"
 	var p1i5 := IntentRes.new()
 	p1i5.action_type = IntentRes.ActionType.BUFF; p1i5.value = 2; p1i5.status_type = "strength"
 	# Phase 2 — 두 머리 (최고 공격력)
@@ -94,7 +94,7 @@ static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	p2i3.action_type = IntentRes.ActionType.DEBUFF; p2i3.value = 3; p2i3.status_type = "vulnerable"
 	p2i3.target = IntentRes.TargetType.ALL
 	var p2i4 := IntentRes.new()
-	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 220; p2i4.target = IntentRes.TargetType.ALL; p2i4.damage_type = "poison"
+	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 220; p2i4.target = IntentRes.TargetType.ALL; p2i4.damage_type = "fire"
 	var p2i5 := IntentRes.new()
 	p2i5.action_type = IntentRes.ActionType.BUFF; p2i5.value = 3; p2i5.status_type = "strength"
 	e.phase_patterns = [
