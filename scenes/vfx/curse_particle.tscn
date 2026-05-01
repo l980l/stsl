@@ -1,65 +1,148 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene format=3 uid="uid://cx7kd2mr9bnf4"]
 
-[ext_resource type="Script" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
-[ext_resource type="Script" path="res://addons/BurstParticles2D/BurstParticles2D.gd" id="2_bp2d"]
-[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="3_orb"]
-[ext_resource type="Texture2D" path="res://addons/BurstParticles2D/orb_small.png" id="4_small"]
+[ext_resource type="Script" uid="uid://40nnoas3p4h2" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
+[ext_resource type="Texture2D" uid="uid://ovw18l4dc1fv" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="2_orb"]
+[ext_resource type="Texture2D" uid="uid://vwe34itxqa37" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb_soft.png" id="3_soft"]
+[ext_resource type="Texture2D" uid="uid://d2lceccxwhwet" path="res://addons/BurstParticles2D/BurstParticles2D-demo/ring.png" id="4_ring"]
+[ext_resource type="Texture2D" uid="uid://b7uw8gs5wkuhg" path="res://addons/BurstParticles2D/extra/dust_chunk_64.png" id="5_dust"]
 
-[sub_resource type="Gradient" id="Grad_cu1"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(0.5, 0.05, 0.7, 0.0, 0.85, 0.3, 1.0, 1.0)
+[sub_resource type="CanvasItemMaterial" id="CIM_add"]
+blend_mode = 1
 
-[sub_resource type="GradientTexture1D" id="GT_cu1"]
-gradient = SubResource("Grad_cu1")
+[sub_resource type="Gradient" id="Grad_flash"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.08, 0.45, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 0.65, 0.1, 0.9, 0.9, 0.2, 0.0, 0.35, 0)
 
-[sub_resource type="Gradient" id="Grad_cu2"]
-offsets = PackedFloat32Array(0, 0.4, 1)
-colors = PackedColorArray(0.3, 0.0, 0.5, 0.0, 0.65, 0.15, 0.85, 0.8, 0.4, 0.05, 0.6, 0.0)
+[sub_resource type="GradientTexture1D" id="GT_flash"]
+gradient = SubResource("Grad_flash")
 
-[sub_resource type="GradientTexture1D" id="GT_cu2"]
-gradient = SubResource("Grad_cu2")
+[sub_resource type="Gradient" id="Grad_curse"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.1, 0.4, 0.7, 1)
+colors = PackedColorArray(0.2, 0.0, 0.35, 0, 0.65, 0.1, 0.9, 1, 0.45, 0.05, 0.7, 0.9, 0.25, 0.0, 0.4, 0.5, 0.1, 0.0, 0.2, 0)
 
-[sub_resource type="Curve" id="Cv_pu"]
-_data = [Vector2(0, 0), 0.0, 6.0, 0, 0, Vector2(0.2, 1), 0.0, 0.0, 0, 0, Vector2(0.75, 0), 0.0, 0.0, 0, 0]
+[sub_resource type="GradientTexture1D" id="GT_curse"]
+gradient = SubResource("Grad_curse")
+
+[sub_resource type="Curve" id="Cv_flash"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 10.0, 0, 0, Vector2(0.2, 1.5), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 0, 0]
 point_count = 3
 
-[sub_resource type="Curve" id="Cv_sh"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+[sub_resource type="CurveTexture" id="CT_flash"]
+curve = SubResource("Cv_flash")
+
+[sub_resource type="Curve" id="Cv_expand"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 10.0, 0, 0, Vector2(0.2, 1.8), 0.0, 0.0, 0, 0, Vector2(1, 0.5), -1.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CT_expand"]
+curve = SubResource("Cv_expand")
+
+[sub_resource type="Curve" id="Cv_shrink"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
 point_count = 2
 
-[node name="CurseParticle" type="Node2D"]
+[sub_resource type="CurveTexture" id="CT_shrink"]
+curve = SubResource("Cv_shrink")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_flash"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+scale_min = 0.12
+scale_max = 0.12
+scale_curve = SubResource("CT_flash")
+color_ramp = SubResource("GT_flash")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_ring"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+scale_min = 0.15
+scale_max = 0.15
+scale_curve = SubResource("CT_expand")
+color_ramp = SubResource("GT_curse")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_sparks"]
+spread = 180.0
+initial_velocity_min = 100.0
+initial_velocity_max = 280.0
+gravity = Vector3(0, 200, 0)
+scale_min = 0.05
+scale_max = 0.15
+scale_curve = SubResource("CT_shrink")
+color_ramp = SubResource("GT_curse")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_orbs"]
+spread = 360.0
+initial_velocity_min = 30.0
+initial_velocity_max = 80.0
+gravity = Vector3(0, -50, 0)
+scale_min = 0.04
+scale_max = 0.1
+scale_curve = SubResource("CT_shrink")
+color_ramp = SubResource("GT_curse")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_aura"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+scale_min = 0.2
+scale_max = 0.2
+scale_curve = SubResource("CT_expand")
+color_ramp = SubResource("GT_curse")
+
+[node name="CurseParticle" type="Node2D" unique_id=597920319]
 script = ExtResource("1_grp")
-autostart = true
-repeat = true
-free_when_finished = true
 
-[node name="Flash" type="Node2D" parent="."]
-script = ExtResource("2_bp2d")
-num_particles = 1
-lifetime = 0.3
-repeat = true
-texture = ExtResource("3_orb")
-image_scale = 1.0
-gradient = SubResource("GT_cu1")
-blend_mode = 1
-distance = 0.0
-scale_curve = SubResource("Cv_pu")
+[node name="CoreFlash" type="GPUParticles2D" parent="." unique_id=859835751]
+material = SubResource("CIM_add")
+emitting = false
+amount = 1
+texture = ExtResource("2_orb")
+lifetime = 0.1
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_flash")
 
-[node name="Swirl" type="Node2D" parent="."]
-script = ExtResource("2_bp2d")
-num_particles = 10
+[node name="DarkRing" type="GPUParticles2D" parent="." unique_id=1167021263]
+modulate = Color(1, 1, 1, 0.8)
+material = SubResource("CIM_add")
+emitting = false
+amount = 1
+texture = ExtResource("4_ring")
+lifetime = 0.35
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_ring")
+
+[node name="CurseSparks" type="GPUParticles2D" parent="." unique_id=1947769374]
+material = SubResource("CIM_add")
+emitting = false
+amount = 15
+texture = ExtResource("5_dust")
 lifetime = 0.55
-repeat = true
-texture = ExtResource("4_small")
-image_scale = 0.2
-image_scale_randomness = 0.2
-gradient = SubResource("GT_cu2")
-blend_mode = 1
-direction_rotation_degrees = 200.0
-direction_rotation_randomness = 0.3
-randomly_flip_rotation = true
-spread_degrees = 360.0
-distance = 65.0
-distance_randomness = 0.4
-center_concentration = 8.0
-scale_curve = SubResource("Cv_sh")
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_sparks")
+
+[node name="VoidOrbs" type="GPUParticles2D" parent="." unique_id=371698276]
+material = SubResource("CIM_add")
+emitting = false
+amount = 8
+texture = ExtResource("2_orb")
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_orbs")
+
+[node name="ShadowAura" type="GPUParticles2D" parent="." unique_id=1613608821]
+modulate = Color(1, 1, 1, 0.5)
+material = SubResource("CIM_add")
+emitting = false
+amount = 1
+texture = ExtResource("3_soft")
+lifetime = 0.4
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_aura")

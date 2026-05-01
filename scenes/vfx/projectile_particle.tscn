@@ -67,57 +67,57 @@ curve = SubResource("Cv_shrink")
 [sub_resource type="ParticleProcessMaterial" id="PPM_flash"]
 initial_velocity_min = 0.0
 initial_velocity_max = 0.0
-scale_min = 0.6
-scale_max = 0.6
+scale_min = 0.192
+scale_max = 0.192
 scale_curve = SubResource("CT_flash")
 color_ramp = SubResource("GT_impact")
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_ring"]
 initial_velocity_min = 0.0
 initial_velocity_max = 0.0
-scale_min = 0.7
-scale_max = 0.7
+scale_min = 0.224
+scale_max = 0.224
 scale_curve = SubResource("CT_ring")
 color_ramp = SubResource("GT_impact")
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_streak"]
 initial_velocity_min = 0.0
 initial_velocity_max = 0.0
-scale_min = 1.0
-scale_max = 1.0
+scale_min = 0.32
+scale_max = 0.32
 scale_curve = SubResource("CT_streak")
 color_ramp = SubResource("GT_impact")
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_forward"]
 direction = Vector3(1, 0, 0)
 spread = 70.0
-initial_velocity_min = 600.0
-initial_velocity_max = 1400.0
-gravity = Vector3(0, 400, 0)
-scale_min = 0.2
-scale_max = 0.7
+initial_velocity_min = 192.0
+initial_velocity_max = 448.0
+gravity = Vector3(0, 128, 0)
+scale_min = 0.064
+scale_max = 0.224
 scale_curve = SubResource("CT_shrink")
 color_ramp = SubResource("GT_spark_back")
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_backward"]
 direction = Vector3(-1, 0, 0)
 spread = 60.0
-initial_velocity_min = 150.0
-initial_velocity_max = 450.0
-gravity = Vector3(0, 400, 0)
-scale_min = 0.2
-scale_max = 0.6
+initial_velocity_min = 48.0
+initial_velocity_max = 144.0
+gravity = Vector3(0, 128, 0)
+scale_min = 0.064
+scale_max = 0.192
 scale_curve = SubResource("CT_shrink")
 color_ramp = SubResource("GT_spark_fwd")
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_scatter"]
 direction = Vector3(1, 0, 0)
 spread = 120.0
-initial_velocity_min = 300.0
-initial_velocity_max = 900.0
-gravity = Vector3(0, 500, 0)
-scale_min = 0.15
-scale_max = 0.5
+initial_velocity_min = 96.0
+initial_velocity_max = 288.0
+gravity = Vector3(0, 160, 0)
+scale_min = 0.048
+scale_max = 0.16
 scale_curve = SubResource("CT_shrink")
 color_ramp = SubResource("GT_spark_fwd")
 

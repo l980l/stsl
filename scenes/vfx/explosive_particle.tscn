@@ -29,8 +29,8 @@ curve = SubResource("Cv_flash")
 [sub_resource type="ParticleProcessMaterial" id="PPM_flash"]
 particle_flag_disable_z = true
 gravity = Vector3(0, 98, 0)
-scale_min = 0.24
-scale_max = 0.24
+scale_min = 0.192
+scale_max = 0.192
 scale_curve = SubResource("CT_flash")
 color_ramp = SubResource("GT_fire")
 
@@ -45,8 +45,8 @@ curve = SubResource("Cv_expand")
 [sub_resource type="ParticleProcessMaterial" id="PPM_glow"]
 particle_flag_disable_z = true
 gravity = Vector3(0, 98, 0)
-scale_min = 0.18
-scale_max = 0.18
+scale_min = 0.144
+scale_max = 0.144
 scale_curve = SubResource("CT_expand")
 color_ramp = SubResource("GT_fire")
 
@@ -61,8 +61,8 @@ curve = SubResource("Cv_ring")
 [sub_resource type="ParticleProcessMaterial" id="PPM_ring"]
 particle_flag_disable_z = true
 gravity = Vector3(0, 98, 0)
-scale_min = 0.24
-scale_max = 0.24
+scale_min = 0.192
+scale_max = 0.192
 scale_curve = SubResource("CT_ring")
 color_ramp = SubResource("GT_fire")
 
@@ -84,11 +84,11 @@ curve = SubResource("Cv_shrink")
 [sub_resource type="ParticleProcessMaterial" id="PPM_sparks"]
 lifetime_randomness = 0.45
 spread = 180.0
-initial_velocity_min = 120.0
-initial_velocity_max = 300.0
-gravity = Vector3(0, 183, 0)
-scale_min = 0.045
-scale_max = 0.15
+initial_velocity_min = 96.0
+initial_velocity_max = 240.0
+gravity = Vector3(0, 146, 0)
+scale_min = 0.036
+scale_max = 0.12
 scale_curve = SubResource("CT_shrink")
 color_ramp = SubResource("GT_ember")
 
@@ -113,11 +113,11 @@ angle_min = -180.0
 angle_max = 180.0
 direction = Vector3(0, -1, 0)
 spread = 35.0
-initial_velocity_min = 15.0
-initial_velocity_max = 42.0
+initial_velocity_min = 12.0
+initial_velocity_max = 33.6
 gravity = Vector3(0, 0, 0)
-scale_min = 0.24
-scale_max = 0.54
+scale_min = 0.192
+scale_max = 0.432
 scale_curve = SubResource("CT_smoke")
 color_ramp = SubResource("GT_smoke")
 
