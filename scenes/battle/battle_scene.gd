@@ -97,6 +97,7 @@ func _ready() -> void:
 	BattleManager.deck_mgr = DeckManager
 	_connect_signals()
 	_start_battle()
+	AudioManager.play_bgm("bgm_battle_normal")
 	if OS.is_debug_build():
 		_debug_badge = Label.new()
 		_debug_badge.position = Vector2(1500, 20)
