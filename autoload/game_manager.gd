@@ -1,4 +1,4 @@
-# autoload/game_manager.gd
+﻿# autoload/game_manager.gd
 class_name GameManagerClass
 extends Node
 
@@ -48,6 +48,7 @@ var current_state: GameState = GameState.MAP
 var current_floor: int = 0
 const MAX_CHAPTERS: int = 2
 var current_chapter: int = 1
+const _DEBUG_TEST_DECK: bool = true  # 임시: 파티클 타입 테스트용. 완료 후 false로 되돌릴 것
 const MAX_ACTS: int = 3
 var current_act: int = 1
 var gold: int = 0
@@ -161,13 +162,33 @@ func start_run(initial_hero_id: String = "napoleon", chapter: int = 1) -> void:
 	if dm:
 		dm.clear()
 
-	# 초기 영웅 생성 및 추가
-	var hero := _make_hero_by_id(initial_hero_id)
-	if tm:
-		tm.add_hero(hero)
+	if _DEBUG_TEST_DECK:
+		# 임시 테스트 덱 — 나폴레옹+클레오파트라+무사시, 7가지 파티클 타입 확인용
+		for hid: String in ["napoleon", "cleopatra", "musashi"]:
+			var h = _make_hero_by_id(hid)
+			if tm:
+				tm.add_hero(h)
+		if dm:
+			var test_cards: Array = [
+				_NapoleonCards._strike(),           # slash
+				_NapoleonCards._hussar_charge(),    # blunt
+				_NapoleonCards._salvo(),            # projectile
+				_NapoleonCards._artillery_volley(), # explosive
+				_CleopatraCards._venom_needle(),    # poison
+				_CleopatraCards._charming_assault(),# curse
+				_MusashiCards._mushin_blade(),      # divine
+				_MusashiCards._defend(),            # block
+			]
+			for card in test_cards:
+				dm.add_card_to_deck(card)
+	else:
+		# 초기 영웅 생성 및 추가
+		var hero := _make_hero_by_id(initial_hero_id)
+		if tm:
+			tm.add_hero(hero)
 
-	# 초기 덱 생성
-	_add_initial_deck_for(hero)
+		# 초기 덱 생성
+		_add_initial_deck_for(hero)
 
 	# 맵 생성
 	var MapGen = load("res://autoload/map_generator.gd")
