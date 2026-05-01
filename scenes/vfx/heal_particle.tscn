@@ -1,0 +1,91 @@
+[gd_scene format=3 uid="uid://bq3n7x2kp8dt5"]
+
+[ext_resource type="Script" uid="uid://40nnoas3p4h2" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
+[ext_resource type="Texture2D" uid="uid://cwj6gq88wt38f" path="res://addons/BurstParticles2D/extra/lensflare_128.png" id="2_cross"]
+[ext_resource type="Texture2D" uid="uid://cefilwqsaceex" path="res://addons/BurstParticles2D/extra/holy_ray_192x32.png" id="3_ray"]
+
+[sub_resource type="CanvasItemMaterial" id="CIM_add"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Grad_aurora"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.2, 0.5, 0.8, 1)
+colors = PackedColorArray(0.2, 0.9, 0.1, 0, 0.35, 1, 0.08, 0.9, 0.6, 1, 0.02, 0.7, 0.9, 0.85, 0, 0.35, 0.2, 0.5, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_aurora"]
+gradient = SubResource("Grad_aurora")
+
+[sub_resource type="Curve" id="Cv_aurora"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 4.0, 0, 0, Vector2(0.25, 1.2), 0.0, 0.0, 0, 0, Vector2(0.75, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CT_aurora"]
+curve = SubResource("Cv_aurora")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_aurora"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(70, 50, 1)
+angle_min = 1.0728835e-05
+angle_max = 1.0728835e-05
+direction = Vector3(0, -1, 0)
+spread = 12.0
+initial_velocity_min = 15.0
+initial_velocity_max = 35.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.72
+scale_max = 1.12
+scale_curve = SubResource("CT_aurora")
+color_ramp = SubResource("GT_aurora")
+
+[sub_resource type="Gradient" id="Grad_heal"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.15, 0.55, 0.85, 1)
+colors = PackedColorArray(0.3, 1, 0.2, 0, 0.5, 1, 0.1, 1, 0.8, 1, 0.05, 0.85, 1, 0.9, 0, 0.4, 0.3, 0.5, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_heal"]
+gradient = SubResource("Grad_heal")
+
+[sub_resource type="Curve" id="Cv_rise"]
+_data = [Vector2(0, 0), 0.0, 3.0, 0, 0, Vector2(0.2, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -1.5, 0.0, 1, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CT_rise"]
+curve = SubResource("Cv_rise")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_cross"]
+emission_shape = 1
+emission_sphere_radius = 90.0
+angle_min = 15.0000105
+angle_max = 15.0000105
+direction = Vector3(0, -1, 0)
+spread = 25.0
+initial_velocity_min = 25.0
+initial_velocity_max = 55.0
+angular_velocity_min = -1.6093254e-05
+angular_velocity_max = -1.6093254e-05
+gravity = Vector3(0, -15, 0)
+scale_min = 0.28
+scale_max = 0.44
+scale_curve = SubResource("CT_rise")
+color_ramp = SubResource("GT_heal")
+
+[node name="HealParticle" type="Node2D" unique_id=382749102]
+script = ExtResource("1_grp")
+
+[node name="AuroraBeam" type="GPUParticles2D" parent="." unique_id=729384710]
+modulate = Color(1, 1, 1, 0.55)
+material = SubResource("CIM_add")
+texture = ExtResource("3_ray")
+lifetime = 1.5
+one_shot = true
+process_material = SubResource("PPM_aurora")
+
+[node name="RisingCross" type="GPUParticles2D" parent="." unique_id=163847291]
+material = SubResource("CIM_add")
+amount = 15
+texture = ExtResource("2_cross")
+lifetime = 1.5
+one_shot = true
+process_material = SubResource("PPM_cross")

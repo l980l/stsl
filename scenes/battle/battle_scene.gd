@@ -1520,6 +1520,16 @@ const _VFX_SCENES: Dictionary = {
 	"curse":      preload("res://scenes/vfx/curse_particle.tscn"),
 }
 const _VFX_DEFAULT: PackedScene = preload("res://scenes/vfx/default_particle.tscn")
+const _VFX_HEAL: PackedScene = preload("res://scenes/vfx/heal_particle.tscn")
+const _VFX_BLOCK: PackedScene = preload("res://scenes/vfx/block_particle.tscn")
+
+func _spawn_self_particles(pos: Vector2, scene: PackedScene) -> void:
+	var fx: Node2D = scene.instantiate()
+	fx.autostart = false
+	fx.repeat = false
+	add_child(fx)
+	fx.global_position = pos
+	fx.burst()
 
 func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, dtype: String = "") -> void:
 	if amount <= 0:
@@ -1543,6 +1553,9 @@ func _on_hero_healed(hero_id: String, amount: int) -> void:
 			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
 			_spawn_heal_popup(popup_pos, amount, hero_id)
 			break
+	var char_node = _hero_char_nodes.get(hero_id)
+	if char_node:
+		_spawn_self_particles(char_node.global_position + Vector2(0.0, -20.0), _VFX_HEAL)
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	_update_hero_ui(hero_id)
@@ -1558,7 +1571,10 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
 		var hero_spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
-		_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
+		if amount == 0:
+			_spawn_self_particles(char_node.global_position + Vector2(randf_range(-10.0, 10.0), randf_range(-20.0, 10.0)), _VFX_BLOCK)
+		else:
+			_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
 
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")

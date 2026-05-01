@@ -1,0 +1,136 @@
+[gd_scene format=3 uid="uid://dm4r9k7vf2xw6"]
+
+[ext_resource type="Script" uid="uid://40nnoas3p4h2" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
+[ext_resource type="Texture2D" uid="uid://ovw18l4dc1fv" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="2_orb"]
+[ext_resource type="Texture2D" uid="uid://vwe34itxqa37" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb_soft.png" id="3_soft"]
+[ext_resource type="Texture2D" uid="uid://ce3hb7yk4kf6y" path="res://addons/BurstParticles2D/extra/impact_ring_192.png" id="4_ring"]
+[ext_resource type="Texture2D" uid="uid://b7uw8gs5wkuhg" path="res://addons/BurstParticles2D/extra/dust_chunk_64.png" id="5_dust"]
+
+[sub_resource type="CanvasItemMaterial" id="CIM_add"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Grad_gather"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.12, 0.5, 0.85, 1)
+colors = PackedColorArray(0.1, 0.5, 0.9, 0, 0.3, 0.85, 1.0, 1.0, 0.1, 0.55, 1.0, 0.9, 0.05, 0.3, 0.8, 0.5, 0.02, 0.1, 0.4, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_gather"]
+gradient = SubResource("Grad_gather")
+
+[sub_resource type="Gradient" id="Grad_ring"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.15, 0.6, 1)
+colors = PackedColorArray(0.2, 0.7, 1.0, 0.9, 0.1, 0.5, 0.95, 1.0, 0.05, 0.3, 0.8, 0.6, 0.02, 0.1, 0.4, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_ring"]
+gradient = SubResource("Grad_ring")
+
+[sub_resource type="Gradient" id="Grad_flash"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.08, 0.45, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 0.4, 0.85, 1.0, 0.8, 0.1, 0.4, 0.7, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_flash"]
+gradient = SubResource("Grad_flash")
+
+[sub_resource type="Curve" id="Cv_shrink"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CT_shrink"]
+curve = SubResource("Cv_shrink")
+
+[sub_resource type="Curve" id="Cv_contract"]
+_data = [Vector2(0, 1.8), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.5, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CT_contract"]
+curve = SubResource("Cv_contract")
+
+[sub_resource type="Curve" id="Cv_late_flash"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.6, 0), 0.0, 8.0, 0, 0, Vector2(0.8, 1.5), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.0, 0.0, 1, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CT_late_flash"]
+curve = SubResource("Cv_late_flash")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_sparks"]
+emission_shape = 2
+emission_sphere_radius = 55.0
+gravity = Vector3(0, 0, 0)
+radial_velocity_min = -160.0
+radial_velocity_max = -60.0
+scale_min = 0.04
+scale_max = 0.1
+scale_curve = SubResource("CT_shrink")
+color_ramp = SubResource("GT_gather")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_ring"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+scale_min = 0.18
+scale_max = 0.18
+scale_curve = SubResource("CT_contract")
+color_ramp = SubResource("GT_ring")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_glow"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+scale_min = 0.14
+scale_max = 0.14
+scale_curve = SubResource("CT_contract")
+color_ramp = SubResource("GT_gather")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_flash"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+scale_min = 0.12
+scale_max = 0.12
+scale_curve = SubResource("CT_late_flash")
+color_ramp = SubResource("GT_flash")
+
+[node name="BlockParticle" type="Node2D" unique_id=748291036]
+script = ExtResource("1_grp")
+
+[node name="GatherSparks" type="GPUParticles2D" parent="." unique_id=847291038]
+material = SubResource("CIM_add")
+emitting = false
+amount = 20
+texture = ExtResource("5_dust")
+lifetime = 0.45
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_sparks")
+
+[node name="ContractRing" type="GPUParticles2D" parent="." unique_id=847362910]
+modulate = Color(1, 1, 1, 0.9)
+material = SubResource("CIM_add")
+emitting = false
+amount = 1
+texture = ExtResource("4_ring")
+lifetime = 0.38
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_ring")
+
+[node name="GlowPulse" type="GPUParticles2D" parent="." unique_id=293847102]
+modulate = Color(1, 1, 1, 0.6)
+material = SubResource("CIM_add")
+emitting = false
+amount = 1
+texture = ExtResource("3_soft")
+lifetime = 0.35
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_glow")
+
+[node name="CoreFlash" type="GPUParticles2D" parent="." unique_id=192847365]
+material = SubResource("CIM_add")
+emitting = false
+amount = 1
+texture = ExtResource("2_orb")
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_flash")
