@@ -11,8 +11,8 @@ blend_mode = 1
 
 [sub_resource type="Gradient" id="Grad_flash"]
 interpolation_mode = 2
-offsets = PackedFloat32Array(0, 0.08, 0.7, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0.7, 1, 1, 1, 0)
+offsets = PackedFloat32Array(0, 0.08, 0.45, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 0.92, 0.5, 0.8, 1, 1, 1, 0)
 
 [sub_resource type="GradientTexture1D" id="GT_flash"]
 gradient = SubResource("Grad_flash")
@@ -27,16 +27,16 @@ curve = SubResource("Cv_flash")
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_flash"]
 particle_flag_disable_z = true
-gravity = Vector3(0, 98, 0)
-scale_min = 0.8
-scale_max = 0.8
+gravity = Vector3(0, 0, 0)
+scale_min = 0.12
+scale_max = 0.12
 scale_curve = SubResource("CT_flash")
 color_ramp = SubResource("GT_flash")
 
 [sub_resource type="Gradient" id="Grad_gold"]
 interpolation_mode = 2
-offsets = PackedFloat32Array(0, 0.12, 0.42, 0.72, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 0.8, 1, 1, 0.85, 0.15, 1, 0.9, 0.65, 0.05, 0.7, 0.6, 0.35, 0.01, 0)
+offsets = PackedFloat32Array(0, 0.1, 0.28, 0.55, 0.82, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 0.92, 0.1, 1, 1, 0.5, 0.05, 0.75, 0.8, 0.45, 0.02, 0.3, 0.7, 0.4, 0, 0)
 
 [sub_resource type="GradientTexture1D" id="GT_gold"]
 gradient = SubResource("Grad_gold")
@@ -51,7 +51,13 @@ curve = SubResource("Cv_expand")
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_ring"]
 particle_flag_disable_z = true
-gravity = Vector3(0, 98, 0)
+angle_min = 1.0728835e-05
+angle_max = 90.000015
+angular_velocity_min = -100.000015
+angular_velocity_max = 99.999985
+gravity = Vector3(0, 0, 0)
+scale_min = 0.15
+scale_max = 0.15
 scale_curve = SubResource("CT_expand")
 color_ramp = SubResource("GT_gold")
 
@@ -67,19 +73,19 @@ particle_flag_disable_z = true
 emission_shape = 6
 emission_ring_axis = Vector3(0, 0, 1)
 emission_ring_height = 0.0
-emission_ring_radius = 441.07
-emission_ring_inner_radius = 343.3
+emission_ring_radius = 66.15
+emission_ring_inner_radius = 51.5
 emission_ring_cone_angle = 90.0
 angle_min = -180.0
 angle_max = 180.0
 spread = 180.0
-initial_velocity_min = 80.0
-initial_velocity_max = 300.0
+initial_velocity_min = 12.0
+initial_velocity_max = 45.0
 angular_velocity_min = -720.0
 angular_velocity_max = 719.99994
-gravity = Vector3(0, 98, 0)
-scale_min = 0.48
-scale_max = 1.12
+gravity = Vector3(0, 0, 0)
+scale_min = 0.072
+scale_max = 0.168
 scale_curve = SubResource("CT_shrink")
 color_ramp = SubResource("GT_gold")
 
@@ -93,9 +99,9 @@ curve = SubResource("Cv_aura")
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_aura"]
 particle_flag_disable_z = true
-gravity = Vector3(0, 98, 0)
-scale_min = 0.5
-scale_max = 0.5
+gravity = Vector3(0, 0, 0)
+scale_min = 0.075
+scale_max = 0.075
 scale_curve = SubResource("CT_aura")
 color_ramp = SubResource("GT_gold")
 
@@ -125,7 +131,8 @@ process_material = SubResource("PPM_ring")
 
 [node name="StarBurst" type="GPUParticles2D" parent="." unique_id=1722202521]
 material = SubResource("CIM_add")
-amount = 50
+emitting = false
+amount = 20
 texture = ExtResource("5_star")
 lifetime = 0.7
 one_shot = true
