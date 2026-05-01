@@ -150,12 +150,6 @@ func _phase_player_main() -> void:
 	if team_mgr:
 		for hero in team_mgr.heroes:
 			_hero_block[hero.hero_id] = 0
-			for stype: String in ["weak", "vulnerable", "taunt"]:
-				var cur: int = _hero_status.get(hero.hero_id, {}).get(stype, 0)
-				if cur > 0:
-					if not _hero_status.has(hero.hero_id):
-						_hero_status[hero.hero_id] = {}
-					_hero_status[hero.hero_id][stype] = cur - 1
 	_trigger_active_powers("player_turn_start")
 	if deck_mgr:
 		deck_mgr.start_turn()
@@ -165,6 +159,14 @@ func _phase_player_main() -> void:
 	player_turn_started.emit()
 
 func _phase_player_post() -> bool:
+	if team_mgr:
+		for hero in team_mgr.heroes:
+			for stype: String in ["weak", "vulnerable", "taunt"]:
+				var cur: int = _hero_status.get(hero.hero_id, {}).get(stype, 0)
+				if cur > 0:
+					if not _hero_status.has(hero.hero_id):
+						_hero_status[hero.hero_id] = {}
+					_hero_status[hero.hero_id][stype] = cur - 1
 	var did_work: bool = false
 	for i in range(_enemies.size()):
 		if not _enemy_alive[i]:
