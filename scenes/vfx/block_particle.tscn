@@ -99,11 +99,11 @@ script = ExtResource("6_shield")
 
 [node name="ShieldPoly" type="Polygon2D" parent="ShieldIcon" unique_id=112837465]
 material = SubResource("CIM_add")
-color = Color(0.2, 0.75, 1, 0)
+color = Color(0.2, 0.75, 1, 1)
 
 [node name="ShieldOutline" type="Line2D" parent="ShieldIcon" unique_id=229384710]
 material = SubResource("CIM_add")
-default_color = Color(0.5, 0.9, 1, 0)
+default_color = Color(0.5, 0.9, 1, 1)
 width = 2.5
 
 [node name="GatherSparks" type="GPUParticles2D" parent="." unique_id=847291038]
