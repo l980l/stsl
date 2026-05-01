@@ -59,6 +59,7 @@ signal enemy_turn_started()
 signal enemy_died(enemy_index: int)
 signal enemy_damaged(enemy_index: int, amount: int, damage_type: String)
 signal hero_damaged(hero_id: String, amount: int, damage_type: String)
+signal hero_block_gained(hero_id: String, amount: int)
 signal status_applied(target: String, status_type: String, stacks: int)
 signal morale_changed(hero_id: String, new_value: int)
 signal active_powers_changed()
@@ -344,6 +345,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							_last_attacker[target_enemy_index] = card.owner_id
 			EffectRes.EffectType.BLOCK:
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + effect.value
+				hero_block_gained.emit(card.owner_id, effect.value)
 			EffectRes.EffectType.APPLY_STATUS:
 				if effect.status_type.begins_with("power."):
 					_register_power(effect.status_type, card.owner_id, effect.value)

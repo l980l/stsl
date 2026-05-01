@@ -783,6 +783,7 @@ func _connect_signals() -> void:
 	BattleManager.player_turn_started.connect(_on_player_turn_started)
 	BattleManager.enemy_turn_started.connect(_on_enemy_turn_started)
 	BattleManager.hero_damaged.connect(_on_hero_damaged)
+	BattleManager.hero_block_gained.connect(_on_hero_block_gained)
 	BattleManager.enemy_damaged.connect(_on_enemy_damaged)
 	TeamManager.hero_healed.connect(_on_hero_healed)
 	BattleManager.enemy_died.connect(_on_enemy_died)
@@ -1560,6 +1561,11 @@ func _on_hero_healed(hero_id: String, amount: int) -> void:
 	if char_node:
 		_spawn_self_particles(char_node.global_position + Vector2(0.0, -20.0), _VFX_HEAL)
 
+func _on_hero_block_gained(hero_id: String, _amount: int) -> void:
+	var char_node = _hero_char_nodes.get(hero_id)
+	if char_node:
+		_spawn_self_particles(char_node.global_position + Vector2(0.0, -10.0), _VFX_BLOCK)
+
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	_update_hero_ui(hero_id)
 	for entry in _hero_nodes:
@@ -1574,9 +1580,7 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 		_play_hit_flash(char_node)
 		_play_hit_shake(char_node, amount)
 		var hero_spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
-		if amount == 0:
-			_spawn_self_particles(char_node.global_position + Vector2(randf_range(-10.0, 10.0), randf_range(-20.0, 10.0)), _VFX_BLOCK)
-		else:
+		if amount > 0:
 			_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
 
 		if char_node.has_node("AnimationPlayer"):
