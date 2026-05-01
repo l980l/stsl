@@ -1311,6 +1311,8 @@ func _on_end_turn_pressed() -> void:
 	BattleManager.end_player_turn()
 
 func _on_player_turn_started() -> void:
+	AudioManager.play_sfx("turn_player_start")
+	AudioManager.play_sfx("card_draw")
 	_end_turn_btn.disabled = false
 	_message_label.text = tr("battle.msg_player_turn")
 	_energy_label.text = "%d/%d" % [DeckManager.current_energy, DeckManager.MAX_ENERGY]
@@ -1330,6 +1332,7 @@ func _on_player_turn_started() -> void:
 	_refresh_synergy_hud()
 
 func _on_enemy_turn_started() -> void:
+	AudioManager.play_sfx("turn_enemy_start")
 	_end_turn_btn.disabled = true
 	_selected_card = null
 	_message_label.text = tr("battle.msg_enemy_turn")
@@ -1348,6 +1351,11 @@ func _on_energy_changed(new_energy: int) -> void:
 
 func _on_card_played(card: Resource) -> void:
 	call_deferred("_refresh_all_hero_ui")
+	var _sfx_key: String = "card_play_attack"
+	match card.get("card_type", -1):
+		CardResource.CardType.SKILL: _sfx_key = "card_play_skill"
+		CardResource.CardType.POWER: _sfx_key = "card_play_power"
+	AudioManager.play_sfx(_sfx_key)
 	var anim_name: String = card.get("play_animation") if card.get("play_animation") != null else ""
 	if anim_name == "":
 		return
@@ -1560,6 +1568,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 	if dtype == "slash":
 		fx.rotation = randf_range(0.0, TAU)
 	fx.burst()
+	AudioManager.play_sfx("impact_" + (dtype if dtype != "" else "default"))
 
 func _on_hero_healed(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)
@@ -1572,11 +1581,13 @@ func _on_hero_healed(hero_id: String, amount: int) -> void:
 	var char_node = _hero_char_nodes.get(hero_id)
 	if char_node:
 		_spawn_self_particles(char_node.global_position + Vector2(0.0, -20.0), _VFX_HEAL)
+		AudioManager.play_sfx("heal")
 
 func _on_hero_block_gained(hero_id: String, _amount: int) -> void:
 	var char_node = _hero_char_nodes.get(hero_id)
 	if char_node:
 		_spawn_self_particles(char_node.global_position + Vector2(0.0, -10.0), _VFX_BLOCK)
+		AudioManager.play_sfx("block")
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	_update_hero_ui(hero_id)
@@ -1619,6 +1630,7 @@ func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 				ap.play("hurt")
 
 func _on_enemy_died(index: int) -> void:
+	AudioManager.play_sfx("enemy_death")
 	_update_enemy_ui(index)
 	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
 	if char_node and char_node.has_node("AnimationPlayer"):
@@ -1627,6 +1639,7 @@ func _on_enemy_died(index: int) -> void:
 			ap.play("death")
 
 func _on_hero_died(hero_id: String) -> void:
+	AudioManager.play_sfx("hero_death")
 	_update_hero_ui(hero_id)
 	var hand: Array = DeckManager.hand
 	for i in range(min(_card_buttons.size(), hand.size())):
