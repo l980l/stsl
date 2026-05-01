@@ -1530,6 +1530,9 @@ func _spawn_self_particles(pos: Vector2, scene: PackedScene) -> void:
 	add_child(fx)
 	fx.global_position = pos
 	fx.burst()
+	var shield := fx.get_node_or_null("ShieldIcon")
+	if shield:
+		shield.play_shield()
 
 func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, dtype: String = "") -> void:
 	if amount <= 0:

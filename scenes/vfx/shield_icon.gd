@@ -9,7 +9,7 @@ func _ready() -> void:
 	_poly.modulate.a = 0.0
 	_outline.modulate.a = 0.0
 
-func burst() -> void:
+func play_shield() -> void:
 	_poly.scale = Vector2(0.2, 0.2)
 	_outline.scale = Vector2(0.2, 0.2)
 	_poly.modulate.a = 0.0
