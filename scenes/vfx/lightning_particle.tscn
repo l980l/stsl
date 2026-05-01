@@ -2,25 +2,24 @@
 
 [ext_resource type="Script" uid="uid://40nnoas3p4h2" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
 [ext_resource type="Texture2D" uid="uid://ovw18l4dc1fv" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="2_orb"]
-[ext_resource type="Texture2D" uid="uid://vwe34itxqa37" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb_soft.png" id="3_soft"]
-[ext_resource type="Texture2D" uid="uid://ciq55avb0ipsp" path="res://addons/kenney_particle_pack/trace_01.png" id="4_trace"]
-[ext_resource type="Texture2D" uid="uid://be4ujherxoj02" path="res://addons/kenney_particle_pack/spark_07.png" id="5_spark"]
-[ext_resource type="Texture2D" uid="uid://ckytknkbu76lp" path="res://addons/kenney_particle_pack/light_03.png" id="6_light"]
+[ext_resource type="Texture2D" uid="uid://ce3hb7yk4kf6y" path="res://addons/BurstParticles2D/extra/impact_ring_192.png" id="3_ring"]
+[ext_resource type="Texture2D" uid="uid://b7uw8gs5wkuhg" path="res://addons/BurstParticles2D/extra/dust_chunk_64.png" id="4_dust"]
+[ext_resource type="Script" uid="uid://cgwh46bgirtg" path="res://scenes/vfx/shockwave_effect.gd" id="7_shock"]
 
 [sub_resource type="CanvasItemMaterial" id="CIM_add"]
 blend_mode = 1
 
-[sub_resource type="Gradient" id="Grad_flash"]
+[sub_resource type="Gradient" id="Grad_warm"]
 interpolation_mode = 2
-offsets = PackedFloat32Array(0, 0.06, 0.4, 0.8, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0.55, 0.95, 0.85, 0.65, 0.15, 0.6, 0.3, 0.25, 0.05, 0)
+offsets = PackedFloat32Array(0, 0.1, 0.5, 0.78, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 0.98, 0.35, 1, 1, 0.75, 0.05, 0.6, 0.4, 0.25, 0, 0)
 
-[sub_resource type="GradientTexture1D" id="GT_flash"]
-gradient = SubResource("Grad_flash")
+[sub_resource type="GradientTexture1D" id="GT_warm"]
+gradient = SubResource("Grad_warm")
 
 [sub_resource type="Curve" id="Cv_flash"]
 _limits = [0.0, 2.0, 0.0, 1.0]
-_data = [Vector2(0, 0), 0.0, 18.0, 0, 0, Vector2(0.08, 1.8), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.5, 0.0, 0, 0]
+_data = [Vector2(0, 0), 0.0, 8.0, 0, 0, Vector2(0.2, 1.2), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 0, 0]
 point_count = 3
 
 [sub_resource type="CurveTexture" id="CT_flash"]
@@ -29,158 +28,127 @@ curve = SubResource("Cv_flash")
 [sub_resource type="ParticleProcessMaterial" id="PPM_flash"]
 particle_flag_disable_z = true
 gravity = Vector3(0, 0, 0)
-scale_min = 0.22
-scale_max = 0.22
+scale_min = 0.21
+scale_max = 0.21
 scale_curve = SubResource("CT_flash")
-color_ramp = SubResource("GT_flash")
+color_ramp = SubResource("GT_warm")
 
-[sub_resource type="Gradient" id="Grad_bolt"]
-interpolation_mode = 2
-offsets = PackedFloat32Array(0, 0.05, 0.3, 0.7, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 0.95, 0.85, 0.4, 1, 0.7, 0.45, 0.15, 0.7, 0.4, 0.2, 0.05, 0)
-
-[sub_resource type="GradientTexture1D" id="GT_bolt"]
-gradient = SubResource("Grad_bolt")
-
-[sub_resource type="Curve" id="Cv_bolt"]
+[sub_resource type="Curve" id="Cv_expand"]
 _limits = [0.0, 2.0, 0.0, 1.0]
-_data = [Vector2(0, 0.4), 0.0, 8.0, 0, 0, Vector2(0.1, 1.4), 0.0, 0.0, 0, 0, Vector2(0.4, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.0, 0.0, 1, 0]
-point_count = 4
+_data = [Vector2(0, 0), 0.0, 10.0, 0, 0, Vector2(0.2, 1.8), 0.0, 0.0, 0, 0, Vector2(1, 0.8), -1.0, 0.0, 0, 0]
+point_count = 3
 
-[sub_resource type="CurveTexture" id="CT_bolt"]
-curve = SubResource("Cv_bolt")
+[sub_resource type="CurveTexture" id="CT_expand"]
+curve = SubResource("Cv_expand")
 
-[sub_resource type="ParticleProcessMaterial" id="PPM_bolts"]
+[sub_resource type="ParticleProcessMaterial" id="PPM_ring"]
 particle_flag_disable_z = true
-emission_shape = 1
-emission_sphere_radius = 16.0
-spread = 180.0
-initial_velocity_min = 60.0
-initial_velocity_max = 130.0
-angular_velocity_min = -45.0
-angular_velocity_max = 45.0
 gravity = Vector3(0, 0, 0)
-scale_min = 0.5
-scale_max = 0.95
-scale_curve = SubResource("CT_bolt")
-color_ramp = SubResource("GT_bolt")
+scale_min = 0.3
+scale_max = 0.3
+scale_curve = SubResource("CT_expand")
+color_ramp = SubResource("GT_warm")
 
-[sub_resource type="Curve" id="Cv_spark_shrink"]
+[sub_resource type="Gradient" id="Grad_dust"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.13, 0.57, 1)
+colors = PackedColorArray(0.1, 0.08, 0, 0, 0.42, 0.38, 0.12, 1, 0.22, 0.18, 0.04, 0.7, 0.05, 0.04, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_dust"]
+gradient = SubResource("Grad_dust")
+
+[sub_resource type="Curve" id="Cv_shrink"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
 point_count = 2
 
-[sub_resource type="CurveTexture" id="CT_spark_shrink"]
-curve = SubResource("Cv_spark_shrink")
+[sub_resource type="CurveTexture" id="CT_shrink"]
+curve = SubResource("Cv_shrink")
 
-[sub_resource type="ParticleProcessMaterial" id="PPM_sparks"]
-emission_shape = 1
-emission_sphere_radius = 18.0
+[sub_resource type="ParticleProcessMaterial" id="PPM_dust"]
+particle_flag_disable_z = true
 spread = 180.0
-initial_velocity_min = 140.0
-initial_velocity_max = 320.0
-gravity = Vector3(0, 200, 0)
-scale_min = 0.05
-scale_max = 0.14
-scale_curve = SubResource("CT_spark_shrink")
-color_ramp = SubResource("GT_flash")
-
-[sub_resource type="Gradient" id="Grad_glow"]
-interpolation_mode = 2
-offsets = PackedFloat32Array(0, 0.15, 0.55, 1)
-colors = PackedColorArray(1, 1, 0.9, 0, 0.95, 0.9, 0.45, 0.7, 0.65, 0.5, 0.2, 0.4, 0.4, 0.2, 0.05, 0)
-
-[sub_resource type="GradientTexture1D" id="GT_glow"]
-gradient = SubResource("Grad_glow")
-
-[sub_resource type="Curve" id="Cv_glow"]
-_limits = [0.0, 2.0, 0.0, 1.0]
-_data = [Vector2(0, 0.4), 0.0, 6.0, 0, 0, Vector2(0.2, 1.4), 0.0, 0.0, 0, 0, Vector2(1, 0), -1.8, 0.0, 1, 0]
-point_count = 3
-
-[sub_resource type="CurveTexture" id="CT_glow"]
-curve = SubResource("Cv_glow")
+initial_velocity_min = 66.0
+initial_velocity_max = 198.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.32
+scale_max = 0.76
+scale_curve = SubResource("CT_shrink")
+color_ramp = SubResource("GT_dust")
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_glow"]
 particle_flag_disable_z = true
 gravity = Vector3(0, 0, 0)
-scale_min = 0.32
-scale_max = 0.32
-scale_curve = SubResource("CT_glow")
-color_ramp = SubResource("GT_glow")
+scale_min = 0.25
+scale_max = 0.25
+color_ramp = SubResource("GT_warm")
 
-[sub_resource type="Gradient" id="Grad_crackle"]
+[sub_resource type="Gradient" id="Grad_shard"]
 interpolation_mode = 2
 offsets = PackedFloat32Array(0, 0.1, 0.5, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 0.95, 0.7, 1, 0.85, 0.65, 0.2, 0.85, 0.4, 0.25, 0.05, 0)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 0.92, 0.25, 0.85, 0.35, 0.22, 0, 0)
 
-[sub_resource type="GradientTexture1D" id="GT_crackle"]
-gradient = SubResource("Grad_crackle")
+[sub_resource type="GradientTexture1D" id="GT_shard"]
+gradient = SubResource("Grad_shard")
 
-[sub_resource type="Curve" id="Cv_crackle"]
-_limits = [0.0, 2.0, 0.0, 1.0]
-_data = [Vector2(0, 0), 0.0, 12.0, 0, 0, Vector2(0.15, 1.5), 0.0, -8.0, 0, 0, Vector2(0.4, 0.4), 0.0, 0.0, 0, 0, Vector2(1, 0), -1.5, 0.0, 1, 0]
-point_count = 4
-
-[sub_resource type="CurveTexture" id="CT_crackle"]
-curve = SubResource("Cv_crackle")
-
-[sub_resource type="ParticleProcessMaterial" id="PPM_crackle"]
-emission_shape = 1
-emission_sphere_radius = 36.0
+[sub_resource type="ParticleProcessMaterial" id="PPM_shards"]
 spread = 180.0
-initial_velocity_min = 30.0
-initial_velocity_max = 80.0
+initial_velocity_min = 120.0
+initial_velocity_max = 270.0
 gravity = Vector3(0, 0, 0)
-scale_min = 0.18
-scale_max = 0.32
-scale_curve = SubResource("CT_crackle")
-color_ramp = SubResource("GT_crackle")
+scale_min = 0.09
+scale_max = 0.3
+scale_curve = SubResource("CT_shrink")
+color_ramp = SubResource("GT_shard")
 
-[node name="LightningParticle" type="Node2D" unique_id=748391040]
+[node name="LightningParticle" type="Node2D"]
 script = ExtResource("1_grp")
 
-[node name="CoreFlash" type="GPUParticles2D" parent="." unique_id=748391041]
+[node name="CoreFlash" type="GPUParticles2D" parent="."]
 material = SubResource("CIM_add")
+emitting = false
 amount = 1
 texture = ExtResource("2_orb")
-lifetime = 0.18
+lifetime = 0.1
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("PPM_flash")
 
-[node name="Bolts" type="GPUParticles2D" parent="." unique_id=748391042]
+[node name="ImpactRing" type="GPUParticles2D" parent="."]
+modulate = Color(1, 1, 0.3, 0.85)
 material = SubResource("CIM_add")
-amount = 12
-texture = ExtResource("4_trace")
-lifetime = 0.32
+amount = 1
+texture = ExtResource("3_ring")
+lifetime = 0.4
 one_shot = true
 explosiveness = 1.0
-process_material = SubResource("PPM_bolts")
+process_material = SubResource("PPM_ring")
 
-[node name="Sparks" type="GPUParticles2D" parent="." unique_id=748391043]
+[node name="DustCloud" type="GPUParticles2D" parent="."]
 material = SubResource("CIM_add")
-amount = 28
-texture = ExtResource("5_spark")
+texture = ExtResource("4_dust")
 lifetime = 0.5
 one_shot = true
 explosiveness = 1.0
-process_material = SubResource("PPM_sparks")
+process_material = SubResource("PPM_dust")
 
-[node name="Afterglow" type="GPUParticles2D" parent="." unique_id=748391044]
-modulate = Color(1, 1, 1, 0.7)
+[node name="ImpactGlow" type="GPUParticles2D" parent="."]
+modulate = Color(1, 0.9, 0.1, 0.5)
 material = SubResource("CIM_add")
 amount = 1
-texture = ExtResource("3_soft")
-lifetime = 0.45
+texture = ExtResource("2_orb")
+lifetime = 0.5
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("PPM_glow")
 
-[node name="Crackles" type="GPUParticles2D" parent="." unique_id=748391045]
+[node name="ShockwaveEffect" type="Node2D" parent="."]
+script = ExtResource("7_shock")
+
+[node name="ShardsBurst" type="GPUParticles2D" parent="."]
 material = SubResource("CIM_add")
-amount = 8
-texture = ExtResource("6_light")
-lifetime = 0.4
+amount = 10
+texture = ExtResource("4_dust")
+lifetime = 0.7
 one_shot = true
-explosiveness = 0.8
-process_material = SubResource("PPM_crackle")
+explosiveness = 1.0
+process_material = SubResource("PPM_shards")

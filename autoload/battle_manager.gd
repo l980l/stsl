@@ -4,6 +4,7 @@ extends Node
 
 const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const RelicRes = preload("res://resources/relic_resource.gd")
 
 const POISON_DMG_PER_STACK: int = 10
 const TOKEN_DMG_PER_STACK: int = 25
@@ -106,7 +107,6 @@ func setup_battle(enemies: Array) -> void:
 	battle_started.emit()
 	var _gm_bs = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
 	if _gm_bs and _gm_bs.is_inside_tree():
-		var RelicRes = load("res://resources/relic_resource.gd")
 		_gm_bs.trigger_relics(RelicRes.TriggerType.BATTLE_START)
 
 func start_player_turn() -> void:
@@ -161,7 +161,6 @@ func _phase_player_main() -> void:
 		deck_mgr.start_turn()
 	var _gm_pts = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
 	if _gm_pts and _gm_pts.is_inside_tree():
-		var RelicRes = load("res://resources/relic_resource.gd")
 		_gm_pts.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START)
 	player_turn_started.emit()
 
@@ -194,7 +193,6 @@ func end_player_turn() -> void:
 	is_player_turn = false
 	var _gm_pte = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
 	if _gm_pte and _gm_pte.is_inside_tree():
-		var RelicRes = load("res://resources/relic_resource.gd")
 		_gm_pte.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_END)
 	if deck_mgr:
 		deck_mgr.discard_hand()
@@ -656,7 +654,6 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 		team_mgr.take_damage(hero_id, amount)
 		var _gm_hd = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
 		if _gm_hd and _gm_hd.is_inside_tree():
-			var RelicRes = load("res://resources/relic_resource.gd")
 			_gm_hd.trigger_relics(RelicRes.TriggerType.ON_HERO_DAMAGED,
 				{"hero_id": hero_id, "amount": amount})
 	hero_damaged.emit(hero_id, amount, damage_type)

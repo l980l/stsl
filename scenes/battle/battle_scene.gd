@@ -1395,6 +1395,15 @@ func _play_hit_shake(node: Node2D, amount: int) -> void:
 
 
 const _POPUP_FONT := preload("res://assets/fonts/IMFellEnglish-Italic.ttf")
+var _popup_ls: Dictionary = {}  # font_size → LabelSettings 캐시
+
+func _get_popup_ls(font_size: int) -> LabelSettings:
+	if not _popup_ls.has(font_size):
+		var ls := LabelSettings.new()
+		ls.font = _POPUP_FONT
+		ls.font_size = font_size
+		_popup_ls[font_size] = ls
+	return _popup_ls[font_size]
 
 const _STATUS_POPUP_INFO := {
 	"weak":          ["Weak",          Color(1.00, 0.55, 0.10)],
@@ -1414,8 +1423,7 @@ func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int,
 	var lbl := Label.new()
 	lbl.text = text
 	lbl.modulate = color
-	lbl.add_theme_font_override("font", _POPUP_FONT)
-	lbl.add_theme_font_size_override("font_size", font_size)
+	lbl.label_settings = _get_popup_ls(font_size)
 	var spawn_pos := Vector2(base_pos.x + randf_range(-15.0, 15.0), base_pos.y + count * 32.0)
 	lbl.position = spawn_pos
 	lbl.z_index = 20
@@ -1447,8 +1455,7 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 	var lbl := Label.new()
 	lbl.text = info[0]
 	lbl.modulate = info[1]
-	lbl.add_theme_font_override("font", _POPUP_FONT)
-	lbl.add_theme_font_size_override("font_size", 26)
+	lbl.label_settings = _get_popup_ls(26)
 	var spawn_pos := Vector2(world_pos.x + randf_range(-15.0, 15.0), world_pos.y + count * 32.0)
 	lbl.position = spawn_pos
 	lbl.pivot_offset = Vector2(30, 13)
@@ -1543,8 +1550,10 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 		return
 	var scene: PackedScene = _VFX_SCENES.get(dtype, _VFX_DEFAULT)
 	var fx: Node2D = scene.instantiate()
-	fx.autostart = false
-	fx.repeat = false
+	if "autostart" in fx:
+		fx.autostart = false
+	if "repeat" in fx:
+		fx.repeat = false
 	add_child(fx)
 	fx.global_position = pos
 	fx.scale.x = -1.0 if flipped else 1.0

@@ -17,6 +17,21 @@ const TYPE_ICON_DIR := "res://assets/art/cards/cardtypes/"
 const DEFAULT_ART := "res://assets/art/cards/illustrations/default_art.png"
 const HERO_ART_DIR := "res://assets/art/heroes/"
 
+const _CINZEL_FONT := preload("res://assets/fonts/Cinzel-Regular.ttf")
+const _GEM_COMMON    := preload("res://assets/art/cards/cardgems/card_rarity_common.png")
+const _GEM_UNCOMMON  := preload("res://assets/art/cards/cardgems/card_rarity_uncommon.png")
+const _GEM_RARE      := preload("res://assets/art/cards/cardgems/card_rarity_rare.png")
+const _GEM_LEGENDARY := preload("res://assets/art/cards/cardgems/card_rarity_legendary.png")
+const _GEM_DIVINE    := preload("res://assets/art/cards/cardgems/card_rarity_divine.png")
+const _TYPE_ATTACK   := preload("res://assets/art/cards/cardtypes/card_type_attack.png")
+const _TYPE_SKILL    := preload("res://assets/art/cards/cardtypes/card_type_skill.png")
+const _TYPE_POWER    := preload("res://assets/art/cards/cardtypes/card_type_power.png")
+const _DEFAULT_ART   := preload("res://assets/art/cards/illustrations/default_art.png")
+const _SAMPLE_FRAME  := preload("res://assets/art/cards/cardframes/sampleframe.png")
+
+static var _art_cache: Dictionary = {}
+static var _frame_cache: Dictionary = {}
+
 var _card: CardResource
 var _mode: int = Mode.HAND
 var _disabled: bool = false
@@ -33,7 +48,7 @@ var _dead_overlay: ColorRect = null
 
 func _ready() -> void:
 	$Container/CostLabel.theme_type_variation = "AccentLabel"
-	$Container/CostLabel.add_theme_font_override("font", load("res://assets/fonts/Cinzel-Regular.ttf"))
+	$Container/CostLabel.add_theme_font_override("font", _CINZEL_FONT)
 	$Container/CostLabel.add_theme_color_override("font_color", Color.WHITE)
 	$Container/CostLabel.add_theme_color_override("font_outline_color", Color.BLACK)
 	$Container/CostLabel.add_theme_constant_override("outline_size", 30)
@@ -124,34 +139,30 @@ func _build_desc() -> String:
 	return ", ".join(lines)
 
 func _resolve_gem_texture(rarity: int) -> Texture2D:
-	const NAMES := {
-		CardResource.Rarity.COMMON:    "card_rarity_common.png",
-		CardResource.Rarity.UNCOMMON:  "card_rarity_uncommon.png",
-		CardResource.Rarity.RARE:      "card_rarity_rare.png",
-		CardResource.Rarity.LEGENDARY: "card_rarity_legendary.png",
-		CardResource.Rarity.DIVINE:    "card_rarity_divine.png",
-	}
-	return load(GEM_DIR + NAMES.get(rarity, "card_rarity_common.png"))
+	match rarity:
+		CardResource.Rarity.UNCOMMON:  return _GEM_UNCOMMON
+		CardResource.Rarity.RARE:      return _GEM_RARE
+		CardResource.Rarity.LEGENDARY: return _GEM_LEGENDARY
+		CardResource.Rarity.DIVINE:    return _GEM_DIVINE
+		_: return _GEM_COMMON
 
 func _resolve_type_icon(card_type: int) -> Texture2D:
-	const NAMES := {
-		CardResource.CardType.ATTACK: "card_type_attack.png",
-		CardResource.CardType.SKILL:  "card_type_skill.png",
-		CardResource.CardType.POWER:  "card_type_power.png",
-	}
-	return load(TYPE_ICON_DIR + NAMES.get(card_type, "card_type_attack.png"))
+	match card_type:
+		CardResource.CardType.SKILL: return _TYPE_SKILL
+		CardResource.CardType.POWER: return _TYPE_POWER
+		_: return _TYPE_ATTACK
 
 func _resolve_art_texture(owner_id: String) -> Texture2D:
-	var hero_path := "%s%s.png" % [HERO_ART_DIR, owner_id]
-	if ResourceLoader.exists(hero_path):
-		return load(hero_path)
-	return load(DEFAULT_ART)
+	if not _art_cache.has(owner_id):
+		var hero_path := "%s%s.png" % [HERO_ART_DIR, owner_id]
+		_art_cache[owner_id] = load(hero_path) if ResourceLoader.exists(hero_path) else _DEFAULT_ART
+	return _art_cache[owner_id]
 
 func _resolve_frame_texture(owner_id: String) -> Texture2D:
-	var hero_path := "%s%s_frame.png" % [FRAME_DIR, owner_id]
-	if ResourceLoader.exists(hero_path):
-		return load(hero_path)
-	return load("%ssampleframe.png" % FRAME_DIR)
+	if not _frame_cache.has(owner_id):
+		var hero_path := "%s%s_frame.png" % [FRAME_DIR, owner_id]
+		_frame_cache[owner_id] = load(hero_path) if ResourceLoader.exists(hero_path) else _SAMPLE_FRAME
+	return _frame_cache[owner_id]
 
 func set_disabled(v: bool) -> void:
 	_disabled = v
