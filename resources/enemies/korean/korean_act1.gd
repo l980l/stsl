@@ -17,7 +17,7 @@ static func haechi(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	var i5 := IntentRes.new()
-	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 180; i5.target = IntentRes.TargetType.RANDOM
+	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 180; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 1
 	return e
@@ -30,12 +30,12 @@ static func jangseung(scene: PackedScene) -> Resource:
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"
 	i1.target = IntentRes.TargetType.ALL
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.LOWEST_HP
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "weak"
 	i3.target = IntentRes.TargetType.ALL
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.RANDOM
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 1
 	return e
@@ -49,11 +49,11 @@ static func haemosu(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 40; i2.status_type = "block"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 150; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 150; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.ALL
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "divine"
 	var i5 := IntentRes.new()
-	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 180; i5.target = IntentRes.TargetType.LOWEST_HP
+	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 180; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 1
 	return e
@@ -65,32 +65,32 @@ static func dangun(scene: PackedScene) -> Resource:
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0: 개벽의 빛
 	var p0i1 := IntentRes.new()
-	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 150; p0i1.target = IntentRes.TargetType.RANDOM
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 150; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "divine"
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.BUFF; p0i2.value = 1; p0i2.status_type = "strength"
 	var p0i3 := IntentRes.new()
 	p0i3.action_type = IntentRes.ActionType.BUFF; p0i3.value = 40; p0i3.status_type = "block"
 	var p0i4 := IntentRes.new()
-	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 130; p0i4.target = IntentRes.TargetType.ALL
+	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 130; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "divine"
 	# Phase 1: 건국 의지
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.RANDOM
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "divine"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 2; p1i2.status_type = "vulnerable"
 	p1i2.target = IntentRes.TargetType.RANDOM
 	var p1i3 := IntentRes.new()
-	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 150; p1i3.target = IntentRes.TargetType.ALL
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 150; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "divine"
 	var p1i4 := IntentRes.new()
-	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 200; p1i4.target = IntentRes.TargetType.LOWEST_HP
+	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 200; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "divine"
 	# Phase 2: 시조의 분노
 	var p2i1 := IntentRes.new()
-	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 220; p2i1.target = IntentRes.TargetType.RANDOM
+	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 220; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "divine"
 	var p2i2 := IntentRes.new()
 	p2i2.action_type = IntentRes.ActionType.BUFF; p2i2.value = 2; p2i2.status_type = "strength"
 	var p2i3 := IntentRes.new()
-	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 190; p2i3.target = IntentRes.TargetType.ALL
+	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 190; p2i3.target = IntentRes.TargetType.ALL; p2i3.damage_type = "divine"
 	var p2i4 := IntentRes.new()
-	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 240; p2i4.target = IntentRes.TargetType.LOWEST_HP
+	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 240; p2i4.target = IntentRes.TargetType.LOWEST_HP; p2i4.damage_type = "divine"
 	var p2i5 := IntentRes.new()
 	p2i5.action_type = IntentRes.ActionType.DEBUFF; p2i5.value = 2; p2i5.status_type = "weak"
 	p2i5.target = IntentRes.TargetType.ALL

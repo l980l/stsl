@@ -10,9 +10,9 @@ static func satyr(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.satyr"; e.max_hp = 350; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 80; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 80; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	e.intent_pattern = [i1, i2]
 	return e
 
@@ -21,13 +21,13 @@ static func harpy(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.harpy"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 45; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 45; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 45; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 45; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 45; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 45; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 45; i4.target = IntentRes.TargetType.RANDOM
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 45; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "slash"
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.SPECIAL; i5.value = 0
 	e.intent_pattern = [i1, i2, i3, i4, i5]
@@ -40,7 +40,7 @@ static func cyclops(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.PREPARE; i1.value = 0; i1.condition = "준비"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 200; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 200; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	e.intent_pattern = [i1, i2]
 	return e
 
@@ -49,7 +49,7 @@ static func snake(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.snake"; e.max_hp = 300; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "vulnerable"
 	i2.target = IntentRes.TargetType.RANDOM
@@ -61,17 +61,17 @@ static func cerberus(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.cerberus"; e.max_hp = 900; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 70; i4.target = IntentRes.TargetType.RANDOM
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 70; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "slash"
 	var i5 := IntentRes.new()
-	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 70; i5.target = IntentRes.TargetType.RANDOM
+	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 70; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "slash"
 	var i6 := IntentRes.new()
-	i6.action_type = IntentRes.ActionType.ATTACK; i6.value = 90; i6.target = IntentRes.TargetType.ALL
+	i6.action_type = IntentRes.ActionType.ATTACK; i6.value = 90; i6.target = IntentRes.TargetType.ALL; i6.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3, i4, i5, i6]
 	return e
 
@@ -80,13 +80,13 @@ static func myrmidon(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.myrmidon"; e.max_hp = 250; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 1; i2.status_type = "strength"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 60; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 60; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 90; i4.target = IntentRes.TargetType.RANDOM
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 90; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 

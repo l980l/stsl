@@ -10,9 +10,9 @@ static func draugr(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.norse.draugr"; e.max_hp = 420; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 90; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 90; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.BUFF; i3.status_type = "strength"; i3.value = 10
 	e.intent_pattern = [i1, i2, i3]
@@ -24,14 +24,14 @@ static func urdr_spider(scene: PackedScene) -> Resource:
 	e.mythology = "norse"
 	# 3턴 루프: 독공격, 일반공격, 독공격
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.status_type = "poison"; i2.value = 3
 	i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 60; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 60; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "poison"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 60; i4.target = IntentRes.TargetType.RANDOM
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 60; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "poison"
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.DEBUFF; i5.status_type = "poison"; i5.value = 3
 	i5.target = IntentRes.TargetType.RANDOM
@@ -45,9 +45,9 @@ static func jotun_soldier(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.status_type = "block"; i1.value = 80
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 180; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 180; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.ALL
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
@@ -62,7 +62,7 @@ static func volva_witch(scene: PackedScene) -> Resource:
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.status_type = "vulnerable"; i2.value = 2
 	i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 110; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 110; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
@@ -71,11 +71,11 @@ static func hrimfaxi_rider(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.norse.hrimfaxi_rider"; e.max_hp = 380; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.LOWEST_HP
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
@@ -87,9 +87,9 @@ static func garlarr_snake(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.SPECIAL; i1.value = 1
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 85; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 85; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 85; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 85; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "poison"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 

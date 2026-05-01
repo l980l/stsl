@@ -10,9 +10,9 @@ static func red_boy(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "fire"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 170; i3.target = IntentRes.TargetType.ALL
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 170; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "fire"
 	e.intent_pattern = [i1, i2, i3]
 	e.charm_resistance = 1
 	return e
@@ -26,11 +26,11 @@ static func nine_dragon_general(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 30; i2.status_type = "block"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 160; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 160; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 2; i4.status_type = "strength"
 	var i5 := IntentRes.new()
-	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 220; i5.target = IntentRes.TargetType.RANDOM
+	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 220; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 1
 	return e
@@ -40,9 +40,9 @@ static func heavenly_hound_brothers(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.chinese.heavenly_hound_brothers"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "chinese"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 130; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 130; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 130; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 130; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "vulnerable"
 	i3.target = IntentRes.TargetType.RANDOM
@@ -50,7 +50,7 @@ static func heavenly_hound_brothers(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.DEBUFF; i4.value = 1; i4.status_type = "vulnerable"
 	i4.target = IntentRes.TargetType.RANDOM
 	var i5 := IntentRes.new()
-	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 160; i5.target = IntentRes.TargetType.LOWEST_HP
+	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 160; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "slash"
 	var i6 := IntentRes.new()
 	i6.action_type = IntentRes.ActionType.DEBUFF; i6.value = 2; i6.status_type = "weak"
 	i6.target = IntentRes.TargetType.RANDOM
@@ -69,28 +69,28 @@ static func erlang_shen(scene: PackedScene) -> Resource:
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.BUFF; p0i2.value = 40; p0i2.status_type = "block"
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 170; p0i3.target = IntentRes.TargetType.RANDOM
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 170; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "divine"
 	var p0i4 := IntentRes.new()
-	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 140; p0i4.target = IntentRes.TargetType.ALL
+	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 140; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "divine"
 	# Phase 1 — 삼안 개안
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "divine"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 160; p1i2.target = IntentRes.TargetType.ALL
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 160; p1i2.target = IntentRes.TargetType.ALL; p1i2.damage_type = "divine"
 	var p1i3 := IntentRes.new()
 	p1i3.action_type = IntentRes.ActionType.DEBUFF; p1i3.value = 2; p1i3.status_type = "vulnerable"
 	p1i3.target = IntentRes.TargetType.RANDOM
 	var p1i4 := IntentRes.new()
-	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 180; p1i4.target = IntentRes.TargetType.LOWEST_HP
+	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 180; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "divine"
 	var p1i5 := IntentRes.new()
 	p1i5.action_type = IntentRes.ActionType.BUFF; p1i5.value = 2; p1i5.status_type = "strength"
 	# Phase 2 — 천군 강림
 	var p2i1 := IntentRes.new()
-	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 180; p2i1.target = IntentRes.TargetType.RANDOM
+	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 180; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "divine"
 	var p2i2 := IntentRes.new()
-	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 180; p2i2.target = IntentRes.TargetType.RANDOM
+	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 180; p2i2.target = IntentRes.TargetType.RANDOM; p2i2.damage_type = "divine"
 	var p2i3 := IntentRes.new()
-	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 220; p2i3.target = IntentRes.TargetType.ALL
+	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 220; p2i3.target = IntentRes.TargetType.ALL; p2i3.damage_type = "divine"
 	var p2i4 := IntentRes.new()
 	p2i4.action_type = IntentRes.ActionType.DEBUFF; p2i4.value = 2; p2i4.status_type = "vulnerable"
 	p2i4.target = IntentRes.TargetType.ALL

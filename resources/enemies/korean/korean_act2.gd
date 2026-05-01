@@ -12,9 +12,9 @@ static func dokkaebi_chief(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 30; i2.status_type = "block"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 170; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 170; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 150; i4.target = IntentRes.TargetType.ALL
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 150; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 1
 	return e
@@ -26,9 +26,9 @@ static func sea_dragon_general(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 160; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 160; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.ALL
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "divine"
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
@@ -40,13 +40,13 @@ static func dongmyeong(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.korean.dongmyeong"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "korean"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "divine"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 90; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 90; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.BUFF; i3.value = 2; i3.status_type = "strength"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 150; i4.target = IntentRes.TargetType.ALL
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 150; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "divine"
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.DEBUFF; i5.value = 2; i5.status_type = "vulnerable"
 	i5.target = IntentRes.TargetType.RANDOM
@@ -65,7 +65,7 @@ static func samsin_grandma(scene: PackedScene) -> Resource:
 	p0i1.action_type = IntentRes.ActionType.DEBUFF; p0i1.value = 2; p0i1.status_type = "weak"
 	p0i1.target = IntentRes.TargetType.ALL
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 140; p0i2.target = IntentRes.TargetType.LOWEST_HP
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 140; p0i2.target = IntentRes.TargetType.LOWEST_HP; p0i2.damage_type = "divine"
 	var p0i3 := IntentRes.new()
 	p0i3.action_type = IntentRes.ActionType.BUFF; p0i3.value = 40; p0i3.status_type = "block"
 	var p0i4 := IntentRes.new()
@@ -76,12 +76,12 @@ static func samsin_grandma(scene: PackedScene) -> Resource:
 	p1i1.action_type = IntentRes.ActionType.DEBUFF; p1i1.value = 2; p1i1.status_type = "vulnerable"
 	p1i1.target = IntentRes.TargetType.ALL
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 180; p1i2.target = IntentRes.TargetType.ALL
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 180; p1i2.target = IntentRes.TargetType.ALL; p1i2.damage_type = "divine"
 	var p1i3 := IntentRes.new()
 	p1i3.action_type = IntentRes.ActionType.DEBUFF; p1i3.value = 4; p1i3.status_type = "poison"
 	p1i3.target = IntentRes.TargetType.ALL
 	var p1i4 := IntentRes.new()
-	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 160; p1i4.target = IntentRes.TargetType.RANDOM
+	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 160; p1i4.target = IntentRes.TargetType.RANDOM; p1i4.damage_type = "divine"
 	var p1i5 := IntentRes.new()
 	p1i5.action_type = IntentRes.ActionType.BUFF; p1i5.value = 1; p1i5.status_type = "strength"
 	# Phase 2: 삼신의 분노
@@ -92,12 +92,12 @@ static func samsin_grandma(scene: PackedScene) -> Resource:
 	p2i2.action_type = IntentRes.ActionType.DEBUFF; p2i2.value = 3; p2i2.status_type = "weak"
 	p2i2.target = IntentRes.TargetType.ALL
 	var p2i3 := IntentRes.new()
-	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 230; p2i3.target = IntentRes.TargetType.LOWEST_HP
+	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 230; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "divine"
 	var p2i4 := IntentRes.new()
 	p2i4.action_type = IntentRes.ActionType.DEBUFF; p2i4.value = 5; p2i4.status_type = "poison"
 	p2i4.target = IntentRes.TargetType.RANDOM
 	var p2i5 := IntentRes.new()
-	p2i5.action_type = IntentRes.ActionType.ATTACK; p2i5.value = 200; p2i5.target = IntentRes.TargetType.ALL
+	p2i5.action_type = IntentRes.ActionType.ATTACK; p2i5.value = 200; p2i5.target = IntentRes.TargetType.ALL; p2i5.damage_type = "divine"
 	var p2i6 := IntentRes.new()
 	p2i6.action_type = IntentRes.ActionType.BUFF; p2i6.value = 2; p2i6.status_type = "strength"
 	e.phase_patterns = [

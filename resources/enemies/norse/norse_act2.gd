@@ -10,13 +10,13 @@ static func troll_warrior(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.norse.troll_warrior"; e.max_hp = 2050; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 160; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 160; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 60; i2.status_type = "block"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 160; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 160; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.ALL
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
@@ -31,7 +31,7 @@ static func norn(scene: PackedScene) -> Resource:
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "vulnerable"
 	i2.target = IntentRes.TargetType.ALL
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 170; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 170; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 6; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
@@ -43,16 +43,16 @@ static func vanir_elf(scene: PackedScene) -> Resource:
 	e.mythology = "norse"
 	e.phase_thresholds = [0.5]
 	var p0i1 := IntentRes.new()
-	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 130; p0i1.target = IntentRes.TargetType.RANDOM
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 130; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "projectile"
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 130; p0i2.target = IntentRes.TargetType.RANDOM
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 130; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "projectile"
 	var p0i3 := IntentRes.new()
 	p0i3.action_type = IntentRes.ActionType.DEBUFF; p0i3.value = 4; p0i3.status_type = "poison"
 	p0i3.target = IntentRes.TargetType.ALL
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 190; p1i1.target = IntentRes.TargetType.ALL
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 190; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "projectile"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 220; p1i2.target = IntentRes.TargetType.LOWEST_HP
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 220; p1i2.target = IntentRes.TargetType.LOWEST_HP; p1i2.damage_type = "projectile"
 	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
 	return e
@@ -66,16 +66,16 @@ static func surtr(scene: PackedScene) -> Resource:
 	e.phase_thresholds = [0.65, 0.3]
 	# 페이즈0
 	var p0i1 := IntentRes.new()
-	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 170; p0i1.target = IntentRes.TargetType.RANDOM
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 170; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "fire"
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 170; p0i2.target = IntentRes.TargetType.RANDOM
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 170; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "fire"
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 140; p0i3.target = IntentRes.TargetType.ALL
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 140; p0i3.target = IntentRes.TargetType.ALL; p0i3.damage_type = "fire"
 	# 페이즈1 (65% HP 전환)
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.BUFF; p1i1.value = 5; p1i1.status_type = "strength"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 200; p1i2.target = IntentRes.TargetType.ALL
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 200; p1i2.target = IntentRes.TargetType.ALL; p1i2.damage_type = "fire"
 	var p1i3 := IntentRes.new()
 	p1i3.action_type = IntentRes.ActionType.DEBUFF; p1i3.value = 2; p1i3.status_type = "vulnerable"
 	p1i3.target = IntentRes.TargetType.ALL
@@ -83,9 +83,9 @@ static func surtr(scene: PackedScene) -> Resource:
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.BUFF; p2i1.value = 15; p2i1.status_type = "strength"
 	var p2i2 := IntentRes.new()
-	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 260; p2i2.target = IntentRes.TargetType.ALL
+	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 260; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "fire"
 	var p2i3 := IntentRes.new()
-	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 300; p2i3.target = IntentRes.TargetType.LOWEST_HP
+	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 300; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "fire"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
 		[p1i1, p1i2, p1i3],

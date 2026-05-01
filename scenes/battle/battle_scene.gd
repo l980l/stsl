@@ -1519,6 +1519,9 @@ const _VFX_SCENES: Dictionary = {
 	"poison":     preload("res://scenes/vfx/poison_particle.tscn"),
 	"divine":     preload("res://scenes/vfx/divine_particle.tscn"),
 	"curse":      preload("res://scenes/vfx/curse_particle.tscn"),
+	"fire":       preload("res://scenes/vfx/fire_particle.tscn"),
+	"ice":        preload("res://scenes/vfx/ice_particle.tscn"),
+	"lightning":  preload("res://scenes/vfx/lightning_particle.tscn"),
 }
 const _VFX_DEFAULT: PackedScene = preload("res://scenes/vfx/default_particle.tscn")
 const _VFX_HEAL: PackedScene = preload("res://scenes/vfx/heal_particle.tscn")

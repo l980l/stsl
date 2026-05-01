@@ -1,0 +1,186 @@
+[gd_scene format=3 uid="uid://bf1ra2p7tk5jq"]
+
+[ext_resource type="Script" uid="uid://40nnoas3p4h2" path="res://addons/BurstParticles2D/BurstParticleGroup2D.gd" id="1_grp"]
+[ext_resource type="Texture2D" uid="uid://ovw18l4dc1fv" path="res://addons/BurstParticles2D/BurstParticles2D-demo/orb.png" id="2_orb"]
+[ext_resource type="Texture2D" uid="uid://cc6y0xis4rnp1" path="res://addons/kenney_particle_pack/flame_05.png" id="3_flame"]
+[ext_resource type="Texture2D" uid="uid://do0d8c0527x7c" path="res://addons/kenney_particle_pack/fire_01.png" id="4_fire"]
+[ext_resource type="Texture2D" uid="uid://bapytnd4vtu7u" path="res://addons/kenney_particle_pack/smoke_05.png" id="5_smoke"]
+[ext_resource type="Texture2D" uid="uid://dki7k58s3kv7s" path="res://addons/kenney_particle_pack/spark_05.png" id="6_spark"]
+
+[sub_resource type="CanvasItemMaterial" id="CIM_add"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Grad_core"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.1, 0.4, 0.75, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 0.7, 1, 1, 0.6, 0.1, 1, 0.85, 0.25, 0.05, 0.6, 0.4, 0.05, 0.01, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_core"]
+gradient = SubResource("Grad_core")
+
+[sub_resource type="Curve" id="Cv_core_flash"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 12.0, 0, 0, Vector2(0.15, 1.6), 0.0, 0.0, 0, 0, Vector2(1, 0), -1.8, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CT_core_flash"]
+curve = SubResource("Cv_core_flash")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_core"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+scale_min = 0.18
+scale_max = 0.18
+scale_curve = SubResource("CT_core_flash")
+color_ramp = SubResource("GT_core")
+
+[sub_resource type="Gradient" id="Grad_flame"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.15, 0.5, 0.85, 1)
+colors = PackedColorArray(1, 1, 0.5, 0, 1, 0.85, 0.3, 1, 1, 0.45, 0.05, 0.95, 0.7, 0.15, 0.02, 0.5, 0.2, 0.03, 0.01, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_flame"]
+gradient = SubResource("Grad_flame")
+
+[sub_resource type="Curve" id="Cv_flame_rise"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0.3), 0.0, 4.0, 0, 0, Vector2(0.2, 1.4), 0.0, 0.0, 0, 0, Vector2(0.7, 1.1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CT_flame_rise"]
+curve = SubResource("Cv_flame_rise")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_flame"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 32.0
+direction = Vector3(0, -1, 0)
+spread = 18.0
+initial_velocity_min = 80.0
+initial_velocity_max = 140.0
+gravity = Vector3(0, -60, 0)
+scale_min = 0.35
+scale_max = 0.55
+scale_curve = SubResource("CT_flame_rise")
+color_ramp = SubResource("GT_flame")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_innerfire"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 16.0
+direction = Vector3(0, -1, 0)
+spread = 12.0
+initial_velocity_min = 60.0
+initial_velocity_max = 110.0
+gravity = Vector3(0, -50, 0)
+scale_min = 0.22
+scale_max = 0.34
+scale_curve = SubResource("CT_flame_rise")
+color_ramp = SubResource("GT_core")
+
+[sub_resource type="Gradient" id="Grad_ember"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.1, 0.5, 1)
+colors = PackedColorArray(1, 1, 0.6, 0, 1, 0.8, 0.2, 1, 1, 0.3, 0.05, 0.7, 0.4, 0.05, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_ember"]
+gradient = SubResource("Grad_ember")
+
+[sub_resource type="Curve" id="Cv_shrink"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CT_shrink"]
+curve = SubResource("Cv_shrink")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_embers"]
+emission_shape = 1
+emission_sphere_radius = 24.0
+direction = Vector3(0, -1, 0)
+spread = 60.0
+initial_velocity_min = 60.0
+initial_velocity_max = 180.0
+gravity = Vector3(0, -40, 0)
+scale_min = 0.04
+scale_max = 0.12
+scale_curve = SubResource("CT_shrink")
+color_ramp = SubResource("GT_ember")
+
+[sub_resource type="Gradient" id="Grad_smoke"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.2, 0.6, 1)
+colors = PackedColorArray(0.4, 0.3, 0.2, 0, 0.5, 0.4, 0.25, 0.5, 0.25, 0.2, 0.15, 0.3, 0.1, 0.08, 0.05, 0)
+
+[sub_resource type="GradientTexture1D" id="GT_smoke"]
+gradient = SubResource("Grad_smoke")
+
+[sub_resource type="Curve" id="Cv_smoke"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0.5), 0.0, 1.5, 0, 0, Vector2(0.5, 1.2), 0.0, 0.0, 0, 0, Vector2(1, 1.8), 0.5, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CT_smoke"]
+curve = SubResource("Cv_smoke")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_smoke"]
+emission_shape = 1
+emission_sphere_radius = 28.0
+direction = Vector3(0, -1, 0)
+spread = 25.0
+initial_velocity_min = 25.0
+initial_velocity_max = 55.0
+gravity = Vector3(0, -30, 0)
+scale_min = 0.25
+scale_max = 0.45
+scale_curve = SubResource("CT_smoke")
+color_ramp = SubResource("GT_smoke")
+
+[node name="FireParticle" type="Node2D" unique_id=748391020]
+script = ExtResource("1_grp")
+
+[node name="CoreFlash" type="GPUParticles2D" parent="." unique_id=748391021]
+material = SubResource("CIM_add")
+amount = 1
+texture = ExtResource("2_orb")
+lifetime = 0.18
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_core")
+
+[node name="FireBody" type="GPUParticles2D" parent="." unique_id=748391022]
+material = SubResource("CIM_add")
+amount = 14
+texture = ExtResource("3_flame")
+lifetime = 0.55
+one_shot = true
+explosiveness = 0.85
+process_material = SubResource("PPM_flame")
+
+[node name="InnerFire" type="GPUParticles2D" parent="." unique_id=748391023]
+modulate = Color(1, 1, 1, 0.9)
+material = SubResource("CIM_add")
+amount = 8
+texture = ExtResource("4_fire")
+lifetime = 0.42
+one_shot = true
+explosiveness = 0.9
+process_material = SubResource("PPM_innerfire")
+
+[node name="Embers" type="GPUParticles2D" parent="." unique_id=748391024]
+material = SubResource("CIM_add")
+amount = 22
+texture = ExtResource("6_spark")
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("PPM_embers")
+
+[node name="SmokeRise" type="GPUParticles2D" parent="." unique_id=748391025]
+modulate = Color(1, 1, 1, 0.5)
+material = SubResource("CIM_add")
+amount = 6
+texture = ExtResource("5_smoke")
+lifetime = 0.9
+one_shot = true
+explosiveness = 0.85
+process_material = SubResource("PPM_smoke")

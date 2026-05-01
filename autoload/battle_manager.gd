@@ -822,12 +822,12 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			if intent.target == IntentRes.TargetType.ALL:
 				if team_mgr:
 					for hero in team_mgr.get_living_heroes():
-						_deal_damage_to_hero(hero.hero_id, dmg)
+						_deal_damage_to_hero(hero.hero_id, dmg, intent.damage_type)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
 				var target_id: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 				if target_id != "":
-					_deal_damage_to_hero(target_id, dmg)
+					_deal_damage_to_hero(target_id, dmg, intent.damage_type)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": target_id})
 		IntentRes.ActionType.BUFF:
 			if intent.status_type == "block" or intent.status_type == "":

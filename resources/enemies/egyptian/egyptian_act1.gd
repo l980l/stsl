@@ -10,13 +10,13 @@ static func jackal_warrior(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.egyptian.jackal_warrior"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 130; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 130; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 130; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 130; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.BUFF; i3.value = 4; i3.status_type = "strength"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 170; i4.target = IntentRes.TargetType.LOWEST_HP
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 170; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
@@ -28,11 +28,11 @@ static func scarab_queen(scene: PackedScene) -> Resource:
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 4; i1.status_type = "poison"
 	i1.target = IntentRes.TargetType.ALL
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.BUFF; i3.value = 40; i3.status_type = "block"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.RANDOM
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "poison"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
@@ -44,11 +44,11 @@ static func obelisk_guardian(scene: PackedScene) -> Resource:
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.BUFF; p0i1.value = 60; p0i1.status_type = "block"
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 150; p0i2.target = IntentRes.TargetType.RANDOM
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 150; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "divine"
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.ALL
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "divine"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 220; p1i2.target = IntentRes.TargetType.RANDOM
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 220; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "divine"
 	e.phase_patterns = [[p0i1, p0i2], [p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
 	return e
@@ -62,26 +62,26 @@ static func sekhmet(scene: PackedScene) -> Resource:
 	e.phase_thresholds = [0.66, 0.33]
 	# 페이즈0
 	var p0i1 := IntentRes.new()
-	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 160; p0i1.target = IntentRes.TargetType.RANDOM
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 160; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "blunt"
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 160; p0i2.target = IntentRes.TargetType.RANDOM
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 160; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "blunt"
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 120; p0i3.target = IntentRes.TargetType.ALL
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 120; p0i3.target = IntentRes.TargetType.ALL; p0i3.damage_type = "blunt"
 	# 페이즈1 (66% HP 전환)
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.RANDOM
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "blunt"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 2; p1i2.status_type = "weak"
 	p1i2.target = IntentRes.TargetType.ALL
 	var p1i3 := IntentRes.new()
-	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 200; p1i3.target = IntentRes.TargetType.ALL
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 200; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "blunt"
 	# 페이즈2 (33% HP 전환)
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.BUFF; p2i1.value = 10; p2i1.status_type = "strength"
 	var p2i2 := IntentRes.new()
-	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 220; p2i2.target = IntentRes.TargetType.ALL
+	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 220; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "blunt"
 	var p2i3 := IntentRes.new()
-	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 260; p2i3.target = IntentRes.TargetType.LOWEST_HP
+	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 260; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "blunt"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
 		[p1i1, p1i2, p1i3],
