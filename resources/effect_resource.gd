@@ -65,10 +65,8 @@ func display_text() -> String:
 			var hit_str: String = ""
 			if hit_count > 1:
 				hit_str = " ×%d" % hit_count
-			var aoe_str: String = ""
-			if target == "ALL":
-				aoe_str = TranslationServer.translate("effect.aoe_suffix")
-			return TranslationServer.translate("effect.damage.text") % [value, aoe_str, hit_str]
+			var _dmg_key: String = "effect.damage.all.text" if target == "ALL" else "effect.damage.single.text"
+			return TranslationServer.translate(_dmg_key) % [value, hit_str]
 		EffectType.BLOCK:
 			return TranslationServer.translate("effect.block.text") % value
 		EffectType.BLOCK_ALL:
@@ -76,19 +74,18 @@ func display_text() -> String:
 		EffectType.FORMATION_BLOCK:
 			return TranslationServer.translate("effect.formation_block.text") % value
 		EffectType.APPLY_STATUS:
-			var _base: String
 			if status_type == "poison":
-				_base = TranslationServer.translate("effect.apply_status_poison.text") % [tr("status.poison.name"), value * 10]
+				var _pk: String = "effect.apply_status_poison.all.text" if target == "ALL" else "effect.apply_status_poison.single.text"
+				return TranslationServer.translate(_pk) % (value * 10)
 			elif status_type.begins_with("power."):
 				var fmt: String = TranslationServer.translate(status_type + ".label")
-				_base = fmt % value if fmt.contains("%") else fmt
+				return fmt % value if fmt.contains("%") else fmt
 			else:
 				var st_key: String = _STATUS_NAME_KEYS.get(status_type, "")
 				var st_name: String = tr(st_key) if st_key else status_type
-				_base = "%s %d" % [st_name, value]
-			if target == "ALL":
-				_base += TranslationServer.translate("effect.aoe_suffix")
-			return _base
+				var _label: String = "%s %d" % [st_name, value]
+				var _wk: String = "effect.apply_status.all.text" if target == "ALL" else "effect.apply_status.single.text"
+				return TranslationServer.translate(_wk) % _label
 		EffectType.DRAW:        return TranslationServer.translate("effect.draw.text") % value
 		EffectType.ENERGY:      return TranslationServer.translate("effect.energy.text") % value
 		EffectType.HEAL:        return TranslationServer.translate("effect.heal.text") % value
@@ -131,7 +128,7 @@ func display_text() -> String:
 				cond_name = tr(cond_key)
 			else:
 				cond_name = status_type
-			return TranslationServer.translate("effect.conditional_dmg.text") % [bonus_value, value, cond_name]
+			return TranslationServer.translate("effect.conditional_dmg.text") % [value, cond_name, bonus_value]
 		EffectType.SUMMON_TOKEN:   return TranslationServer.translate("effect.summon_token.text") % value
 		EffectType.CHARM:          return TranslationServer.translate("effect.charm.text") % value
 		EffectType.REVIVE:              return TranslationServer.translate("effect.revive.text") % value
@@ -139,7 +136,9 @@ func display_text() -> String:
 		EffectType.COST_ZERO_TURN:      return TranslationServer.translate("effect.cost_zero_turn.text")
 		EffectType.BLOCK_PER_CARDS_PLAYED: return TranslationServer.translate("effect.block_per_cards_played.text") % value
 		EffectType.ON_KILL_DRAW:        return TranslationServer.translate("effect.on_kill_draw.text") % value
-		EffectType.PURGE_STATUS:        return TranslationServer.translate("effect.purge_status.text")
+		EffectType.PURGE_STATUS:
+			var _psk: String = "effect.purge_status.all.text" if target == "ALL" else "effect.purge_status.single.text"
+			return TranslationServer.translate(_psk)
 		EffectType.PER_DRAW_DMG:        return TranslationServer.translate("effect.per_draw_dmg.text") % value
 		EffectType.DAMAGE_PER_BLOCK:     return TranslationServer.translate("effect.damage_per_block.text") % value
 		EffectType.DAMAGE_PER_DEAD_ALLY: return TranslationServer.translate("effect.damage_per_dead_ally.text") % value
@@ -148,11 +147,11 @@ func display_text() -> String:
 		EffectType.MORALE_TO_BLOCK:      return TranslationServer.translate("effect.morale_to_block.text")
 		EffectType.DAMAGE_PER_HAND_SIZE: return TranslationServer.translate("effect.damage_per_hand_size.text") % value
 		EffectType.DAMAGE_PER_TOKEN:     return TranslationServer.translate("effect.damage_per_token.text") % value
-		EffectType.HEAL_PER_DEAD_ALLY:   return TranslationServer.translate("effect.heal_per_dead_ally.text") % value
+		EffectType.HEAL_PER_DEAD_ALLY:
+			var _hpk: String = "effect.heal_per_dead_ally.all.text" if target == "ALL" else "effect.heal_per_dead_ally.single.text"
+			return TranslationServer.translate(_hpk) % value
 		EffectType.ENERGY_TO_DAMAGE:     return TranslationServer.translate("effect.energy_to_damage.text") % value
 		EffectType.STATUS_DOUBLE:
-			var _sd := TranslationServer.translate("effect.status_double.text")
-			if target == "ALL":
-				_sd += TranslationServer.translate("effect.aoe_suffix")
-			return _sd
+			var _sdk: String = "effect.status_double.all.text" if target == "ALL" else "effect.status_double.single.text"
+			return TranslationServer.translate(_sdk)
 	return ""

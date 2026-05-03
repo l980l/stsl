@@ -136,7 +136,7 @@ func _build_desc() -> String:
 	var lines: Array = []
 	for eff in _card.effects:
 		lines.append(eff.display_text())
-	return ", ".join(lines)
+	return "\n".join(lines)
 
 func _resolve_gem_texture(rarity: int) -> Texture2D:
 	match rarity:

@@ -103,7 +103,7 @@ func _format_effects(card: Resource) -> String:
 	var parts: Array = []
 	for e in card.effects:
 		parts.append(e.display_text())
-	return " + ".join(parts)
+	return " ".join(parts)
 
 # ─────────────────────────────────────────
 # 이름 변환 헬퍼

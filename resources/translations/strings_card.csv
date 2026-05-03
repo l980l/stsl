@@ -1,18 +1,18 @@
 ﻿keys,ko,en,fr,it,es,ja,el,zh,zh_TW
 effect.damage.text,피해 %d%s%s,Deal %d%s%s damage,Inflige %d%s%s dégâts,Infligge %d%s%s danni,Inflige %d%s%s de daño,%d%s%sダメージ,Προκάλεσε %d%s%s ζημιά,造成 %d%s%s 伤害,造成 %d%s%s 伤害
-effect.block.text,방어 %d,Gain %d Block,Gagne %d d'Armure,Ottieni %d Scudo,Gana %d de Escudo,ブロック %d,Κέρδισε %d Άμυνα,获得 %d 护甲,获得 %d 护甲
-effect.block_all.text,전체 방어 %d,Gain %d Block to all,Gagne %d d'Armure à tous,Ottieni %d Scudo a tutti,Gana %d de Escudo a todos,全員にブロック %d,Κέρδισε %d Άμυνα για όλους,全体获得 %d 护甲,全体获得 %d 护甲
-effect.formation_block.text,영웅수×%d 방어,Gain %d Block per Hero,Gagne %d d'Armure par Héros,Ottieni %d Scudo per Eroe,Gana %d de Escudo por Héroe,英雄数×%d ブロック,Κέρδισε %d Άμυνα ανά Ήρωα,英雄数×%d 护甲,英雄数×%d 护甲
-effect.draw.text,드로우 %d,Draw %d,Piochez %d,Pesca %d,Roba %d,ドロー %d,Τράβηξε %d,抽 %d 张牌,抽 %d 张牌
-effect.energy.text,에너지 +%d,Gain %d Energy,Gagne %d Énergie,Guadagna %d Energia,Gana %d de Energía,エネルギー +%d,Κέρδισε %d Ενέργεια,能量 +%d,能量 +%d
-effect.heal.text,회복 %d,Heal %d,Soigne %d,Cura %d,Cura %d,回復 %d,Θεράπευσε %d,恢复 %d,恢复 %d
-effect.heal_all.text,전체 회복 %d,Heal all for %d,Soigne tous pour %d,Cura tutti di %d,Cura a todos por %d,全員回復 %d,Θεράπευσε όλους για %d,全体恢复 %d,全体恢复 %d
-effect.gain_morale.text,사기 +%d,Gain %d Morale,Gagne %d Moral,Guadagna %d Morale,Gana %d de Moral,士気 +%d,Κέρδισε %d Ηθικό,士气 +%d,士气 +%d
-effect.consume_morale.text,사기→피해 %d,Morale -> %d Damage,Moral -> %d Dégâts,Morale -> %d Danni,Moral -> %d Daño,士気→ダメージ %d,Ηθικό -> %d Ζημιά,士气→伤害 %d,士气→伤害 %d
-effect.poison_burst.text,독 즉발,Trigger Poison,Déclenche le Poison,Attiva Veleno,Detona Veneno,毒即発,Ενεργοποίηση Δηλητηρίου,毒性爆发,毒性爆发
-effect.counter_block.text,방어도×%d%%,%d%% of Block,%d%% de l'Armure,%d%% dello Scudo,%d%% del Escudo,ブロック×%d%%,%d%% της Άμυνας,护甲×%d%%,护甲×%d%%
-effect.cost_next.text,다음 비용 -%d,Next cost -%d,Coût suivant -%d,Prossimo costo -%d,Siguiente coste -%d,次のコスト -%d,Επόμενο κόστος -%d,下一次费用 -%d,下一次费用 -%d
-effect.conditional_dmg.text,%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s)
+effect.block.text,방어도 %d을 얻습니다.,Gain %d Block,Gagne %d d'Armure,Ottieni %d Scudo,Gana %d de Escudo,ブロック %d,Κέρδισε %d Άμυνα,获得 %d 护甲,获得 %d 护甲
+effect.block_all.text,모든 아군이 방어도 %d을 얻습니다.,Gain %d Block to all,Gagne %d d'Armure à tous,Ottieni %d Scudo a tutti,Gana %d de Escudo a todos,全員にブロック %d,Κέρδισε %d Άμυνα για όλους,全体获得 %d 护甲,全体获得 %d 护甲
+effect.formation_block.text,생존한 영웅 1명당 방어도 %d을 얻습니다.,Gain %d Block per Hero,Gagne %d d'Armure par Héros,Ottieni %d Scudo per Eroe,Gana %d de Escudo por Héroe,英雄数×%d ブロック,Κέρδισε %d Άμυνα ανά Ήρωα,英雄数×%d 护甲,英雄数×%d 护甲
+effect.draw.text,카드 %d장을 뽑습니다.,Draw %d,Piochez %d,Pesca %d,Roba %d,ドロー %d,Τράβηξε %d,抽 %d 张牌,抽 %d 张牌
+effect.energy.text,에너지 %d을 얻습니다.,Gain %d Energy,Gagne %d Énergie,Guadagna %d Energia,Gana %d de Energía,エネルギー +%d,Κέρδισε %d Ενέργεια,能量 +%d,能量 +%d
+effect.heal.text,체력 %d을 회복합니다.,Heal %d,Soigne %d,Cura %d,Cura %d,回復 %d,Θεράπευσε %d,恢复 %d,恢复 %d
+effect.heal_all.text,모든 아군의 체력 %d을 회복합니다.,Heal all for %d,Soigne tous pour %d,Cura tutti di %d,Cura a todos por %d,全員回復 %d,Θεράπευσε όλους για %d,全体恢复 %d,全体恢复 %d
+effect.gain_morale.text,사기 %d을 얻습니다.,Gain %d Morale,Gagne %d Moral,Guadagna %d Morale,Gana %d de Moral,士気 +%d,Κέρδισε %d Ηθικό,士气 +%d,士气 +%d
+effect.consume_morale.text,사기를 소모해 적에게 피해 %d을 입힙니다.,Morale -> %d Damage,Moral -> %d Dégâts,Morale -> %d Danni,Moral -> %d Daño,士気→ダメージ %d,Ηθικό -> %d Ζημιά,士气→伤害 %d,士气→伤害 %d
+effect.poison_burst.text,적의 독 스택만큼 즉시 피해를 입히고 독을 초기화합니다.,Trigger Poison,Déclenche le Poison,Attiva Veleno,Detona Veneno,毒即発,Ενεργοποίηση Δηλητηρίου,毒性爆发,毒性爆发
+effect.counter_block.text,현재 방어도의 %d%%만큼 적에게 피해를 입힙니다.,%d%% of Block,%d%% de l'Armure,%d%% dello Scudo,%d%% del Escudo,ブロック×%d%%,%d%% της Άμυνας,护甲×%d%%,护甲×%d%%
+effect.cost_next.text,이번 턴 다음 카드의 비용을 %d 줄입니다.,Next cost -%d,Coût suivant -%d,Prossimo costo -%d,Siguiente coste -%d,次のコスト -%d,Επόμενο κόστος -%d,下一次费用 -%d,下一次费用 -%d
+effect.conditional_dmg.text,평소 적에게 피해 %d을 입히고 %s에는 피해 %d을 입힙니다.,%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s)
 effect.condition.has_debuffs,디버프 %d종↑,%d+ debuffs,%d+ débuffs,%d+ debuff,%d+ debuffs,デバフ%d種↑,%d+ αρνητικά,%d种异常↑,%d種異常↑
 effect.condition.has_poison,독 보유 시,if poisoned,si empoisonné,se avvelenato,si envenenado,毒保有時,αν δηλητηριασμένο,中毒时,中毒時
 effect.condition.has_poison_n,독 %d이상 시,if poison ≥%d,si poison ≥%d,se veleno ≥%d,si veneno ≥%d,毒%d以上時,αν δηλητήριο ≥%d,毒 ≥%d时,毒 ≥%d時
@@ -23,17 +23,29 @@ effect.condition.very_low_hp,HP 30% 이하 시,if HP ≤30%,si PV ≤30%,se PF �
 effect.condition.hand_size_n,손패 %d장 이하 시,if hand ≤%d,si main ≤%d,se mano ≤%d,si mano ≤%d,手札%d枚以下時,αν χαρτιά ≤%d,手牌 ≤%d时,手牌 ≤%d時
 effect.condition.enemy_count_n,적 %d명 이하 시,if ≤%d enemies,si ≤%d ennemis,se ≤%d nemici,si ≤%d enemigos,敵%d体以下時,αν ≤%d εχθροί,敌 ≤%d时,敵 ≤%d時
 effect.condition.enemy_hp_below,적 HP %d% 이하 시,if enemy HP ≤%d%,si PV ennemi ≤%d%,se PF nemico ≤%d%,si PV enemigo ≤%d%,敵HP%d%以下時,αν εχθ.HP ≤%d%,敌HP ≤%d%时,敵HP ≤%d%時
-effect.summon_token.text,병사 소환 %d,Summon %d Soldiers,Invoque %d Soldats,Evoca %d Soldati,Invoca %d Soldados,兵士召喚 %d,Κάλεσε %d Στρατιώτες,召唤 %d 士兵,召唤 %d 士兵
-effect.charm.text,매혹 %d,Charm %d,Charme %d,Fascino %d,Encanto %d,魅惑 %d,Γοητεία %d,魅惑 %d,魅惑 %d
-effect.revive.text,부활 %d%%,Revive with %d%% HP,Ressuscite avec %d%% PV,Rianima con %d%% PS,Revive con %d%% PV,復活 %d%%,Αναβίωση με %d%% HP,复活 %d%%,复活 %d%%
-effect.sacrifice_hp.text,자기 HP -%d,Lose %d HP,Perds %d PV,Perdi %d PS,Pierde %d PV,自己HP -%d,Χάσε %d HP,自身生命 -%d,自身生命 -%d
-effect.cost_zero_turn.text,이번 턴 코스트 0,Cost 0 this turn,Coût 0 ce tour,Costo 0 questo turno,Coste 0 este turno,このターンコスト0,Κόστος 0 αυτόν τον γύρο,本回合费用为0,本回合费用为0
-effect.block_per_cards_played.text,카드수×%d 방어,%d Block per card played,%d Armure par carte jouée,%d Scudo per carta giocata,%d Escudo por carta jugada,カード数×%d ブロック,%d Άμυνα ανά παιγμένο φύλλο,牌数×%d 护甲,牌数×%d 护甲
-effect.on_kill_draw.text,처치시 드로우 %d,Draw %d on kill,Piochez %d par élimination,Pesca %d all'uccisione,Roba %d al matar,撃破時ドロー %d,Τράβηξε %d κατά την εξόντωση,击杀时抽 %d 张牌,击杀时抽 %d 张牌
+effect.summon_token.text,병사 %d명을 소환합니다.,Summon %d Soldiers,Invoque %d Soldats,Evoca %d Soldati,Invoca %d Soldados,兵士召喚 %d,Κάλεσε %d Στρατιώτες,召唤 %d 士兵,召唤 %d 士兵
+effect.charm.text,적 1명을 매혹 %d합니다.,Charm %d,Charme %d,Fascino %d,Encanto %d,魅惑 %d,Γοητεία %d,魅惑 %d,魅惑 %d
+effect.revive.text,사망한 아군 1명을 최대 체력의 %d%%로 부활시킵니다.,Revive with %d%% HP,Ressuscite avec %d%% PV,Rianima con %d%% PS,Revive con %d%% PV,復活 %d%%,Αναβίωση με %d%% HP,复活 %d%%,复活 %d%%
+effect.sacrifice_hp.text,자신의 체력 %d을 소모합니다.,Lose %d HP,Perds %d PV,Perdi %d PS,Pierde %d PV,自己HP -%d,Χάσε %d HP,自身生命 -%d,自身生命 -%d
+effect.cost_zero_turn.text,이번 턴 남은 카드의 비용이 모두 0이 됩니다.,Cost 0 this turn,Coût 0 ce tour,Costo 0 questo turno,Coste 0 este turno,このターンコスト0,Κόστος 0 αυτόν τον γύρο,本回合费用为0,本回合费用为0
+effect.block_per_cards_played.text,이번 턴 사용한 카드 1장당 방어도 %d을 얻습니다.,%d Block per card played,%d Armure par carte jouée,%d Scudo per carta giocata,%d Escudo por carta jugada,カード数×%d ブロック,%d Άμυνα ανά παιγμένο φύλλο,牌数×%d 护甲,牌数×%d 护甲
+effect.on_kill_draw.text,적을 처치할 때마다 카드 %d장을 뽑습니다.,Draw %d on kill,Piochez %d par élimination,Pesca %d all'uccisione,Roba %d al matar,撃破時ドロー %d,Τράβηξε %d κατά την εξόντωση,击杀时抽 %d 张牌,击杀时抽 %d 张牌
 effect.purge_status.text,디버프 제거,Remove debuffs,Retire les malus,Rimuovi debuff,Elimina penalizaciones,デバフ除去,Αφαίρεση εξασθενήσεων,移除负面状态,移除负面状态
-effect.per_draw_dmg.text,드로우수×%d 피해,%d damage per draw,%d dégâts par pioche,%d danni per pesca,%d daño por robo,ドロー数×%d ダメージ,%d ζημιά ανά τράβηγμα,抽牌数×%d 伤害,抽牌数×%d 伤害
+effect.per_draw_dmg.text,이번 턴 뽑은 카드 1장당 적에게 피해 %d을 입힙니다.,%d damage per draw,%d dégâts par pioche,%d danni per pesca,%d daño por robo,ドロー数×%d ダメージ,%d ζημιά ανά τράβηγμα,抽牌数×%d 伤害,抽牌数×%d 伤害
 effect.apply_status_poison.text,%s %d 데미지,%s %d damage,%s %d dégâts,%s %d danni,%s %d de daño,%s %d ダメージ,%s %d ζημιά,%s %d 伤害,%s %d 伤害
 effect.aoe_suffix, (전체), (All), (Tous), (Tutti), (Todos), (全体), (Όλοι), (全体), (全体)
+effect.damage.single.text,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s
+effect.damage.all.text,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s
+effect.apply_status.single.text,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.
+effect.apply_status.all.text,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.
+effect.apply_status_poison.single.text,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.
+effect.apply_status_poison.all.text,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.
+effect.status_double.single.text,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.
+effect.status_double.all.text,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.
+effect.purge_status.single.text,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.
+effect.purge_status.all.text,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.
+effect.heal_per_dead_ally.single.text,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.
+effect.heal_per_dead_ally.all.text,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.
 card.napoleon.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライク,Χτύπημα,打击,打击
 card.napoleon.strike.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
 card.napoleon.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
@@ -571,15 +583,15 @@ card.genghis_khan.steppe_lord.name,초원의 군주,Steppe Lord,Seigneur de la s
 card.genghis_khan.steppe_lord.archetype,(권능),(Power),(Pouvoir),(Potere),(Poder),(権能),(Δύναμη),(能力),(能力)
 card.musashi.sword_enlightenment.name,검의 깨달음,Sword Enlightenment,Éveil à l'épée,Risveglio della spada,Iluminación de la espada,剣の悟り,Φώτιση του Σπαθιού,剑之觉悟,剑之觉悟
 card.musashi.sword_enlightenment.archetype,(권능),(Power),(Pouvoir),(Potere),(Poder),(権能),(Δύναμη),(能力),(能力)
-effect.damage_per_block.text,방어도×%d%% 피해,%d%% of Block as damage,%d%% de l'Armure en dégâts,%d%% dello Scudo in danni,%d%% del Escudo en daño,ブロック×%d%%ダメージ,%d%% της Άμυνας ως ζημιά,护甲×%d%%伤害,護甲×%d%%傷害
-effect.damage_per_dead_ally.text,사망 아군×%d 피해,%d damage per dead ally,%d dégâts par allié mort,%d danni per alleato morto,%d daño por aliado muerto,死亡した仲間×%d ダメージ,%d ζημιά ανά νεκρό σύμμαχο,每位阵亡盟友%d伤害,每位陣亡盟友%d傷害
-effect.double_next_damage.text,다음 피해 ×2,Next damage ×2,Prochain dégât ×2,Prossimo danno ×2,Próximo daño ×2,次のダメージ ×2,Επόμενη ζημιά ×2,下次伤害×2,下次傷害×2
-effect.discard_pick_draw.text,선택 버리기→드로우 %d+에너지+1,Choose Discard→Draw %d+Energy+1,Choisir Défausse→Pioche %d+Énergie+1,Scegli Scarto→Pesca %d+Energia+1,Elige Descarte→Roba %d+Energía+1,選択捨て→ドロー %d+エナジー+1,Επιλογή Απόρριψης→Τράβηξε %d+Ενέργεια+1,选择弃牌→抽%d张+能量+1,選擇棄牌→抽%d張+能量+1
-effect.morale_to_block.text,사기만큼 방어도를 쌓습니다.,Gain Block equal to Morale.,Gagne une Armure égale au Moral.,Ottieni Scudo pari al Morale.,Gana Escudo igual al Moral.,士気分ブロックを得る。,Κέρδισε Άμυνα ίση με το Ηθικό.,获得等同于士气的护甲。,獲得等同於士氣的護甲。
-effect.damage_per_hand_size.text,손패×%d 피해,Hand size×%d damage,Taille de main×%d dégâts,Taglia mano×%d danni,Tamaño de mano×%d daño,手札数×%d ダメージ,Χέρι×%d ζημιά,手牌数×%d伤害,手牌數×%d傷害
-effect.damage_per_token.text,병사×%d 피해,Soldiers×%d damage,Soldats×%d dégâts,Soldati×%d danni,Soldados×%d daño,兵士×%d ダメージ,Στρατιώτες×%d ζημιά,士兵×%d伤害,士兵×%d傷害
+effect.damage_per_block.text,현재 방어도의 %d%%만큼 적에게 피해를 입힙니다.,%d%% of Block as damage,%d%% de l'Armure en dégâts,%d%% dello Scudo in danni,%d%% del Escudo en daño,ブロック×%d%%ダメージ,%d%% της Άμυνας ως ζημιά,护甲×%d%%伤害,護甲×%d%%傷害
+effect.damage_per_dead_ally.text,사망한 아군 1명당 적에게 피해 %d을 입힙니다.,%d damage per dead ally,%d dégâts par allié mort,%d danni per alleato morto,%d daño por aliado muerto,死亡した仲間×%d ダメージ,%d ζημιά ανά νεκρό σύμμαχο,每位阵亡盟友%d伤害,每位陣亡盟友%d傷害
+effect.double_next_damage.text,이번 턴 다음 피해 효과를 2배로 만듭니다.,Next damage ×2,Prochain dégât ×2,Prossimo danno ×2,Próximo daño ×2,次のダメージ ×2,Επόμενη ζημιά ×2,下次伤害×2,下次傷害×2
+effect.discard_pick_draw.text,손패에서 카드 1장을 선택해 버린 뒤 카드 %d장을 뽑고 에너지 1을 얻습니다.,Choose Discard→Draw %d+Energy+1,Choisir Défausse→Pioche %d+Énergie+1,Scegli Scarto→Pesca %d+Energia+1,Elige Descarte→Roba %d+Energía+1,選択捨て→ドロー %d+エナジー+1,Επιλογή Απόρριψης→Τράβηξε %d+Ενέργεια+1,选择弃牌→抽%d张+能量+1,選擇棄牌→抽%d張+能量+1
+effect.morale_to_block.text,사기 1당 방어도를 1 얻습니다.,Gain Block equal to Morale.,Gagne une Armure égale au Moral.,Ottieni Scudo pari al Morale.,Gana Escudo igual al Moral.,士気分ブロックを得る。,Κέρδισε Άμυνα ίση με το Ηθικό.,获得等同于士气的护甲。,獲得等同於士氣的護甲。
+effect.damage_per_hand_size.text,손패 1장당 적에게 피해 %d을 입힙니다.,Hand size×%d damage,Taille de main×%d dégâts,Taglia mano×%d danni,Tamaño de mano×%d daño,手札数×%d ダメージ,Χέρι×%d ζημιά,手牌数×%d伤害,手牌數×%d傷害
+effect.damage_per_token.text,살아있는 병사 1명당 적에게 피해 %d을 입힙니다.,Soldiers×%d damage,Soldats×%d dégâts,Soldati×%d danni,Soldados×%d daño,兵士×%d ダメージ,Στρατιώτες×%d ζημιά,士兵×%d伤害,士兵×%d傷害
 effect.heal_per_dead_ally.text,사망 아군×%d 회복,%d heal per dead ally,%d soin par allié mort,%d cura per alleato morto,%d cura por aliado muerto,死亡した仲間×%d 回復,%d θεραπεία ανά νεκρό σύμμαχο,每位阵亡盟友%d恢复,每位陣亡盟友%d恢復
-effect.energy_to_damage.text,에너지×%d 피해,Energy×%d damage,Énergie×%d dégâts,Energia×%d danni,Energía×%d daño,エナジー×%d ダメージ,Ενέργεια×%d ζημιά,能量×%d伤害,能量×%d傷害
+effect.energy_to_damage.text,남은 에너지 1당 적에게 피해 %d을 입힌 뒤 에너지를 모두 소진합니다.,Energy×%d damage,Énergie×%d dégâts,Energia×%d danni,Energía×%d daño,エナジー×%d ダメージ,Ενέργεια×%d ζημιά,能量×%d伤害,能量×%d傷害
 effect.status_double.text,디버프 스택 ×2,Double debuff stacks,Double les malus,Raddoppia i debuff,Duplica penalizaciones,デバフスタック ×2,Διπλασιάζει τα debuffs,负面状态×2,負面狀態×2
 card.musashi.steel_strike.name,강철 일격,Steel Strike,Frappe d'acier,Colpo d'acciaio,Golpe de acero,鋼鉄の一撃,Χτύπημα Χάλυβα,钢铁一击,鋼鐵一擊
 card.musashi.steel_strike.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,雙刀流
