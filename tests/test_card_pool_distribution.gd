@@ -157,14 +157,18 @@ func test_genghis_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_genghis_rarity_distribution")
 	var GhisCards = load("res://resources/cards/cards_genghis_khan.gd")
 	var pool: Array = GhisCards.pool()
-	_assert(pool.size() == 41, "칭기즈칸 풀 41장")
+	_assert(pool.size() == 30, "칭기즈칸 풀 30장 (H5 재설계)")
 	var counts: Dictionary = _count_rarities(pool)
-	# starter_deck(strike/defend) 제외 — COMMON 8장
-	_assert(counts["COMMON"] == 8, "칭기즈칸 COMMON 8장 (실제: %d)" % counts["COMMON"])
-	_assert(counts["UNCOMMON"] == 14, "칭기즈칸 UNCOMMON 14장 (실제: %d)" % counts["UNCOMMON"])
-	_assert(counts["RARE"] == 16, "칭기즈칸 RARE 16장 (실제: %d)" % counts["RARE"])
+	# COMMON 5: 급습, 기마도하, 기병소집, 화살세례, 노획
+	_assert(counts["COMMON"] == 5, "칭기즈칸 COMMON 5장 (실제: %d)" % counts["COMMON"])
+	# UNCOMMON 13: 돌격, 사막기마, 칸의분노, 신호나팔, 측면우회, 호드진군, 기병후퇴, 포위전술, 처형대, 전리품배분, 처형의권능, 칸의보고, 전쟁의대가
+	_assert(counts["UNCOMMON"] == 13, "칭기즈칸 UNCOMMON 13장 (실제: %d)" % counts["UNCOMMON"])
+	# RARE 10: 기동의권능, 만리원정, 붉은지평선, 칭기즈광기, 군마의권능, 칸의깃발, 토큰일제사격, 천만의군세, 약탈자의본능, 칸의도박
+	_assert(counts["RARE"] == 10, "칭기즈칸 RARE 10장 (실제: %d)" % counts["RARE"])
+	# LEGENDARY 2: 대칸의명령, 학살의칸
 	_assert(counts["LEGENDARY"] == 2, "칭기즈칸 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
-	_assert(counts["DIVINE"] == 1, "칭기즈칸 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
+	# DIVINE 0
+	_assert(counts["DIVINE"] == 0, "칭기즈칸 DIVINE 0장 (실제: %d)" % counts["DIVINE"])
 
 func test_genghis_archetype_distribution() -> void:
 	print("[TestCardPoolDistribution] test_genghis_archetype_distribution")
@@ -172,13 +176,13 @@ func test_genghis_archetype_distribution() -> void:
 	var pool: Array = GhisCards.pool()
 	var archetypes := {"기동": 0, "몽골 기병": 0, "약탈": 0}
 	for c in pool:
-		var a: String = c.get("archetype") if c.get("archetype") != null else ""
+		var a_key: String = c.get("archetype") if c.get("archetype") != null else ""
+		var a: String = TranslationServer.translate(a_key) if a_key != "" else ""
 		if a in archetypes:
 			archetypes[a] += 1
-	# starter_deck 제외: 기동 11, 몽골 기병 15, 약탈 12
-	_assert(archetypes["기동"] == 11, "칭기즈칸 기동 11장 (실제: %d)" % archetypes["기동"])
-	_assert(archetypes["몽골 기병"] == 15, "칭기즈칸 몽골 기병 15장 (실제: %d)" % archetypes["몽골 기병"])
-	_assert(archetypes["약탈"] == 12, "칭기즈칸 약탈 12장 (실제: %d)" % archetypes["약탈"])
+	_assert(archetypes["기동"] == 12, "칭기즈칸 기동 12장 (실제: %d)" % archetypes["기동"])
+	_assert(archetypes["몽골 기병"] == 10, "칭기즈칸 몽골 기병 10장 (실제: %d)" % archetypes["몽골 기병"])
+	_assert(archetypes["약탈"] == 8, "칭기즈칸 약탈 8장 (실제: %d)" % archetypes["약탈"])
 
 func test_musashi_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_musashi_rarity_distribution")
