@@ -1,7 +1,7 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-04-27 v7)
-> 기준: 챕터 1·2 완성 + 영웅 6인 + 번역 인프라 + 덱뷰어 완성 기준
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-03 v10)
+> 기준: 챕터 1·2 완성 + 영웅 6인 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
 ---
@@ -33,6 +33,7 @@
 **맵 아이콘·알고리즘** (PR #88): Slay-the-Spire 방식 맵 생성 알고리즘 + 15×7 좌표계 + 룸 아이콘 7종 SVG(`IconUtils.get_room_icon()`).
 **전투 UI 보완** (PR #89~#91): Enthrall 상태이상 아이콘·번역 추가, 카운터 아이콘 시계 SVG + 발동 순서 고정, HP바 8px halo bloom, 팝업 트윈 개선, 설정 오버레이 커서 크기 세그먼트 컨트롤(S/M/L/XL)·취소/적용/초기화 버튼 추가.
 **이벤트 씬 i18n·격자 패턴** (PR #92): 이벤트 선택지 하드코딩 한국어 → tr() 교체(10개 번역 키 신설, 8언어), 8개 씬 격자 배경 오버레이 셰이더 적용.
+**오디오 시스템 V2** (PR #94): `AudioManager` autoload (SFX 풀 16ch·BGM 크로스페이드·버스 볼륨 저장), `UISound` autoload (전역 버튼 호버·클릭 SFX, no_ui_sound 메타 opt-out), SFX 24종(-14 LUFS) + BGM 70종(-18 LUFS) 생성·정규화, 신화별 전투 BGM·보스 페이즈별 BGM 동적 선택, BGM 트랙 종료 자동 반복, 설정창 사운드 탭(볼륨 슬라이더 4개), `assets/audio/` .gitignore 처리. BurstParticleGroup2D weakref 람다 크래시 수정. 맵 룸 아이콘 툴팁 0.4s 지연 구현. `has_debuffs_N` 카드 조건 설명 동적 파싱.
 
 ---
 
@@ -452,13 +453,21 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - ✅ 씬 전환 페이드 인/아웃 (`autoload/scene_transition.gd` + CanvasLayer 검정 오버레이)
 - 🔲 페이즈 전환 연출 (보스 분노 이펙트)
 
-### 7-6. 오디오
-- ✅ 사운드 에셋 요구사항 문서 (`docs/sound_assets_required.md`) — BGM 16·UI SFX 23·Battle SFX 37·Enemy SFX 29·이벤트 7·Ambient 8·VO 11, 총 131개 파일 정의 + Godot 4 폴더 구조 포함
-- 🔲 BGM 임포트 및 AudioStreamPlayer 연동 (Act별·보스별 전환)
-- 🔲 SFX 임포트 및 AudioManager 싱글턴 구축 (`play_sfx(key)` 인터페이스)
-- 🔲 카드 사용·공격 임팩트·방어·피격·적 사망 SFX 이벤트 연결
-- 🔲 UI SFX: 버튼 클릭, 씬 전환
-- 🔲 보이스: 선택 사항 (캐릭터 전용 보이스 라인)
+### 7-6. 오디오 ✅ 기반 완료 (PR #94)
+- ✅ 사운드 에셋 요구사항 문서 (`docs/sound_assets_required.md`)
+- ✅ `AudioManager` autoload — SFX 풀(16ch) + BGM 크로스페이드 페어 + 버스 볼륨 저장(`user://audio_settings.json`)
+- ✅ `UISound` autoload — 전역 BaseButton 호버·클릭 SFX 자동 연결, `no_ui_sound` 메타 opt-out
+- ✅ SFX 24종 생성 (-14 LUFS): impact 11종·card 3종·heal/block·ui 2종·death 2종 등
+- ✅ BGM 70종 생성 (-18 LUFS): 메뉴×3·신화별 전투×18·보스×36+·이벤트/상점/휴식 (로컬 전용, .gitignore)
+- ✅ 신화별 전투 BGM 동적 선택 (`play_bgm_dynamic("battle", myth)`)
+- ✅ 보스 페이즈별 BGM 전환 (`boss_phase_changed` 시그널 → `play_bgm_dynamic("boss", id, phase)`)
+- ✅ BGM 트랙 종료 후 자동 반복 (동일 카테고리 랜덤 재선택)
+- ✅ 동일 카테고리 BGM 재시작 방지 (`_bgm_base_key` 추적)
+- ✅ 설정창 사운드 탭 — 마스터·음악·효과음·UI 볼륨 슬라이더 4개
+- ✅ 카드 사용·공격 임팩트·방어·피격·적 사망·카드 드로우·호버 SFX 이벤트 연결
+- ✅ 라우드니스 정규화 (SFX -14 LUFS / BGM -18 LUFS, ffmpeg loudnorm)
+- 🔲 이벤트 BGM 나머지 (dark×3·encounter×2·fortune×2 일부 미생성)
+- 🔲 보이스 (캐릭터 전용 보이스 라인 — 선택 사항)
 
 ---
 
@@ -659,7 +668,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-04-27 v9. PR #85~#92 반영 — Sacred UI 디자인 시스템·맵 아이콘·알고리즘·이벤트 i18n·격자 셰이더·설정 오버레이 개선.
+> 최종 갱신: 2026-05-03 v10. PR #94 반영 — 오디오 시스템 V2(AudioManager·UISound·SFX·BGM·라우드니스 정규화), 설정창 사운드 탭, BurstParticle weakref 수정, 맵 툴팁 지연, 카드 조건 설명 동적 파싱.
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -681,9 +690,10 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 씬 전환 페이드 인/아웃 (M7-5) | SceneTransition 오토로드 (PR #86) |
 | ✅ 완료 | 설정 UI + 커서 크기 옵션 (M8.5·M8.6) | PR #91. 세그먼트 S/M/L/XL·취소/적용/초기화·언어 선택 UI |
 | ✅ 완료 | 이벤트 선택지 i18n (M8.5) | PR #92. 하드코딩 한국어 → tr() 10개 키 신설, 8언어 |
+| ✅ 완료 | 오디오 시스템 V2 (M7-6) | PR #94. AudioManager·UISound·SFX 24종·BGM 70종·동적 선택·루프·정규화 |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
+| 🟡 중기 | 이벤트 BGM 나머지 생성 (M7-6) | dark×3·encounter×2·fortune×2 미생성분 |
 | 🟢 장기 | 비주얼 (M7-1~7-5) 캐릭터·카드 아트, 이펙트 | 몰입감 |
-| 🟢 장기 | 오디오 임포트 및 AudioManager (M7-6) | 몰입감 |
 | 🟢 장기 | 모바일 최적화 (M8-1~8-5) | 해상도·세이브·성능 |
 | 🟢 장기 | 접근성 (M8.6) | 색맹·자막·폰트 크기. 스팀 권장, 모바일 의무화 추세 |
 | 🔵 출시 직전 | 밸런싱 / 튜토리얼 / 업적 / QA (M9-1~9-4) | 품질 보증 |
