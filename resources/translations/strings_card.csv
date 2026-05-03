@@ -619,6 +619,22 @@ card.joan_of_arc.martyr_wrath.name,순교자의 분노,Martyr's Wrath,Colère du
 card.joan_of_arc.martyr_wrath.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
 card.joan_of_arc.dead_blessing.name,망자의 축복,Dead Blessing,Bénédiction des morts,Benedizione dei caduti,Bendición de los muertos,亡者の祝福,Ευλογία Νεκρών,亡者祝福,亡者祝福
 card.joan_of_arc.dead_blessing.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
+card.joan_of_arc.crusaders_faith.name,십자군의 신앙,Crusader's Faith,Foi du Croisé,Fede del Crociato,Fe del Cruzado,十字軍の信仰,Πίστη Σταυροφόρου,十字军的信仰,十字軍的信仰
+card.joan_of_arc.crusaders_faith.archetype,신성,Holy,Sacré,Sacro,Sagrado,神聖,Ιερό,神圣,神聖
+card.joan_of_arc.divine_echo.name,신성한 반향,Divine Echo,Écho Divin,Eco Divino,Eco Divino,神聖な反響,Θεϊκή Απήχηση,神圣回响,神聖回響
+card.joan_of_arc.divine_echo.archetype,신성,Holy,Sacré,Sacro,Sagrado,神聖,Ιερό,神圣,神聖
+card.joan_of_arc.oracle_light.name,신탁의 빛,Oracle's Light,Lumière de l'Oracle,Luce dell'Oracolo,Luz del Oráculo,神託の光,Φως Μαντείου,神谕之光,神諭之光
+card.joan_of_arc.oracle_light.archetype,신성,Holy,Sacré,Sacro,Sagrado,神聖,Ιερό,神圣,神聖
+card.joan_of_arc.guardian_angel.name,수호 천사,Guardian Angel,Ange Gardien,Angelo Custode,Ángel Guardián,守護天使,Φύλακας Άγγελος,守护天使,守護天使
+card.joan_of_arc.guardian_angel.archetype,부활,Revival,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,復活
+card.joan_of_arc.passion_power.name,수난의 권능,Passion Power,Pouvoir de la Passion,Potere della Passione,Poder de la Pasión,受難の権能,Δύναμη Πάθους,受难之能,受難之能
+card.joan_of_arc.passion_power.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
+card.joan_of_arc.martyr_strength.name,순교의 힘,Martyr's Strength,Force du Martyr,Forza del Martire,Fuerza del Mártir,殉教の力,Δύναμη Μάρτυρα,殉道之力,殉道之力
+card.joan_of_arc.martyr_strength.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
+card.joan_of_arc.saints_revelation.name,성흔의 결실,Saint's Revelation,Révélation du Saint,Rivelazione del Santo,Revelación del Santo,聖痕の結実,Αποκάλυψη Αγίου,圣痕结果,聖痕結果
+card.joan_of_arc.saints_revelation.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
+card.joan_of_arc.martyrs_light.name,순교자의 빛,Martyr's Light,Lumière du Martyr,Luce del Martire,Luz del Mártir,殉教者の光,Φως Μάρτυρα,殉道者之光,殉道者之光
+card.joan_of_arc.martyrs_light.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
 card.genghis_khan.soul_strike.name,영혼 베기,Soul Strike,Frappe de l'âme,Colpo dell'anima,Golpe del alma,魂の一撃,Χτύπημα Ψυχής,灵魂一击,靈魂一擊
 card.genghis_khan.soul_strike.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,機動
 card.genghis_khan.berserk_blow.name,광폭한 일격,Berserk Blow,Coup berserk,Colpo berserk,Golpe berserk,狂暴の一撃,Χτύπημα Μανίας,狂暴一击,狂暴一擊

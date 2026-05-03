@@ -1,6 +1,8 @@
 # resources/cards/cards_joan_of_arc.gd
-# 잔다르크 카드 — starter 10 + pool 30 (신성공격 11 / 힐·부활 10 / 순교 9)
-# CP 공식: DMG×0.010, BLOCK×0.008, HEAL×0.013, HEAL_ALL×0.020, BLOCK_ALL×0.013
+# 잔다르크 카드 — starter 10 + pool 30 (신성 11 / 부활 10 / 순교 9)
+# 신성: strength_player + echo_next_attack Amplifier → 강타 페이오프
+# 부활: draw_per_turn + heal_team_per_turn Amplifier → REVIVE Payoff
+# 순교: sacrifice_bank Amplifier → SACRIFICE_PAYOFF spine
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
 
@@ -16,21 +18,24 @@ static func starter_deck() -> Array:
 
 static func pool() -> Array:
 	return [
-		# ── 신성공격 11 ──
-		_holy_bolt(),
-		_orleans_charge(), _holy_wave(), _martyrs_strike(), _crusade(),
-		_holy_fury(), _holy_lance(), _holy_judge(), _divine_wrath(),
-		_divine_punishment(), _archangels_wrath(),
-		# ── 힐·부활 10 ──
-		_holy_touch(), _communion(),
-		_hymn(), _second_chance(), _holy_purification(), _angel_wings(),
-		_knights_oath(), _flag_of_orleans(),
-		_miracle_revive(), _joan_return(),
-		# ── 순교 9 ──
-		_martyrs_will(), _altar_flame(),
-		_martyrdom_steps(), _holy_rage(),
-		_last_shield(), _purifying_sacrifice(), _saints_vow(),
-		_saints_flame(), _martyr_wrath(),
+		# ── 신성 11 (F×4 / A×2 / P×2 / C×2 / Chaos×1) ──
+		_holy_bolt(), _orleans_charge(), _holy_wave(), _holy_fury(),   # F
+		_crusaders_faith(), _divine_echo(),                             # A
+		_archangels_wrath(), _divine_punishment(),                      # P
+		_crusade(), _holy_judge(),                                      # C
+		_oracle_light(),                                                # Chaos
+		# ── 부활 10 (F×3 / A×2 / P×2 / C×2 / Chaos×1) ──
+		_holy_touch(), _communion(), _hymn(),                           # F
+		_guardian_angel(), _angel_wings(),                              # A
+		_miracle_revive(), _joan_return(),                              # P
+		_holy_purification(), _knights_oath(),                          # C
+		_flag_of_orleans(),                                             # Chaos
+		# ── 순교 9 (F×3 / A×2 / P×2 / C×1 / Chaos×1) ──
+		_martyrs_will(), _altar_flame(), _martyrdom_steps(),            # F
+		_passion_power(), _martyr_strength(),                           # A
+		_saints_revelation(), _martyrs_light(),                         # P
+		_last_shield(),                                                 # C
+		_saints_flame(),                                                # Chaos
 	]
 
 # ─────────────────────────────────────────
@@ -61,7 +66,7 @@ static func _defend() -> Resource:
 	c.effects = [e]; return c
 
 static func _holy_smite() -> Resource:
-	# COMMON, 1코, ATTACK: DMG 80 divine + HEAL 20 SELF (cp=1.06)
+	# COMMON, 1코, ATTACK: DMG 80 divine + HEAL 20 SELF (시작덱 신성 F)
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.holy_smite.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -77,7 +82,7 @@ static func _holy_smite() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _shield_prayer() -> Resource:
-	# COMMON, 1코, SKILL: BLOCK 80 SELF + HEAL 20 SELF (cp=0.90)
+	# COMMON, 1코, SKILL: BLOCK 80 SELF + HEAL 20 SELF (시작덱 부활 F)
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.shield_prayer.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -92,11 +97,11 @@ static func _shield_prayer() -> Resource:
 	c.effects = [ea, eb]; return c
 
 # ─────────────────────────────────────────
-# 신성공격 12장
+# 신성 11 — strength + echo 스파인
 # ─────────────────────────────────────────
 
 static func _holy_bolt() -> Resource:
-	# COMMON, 1코, ATTACK: DMG 70 divine + VULNERABLE 1 SINGLE (cp=1.0)
+	# [F] 신성 화살 — COMMON, 1코, ATTACK: DMG 70 divine + VULNERABLE 1
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.holy_bolt.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -112,7 +117,7 @@ static func _holy_bolt() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _orleans_charge() -> Resource:
-	# UNCOMMON, 1코, ATTACK: DMG 110 divine SINGLE (cp=1.0)
+	# [F] 오를레앙의 돌격 — UNCOMMON, 1코, ATTACK: DMG 110 divine SINGLE
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.orleans_charge.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -125,7 +130,7 @@ static func _orleans_charge() -> Resource:
 	c.effects = [e]; return c
 
 static func _holy_wave() -> Resource:
-	# UNCOMMON, 1코, ATTACK: DMG 65 ALL divine (cp=1.0)
+	# [F] 신성의 물결 — UNCOMMON, 1코, ATTACK: DMG 65 ALL divine
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.holy_wave.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -137,40 +142,8 @@ static func _holy_wave() -> Resource:
 	e.damage_type = "divine"
 	c.effects = [e]; return c
 
-static func _martyrs_strike() -> Resource:
-	# UNCOMMON, 1코, ATTACK: SACRIFICE 80 + DMG 150 divine SINGLE (cp=1.07)
-	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.martyrs_strike.name"; c.owner_id = "joan_of_arc"
-	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.martyrs_strike.archetype"
-	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
-	ea.value = 80; ea.base_value = 80
-	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.DAMAGE
-	eb.value = 150; eb.base_value = 150; eb.target = "SINGLE"
-	eb.damage_type = "divine"
-	c.effects = [ea, eb]; return c
-
-static func _crusade() -> Resource:
-	# UNCOMMON, 2코, ATTACK: DMG 82 ALL + VULNERABLE 1 ALL (cp=1.81)
-	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.crusade.name"; c.owner_id = "joan_of_arc"
-	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.crusade.archetype"
-	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 82; ea.base_value = 82; ea.target = "ALL"
-	ea.damage_type = "divine"
-	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "vulnerable"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
-	c.effects = [ea, eb]; return c
-
 static func _holy_fury() -> Resource:
-	# RARE, 2코, ATTACK: DMG 140 ALL divine (cp=1.98)
+	# [F] 성스러운 분노 — RARE, 2코, ATTACK: DMG 140 ALL divine (강력 Foundation)
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.holy_fury.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
@@ -182,59 +155,48 @@ static func _holy_fury() -> Resource:
 	e.damage_type = "divine"
 	c.effects = [e]; return c
 
-static func _holy_lance() -> Resource:
-	# RARE, 2코, ATTACK: DMG 240 divine SINGLE (cp=2.0)
+static func _crusaders_faith() -> Resource:
+	# [A] 십자군의 신앙 — UNCOMMON, 1코, POWER: 영웅 strength +2 (매 공격 +2)
 	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.holy_lance.name"; c.owner_id = "joan_of_arc"
-	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.holy_lance.archetype"
+	c.card_name = "card.joan_of_arc.crusaders_faith.name"; c.owner_id = "joan_of_arc"
+	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.crusaders_faith.archetype"
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.DAMAGE
-	e.value = 240; e.base_value = 240; e.target = "SINGLE"
-	e.damage_type = "divine"
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.strength_player"; e.value = 2; e.base_value = 2; e.target = "SELF"
 	c.effects = [e]; return c
 
-static func _holy_judge() -> Resource:
-	# RARE, 2코, ATTACK: DMG 100 + WEAK 2 + VULNERABLE 2 SINGLE (cp=1.83)
+static func _divine_echo() -> Resource:
+	# [A] 신성한 반향 — RARE, 2코, POWER: 다음 ATTACK 카드 효과를 1회 재시전
 	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.holy_judge.name"; c.owner_id = "joan_of_arc"
-	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.holy_judge.archetype"
-	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
-	ea.damage_type = "divine"
-	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "weak"; eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"
-	var ec := EffRes.new()
-	ec.effect_type = EffRes.EffectType.APPLY_STATUS
-	ec.status_type = "vulnerable"; ec.value = 2; ec.base_value = 2; ec.target = "SINGLE"
-	c.effects = [ea, eb, ec]; return c
+	c.card_name = "card.joan_of_arc.divine_echo.name"; c.owner_id = "joan_of_arc"
+	c.cost = 2; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.divine_echo.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.echo_next_attack"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	c.effects = [e]; return c
 
-static func _divine_wrath() -> Resource:
-	# RARE, 2코, ATTACK: DMG 60 ALL + WEAK 1 ALL + VULNERABLE 1 ALL (cp=1.85)
+static func _archangels_wrath() -> Resource:
+	# [P] 대천사의 분노 — RARE, 2코, ATTACK: DMG 180 ALL divine + HEAL_ALL 30
 	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.divine_wrath.name"; c.owner_id = "joan_of_arc"
+	c.card_name = "card.joan_of_arc.archangels_wrath.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.divine_wrath.archetype"
+	c.archetype = "card.joan_of_arc.archangels_wrath.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 60; ea.base_value = 60; ea.target = "ALL"
+	ea.value = 180; ea.base_value = 180; ea.target = "ALL"
 	ea.damage_type = "divine"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "weak"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
-	var ec := EffRes.new()
-	ec.effect_type = EffRes.EffectType.APPLY_STATUS
-	ec.status_type = "vulnerable"; ec.value = 1; ec.base_value = 1; ec.target = "ALL"
-	c.effects = [ea, eb, ec]; return c
+	eb.effect_type = EffRes.EffectType.HEAL_ALL
+	eb.value = 30; eb.base_value = 30
+	c.effects = [ea, eb]; return c
 
 static func _divine_punishment() -> Resource:
-	# LEGENDARY, 2코, ATTACK: SACRIFICE 100 + DMG 150 ALL + WEAK 2 ALL + VULNERABLE 2 ALL (cp=2.77)
+	# [P] 신성한 징벌 — LEGENDARY, 2코, ATTACK: SAC 100 + DMG 150 ALL + WEAK 2 + VULN 2
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.divine_punishment.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
@@ -255,28 +217,60 @@ static func _divine_punishment() -> Resource:
 	ed.status_type = "vulnerable"; ed.value = 2; ed.base_value = 2; ed.target = "ALL"
 	c.effects = [ea, eb, ec, ed]; return c
 
-static func _archangels_wrath() -> Resource:
-	# LEGENDARY, 3코, ATTACK: DMG 200 ALL divine + WEAK 1 ALL (cp=3.08)
+static func _crusade() -> Resource:
+	# [C] 십자군 — UNCOMMON, 2코, ATTACK: DMG 82 ALL + VULNERABLE 1 ALL
 	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.archangels_wrath.name"; c.owner_id = "joan_of_arc"
-	c.cost = 3; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.archangels_wrath.archetype"
+	c.card_name = "card.joan_of_arc.crusade.name"; c.owner_id = "joan_of_arc"
+	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
+	c.archetype = "card.joan_of_arc.crusade.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 200; ea.base_value = 200; ea.target = "ALL"
+	ea.value = 82; ea.base_value = 82; ea.target = "ALL"
 	ea.damage_type = "divine"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "weak"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
+	eb.status_type = "vulnerable"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
 	c.effects = [ea, eb]; return c
 
+static func _holy_judge() -> Resource:
+	# [C] 신성 심판 — RARE, 2코, ATTACK: DMG 100 + WEAK 2 + VULNERABLE 2 SINGLE
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.holy_judge.name"; c.owner_id = "joan_of_arc"
+	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.archetype = "card.joan_of_arc.holy_judge.archetype"
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.DAMAGE
+	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
+	ea.damage_type = "divine"
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.APPLY_STATUS
+	eb.status_type = "weak"; eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"
+	var ec := EffRes.new()
+	ec.effect_type = EffRes.EffectType.APPLY_STATUS
+	ec.status_type = "vulnerable"; ec.value = 2; ec.base_value = 2; ec.target = "SINGLE"
+	c.effects = [ea, eb, ec]; return c
+
+static func _oracle_light() -> Resource:
+	# [Chaos] 신탁의 빛 — RARE, 0코, SKILL EXHAUST: DRAW 3 (무작위 운명 카드 3장)
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.oracle_light.name"; c.owner_id = "joan_of_arc"
+	c.cost = 0; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.oracle_light.archetype"
+	c.is_exhaust = true
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.DRAW
+	e.value = 3; e.base_value = 3
+	c.effects = [e]; return c
+
 # ─────────────────────────────────────────
-# 힐·부활 12장
+# 부활 10 — draw_per_turn + heal_team_per_turn 스파인
 # ─────────────────────────────────────────
 
 static func _holy_touch() -> Resource:
-	# COMMON, 1코, SKILL: HEAL 77 SELF (cp=1.0)
+	# [F] 성녀의 손길 — COMMON, 1코, SKILL: HEAL 77 SELF
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.holy_touch.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -288,7 +282,7 @@ static func _holy_touch() -> Resource:
 	c.effects = [e]; return c
 
 static func _communion() -> Resource:
-	# COMMON, 1코, SKILL: HEAL 20 SELF + DRAW 1 (cp=1.06)
+	# [F] 성찬 — COMMON, 1코, SKILL: HEAL 20 SELF + DRAW 1
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.communion.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -303,7 +297,7 @@ static func _communion() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _hymn() -> Resource:
-	# UNCOMMON, 1코, SKILL: HEAL_ALL 55 (cp=1.0)
+	# [F] 성가 — UNCOMMON, 1코, SKILL: HEAL_ALL 55
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.hymn.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -314,78 +308,32 @@ static func _hymn() -> Resource:
 	e.value = 55; e.base_value = 55
 	c.effects = [e]; return c
 
-static func _second_chance() -> Resource:
-	# UNCOMMON, 1코, SKILL: HEAL 70 LOWEST_HP + BLOCK 25 SELF (cp=1.01)
+static func _guardian_angel() -> Resource:
+	# [A] 수호 천사 — RARE, 1코, POWER: 매 턴 시작 시 DRAW 1 추가
 	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.second_chance.name"; c.owner_id = "joan_of_arc"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.second_chance.archetype"
-	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.HEAL
-	ea.value = 70; ea.base_value = 70; ea.target = "LOWEST_HP"
-	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.BLOCK
-	eb.value = 25; eb.base_value = 25; eb.target = "SELF"
-	c.effects = [ea, eb]; return c
-
-static func _holy_purification() -> Resource:
-	# UNCOMMON, 1코, SKILL: PURGE_STATUS ALL + HEAL_ALL 25 (cp=0.91)
-	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.holy_purification.name"; c.owner_id = "joan_of_arc"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.holy_purification.archetype"
-	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.PURGE_STATUS
-	ea.target = "ALL"
-	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.HEAL_ALL
-	eb.value = 25; eb.base_value = 25
-	c.effects = [ea, eb]; return c
+	c.card_name = "card.joan_of_arc.guardian_angel.name"; c.owner_id = "joan_of_arc"
+	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.guardian_angel.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.draw_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	c.effects = [e]; return c
 
 static func _angel_wings() -> Resource:
-	# RARE, 1코, SKILL: INNATE + HEAL 70 SELF (cp=1.01, is_innate)
+	# [A] 천사의 날개 — RARE, 2코, POWER: 매 턴 시작 시 팀 전체 회복 20
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.angel_wings.name"; c.owner_id = "joan_of_arc"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.joan_of_arc.angel_wings.archetype"
-	c.is_innate = true
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.HEAL
-	e.value = 70; e.base_value = 70; e.target = "SELF"
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.heal_team_per_turn"; e.value = 20; e.base_value = 20; e.target = "SELF"
 	c.effects = [e]; return c
-
-static func _knights_oath() -> Resource:
-	# LEGENDARY, 2코, SKILL: HEAL 200 SELF (cp=2.0)
-	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.knights_oath.name"; c.owner_id = "joan_of_arc"
-	c.cost = 2; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.knights_oath.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.HEAL
-	e.value = 200; e.base_value = 200; e.target = "SELF"
-	c.effects = [e]; return c
-
-static func _flag_of_orleans() -> Resource:
-	# LEGENDARY, 2코, SKILL: HEAL_ALL 80 + BLOCK_ALL 80 (cp=2.03)
-	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.flag_of_orleans.name"; c.owner_id = "joan_of_arc"
-	c.cost = 2; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.flag_of_orleans.archetype"
-	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.HEAL_ALL
-	ea.value = 80; ea.base_value = 80
-	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.BLOCK_ALL
-	eb.value = 80; eb.base_value = 80
-	c.effects = [ea, eb]; return c
 
 static func _miracle_revive() -> Resource:
-	# RARE, 2코, SKILL: REVIVE 30% + EXHAUST (cp=1.70, is_exhaust)
+	# [P] 기적의 부활 — RARE, 2코, SKILL EXHAUST: REVIVE 30%
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.miracle_revive.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
@@ -398,7 +346,7 @@ static func _miracle_revive() -> Resource:
 	c.effects = [e]; return c
 
 static func _joan_return() -> Resource:
-	# LEGENDARY, 3코, SKILL: REVIVE 100% + HEAL_ALL 30 (cp=3.08)
+	# [P] 잔 다르크의 귀환 — LEGENDARY, 3코, SKILL: REVIVE 100% + HEAL_ALL 30
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.joan_return.name"; c.owner_id = "joan_of_arc"
 	c.cost = 3; c.card_type = CardRes.CardType.SKILL
@@ -412,12 +360,54 @@ static func _joan_return() -> Resource:
 	eb.value = 30; eb.base_value = 30
 	c.effects = [ea, eb]; return c
 
+static func _holy_purification() -> Resource:
+	# [C] 신성한 정화 — UNCOMMON, 1코, SKILL: PURGE_STATUS ALL + HEAL_ALL 25
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.holy_purification.name"; c.owner_id = "joan_of_arc"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.holy_purification.archetype"
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.PURGE_STATUS
+	ea.target = "ALL"
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.HEAL_ALL
+	eb.value = 25; eb.base_value = 25
+	c.effects = [ea, eb]; return c
+
+static func _knights_oath() -> Resource:
+	# [C] 기사단의 맹세 — UNCOMMON, 1코, SKILL: APPLY_STATUS taunt=2 SELF (도발 2턴)
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.knights_oath.name"; c.owner_id = "joan_of_arc"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.knights_oath.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "taunt"; e.value = 2; e.base_value = 2; e.target = "SELF"
+	c.effects = [e]; return c
+
+static func _flag_of_orleans() -> Resource:
+	# [Chaos] 신국의 깃발 — LEGENDARY, 2코, SKILL: HEAL_ALL 80 + BLOCK_ALL 80
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.flag_of_orleans.name"; c.owner_id = "joan_of_arc"
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.flag_of_orleans.archetype"
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.HEAL_ALL
+	ea.value = 80; ea.base_value = 80
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.BLOCK_ALL
+	eb.value = 80; eb.base_value = 80
+	c.effects = [ea, eb]; return c
+
 # ─────────────────────────────────────────
-# 순교 11장
+# 순교 9 — sacrifice_bank + SACRIFICE_PAYOFF 스파인
 # ─────────────────────────────────────────
 
 static func _martyrs_will() -> Resource:
-	# UNCOMMON, 1코, SKILL: SACRIFICE 50 + HEAL_ALL 65 (cp=1.0)
+	# [F] 순교의 의지 — UNCOMMON, 1코, SKILL: SACRIFICE 50 + HEAL_ALL 65
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.martyrs_will.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -432,7 +422,7 @@ static func _martyrs_will() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _altar_flame() -> Resource:
-	# UNCOMMON, 1코, SKILL: SACRIFICE 50 + BLOCK_ALL 110 (cp=1.12)
+	# [F] 제단의 불꽃 — UNCOMMON, 1코, SKILL: SACRIFICE 50 + BLOCK_ALL 110
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.altar_flame.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -447,7 +437,7 @@ static func _altar_flame() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _martyrdom_steps() -> Resource:
-	# UNCOMMON, 1코, SKILL: SACRIFICE 100 + DRAW 2 (cp=1.09)
+	# [F] 순교의 발걸음 — UNCOMMON, 1코, SKILL: SACRIFICE 100 + DRAW 2
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.martyrdom_steps.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -461,24 +451,58 @@ static func _martyrdom_steps() -> Resource:
 	eb.value = 2; eb.base_value = 2
 	c.effects = [ea, eb]; return c
 
-static func _holy_rage() -> Resource:
-	# UNCOMMON, 2코, ATTACK: SACRIFICE 300 + DMG 200 ALL divine (cp=2.0)
+static func _passion_power() -> Resource:
+	# [A] 수난의 권능 — RARE, 1코, POWER: sacrifice_bank 활성화 (SACRIFICE_HP 누적 추적)
 	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.holy_rage.name"; c.owner_id = "joan_of_arc"
+	c.card_name = "card.joan_of_arc.passion_power.name"; c.owner_id = "joan_of_arc"
+	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.passion_power.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.sacrifice_bank"; e.value = 0; e.base_value = 0; e.target = "SELF"
+	c.effects = [e]; return c
+
+static func _martyr_strength() -> Resource:
+	# [A] 순교의 힘 — UNCOMMON, 1코, POWER: strength +1 (희생이 힘으로)
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.martyr_strength.name"; c.owner_id = "joan_of_arc"
+	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.martyr_strength.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.strength_player"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	c.effects = [e]; return c
+
+static func _saints_revelation() -> Resource:
+	# [P] 성흔의 결실 — RARE, 2코, ATTACK: sacrifice_bank/100 × 20 피해 (ALL)
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.saints_revelation.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.holy_rage.archetype"
-	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
-	ea.value = 300; ea.base_value = 300
-	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.DAMAGE
-	eb.value = 200; eb.base_value = 200; eb.target = "ALL"
-	eb.damage_type = "divine"
-	c.effects = [ea, eb]; return c
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.archetype = "card.joan_of_arc.saints_revelation.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.SACRIFICE_PAYOFF
+	e.value = 20; e.base_value = 20; e.target = "ALL"
+	e.damage_type = "divine"
+	c.effects = [e]; return c
+
+static func _martyrs_light() -> Resource:
+	# [P] 순교자의 빛 — LEGENDARY, 2코, SKILL EXHAUST: sacrifice_bank/100 × 15 BLOCK_ALL
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.martyrs_light.name"; c.owner_id = "joan_of_arc"
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.martyrs_light.archetype"
+	c.is_exhaust = true
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.SACRIFICE_PAYOFF
+	e.value = 15; e.base_value = 15; e.status_type = "block"; e.target = "ALL"
+	c.effects = [e]; return c
 
 static func _last_shield() -> Resource:
-	# RARE, 1코, SKILL: SACRIFICE 100 + BLOCK_ALL 130 (cp=1.075)
+	# [C] 최후의 방패 — RARE, 1코, SKILL: SACRIFICE 100 + BLOCK_ALL 130
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.last_shield.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -492,49 +516,14 @@ static func _last_shield() -> Resource:
 	eb.value = 130; eb.base_value = 130
 	c.effects = [ea, eb]; return c
 
-static func _purifying_sacrifice() -> Resource:
-	# RARE, 1코, SKILL: SACRIFICE 50 + PURGE_STATUS ALL + HEAL_ALL 50 (cp=1.08)
-	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.purifying_sacrifice.name"; c.owner_id = "joan_of_arc"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.purifying_sacrifice.archetype"
-	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
-	ea.value = 50; ea.base_value = 50
-	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.PURGE_STATUS
-	eb.target = "ALL"
-	var ec := EffRes.new()
-	ec.effect_type = EffRes.EffectType.HEAL_ALL
-	ec.value = 50; ec.base_value = 50
-	c.effects = [ea, eb, ec]; return c
-
-static func _saints_vow() -> Resource:
-	# RARE, 2코, SKILL: SACRIFICE 200 + HEAL_ALL 103 + BLOCK_ALL 70 (cp=1.81)
-	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.saints_vow.name"; c.owner_id = "joan_of_arc"
-	c.cost = 2; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.saints_vow.archetype"
-	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
-	ea.value = 200; ea.base_value = 200
-	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.HEAL_ALL
-	eb.value = 103; eb.base_value = 103
-	var ec := EffRes.new()
-	ec.effect_type = EffRes.EffectType.BLOCK_ALL
-	ec.value = 70; ec.base_value = 70
-	c.effects = [ea, eb, ec]; return c
-
 static func _saints_flame() -> Resource:
-	# DIVINE, 2코, ATTACK: SACRIFICE 250 + DMG 220 ALL divine (cp=1.96)
+	# [Chaos] 성녀의 화염 — DIVINE, 2코, ATTACK EXHAUST: SACRIFICE 250 + DMG 220 ALL divine
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.saints_flame.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "attack"
 	c.archetype = "card.joan_of_arc.saints_flame.archetype"
+	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
 	ea.value = 250; ea.base_value = 250
@@ -543,16 +532,3 @@ static func _saints_flame() -> Resource:
 	eb.value = 220; eb.base_value = 220; eb.target = "ALL"
 	eb.damage_type = "divine"
 	c.effects = [ea, eb]; return c
-
-static func _martyr_wrath() -> Resource:
-	# UNCOMMON, 1코, ATTACK: DAMAGE_PER_DEAD_ALLY 220 divine SINGLE (cp=1.0)
-	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.martyr_wrath.name"; c.owner_id = "joan_of_arc"
-	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.martyr_wrath.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.DAMAGE_PER_DEAD_ALLY
-	e.value = 220; e.base_value = 220; e.target = "SINGLE"
-	e.damage_type = "divine"
-	c.effects = [e]; return c

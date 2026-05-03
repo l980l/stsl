@@ -111,13 +111,17 @@ func test_joan_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_joan_rarity_distribution")
 	var JoanCards = load("res://resources/cards/cards_joan_of_arc.gd")
 	var pool: Array = JoanCards.pool()
-	_assert(pool.size() == 41, "잔다르크 풀 41장")
+	_assert(pool.size() == 30, "잔다르크 풀 30장 (H3 재설계)")
 	var counts: Dictionary = _count_rarities(pool)
-	# starter_deck(strike/defend) 제외 — COMMON 8장
-	_assert(counts["COMMON"] == 8, "잔다르크 COMMON 8장 (실제: %d)" % counts["COMMON"])
-	_assert(counts["UNCOMMON"] == 15, "잔다르크 UNCOMMON 15장 (실제: %d)" % counts["UNCOMMON"])
-	_assert(counts["RARE"] == 15, "잔다르크 RARE 15장 (실제: %d)" % counts["RARE"])
-	_assert(counts["LEGENDARY"] == 2, "잔다르크 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
+	# COMMON 3: holy_bolt, holy_touch, communion
+	_assert(counts["COMMON"] == 3, "잔다르크 COMMON 3장 (실제: %d)" % counts["COMMON"])
+	# UNCOMMON 11: orleans,holy_wave,crusaders_faith,crusade,hymn,holy_purification,knights_oath,martyrs_will,altar_flame,martyrdom_steps,martyr_strength
+	_assert(counts["UNCOMMON"] == 11, "잔다르크 UNCOMMON 11장 (실제: %d)" % counts["UNCOMMON"])
+	# RARE 11: holy_fury,divine_echo,archangels_wrath,holy_judge,oracle_light,guardian_angel,angel_wings,miracle_revive,passion_power,saints_revelation,last_shield
+	_assert(counts["RARE"] == 11, "잔다르크 RARE 11장 (실제: %d)" % counts["RARE"])
+	# LEGENDARY 4: divine_punishment,joan_return,flag_of_orleans,martyrs_light
+	_assert(counts["LEGENDARY"] == 4, "잔다르크 LEGENDARY 4장 (실제: %d)" % counts["LEGENDARY"])
+	# DIVINE 1: saints_flame
 	_assert(counts["DIVINE"] == 1, "잔다르크 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
 
 func test_joan_archetype_distribution() -> void:
@@ -126,13 +130,13 @@ func test_joan_archetype_distribution() -> void:
 	var pool: Array = JoanCards.pool()
 	var archetypes := {"신성": 0, "부활": 0, "순교": 0}
 	for c in pool:
-		var a: String = c.get("archetype") if c.get("archetype") != null else ""
+		var a_key: String = c.get("archetype") if c.get("archetype") != null else ""
+		var a: String = TranslationServer.translate(a_key) if a_key != "" else ""
 		if a in archetypes:
 			archetypes[a] += 1
-	# starter_deck 제외: 신성 12(=14-2), 부활 13, 순교 13
-	_assert(archetypes["신성"] == 12, "잔다르크 신성 12장 (실제: %d)" % archetypes["신성"])
-	_assert(archetypes["부활"] == 13, "잔다르크 부활 13장 (실제: %d)" % archetypes["부활"])
-	_assert(archetypes["순교"] == 13, "잔다르크 순교 13장 (실제: %d)" % archetypes["순교"])
+	_assert(archetypes["신성"] == 11, "잔다르크 신성 11장 (실제: %d)" % archetypes["신성"])
+	_assert(archetypes["부활"] == 10, "잔다르크 부활 10장 (실제: %d)" % archetypes["부활"])
+	_assert(archetypes["순교"] == 9, "잔다르크 순교 9장 (실제: %d)" % archetypes["순교"])
 
 func test_genghis_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_genghis_rarity_distribution")
