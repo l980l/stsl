@@ -118,6 +118,14 @@ func display_text() -> String:
 				cond_name = tr("effect.condition.low_hp")
 			elif status_type == "very_low_hp":
 				cond_name = tr("effect.condition.very_low_hp")
+			elif status_type == "hand_size_0":
+				cond_name = tr("effect.condition.hand_size_0")
+			elif status_type.begins_with("enemy_count_"):
+				var n := status_type.trim_prefix("enemy_count_").to_int()
+				cond_name = tr("effect.condition.enemy_count_n").replace("%d", str(n))
+			elif status_type.begins_with("enemy_hp_below_"):
+				var n := status_type.trim_prefix("enemy_hp_below_").to_int()
+				cond_name = tr("effect.condition.enemy_hp_below").replace("%d", str(n))
 			elif cond_key:
 				cond_name = tr(cond_key)
 			else:
