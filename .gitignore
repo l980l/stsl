@@ -6,6 +6,9 @@
 *.import
 *.translation
 
+# 오디오 에셋 — 로컬에서만 관리
+assets/audio/
+
 # 아트 에셋 — git 미추적, 로컬에서 직접 관리 (라인 SVG 아이콘 제외)
 assets/art/backgrounds/
 assets/art/cards/
