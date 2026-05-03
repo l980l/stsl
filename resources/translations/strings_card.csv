@@ -20,7 +20,7 @@ effect.condition.has_morale,사기 보유 시,if has morale,si moral positif,se 
 effect.condition.has_morale_n,사기 %d이상 시,if morale ≥%d,si moral ≥%d,se morale ≥%d,si moral ≥%d,士気%d以上時,αν ηθικό ≥%d,士气 ≥%d时,士氣 ≥%d時
 effect.condition.low_hp,HP 50% 이하 시,if HP ≤50%,si PV ≤50%,se PF ≤50%,si PV ≤50%,HP50%以下時,αν HP ≤50%,HP ≤50%时,HP ≤50%時
 effect.condition.very_low_hp,HP 30% 이하 시,if HP ≤30%,si PV ≤30%,se PF ≤30%,si PV ≤30%,HP30%以下時,αν HP ≤30%,HP ≤30%时,HP ≤30%時
-effect.condition.hand_size_0,패 없을 시,if no hand,si main vide,se mano vuota,si mano vacía,手札なし時,αν χωρίς χαρτιά,手牌为空时,手牌為空時
+effect.condition.hand_size_n,손패 %d장 이하 시,if hand ≤%d,si main ≤%d,se mano ≤%d,si mano ≤%d,手札%d枚以下時,αν χαρτιά ≤%d,手牌 ≤%d时,手牌 ≤%d時
 effect.condition.enemy_count_n,적 %d명 이하 시,if ≤%d enemies,si ≤%d ennemis,se ≤%d nemici,si ≤%d enemigos,敵%d体以下時,αν ≤%d εχθροί,敌 ≤%d时,敵 ≤%d時
 effect.condition.enemy_hp_below,적 HP %d% 이하 시,if enemy HP ≤%d%,si PV ennemi ≤%d%,se PF nemico ≤%d%,si PV enemigo ≤%d%,敵HP%d%以下時,αν εχθ.HP ≤%d%,敌HP ≤%d%时,敵HP ≤%d%時
 effect.summon_token.text,병사 소환 %d,Summon %d Soldiers,Invoque %d Soldats,Evoca %d Soldati,Invoca %d Soldados,兵士召喚 %d,Κάλεσε %d Στρατιώτες,召唤 %d 士兵,召唤 %d 士兵
