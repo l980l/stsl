@@ -51,12 +51,12 @@ enum EffectType {
 @export var damage_type: String = ""  # DAMAGE 계열 시각 타입. "" → slash fallback. slash/blunt/projectile/explosive/poison/divine/curse
 
 const _STATUS_NAME_KEYS := {
-	"weak":       "status.weak.name",
-	"vulnerable": "status.vulnerable.name",
-	"morale":     "status.morale.name",
-	"charm":      "status.charm.name",
-	"strength":   "status.strength.name",
-	"taunt":      "status.taunt.name",
+	"weak":          "status.weak.name",
+	"vulnerable":    "status.vulnerable.name",
+	"morale":        "status.morale.name",
+	"charm":         "status.charm.name",
+	"strength":      "status.strength.name",
+	"taunt":         "status.taunt.name",
 }
 
 func display_text() -> String:
@@ -103,6 +103,9 @@ func display_text() -> String:
 			var cond_name: String
 			if status_type == "poison":
 				cond_name = tr("status.poison.name")
+			elif status_type.begins_with("has_debuffs_"):
+				var n := status_type.trim_prefix("has_debuffs_").to_int()
+				cond_name = tr("effect.condition.has_debuffs") % n
 			elif cond_key:
 				cond_name = tr(cond_key)
 			else:
