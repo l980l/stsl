@@ -374,28 +374,28 @@ static func _miraculous_recovery() -> Resource:
 	c.effects = [e]; return c
 
 static func _all_in() -> Resource:
-	# [F] 이판사판 — UNCOMMON, 1코, ATTACK: HEAL -60 SELF + DMG 188
+	# [F] 이판사판 — UNCOMMON, 1코, ATTACK: SACRIFICE_HP 60 + DMG 188
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.all_in.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
 	c.archetype = "card.yi_sun_sin.all_in.archetype"
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.HEAL; ea.value = -60; ea.base_value = -60; ea.target = "SELF"
+	ea.effect_type = EffRes.EffectType.SACRIFICE_HP; ea.value = 60; ea.base_value = 60; ea.target = "SELF"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DAMAGE; eb.value = 188; eb.base_value = 188; eb.target = "SINGLE"
 	eb.damage_type = "slash"
 	c.effects = [ea, eb]; return c
 
 static func _last_stand() -> Resource:
-	# [F] 배수진 — RARE, 1코, SKILL: HEAL -80 SELF + BLOCK 280
+	# [F] 배수진 — RARE, 1코, SKILL: SACRIFICE_HP 80 + BLOCK 280
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.last_stand.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.last_stand.archetype"
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.HEAL; ea.value = -80; ea.base_value = -80; ea.target = "SELF"
+	ea.effect_type = EffRes.EffectType.SACRIFICE_HP; ea.value = 80; ea.base_value = 80; ea.target = "SELF"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 280; eb.base_value = 280
 	c.effects = [ea, eb]; return c

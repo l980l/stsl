@@ -26,7 +26,7 @@ effect.condition.enemy_hp_below,적의 HP가 %d% 이하라면,if enemy HP ≤%d%
 effect.summon_token.text,병사 %d명을 소환합니다.,Summon %d Soldiers,Invoque %d Soldats,Evoca %d Soldati,Invoca %d Soldados,兵士召喚 %d,Κάλεσε %d Στρατιώτες,召唤 %d 士兵,召唤 %d 士兵
 effect.charm.text,적 1명을 매혹 %d합니다.,Charm %d,Charme %d,Fascino %d,Encanto %d,魅惑 %d,Γοητεία %d,魅惑 %d,魅惑 %d
 effect.revive.text,사망한 아군 1명을 최대 체력의 %d%%로 부활시킵니다.,Revive with %d%% HP,Ressuscite avec %d%% PV,Rianima con %d%% PS,Revive con %d%% PV,復活 %d%%,Αναβίωση με %d%% HP,复活 %d%%,复活 %d%%
-effect.sacrifice_hp.text,자신의 체력 %d을 소모합니다.,Lose %d HP,Perds %d PV,Perdi %d PS,Pierde %d PV,自己HP -%d,Χάσε %d HP,自身生命 -%d,自身生命 -%d
+effect.sacrifice_hp.text,체력 %d을 잃습니다.,Lose %d HP,Perds %d PV,Perdi %d PS,Pierde %d PV,自己HP -%d,Χάσε %d HP,自身生命 -%d,自身生命 -%d
 effect.cost_zero_turn.text,이번 턴 남은 카드의 비용이 모두 0이 됩니다.,Cost 0 this turn,Coût 0 ce tour,Costo 0 questo turno,Coste 0 este turno,このターンコスト0,Κόστος 0 αυτόν τον γύρο,本回合费用为0,本回合费用为0
 effect.block_per_cards_played.text,이번 턴 사용한 카드 1장당 방어도 %d을 얻습니다.,%d Block per card played,%d Armure par carte jouée,%d Scudo per carta giocata,%d Escudo por carta jugada,カード数×%d ブロック,%d Άμυνα ανά παιγμένο φύλλο,牌数×%d 护甲,牌数×%d 护甲
 effect.on_kill_draw.text,적을 처치할 때마다 카드 %d장을 뽑습니다.,Draw %d on kill,Piochez %d par élimination,Pesca %d all'uccisione,Roba %d al matar,撃破時ドロー %d,Τράβηξε %d κατά την εξόντωση,击杀时抽 %d 张牌,击杀时抽 %d 张牌
