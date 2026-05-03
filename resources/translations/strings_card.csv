@@ -12,8 +12,14 @@ effect.consume_morale.text,사기→피해 %d,Morale -> %d Damage,Moral -> %d D�
 effect.poison_burst.text,독 즉발,Trigger Poison,Déclenche le Poison,Attiva Veleno,Detona Veneno,毒即発,Ενεργοποίηση Δηλητηρίου,毒性爆发,毒性爆发
 effect.counter_block.text,방어도×%d%%,%d%% of Block,%d%% de l'Armure,%d%% dello Scudo,%d%% del Escudo,ブロック×%d%%,%d%% της Άμυνας,护甲×%d%%,护甲×%d%%
 effect.cost_next.text,다음 비용 -%d,Next cost -%d,Coût suivant -%d,Prossimo costo -%d,Siguiente coste -%d,次のコスト -%d,Επόμενο κόστος -%d,下一次费用 -%d,下一次费用 -%d
-effect.conditional_dmg.text,%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s),%d/%d(%s)
+effect.conditional_dmg.text,%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s)
 effect.condition.has_debuffs,디버프 %d종↑,%d+ debuffs,%d+ débuffs,%d+ debuff,%d+ debuffs,デバフ%d種↑,%d+ αρνητικά,%d种异常↑,%d種異常↑
+effect.condition.has_poison,독 보유 시,if poisoned,si empoisonné,se avvelenato,si envenenado,毒保有時,αν δηλητηριασμένο,中毒时,中毒時
+effect.condition.has_poison_n,독 %d이상 시,if poison ≥%d,si poison ≥%d,se veleno ≥%d,si veneno ≥%d,毒%d以上時,αν δηλητήριο ≥%d,毒 ≥%d时,毒 ≥%d時
+effect.condition.has_morale,사기 보유 시,if has morale,si moral positif,se morale positivo,si moral positivo,士気保有時,αν έχει ηθικό,有士气时,有士氣時
+effect.condition.has_morale_n,사기 %d이상 시,if morale ≥%d,si moral ≥%d,se morale ≥%d,si moral ≥%d,士気%d以上時,αν ηθικό ≥%d,士气 ≥%d时,士氣 ≥%d時
+effect.condition.low_hp,HP 50% 이하 시,if HP ≤50%,si PV ≤50%,se PF ≤50%,si PV ≤50%,HP50%以下時,αν HP ≤50%,HP ≤50%时,HP ≤50%時
+effect.condition.very_low_hp,HP 30% 이하 시,if HP ≤30%,si PV ≤30%,se PF ≤30%,si PV ≤30%,HP30%以下時,αν HP ≤30%,HP ≤30%时,HP ≤30%時
 effect.summon_token.text,병사 소환 %d,Summon %d Soldiers,Invoque %d Soldats,Evoca %d Soldati,Invoca %d Soldados,兵士召喚 %d,Κάλεσε %d Στρατιώτες,召唤 %d 士兵,召唤 %d 士兵
 effect.charm.text,매혹 %d,Charm %d,Charme %d,Fascino %d,Encanto %d,魅惑 %d,Γοητεία %d,魅惑 %d,魅惑 %d
 effect.revive.text,부활 %d%%,Revive with %d%% HP,Ressuscite avec %d%% PV,Rianima con %d%% PS,Revive con %d%% PV,復活 %d%%,Αναβίωση με %d%% HP,复活 %d%%,复活 %d%%

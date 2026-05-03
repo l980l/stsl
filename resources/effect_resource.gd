@@ -101,11 +101,23 @@ func display_text() -> String:
 		EffectType.CONDITIONAL_DMG:
 			var cond_key: String = _STATUS_NAME_KEYS.get(status_type, "")
 			var cond_name: String
-			if status_type == "poison":
-				cond_name = tr("status.poison.name")
+			if status_type == "poison" or status_type == "has_poison":
+				cond_name = tr("effect.condition.has_poison")
+			elif status_type.begins_with("has_poison_"):
+				var n := status_type.trim_prefix("has_poison_").to_int()
+				cond_name = tr("effect.condition.has_poison_n").replace("%d", str(n))
 			elif status_type.begins_with("has_debuffs_"):
 				var n := status_type.trim_prefix("has_debuffs_").to_int()
-				cond_name = tr("effect.condition.has_debuffs") % n
+				cond_name = tr("effect.condition.has_debuffs").replace("%d", str(n))
+			elif status_type == "has_morale":
+				cond_name = tr("effect.condition.has_morale")
+			elif status_type.begins_with("has_morale_"):
+				var n := status_type.trim_prefix("has_morale_").to_int()
+				cond_name = tr("effect.condition.has_morale_n").replace("%d", str(n))
+			elif status_type == "low_hp":
+				cond_name = tr("effect.condition.low_hp")
+			elif status_type == "very_low_hp":
+				cond_name = tr("effect.condition.very_low_hp")
 			elif cond_key:
 				cond_name = tr(cond_key)
 			else:

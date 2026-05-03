@@ -243,7 +243,7 @@ func _generate_cards() -> void:
 			starter_count[c.card_name] = starter_count.get(c.card_name, 0) + 1
 		var starter_parts: Array = []
 		for cname in starter_count:
-			starter_parts.append("%s ×%d" % [cname, starter_count[cname]])
+			starter_parts.append("%s ×%d" % [tr(cname), starter_count[cname]])
 		md += "### 시작 덱\n- %s\n\n" % ", ".join(starter_parts)
 
 		# 시작 덱 카드도 CSV에 추가 (중복 제거)
@@ -257,7 +257,7 @@ func _generate_cards() -> void:
 			var eff1: String = "—" if max_lv < 1 else _format_effects(_apply_upgrade(card, 1))
 			var eff2: String = "—" if max_lv < 2 else _format_effects(_apply_upgrade(card, 2))
 			csv_rows.append([
-				hero["id"], card.card_name, card.cost,
+				hero["id"], tr(card.card_name), card.cost,
 				_card_type_name(card.card_type),
 				_rarity_name(card.rarity),
 				max_lv, eff0, eff1 if max_lv >= 1 else "", eff2 if max_lv >= 2 else ""
@@ -275,13 +275,13 @@ func _generate_cards() -> void:
 			var eff1: String = "—" if max_lv < 1 else _format_effects(_apply_upgrade(card, 1))
 			var eff2: String = "—" if max_lv < 2 else _format_effects(_apply_upgrade(card, 2))
 			md += "| %s | %d | %s | %s | %s | %s | %s |\n" % [
-				card.card_name, card.cost,
+				tr(card.card_name), card.cost,
 				_card_type_name(card.card_type),
 				_rarity_name(card.rarity),
 				eff0, eff1, eff2
 			]
 			csv_rows.append([
-				hero["id"], card.card_name, card.cost,
+				hero["id"], tr(card.card_name), card.cost,
 				_card_type_name(card.card_type),
 				_rarity_name(card.rarity),
 				max_lv, eff0, eff1 if max_lv >= 1 else "", eff2 if max_lv >= 2 else ""
