@@ -130,6 +130,18 @@ card.napoleon.emperors_assault.name,황제의 돌격,Emperor's Assault,Assaut de
 card.napoleon.emperors_assault.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
 card.napoleon.empire_glory.name,제국의 영광,Empire Glory,Gloire de l'Empire,Gloria dell'Impero,Gloria del Imperio,帝国の栄光,Δόξα της Αυτοκρατορίας,帝国荣光,帝国荣光
 card.napoleon.empire_glory.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,军团
+card.napoleon.emperors_power.name,황제의 권능,Emperor's Power,Pouvoir de l'Empereur,Potere dell'Imperatore,Poder del Emperador,皇帝の権能,Δύναμη του Αυτοκράτορα,皇帝的权能,皇帝的权能
+card.napoleon.emperors_power.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.conquest_decree.name,정복 칙령,Conquest Decree,Décret de conquête,Decreto di conquista,Decreto de conquista,征服の勅令,Διάταγμα κατάκτησης,征服令,征服令
+card.napoleon.conquest_decree.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.alps_crossing.name,알프스 횡단,Alps Crossing,Traversée des Alpes,Attraversamento delle Alpi,Cruce de los Alpes,アルプス越え,Διάσχιση των Άλπεων,翻越阿尔卑斯,翻越阿尔卑斯
+card.napoleon.alps_crossing.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
+card.napoleon.emperors_legion.name,황제의 군단,Emperor's Legion,Légion de l'Empereur,Legione dell'Imperatore,Legión del Emperador,皇帝の軍団,Λεγεώνα του Αυτοκράτορα,皇帝的军团,皇帝的军团
+card.napoleon.emperors_legion.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,군단,군단
+card.napoleon.emperors_will.name,황제의 의지,Emperor's Will,Volonté de l'Empereur,Volontà dell'Imperatore,Voluntad del Emperador,皇帝の意志,Θέληση του Αυτοκράτορα,皇帝的意志,皇帝的意志
+card.napoleon.emperors_will.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
+card.napoleon.reconnaissance.name,정찰,Reconnaissance,Reconnaissance,Ricognizione,Reconocimiento,偵察,Αναγνώριση,侦察,侦察
+card.napoleon.reconnaissance.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
 card.cleopatra.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライク,Χτύπημα,打击,打击
 card.cleopatra.strike.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
 card.cleopatra.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御

@@ -1,5 +1,8 @@
 # resources/cards/cards_napoleon.gd
 # 나폴레옹 카드 — starter 10 + pool 30 (돌격 10 / 군단 12 / 지휘 8)
+# 돌격: morale_per_turn + CONSUME_MORALE 스파인
+# 군단: summon_per_turn + DAMAGE_PER_TOKEN 스파인
+# 지휘: draw_per_turn + COST_ZERO 스파인
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
 
@@ -15,20 +18,25 @@ static func starter_deck() -> Array:
 
 static func pool() -> Array:
 	return [
-		# ── 돌격 10 ──
-		_swift_advance(), _hussar_charge(), _salvo(),
-		_arcole_breakthrough(), _cavalry_threat(),
-		_breakthrough_advance(), _austerlitz_maneuver(),
-		_one_man_army(), _emperors_assault(), _emperors_spirit(),
-		# ── 군단 12 ──
-		_grand_armee_shield(), _artillery_volley(), _borodino_bombardment(),
+		# ── 돌격 10 (F×3 / A×2 / P×2 / C×2 / Chaos×1) ──
+		_cavalry_threat(), _hussar_charge(), _austerlitz_maneuver(),   # F
+		_emperors_power(), _conquest_decree(),                          # A
+		_one_man_army(), _emperors_assault(),                           # P
+		_arcole_breakthrough(), _emperors_spirit(),                     # C
+		_alps_crossing(),                                               # Chaos
+		# ── 군단 12 (F×4 / A×2 / P×3 / C×2 / Chaos×1) ──
 		_trench_construction(), _guard_charge(),
-		_artillery_gather(), _imperial_artillery(), _imperial_infantry_call(),
-		_eagle_standard(), _great_army_siege(), _empire_glory(), _legion_charge(),
-		# ── 지휘 8 ──
-		_line_reform(), _marshal_appointment(), _emperors_command(),
-		_drum_beat(), _charge_bugle(), _victory_proclamation(),
-		_emperors_encirclement(), _glory_shout(),
+		_artillery_gather(), _imperial_infantry_call(),                 # F
+		_emperors_legion(), _imperial_artillery(),                      # A
+		_artillery_volley(), _borodino_bombardment(), _legion_charge(), # P
+		_eagle_standard(), _grand_armee_shield(),                       # C
+		_empire_glory(),                                                # Chaos
+		# ── 지휘 8 (F×2 / A×2 / P×2 / C×1 / Chaos×1) ──
+		_line_reform(), _charge_bugle(),                                # F
+		_emperors_will(), _glory_shout(),                               # A
+		_emperors_command(), _victory_proclamation(),                   # P
+		_emperors_encirclement(),                                       # C
+		_reconnaissance(),                                              # Chaos
 	]
 
 # ─────────────────────────────────────────
@@ -566,3 +574,86 @@ static func _glory_shout() -> Resource:
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
+
+# ─────────────────────────────────────────
+# v3 신규 카드 6장 (H6 재설계)
+# ─────────────────────────────────────────
+
+static func _emperors_power() -> Resource:
+	# 황제의 권능 — UNCOMMON, 1코, POWER, 돌격 [A]: 매턴 사기+1
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.emperors_power.name"; c.owner_id = "napoleon"
+	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.napoleon.emperors_power.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.morale_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	c.effects = [e]; return c
+
+static func _conquest_decree() -> Resource:
+	# 정복 칙령 — RARE, 1코, POWER, 돌격 [A]: 매턴 BLOCK+15
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.conquest_decree.name"; c.owner_id = "napoleon"
+	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.napoleon.conquest_decree.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.block_per_turn"; e.value = 15; e.base_value = 15; e.target = "SELF"
+	c.effects = [e]; return c
+
+static func _alps_crossing() -> Resource:
+	# 알프스 횡단 — RARE, 0코, SKILL, 돌격 [Chaos]: SACRIFICE 40 + ENERGY 3 + DRAW 2, EXHAUST
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.alps_crossing.name"; c.owner_id = "napoleon"
+	c.cost = 0; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.napoleon.alps_crossing.archetype"
+	c.is_exhaust = true
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
+	ea.value = 40; ea.base_value = 40; ea.target = "SELF"
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.ENERGY
+	eb.value = 3; eb.base_value = 3
+	var ec := EffRes.new()
+	ec.effect_type = EffRes.EffectType.DRAW
+	ec.value = 2; ec.base_value = 2
+	c.effects = [ea, eb, ec]; return c
+
+static func _emperors_legion() -> Resource:
+	# 황제의 군단 — RARE, 1코, POWER, 군단 [A]: 매턴 토큰+1
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.emperors_legion.name"; c.owner_id = "napoleon"
+	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.napoleon.emperors_legion.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.summon_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	c.effects = [e]; return c
+
+static func _emperors_will() -> Resource:
+	# 황제의 의지 — UNCOMMON, 1코, POWER, 지휘 [A]: 매턴 드로우+1
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.emperors_will.name"; c.owner_id = "napoleon"
+	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.napoleon.emperors_will.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.draw_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	c.effects = [e]; return c
+
+static func _reconnaissance() -> Resource:
+	# 정찰 — UNCOMMON, 1코, SKILL, 지휘 [Chaos]: DRAW 2
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.reconnaissance.name"; c.owner_id = "napoleon"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.napoleon.reconnaissance.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.DRAW
+	e.value = 2; e.base_value = 2
+	c.effects = [e]; return c

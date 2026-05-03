@@ -47,16 +47,16 @@ func test_napoleon_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_napoleon_rarity_distribution")
 	var gm = _load_gm()
 	var pool: Array = gm._napoleon_card_pool()
-	_assert(pool.size() == 40, "나폴레옹 풀 40장")
+	_assert(pool.size() == 30, "나폴레옹 풀 30장 (H6 재설계)")
 	var counts: Dictionary = _count_rarities(pool)
-	# COMMON 8: 신속기동, 전열재편, 전진명령, 참호구축, 척후정찰, 북소리, 진격나팔, 기병위협
-	_assert(counts["COMMON"] == 8, "나폴레옹 COMMON 8장 (실제: %d)" % counts["COMMON"])
-	# UNCOMMON 12: 경기병돌격, 그랑다르메방패, 살보사격, 원수서임, 근위대돌격, 전선돌파, 지휘관눈, 보급선확보, 포병집결, 기동사격, 교두보점령, 황실포병대
-	_assert(counts["UNCOMMON"] == 14, "나폴레옹 UNCOMMON 14장 (실제: %d)" % counts["UNCOMMON"])
-	# RARE 13: 아르콜레돌파, 포병일제사격, 예나기습, 보로디노포격, 총공세명령, 제국보병소집, 아우스터리츠기동, 워털루결의, 독수리군기, 승리포고, 대육군포위전, 황제포위령, 일기당천
-	_assert(counts["RARE"] == 13, "나폴레옹 RARE 13장 (실제: %d)" % counts["RARE"])
-	# LEGENDARY 3: 황제명령, 전략적후퇴, 황제돌격
-	_assert(counts["LEGENDARY"] == 3, "나폴레옹 LEGENDARY 3장 (실제: %d)" % counts["LEGENDARY"])
+	# COMMON 4: 기병위협, 참호구축, 전열재편, 진격나팔
+	_assert(counts["COMMON"] == 4, "나폴레옹 COMMON 4장 (실제: %d)" % counts["COMMON"])
+	# UNCOMMON 10: 경기병돌격, 황제의권능, 근위대돌격, 포병집결, 황실포병대, 군단진격, 그랑다르메방패, 황제의의지, 영광의함성, 정찰
+	_assert(counts["UNCOMMON"] == 10, "나폴레옹 UNCOMMON 10장 (실제: %d)" % counts["UNCOMMON"])
+	# RARE 12: 아우스터리츠기동, 정복칙령, 일기당천, 아르콜레돌파, 알프스횡단, 제국보병소집, 황제군단, 포병일제사격, 보로디노포격, 독수리군기, 승리포고, 황제포위령
+	_assert(counts["RARE"] == 12, "나폴레옹 RARE 12장 (실제: %d)" % counts["RARE"])
+	# LEGENDARY 2: 황제돌격, 황제명령
+	_assert(counts["LEGENDARY"] == 2, "나폴레옹 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
 	# DIVINE 2: 황제기개, 제국영광
 	_assert(counts["DIVINE"] == 2, "나폴레옹 DIVINE 2장 (실제: %d)" % counts["DIVINE"])
 
