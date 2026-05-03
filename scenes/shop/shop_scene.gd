@@ -43,6 +43,7 @@ var _confirm_upgrade_btn:   Button    = null
 func _ready() -> void:
 	_inventory = GameManager.generate_shop_inventory()
 	_build_ui()
+	AudioManager.play_bgm_dynamic("shop", "")
 
 func _input(ev: InputEvent) -> void:
 	if _active_scroll == null:

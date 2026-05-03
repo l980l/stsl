@@ -28,6 +28,7 @@ var _confirm_upgrade_btn:   Button          = null
 func _ready() -> void:
 	_build_ui()
 	_play_open()
+	AudioManager.play_bgm_dynamic("rest", "")
 
 func _input(ev: InputEvent) -> void:
 	if _upgrade_scroll == null:

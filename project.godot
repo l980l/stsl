@@ -30,6 +30,8 @@ IconUtils="*res://autoload/icon_utils.gd"
 SacredPalette="*res://autoload/sacred_palette.gd"
 SacredTheme="*res://autoload/sacred_theme.gd"
 SceneTransition="*res://autoload/scene_transition.gd"
+AudioManager="*res://autoload/audio_manager.gd"
+UISound="*res://autoload/ui_sound.gd"
 
 [display]
 
@@ -44,6 +46,7 @@ enabled=PackedStringArray("res://addons/BurstParticles2D/plugin.cfg")
 [gui]
 
 theme/custom="res://resources/theme/global_theme.tres"
+timers/tooltip_delay_sec=0.0
 
 [internationalization]
 

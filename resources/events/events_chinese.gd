@@ -15,6 +15,7 @@ static func _queen_mother_peach() -> Resource:
 	var e: Resource = EventRes.new()
 	e.event_name = "event.chinese.queen_mother_peach.name"
 	e.description = "event.chinese.queen_mother_peach.desc"
+	e.bgm_type = "mysterious"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.chinese.queen_mother_peach.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.HEAL; ca.value = 40
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.chinese.queen_mother_peach.choice_2"
@@ -25,6 +26,7 @@ static func _monkey_king_challenge() -> Resource:
 	var e: Resource = EventRes.new()
 	e.event_name = "event.chinese.monkey_king_challenge.name"
 	e.description = "event.chinese.monkey_king_challenge.desc"
+	e.bgm_type = "fortune"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.chinese.monkey_king_challenge.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.ADD_RELIC_GAMBLE
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.chinese.monkey_king_challenge.choice_2"
@@ -35,6 +37,7 @@ static func _tang_monk_scripture() -> Resource:
 	var e: Resource = EventRes.new()
 	e.event_name = "event.chinese.tang_monk_scripture.name"
 	e.description = "event.chinese.tang_monk_scripture.desc"
+	e.bgm_type = "mysterious"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.chinese.tang_monk_scripture.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.DRAW_UP; ca.value = 1
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.chinese.tang_monk_scripture.choice_2"
@@ -45,6 +48,7 @@ static func _eight_immortals_feast() -> Resource:
 	var e: Resource = EventRes.new()
 	e.event_name = "event.chinese.eight_immortals_feast.name"
 	e.description = "event.chinese.eight_immortals_feast.desc"
+	e.bgm_type = "encounter"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.chinese.eight_immortals_feast.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.HEAL; ca.value = 50; ca.cost_gold = 40
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.chinese.eight_immortals_feast.choice_2"
@@ -57,6 +61,7 @@ static func _celestial_market() -> Resource:
 	var e: Resource = EventRes.new()
 	e.event_name = "event.chinese.celestial_market.name"
 	e.description = "event.chinese.celestial_market.desc"
+	e.bgm_type = "fortune"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.chinese.celestial_market.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.ADD_RELIC; ca.cost_gold = 80
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.chinese.celestial_market.choice_2"
@@ -69,6 +74,7 @@ static func _dragon_king_invitation() -> Resource:
 	var e: Resource = EventRes.new()
 	e.event_name = "event.chinese.dragon_king_invitation.name"
 	e.description = "event.chinese.dragon_king_invitation.desc"
+	e.bgm_type = "encounter"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.chinese.dragon_king_invitation.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.GOLD; ca.value = 90; ca.cost_hp = 25
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.chinese.dragon_king_invitation.choice_2"
@@ -81,6 +87,7 @@ static func _lu_dongbin_sword() -> Resource:
 	var e: Resource = EventRes.new()
 	e.event_name = "event.chinese.lu_dongbin_sword.name"
 	e.description = "event.chinese.lu_dongbin_sword.desc"
+	e.bgm_type = "mysterious"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.chinese.lu_dongbin_sword.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.REMOVE_CARD; ca.value = 1
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.chinese.lu_dongbin_sword.choice_2"
@@ -91,6 +98,7 @@ static func _pangu_fragment() -> Resource:
 	var e: Resource = EventRes.new()
 	e.event_name = "event.chinese.pangu_fragment.name"
 	e.description = "event.chinese.pangu_fragment.desc"
+	e.bgm_type = "encounter"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.chinese.pangu_fragment.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.ADD_HERO
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.chinese.pangu_fragment.choice_2"
@@ -101,6 +109,7 @@ static func _shennong_herbs() -> Resource:
 	var e: Resource = EventRes.new()
 	e.event_name = "event.chinese.shennong_herbs.name"
 	e.description = "event.chinese.shennong_herbs.desc"
+	e.bgm_type = "encounter"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.chinese.shennong_herbs.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.HEAL; ca.value = 40; ca.cost_hp = 15
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.chinese.shennong_herbs.choice_2"
@@ -113,6 +122,7 @@ static func _phoenix_rebirth() -> Resource:
 	var e: Resource = EventRes.new()
 	e.event_name = "event.chinese.phoenix_rebirth.name"
 	e.description = "event.chinese.phoenix_rebirth.desc"
+	e.bgm_type = "mysterious"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.chinese.phoenix_rebirth.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.ADD_RELIC_GAMBLE
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.chinese.phoenix_rebirth.choice_2"
