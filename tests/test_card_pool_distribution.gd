@@ -9,6 +9,7 @@ var failed: int = 0
 func run_all() -> Dictionary:
 	test_napoleon_rarity_distribution()
 	test_yi_sun_sin_rarity_distribution()
+	test_yi_sun_sin_archetype_distribution()
 	test_cleopatra_rarity_distribution()
 	test_cleopatra_archetype_distribution()
 	test_joan_rarity_distribution()
@@ -63,18 +64,32 @@ func test_yi_sun_sin_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_yi_sun_sin_rarity_distribution")
 	var gm = _load_gm()
 	var pool: Array = gm._yi_sun_sin_card_pool()
-	_assert(pool.size() == 41, "이순신 풀 41장")
+	_assert(pool.size() == 30, "이순신 풀 30장 (H4 재설계)")
 	var counts: Dictionary = _count_rarities(pool)
-	# COMMON 7: 거북선방패, 해군기동, 장갑강화, 방패막이, 군기진작, 진형결속, 기사회생
-	_assert(counts["COMMON"] == 7, "이순신 COMMON 7장 (실제: %d)" % counts["COMMON"])
-	# UNCOMMON 12: 거북선돌격, 반격, 진형강화, 수군훈련, 불굴, 연속방어, 함포사격, 사기고취, 전열정비, 이판사판, 사즉생돌격, 독전
-	_assert(counts["UNCOMMON"] == 13, "이순신 UNCOMMON 13장 (실제: %d)" % counts["UNCOMMON"])
-	# RARE 15: 철갑, 학익진, 엄정한훈련, 배수진, 철벽, 돌격태세, 반격태세, 함대결집, 진형사수, 함대지휘, 일제사격, 사지결단, 위기돌파, 혈전, 전사의각오
-	_assert(counts["RARE"] == 15, "이순신 RARE 15장 (실제: %d)" % counts["RARE"])
-	# LEGENDARY 4: 한산대첩, 필사즉생, 지휘본능, 불사조
+	# COMMON 4: 거북선방패, 진형결속, 군기진작, 기사회생
+	_assert(counts["COMMON"] == 4, "이순신 COMMON 4장 (실제: %d)" % counts["COMMON"])
+	# UNCOMMON 8: 거북선돌격, 반격, 연속방어, 진형강화, 수군훈련, 전열정비, 이판사판, 죽음의결의
+	_assert(counts["UNCOMMON"] == 8, "이순신 UNCOMMON 8장 (실제: %d)" % counts["UNCOMMON"])
+	# RARE 14: 거북의권능, 함대연합, 일제사격, 함포일제사, 돌격태세, 함대지휘, 진형의힘, 진형사수, 엄정한훈련, 배수진, 전사의각오, 위기돌파, 사지결단, 혈전
+	_assert(counts["RARE"] == 14, "이순신 RARE 14장 (실제: %d)" % counts["RARE"])
+	# LEGENDARY 4: 귀선출항, 지휘본능, 필사즉생, 불사조
 	_assert(counts["LEGENDARY"] == 4, "이순신 LEGENDARY 4장 (실제: %d)" % counts["LEGENDARY"])
-	# DIVINE 2: 노량해전, 학익진완성
-	_assert(counts["DIVINE"] == 2, "이순신 DIVINE 2장 (실제: %d)" % counts["DIVINE"])
+	# DIVINE 0
+	_assert(counts["DIVINE"] == 0, "이순신 DIVINE 0장 (실제: %d)" % counts["DIVINE"])
+
+func test_yi_sun_sin_archetype_distribution() -> void:
+	print("[TestCardPoolDistribution] test_yi_sun_sin_archetype_distribution")
+	var gm = _load_gm()
+	var pool: Array = gm._yi_sun_sin_card_pool()
+	var archetypes := {"거북선": 0, "학익진": 0, "필사즉생": 0}
+	for c in pool:
+		var a_key: String = c.get("archetype") if c.get("archetype") != null else ""
+		var a: String = TranslationServer.translate(a_key) if a_key != "" else ""
+		if a in archetypes:
+			archetypes[a] += 1
+	_assert(archetypes["거북선"] == 10, "이순신 거북선 10장 (실제: %d)" % archetypes["거북선"])
+	_assert(archetypes["학익진"] == 10, "이순신 학익진 10장 (실제: %d)" % archetypes["학익진"])
+	_assert(archetypes["필사즉생"] == 10, "이순신 필사즉생 10장 (실제: %d)" % archetypes["필사즉생"])
 
 func test_cleopatra_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_cleopatra_rarity_distribution")

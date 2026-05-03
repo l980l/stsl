@@ -279,7 +279,7 @@ card.yi_sun_sin.regroup.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,A
 card.yi_sun_sin.fleet_command.name,함대 지휘,Fleet Command,Commandement de la flotte,Comando della flotta,Mando de la flota,艦隊指揮,Διοίκηση Στόλου,舰队指挥,舰队指挥
 card.yi_sun_sin.fleet_command.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
 card.yi_sun_sin.volley_fire.name,일제 사격,Volley Fire,Feu de volée,Fuoco di volata,Fuego de volea,一斉射撃,Ομοβροντία,一齐射击,一齐射击
-card.yi_sun_sin.volley_fire.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.volley_fire.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
 card.yi_sun_sin.command_instinct.name,지휘 본능,Command Instinct,Instinct de commandement,Istinto di comando,Instinto de mando,指揮本能,Ένστικτο Διοίκησης,指挥本能,指挥本能
 card.yi_sun_sin.command_instinct.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
 card.yi_sun_sin.formation_bond.name,진형 결속,Formation Bond,Lien de formation,Legame di formazione,Vínculo de formación,陣形結束,Δεσμός Σχηματισμού,阵型团结,阵型团结
@@ -673,4 +673,16 @@ effect.sacrifice_payoff.text,HP 희생 100당 적에게 피해 %d을 입힙니�
 effect.sacrifice_payoff.block.text,HP 희생 100당 방어도 %d을 얻습니다.,Gain %d Block per 100 HP sacrificed,Gagnez %d Bloc par 100 PV sacrifiés,Ottieni %d Blocco per 100 PV sacrificati,Gana %d Bloqueo por 100 PV sacrificados,HP犠牲100毎に %d ブロック,Απόκτηση %d Μπλοκ ανά 100 HP,每牺牲100HP获得 %d 格挡,每牺牲100HP获得 %d 格挡
 effect.charm_to_damage.text,매혹 스택을 소비해 스택당 피해 %d을 입힙니다.,Convert charm: %d damage per stack,Convertit charme en %d dégâts/pile,Converte fascino in %d danno/pila,Convierte encanto en %d daño/pila,魅了を %d ダメージに変換,Μετατρέπει γοητεία σε %d ζημιά/στοίβα,将魅惑转为每层 %d 伤害,将魅惑转为每层 %d 伤害
 effect.multi_hit_random.text,랜덤 적에게 %d회 피해 %d을 입힙니다.,Hit random enemies %d×%d,Frappe aléatoire %d×%d,Colpisce casuale %d×%d,Golpea aleatorio %d×%d,ランダム敵 %d×%d ダメージ,Τυχαία %d×%d ζημιά,随机攻击 %d×%d 伤害,随机攻击 %d×%d 伤害
+card.yi_sun_sin.turtle_power.name,거북의 권능,Turtle Power,Turtle Power,Turtle Power,Turtle Power,亀の権能,Turtle Power,亀甲权能,亀甲权能
+card.yi_sun_sin.turtle_power.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.fleet_alliance.name,함대 연합,Fleet Alliance,Alliance de la flotte,Alleanza della flotta,Alianza de la flota,艦隊連合,Συμμαχία Στόλου,舰队联合,舰队联合
+card.yi_sun_sin.fleet_alliance.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.fleet_fire.name,함포 일제사,Fleet Broadside,Broadside de la flotte,Fiancata della flotta,Andanada de la flota,艦砲斉射,Βολή Στόλου,舰炮齐射,舰炮齐射
+card.yi_sun_sin.fleet_fire.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.turtle_launch.name,귀선 출항,Turtle Launch,Lancement de la tortue,Lancio della tartaruga,Lanzamiento tortuga,亀船出航,Εκτόξευση Χελώνας,龟船出航,龟船出航
+card.yi_sun_sin.turtle_launch.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
+card.yi_sun_sin.formation_strength.name,진형의 힘,Formation Strength,Force de formation,Forza della formazione,Fuerza de formación,陣形の力,Δύναμη Σχηματισμού,阵型之力,阵型之力
+card.yi_sun_sin.formation_strength.archetype,학익진,Crane Wing,Aile de grue,Ala di gru,Ala de grulla,鶴翼の陣,Σχηματισμός Γερανού,鹤翼阵,鹤翼阵
+card.yi_sun_sin.death_resolve.name,죽음의 결의,Death Resolve,Résolution mortelle,Risolutezza della morte,Resolución de muerte,死の決意,Απόφαση Θανάτου,死之决意,死之决意
+card.yi_sun_sin.death_resolve.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
 effect.damage_per_status_type.text,디버프 종류당 피해 %d을 입힙니다.,Deal %d per debuff type,Inflige %d par type de débuff,Infligge %d per tipo debuff,Inflige %d por tipo desventaja,デバフ種 %d ダメージ,Ζημιά %d ανά τύπο εξασθένησης,每种减益造成 %d 伤害,每种减益造成 %d 伤害
