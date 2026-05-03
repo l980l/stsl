@@ -737,6 +737,24 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					for i in range(_enemies.size()):
 						if _enemy_alive[i]:
 							_mhr_living.append(i)
+			EffectRes.EffectType.DAMAGE_PER_STATUS_TYPE:
+				var _dpst_targets: Array = []
+				if effect.target == "ALL":
+					for i in range(_enemies.size()):
+						if _enemy_alive[i]:
+							_dpst_targets.append(i)
+				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+					_dpst_targets.append(target_enemy_index)
+				for _di in _dpst_targets:
+					var _dst: Dictionary = _enemy_status[_di]
+					var _types: int = 0
+					if _dst.get("weak", 0) > 0: _types += 1
+					if _dst.get("vulnerable", 0) > 0: _types += 1
+					if _dst.get("poison", 0) > 0: _types += 1
+					if _dst.get("charm", 0) > 0: _types += 1
+					if _types > 0:
+						_deal_damage_to_enemy(_di, _types * effect.value, effect.damage_type)
+						_last_attacker[_di] = card.owner_id
 	# power.echo_next_attack: 이 ATTACK 카드 효과 전체를 1회 재시전 (재진입 가드)
 	if not _in_echo_replay and card.card_type == CardRes.CardType.ATTACK:
 		var _echo_key: String = "power.echo_next_attack:" + card.owner_id

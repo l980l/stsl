@@ -40,6 +40,7 @@ enum EffectType {
 	SACRIFICE_PAYOFF,     # power.sacrifice_bank 읽기 → (뱅크/100) × value dmg 또는 block (status_type="block")
 	CHARM_TO_DAMAGE,      # 대상 적 charm 스택 소비 → 스택당 bonus_value dmg
 	MULTI_HIT_RANDOM,     # 랜덤 적에게 hit_count회 value 피해 (같은 적 반복 가능)
+	DAMAGE_PER_STATUS_TYPE, # 대상 적의 디버프 종류 수(weak/vuln/poison/charm) × value 피해
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
@@ -168,4 +169,6 @@ func display_text() -> String:
 			return TranslationServer.translate("effect.charm_to_damage.text") % bonus_value
 		EffectType.MULTI_HIT_RANDOM:
 			return TranslationServer.translate("effect.multi_hit_random.text") % [hit_count, value]
+		EffectType.DAMAGE_PER_STATUS_TYPE:
+			return TranslationServer.translate("effect.damage_per_status_type.text") % value
 	return ""

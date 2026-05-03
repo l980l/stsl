@@ -10,6 +10,7 @@ func run_all() -> Dictionary:
 	test_napoleon_rarity_distribution()
 	test_yi_sun_sin_rarity_distribution()
 	test_cleopatra_rarity_distribution()
+	test_cleopatra_archetype_distribution()
 	test_joan_rarity_distribution()
 	test_joan_archetype_distribution()
 	test_genghis_rarity_distribution()
@@ -79,18 +80,32 @@ func test_cleopatra_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_cleopatra_rarity_distribution")
 	var gm = _load_gm()
 	var pool: Array = gm._cleopatra_card_pool()
-	_assert(pool.size() == 39, "클레오파트라 풀 39장")
+	_assert(pool.size() == 30, "클레오파트라 풀 30장 (H2 재설계)")
 	var counts: Dictionary = _count_rarities(pool)
-	# COMMON 8: 독씨앗, 이시스가호, 독안개살포, 밀납덫, 모래폭풍, 나일축복, 뱀눈빛, 이중독니
-	_assert(counts["COMMON"] == 8, "클레오파트라 COMMON 8장 (실제: %d)" % counts["COMMON"])
-	# UNCOMMON 12: 아스프독니, 사막독무, 저주시선, 유혹, 유혹눈길, 독향연, 파라오저주, 나일흐름, 뱀독무, 매혹언어, 사막약법, 독심판
-	_assert(counts["UNCOMMON"] == 12, "클레오파트라 UNCOMMON 12장 (실제: %d)" % counts["UNCOMMON"])
-	# RARE 12: 나일안개, 독사마수, 파라오독, 람세스방패, 이시스분노, 독살의식, 여왕포옹, 저주낙인, 나일파멸, 매혹강습, 파라오분노, 저주교차로
+	# COMMON 3: 독의씨앗, 모래폭풍, 뱀의눈빛
+	_assert(counts["COMMON"] == 3, "클레오파트라 COMMON 3장 (실제: %d)" % counts["COMMON"])
+	# UNCOMMON 9: 아스프독니, 독의향연, 독의잔치, 독의정화, 저주의시선, 사막의비책, 유혹, 파라오칙령, 매혹의언어
+	_assert(counts["UNCOMMON"] == 9, "클레오파트라 UNCOMMON 9장 (실제: %d)" % counts["UNCOMMON"])
+	# RARE 13: 나일안개, 독사권능, 파라오독력, 독살의식, 나일분노, 람세스방패, 이시스진노, 저주낙인, 파라오분노, 독꽃만개, 여왕위엄, 매혹향기, 매혹처형
 	_assert(counts["RARE"] == 13, "클레오파트라 RARE 13장 (실제: %d)" % counts["RARE"])
-	# LEGENDARY 4: 나일분노, 파라오명, 독왕좌, 이시스심판
+	# LEGENDARY 4: 나일천벌, 독의옥좌, 이시스심판, 여왕포옹
 	_assert(counts["LEGENDARY"] == 4, "클레오파트라 LEGENDARY 4장 (실제: %d)" % counts["LEGENDARY"])
-	# DIVINE 2: 클레오파트라입맞춤, 세케메트저주
-	_assert(counts["DIVINE"] == 2, "클레오파트라 DIVINE 2장 (실제: %d)" % counts["DIVINE"])
+	# DIVINE 1: 클레오입맞춤
+	_assert(counts["DIVINE"] == 1, "클레오파트라 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
+
+func test_cleopatra_archetype_distribution() -> void:
+	print("[TestCardPoolDistribution] test_cleopatra_archetype_distribution")
+	var gm = _load_gm()
+	var pool: Array = gm._cleopatra_card_pool()
+	var archetypes := {"독살": 0, "저주": 0, "조종": 0}
+	for c in pool:
+		var a_key: String = c.get("archetype") if c.get("archetype") != null else ""
+		var a: String = TranslationServer.translate(a_key) if a_key != "" else ""
+		if a in archetypes:
+			archetypes[a] += 1
+	_assert(archetypes["독살"] == 12, "클레오파트라 독살 12장 (실제: %d)" % archetypes["독살"])
+	_assert(archetypes["저주"] == 10, "클레오파트라 저주 10장 (실제: %d)" % archetypes["저주"])
+	_assert(archetypes["조종"] == 8, "클레오파트라 조종 8장 (실제: %d)" % archetypes["조종"])
 
 func test_joan_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_joan_rarity_distribution")

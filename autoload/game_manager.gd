@@ -175,7 +175,7 @@ func start_run(initial_hero_id: String = "napoleon", chapter: int = 1) -> void:
 				_NapoleonCards._salvo(),            # projectile
 				_NapoleonCards._artillery_volley(), # explosive
 				_CleopatraCards._venom_needle(),    # poison
-				_CleopatraCards._charming_assault(),# curse
+				_CleopatraCards._sandstorm(),       # curse
 				_MusashiCards._mushin_blade(),      # divine
 				_MusashiCards._defend(),            # block
 			]

@@ -627,8 +627,26 @@ card.napoleon.legion_charge.name,군단의 진격,Legion Charge,Charge de la lé
 card.napoleon.legion_charge.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,軍團
 card.napoleon.glory_shout.name,영광의 함성,Glory Shout,Cri de gloire,Grido di gloria,Grito de gloria,栄光の叫び,Κραυγή Δόξας,荣耀呐喊,榮耀吶喊
 card.napoleon.glory_shout.archetype,사기,Morale,Moral,Morale,Moral,士気,Ηθικό,士气,士氣
-card.cleopatra.venom_bloom.name,독의 증식,Venom Bloom,Floraison vénéneuse,Fioritura velenosa,Floración venenosa,毒の増殖,Ανθός Δηλητηρίου,毒性增殖,毒性增殖
-card.cleopatra.venom_bloom.archetype,독,Poison,Poison,Veleno,Veneno,毒,Δηλητήριο,毒,毒
+card.cleopatra.venom_bloom.name,독꽃의 만개,Venom Bloom,Floraison vénéneuse,Fioritura velenosa,Floración venenosa,毒の増殖,Ανθός Δηλητηρίου,毒性增殖,毒性增殖
+card.cleopatra.venom_bloom.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.serpent_power.name,독사의 권능,Serpent Power,Pouvoir du Serpent,Potere del Serpente,Poder de la Serpiente,毒蛇の権能,Δύναμη του Φιδιού,毒蛇之能,毒蛇之能
+card.cleopatra.serpent_power.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.pharaoh_venom.name,파라오의 독력,Pharaoh's Venom,Venin du Pharaon,Veleno del Faraone,Veneno del Faraón,ファラオの毒力,Δηλητήριο του Φαραώ,法老的毒力,法老的毒力
+card.cleopatra.pharaoh_venom.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.nile_verdict.name,나일의 천벌,Nile Verdict,Verdict du Nil,Verdetto del Nilo,Veredicto del Nilo,ナイルの天罰,Ετυμηγορία του Νείλου,尼罗河天罚,尼罗河天罚
+card.cleopatra.nile_verdict.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.poison_party.name,독의 잔치,Poison Party,Festin de Venin,Festa del Veleno,Fiesta del Veneno,毒の宴,Γιορτή Δηλητηρίου,毒之盛宴,毒之盛宴
+card.cleopatra.poison_party.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.poison_purge.name,독의 정화,Poison Purge,Purge du Venin,Purga del Veleno,Purga del Veneno,毒の浄化,Εκκαθάριση Δηλητηρίου,毒之净化,毒之净化
+card.cleopatra.poison_purge.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.isis_wrath.name,이시스의 진노,Isis' Wrath,Courroux d'Isis,Ira di Iside,Ira de Isis,イシスの憤怒,Οργή της Ίσιδας,伊西斯之怒,伊西斯之怒
+card.cleopatra.isis_wrath.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
+card.cleopatra.queens_dignity.name,여왕의 위엄,Queen's Dignity,Dignité de la Reine,Dignità della Regina,Dignidad de la Reina,女王の威厳,Αξιοπρέπεια της Βασίλισσας,女王的威严,女王的威严
+card.cleopatra.queens_dignity.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.charming_perfume.name,매혹의 향기,Charming Perfume,Parfum Envoûtant,Profumo Incantevole,Perfume Encantador,魅惑の香り,Γοητευτικό Άρωμα,魅惑香气,魅惑香气
+card.cleopatra.charming_perfume.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.charm_execution.name,매혹의 처형,Charm Execution,Exécution Charmante,Esecuzione Ammaliante,Ejecución Encantadora,魅惑の処刑,Εκτέλεση Γοητείας,魅惑处决,魅惑处决
+card.cleopatra.charm_execution.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.yi_sun_sin.discard_focus.name,결단의 정리,Discard Focus,Concentration et défausse,Concentrazione e scarto,Concentración y descarte,決断の整理,Ανασύνταξη Εστίασης,弃牌聚焦,棄牌聚焦
 card.yi_sun_sin.discard_focus.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龜船
 card.tag.exhaust,소모,Exhaust,Épuisement,Esaurimento,Agotamiento,消耗,Εξάντληση,消耗,消耗
@@ -639,3 +657,4 @@ effect.sacrifice_payoff.text,HP 희생 100당 적에게 피해 %d을 입힙니�
 effect.sacrifice_payoff.block.text,HP 희생 100당 방어도 %d을 얻습니다.,Gain %d Block per 100 HP sacrificed,Gagnez %d Bloc par 100 PV sacrifiés,Ottieni %d Blocco per 100 PV sacrificati,Gana %d Bloqueo por 100 PV sacrificados,HP犠牲100毎に %d ブロック,Απόκτηση %d Μπλοκ ανά 100 HP,每牺牲100HP获得 %d 格挡,每牺牲100HP获得 %d 格挡
 effect.charm_to_damage.text,매혹 스택을 소비해 스택당 피해 %d을 입힙니다.,Convert charm: %d damage per stack,Convertit charme en %d dégâts/pile,Converte fascino in %d danno/pila,Convierte encanto en %d daño/pila,魅了を %d ダメージに変換,Μετατρέπει γοητεία σε %d ζημιά/στοίβα,将魅惑转为每层 %d 伤害,将魅惑转为每层 %d 伤害
 effect.multi_hit_random.text,랜덤 적에게 %d회 피해 %d을 입힙니다.,Hit random enemies %d×%d,Frappe aléatoire %d×%d,Colpisce casuale %d×%d,Golpea aleatorio %d×%d,ランダム敵 %d×%d ダメージ,Τυχαία %d×%d ζημιά,随机攻击 %d×%d 伤害,随机攻击 %d×%d 伤害
+effect.damage_per_status_type.text,디버프 종류당 피해 %d을 입힙니다.,Deal %d per debuff type,Inflige %d par type de débuff,Infligge %d per tipo debuff,Inflige %d por tipo desventaja,デバフ種 %d ダメージ,Ζημιά %d ανά τύπο εξασθένησης,每种减益造成 %d 伤害,每种减益造成 %d 伤害
