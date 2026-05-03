@@ -23,6 +23,10 @@ enum Rarity {
 @export var art: Texture2D
 @export var play_animation: String = ""
 @export var archetype: String = ""
+@export var is_exhaust: bool = false   # 사용 후 소멸
+@export var is_ethereal: bool = false  # 턴 끝 손에 있으면 소멸
+@export var is_retain: bool = false    # 턴 끝 손에 남음
+@export var is_innate: bool = false    # 전투 시작 시 손패 보장
 
 func max_upgrade_level() -> int:
 	match rarity:
