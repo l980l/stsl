@@ -150,12 +150,11 @@ func test_musashi_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_musashi_rarity_distribution")
 	var MusaCards = load("res://resources/cards/cards_musashi.gd")
 	var pool: Array = MusaCards.pool()
-	_assert(pool.size() == 41, "무사시 풀 41장")
+	_assert(pool.size() == 30, "무사시 풀 30장 (H1 재설계)")
 	var counts: Dictionary = _count_rarities(pool)
-	# starter_deck(strike/defend) 제외 — COMMON 8장
-	_assert(counts["COMMON"] == 8, "무사시 COMMON 8장 (실제: %d)" % counts["COMMON"])
-	_assert(counts["UNCOMMON"] == 15, "무사시 UNCOMMON 15장 (실제: %d)" % counts["UNCOMMON"])
-	_assert(counts["RARE"] == 15, "무사시 RARE 15장 (실제: %d)" % counts["RARE"])
+	_assert(counts["COMMON"] == 5, "무사시 COMMON 5장 (실제: %d)" % counts["COMMON"])
+	_assert(counts["UNCOMMON"] == 12, "무사시 UNCOMMON 12장 (실제: %d)" % counts["UNCOMMON"])
+	_assert(counts["RARE"] == 10, "무사시 RARE 10장 (실제: %d)" % counts["RARE"])
 	_assert(counts["LEGENDARY"] == 2, "무사시 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
 	_assert(counts["DIVINE"] == 1, "무사시 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
 
@@ -165,10 +164,10 @@ func test_musashi_archetype_distribution() -> void:
 	var pool: Array = MusaCards.pool()
 	var archetypes := {"이도류": 0, "결투": 0, "무심": 0}
 	for c in pool:
-		var a: String = c.get("archetype") if c.get("archetype") != null else ""
+		var a_key: String = c.get("archetype") if c.get("archetype") != null else ""
+		var a: String = TranslationServer.translate(a_key) if a_key != "" else ""
 		if a in archetypes:
 			archetypes[a] += 1
-	# starter_deck 제외: 이도류 12, 결투 12, 무심 14
-	_assert(archetypes["이도류"] == 12, "무사시 이도류 12장 (실제: %d)" % archetypes["이도류"])
-	_assert(archetypes["결투"] == 12, "무사시 결투 12장 (실제: %d)" % archetypes["결투"])
-	_assert(archetypes["무심"] == 14, "무사시 무심 14장 (실제: %d)" % archetypes["무심"])
+	_assert(archetypes["이도류"] == 10, "무사시 이도류 10장 (실제: %d)" % archetypes["이도류"])
+	_assert(archetypes["결투"] == 10, "무사시 결투 10장 (실제: %d)" % archetypes["결투"])
+	_assert(archetypes["무심"] == 10, "무사시 무심 10장 (실제: %d)" % archetypes["무심"])

@@ -3,6 +3,7 @@ class_name BattleManagerClass
 extends Node
 
 const EffectRes = preload("res://resources/effect_resource.gd")
+const CardRes  = preload("res://resources/card_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const RelicRes = preload("res://resources/relic_resource.gd")
 
@@ -51,6 +52,7 @@ var _cards_played_this_turn: int = 0
 var _enemy_card_counters: Dictionary = {}
 var _cards_drawn_this_turn: int = 0
 var _kills_this_card: int = 0
+var _in_echo_replay: bool = false
 
 signal battle_started()
 signal battle_won()
@@ -735,6 +737,39 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					for i in range(_enemies.size()):
 						if _enemy_alive[i]:
 							_mhr_living.append(i)
+	# power.echo_next_attack: 이 ATTACK 카드 효과 전체를 1회 재시전 (재진입 가드)
+	if not _in_echo_replay and card.card_type == CardRes.CardType.ATTACK:
+		var _echo_key: String = "power.echo_next_attack:" + card.owner_id
+		if _active_powers.has(_echo_key):
+			_active_powers.erase(_echo_key)
+			active_powers_changed.emit()
+			_in_echo_replay = true
+			for effect in card.effects:
+				if effect.condition != "" and not _evaluate_condition(effect.condition, card):
+					continue
+				match effect.effect_type:
+					EffectRes.EffectType.DAMAGE:
+						var dmg2: int = effect.value
+						var _os2: Dictionary = _hero_status.get(card.owner_id, {})
+						if _os2.get("weak", 0) > 0:
+							dmg2 = int(dmg2 * 0.75)
+						dmg2 += _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+						var _bph2: int = _active_powers.get("power.bonus_per_hit:" + card.owner_id, {}).get("value", 0)
+						for _eh in range(effect.hit_count):
+							if effect.target == "ALL":
+								for i in range(_enemies.size()):
+									if _enemy_alive[i]:
+										_deal_damage_to_enemy(i, dmg2, effect.damage_type)
+										if _bph2 > 0:
+											_deal_damage_to_enemy(i, _bph2, effect.damage_type)
+										_last_attacker[i] = card.owner_id
+							else:
+								if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+									_deal_damage_to_enemy(target_enemy_index, dmg2, effect.damage_type)
+									if _bph2 > 0:
+										_deal_damage_to_enemy(target_enemy_index, _bph2, effect.damage_type)
+									_last_attacker[target_enemy_index] = card.owner_id
+			_in_echo_replay = false
 	_apply_synergy_bonus(card, target_enemy_index)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "") -> void:
@@ -1134,6 +1169,8 @@ func _evaluate_condition(cond: String, _card: Resource) -> bool:
 			return deck_mgr != null and deck_mgr.hand.size() == 0
 		"enemy_count_1":
 			return _get_living_enemy_count() == 1
+		"not_enemy_count_1":
+			return _get_living_enemy_count() != 1
 		"team_hp_below_30":
 			if team_mgr:
 				for h in team_mgr.heroes:

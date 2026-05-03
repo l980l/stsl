@@ -597,6 +597,24 @@ card.musashi.steel_strike.name,강철 일격,Steel Strike,Frappe d'acier,Colpo d
 card.musashi.steel_strike.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,雙刀流
 card.musashi.thousand_cuts.name,만 번의 베기,Thousand Cuts,Mille coupures,Mille tagli,Mil cortes,万剣の斬り,Χίλιες Κοπές,千刀斩,千刀斬
 card.musashi.thousand_cuts.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,雙刀流
+card.musashi.twin_blades_basic.name,쌍도 기초,Twin Blades Basic,Bases de la double lame,Basi della doppia lama,Bases de la doble hoja,双刀基礎,Βάσεις Διπλής Λεπίδας,双刀基础,双刀基础
+card.musashi.twin_blades_basic.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.twin_sword_power.name,쌍검 권능,Twin Sword Power,Pouvoir des doubles épées,Potere delle doppie spade,Poder de las dos espadas,双剣権能,Δύναμη Δύο Σπαθιών,双剑权能,双剑权能
+card.musashi.twin_sword_power.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.rhythm_of_strikes.name,연격의 박자,Rhythm of Strikes,Rythme des frappes,Ritmo dei colpi,Ritmo de los golpes,連撃の拍子,Ρυθμός Χτυπημάτων,连击节拍,连击节拍
+card.musashi.rhythm_of_strikes.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.demon_swordsman.name,검귀의 광기,Demon Swordsman,Folie du démon,Follia del demone,Locura del demonio,剣鬼の狂気,Τρέλα Δαίμονα-Ξιφομάχου,剑鬼狂气,剑鬼狂气
+card.musashi.demon_swordsman.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
+card.musashi.swordsmans_resolve.name,검사의 결의,Swordsman's Resolve,Résolution du duelliste,Risoluzione del duellante,Resolución del esgrimidor,剣士の決意,Αποφασιστικότητα Ξιφομάχου,剑士决意,剑士决意
+card.musashi.swordsmans_resolve.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.blade_polish.name,도검 연마,Blade Polish,Affûtage de la lame,Affilatura della lama,Afilado de la hoja,刀剣研磨,Τρόχισμα Λεπίδας,磨刃,磨刃
+card.musashi.blade_polish.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.fate_duel.name,운명의 결투,Fate Duel,Duel du destin,Duello del destino,Duelo del destino,運命の決闘,Μονομαχία Μοίρας,命运决斗,命运决斗
+card.musashi.fate_duel.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
+card.musashi.mushin_power.name,무심의 권능,Mushin Power,Pouvoir Mushin,Potere Mushin,Poder Mushin,無心の権能,Δύναμη Μουσίν,无心权能,无心权能
+card.musashi.mushin_power.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.block_convert.name,공의 일격,Void Strike,Frappe du vide,Colpo del vuoto,Golpe del vacío,空の一撃,Χτύπημα του Κενού,虚空一击,虚空一击
+card.musashi.block_convert.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
 card.joan_of_arc.martyr_wrath.name,순교자의 분노,Martyr's Wrath,Colère du martyr,Ira del martire,Ira del mártir,殉教者の怒り,Οργή Μάρτυρα,殉道者之怒,殉道者之怒
 card.joan_of_arc.martyr_wrath.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
 card.joan_of_arc.dead_blessing.name,망자의 축복,Dead Blessing,Bénédiction des morts,Benedizione dei caduti,Bendición de los muertos,亡者の祝福,Ευλογία Νεκρών,亡者祝福,亡者祝福
