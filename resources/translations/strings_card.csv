@@ -12,17 +12,17 @@ effect.consume_morale.text,사기를 소모해 적에게 피해 %d을 입힙니�
 effect.poison_burst.text,적의 독 스택만큼 즉시 피해를 입히고 독을 초기화합니다.,Trigger Poison,Déclenche le Poison,Attiva Veleno,Detona Veneno,毒即発,Ενεργοποίηση Δηλητηρίου,毒性爆发,毒性爆发
 effect.counter_block.text,현재 방어도의 %d%%만큼 적에게 피해를 입힙니다.,%d%% of Block,%d%% de l'Armure,%d%% dello Scudo,%d%% del Escudo,ブロック×%d%%,%d%% της Άμυνας,护甲×%d%%,护甲×%d%%
 effect.cost_next.text,이번 턴 다음 카드의 비용을 %d 줄입니다.,Next cost -%d,Coût suivant -%d,Prossimo costo -%d,Siguiente coste -%d,次のコスト -%d,Επόμενο κόστος -%d,下一次费用 -%d,下一次费用 -%d
-effect.conditional_dmg.text,평소 적에게 피해 %d을 입히고 %s에는 피해 %d을 입힙니다.,%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s)
-effect.condition.has_debuffs,디버프 %d종↑,%d+ debuffs,%d+ débuffs,%d+ debuff,%d+ debuffs,デバフ%d種↑,%d+ αρνητικά,%d种异常↑,%d種異常↑
-effect.condition.has_poison,독 보유 시,if poisoned,si empoisonné,se avvelenato,si envenenado,毒保有時,αν δηλητηριασμένο,中毒时,中毒時
-effect.condition.has_poison_n,독 %d이상 시,if poison ≥%d,si poison ≥%d,se veleno ≥%d,si veneno ≥%d,毒%d以上時,αν δηλητήριο ≥%d,毒 ≥%d时,毒 ≥%d時
-effect.condition.has_morale,사기 보유 시,if has morale,si moral positif,se morale positivo,si moral positivo,士気保有時,αν έχει ηθικό,有士气时,有士氣時
-effect.condition.has_morale_n,사기 %d이상 시,if morale ≥%d,si moral ≥%d,se morale ≥%d,si moral ≥%d,士気%d以上時,αν ηθικό ≥%d,士气 ≥%d时,士氣 ≥%d時
-effect.condition.low_hp,HP 50% 이하 시,if HP ≤50%,si PV ≤50%,se PF ≤50%,si PV ≤50%,HP50%以下時,αν HP ≤50%,HP ≤50%时,HP ≤50%時
-effect.condition.very_low_hp,HP 30% 이하 시,if HP ≤30%,si PV ≤30%,se PF ≤30%,si PV ≤30%,HP30%以下時,αν HP ≤30%,HP ≤30%时,HP ≤30%時
-effect.condition.hand_size_n,손패 %d장 이하 시,if hand ≤%d,si main ≤%d,se mano ≤%d,si mano ≤%d,手札%d枚以下時,αν χαρτιά ≤%d,手牌 ≤%d时,手牌 ≤%d時
-effect.condition.enemy_count_n,적 %d명 이하 시,if ≤%d enemies,si ≤%d ennemis,se ≤%d nemici,si ≤%d enemigos,敵%d体以下時,αν ≤%d εχθροί,敌 ≤%d时,敵 ≤%d時
-effect.condition.enemy_hp_below,적 HP %d% 이하 시,if enemy HP ≤%d%,si PV ennemi ≤%d%,se PF nemico ≤%d%,si PV enemigo ≤%d%,敵HP%d%以下時,αν εχθ.HP ≤%d%,敌HP ≤%d%时,敵HP ≤%d%時
+effect.conditional_dmg.text,적에게 피해 %d을 입힙니다. %s 대신 피해 %d을 입힙니다.,%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s)
+effect.condition.has_debuffs,디버프가 %d종 이상이라면,%d+ debuffs,%d+ débuffs,%d+ debuff,%d+ debuffs,デバフ%d種↑,%d+ αρνητικά,%d种异常↑,%d種異常↑
+effect.condition.has_poison,독을 보유하고 있다면,if poisoned,si empoisonné,se avvelenato,si envenenado,毒保有時,αν δηλητηριασμένο,中毒时,中毒時
+effect.condition.has_poison_n,독이 %d 이상이라면,if poison ≥%d,si poison ≥%d,se veleno ≥%d,si veneno ≥%d,毒%d以上時,αν δηλητήριο ≥%d,毒 ≥%d时,毒 ≥%d時
+effect.condition.has_morale,사기가 있다면,if has morale,si moral positif,se morale positivo,si moral positivo,士気保有時,αν έχει ηθικό,有士气时,有士氣時
+effect.condition.has_morale_n,사기가 %d 이상이라면,if morale ≥%d,si moral ≥%d,se morale ≥%d,si moral ≥%d,士気%d以上時,αν ηθικό ≥%d,士气 ≥%d时,士氣 ≥%d時
+effect.condition.low_hp,HP가 50% 이하라면,if HP ≤50%,si PV ≤50%,se PF ≤50%,si PV ≤50%,HP50%以下時,αν HP ≤50%,HP ≤50%时,HP ≤50%時
+effect.condition.very_low_hp,HP가 30% 이하라면,if HP ≤30%,si PV ≤30%,se PF ≤30%,si PV ≤30%,HP30%以下時,αν HP ≤30%,HP ≤30%时,HP ≤30%時
+effect.condition.hand_size_n,손패가 %d장 이하라면,if hand ≤%d,si main ≤%d,se mano ≤%d,si mano ≤%d,手札%d枚以下時,αν χαρτιά ≤%d,手牌 ≤%d时,手牌 ≤%d時
+effect.condition.enemy_count_n,적이 %d명 이하라면,if ≤%d enemies,si ≤%d ennemis,se ≤%d nemici,si ≤%d enemigos,敵%d体以下時,αν ≤%d εχθροί,敌 ≤%d时,敵 ≤%d時
+effect.condition.enemy_hp_below,적의 HP가 %d% 이하라면,if enemy HP ≤%d%,si PV ennemi ≤%d%,se PF nemico ≤%d%,si PV enemigo ≤%d%,敵HP%d%以下時,αν εχθ.HP ≤%d%,敌HP ≤%d%时,敵HP ≤%d%時
 effect.summon_token.text,병사 %d명을 소환합니다.,Summon %d Soldiers,Invoque %d Soldats,Evoca %d Soldati,Invoca %d Soldados,兵士召喚 %d,Κάλεσε %d Στρατιώτες,召唤 %d 士兵,召唤 %d 士兵
 effect.charm.text,적 1명을 매혹 %d합니다.,Charm %d,Charme %d,Fascino %d,Encanto %d,魅惑 %d,Γοητεία %d,魅惑 %d,魅惑 %d
 effect.revive.text,사망한 아군 1명을 최대 체력의 %d%%로 부활시킵니다.,Revive with %d%% HP,Ressuscite avec %d%% PV,Rianima con %d%% PS,Revive con %d%% PV,復活 %d%%,Αναβίωση με %d%% HP,复活 %d%%,复活 %d%%
