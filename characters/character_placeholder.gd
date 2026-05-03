@@ -49,20 +49,17 @@ func _make_idle() -> Animation:
 	var a := Animation.new()
 	a.loop_mode = Animation.LOOP_LINEAR
 	a.length = 1.0
-	var t := a.add_track(Animation.TYPE_VALUE)
-	a.track_set_path(t, "Body:position")
-	a.track_insert_key(t, 0.0, Vector2.ZERO)
-	a.track_insert_key(t, 1.0, Vector2.ZERO)
 	return a
 
 func _make_attack() -> Animation:
+	var rest := body.position
 	var a := Animation.new()
 	a.length = 0.5
 	var t := a.add_track(Animation.TYPE_VALUE)
 	a.track_set_path(t, "Body:position")
-	a.track_insert_key(t, 0.0, Vector2.ZERO)
-	a.track_insert_key(t, 0.2, Vector2(60, 0))
-	a.track_insert_key(t, 0.5, Vector2.ZERO)
+	a.track_insert_key(t, 0.0, rest)
+	a.track_insert_key(t, 0.2, rest + Vector2(60, 0))
+	a.track_insert_key(t, 0.5, rest)
 	return a
 
 func _make_hurt() -> Animation:

@@ -24,7 +24,16 @@ func start_turn() -> void:
 	pending_cost_reduction = 0
 	pending_all_cost_zero = false
 	energy_changed.emit(current_energy)
-	draw_cards(base_draw_count)
+	# innate 카드 먼저 손패로 (draw pile에서 찾아서 앞으로)
+	var innate_count: int = 0
+	for i in range(draw_pile.size() - 1, -1, -1):
+		if draw_pile[i].get("is_innate") == true:
+			var c = draw_pile[i]
+			draw_pile.remove_at(i)
+			hand.append(c)
+			card_drawn.emit(c)
+			innate_count += 1
+	draw_cards(max(0, base_draw_count - innate_count))
 
 func draw_cards(count: int) -> void:
 	for i in range(count):
@@ -59,7 +68,7 @@ func play_card(card: Resource) -> bool:
 		current_energy -= effective_cost
 	energy_changed.emit(current_energy)
 	hand.erase(card)
-	if card.get("card_type") == 2:  # CardType.POWER — 전투 중 소멸
+	if card.get("card_type") == 2 or card.get("is_exhaust") == true:
 		exhaust_pile.append(card)
 	else:
 		discard_pile.append(card)
@@ -80,9 +89,15 @@ func discard_card(card: Resource) -> void:
 	hand_changed.emit()
 
 func discard_hand() -> void:
+	var retained: Array = []
 	for card in hand:
-		discard_pile.append(card)
-	hand.clear()
+		if card.get("is_retain") == true:
+			retained.append(card)
+		elif card.get("is_ethereal") == true:
+			exhaust_pile.append(card)
+		else:
+			discard_pile.append(card)
+	hand = retained
 	hand_changed.emit()
 
 func add_card_to_deck(card: Resource) -> void:

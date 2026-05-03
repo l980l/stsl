@@ -89,6 +89,8 @@ func _get_particle_position(id: int) -> Vector2:
 		return Vector2.from_angle(arr_dir[id]) * arr_distance[id] + arr_offset[id]
 
 func _kill_particle(id: int) -> void:
+	if id >= arr_rid.size():
+		return
 	RenderingServer.free_rid(arr_rid[id])
 	arr_dead[id] = true
 
@@ -105,6 +107,8 @@ class BurstParticlesRng extends RandomNumberGenerator:
 @export_category("Particles")
 @export var num_particles := 10:
 	set(value):
+		if tween:
+			tween.kill()
 		kill()
 		num_particles = value
 		_resize_arrays()
@@ -438,4 +442,3 @@ func kill():
 	for i in num_particles:
 		if i < arr_rid.size():
 			_kill_particle(i)
-
