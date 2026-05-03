@@ -67,6 +67,13 @@ ui.settings.cursor_size,커서 크기,Cursor Size,Taille du curseur,Dimensione c
 ui.settings.btn_defaults,초기화,Restore Defaults,Restaurer,Ripristina,Restablecer,初期化,Επαναφορά,恢复默认,恢复默认
 ui.settings.btn_cancel,취소,Cancel,Annuler,Annulla,Cancelar,キャンセル,Άκυρο,取消,取消
 ui.settings.btn_apply,적용,Apply,Appliquer,Applica,Aplicar,適用,Εφαρμογή,应用,应用
+ui.settings.sound,사운드,Sound,Son,Suono,Sonido,サウンド,Ήχος,音效,音效
+ui.settings.display,화면,Display,Affichage,Schermo,Pantalla,画面,Οθόνη,画面,画面
+ui.settings.language_tab,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言,语言
+ui.settings.vol_master,마스터,Master,Master,Master,Master,マスター,Master,主音量,主音量
+ui.settings.vol_music,음악,Music,Musique,Musica,Música,音楽,Μουσική,音乐,音樂
+ui.settings.vol_sfx,효과음,SFX,Effets,Effetti,Efectos,効果音,Ηχητικά,音效,音效
+ui.settings.vol_ui,UI,UI,UI,UI,UI,UI,UI,UI,UI
 ui.common.btn_settings,설정,Settings,Paramètres,Impostazioni,Configuración,設定,Ρυθμίσεις,设置,设置
 ui.map.room_event,이벤트,Event,Événement,Evento,Evento,イベント,Γεγονός,事件,事件
 ui.map.room_type.secret,비밀,Secret,Secret,Segreto,Secreto,秘密,Μυστικό,秘密,秘密

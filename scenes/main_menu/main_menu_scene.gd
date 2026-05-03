@@ -2,7 +2,7 @@
 extends Node2D
 
 func _ready() -> void:
-	AudioManager.play_bgm("bgm_menu")
+	AudioManager.play_bgm_dynamic("menu", "")
 	_build_ui()
 
 func _build_ui() -> void:

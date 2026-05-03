@@ -97,7 +97,7 @@ func _ready() -> void:
 	BattleManager.deck_mgr = DeckManager
 	_connect_signals()
 	_start_battle()
-	AudioManager.play_bgm("bgm_battle_normal")
+	_play_battle_bgm()
 	if OS.is_debug_build():
 		_debug_badge = Label.new()
 		_debug_badge.position = Vector2(1500, 20)
@@ -409,6 +409,7 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	btn.size = Vector2(SLOT_W, SLOT_H)
 	btn.text = ""
 	btn.visible = false
+	btn.set_meta("no_ui_sound", true)
 	var captured_index := index
 	btn.pressed.connect(func(): _on_enemy_pressed(captured_index))
 	add_child(btn)
@@ -797,6 +798,24 @@ func _connect_signals() -> void:
 	BattleManager.active_powers_changed.connect(_on_active_powers_changed)
 	BattleManager.enemy_counter_changed.connect(_on_enemy_counter_changed)
 	BattleManager.card_pick_requested.connect(_on_card_pick_requested)
+	BattleManager.boss_phase_changed.connect(_on_boss_phase_changed)
+
+var _bgm_boss_id: String = ""
+
+func _play_battle_bgm() -> void:
+	var enemies := GameManager.pending_enemies
+	var first = enemies[0] if not enemies.is_empty() else null
+	var EnemyRes = load("res://resources/enemy_resource.gd")
+	if first != null and first.grade == EnemyRes.Grade.BOSS:
+		_bgm_boss_id = first.enemy_name.split(".")[-1]
+		AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, 0)
+	else:
+		var myth: String = GameManager.act_mythologies[GameManager.current_act - 1]
+		AudioManager.play_bgm_dynamic("battle", myth)
+
+func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
+	if new_phase >= 1 and not _bgm_boss_id.is_empty():
+		AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, new_phase)
 
 # ─────────────────────────────────────────────
 # 배틀 초기화
@@ -1198,6 +1217,7 @@ func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 func _on_card_hovered(_card: Resource, card_node: CardScene) -> void:
 	if _drag_card != null:
 		return
+	AudioManager.play_sfx("card_hover")
 	var hover_idx: int = card_node.get_meta("_fan_idx", -1)
 	if hover_idx < 0:
 		return
@@ -1312,7 +1332,6 @@ func _on_end_turn_pressed() -> void:
 	BattleManager.end_player_turn()
 
 func _on_player_turn_started() -> void:
-	AudioManager.play_sfx("turn_player_start")
 	AudioManager.play_sfx("card_draw")
 	_end_turn_btn.disabled = false
 	_message_label.text = tr("battle.msg_player_turn")
@@ -1333,7 +1352,6 @@ func _on_player_turn_started() -> void:
 	_refresh_synergy_hud()
 
 func _on_enemy_turn_started() -> void:
-	AudioManager.play_sfx("turn_enemy_start")
 	_end_turn_btn.disabled = true
 	_selected_card = null
 	_message_label.text = tr("battle.msg_enemy_turn")
@@ -1352,11 +1370,6 @@ func _on_energy_changed(new_energy: int) -> void:
 
 func _on_card_played(card: Resource) -> void:
 	call_deferred("_refresh_all_hero_ui")
-	var _sfx_key: String = "card_play_attack"
-	match card.get("card_type", -1):
-		CardResource.CardType.SKILL: _sfx_key = "card_play_skill"
-		CardResource.CardType.POWER: _sfx_key = "card_play_power"
-	AudioManager.play_sfx(_sfx_key)
 	var anim_name: String = card.get("play_animation") if card.get("play_animation") != null else ""
 	if anim_name == "":
 		return

@@ -21,6 +21,7 @@ func _ready() -> void:
 		return
 	_build_ui(event)
 	_play_open()
+	AudioManager.play_bgm_dynamic("event", event.bgm_type)
 
 func _build_ui(event: Resource) -> void:
 	($BG as ColorRect).color = SacredPalette.INK_1000
