@@ -24,6 +24,9 @@ var _warned: Dictionary = {}
 
 var _vol: Dictionary = {"master": 1.0, "sfx": 1.0, "music": 0.8, "ui": 1.0}
 var _bgm_base_key: String = ""
+var _bgm_category: String = ""
+var _bgm_identifier: String = ""
+var _bgm_phase: int = 0
 
 func _ready() -> void:
 	_ensure_buses()
@@ -145,6 +148,11 @@ func _on_bgm_fadeout_timer() -> void:
 	var tw := create_tween()
 	tw.tween_property(p, "volume_db", -80.0, _BGM_FADE_OUT)
 	tw.chain().tween_callback(p.stop)
+	if not _bgm_category.is_empty():
+		var cat := _bgm_category
+		var ident := _bgm_identifier
+		var ph := _bgm_phase
+		tw.chain().tween_callback(func(): play_bgm_dynamic(cat, ident, ph))
 
 func play_bgm_dynamic(category: String, identifier: String, phase: int = 0) -> void:
 	# category="battle", identifier="greek" → bgm_battle_greek (variant 랜덤)
@@ -183,10 +191,14 @@ func play_bgm_dynamic(category: String, identifier: String, phase: int = 0) -> v
 		resolved_key = base_key + "_" + str(randi() % variant_num + 1)
 
 	_bgm_base_key = base_key
+	_bgm_category = category
+	_bgm_identifier = identifier
+	_bgm_phase = phase
 	play_bgm(resolved_key)
 
 func stop_bgm(fade: float = _BGM_FADE_OUT) -> void:
 	_bgm_base_key = ""
+	_bgm_category = ""
 	_bgm_fadeout_timer.stop()
 	var p := _bgm_players[_bgm_cur]
 	if not p.playing:

@@ -66,6 +66,7 @@ signal morale_changed(hero_id: String, new_value: int)
 signal active_powers_changed()
 signal enemy_counter_changed(enemy_index: int)
 signal card_pick_requested(action: String, draw_count: int)
+signal boss_phase_changed(enemy_index: int, new_phase: int)
 
 func setup_battle(enemies: Array) -> void:
 	if deck_mgr != null:
@@ -1049,6 +1050,7 @@ func _check_phase_transition(enemy_index: int) -> void:
 	if hp_ratio <= enemy.phase_thresholds[current_phase]:
 		_enemy_phase[enemy_index] += 1
 		_enemy_intent_index[enemy_index] = 0
+		boss_phase_changed.emit(enemy_index, _enemy_phase[enemy_index])
 		if enemy.get("phase_heal_ratios") != null and current_phase < enemy.phase_heal_ratios.size():
 			var heal_ratio: float = enemy.phase_heal_ratios[current_phase]
 			if heal_ratio > 0.0:
