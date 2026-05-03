@@ -613,3 +613,11 @@ card.cleopatra.venom_bloom.name,독의 증식,Venom Bloom,Floraison vénéneuse,
 card.cleopatra.venom_bloom.archetype,독,Poison,Poison,Veleno,Veneno,毒,Δηλητήριο,毒,毒
 card.yi_sun_sin.discard_focus.name,결단의 정리,Discard Focus,Concentration et défausse,Concentrazione e scarto,Concentración y descarte,決断の整理,Ανασύνταξη Εστίασης,弃牌聚焦,棄牌聚焦
 card.yi_sun_sin.discard_focus.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龜船
+card.tag.exhaust,소모,Exhaust,Épuisement,Esaurimento,Agotamiento,消耗,Εξάντληση,消耗,消耗
+card.tag.ethereal,에테리얼,Ethereal,Éthéré,Etereo,Etéreo,エーテリアル,Αιθέρια,以太,以太
+card.tag.retain,유지,Retain,Conserver,Mantenere,Retener,保留,Διατήρηση,保留,保留
+card.tag.innate,내재,Innate,Inné,Innato,Innato,内在,Εγγενής,内在,內在
+effect.sacrifice_payoff.text,HP 희생 100당 적에게 피해 %d을 입힙니다.,Deal %d dmg per 100 HP sacrificed,Inflige %d dégâts par 100 PV sacrifiés,Infligge %d danni per 100 PV sacrificati,Inflige %d daño por 100 PV sacrificados,HP犠牲100毎に %d ダメージ,Πρόκληση %d ζημιάς ανά 100 HP,每牺牲100HP造成 %d 伤害,每牺牲100HP造成 %d 伤害
+effect.sacrifice_payoff.block.text,HP 희생 100당 방어도 %d을 얻습니다.,Gain %d Block per 100 HP sacrificed,Gagnez %d Bloc par 100 PV sacrifiés,Ottieni %d Blocco per 100 PV sacrificati,Gana %d Bloqueo por 100 PV sacrificados,HP犠牲100毎に %d ブロック,Απόκτηση %d Μπλοκ ανά 100 HP,每牺牲100HP获得 %d 格挡,每牺牲100HP获得 %d 格挡
+effect.charm_to_damage.text,매혹 스택을 소비해 스택당 피해 %d을 입힙니다.,Convert charm: %d damage per stack,Convertit charme en %d dégâts/pile,Converte fascino in %d danno/pila,Convierte encanto en %d daño/pila,魅了を %d ダメージに変換,Μετατρέπει γοητεία σε %d ζημιά/στοίβα,将魅惑转为每层 %d 伤害,将魅惑转为每层 %d 伤害
+effect.multi_hit_random.text,랜덤 적에게 %d회 피해 %d을 입힙니다.,Hit random enemies %d×%d,Frappe aléatoire %d×%d,Colpisce casuale %d×%d,Golpea aleatorio %d×%d,ランダム敵 %d×%d ダメージ,Τυχαία %d×%d ζημιά,随机攻击 %d×%d 伤害,随机攻击 %d×%d 伤害

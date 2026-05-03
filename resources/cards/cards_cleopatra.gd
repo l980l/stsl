@@ -76,16 +76,19 @@ static func _venom_needle() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _royal_guard() -> Resource:
-	# 왕실 방어 — COMMON, 1코, SKILL, 저주: BLOCK 80
+	# 왕실 방어 — COMMON, 1코, SKILL, 저주: BLOCK 80 + POISON 1 SINGLE
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.royal_guard.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
 	c.archetype = "card.cleopatra.royal_guard.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.BLOCK
-	e.value = 125; e.base_value = 125
-	c.effects = [e]; return c
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.BLOCK
+	ea.value = 80; ea.base_value = 80
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.APPLY_STATUS
+	eb.status_type = "poison"; eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"
+	c.effects = [ea, eb]; return c
 
 # ─────────────────────────────────────────
 # v1 풀 카드 13장

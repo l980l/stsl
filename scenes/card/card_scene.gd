@@ -136,6 +136,13 @@ func _build_desc() -> String:
 	var lines: Array = []
 	for eff in _card.effects:
 		lines.append(eff.display_text())
+	var tags: Array = []
+	if _card.is_exhaust:  tags.append("[%s]" % tr("card.tag.exhaust"))
+	if _card.is_ethereal: tags.append("[%s]" % tr("card.tag.ethereal"))
+	if _card.is_retain:   tags.append("[%s]" % tr("card.tag.retain"))
+	if _card.is_innate:   tags.append("[%s]" % tr("card.tag.innate"))
+	if tags.size() > 0:
+		lines.append(" ".join(tags))
 	return " ".join(lines)
 
 func _resolve_gem_texture(rarity: int) -> Texture2D:

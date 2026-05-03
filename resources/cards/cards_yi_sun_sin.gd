@@ -65,15 +65,18 @@ static func _defend() -> Resource:
 	c.effects = [e]; return c
 
 static func _shield() -> Resource:
+	# 방패 — COMMON, 1코, SKILL: BLOCK 70 + DRAW 1
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.shield.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.shield.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.BLOCK; e.value = 125; e.base_value = 125
-	c.effects = [e]; return c
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.BLOCK; ea.value = 70; ea.base_value = 70
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.DRAW; eb.value = 1; eb.base_value = 1
+	c.effects = [ea, eb]; return c
 
 static func _counter_strike() -> Resource:
 	var c := CardRes.new()
@@ -151,7 +154,7 @@ static func _formation_boost() -> Resource:
 	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 40; e.base_value = 40
 	c.effects = [e]; return c
 
-# #7 수군 훈련 — UNCOMMON, cost 1, SKILL, 학익진
+# #7 수군 훈련 — UNCOMMON, cost 1, SKILL, 학익진: DRAW 1 + FORMATION_BLOCK 30
 static func _naval_training() -> Resource:
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.naval_training.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
@@ -160,13 +163,13 @@ static func _naval_training() -> Resource:
 	c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.naval_training.archetype"
 	var e1 := EffRes.new()
-	e1.effect_type = EffRes.EffectType.BLOCK; e1.value = 50; e1.base_value = 50
+	e1.effect_type = EffRes.EffectType.DRAW; e1.value = 1; e1.base_value = 1
 	var e2 := EffRes.new()
-	e2.effect_type = EffRes.EffectType.DRAW; e2.value = 1; e2.base_value = 1
+	e2.effect_type = EffRes.EffectType.FORMATION_BLOCK; e2.value = 30; e2.base_value = 30
 	c.effects = [e1, e2]; return c
 
 
-# #9 엄정한 훈련 — RARE, cost 1, SKILL, 학익진
+# #9 엄정한 훈련 — RARE, cost 1, SKILL, 학익진: DRAW 2 + HEAL_ALL 20
 static func _strict_training() -> Resource:
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.strict_training.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
@@ -175,9 +178,9 @@ static func _strict_training() -> Resource:
 	c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.strict_training.archetype"
 	var e1 := EffRes.new()
-	e1.effect_type = EffRes.EffectType.DRAW; e1.value = 1; e1.base_value = 1
+	e1.effect_type = EffRes.EffectType.DRAW; e1.value = 2; e1.base_value = 2
 	var e2 := EffRes.new()
-	e2.effect_type = EffRes.EffectType.BLOCK; e2.value = 40; e2.base_value = 40
+	e2.effect_type = EffRes.EffectType.HEAL_ALL; e2.value = 20; e2.base_value = 20
 	c.effects = [e1, e2]; return c
 
 # #10 배수진 — RARE, cost 1, SKILL, 필사즉생
@@ -293,7 +296,7 @@ static func _morale_boost() -> Resource:
 	e2.effect_type = EffRes.EffectType.GAIN_MORALE; e2.value = 1; e2.base_value = 1
 	c.effects = [e1, e2]; return c
 
-# #25 군기 진작 — COMMON, cost 1, SKILL, 학익진
+# #25 군기 진작 — COMMON, cost 1, SKILL, 학익진: BLOCK 50 + MORALE+1
 static func _discipline() -> Resource:
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.discipline.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
@@ -301,9 +304,11 @@ static func _discipline() -> Resource:
 	c.rarity = CardRes.Rarity.COMMON
 	c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.discipline.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 30; e.base_value = 30
-	c.effects = [e]; return c
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.BLOCK; ea.value = 50; ea.base_value = 50
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.GAIN_MORALE; eb.value = 1; eb.base_value = 1
+	c.effects = [ea, eb]; return c
 
 # #26 진형 사수 — RARE, cost 2, SKILL, 학익진
 # BLOCK_ALL 90 + 팀원 3명 이상이면 DRAW 1 조건부 발동

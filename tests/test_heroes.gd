@@ -98,32 +98,32 @@ func _make_card(owner_id: String, effects: Array) -> Resource:
 func test_napoleon_card_pool_size() -> void:
 	print("[TestHeroes] test_napoleon_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._napoleon_card_pool().size() == 40, "나폴레옹 카드 풀 40장")
+	_assert(gm._napoleon_card_pool().size() == 30, "나폴레옹 카드 풀 30장")
 
 func test_cleopatra_card_pool_size() -> void:
 	print("[TestHeroes] test_cleopatra_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._cleopatra_card_pool().size() == 39, "클레오파트라 카드 풀 39장")
+	_assert(gm._cleopatra_card_pool().size() == 30, "클레오파트라 카드 풀 30장")
 
 func test_yi_sun_sin_card_pool_size() -> void:
 	print("[TestHeroes] test_yi_sun_sin_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._yi_sun_sin_card_pool().size() == 41, "이순신 카드 풀 41장")
+	_assert(gm._yi_sun_sin_card_pool().size() == 30, "이순신 카드 풀 30장")
 
 func test_joan_of_arc_card_pool_size() -> void:
 	print("[TestHeroes] test_joan_of_arc_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._joan_of_arc_card_pool().size() == 41, "잔다르크 카드 풀 41장")
+	_assert(gm._joan_of_arc_card_pool().size() == 30, "잔다르크 카드 풀 30장")
 
 func test_genghis_khan_card_pool_size() -> void:
 	print("[TestHeroes] test_genghis_khan_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._genghis_khan_card_pool().size() == 41, "칭기즈칸 카드 풀 41장")
+	_assert(gm._genghis_khan_card_pool().size() == 30, "칭기즈칸 카드 풀 30장")
 
 func test_musashi_card_pool_size() -> void:
 	print("[TestHeroes] test_musashi_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._musashi_card_pool().size() == 41, "무사시 카드 풀 41장")
+	_assert(gm._musashi_card_pool().size() == 30, "무사시 카드 풀 30장")
 
 func test_hit_count_damage_multi_hit() -> void:
 	print("[TestHeroes] test_hit_count_damage_multi_hit")

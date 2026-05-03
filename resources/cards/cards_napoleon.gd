@@ -96,7 +96,7 @@ static func _swift_march() -> Resource:
 # ─────────────────────────────────────────
 
 static func _swift_advance() -> Resource:
-	# 신속 기동 — COMMON, 1코, ATTACK, 돌격: DMG 60 + MORALE+1
+	# 신속 기동 — COMMON, 1코, ATTACK, 돌격: DMG 50 + DRAW 1
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.swift_advance.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -104,10 +104,10 @@ static func _swift_advance() -> Resource:
 	c.archetype = "card.napoleon.swift_advance.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 60; ea.base_value = 60; ea.target = "SINGLE"
+	ea.value = 50; ea.base_value = 50; ea.target = "SINGLE"
 	ea.damage_type = "blunt"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.GAIN_MORALE
+	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
 
@@ -269,16 +269,19 @@ static func _emperors_spirit() -> Resource:
 
 
 static func _trench_construction() -> Resource:
-	# 참호 구축 — COMMON, 1코, SKILL, 군단: BLOCK 125
+	# 참호 구축 — COMMON, 1코, SKILL, 군단: BLOCK 80 + MORALE+1
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.trench_construction.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
 	c.archetype = "card.napoleon.trench_construction.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.BLOCK
-	e.value = 125; e.base_value = 125; e.target = "SELF"
-	c.effects = [e]; return c
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.BLOCK
+	ea.value = 80; ea.base_value = 80; ea.target = "SELF"
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.GAIN_MORALE
+	eb.value = 1; eb.base_value = 1
+	c.effects = [ea, eb]; return c
 
 
 static func _drum_beat() -> Resource:
@@ -374,7 +377,7 @@ static func _artillery_gather() -> Resource:
 
 
 static func _imperial_artillery() -> Resource:
-	# 황실 포병대 — UNCOMMON, 1코, ATTACK, 군단: DMG 80 + MORALE+1
+	# 황실 포병대 — UNCOMMON, 1코, ATTACK, 군단: DMG 80 + VULNERABLE 1 SINGLE
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.imperial_artillery.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -385,8 +388,8 @@ static func _imperial_artillery() -> Resource:
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
 	ea.damage_type = "explosive"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.GAIN_MORALE
-	eb.value = 1; eb.base_value = 1
+	eb.effect_type = EffRes.EffectType.APPLY_STATUS
+	eb.status_type = "vulnerable"; eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"
 	c.effects = [ea, eb]; return c
 
 static func _imperial_infantry_call() -> Resource:

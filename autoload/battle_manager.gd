@@ -281,6 +281,20 @@ func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
 					var blk: int = _hero_block.get(owner_id, 0)
 					if enemy_idx >= 0 and blk > 0:
 						_deal_damage_to_enemy(enemy_idx, int(blk * v / 100.0))
+			"power.morale_per_turn":
+				if phase == "player_turn_start":
+					if not _hero_status.has(owner_id):
+						_hero_status[owner_id] = {}
+					var cur_morale: int = _hero_status[owner_id].get("morale", 0) + v
+					_hero_status[owner_id]["morale"] = cur_morale
+					morale_changed.emit(owner_id, cur_morale)
+			"power.summon_per_turn":
+				if phase == "player_turn_start":
+					if not _hero_status.has(owner_id):
+						_hero_status[owner_id] = {}
+					var cur_tok: int = _hero_status[owner_id].get("tokens", 0)
+					_hero_status[owner_id]["tokens"] = min(cur_tok + v, TOKEN_MAX_STACK)
+					status_applied.emit(owner_id, "tokens", v)
 	if phase == "player_turn_start":
 		active_powers_changed.emit()
 
@@ -334,31 +348,70 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
 				if owner_status.get("weak", 0) > 0:
 					dmg = int(dmg * 0.75)
+				# power.strength_player: 영웅 측 strength 플랫 보너스
+				dmg += _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+				# power.bonus_per_hit: 히트당 추가 피해
+				var _bph: int = _active_powers.get("power.bonus_per_hit:" + card.owner_id, {}).get("value", 0)
 				for _hit in range(effect.hit_count):
 					if effect.target == "ALL":
 						for i in range(_enemies.size()):
 							if _enemy_alive[i]:
 								_deal_damage_to_enemy(i, dmg, effect.damage_type)
+								if _bph > 0:
+									_deal_damage_to_enemy(i, _bph, effect.damage_type)
 								_last_attacker[i] = card.owner_id
 					else:
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 							_deal_damage_to_enemy(target_enemy_index, dmg, effect.damage_type)
+							if _bph > 0:
+								_deal_damage_to_enemy(target_enemy_index, _bph, effect.damage_type)
 							_last_attacker[target_enemy_index] = card.owner_id
+				# power.every_nth_attack_bonus: N번째 DAMAGE 효과마다 추가 피해
+				for _nth_pk in _active_powers:
+					if _nth_pk.begins_with("power.every_nth_attack_bonus:") and _active_powers[_nth_pk].get("owner_id", "") == card.owner_id:
+						var _nth: Dictionary = _active_powers[_nth_pk]
+						var _interval: int = _nth.get("params", {}).get("bonus_value", 3)
+						if _interval <= 0:
+							_interval = 3
+						if not _nth.has("params"):
+							_nth["params"] = {}
+						_nth["params"]["count"] = _nth["params"].get("count", 0) + 1
+						if _nth["params"]["count"] >= _interval:
+							_nth["params"]["count"] = 0
+							var _nth_bonus: int = _nth.get("value", 0)
+							if _nth_bonus > 0:
+								if effect.target == "ALL":
+									for i in range(_enemies.size()):
+										if _enemy_alive[i]:
+											_deal_damage_to_enemy(i, _nth_bonus, effect.damage_type)
+								elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+									_deal_damage_to_enemy(target_enemy_index, _nth_bonus, effect.damage_type)
 			EffectRes.EffectType.BLOCK:
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + effect.value
 				hero_block_gained.emit(card.owner_id, effect.value)
 			EffectRes.EffectType.APPLY_STATUS:
 				if effect.status_type.begins_with("power."):
-					_register_power(effect.status_type, card.owner_id, effect.value)
-				elif effect.target == "ALL":
-					for i in range(_enemies.size()):
-						if _enemy_alive[i]:
-							_apply_status_to_enemy(i, effect.status_type, effect.value)
-				elif effect.target == "SELF":
-					_apply_status_to_hero(card.owner_id, effect.status_type, effect.value)
+					var _pw_params: Dictionary = {}
+					if effect.bonus_value > 0:
+						_pw_params["bonus_value"] = effect.bonus_value
+					_register_power(effect.status_type, card.owner_id, effect.value, _pw_params)
 				else:
-					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-						_apply_status_to_enemy(target_enemy_index, effect.status_type, effect.value)
+					var _as_stacks: int = effect.value
+					# power.debuff_amplify: 약화/취약/독 부여 시 추가 스택
+					if effect.status_type in ["weak", "vulnerable", "poison"]:
+						_as_stacks += _active_powers.get("power.debuff_amplify:" + card.owner_id, {}).get("value", 0)
+					# power.poison_double_application: 독 부여 시 스택 ×2
+					if effect.status_type == "poison" and _active_powers.has("power.poison_double_application:" + card.owner_id):
+						_as_stacks = _as_stacks * 2
+					if effect.target == "ALL":
+						for i in range(_enemies.size()):
+							if _enemy_alive[i]:
+								_apply_status_to_enemy(i, effect.status_type, _as_stacks)
+					elif effect.target == "SELF":
+						_apply_status_to_hero(card.owner_id, effect.status_type, _as_stacks)
+					else:
+						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+							_apply_status_to_enemy(target_enemy_index, effect.status_type, _as_stacks)
 			EffectRes.EffectType.DRAW:
 				if deck_mgr:
 					deck_mgr.draw_cards(effect.value)
@@ -389,12 +442,17 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				status_applied.emit(card.owner_id, "morale", effect.value)
 				morale_changed.emit(card.owner_id, new_morale)
 			EffectRes.EffectType.CHARM:
+				var _charm_stacks: int = effect.value
+				# power.charm_double_apply: 적용 스택 수 배증
+				var _cdbl: int = _active_powers.get("power.charm_double_apply:" + card.owner_id, {}).get("value", 0)
+				if _cdbl > 0:
+					_charm_stacks = _charm_stacks * (1 + _cdbl)
 				if effect.target == "ALL":
 					for ei in range(_enemies.size()):
 						if _enemy_alive[ei]:
-							_apply_status_to_enemy(ei, "charm", effect.value)
+							_apply_status_to_enemy(ei, "charm", _charm_stacks)
 				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-					_apply_status_to_enemy(target_enemy_index, "charm", effect.value)
+					_apply_status_to_enemy(target_enemy_index, "charm", _charm_stacks)
 			EffectRes.EffectType.CONSUME_MORALE:
 				var morale: int = _hero_status.get(card.owner_id, {}).get("morale", 0)
 				if morale >= effect.value:
@@ -522,6 +580,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.SACRIFICE_HP:
 				if team_mgr:
 					team_mgr.take_damage(card.owner_id, effect.value)
+					# power.sacrifice_bank: 전투 중 누적 희생 HP 추적
+					var _bank_key: String = "power.sacrifice_bank:" + card.owner_id
+					if _active_powers.has(_bank_key):
+						_active_powers[_bank_key]["value"] += effect.value
 					_check_lose_condition()
 			EffectRes.EffectType.COST_ZERO_TURN:
 				if deck_mgr:
@@ -582,10 +644,16 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if hand_size > 0:
 						_deal_damage_to_enemy(target_enemy_index, hand_size * effect.value, effect.damage_type)
 			EffectRes.EffectType.DAMAGE_PER_TOKEN:
-				if target_enemy_index >= 0:
-					var tokens: int = _hero_status.get(card.owner_id, {}).get("tokens", 0)
-					if tokens > 0:
-						_deal_damage_to_enemy(target_enemy_index, tokens * effect.value, effect.damage_type)
+				var _dpt_tokens: int = _hero_status.get(card.owner_id, {}).get("tokens", 0)
+				if _dpt_tokens > 0:
+					var _dpt_bonus: int = _active_powers.get("power.token_bonus_dmg:" + card.owner_id, {}).get("value", 0)
+					var _dpt_dmg: int = _dpt_tokens * (effect.value + _dpt_bonus)
+					if effect.target == "ALL":
+						for i in range(_enemies.size()):
+							if _enemy_alive[i]:
+								_deal_damage_to_enemy(i, _dpt_dmg, effect.damage_type)
+					elif target_enemy_index >= 0:
+						_deal_damage_to_enemy(target_enemy_index, _dpt_dmg, effect.damage_type)
 			EffectRes.EffectType.HEAL_PER_DEAD_ALLY:
 				if team_mgr:
 					var dead_count: int = 0
@@ -620,6 +688,53 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						if cur > 0:
 							_enemy_status[i][key] = cur * 2
 							status_applied.emit("enemy_%d" % i, key, cur * 2)
+			EffectRes.EffectType.SACRIFICE_PAYOFF:
+				var _sbank_key: String = "power.sacrifice_bank:" + card.owner_id
+				var _banked: int = _active_powers.get(_sbank_key, {}).get("value", 0)
+				if _banked > 0:
+					var _payout: int = (_banked / 100) * effect.value
+					if _payout > 0:
+						if effect.status_type == "block":
+							if effect.target == "ALL" and team_mgr:
+								for hero in team_mgr.heroes:
+									_hero_block[hero.hero_id] = _hero_block.get(hero.hero_id, 0) + _payout
+							else:
+								_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + _payout
+						else:
+							if effect.target == "ALL":
+								for i in range(_enemies.size()):
+									if _enemy_alive[i]:
+										_deal_damage_to_enemy(i, _payout, effect.damage_type)
+							elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+								_deal_damage_to_enemy(target_enemy_index, _payout, effect.damage_type)
+			EffectRes.EffectType.CHARM_TO_DAMAGE:
+				var _ctd_targets: Array = []
+				if effect.target == "ALL":
+					for i in range(_enemies.size()):
+						if _enemy_alive[i]:
+							_ctd_targets.append(i)
+				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+					_ctd_targets = [target_enemy_index]
+				for i in _ctd_targets:
+					var _cstacks: int = _enemy_status[i].get("charm", 0)
+					if _cstacks > 0:
+						_enemy_status[i]["charm"] = 0
+						_deal_damage_to_enemy(i, _cstacks * effect.bonus_value, effect.damage_type)
+			EffectRes.EffectType.MULTI_HIT_RANDOM:
+				var _mhr_living: Array = []
+				for i in range(_enemies.size()):
+					if _enemy_alive[i]:
+						_mhr_living.append(i)
+				for _h in range(effect.hit_count):
+					if _mhr_living.is_empty():
+						break
+					var _rand_e: int = _mhr_living[randi() % _mhr_living.size()]
+					_deal_damage_to_enemy(_rand_e, effect.value, effect.damage_type)
+					_last_attacker[_rand_e] = card.owner_id
+					_mhr_living.clear()
+					for i in range(_enemies.size()):
+						if _enemy_alive[i]:
+							_mhr_living.append(i)
 	_apply_synergy_bonus(card, target_enemy_index)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "") -> void:
@@ -672,7 +787,12 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 		_enemy_status[enemy_index]["poison_dur"] = 3
 	elif status_type == "charm":
 		var new_charm: int = _enemy_status[enemy_index].get("charm", 0) + stacks
-		var threshold: int = 3 + _enemy_status[enemy_index].get("charm_resistance", 0)
+		# power.charm_threshold_minus: 임계치 하향 (모든 영웅의 합산)
+		var _charm_reduce: int = 0
+		for _cpk in _active_powers:
+			if _cpk.begins_with("power.charm_threshold_minus:"):
+				_charm_reduce += _active_powers[_cpk].get("value", 0)
+		var threshold: int = max(1, 3 + _enemy_status[enemy_index].get("charm_resistance", 0) - _charm_reduce)
 		if new_charm >= threshold:
 			_enemy_status[enemy_index]["charm"] = 0
 			_enemy_status[enemy_index]["enthrall"] = _enemy_status[enemy_index].get("enthrall", 0) + 1

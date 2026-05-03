@@ -94,6 +94,8 @@ func _apply_upgrade(card: Resource, level: int) -> Resource:
 				var lv: int = i + 1
 				effect.value = int(effect.base_value * (1.0 + rate * lv))
 				effect.bonus_value = int(effect.base_bonus_value * (1.0 + rate * lv))
+			elif effect.effect_type == EffRes.EffectType.APPLY_STATUS and effect.status_type.begins_with("power."):
+				effect.value = effect.base_value + (i + 1) * 5
 			elif effect.effect_type in INT_TYPES:
 				effect.value = effect.base_value + (i + 1)
 				effect.bonus_value = effect.base_bonus_value + (i + 1) if effect.base_bonus_value > 0 else 0
@@ -103,6 +105,10 @@ func _format_effects(card: Resource) -> String:
 	var parts: Array = []
 	for e in card.effects:
 		parts.append(e.display_text())
+	if card.is_exhaust:  parts.append("[%s]" % tr("card.tag.exhaust"))
+	if card.is_ethereal: parts.append("[%s]" % tr("card.tag.ethereal"))
+	if card.is_retain:   parts.append("[%s]" % tr("card.tag.retain"))
+	if card.is_innate:   parts.append("[%s]" % tr("card.tag.innate"))
 	return " ".join(parts)
 
 # ─────────────────────────────────────────

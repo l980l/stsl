@@ -392,18 +392,18 @@ static func _zen_realm() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _empty_guard() -> Resource:
-	# 공수처 — UNCOMMON, 1코, 기술, 무심: DRAW 1 + BLOCK 80
+	# 공수처 — UNCOMMON, 1코, 기술, 무심: BLOCK 50 + COST_NEXT -1
 	var c := CardRes.new()
 	c.card_name = "card.musashi.empty_guard.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	c.archetype = "card.musashi.empty_guard.archetype"
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.DRAW
-	ea.value = 1; ea.base_value = 1
+	ea.effect_type = EffRes.EffectType.BLOCK
+	ea.value = 50; ea.base_value = 50; ea.target = "SELF"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.BLOCK
-	eb.value = 50; eb.base_value = 50; eb.target = "SELF"
+	eb.effect_type = EffRes.EffectType.COST_NEXT
+	eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
 
 

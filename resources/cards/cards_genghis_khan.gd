@@ -117,16 +117,20 @@ static func _scout() -> Resource:
 	c.effects = [e]; return c
 
 static func _arrow_volley() -> Resource:
+	# 화살 일제사격 — UNCOMMON, 1코, ATTACK, 기동: DMG 40 ALL + MORALE+1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.arrow_volley.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
 	c.archetype = "card.genghis_khan.arrow_volley.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.DAMAGE
-	e.value = 55; e.base_value = 55; e.target = "ALL"
-	e.damage_type = "projectile"
-	c.effects = [e]; return c
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.DAMAGE
+	ea.value = 40; ea.base_value = 40; ea.target = "ALL"
+	ea.damage_type = "projectile"
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.GAIN_MORALE
+	eb.value = 1; eb.base_value = 1
+	c.effects = [ea, eb]; return c
 
 static func _ambush() -> Resource:
 	var c := CardRes.new()
@@ -197,6 +201,7 @@ static func _poison_arrow() -> Resource:
 
 
 static func _conquerors_ambition() -> Resource:
+	# 정복자의 야망 — RARE, 1코, ATTACK, 기동: DMG 70 + MORALE+1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.conquerors_ambition.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -204,10 +209,10 @@ static func _conquerors_ambition() -> Resource:
 	c.archetype = "card.genghis_khan.conquerors_ambition.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 60; ea.base_value = 60; ea.target = "SINGLE"
+	ea.value = 70; ea.base_value = 70; ea.target = "SINGLE"
 	ea.damage_type = "slash"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.DRAW
+	eb.effect_type = EffRes.EffectType.GAIN_MORALE
 	eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
 
@@ -321,7 +326,7 @@ static func _spoils_distribution() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _plunder_flame() -> Resource:
-	# 약탈의 불길 — UNCOMMON, 1코, 공격, 약탈: DMG 100 + DRAW 1
+	# 약탈의 불길 — UNCOMMON, 1코, 공격, 약탈: DMG 80 SINGLE + POISON 1 ALL
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.plunder_flame.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -329,11 +334,11 @@ static func _plunder_flame() -> Resource:
 	c.archetype = "card.genghis_khan.plunder_flame.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 50; ea.base_value = 50; ea.target = "SINGLE"
+	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
 	ea.damage_type = "explosive"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.DRAW
-	eb.value = 1; eb.base_value = 1
+	eb.effect_type = EffRes.EffectType.APPLY_STATUS
+	eb.status_type = "poison"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
 	c.effects = [ea, eb]; return c
 
 static func _rapid_fire() -> Resource:
@@ -382,7 +387,7 @@ static func _cavalry_encirclement() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _iron_breakthrough() -> Resource:
-	# 무간 돌파 — UNCOMMON, 2코, 공격, 몽골 기병: DMG 80 ALL + WEAK 1 ALL
+	# 무간 돌파 — UNCOMMON, 2코, 공격, 몽골 기병: DMG 90 ALL + VULNERABLE 1 ALL
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.iron_breakthrough.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
@@ -394,7 +399,7 @@ static func _iron_breakthrough() -> Resource:
 	ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.value = 1; eb.base_value = 1; eb.target = "ALL"; eb.status_type = "weak"
+	eb.value = 1; eb.base_value = 1; eb.target = "ALL"; eb.status_type = "vulnerable"
 	c.effects = [ea, eb]; return c
 
 static func _desert_cavalry() -> Resource:

@@ -234,23 +234,26 @@ static func _divine_wrath() -> Resource:
 	c.effects = [ea, eb, ec]; return c
 
 static func _divine_punishment() -> Resource:
-	# LEGENDARY, 2코, ATTACK: DMG 80 ALL + WEAK 1 ALL + VULNERABLE 1 ALL (cp=1.97)
+	# LEGENDARY, 2코, ATTACK: SACRIFICE 100 + DMG 150 ALL + WEAK 2 ALL + VULNERABLE 2 ALL (cp=2.77)
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.divine_punishment.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
 	c.archetype = "card.joan_of_arc.divine_punishment.archetype"
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 80; ea.base_value = 80; ea.target = "ALL"
-	ea.damage_type = "divine"
+	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
+	ea.value = 100; ea.base_value = 100
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "weak"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
+	eb.effect_type = EffRes.EffectType.DAMAGE
+	eb.value = 150; eb.base_value = 150; eb.target = "ALL"
+	eb.damage_type = "divine"
 	var ec := EffRes.new()
 	ec.effect_type = EffRes.EffectType.APPLY_STATUS
-	ec.status_type = "vulnerable"; ec.value = 1; ec.base_value = 1; ec.target = "ALL"
-	c.effects = [ea, eb, ec]; return c
+	ec.status_type = "weak"; ec.value = 2; ec.base_value = 2; ec.target = "ALL"
+	var ed := EffRes.new()
+	ed.effect_type = EffRes.EffectType.APPLY_STATUS
+	ed.status_type = "vulnerable"; ed.value = 2; ed.base_value = 2; ed.target = "ALL"
+	c.effects = [ea, eb, ec, ed]; return c
 
 static func _archangels_wrath() -> Resource:
 	# LEGENDARY, 3코, ATTACK: DMG 200 ALL divine + WEAK 1 ALL (cp=3.08)

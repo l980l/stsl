@@ -37,6 +37,9 @@ enum EffectType {
 	HEAL_PER_DEAD_ALLY,   # 사망 아군 수 × value HP 회복. target=SINGLE/ALL
 	ENERGY_TO_DAMAGE,     # 남은 에너지 × value 데미지 + 에너지 소진
 	STATUS_DOUBLE,        # 대상 적 weak/vulnerable/poison/charm 스택 ×2
+	SACRIFICE_PAYOFF,     # power.sacrifice_bank 읽기 → (뱅크/100) × value dmg 또는 block (status_type="block")
+	CHARM_TO_DAMAGE,      # 대상 적 charm 스택 소비 → 스택당 bonus_value dmg
+	MULTI_HIT_RANDOM,     # 랜덤 적에게 hit_count회 value 피해 (같은 적 반복 가능)
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
@@ -77,6 +80,9 @@ func display_text() -> String:
 			if status_type == "poison":
 				var _pk: String = "effect.apply_status_poison.all.text" if target == "ALL" else "effect.apply_status_poison.single.text"
 				return TranslationServer.translate(_pk) % (value * 10)
+			elif status_type == "power.every_nth_attack_bonus":
+				var fmt: String = TranslationServer.translate("power.every_nth_attack_bonus.label")
+				return fmt % [bonus_value, value] if fmt.contains("%") else fmt
 			elif status_type.begins_with("power."):
 				var fmt: String = TranslationServer.translate(status_type + ".label")
 				return fmt % value if fmt.contains("%") else fmt
@@ -154,4 +160,12 @@ func display_text() -> String:
 		EffectType.STATUS_DOUBLE:
 			var _sdk: String = "effect.status_double.all.text" if target == "ALL" else "effect.status_double.single.text"
 			return TranslationServer.translate(_sdk)
+		EffectType.SACRIFICE_PAYOFF:
+			if status_type == "block":
+				return TranslationServer.translate("effect.sacrifice_payoff.block.text") % value
+			return TranslationServer.translate("effect.sacrifice_payoff.text") % value
+		EffectType.CHARM_TO_DAMAGE:
+			return TranslationServer.translate("effect.charm_to_damage.text") % bonus_value
+		EffectType.MULTI_HIT_RANDOM:
+			return TranslationServer.translate("effect.multi_hit_random.text") % [hit_count, value]
 	return ""
