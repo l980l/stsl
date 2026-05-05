@@ -1,7 +1,7 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-03 v10)
-> 기준: 챕터 1·2 완성 + 영웅 6인 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 기준
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-05 v11)
+> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
 ---
@@ -9,7 +9,9 @@
 ## 현재 상태 요약
 
 **챕터 1** (그리스·이집트·북유럽 랜덤 배정) 완성. **챕터 2** (한국·중국·일본 랜덤 배정) 완성 (PR #50, #51, #58, #59, #60).
-영웅 6인(나폴레옹·이순신·클레오파트라·잔 다르크·칭기즈칸·미야모토 무사시), 영웅당 카드 40장(아키타입 3개).
+영웅 6인(나폴레옹·이순신·클레오파트라·잔 다르크·칭기즈칸·미야모토 무사시), **영웅당 카드 풀 30장(아키타입 3개, v3 전면 재설계 완료)**.
+**카드 다양성 엔진 확장**: EffectType 3종 신규(MULTI_HIT_RANDOM·DAMAGE_PER_STATUS_TYPE·DRAW_PER_ENTHRALL) + Power 훅 16종 추가.
+**balance_check 전면 공식화**: SKIP 34개 → 0, X코 카드(spend_all_energy) 유효코스트 처리 추가. 최종 결과 OK 240 | NG 0 | SKIP 0 | DUP 0.
 **챕터 1 Act 1 (그리스)**: 적 10종(일반 6·엘리트 4·보스 히드라), 이벤트 10종, 렐릭 19종.
 **챕터 1 Act 2 (이집트)**: 적 10종(일반 6·엘리트 3·보스 오시리스 2페이즈), 이벤트 10종, 전용 렐릭 3종, 난이도 스케일(HP ×1.3, 공격 ×1.2).
 **챕터 1 Act 3 (북유럽)**: 적 10종(일반 6·엘리트 3·보스 요르문간드르 3페이즈), 이벤트 10종, 전용 렐릭 3종(총 풀 25종).
@@ -172,6 +174,15 @@
 - ✅ BUFF intent 처리 — status_type 기반 분기 (strength vs 방어도), 적 strength 공격력 반영 (PR #35)
 - ✅ poison_per_turn 지속 시간 누적 수정 (2 고정 → 기존값+2, PR #35)
 - ✅ IntentResource PREPARE 타입 추가 — 사이클롭스 준비 턴 방어도 0 표시 버그 수정 (PR #35)
+
+### 1-10. 카드 밸런스 검증 도구 ✅
+
+- ✅ `tools/balance_check.gd` — 헤드리스 CP 검증기
+  - 전 EffectType(0~39) CP 공식 커버 (SKIP 34→0)
+  - X코 카드(spend_all_energy) 유효코스트 자동 감지 처리
+  - DUP 중복 효과 시그니처 검사
+  - 업그레이드 CP 증가율(±15%/레벨) 검증
+  - 최종 결과: OK 240 | NG 0 | SKIP 0 | DUP 0
 
 ### 1-9. 개발·기획 지원 도구 ✅
 
@@ -370,6 +381,12 @@ GDD 기준 MVP 3인 이후 확장 영웅.
   - CONDITIONAL_DMG 조건키 확장: enemy_hp_below_30/50 / dead_ally_any / dead_ally_count / team_hp_below_30
   - 잔 다르크 38장 (신성/부활/순교), 칭기즈칸 38장 (기동/몽골 기병/약탈), 무사시 38장 (이도류/결투/무심)
   - 978 테스트 통과
+- ✅ **v3 전면 재설계 완료** (영웅당 30장, 아키타입 역할 분류 완성)
+  - 엔진 확장: MULTI_HIT_RANDOM(36) / DAMAGE_PER_STATUS_TYPE(37) / DRAW_PER_ENTHRALL(38) 신규 EffectType
+  - Power 훅 16종 추가: charm_double_apply / on_enthrall_strength / sacrifice_bank / echo_next_attack / spend_all_energy_poison_double 등
+  - 무사시 30장 (이도류10/결투10/무심10), 클레오파트라 30장 (독살12/저주10/조종8), 잔다르크 30장, 이순신 30장, 칭기즈칸 30장, 나폴레옹 30장
+  - balance_check SKIP 34→0 전면 공식화, X코 카드 유효코스트 처리
+  - 최종 결과: OK 240 | NG 0 | SKIP 0 | DUP 0
 - 🔲 영웅 선택 화면·스프라이트·사운드 (Milestone 7 UI 폴리시 단계)
 
 ---
