@@ -1,4 +1,4 @@
-# resources/enemies/japanese/japanese_act3.gd
+﻿# resources/enemies/japanese/japanese_act3.gd
 # 일본 신화 Act 3 — 엘리트 3종(아마노이와토 수문장·스사노오의 검·유키온나의 여왕) + 보스(야마타노오로치)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -16,7 +16,7 @@ static func iwato_guardian(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 190; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func susanoo_blade(scene: PackedScene) -> Resource:
@@ -33,7 +33,7 @@ static func susanoo_blade(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.DEBUFF; i4.value = 2; i4.status_type = "vulnerable"
 	i4.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func blizzard_queen(scene: PackedScene) -> Resource:
@@ -53,7 +53,7 @@ static func blizzard_queen(scene: PackedScene) -> Resource:
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.BUFF; i5.value = 2; i5.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func yamata_no_orochi(scene: PackedScene) -> Resource:
@@ -103,7 +103,7 @@ static func yamata_no_orochi(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3, p2i4, p2i5]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 static func elites() -> Array:

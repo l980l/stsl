@@ -10,6 +10,7 @@ const RelicRes = preload("res://resources/relic_resource.gd")
 const POISON_DMG_PER_STACK: int = 10
 const TOKEN_DMG_PER_STACK: int = 25
 const TOKEN_MAX_STACK: int = 6
+const CHARM_THRESHOLD_BASE: int = 100
 
 # 의존성 주입 — 프로덕션: BattleScene이 설정, 테스트: 직접 할당
 var team_mgr = null
@@ -52,6 +53,7 @@ var _cards_played_this_turn: int = 0
 var _enemy_card_counters: Dictionary = {}
 var _cards_drawn_this_turn: int = 0
 var _kills_this_card: int = 0
+var _enthralls_this_card: int = 0
 var _in_echo_replay: bool = false
 
 signal battle_started()
@@ -297,6 +299,16 @@ func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
 					var cur_tok: int = _hero_status[owner_id].get("tokens", 0)
 					_hero_status[owner_id]["tokens"] = min(cur_tok + v, TOKEN_MAX_STACK)
 					status_applied.emit(owner_id, "tokens", v)
+			"power.on_enthrall_strength":
+				if phase == "on_enthrall":
+					var _oes_id: String = power.get("owner_id", "")
+					var cur_str: int = _active_powers.get("power.strength_player:" + _oes_id, {}).get("value", 0)
+					_active_powers["power.strength_player:" + _oes_id] = {
+						"value": cur_str + v,
+						"owner_id": _oes_id,
+						"params": {},
+					}
+					active_powers_changed.emit()
 	if phase == "player_turn_start":
 		active_powers_changed.emit()
 
@@ -340,6 +352,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 	if team_mgr and not team_mgr.is_alive(card.owner_id):
 		return
 	_kills_this_card = 0
+	_enthralls_this_card = 0
 	for effect in card.effects:
 		# condition 필드 평가 — 조건 불충족 시 이 효과 스킵
 		if effect.condition != "" and not _evaluate_condition(effect.condition, card):
@@ -451,8 +464,13 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_charm_stacks = _charm_stacks * (1 + _cdbl)
 				if effect.target == "ALL":
 					for ei in range(_enemies.size()):
-						if _enemy_alive[ei]:
-							_apply_status_to_enemy(ei, "charm", _charm_stacks)
+						if not _enemy_alive[ei]:
+							continue
+						if effect.condition == "enemy_hp_below_50":
+							var _max_chp: int = _enemies[ei].max_hp
+							if not (_max_chp > 0 and float(_enemy_hp[ei]) / float(_max_chp) <= 0.50):
+								continue
+						_apply_status_to_enemy(ei, "charm", _charm_stacks)
 				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					_apply_status_to_enemy(target_enemy_index, "charm", _charm_stacks)
 			EffectRes.EffectType.CONSUME_MORALE:
@@ -471,7 +489,16 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if card.owner_id == "napoleon" and team_mgr and team_mgr.is_alive("musashi"):
 						_hero_block["musashi"] = _hero_block.get("musashi", 0) + 8
 			EffectRes.EffectType.POISON_BURST:
-				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+				if effect.target == "ALL":
+					for _pbi in range(_enemies.size()):
+						if _enemy_alive[_pbi]:
+							var _pb_pdmg: int = _enemy_status[_pbi].get("poison_dmg", 0)
+							if _pb_pdmg > 0:
+								var _pb_dmg: int = _pb_pdmg * effect.value / 100 * POISON_DMG_PER_STACK
+								_deal_damage_to_enemy(_pbi, _pb_dmg, effect.damage_type)
+								_enemy_status[_pbi]["poison_dmg"] = 0
+								_enemy_status[_pbi]["poison_dur"] = 0
+				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					var pdmg: int = _enemy_status[target_enemy_index].get("poison_dmg", 0)
 					if pdmg > 0:
 						var burst_dmg: int = pdmg * effect.value / 100 * POISON_DMG_PER_STACK
@@ -599,6 +626,25 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					for _i in range(_kills_this_card):
 						deck_mgr.draw_cards(effect.value)
 						_cards_drawn_this_turn += effect.value
+			EffectRes.EffectType.DRAW_PER_ENTHRALL:
+				# 이번 카드로 반함 발동 횟수 × value 드로우
+				if deck_mgr and _enthralls_this_card > 0:
+					var _draw_amt: int = _enthralls_this_card * effect.value
+					deck_mgr.draw_cards(_draw_amt)
+					_cards_drawn_this_turn += _draw_amt
+			EffectRes.EffectType.DAMAGE_PER_CHARMED_ENEMY:
+				# charm 스택 보유 적 수 × value 피해
+				var _charmed_count: int = 0
+				for _cei in range(_enemies.size()):
+					if _enemy_alive[_cei] and _enemy_status[_cei].get("charm", 0) > 0:
+						_charmed_count += 1
+				var _cpce_dmg: int = _charmed_count * effect.value
+				if effect.target == "ALL":
+					for _cei2 in range(_enemies.size()):
+						if _enemy_alive[_cei2]:
+							_deal_damage_to_enemy(_cei2, _cpce_dmg, effect.damage_type)
+				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+					_deal_damage_to_enemy(target_enemy_index, _cpce_dmg, effect.damage_type)
 			EffectRes.EffectType.PURGE_STATUS:
 				if team_mgr:
 					var heroes_to_purge: Array = []
@@ -805,6 +851,11 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 		_enemy_alive[enemy_index] = false
 		_kills_this_card += 1
 		enemy_died.emit(enemy_index)
+		for _pke in _active_powers:
+			if _pke.split(":")[0] == "power.on_kill_energy":
+				if deck_mgr:
+					deck_mgr.current_energy += _active_powers[_pke].get("value", 1)
+					deck_mgr.energy_changed.emit(deck_mgr.current_energy)
 	_check_phase_transition(enemy_index)
 	_check_win_condition()
 
@@ -845,11 +896,13 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 		for _cpk in _active_powers:
 			if _cpk.begins_with("power.charm_threshold_minus:"):
 				_charm_reduce += _active_powers[_cpk].get("value", 0)
-		var threshold: int = max(1, 3 + _enemy_status[enemy_index].get("charm_resistance", 0) - _charm_reduce)
+		var threshold: int = max(1, CHARM_THRESHOLD_BASE + _enemy_status[enemy_index].get("charm_resistance", 0) - _charm_reduce)
 		if new_charm >= threshold:
 			_enemy_status[enemy_index]["charm"] = 0
 			_enemy_status[enemy_index]["enthrall"] = _enemy_status[enemy_index].get("enthrall", 0) + 1
 			status_applied.emit("enemy_%d" % enemy_index, "enthrall", 1)
+			_enthralls_this_card += 1
+			_trigger_active_powers("on_enthrall", {"enemy_index": enemy_index})
 			return
 		else:
 			_enemy_status[enemy_index]["charm"] = new_charm
@@ -939,10 +992,16 @@ func _phase_enemy_main() -> void:
 			if _enemy_status[i].get(stype, 0) > 0:
 				_enemy_status[i][stype] -= 1
 		var charm: int = _enemy_status[i].get("charm", 0)
-		var charm_threshold: int = 3 + _enemy_status[i].get("charm_resistance", 0)
+		var _charm_reduce_turn: int = 0
+		for _cpk2 in _active_powers:
+			if _cpk2.begins_with("power.charm_threshold_minus:"):
+				_charm_reduce_turn += _active_powers[_cpk2].get("value", 0)
+		var charm_threshold: int = max(1, CHARM_THRESHOLD_BASE + _enemy_status[i].get("charm_resistance", 0) - _charm_reduce_turn)
 		if charm >= charm_threshold:
 			_enemy_status[i]["charm"] = 0
 			_enemy_status[i]["enthrall"] = _enemy_status[i].get("enthrall", 0) + 1
+			status_applied.emit("enemy_%d" % i, "enthrall", 1)
+			_trigger_active_powers("on_enthrall", {"enemy_index": i})
 		var enthrall: int = _enemy_status[i].get("enthrall", 0)
 		if enthrall > 0:
 			_enemy_status[i]["enthrall"] = enthrall - 1

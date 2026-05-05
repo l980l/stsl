@@ -1,4 +1,4 @@
-# resources/enemies/greek/greek_act1.gd
+﻿# resources/enemies/greek/greek_act1.gd
 # 그리스 신화 — Act1 엘리트 4종 + 보스(히드라)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -16,7 +16,7 @@ static func minotaur(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 260; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func medusa(scene: PackedScene) -> Resource:
@@ -34,7 +34,7 @@ static func medusa(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 180; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func gorgon(scene: PackedScene) -> Resource:
@@ -66,7 +66,7 @@ static func gorgon(scene: PackedScene) -> Resource:
 	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 160; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "curse"
 	e.phase_patterns = [[p0i1, p0i2, p0i3, p0i4, p0i5, p0i6], [p1i1, p1i2, p1i3]]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func scylla(scene: PackedScene) -> Resource:
@@ -98,7 +98,7 @@ static func scylla(scene: PackedScene) -> Resource:
 	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 160; p1i3.target = IntentRes.TargetType.RANDOM; p1i3.damage_type = "slash"
 	e.phase_patterns = [[p0i1, p0i2, p0i3, p0i4, p0i5, p0i6, p0i7], [p1i1, p1i2, p1i3]]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 # ──── 보스 ────
@@ -139,7 +139,7 @@ static func hydra(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3, p2i4, p2i5]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 # ──── API ────

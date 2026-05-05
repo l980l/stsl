@@ -1,4 +1,4 @@
-# resources/enemies/japanese/japanese_act1.gd
+﻿# resources/enemies/japanese/japanese_act1.gd
 # 일본 신화 Act 1 — 엘리트 3종(오니 장군·야마우바·로닌 무적) + 보스(라이덴)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -17,7 +17,7 @@ static func oni_general(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.DEBUFF; i4.value = 2; i4.status_type = "vulnerable"
 	i4.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func yamamba(scene: PackedScene) -> Resource:
@@ -35,7 +35,7 @@ static func yamamba(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 160; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func invincible_ronin(scene: PackedScene) -> Resource:
@@ -51,7 +51,7 @@ static func invincible_ronin(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func raijin(scene: PackedScene) -> Resource:
@@ -95,7 +95,7 @@ static func raijin(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3, p2i4]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 static func elites() -> Array:

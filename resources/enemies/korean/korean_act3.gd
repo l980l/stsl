@@ -1,4 +1,4 @@
-# resources/enemies/korean/korean_act3.gd
+﻿# resources/enemies/korean/korean_act3.gd
 # 한국 신화 — Act 3 엘리트 3종(저승 판관·갓신·처용신) + 보스(구삼승할망)
 const EnemyRes   = preload("res://resources/enemy_resource.gd")
 const IntentRes  = preload("res://resources/intent_resource.gd")
@@ -20,7 +20,7 @@ static func underworld_judge(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.DEBUFF; i5.value = 2; i5.status_type = "weak"
 	i5.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	# 카드 타입 카운터: 공격 카드 4장마다 HP 가장 낮은 영웅에게 50 즉결 데미지
 	var _jtrigger := IntentRes.new()
 	_jtrigger.action_type = IntentRes.ActionType.ATTACK
@@ -50,7 +50,7 @@ static func gat_spirit(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 200; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func cheoyong_god(scene: PackedScene) -> Resource:
@@ -70,7 +70,7 @@ static func cheoyong_god(scene: PackedScene) -> Resource:
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 190; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func gusamseung_halmang(scene: PackedScene) -> Resource:
@@ -129,7 +129,7 @@ static func gusamseung_halmang(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 static func elites() -> Array:

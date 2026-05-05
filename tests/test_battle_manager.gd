@@ -56,6 +56,10 @@ func run_all() -> Dictionary:
 	test_synergy_genghis_cleopatra_not_present()
 	test_synergy_musashi_yisunsin_duel()
 	test_synergy_musashi_yisunsin_not_present()
+	test_on_enthrall_strength_trigger()
+	test_draw_per_enthrall_fires()
+	test_damage_per_charmed_enemy()
+	test_on_enthrall_trigger_enemy_turn()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -364,9 +368,9 @@ func test_charm_converts_to_enthrall_at_3() -> void:
 	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
 	var intent := _make_intent(IntentRes.ActionType.ATTACK, 10, IntentRes.TargetType.RANDOM)
 	bm.setup_battle([_make_enemy(30, [intent])])
-	bm._enemy_status[0]["charm"] = 3
+	bm._enemy_status[0]["charm"] = 100  # 임계치 100 기준 (구: 3)
 	bm.start_player_turn()
-	bm.end_player_turn()  # charm 3 → enthrall 전환, 다른 적 없어 공격 스킵
+	bm.end_player_turn()  # charm 100 → enthrall 전환, 다른 적 없어 공격 스킵
 	_assert(bm.team_mgr.get_current_hp("napoleon") == 70, "홀림 턴: 다른 적 없어 영웅 HP 불변")
 	_assert(bm._enemy_status[0].get("charm", -1) == 0, "charm 스택 → 0 초기화")
 
@@ -817,3 +821,102 @@ func test_synergy_musashi_yisunsin_not_present() -> void:
 	bm.play_card(card, 0)
 	_assert(bm._hero_block.get("yi_sun_sin", 0) == 0,
 		"검사의 약속: 이순신 없으면 BLOCK 미부여")
+
+func test_on_enthrall_strength_trigger() -> void:
+	print("[TestBattleManager] test_on_enthrall_strength_trigger")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 200))
+	var intent := _make_intent(IntentRes.ActionType.ATTACK, 10, IntentRes.TargetType.RANDOM)
+	bm.setup_battle([_make_enemy(100, [intent])])
+	bm.start_player_turn()
+	# 뱀의 의식: power.on_enthrall_strength +1 등록
+	bm._active_powers["power.on_enthrall_strength:cleopatra"] = {
+		"value": 1, "owner_id": "cleopatra", "params": {}
+	}
+	# CHARM 100 부여 → 즉시 enthrall 전환 → on_enthrall 트리거 발동
+	bm._apply_status_to_enemy(0, "charm", 100)
+	var str_val: int = bm._active_powers.get("power.strength_player:cleopatra", {}).get("value", 0)
+	_assert(str_val == 1, "on_enthrall_strength: enthrall 1회 발동 시 strength +1 등록")
+	# 한 번 더 — charm 100 재부여 → enthrall 2회
+	bm._apply_status_to_enemy(0, "charm", 100)
+	str_val = bm._active_powers.get("power.strength_player:cleopatra", {}).get("value", 0)
+	_assert(str_val == 2, "on_enthrall_strength: enthrall 누적 2회 → strength +2")
+
+func test_draw_per_enthrall_fires() -> void:
+	print("[TestBattleManager] test_draw_per_enthrall_fires")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 200))
+	var intent := _make_intent(IntentRes.ActionType.ATTACK, 10, IntentRes.TargetType.RANDOM)
+	bm.setup_battle([_make_enemy(100, [intent])])
+	bm.start_player_turn()
+	# deck에 더미 카드 충분히 추가
+	for _i in range(5):
+		bm.deck_mgr.deck.append(_make_card("cleopatra", 0, []))
+	# 클레오파트라의 입맞춤: CHARM 100 SINGLE + DRAW_PER_ENTHRALL 2
+	var ea := EffectRes.new()
+	ea.effect_type = EffectRes.EffectType.CHARM
+	ea.value = 100; ea.target = "SINGLE"
+	var eb := EffectRes.new()
+	eb.effect_type = EffectRes.EffectType.DRAW_PER_ENTHRALL
+	eb.value = 2
+	var card := _make_card("cleopatra", 0, [ea, eb])
+	bm.deck_mgr.hand.append(card)
+	bm.deck_mgr.current_energy = 3
+	var drawn_before: int = bm._cards_drawn_this_turn
+	bm.play_card(card, 0)
+	# CHARM 100 → enthrall 발동 → DRAW_PER_ENTHRALL 2 → _cards_drawn_this_turn +2
+	_assert(bm._cards_drawn_this_turn >= drawn_before + 2,
+		"DRAW_PER_ENTHRALL: enthrall 발동 시 카드 2장 드로우 발생")
+
+func test_damage_per_charmed_enemy() -> void:
+	print("[TestBattleManager] test_damage_per_charmed_enemy")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 200))
+	var intent := _make_intent(IntentRes.ActionType.ATTACK, 5, IntentRes.TargetType.RANDOM)
+	bm.setup_battle([
+		_make_enemy(500, [intent]),
+		_make_enemy(500, [intent]),
+		_make_enemy(500, [intent]),
+	])
+	bm.start_player_turn()
+	# 적 0,1번에 charm 50 부여 (미반함), 2번은 charm 0
+	bm._enemy_status[0]["charm"] = 50
+	bm._enemy_status[1]["charm"] = 50
+	# 황금 왕좌: DAMAGE 0 ALL + DAMAGE_PER_CHARMED_ENEMY 20 ALL
+	var ea := EffectRes.new()
+	ea.effect_type = EffectRes.EffectType.DAMAGE
+	ea.value = 0; ea.target = "ALL"
+	var eb := EffectRes.new()
+	eb.effect_type = EffectRes.EffectType.DAMAGE_PER_CHARMED_ENEMY
+	eb.value = 20; eb.target = "ALL"
+	var card := _make_card("cleopatra", 0, [ea, eb])
+	bm.deck_mgr.hand.append(card)
+	bm.deck_mgr.current_energy = 3
+	bm.play_card(card, 0)
+	# 매혹된 적 2마리 × 20 = 40 ALL dmg (모든 3마리에게)
+	_assert(bm.get_enemy_hp(0) == 460, "DAMAGE_PER_CHARMED_ENEMY: 매혹 2마리×20=40 → 적0 HP 460")
+	_assert(bm.get_enemy_hp(1) == 460, "DAMAGE_PER_CHARMED_ENEMY: 매혹 2마리×20=40 → 적1 HP 460")
+	_assert(bm.get_enemy_hp(2) == 460, "DAMAGE_PER_CHARMED_ENEMY: ALL 대상 → 매혹 없는 적2도 40 피해")
+
+func test_on_enthrall_trigger_enemy_turn() -> void:
+	print("[TestBattleManager] test_on_enthrall_trigger_enemy_turn")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 200))
+	var intent := _make_intent(IntentRes.ActionType.ATTACK, 10, IntentRes.TargetType.RANDOM)
+	bm.setup_battle([_make_enemy(100, [intent])])
+	bm.start_player_turn()
+	# 뱀의 의식 등록
+	bm._active_powers["power.on_enthrall_strength:cleopatra"] = {
+		"value": 1, "owner_id": "cleopatra", "params": {}
+	}
+	# charm 99 부여 (임계치 미달) → 적 턴 charm 평가에서 반함 안 됨
+	bm._enemy_status[0]["charm"] = 99
+	bm.end_player_turn()  # 적 턴: charm 99 < 100 → enthrall 미발동
+	var str_val: int = bm._active_powers.get("power.strength_player:cleopatra", {}).get("value", 0)
+	_assert(str_val == 0, "charm 99 < 임계치 100: 적 턴에 enthrall 미발동, strength 불변")
+	# charm을 다시 100으로 올려서 적 턴에 enthrall 발동 확인
+	bm.start_player_turn()
+	bm._enemy_status[0]["charm"] = 100
+	bm.end_player_turn()  # 적 턴: charm 100 >= 100 → enthrall + on_enthrall_strength 발동
+	str_val = bm._active_powers.get("power.strength_player:cleopatra", {}).get("value", 0)
+	_assert(str_val == 1, "charm 100 적 턴 도달: enthrall 발동 → strength +1")

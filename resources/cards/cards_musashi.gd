@@ -34,7 +34,7 @@ static func pool() -> Array:
 		_meditation(), _empty_state(), _void_sword(),            # F
 		_mushin_power(), _empty_guard(),                         # A
 		_mushin_blade(), _clear_wind(),                          # P
-		_zen_realm(), _block_convert(),                          # C
+		_mushin_burst(), _void_guard(),                          # C
 		_five_rings_realm(),                                     # Chaos
 	]
 
@@ -226,7 +226,7 @@ static func _steel_strike() -> Resource:
 	c.effects = [e]; return c
 
 static func _demon_swordsman() -> Resource:
-	# [Chaos] 검귀의 광기 — RARE, 0코, 공격: 랜덤 적에게 4회 40씩, EXHAUST
+	# [Chaos] 검귀의 광기 — RARE, 0코, 공격: 랜덤 적에게 5회 30씩, EXHAUST
 	var c := CardRes.new()
 	c.card_name = "card.musashi.demon_swordsman.name"; c.owner_id = "musashi"
 	c.cost = 0; c.card_type = CardRes.CardType.ATTACK
@@ -235,7 +235,7 @@ static func _demon_swordsman() -> Resource:
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.MULTI_HIT_RANDOM
-	e.value = 40; e.base_value = 40; e.hit_count = 4
+	e.value = 30; e.base_value = 30; e.hit_count = 5
 	e.damage_type = "slash"
 	c.effects = [e]; return c
 
@@ -307,11 +307,13 @@ static func _blade_polish() -> Resource:
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.strength_player"; e.value = 3; e.base_value = 3; e.target = "SELF"
-	c.effects = [e]; return c
+	e.status_type = "power.strength_player"; e.value = 2; e.base_value = 2; e.target = "SELF"
+	var es := EffRes.new()
+	es.effect_type = EffRes.EffectType.SACRIFICE_HP; es.value = 30; es.base_value = 30
+	c.effects = [e, es]; return c
 
 static func _single_cut() -> Resource:
-	# [P] 일도양단 — RARE, 2코, 공격: 적 1명 → 280 / 복수 → 160 (strength 정산)
+	# [P] 일도양단 — RARE, 2코, 공격: 적 1명 → 340 / 복수 → 160 (strength 정산)
 	var c := CardRes.new()
 	c.card_name = "card.musashi.single_cut.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
@@ -320,7 +322,7 @@ static func _single_cut() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 160; e.base_value = 160
-	e.bonus_value = 280; e.base_bonus_value = 280
+	e.bonus_value = 340; e.base_bonus_value = 340
 	e.target = "SINGLE"; e.status_type = "enemy_count_1"
 	e.damage_type = "slash"
 	c.effects = [e]; return c
@@ -365,7 +367,7 @@ static func _torrent() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _peerless_cut() -> Resource:
-	# [C] 무쌍 베기 — RARE, 1코, 공격: 적 1명 → 200 + WEAK1 / 120 (디버프 세팅)
+	# [C] 무쌍 베기 — RARE, 1코, 공격: 적 1명 → 150 + WEAK1 / 90 (디버프 세팅)
 	var c := CardRes.new()
 	c.card_name = "card.musashi.peerless_cut.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -373,8 +375,8 @@ static func _peerless_cut() -> Resource:
 	c.archetype = "card.musashi.peerless_cut.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CONDITIONAL_DMG
-	ea.value = 120; ea.base_value = 120
-	ea.bonus_value = 200; ea.base_bonus_value = 200
+	ea.value = 90; ea.base_value = 90
+	ea.bonus_value = 150; ea.base_bonus_value = 150
 	ea.target = "SINGLE"; ea.status_type = "enemy_count_1"
 	ea.damage_type = "slash"
 	var eb := EffRes.new()
@@ -384,25 +386,16 @@ static func _peerless_cut() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _fate_duel() -> Resource:
-	# [Chaos] 운명의 결투 — RARE, 2코, 공격: 적 1명 → 적 현재HP만큼 dmg / 2명 이상 → SACRIFICE_HP 50
+	# [Chaos] 운명의 결투 — RARE, 2코, 기술: 타겟 적과 3턴 결투 (상호 피해 +50%)
 	var c := CardRes.new()
 	c.card_name = "card.musashi.fate_duel.name"; c.owner_id = "musashi"
-	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.musashi.fate_duel.archetype"
-	var ea := EffRes.new()
-	# 적 1명 조건 → 대량 피해 (충분히 큰 값으로 오버킬 표현)
-	ea.effect_type = EffRes.EffectType.CONDITIONAL_DMG
-	ea.value = 0; ea.base_value = 0
-	ea.bonus_value = 9999; ea.base_bonus_value = 9999
-	ea.target = "SINGLE"; ea.status_type = "enemy_count_1"
-	ea.damage_type = "slash"
-	var eb := EffRes.new()
-	# 2명 이상(enemy_count_1 불충족)이면 자해 50
-	eb.effect_type = EffRes.EffectType.SACRIFICE_HP
-	eb.value = 50; eb.base_value = 50; eb.target = "SELF"
-	eb.condition = "not_enemy_count_1"
-	c.effects = [ea, eb]; return c
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "duel_lock"; e.value = 3; e.base_value = 3; e.target = "SINGLE"
+	c.effects = [e]; return c
 
 # ─────────────────────────────────────────
 # 무심 10 — 빈 손 조건 + echo 스파인
@@ -440,7 +433,7 @@ static func _empty_state() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _void_sword() -> Resource:
-	# [F] 공허의 검 — COMMON, 1코, 공격: hand=0 → 200 / 100
+	# [F] 공허의 검 — COMMON, 1코, 공격: hand=0 → 150 / 75
 	var c := CardRes.new()
 	c.card_name = "card.musashi.void_sword.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -448,26 +441,27 @@ static func _void_sword() -> Resource:
 	c.archetype = "card.musashi.void_sword.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
-	e.value = 100; e.base_value = 100
-	e.bonus_value = 200; e.base_bonus_value = 200
+	e.value = 75; e.base_value = 75
+	e.bonus_value = 150; e.base_bonus_value = 150
 	e.target = "SINGLE"; e.status_type = "hand_size_0"
 	e.damage_type = "divine"
 	c.effects = [e]; return c
 
 static func _mushin_power() -> Resource:
-	# [A] 무심의 권능 — RARE, 1코, 파워: 다음 ATTACK 카드 효과 1회 재시전
+	# [A] 무심의 권능 — RARE, 2코, 기술 EXHAUST: 다음 공격 카드 2회 추가시전 (총 3회)
 	var c := CardRes.new()
 	c.card_name = "card.musashi.mushin_power.name"; c.owner_id = "musashi"
-	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.musashi.mushin_power.archetype"
+	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.echo_next_attack"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	e.status_type = "power.echo_next_attack"; e.value = 3; e.base_value = 3; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _empty_guard() -> Resource:
-	# [A] 공수처 — UNCOMMON, 1코, 기술: BLOCK 50 + COST_NEXT -1 (다음 카드 연계)
+	# [A] 공수처 — UNCOMMON, 1코, 기술: BLOCK 75 + WEAK 1 (공격·방어 자세 → 적 약화)
 	var c := CardRes.new()
 	c.card_name = "card.musashi.empty_guard.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -475,10 +469,10 @@ static func _empty_guard() -> Resource:
 	c.archetype = "card.musashi.empty_guard.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
-	ea.value = 50; ea.base_value = 50; ea.target = "SELF"
+	ea.value = 75; ea.base_value = 75; ea.target = "SELF"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.COST_NEXT
-	eb.value = 1; eb.base_value = 1
+	eb.effect_type = EffRes.EffectType.APPLY_STATUS
+	eb.status_type = "weak"; eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"
 	c.effects = [ea, eb]; return c
 
 static func _mushin_blade() -> Resource:
@@ -516,34 +510,34 @@ static func _clear_wind() -> Resource:
 	eb.condition = "hand_size_0"
 	c.effects = [ea, eb]; return c
 
-static func _zen_realm() -> Resource:
-	# [C] 선의 경지 — UNCOMMON, 1코, 기술: DRAW 1 + hand=0 → BLOCK 60 (빈손 지속 카운터)
+static func _mushin_burst() -> Resource:
+	# [C] 무심 방출 — UNCOMMON, 0코, 기술 EXHAUST: BLOCK 40 + ENERGY 1 (무심 빈손 유지 + 연계 가속)
 	var c := CardRes.new()
-	c.card_name = "card.musashi.zen_realm.name"; c.owner_id = "musashi"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.card_name = "card.musashi.mushin_burst.name"; c.owner_id = "musashi"
+	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.zen_realm.archetype"
+	c.archetype = "card.musashi.mushin_burst.archetype"
+	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
-	ea.value = 60; ea.base_value = 60; ea.target = "SELF"
-	ea.condition = "hand_size_0"
+	ea.value = 40; ea.base_value = 40; ea.target = "SELF"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.DRAW
+	eb.effect_type = EffRes.EffectType.ENERGY
 	eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
 
-static func _block_convert() -> Resource:
-	# [C] 공의 일격 — UNCOMMON, 1코, 공격: 현재 BLOCK × 100% 피해로 전환 (방어↔공격 전환)
+static func _void_guard() -> Resource:
+	# [C] 공허의 방패 — UNCOMMON, 1코, 기술: 상태이상 전부 제거 후 BLOCK 60
 	var c := CardRes.new()
-	c.card_name = "card.musashi.block_convert.name"; c.owner_id = "musashi"
-	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.block_convert.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.DAMAGE_PER_BLOCK
-	e.value = 100; e.base_value = 100; e.target = "SINGLE"
-	e.damage_type = "slash"
-	c.effects = [e]; return c
+	c.card_name = "card.musashi.void_guard.name"; c.owner_id = "musashi"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.musashi.void_guard.archetype"
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.PURGE_STATUS; ea.target = "SELF"
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 60; eb.base_value = 60
+	c.effects = [ea, eb]; return c
 
 static func _five_rings_realm() -> Resource:
 	# [Chaos] 오륜의 경지 — LEGENDARY, 2코, 기술: hand=0 → COST_ZERO_TURN + DRAW 1, EXHAUST

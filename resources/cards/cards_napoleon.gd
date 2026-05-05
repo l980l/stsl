@@ -238,7 +238,7 @@ static func _borodino_bombardment() -> Resource:
 
 
 static func _emperors_command() -> Resource:
-	# 황제의 명령 — LEGENDARY, 2코, ATTACK, 지휘: DMG 80 ALL + MORALE+2 [INNATE]
+	# 황제의 명령 — LEGENDARY, 2코, ATTACK, 지휘: DMG 80 ALL + MORALE+3 [INNATE]
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.emperors_command.name"; c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
@@ -247,7 +247,7 @@ static func _emperors_command() -> Resource:
 	c.is_innate = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 80; ea.base_value = 80; ea.target = "ALL"
+	ea.value = 75; ea.base_value = 75; ea.target = "ALL"
 	ea.damage_type = "explosive"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.GAIN_MORALE
@@ -514,7 +514,7 @@ static func _one_man_army() -> Resource:
 
 
 static func _emperors_assault() -> Resource:
-	# 황제의 돌격 — LEGENDARY, 2코, ATTACK, 돌격: DMG 200 + CONSUME_MORALE(2)→DMG 250 + BLOCK 100
+	# 황제의 돌격 — LEGENDARY, 2코, ATTACK, 돌격: DMG 210 + CONSUME_MORALE(2)→DMG 250 + BLOCK 100
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.emperors_assault.name"; c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
@@ -530,21 +530,20 @@ static func _emperors_assault() -> Resource:
 	eb.value = 100; eb.base_value = 100; eb.target = "SELF"
 	var ec := EffRes.new()
 	ec.effect_type = EffRes.EffectType.DAMAGE
-	ec.value = 200; ec.base_value = 200; ec.target = "SINGLE"
+	ec.value = 210; ec.base_value = 210; ec.target = "SINGLE"
 	ec.damage_type = "blunt"
 	c.effects = [ea, eb, ec]; return c
 
 static func _empire_glory() -> Resource:
-	# 제국의 영광 — DIVINE, 0코, POWER, 군단: SUMMON_TOKEN 1, EXHAUST
+	# 제국의 영광 — DIVINE, 1코, POWER, 군단: SUMMON_TOKEN 2
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.empire_glory.name"; c.owner_id = "napoleon"
-	c.cost = 0; c.card_type = CardRes.CardType.POWER
+	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "idle"
 	c.archetype = "card.napoleon.empire_glory.archetype"
-	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.SUMMON_TOKEN
-	e.value = 1; e.base_value = 1
+	e.value = 2; e.base_value = 2
 	c.effects = [e]; return c
 
 static func _legion_charge() -> Resource:
@@ -556,7 +555,7 @@ static func _legion_charge() -> Resource:
 	c.archetype = "card.napoleon.legion_charge.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_TOKEN
-	e.value = 110; e.base_value = 110; e.target = "SINGLE"
+	e.value = 75; e.base_value = 75; e.target = "SINGLE"
 	e.damage_type = "blunt"
 	c.effects = [e]; return c
 
@@ -600,20 +599,20 @@ static func _conquest_decree() -> Resource:
 	c.archetype = "card.napoleon.conquest_decree.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.block_per_turn"; e.value = 15; e.base_value = 15; e.target = "SELF"
+	e.status_type = "power.block_per_turn"; e.value = 50; e.base_value = 50; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _alps_crossing() -> Resource:
-	# 알프스 횡단 — RARE, 0코, SKILL, 돌격 [Chaos]: SACRIFICE 40 + ENERGY 3 + DRAW 2, EXHAUST
+	# 알프스 횡단 — RARE, 2코, SKILL, 돌격 [Chaos]: SACRIFICE 40 + ENERGY 3 + DRAW 2, EXHAUST
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.alps_crossing.name"; c.owner_id = "napoleon"
-	c.cost = 0; c.card_type = CardRes.CardType.SKILL
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.napoleon.alps_crossing.archetype"
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
-	ea.value = 40; ea.base_value = 40; ea.target = "SELF"
+	ea.value = 80; ea.base_value = 80; ea.target = "SELF"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.ENERGY
 	eb.value = 3; eb.base_value = 3
@@ -623,7 +622,7 @@ static func _alps_crossing() -> Resource:
 	c.effects = [ea, eb, ec]; return c
 
 static func _emperors_legion() -> Resource:
-	# 황제의 군단 — RARE, 1코, POWER, 군단 [A]: 매턴 토큰+1
+	# 황제의 군단 — RARE, 1코, POWER, 사기 [A]: 매턴 사기+3 (황제의 권능 UNCOMMON 1과 티어 구분)
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.emperors_legion.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
@@ -631,14 +630,16 @@ static func _emperors_legion() -> Resource:
 	c.archetype = "card.napoleon.emperors_legion.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.summon_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
-	c.effects = [e]; return c
+	e.status_type = "power.morale_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	var es := EffRes.new()
+	es.effect_type = EffRes.EffectType.SACRIFICE_HP; es.value = 10; es.base_value = 10
+	c.effects = [e, es]; return c
 
 static func _emperors_will() -> Resource:
-	# 황제의 의지 — UNCOMMON, 1코, POWER, 지휘 [A]: 매턴 드로우+1
+	# 황제의 의지 — UNCOMMON, 2코, POWER, 지휘 [A]: 매턴 드로우+1
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.emperors_will.name"; c.owner_id = "napoleon"
-	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	c.archetype = "card.napoleon.emperors_will.archetype"
 	var e := EffRes.new()
@@ -647,12 +648,13 @@ static func _emperors_will() -> Resource:
 	c.effects = [e]; return c
 
 static func _reconnaissance() -> Resource:
-	# 정찰 — UNCOMMON, 1코, SKILL, 지휘 [Chaos]: DRAW 2
+	# 정찰 — COMMON, 1코, SKILL, 지휘 [Chaos]: DRAW 2, EXHAUST
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.reconnaissance.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
 	c.archetype = "card.napoleon.reconnaissance.archetype"
+	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DRAW
 	e.value = 2; e.base_value = 2

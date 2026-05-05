@@ -28,11 +28,11 @@ static func pool() -> Array:
 		_cavalry_summon(), _arrow_shower(), _horde_advance(),               # F
 		_war_horse_power(), _khans_banner(),                                # A
 		_horde_volley(), _ten_thousand_army(),                              # P
-		_cavalry_retreat(), _siege(),                                       # C
+		_cavalry_retreat(), _cavalry_encirclement(),                        # C
 		_plunderers_instinct(),                                             # Chaos
 		# ── 약탈 8 (F×3 / A×1 / P×1 / C×2 / Chaos×1) ──
 		_plunder(), _hunters_bow(), _spoils_collection(),                   # F
-		_executioners_power(),                                              # A
+		_executioners_bounty(),                                             # A
 		_massacre_khan(),                                                   # P
 		_khans_treasury(), _war_tribute(),                                  # C
 		_khans_gamble(),                                                    # Chaos
@@ -96,7 +96,7 @@ static func _rider_call() -> Resource:
 # ─────────────────────────────────────────
 
 static func _quick_strike() -> Resource:
-	# [F] 급습 — COMMON, 0코, ATTACK: DMG 40
+	# [F] 급습 — COMMON, 0코, ATTACK: DMG 20
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.swift_raid.name"; c.owner_id = "genghis_khan"
 	c.cost = 0; c.card_type = CardRes.CardType.ATTACK
@@ -104,15 +104,15 @@ static func _quick_strike() -> Resource:
 	c.archetype = "card.genghis_khan.swift_raid.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
-	e.value = 40; e.base_value = 40; e.target = "SINGLE"; e.damage_type = "slash"
+	e.value = 20; e.base_value = 20; e.target = "SINGLE"; e.damage_type = "slash"
 	c.effects = [e]; return c
 
 static func _sprint() -> Resource:
-	# [F] 기마 도하 — COMMON, 1코, SKILL: DRAW 2 + ENERGY 1
+	# [F] 기마 도하 — UNCOMMON, 2코, SKILL: DRAW 2 + ENERGY 1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.cavalry_crossing.name"; c.owner_id = "genghis_khan"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	c.archetype = "card.genghis_khan.cavalry_crossing.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 2; ea.base_value = 2
@@ -121,7 +121,7 @@ static func _sprint() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _horse_charge() -> Resource:
-	# [F] 돌격 — UNCOMMON, 1코, ATTACK: DMG 80 + DRAW 1
+	# [F] 돌격 — UNCOMMON, 1코, ATTACK: DMG 50 + DRAW 1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.horse_charge.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -129,7 +129,7 @@ static func _horse_charge() -> Resource:
 	c.archetype = "card.genghis_khan.horse_charge.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"; ea.damage_type = "blunt"
+	ea.value = 50; ea.base_value = 50; ea.target = "SINGLE"; ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW; eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
@@ -150,13 +150,15 @@ static func _khans_fury() -> Resource:
 	# [A] 칸의 분노 — UNCOMMON, 1코, POWER: 매 턴 시작 시 DRAW +1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.khans_fury.name"; c.owner_id = "genghis_khan"
-	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	c.archetype = "card.genghis_khan.khans_fury.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.draw_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
-	c.effects = [e]; return c
+	var es := EffRes.new()
+	es.effect_type = EffRes.EffectType.SACRIFICE_HP; es.value = 10; es.base_value = 10
+	c.effects = [e, es]; return c
 
 static func _mobility_power() -> Resource:
 	# [A] 기동의 권능 — RARE, 1코, POWER: 매 턴 시작 시 BLOCK +15
@@ -167,7 +169,7 @@ static func _mobility_power() -> Resource:
 	c.archetype = "card.genghis_khan.mobility_power.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.block_per_turn"; e.value = 15; e.base_value = 15; e.target = "SELF"
+	e.status_type = "power.block_per_turn"; e.value = 55; e.base_value = 55; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _endless_march() -> Resource:
@@ -179,7 +181,7 @@ static func _endless_march() -> Resource:
 	c.archetype = "card.genghis_khan.long_march.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK_PER_CARDS_PLAYED
-	e.value = 20; e.base_value = 20
+	e.value = 75; e.base_value = 75
 	c.effects = [e]; return c
 
 static func _red_horizon() -> Resource:
@@ -210,18 +212,20 @@ static func _great_decree() -> Resource:
 	c.effects = [e]; return c
 
 static func _signal_horn() -> Resource:
-	# [C] 신호 나팔 — UNCOMMON, 1코, SKILL: DRAW 2
+	# [C] 신호 나팔 — UNCOMMON, 2코, SKILL: DRAW 2 + GAIN_MORALE 1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.signal_horn.name"; c.owner_id = "genghis_khan"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	c.archetype = "card.genghis_khan.signal_horn.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.DRAW; e.value = 2; e.base_value = 2
-	c.effects = [e]; return c
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 2; ea.base_value = 2
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.GAIN_MORALE; eb.value = 1; eb.base_value = 1
+	c.effects = [ea, eb]; return c
 
 static func _flanking() -> Resource:
-	# [C] 측면 우회 — UNCOMMON, 1코, ATTACK: DMG 60 ALL + VULN 1 ALL
+	# [C] 측면 우회 — UNCOMMON, 1코, ATTACK: DMG 35 ALL + VULN 1 ALL
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.flanking.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -229,23 +233,23 @@ static func _flanking() -> Resource:
 	c.archetype = "card.genghis_khan.flanking.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 60; ea.base_value = 60; ea.target = "ALL"; ea.damage_type = "blunt"
+	ea.value = 35; ea.base_value = 35; ea.target = "ALL"; ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "vulnerable"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
 	c.effects = [ea, eb]; return c
 
 static func _genghis_fury() -> Resource:
-	# [Chaos] 칭기즈의 광기 — RARE, 0코, ATTACK EXHAUST: 랜덤 적 6회 × DMG 25
+	# [Chaos] 징기스의 분노 — RARE, 1코, ATTACK EXHAUST: DMG 120 ALL blunt
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.genghis_fury.name"; c.owner_id = "genghis_khan"
-	c.cost = 0; c.card_type = CardRes.CardType.ATTACK
+	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
 	c.archetype = "card.genghis_khan.genghis_fury.archetype"
 	c.is_exhaust = true
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.MULTI_HIT_RANDOM
-	e.hit_count = 6; e.value = 25; e.base_value = 25; e.damage_type = "blunt"
+	e.effect_type = EffRes.EffectType.DAMAGE
+	e.hit_count = 1; e.value = 120; e.base_value = 120; e.target = "ALL"; e.damage_type = "blunt"
 	c.effects = [e]; return c
 
 # ─────────────────────────────────────────
@@ -253,18 +257,20 @@ static func _genghis_fury() -> Resource:
 # ─────────────────────────────────────────
 
 static func _cavalry_summon() -> Resource:
-	# [F] 기병 소집 — COMMON, 1코, SKILL: SUMMON_TOKEN 1
+	# [F] 기병 소집 — COMMON, 1코, SKILL: SUMMON_TOKEN 1 + BLOCK 20 SELF
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.cavalry_summon.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
 	c.archetype = "card.genghis_khan.cavalry_summon.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.SUMMON_TOKEN; e.value = 1; e.base_value = 1
-	c.effects = [e]; return c
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.SUMMON_TOKEN; ea.value = 1; ea.base_value = 1
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 20; eb.base_value = 20
+	c.effects = [ea, eb]; return c
 
 static func _arrow_shower() -> Resource:
-	# [F] 화살 세례 — COMMON, 1코, ATTACK: DMG 40 ALL
+	# [F] 화살 세례 — COMMON, 1코, ATTACK: DMG 60 ALL
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.arrow_volley.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -272,11 +278,11 @@ static func _arrow_shower() -> Resource:
 	c.archetype = "card.genghis_khan.arrow_volley.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
-	e.value = 40; e.base_value = 40; e.target = "ALL"; e.damage_type = "projectile"
+	e.value = 60; e.base_value = 60; e.target = "ALL"; e.damage_type = "projectile"
 	c.effects = [e]; return c
 
 static func _horde_advance() -> Resource:
-	# [F] 호드 진군 — UNCOMMON, 1코, ATTACK: DMG 60 ALL + SUMMON_TOKEN 1
+	# [F] 호드 진군 — UNCOMMON, 1코, ATTACK: DMG 25 ALL + SUMMON_TOKEN 1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.horde_advance.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -284,22 +290,24 @@ static func _horde_advance() -> Resource:
 	c.archetype = "card.genghis_khan.horde_advance.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 60; ea.base_value = 60; ea.target = "ALL"; ea.damage_type = "blunt"
+	ea.value = 25; ea.base_value = 25; ea.target = "ALL"; ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.SUMMON_TOKEN; eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
 
 static func _war_horse_power() -> Resource:
-	# [A] 군마의 권능 — RARE, 1코, POWER: 매 턴 시작 시 SUMMON_TOKEN 1
+	# [A] 군마의 권능 — RARE, 2코, POWER: 매 턴 시작 시 SUMMON_TOKEN 1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.war_horse_power.name"; c.owner_id = "genghis_khan"
-	c.cost = 1; c.card_type = CardRes.CardType.POWER
+	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.genghis_khan.war_horse_power.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.summon_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
-	c.effects = [e]; return c
+	var es := EffRes.new()
+	es.effect_type = EffRes.EffectType.SACRIFICE_HP; es.value = 5; es.base_value = 5
+	c.effects = [e, es]; return c
 
 static func _khans_banner() -> Resource:
 	# [A] 칸의 깃발 — RARE, 1코, POWER: 토큰 1개당 피해 +8 (DAMAGE_PER_TOKEN 보너스)
@@ -322,11 +330,11 @@ static func _horde_volley() -> Resource:
 	c.archetype = "card.genghis_khan.horde_volley.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_TOKEN
-	e.value = 40; e.base_value = 40; e.target = "ALL"; e.damage_type = "projectile"
+	e.value = 50; e.base_value = 50; e.target = "ALL"; e.damage_type = "projectile"
 	c.effects = [e]; return c
 
 static func _ten_thousand_army() -> Resource:
-	# [P] 천만의 군세 — RARE, 2코, SKILL: SUMMON_TOKEN 3 + BLOCK 60
+	# [P] 천만의 군세 — RARE, 2코, SKILL: SUMMON_TOKEN 3 + BLOCK 20
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.ten_thousand_army.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
@@ -335,33 +343,31 @@ static func _ten_thousand_army() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SUMMON_TOKEN; ea.value = 3; ea.base_value = 3
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 60; eb.base_value = 60
+	eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 20; eb.base_value = 20
 	c.effects = [ea, eb]; return c
 
 static func _cavalry_retreat() -> Resource:
-	# [C] 기병 후퇴 — UNCOMMON, 1코, SKILL: BLOCK_ALL 50
+	# [C] 기병 후퇴 — UNCOMMON, 1코, SKILL: BLOCK_ALL 85
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.cavalry_retreat.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	c.archetype = "card.genghis_khan.cavalry_retreat.archetype"
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.BLOCK_ALL; e.value = 50; e.base_value = 50
+	e.effect_type = EffRes.EffectType.BLOCK_ALL; e.value = 85; e.base_value = 85
 	c.effects = [e]; return c
 
-static func _siege() -> Resource:
-	# [C] 포위 전술 — UNCOMMON, 1코, ATTACK: DMG 30 ALL + VULN 1 ALL
+static func _cavalry_encirclement() -> Resource:
+	# [C] 기병 포위망 — UNCOMMON, 1코, SKILL: BLOCK_ALL 35 + SUMMON_TOKEN 1 (몽골 기병 전열 보호)
 	var c := CardRes.new()
-	c.card_name = "card.genghis_khan.encirclement.name"; c.owner_id = "genghis_khan"
-	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.encirclement.archetype"
+	c.card_name = "card.genghis_khan.cavalry_encirclement.name"; c.owner_id = "genghis_khan"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.genghis_khan.cavalry_encirclement.archetype"
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 30; ea.base_value = 30; ea.target = "ALL"; ea.damage_type = "blunt"
+	ea.effect_type = EffRes.EffectType.BLOCK_ALL; ea.value = 35; ea.base_value = 35
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "vulnerable"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
+	eb.effect_type = EffRes.EffectType.SUMMON_TOKEN; eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
 
 static func _plunderers_instinct() -> Resource:
@@ -382,7 +388,7 @@ static func _plunderers_instinct() -> Resource:
 # ─────────────────────────────────────────
 
 static func _plunder() -> Resource:
-	# [F] 노획 — COMMON, 1코, ATTACK: DMG 70 + DRAW 1
+	# [F] 노획 — COMMON, 1코, ATTACK: DMG 35 + DRAW 1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.loot.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -390,7 +396,7 @@ static func _plunder() -> Resource:
 	c.archetype = "card.genghis_khan.loot.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 70; ea.base_value = 70; ea.target = "SINGLE"; ea.damage_type = "slash"
+	ea.value = 35; ea.base_value = 35; ea.target = "SINGLE"; ea.damage_type = "slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW; eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
@@ -421,16 +427,16 @@ static func _spoils_collection() -> Resource:
 	eb.effect_type = EffRes.EffectType.HEAL_ALL; eb.value = 15; eb.base_value = 15
 	c.effects = [ea, eb]; return c
 
-static func _executioners_power() -> Resource:
-	# [A] 처형의 권능 — UNCOMMON, 1코, POWER: 매 턴 시작 시 DRAW +1
+static func _executioners_bounty() -> Resource:
+	# [A] 처형 현상금 — RARE, 1코, POWER: 적 처치마다 에너지 +1
 	var c := CardRes.new()
-	c.card_name = "card.genghis_khan.executioners_power.name"; c.owner_id = "genghis_khan"
+	c.card_name = "card.genghis_khan.executioners_bounty.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.executioners_power.archetype"
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.genghis_khan.executioners_bounty.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.draw_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	e.status_type = "power.on_kill_energy"; e.value = 1; e.base_value = 1; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _massacre_khan() -> Resource:
@@ -448,42 +454,42 @@ static func _massacre_khan() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _khans_treasury() -> Resource:
-	# [C] 칸의 보고 — UNCOMMON, 1코, SKILL: DRAW 1 + ENERGY 1
+	# [C] 칸의 보고 — COMMON, 1코, SKILL: GAIN_MORALE 2 + BLOCK 30 SELF
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.khans_treasury.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
 	c.archetype = "card.genghis_khan.khans_treasury.archetype"
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 1; ea.base_value = 1
+	ea.effect_type = EffRes.EffectType.GAIN_MORALE; ea.value = 2; ea.base_value = 2
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.ENERGY; eb.value = 1; eb.base_value = 1
+	eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 30; eb.base_value = 30; eb.target = "SELF"
 	c.effects = [ea, eb]; return c
 
 static func _war_tribute() -> Resource:
-	# [C] 전쟁의 대가 — UNCOMMON, 1코, ATTACK: DMG 60 ALL + DRAW 1
+	# [C] 전쟁의 대가 — UNCOMMON, 2코, ATTACK: DMG 70 ALL + DRAW 1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.war_tribute.name"; c.owner_id = "genghis_khan"
-	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
+	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
 	c.archetype = "card.genghis_khan.war_tribute.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 60; ea.base_value = 60; ea.target = "ALL"; ea.damage_type = "blunt"
+	ea.value = 70; ea.base_value = 70; ea.target = "ALL"; ea.damage_type = "blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW; eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
 
 static func _khans_gamble() -> Resource:
-	# [Chaos] 칸의 도박 — RARE, 0코, SKILL EXHAUST: DRAW 3 + ENERGY 2
+	# [Chaos] 칸의 도박 — RARE, 2코, SKILL EXHAUST: DRAW 3 + ENERGY 1
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.khans_gamble.name"; c.owner_id = "genghis_khan"
-	c.cost = 0; c.card_type = CardRes.CardType.SKILL
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.genghis_khan.khans_gamble.archetype"
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 3; ea.base_value = 3
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.ENERGY; eb.value = 2; eb.base_value = 2
+	eb.effect_type = EffRes.EffectType.ENERGY; eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c

@@ -1,4 +1,4 @@
-# resources/enemies/japanese/japanese_act2.gd
+﻿# resources/enemies/japanese/japanese_act2.gd
 # 일본 신화 Act 2 — 엘리트 3종(혼돈의 텐구·야샤·누레리온) + 보스(슈텐도지)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -16,7 +16,7 @@ static func chaos_tengu(scene: PackedScene) -> Resource:
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "vulnerable"
 	i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func yasha(scene: PackedScene) -> Resource:
@@ -32,7 +32,7 @@ static func yasha(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func nureriyon(scene: PackedScene) -> Resource:
@@ -52,7 +52,7 @@ static func nureriyon(scene: PackedScene) -> Resource:
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 150; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func shuten_doji(scene: PackedScene) -> Resource:
@@ -100,7 +100,7 @@ static func shuten_doji(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3, p2i4, p2i5]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 static func elites() -> Array:

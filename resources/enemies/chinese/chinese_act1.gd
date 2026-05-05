@@ -1,4 +1,4 @@
-# resources/enemies/chinese/chinese_act1.gd
+﻿# resources/enemies/chinese/chinese_act1.gd
 # 중국 신화 Act 1 — 엘리트 3종(금각·은각·흑풍괴) + 보스(치우)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -22,7 +22,7 @@ static func golden_horn_king(scene: PackedScene) -> Resource:
 	i6.action_type = IntentRes.ActionType.DEBUFF; i6.value = 2; i6.status_type = "vulnerable"
 	i6.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [i1, i2, i3, i4, i5, i6]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func silver_horn_king(scene: PackedScene) -> Resource:
@@ -39,7 +39,7 @@ static func silver_horn_king(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 170; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func black_wind_demon(scene: PackedScene) -> Resource:
@@ -59,7 +59,7 @@ static func black_wind_demon(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.DEBUFF; i5.value = 1; i5.status_type = "vulnerable"
 	i5.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func chiyou(scene: PackedScene) -> Resource:
@@ -104,7 +104,7 @@ static func chiyou(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3, p2i4]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 static func elites() -> Array:

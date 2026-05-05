@@ -1,4 +1,4 @@
-# resources/enemies/korean/korean_act2.gd
+﻿# resources/enemies/korean/korean_act2.gd
 # 한국 신화 — Act 2 엘리트 3종(도깨비 대장·용왕의 장군·동명성왕) + 보스(삼신할미)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -16,7 +16,7 @@ static func dokkaebi_chief(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 150; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func sea_dragon_general(scene: PackedScene) -> Resource:
@@ -32,7 +32,7 @@ static func sea_dragon_general(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func dongmyeong(scene: PackedScene) -> Resource:
@@ -51,7 +51,7 @@ static func dongmyeong(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.DEBUFF; i5.value = 2; i5.status_type = "vulnerable"
 	i5.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func samsin_grandma(scene: PackedScene) -> Resource:
@@ -106,7 +106,7 @@ static func samsin_grandma(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 static func elites() -> Array:

@@ -1,4 +1,4 @@
-# tests/test_enemies.gd
+﻿# tests/test_enemies.gd
 class_name TestEnemies
 extends RefCounted
 
@@ -623,10 +623,10 @@ func test_korean_act1_shape() -> void:
 	_assert(b.max_hp == 4500, "단군 HP 4500")
 	_assert(b.phase_thresholds.size() == 2, "단군 3페이즈")
 	_assert(b.mythology == "korean", "단군 mythology=korean")
-	_assert(b.charm_resistance == 2, "단군 charm_resistance=2")
+	_assert(b.charm_resistance == 20, "단군 charm_resistance=20")
 	var haemosu = M.haemosu(scene)
 	_assert(haemosu.max_hp == 1900, "해모수 엘리트 HP 1900")
-	_assert(haemosu.charm_resistance == 1, "해모수 charm_resistance=1")
+	_assert(haemosu.charm_resistance == 20, "해모수 charm_resistance=20")
 
 func test_korean_act2_shape() -> void:
 	print("[TestEnemies] test_korean_act2_shape")
@@ -638,10 +638,10 @@ func test_korean_act2_shape() -> void:
 	_assert(b.max_hp == 4800, "삼신할미 HP 4800")
 	_assert(b.phase_thresholds.size() == 2, "삼신할미 3페이즈")
 	_assert(b.mythology == "korean", "삼신할미 mythology=korean")
-	_assert(b.charm_resistance == 2, "삼신할미 charm_resistance=2")
+	_assert(b.charm_resistance == 20, "삼신할미 charm_resistance=20")
 	var dongmyeong = M.dongmyeong(scene)
 	_assert(dongmyeong.max_hp == 1900, "동명성왕 엘리트 HP 1900")
-	_assert(dongmyeong.charm_resistance == 1, "동명성왕 charm_resistance=1")
+	_assert(dongmyeong.charm_resistance == 20, "동명성왕 charm_resistance=20")
 
 func test_korean_act3_shape() -> void:
 	print("[TestEnemies] test_korean_act3_shape")
@@ -653,7 +653,7 @@ func test_korean_act3_shape() -> void:
 	_assert(b.max_hp == 4800, "구삼승할망 HP 4800")
 	_assert(b.phase_thresholds.size() == 2, "구삼승할망 3페이즈")
 	_assert(b.mythology == "korean", "구삼승할망 mythology=korean")
-	_assert(b.charm_resistance == 2, "구삼승할망 charm_resistance=2")
+	_assert(b.charm_resistance == 20, "구삼승할망 charm_resistance=20")
 
 func test_chinese_normals_shape() -> void:
 	print("[TestEnemies] test_chinese_normals_shape")
@@ -678,10 +678,10 @@ func test_chinese_act1_shape() -> void:
 	_assert(b.max_hp == 4500, "치우 HP 4500")
 	_assert(b.phase_thresholds.size() == 2, "치우 3페이즈")
 	_assert(b.mythology == "chinese", "치우 mythology=chinese")
-	_assert(b.charm_resistance == 2, "치우 charm_resistance=2")
+	_assert(b.charm_resistance == 20, "치우 charm_resistance=20")
 	var elite = M.golden_horn_king(scene)
 	_assert(elite.max_hp == 1600, "금각 대왕 HP 1600")
-	_assert(elite.charm_resistance == 1, "금각 대왕 charm_resistance=1")
+	_assert(elite.charm_resistance == 20, "금각 대왕 charm_resistance=20")
 
 func test_chinese_act2_shape() -> void:
 	print("[TestEnemies] test_chinese_act2_shape")
@@ -693,7 +693,7 @@ func test_chinese_act2_shape() -> void:
 	_assert(b.max_hp == 4800, "이랑신 HP 4800")
 	_assert(b.phase_thresholds.size() == 2, "이랑신 3페이즈")
 	_assert(b.mythology == "chinese", "이랑신 mythology=chinese")
-	_assert(b.charm_resistance == 2, "이랑신 charm_resistance=2")
+	_assert(b.charm_resistance == 20, "이랑신 charm_resistance=20")
 
 func test_chinese_act3_shape() -> void:
 	print("[TestEnemies] test_chinese_act3_shape")
@@ -705,7 +705,7 @@ func test_chinese_act3_shape() -> void:
 	_assert(b.max_hp == 4800, "반고 HP 4800")
 	_assert(b.phase_thresholds.size() == 2, "반고 3페이즈")
 	_assert(b.mythology == "chinese", "반고 mythology=chinese")
-	_assert(b.charm_resistance == 2, "반고 charm_resistance=2")
+	_assert(b.charm_resistance == 20, "반고 charm_resistance=20")
 
 func test_japanese_normals_shape() -> void:
 	print("[TestEnemies] test_japanese_normals_shape")
@@ -730,10 +730,10 @@ func test_japanese_act1_shape() -> void:
 	_assert(b.max_hp == 4500, "라이덴 HP 4500")
 	_assert(b.phase_thresholds.size() == 2, "라이덴 3페이즈")
 	_assert(b.mythology == "japanese", "라이덴 mythology=japanese")
-	_assert(b.charm_resistance == 2, "라이덴 charm_resistance=2")
+	_assert(b.charm_resistance == 20, "라이덴 charm_resistance=20")
 	var elite = M.oni_general(scene)
 	_assert(elite.max_hp == 1600, "오니 장군 HP 1600")
-	_assert(elite.charm_resistance == 1, "오니 장군 charm_resistance=1")
+	_assert(elite.charm_resistance == 20, "오니 장군 charm_resistance=20")
 
 func test_japanese_act2_shape() -> void:
 	print("[TestEnemies] test_japanese_act2_shape")
@@ -745,7 +745,7 @@ func test_japanese_act2_shape() -> void:
 	_assert(b.max_hp == 4800, "슈텐도지 HP 4800")
 	_assert(b.phase_thresholds.size() == 2, "슈텐도지 3페이즈")
 	_assert(b.mythology == "japanese", "슈텐도지 mythology=japanese")
-	_assert(b.charm_resistance == 2, "슈텐도지 charm_resistance=2")
+	_assert(b.charm_resistance == 20, "슈텐도지 charm_resistance=20")
 
 func test_japanese_act3_shape() -> void:
 	print("[TestEnemies] test_japanese_act3_shape")
@@ -757,4 +757,4 @@ func test_japanese_act3_shape() -> void:
 	_assert(b.max_hp == 4800, "야마타노오로치 HP 4800")
 	_assert(b.phase_thresholds.size() == 2, "야마타노오로치 3페이즈")
 	_assert(b.mythology == "japanese", "야마타노오로치 mythology=japanese")
-	_assert(b.charm_resistance == 2, "야마타노오로치 charm_resistance=2")
+	_assert(b.charm_resistance == 20, "야마타노오로치 charm_resistance=20")

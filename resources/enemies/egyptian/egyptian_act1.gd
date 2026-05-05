@@ -1,4 +1,4 @@
-# resources/enemies/egyptian/egyptian_act1.gd
+﻿# resources/enemies/egyptian/egyptian_act1.gd
 # 이집트 신화 — Act1 초반 사막 엘리트 3종 + 보스(세크메트)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -88,7 +88,7 @@ static func sekhmet(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 # ──── API ────

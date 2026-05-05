@@ -99,12 +99,14 @@ func test_cleopatra_rarity_distribution() -> void:
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 3: 독의씨앗, 모래폭풍, 뱀의눈빛
 	_assert(counts["COMMON"] == 3, "클레오파트라 COMMON 3장 (실제: %d)" % counts["COMMON"])
-	# UNCOMMON 9: 아스프독니, 독의향연, 독의잔치, 독의정화, 저주의시선, 사막의비책, 유혹, 파라오칙령, 매혹의언어
-	_assert(counts["UNCOMMON"] == 9, "클레오파트라 UNCOMMON 9장 (실제: %d)" % counts["UNCOMMON"])
+	# UNCOMMON 8: 아스프독니, 독의향연, 독의잔치, 독의정화, 저주의시선, 사막의비책, 유혹, 나일의속삭임
+	# (매혹의언어 삭제 → 뱀의의식LEGENDARY로 교체)
+	_assert(counts["UNCOMMON"] == 8, "클레오파트라 UNCOMMON 8장 (실제: %d)" % counts["UNCOMMON"])
 	# RARE 13: 나일안개, 독사권능, 파라오독력, 독살의식, 나일분노, 람세스방패, 이시스진노, 저주낙인, 파라오분노, 독꽃만개, 여왕위엄, 매혹향기, 매혹처형
 	_assert(counts["RARE"] == 13, "클레오파트라 RARE 13장 (실제: %d)" % counts["RARE"])
-	# LEGENDARY 4: 나일천벌, 독의옥좌, 이시스심판, 여왕포옹
-	_assert(counts["LEGENDARY"] == 4, "클레오파트라 LEGENDARY 4장 (실제: %d)" % counts["LEGENDARY"])
+	# LEGENDARY 5: 나일천벌, 독의옥좌, 이시스심판, 뱀의의식, 황금왕좌
+	# (여왕포옹→황금왕좌 교체, 뱀의의식 신규 추가)
+	_assert(counts["LEGENDARY"] == 5, "클레오파트라 LEGENDARY 5장 (실제: %d)" % counts["LEGENDARY"])
 	# DIVINE 1: 클레오입맞춤
 	_assert(counts["DIVINE"] == 1, "클레오파트라 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
 
@@ -161,10 +163,10 @@ func test_genghis_rarity_distribution() -> void:
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 5: 급습, 기마도하, 기병소집, 화살세례, 노획
 	_assert(counts["COMMON"] == 5, "칭기즈칸 COMMON 5장 (실제: %d)" % counts["COMMON"])
-	# UNCOMMON 13: 돌격, 사막기마, 칸의분노, 신호나팔, 측면우회, 호드진군, 기병후퇴, 포위전술, 처형대, 전리품배분, 처형의권능, 칸의보고, 전쟁의대가
-	_assert(counts["UNCOMMON"] == 13, "칭기즈칸 UNCOMMON 13장 (실제: %d)" % counts["UNCOMMON"])
-	# RARE 10: 기동의권능, 만리원정, 붉은지평선, 칭기즈광기, 군마의권능, 칸의깃발, 토큰일제사격, 천만의군세, 약탈자의본능, 칸의도박
-	_assert(counts["RARE"] == 10, "칭기즈칸 RARE 10장 (실제: %d)" % counts["RARE"])
+	# UNCOMMON 12: 돌격, 사막기마, 칸의분노, 신호나팔, 측면우회, 호드진군, 기병후퇴, 기병포위망, 처형대, 전리품배분, 칸의보고, 전쟁의대가
+	_assert(counts["UNCOMMON"] == 12, "칭기즈칸 UNCOMMON 12장 (실제: %d)" % counts["UNCOMMON"])
+	# RARE 11: 기동의권능, 만리원정, 붉은지평선, 칭기즈광기, 군마의권능, 칸의깃발, 토큰일제사격, 천만의군세, 약탈자의본능, 칸의도박, 처형현상금
+	_assert(counts["RARE"] == 11, "칭기즈칸 RARE 11장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 2: 대칸의명령, 학살의칸
 	_assert(counts["LEGENDARY"] == 2, "칭기즈칸 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
 	# DIVINE 0

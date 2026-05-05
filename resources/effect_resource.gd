@@ -41,6 +41,8 @@ enum EffectType {
 	CHARM_TO_DAMAGE,      # 대상 적 charm 스택 소비 → 스택당 bonus_value dmg
 	MULTI_HIT_RANDOM,     # 랜덤 적에게 hit_count회 value 피해 (같은 적 반복 가능)
 	DAMAGE_PER_STATUS_TYPE, # 대상 적의 디버프 종류 수(weak/vuln/poison/charm) × value 피해
+	DRAW_PER_ENTHRALL,    # 이 카드 사용 중 반함(enthrall) 발동 횟수 × value 드로우 (클레오 입맞춤)
+	DAMAGE_PER_CHARMED_ENEMY, # 현재 charm 스택 보유 적 수 × value 피해 (황금 왕좌)
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
@@ -99,7 +101,10 @@ func display_text() -> String:
 		EffectType.HEAL_ALL:    return TranslationServer.translate("effect.heal_all.text") % value
 		EffectType.GAIN_MORALE: return TranslationServer.translate("effect.gain_morale.text") % value
 		EffectType.CONSUME_MORALE: return TranslationServer.translate("effect.consume_morale.text") % bonus_value
-		EffectType.POISON_BURST:   return TranslationServer.translate("effect.poison_burst.text")
+		EffectType.POISON_BURST:
+			if target == "ALL":
+				return TranslationServer.translate("effect.poison_burst_all.text")
+			return TranslationServer.translate("effect.poison_burst.text")
 		EffectType.COUNTER_BLOCK:  return TranslationServer.translate("effect.counter_block.text") % value
 		EffectType.COST_NEXT:      return TranslationServer.translate("effect.cost_next.text") % value
 		EffectType.CONDITIONAL_DMG:
@@ -137,7 +142,14 @@ func display_text() -> String:
 				cond_name = status_type
 			return TranslationServer.translate("effect.conditional_dmg.text") % [value, cond_name, bonus_value]
 		EffectType.SUMMON_TOKEN:   return TranslationServer.translate("effect.summon_token.text") % value
-		EffectType.CHARM:          return TranslationServer.translate("effect.charm.text") % value
+		EffectType.CHARM:
+			var _ck: String = "effect.charm.all.text" if target == "ALL" else "effect.charm.text"
+			var _ct: String = TranslationServer.translate(_ck) % value
+			if condition.begins_with("enemy_hp_below_"):
+				var _n: int = condition.trim_prefix("enemy_hp_below_").to_int()
+				var _cond: String = tr("effect.condition.enemy_hp_below").replace("%d", str(_n))
+				_ct = _cond + ": " + _ct
+			return _ct
 		EffectType.REVIVE:              return TranslationServer.translate("effect.revive.text") % value
 		EffectType.SACRIFICE_HP:        return TranslationServer.translate("effect.sacrifice_hp.text") % value
 		EffectType.COST_ZERO_TURN:      return TranslationServer.translate("effect.cost_zero_turn.text")
@@ -171,4 +183,8 @@ func display_text() -> String:
 			return TranslationServer.translate("effect.multi_hit_random.text") % [hit_count, value]
 		EffectType.DAMAGE_PER_STATUS_TYPE:
 			return TranslationServer.translate("effect.damage_per_status_type.text") % value
+		EffectType.DRAW_PER_ENTHRALL:
+			return TranslationServer.translate("effect.draw_per_enthrall.text") % value
+		EffectType.DAMAGE_PER_CHARMED_ENEMY:
+			return TranslationServer.translate("effect.damage_per_charmed_enemy.text") % value
 	return ""

@@ -1,4 +1,4 @@
-# resources/enemies/korean/korean_act1.gd
+﻿# resources/enemies/korean/korean_act1.gd
 # 한국 신화 — Act 1 엘리트 3종(해치·장승·해모수) + 보스(단군)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -19,7 +19,7 @@ static func haechi(scene: PackedScene) -> Resource:
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 180; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func jangseung(scene: PackedScene) -> Resource:
@@ -37,7 +37,7 @@ static func jangseung(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func haemosu(scene: PackedScene) -> Resource:
@@ -55,7 +55,7 @@ static func haemosu(scene: PackedScene) -> Resource:
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 180; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func dangun(scene: PackedScene) -> Resource:
@@ -100,7 +100,7 @@ static func dangun(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3, p2i4, p2i5]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 static func elites() -> Array:

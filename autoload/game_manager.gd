@@ -478,7 +478,7 @@ func upgrade_card(card: Resource) -> void:
 			effect.value = int(effect.base_value * (1.0 + rate * level))
 			effect.bonus_value = int(effect.base_bonus_value * (1.0 + rate * level))
 		elif effect.effect_type == EffRes.EffectType.APPLY_STATUS and effect.status_type.begins_with("power."):
-			effect.value = effect.base_value + level * 5
+			effect.value = effect.base_value + level
 		elif effect.effect_type in INT_TYPES:
 			effect.value = effect.base_value + level
 			effect.bonus_value = effect.base_bonus_value + level if effect.base_bonus_value > 0 else 0

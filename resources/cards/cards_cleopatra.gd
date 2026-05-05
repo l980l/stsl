@@ -2,7 +2,7 @@
 # 클레오파트라 카드 — starter 10 + pool 30 (독살 12 / 저주 10 / 조종 8)
 # 독살: 독 축적 스파인 + poison_per_turn/poison_double Amplifier + MULTI_HIT_RANDOM Chaos
 # 저주: 디버프 복합 + block_per_turn/debuff_amplify Amplifier + STATUS_DOUBLE Payoff
-# 조종: 매혹 자원화 + charm_threshold_minus/charm_double_apply + CHARM_TO_DAMAGE Payoff
+# 조종: 매혹 빌드업(임계 100/저항 120) + on_enthrall 트리거(입맞춤·뱀의 의식) + CHARM_TO_DAMAGE/황금 왕좌 Payoff
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
 
@@ -21,7 +21,7 @@ static func pool() -> Array:
 		# ── 독살 12 (F×4 / A×2 / P×3 / C×2 / Chaos×1) ──
 		_poison_seed(), _asp_fang(), _nile_mist(), _poison_feast(),  # F
 		_serpent_power(), _pharaoh_venom(),                          # A
-		_poison_ritual(), _nile_verdict(), _poison_throne(),         # P
+		_poison_ritual(), _pharaohs_plague(), _poison_throne(),       # P
 		_poison_party(), _poison_purge(),                            # C
 		_nile_fury(),                                                # Chaos
 		# ── 저주 10 (F×3 / A×2 / P×2 / C×2 / Chaos×1) ──
@@ -30,12 +30,11 @@ static func pool() -> Array:
 		_curse_brand(), _isis_judgment(),                            # P
 		_desert_recipe(), _pharaoh_fury(),                           # C
 		_venom_bloom(),                                              # Chaos
-		# ── 조종 8 (F×3 / A×2 / P×1 / C×1 / Chaos×1) ──
-		_temptation(), _pharaoh_decree(), _cleopatras_kiss(),        # F
-		_queens_dignity(), _charming_perfume(),                      # A
-		_charm_execution(),                                          # P
-		_charming_language(),                                        # C
-		_queens_embrace(),                                           # Chaos
+		# ── 조종 8 (F×3 / A×1 / P×3 / Chaos×1) ──
+		_temptation(), _nile_whisper(), _cleopatras_kiss(),          # F
+		_queens_dignity(),                                           # A
+		_charming_perfume(), _charm_execution(), _serpent_ritual(),  # P
+		_golden_throne(),                                            # Chaos
 	]
 
 # ─────────────────────────────────────────
@@ -168,19 +167,19 @@ static func _serpent_power() -> Resource:
 	c.archetype = "card.cleopatra.serpent_power.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.poison_per_turn"; e.value = 2; e.base_value = 2; e.target = "SELF"
+	e.status_type = "power.poison_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _pharaoh_venom() -> Resource:
-	# [A] 파라오의 독력 — RARE, 2코, POWER: 독 부여 시 ×2 적용
+	# [A] 파라오의 독력 — RARE, 0코, SKILL: 남은 에너지 소모, 에너지당 독 부여량 ×2 / 강화: +1스택
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.pharaoh_venom.name"; c.owner_id = "cleopatra"
-	c.cost = 2; c.card_type = CardRes.CardType.POWER
+	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.cleopatra.pharaoh_venom.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.poison_double_application"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	e.status_type = "power.spend_all_energy_poison_double"; e.value = 0; e.base_value = 0; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _poison_ritual() -> Resource:
@@ -196,16 +195,17 @@ static func _poison_ritual() -> Resource:
 	e.damage_type = "poison"
 	c.effects = [e]; return c
 
-static func _nile_verdict() -> Resource:
-	# [P] 나일의 천벌 — LEGENDARY, 2코, SKILL: STATUS_DOUBLE SINGLE (독/약/취약/매혹 ×2)
+static func _pharaohs_plague() -> Resource:
+	# [P] 파라오의 역병 — LEGENDARY, 2코, SKILL: POISON_BURST ALL (전체 독 즉시 폭발, 독살 크로스 페이오프)
 	var c := CardRes.new()
-	c.card_name = "card.cleopatra.nile_verdict.name"; c.owner_id = "cleopatra"
+	c.card_name = "card.cleopatra.pharaohs_plague.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.nile_verdict.archetype"
+	c.archetype = "card.cleopatra.pharaohs_plague.archetype"
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.STATUS_DOUBLE
-	e.value = 0; e.base_value = 0; e.target = "SINGLE"
+	e.effect_type = EffRes.EffectType.POISON_BURST
+	e.value = 100; e.base_value = 100; e.target = "ALL"
+	e.damage_type = "poison"
 	c.effects = [e]; return c
 
 static func _poison_throne() -> Resource:
@@ -217,12 +217,12 @@ static func _poison_throne() -> Resource:
 	c.archetype = "card.cleopatra.poison_throne.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_STATUS_TYPE
-	e.value = 80; e.base_value = 80; e.target = "SINGLE"
+	e.value = 130; e.base_value = 130; e.target = "SINGLE"
 	e.damage_type = "poison"
 	c.effects = [e]; return c
 
 static func _poison_party() -> Resource:
-	# [C] 독의 잔치 — UNCOMMON, 2코, ATTACK: DMG 50 ALL + POISON 1 ALL
+	# [C] 독의 잔치 — UNCOMMON, 2코, ATTACK: DMG 80 ALL + POISON 1 ALL
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.poison_party.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
@@ -230,7 +230,7 @@ static func _poison_party() -> Resource:
 	c.archetype = "card.cleopatra.poison_party.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 50; ea.base_value = 50; ea.target = "ALL"
+	ea.value = 80; ea.base_value = 80; ea.target = "ALL"
 	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
@@ -238,10 +238,10 @@ static func _poison_party() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _poison_purge() -> Resource:
-	# [C] 독의 정화 — UNCOMMON, 1코, SKILL: 아군 디버프 제거 SELF + POISON 2 ALL
+	# [C] 독의 정화 — UNCOMMON, 2코, SKILL: 아군 디버프 제거 SELF + POISON 2 ALL
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.poison_purge.name"; c.owner_id = "cleopatra"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	c.archetype = "card.cleopatra.poison_purge.archetype"
 	var ea := EffRes.new()
@@ -261,7 +261,7 @@ static func _nile_fury() -> Resource:
 	c.archetype = "card.cleopatra.nile_fury.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.MULTI_HIT_RANDOM
-	ea.value = 30; ea.base_value = 30; ea.hit_count = 5
+	ea.value = 65; ea.base_value = 65; ea.hit_count = 5
 	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
@@ -288,7 +288,7 @@ static func _cursed_gaze() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _sandstorm() -> Resource:
-	# [F] 모래폭풍 — COMMON, 1코, ATTACK: DMG 60 ALL + WEAK 1 ALL
+	# [F] 모래폭풍 — COMMON, 1코, ATTACK: DMG 30 ALL + WEAK 1 ALL
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.sandstorm.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -296,7 +296,7 @@ static func _sandstorm() -> Resource:
 	c.archetype = "card.cleopatra.sandstorm.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 60; ea.base_value = 60; ea.target = "ALL"
+	ea.value = 30; ea.base_value = 30; ea.target = "ALL"
 	ea.damage_type = "curse"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
@@ -316,7 +316,7 @@ static func _snake_gaze() -> Resource:
 	c.effects = [e]; return c
 
 static func _ramesses_shield() -> Resource:
-	# [A] 람세스의 방패 — RARE, 1코, POWER: 매 턴 BLOCK +15
+	# [A] 람세스의 방패 — RARE, 1코, POWER: 매 턴 BLOCK +12
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.ramesses_shield.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
@@ -324,7 +324,7 @@ static func _ramesses_shield() -> Resource:
 	c.archetype = "card.cleopatra.ramesses_shield.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.block_per_turn"; e.value = 15; e.base_value = 15; e.target = "SELF"
+	e.status_type = "power.block_per_turn"; e.value = 45; e.base_value = 45; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _isis_wrath() -> Resource:
@@ -362,22 +362,23 @@ static func _curse_brand() -> Resource:
 	c.effects = [ea, eb, ec, ed]; return c
 
 static func _isis_judgment() -> Resource:
-	# [P] 이시스의 심판 — LEGENDARY, 2코, SKILL: STATUS_DOUBLE ALL (전체 디버프 ×2)
+	# [P] 이시스의 심판 — LEGENDARY, 1코, SKILL EXHAUST: STATUS_DOUBLE ALL (전체 디버프 ×2, 한 게임당 1회)
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.isis_judgment.name"; c.owner_id = "cleopatra"
-	c.cost = 2; c.card_type = CardRes.CardType.SKILL
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
 	c.archetype = "card.cleopatra.isis_judgment.archetype"
+	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.STATUS_DOUBLE
 	e.value = 0; e.base_value = 0; e.target = "ALL"
 	c.effects = [e]; return c
 
 static func _desert_recipe() -> Resource:
-	# [C] 사막의 비책 — UNCOMMON, 1코, SKILL: DISCARD_PICK_DRAW 2 (버리고 2드로우+에너지)
+	# [C] 사막의 비책 — UNCOMMON, 2코, SKILL: DISCARD_PICK_DRAW 2 (버리고 2드로우+에너지)
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.desert_recipe.name"; c.owner_id = "cleopatra"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	c.archetype = "card.cleopatra.desert_recipe.archetype"
 	var e := EffRes.new()
@@ -402,7 +403,7 @@ static func _pharaoh_fury() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _venom_bloom() -> Resource:
-	# [Chaos] 독꽃의 만개 — RARE, 2코, ATTACK: DMG 30 ALL + POISON 2 ALL (독 폭발 세팅)
+	# [Chaos] 독꽃의 만개 — RARE, 2코, ATTACK: DMG 40 ALL + POISON 2 ALL (독 폭발 세팅)
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.venom_bloom.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
@@ -410,7 +411,7 @@ static func _venom_bloom() -> Resource:
 	c.archetype = "card.cleopatra.venom_bloom.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 30; ea.base_value = 30; ea.target = "ALL"
+	ea.value = 40; ea.base_value = 40; ea.target = "ALL"
 	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
@@ -422,7 +423,7 @@ static func _venom_bloom() -> Resource:
 # ─────────────────────────────────────────
 
 static func _temptation() -> Resource:
-	# [F] 유혹 — UNCOMMON, 1코, SKILL: CHARM 1 SINGLE
+	# [F] 유혹 — UNCOMMON, 1코, SKILL: CHARM 30 SINGLE
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.temptation.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -430,32 +431,35 @@ static func _temptation() -> Resource:
 	c.archetype = "card.cleopatra.temptation.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CHARM
-	e.value = 1; e.base_value = 1; e.target = "SINGLE"
+	e.value = 30; e.base_value = 30; e.target = "SINGLE"
 	c.effects = [e]; return c
 
-static func _pharaoh_decree() -> Resource:
-	# [F] 파라오의 칙령 — UNCOMMON, 1코, SKILL: CHARM 1 ALL
+static func _nile_whisper() -> Resource:
+	# [F] 나일의 속삭임 — UNCOMMON, 1코, SKILL: CHARM 25 ALL (광역 빌드업)
 	var c := CardRes.new()
-	c.card_name = "card.cleopatra.pharaoh_decree.name"; c.owner_id = "cleopatra"
+	c.card_name = "card.cleopatra.nile_whisper.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.pharaoh_decree.archetype"
+	c.archetype = "card.cleopatra.nile_whisper.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CHARM
-	e.value = 1; e.base_value = 1; e.target = "ALL"
+	e.value = 25; e.base_value = 25; e.target = "ALL"
 	c.effects = [e]; return c
 
 static func _cleopatras_kiss() -> Resource:
-	# [F] 클레오의 입맞춤 — DIVINE, 2코, SKILL: CHARM 2 SINGLE (강력 Foundation)
+	# [F] 클레오의 입맞춤 — DIVINE, 2코, SKILL: CHARM 60 SINGLE + 반함 시 카드 2장 드로우
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.cleopatras_kiss.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "idle"
 	c.archetype = "card.cleopatra.cleopatras_kiss.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.CHARM
-	e.value = 2; e.base_value = 2; e.target = "SINGLE"
-	c.effects = [e]; return c
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.CHARM
+	ea.value = 60; ea.base_value = 60; ea.target = "SINGLE"
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.DRAW_PER_ENTHRALL
+	eb.value = 2; eb.base_value = 2
+	c.effects = [ea, eb]; return c
 
 static func _queens_dignity() -> Resource:
 	# [A] 여왕의 위엄 — RARE, 1코, POWER: 매혹 임계치 -20
@@ -466,23 +470,24 @@ static func _queens_dignity() -> Resource:
 	c.archetype = "card.cleopatra.queens_dignity.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.charm_threshold_minus"; e.value = 20; e.base_value = 20; e.target = "SELF"
+	e.status_type = "power.charm_threshold_minus"; e.value = 40; e.base_value = 40; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _charming_perfume() -> Resource:
-	# [A] 매혹의 향기 — RARE, 2코, POWER: 매혹 부여 시 스택 ×2
+	# [P] 매혹의 향기 — RARE, 3코, SKILL EXHAUST: 2턴 동안 매혹 부여 시 스택 ×2
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.charming_perfume.name"; c.owner_id = "cleopatra"
-	c.cost = 2; c.card_type = CardRes.CardType.POWER
+	c.cost = 3; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.cleopatra.charming_perfume.archetype"
+	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.charm_double_apply"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	e.status_type = "power.charm_double_apply"; e.value = 2; e.base_value = 2; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _charm_execution() -> Resource:
-	# [P] 매혹의 처형 — RARE, 2코, ATTACK: 적 매혹 스택 소비 → 스택당 80 피해
+	# [P] 매혹의 처형 — RARE, 2코, ATTACK: 적 매혹 스택 소비 → 스택당 2 피해 (100스택=200)
 	var c := CardRes.new()
 	c.card_name = "card.cleopatra.charm_execution.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
@@ -490,37 +495,36 @@ static func _charm_execution() -> Resource:
 	c.archetype = "card.cleopatra.charm_execution.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CHARM_TO_DAMAGE
-	e.bonus_value = 80; e.base_bonus_value = 80; e.target = "SINGLE"
+	e.bonus_value = 5; e.base_bonus_value = 5; e.target = "SINGLE"
 	e.damage_type = "curse"
 	c.effects = [e]; return c
 
-static func _charming_language() -> Resource:
-	# [C] 매혹의 언어 — UNCOMMON, 1코, SKILL: CHARM 1 ALL + DRAW 1 (드로우 가속)
+static func _serpent_ritual() -> Resource:
+	# [P] 뱀의 의식 — LEGENDARY, 1코, POWER: 반함 발동 시마다 strength +20 영구
 	var c := CardRes.new()
-	c.card_name = "card.cleopatra.charming_language.name"; c.owner_id = "cleopatra"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.charming_language.archetype"
-	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.CHARM
-	ea.value = 1; ea.base_value = 1; ea.target = "ALL"
-	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.DRAW
-	eb.value = 1; eb.base_value = 1
-	c.effects = [ea, eb]; return c
-
-static func _queens_embrace() -> Resource:
-	# [Chaos] 여왕의 포옹 — LEGENDARY, 0코, SKILL: CHARM 2 ALL + DRAW 1, EXHAUST
-	var c := CardRes.new()
-	c.card_name = "card.cleopatra.queens_embrace.name"; c.owner_id = "cleopatra"
-	c.cost = 0; c.card_type = CardRes.CardType.SKILL
+	c.card_name = "card.cleopatra.serpent_ritual.name"; c.owner_id = "cleopatra"
+	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.queens_embrace.archetype"
+	c.archetype = "card.cleopatra.serpent_ritual.archetype"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.on_enthrall_strength"; e.value = 20; e.base_value = 20; e.target = "SELF"
+	c.effects = [e]; return c
+
+static func _golden_throne() -> Resource:
+	# [Chaos] 황금 왕좌 — LEGENDARY, 2코, ATTACK, EXHAUST: 모든 적에 150 dmg + 매혹된 적 1마리당 추가 20 dmg ALL
+	var c := CardRes.new()
+	c.card_name = "card.cleopatra.golden_throne.name"; c.owner_id = "cleopatra"
+	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
+	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
+	c.archetype = "card.cleopatra.golden_throne.archetype"
 	c.is_exhaust = true
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.CHARM
-	ea.value = 2; ea.base_value = 2; ea.target = "ALL"
+	ea.effect_type = EffRes.EffectType.DAMAGE
+	ea.value = 150; ea.base_value = 150; ea.target = "ALL"
+	ea.damage_type = "curse"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.DRAW
-	eb.value = 1; eb.base_value = 1
+	eb.effect_type = EffRes.EffectType.DAMAGE_PER_CHARMED_ENEMY
+	eb.value = 20; eb.base_value = 20; eb.target = "ALL"
+	eb.damage_type = "curse"
 	c.effects = [ea, eb]; return c

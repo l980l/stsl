@@ -1,4 +1,4 @@
-# resources/enemies/egyptian/egyptian_act2.gd
+﻿# resources/enemies/egyptian/egyptian_act2.gd
 # 이집트 신화 — Act2 엘리트 3종 + 보스(오시리스)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -22,7 +22,7 @@ static func apep_snake(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 200; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "poison"
 	e.intent_pattern = [i1, i1b, i2, i2b, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func seth_hound(scene: PackedScene) -> Resource:
@@ -38,7 +38,7 @@ static func seth_hound(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 280; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i2b, i3]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func ba_bird(scene: PackedScene) -> Resource:
@@ -56,7 +56,7 @@ static func ba_bird(scene: PackedScene) -> Resource:
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.SPECIAL; i5.value = 2
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 # ──── 보스 ────
@@ -96,7 +96,7 @@ static func osiris(scene: PackedScene) -> Resource:
 		[p0_i1, p0_i2, p0_i3, p0_i3b, p0_i4],
 		[p1_i1, p1_i2, p1_i2b, p1_i3, p1_i4, p1_i4b, p1_i5],
 	]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 # ──── API ────

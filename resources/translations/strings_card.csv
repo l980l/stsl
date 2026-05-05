@@ -10,6 +10,7 @@ effect.heal_all.text,모든 아군의 체력 %d을 회복합니다.,Heal all for
 effect.gain_morale.text,사기 %d을 얻습니다.,Gain %d Morale,Gagne %d Moral,Guadagna %d Morale,Gana %d de Moral,士気 +%d,Κέρδισε %d Ηθικό,士气 +%d,士气 +%d
 effect.consume_morale.text,사기를 소모해 적에게 피해 %d을 입힙니다.,Morale -> %d Damage,Moral -> %d Dégâts,Morale -> %d Danni,Moral -> %d Daño,士気→ダメージ %d,Ηθικό -> %d Ζημιά,士气→伤害 %d,士气→伤害 %d
 effect.poison_burst.text,적의 독 스택만큼 즉시 피해를 입히고 독을 초기화합니다.,Trigger Poison,Déclenche le Poison,Attiva Veleno,Detona Veneno,毒即発,Ενεργοποίηση Δηλητηρίου,毒性爆发,毒性爆发
+effect.poison_burst_all.text,모든 적의 독 스택만큼 즉시 피해를 입히고 독을 초기화합니다.,Trigger Poison (All),Déclenche le Poison (Tous),Attiva Veleno (Tutti),Detona Veneno (Todos),毒即発(全体),Ενεργοποίηση Δηλητηρίου (Όλοι),毒性爆发(全体),毒性爆发(全体)
 effect.counter_block.text,현재 방어도의 %d%%만큼 적에게 피해를 입힙니다.,%d%% of Block,%d%% de l'Armure,%d%% dello Scudo,%d%% del Escudo,ブロック×%d%%,%d%% της Άμυνας,护甲×%d%%,护甲×%d%%
 effect.cost_next.text,이번 턴 다음 카드의 비용을 %d 줄입니다.,Next cost -%d,Coût suivant -%d,Prossimo costo -%d,Siguiente coste -%d,次のコスト -%d,Επόμενο κόστος -%d,下一次费用 -%d,下一次费用 -%d
 effect.conditional_dmg.text,적에게 피해 %d을 입힙니다. %s 대신 피해 %d을 입힙니다.,%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s),%d / %d (%s)
@@ -24,7 +25,8 @@ effect.condition.hand_size_n,손패가 %d장 이하라면,if hand ≤%d,si main 
 effect.condition.enemy_count_n,적이 %d명 이하라면,if ≤%d enemies,si ≤%d ennemis,se ≤%d nemici,si ≤%d enemigos,敵%d体以下時,αν ≤%d εχθροί,敌 ≤%d时,敵 ≤%d時
 effect.condition.enemy_hp_below,적의 HP가 %d% 이하라면,if enemy HP ≤%d%,si PV ennemi ≤%d%,se PF nemico ≤%d%,si PV enemigo ≤%d%,敵HP%d%以下時,αν εχθ.HP ≤%d%,敌HP ≤%d%时,敵HP ≤%d%時
 effect.summon_token.text,병사 %d명을 소환합니다.,Summon %d Soldiers,Invoque %d Soldats,Evoca %d Soldati,Invoca %d Soldados,兵士召喚 %d,Κάλεσε %d Στρατιώτες,召唤 %d 士兵,召唤 %d 士兵
-effect.charm.text,적 1명을 매혹 %d합니다.,Charm %d,Charme %d,Fascino %d,Encanto %d,魅惑 %d,Γοητεία %d,魅惑 %d,魅惑 %d
+effect.charm.text,적 1명을 매혹 %d합니다.,Charm %d (single),Charme %d (cible),Fascino %d (singolo),Encanto %d (individual),魅惑 %d (単体),Γοητεία %d (μεμον.),魅惑 %d (单体),魅惑 %d (単体)
+effect.charm.all.text,모든 적을 매혹 %d합니다.,Charm all %d,Charme tout %d,Fascino tutto %d,Encanto todo %d,全体魅惑 %d,Γοητεία όλους %d,魅惑所有 %d,全体魅惑 %d
 effect.revive.text,사망한 아군 1명을 최대 체력의 %d%%로 부활시킵니다.,Revive with %d%% HP,Ressuscite avec %d%% PV,Rianima con %d%% PS,Revive con %d%% PV,復活 %d%%,Αναβίωση με %d%% HP,复活 %d%%,复活 %d%%
 effect.sacrifice_hp.text,체력 %d을 잃습니다.,Lose %d HP,Perds %d PV,Perdi %d PS,Pierde %d PV,HP %dを失います,Χάσε %d HP,失去%d生命,失去%d生命
 effect.cost_zero_turn.text,이번 턴 남은 카드의 비용이 모두 0이 됩니다.,Cost 0 this turn,Coût 0 ce tour,Costo 0 questo turno,Coste 0 este turno,このターンコスト0,Κόστος 0 αυτόν τον γύρο,本回合费用为0,本回合费用为0
@@ -174,6 +176,8 @@ card.cleopatra.nile_fury.name,나일의 분노,Nile Fury,Fureur du Nil,Furia del
 card.cleopatra.nile_fury.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
 card.cleopatra.pharaoh_decree.name,파라오의 명,Pharaoh's Decree,Décret du Pharaon,Editto del Faraone,Decreto del Faraón,ファラオの命,Διάταγμα του Φαραώ,法老之命,法老之命
 card.cleopatra.pharaoh_decree.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.nile_whisper.name,나일의 속삭임,Nile's Whisper,Murmure du Nil,Sussurro del Nilo,Susurro del Nilo,ナイルのささやき,Ψίθυρος του Νείλου,尼罗河私语,尼罗河私语
+card.cleopatra.nile_whisper.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.cleopatras_kiss.name,클레오파트라의 입맞춤,Cleopatra's Kiss,Baiser de Cléopâtre,Bacio di Cleopatra,Beso de Cleopatra,クレオパトラの接吻,Φιλί της Κλεοπάτρας,克利奥帕特拉之吻,克利奥帕特拉之吻
 card.cleopatra.cleopatras_kiss.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.poison_fog_spray.name,독안개 살포,Poison Fog Spray,Pulvérisation de brume empoisonnée,Spruzzo di nebbia velenosa,Aerosol de niebla venenosa,毒霧散布,Ψεκασμός Δηλητηριώδους Ομίχλης,喷洒毒雾,喷洒毒雾
@@ -198,8 +202,8 @@ card.cleopatra.nile_flow.name,나일의 흐름,Nile Flow,Courant du Nil,Flusso d
 card.cleopatra.nile_flow.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.snake_poison_dance.name,뱀의 독무,Snake Poison Dance,Danse du venin du serpent,Danza del veleno del serpente,Danza del veneno de serpiente,蛇の毒舞,Χορός του Δηλητηρίου του Φιδιού,蛇之毒舞,蛇之毒舞
 card.cleopatra.snake_poison_dance.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
-card.cleopatra.charming_language.name,매혹의 언어,Charming Language,Langage charmant,Linguaggio affascinante,Lenguaje encantador,魅惑の言語,Γοητευτική Γλώσσα,魅惑语言,魅惑语言
-card.cleopatra.charming_language.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.serpent_ritual.name,뱀의 의식,Serpent Ritual,Rituel du Serpent,Rituale del Serpente,Ritual de la Serpiente,蛇の儀式,Τελετουργικό του Φιδιού,蛇之仪式,蛇之儀式
+card.cleopatra.serpent_ritual.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.desert_recipe.name,사막의 약법,Desert Recipe,Recette du désert,Ricetta del deserto,Receta del desierto,砂漠の薬法,Συνταγή της Ερήμου,沙漠药方,沙漠药方
 card.cleopatra.desert_recipe.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
 card.cleopatra.poison_judgment.name,독의 심판,Poison Judgment,Jugement du poison,Giudizio del veleno,Juicio de veneno,毒の審判,Κρίση του Δηλητηρίου,毒之审判,毒之审判
@@ -208,8 +212,8 @@ card.cleopatra.isis_fury.name,이시스의 분노,Isis' Fury,Fureur d'Isis,Furia
 card.cleopatra.isis_fury.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
 card.cleopatra.poison_ritual.name,독살의 의식,Poison Ritual,Rituel d'empoisonnement,Rituale di avvelenamento,Ritual de envenenamiento,毒殺の儀式,Τελετουργικό Δηλητηρίασης,毒杀仪式,毒杀仪式
 card.cleopatra.poison_ritual.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
-card.cleopatra.queens_embrace.name,여왕의 포옹,Queen's Embrace,Étreinte de la reine,Abbraccio della regina,Abrazo de la reina,女王の抱擁,Αγκαλιά της Βασίλισσας,女王的拥抱,女王的拥抱
-card.cleopatra.queens_embrace.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
+card.cleopatra.golden_throne.name,황금 왕좌,Golden Throne,Trône d'or,Trono d'oro,Trono de Oro,黄金の王座,Χρυσός Θρόνος,黄金王座,黃金王座
+card.cleopatra.golden_throne.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.curse_brand.name,저주의 낙인,Curse Brand,Marque de malédiction,Marchio della maledizione,Marca de maldición,呪いの烙印,Στίγμα της Κατάρας,诅咒烙印,诅咒烙印
 card.cleopatra.curse_brand.archetype,저주,Curse,Malédiction,Maledizione,Maldición,呪い,Κατάρα,诅咒,诅咒
 card.cleopatra.nile_doom.name,나일의 파멸,Nile Doom,Destin du Nil,Rovina del Nilo,Ruina del Nilo,ナイルの破滅,Όλεθρος του Νείλου,尼罗河的毁灭,尼罗河的毁灭
@@ -310,8 +314,8 @@ card.yi_sun_sin.bloody_battle.name,혈전,Bloody Battle,Bataille sanglante,Batta
 card.yi_sun_sin.bloody_battle.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
 card.yi_sun_sin.war_drum.name,독전,War Drum,Tambour de guerre,Tamburo di guerra,Tambor de guerra,督戦,Τύμπανο Πολέμου,督战,督战
 card.yi_sun_sin.war_drum.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
-card.yi_sun_sin.warriors_resolve.name,전사의 각오,Warrior's Resolve,Résolution du guerrier,Risoluzione del guerriero,Resolución del guerrero,戦士の覚悟,Απόφαση του Πολεμιστή,战士的觉悟,战士的觉悟
-card.yi_sun_sin.warriors_resolve.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
+card.yi_sun_sin.fighting_spirit.name,투지,Fighting Spirit,Esprit combatif,Spirito combattivo,Espíritu de lucha,闘志,Μαχητικό Πνεύμα,斗志,斗志
+card.yi_sun_sin.fighting_spirit.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
 card.yi_sun_sin.phoenix.name,불사조,Phoenix,Phénix,Fenice,Fénix,不死鳥,Φοίνικας,不死鸟,不死鸟
 card.yi_sun_sin.phoenix.archetype,필사즉생,Death or Glory,La mort ou la gloire,Morte o gloria,Muerte o gloria,必死即生,Θάνατος ή Δόξα,必死即生,必死即生
 card.joan_of_arc.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライク,Χτύπημα,打击,打击
@@ -558,8 +562,8 @@ card.musashi.battle_gaze.name,결전의 눈빛,Battle Gaze,Regard de bataille,Sg
 card.musashi.battle_gaze.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
 card.musashi.torrent.name,격류,Torrent,Torrent,Torrente,Torrente,激流,Χείμαρρος,格流,格流
 card.musashi.torrent.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
-card.musashi.zen_realm.name,선의 경지,Zen Realm,Royaume Zen,Reame Zen,Reino Zen,禅の境地,Σφαίρα Ζεν,禅之境界,禅之境界
-card.musashi.zen_realm.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.mushin_burst.name,무심 방출,Mushin Burst,Décharge Mushin,Scarica Mushin,Descarga Mushin,無心放出,Έκρηξη Μουσίν,无心方出,无心方出
+card.musashi.mushin_burst.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
 card.musashi.empty_guard.name,공수처,Empty Guard,Garde vide,Guardia vuota,Guardia vacía,空守り,Κενή Φρουρά,空守处,空守处
 card.musashi.empty_guard.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
 card.musashi.detach.name,탈속,Detach,Détachement,Distacco,Desapego,脱俗,Απόσπαση,脱俗,脱俗
@@ -625,15 +629,15 @@ card.musashi.fate_duel.name,운명의 결투,Fate Duel,Duel du destin,Duello del
 card.musashi.fate_duel.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
 card.musashi.mushin_power.name,무심의 권능,Mushin Power,Pouvoir Mushin,Potere Mushin,Poder Mushin,無心の権能,Δύναμη Μουσίν,无心权能,无心权能
 card.musashi.mushin_power.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
-card.musashi.block_convert.name,공의 일격,Void Strike,Frappe du vide,Colpo del vuoto,Golpe del vacío,空の一撃,Χτύπημα του Κενού,虚空一击,虚空一击
-card.musashi.block_convert.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
+card.musashi.void_guard.name,공허의 방패,Void Guard,Garde du vide,Guardia del vuoto,Guardia del vacío,空の盾,Φρουρός του Κενού,虚空盾牌,虚空盾牌
+card.musashi.void_guard.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
 card.joan_of_arc.martyr_wrath.name,순교자의 분노,Martyr's Wrath,Colère du martyr,Ira del martire,Ira del mártir,殉教者の怒り,Οργή Μάρτυρα,殉道者之怒,殉道者之怒
 card.joan_of_arc.martyr_wrath.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
 card.joan_of_arc.dead_blessing.name,망자의 축복,Dead Blessing,Bénédiction des morts,Benedizione dei caduti,Bendición de los muertos,亡者の祝福,Ευλογία Νεκρών,亡者祝福,亡者祝福
 card.joan_of_arc.dead_blessing.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉道,殉道
 card.joan_of_arc.crusaders_faith.name,십자군의 신앙,Crusader's Faith,Foi du Croisé,Fede del Crociato,Fe del Cruzado,十字軍の信仰,Πίστη Σταυροφόρου,十字军的信仰,十字軍的信仰
 card.joan_of_arc.crusaders_faith.archetype,신성,Holy,Sacré,Sacro,Sagrado,神聖,Ιερό,神圣,神聖
-card.joan_of_arc.divine_echo.name,신성한 반향,Divine Echo,Écho Divin,Eco Divino,Eco Divino,神聖な反響,Θεϊκή Απήχηση,神圣回响,神聖回響
+card.joan_of_arc.divine_echo.name,성스러운 갑주,Sacred Armor,Armure Sacrée,Armatura Sacra,Armadura Sagrada,聖なる鎧,Ιερή Πανοπλία,神圣铠甲,神聖鎧甲
 card.joan_of_arc.divine_echo.archetype,신성,Holy,Sacré,Sacro,Sagrado,神聖,Ιερό,神圣,神聖
 card.joan_of_arc.oracle_light.name,신탁의 빛,Oracle's Light,Lumière de l'Oracle,Luce dell'Oracolo,Luz del Oráculo,神託の光,Φως Μαντείου,神谕之光,神諭之光
 card.joan_of_arc.oracle_light.archetype,신성,Holy,Sacré,Sacro,Sagrado,神聖,Ιερό,神圣,神聖
@@ -661,8 +665,8 @@ card.cleopatra.serpent_power.name,독사의 권능,Serpent Power,Pouvoir du Serp
 card.cleopatra.serpent_power.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
 card.cleopatra.pharaoh_venom.name,파라오의 독력,Pharaoh's Venom,Venin du Pharaon,Veleno del Faraone,Veneno del Faraón,ファラオの毒力,Δηλητήριο του Φαραώ,法老的毒力,法老的毒力
 card.cleopatra.pharaoh_venom.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
-card.cleopatra.nile_verdict.name,나일의 천벌,Nile Verdict,Verdict du Nil,Verdetto del Nilo,Veredicto del Nilo,ナイルの天罰,Ετυμηγορία του Νείλου,尼罗河天罚,尼罗河天罚
-card.cleopatra.nile_verdict.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
+card.cleopatra.pharaohs_plague.name,파라오의 역병,Pharaoh's Plague,Fléau du Pharaon,Piaga del Faraone,Plaga del Faraón,ファラオの疫病,Πανδημία του Φαραώ,法老的瘟疫,法老的瘟疫
+card.cleopatra.pharaohs_plague.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
 card.cleopatra.poison_party.name,독의 잔치,Poison Party,Festin de Venin,Festa del Veleno,Fiesta del Veneno,毒の宴,Γιορτή Δηλητηρίου,毒之盛宴,毒之盛宴
 card.cleopatra.poison_party.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
 card.cleopatra.poison_purge.name,독의 정화,Poison Purge,Purge du Venin,Purga del Veleno,Purga del Veneno,毒の浄化,Εκκαθάριση Δηλητηρίου,毒之净化,毒之净化
@@ -723,8 +727,8 @@ card.genghis_khan.cavalry_retreat.name,기병 후퇴,Cavalry Retreat,Retraite de
 card.genghis_khan.cavalry_retreat.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
 card.genghis_khan.plunderers_instinct.name,약탈자의 본능,Plunderer's Instinct,Instinct du pillard,Istinto del saccheggiatore,Instinto del saqueador,略奪者の本能,Ένστικτο Λεηλατητή,掠夺者本能,掠夺者本能
 card.genghis_khan.plunderers_instinct.archetype,몽골 기병,Mongol Cavalry,Cavalerie mongole,Cavalleria mongola,Caballería mongola,モンゴル騎兵,Μογγολικό Ιππικό,蒙古骑兵,蒙古骑兵
-card.genghis_khan.executioners_power.name,처형의 권능,Executioner's Power,Puissance de l'exécuteur,Potere del boia,Poder del verdugo,処刑者の権能,Δύναμη Εκτελεστή,处刑者权能,处刑者权能
-card.genghis_khan.executioners_power.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
+card.genghis_khan.executioners_bounty.name,처형 현상금,Executioner's Bounty,Prime du bourreau,Taglia del boia,Recompensa del verdugo,処刑懸賞,Αμοιβή Εκτελεστή,处刑赏金,处刑赏金
+card.genghis_khan.executioners_bounty.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
 card.genghis_khan.massacre_khan.name,학살의 칸,Massacre Khan,Khan du massacre,Khan del massacro,Khan de la masacre,虐殺のハン,Χαν Σφαγής,屠杀可汗,屠杀可汗
 card.genghis_khan.massacre_khan.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
 card.genghis_khan.khans_treasury.name,칸의 보고,Khan's Treasury,Trésor du Khan,Tesoro del Khan,Tesoro del Kan,ハンの宝庫,Θησαυρός του Χαν,可汗宝库,可汗宝库
@@ -732,3 +736,7 @@ card.genghis_khan.khans_treasury.archetype,약탈,Plunder,Pillage,Saccheggio,Saq
 card.genghis_khan.khans_gamble.name,칸의 도박,Khan's Gamble,Pari du Khan,Scommessa del Khan,Apuesta del Kan,ハンの賭け,Στοίχημα του Χαν,可汗赌注,可汗赌注
 card.genghis_khan.khans_gamble.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
 effect.damage_per_status_type.text,디버프 종류당 피해 %d을 입힙니다.,Deal %d per debuff type,Inflige %d par type de débuff,Infligge %d per tipo debuff,Inflige %d por tipo desventaja,デバフ種 %d ダメージ,Ζημιά %d ανά τύπο εξασθένησης,每种减益造成 %d 伤害,每种减益造成 %d 伤害
+effect.draw_per_enthrall.text,이 카드로 반함 발동 시 카드 %d장을 뽑습니다.,Draw %d card(s) if this card causes enthrall,Piochez %d carte(s) si cette carte provoque le charme,Pesca %d carta(e) se causa ammaliamento,Roba %d carta(s) si causa enthrall,このカードで反心が発動したらカードを %d 枚引く,Τράβηξε %d χαρτί(α) αν αυτή η κάρτα προκαλεί Γοητεία,此牌触发反迷时抽 %d 张牌,此牌觸發反迷時抽 %d 張牌
+effect.damage_per_charmed_enemy.text,매혹된 적 1명당 %d 피해를 입힙니다.,Deal %d damage per Charmed enemy,Inflige %d dégâts par ennemi charmé,Infligge %d danni per nemico ammaliato,Inflige %d de daño por enemigo encantado,魅惑された敵1体につき %d ダメージ,Προκάλεσε %d ζημιά ανά γοητευμένο εχθρό,每个着迷的敌人造成 %d 伤害,每個著迷的敵人造成 %d 傷害
+power.on_enthrall_strength.label,매혹 반함 발동 시 strength +%d 영구,On enthrall: gain Strength +%d permanently,Réf. charme: Strength +%d permanent,Al fascino: Forza +%d permanente,Al embrujo: Fuerza +%d permanente,反心発動時: ストレングス +%d 永久,Στην Γοητεία: Δύναμη +%d μόνιμα,反迷触发: 力量 +%d 永久,反迷觸發: 力量 +%d 永久
+power.on_kill_energy.label,적 처치 시 에너지 +%d,On kill: gain %d Energy,Au meurtre: +%d Énergie,All'uccisione: +%d Energia,Al matar: +%d Energía,敵撃破時: エネルギー +%d,Στη σφαγή: +%d Ενέργεια,击杀时获得 %d 能量,擊殺時獲得 %d 能量

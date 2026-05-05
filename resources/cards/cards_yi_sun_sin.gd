@@ -1,6 +1,6 @@
 # resources/cards/cards_yi_sun_sin.gd
 # 이순신 카드 — starter 10 + pool 30 (거북선 10 / 학익진 10 / 필사즉생 10)
-# 거북선: block_per_turn + token_bonus_dmg Amplifier → DAMAGE_PER_TOKEN Payoff
+# 거북선: block_per_turn + every_nth_attack_bonus Amplifier → DAMAGE_PER_TOKEN/EXHAUST Payoff
 # 학익진: draw_per_turn + block_per_turn Amplifier → FORMATION_BLOCK Payoff
 # 필사즉생: morale_per_turn + block_per_turn Amplifier → 저HP 조건 Payoff
 const CardRes = preload("res://resources/card_resource.gd")
@@ -20,10 +20,10 @@ static func pool() -> Array:
 	return [
 		# ── 거북선 10 (F×3 / A×2 / P×2 / C×2 / Chaos×1) ──
 		_turtle_shield(), _turtle_ship_charge(), _counter(),              # F
-		_turtle_power(), _fleet_alliance(),                               # A
+		_turtle_power(), _cannon_rhythm(),                                # A
 		_volley_fire(), _fleet_fire(),                                    # P
 		_consecutive_defense(), _charge_stance(),                         # C
-		_turtle_launch(),                                                 # Chaos
+		_iron_ram(),                                                      # Chaos
 		# ── 학익진 10 (F×3 / A×2 / P×2 / C×2 / Chaos×1) ──
 		_formation_bond(), _formation_boost(), _discipline(),             # F
 		_fleet_command(), _formation_strength(),                          # A
@@ -32,7 +32,7 @@ static func pool() -> Array:
 		_strict_training(),                                               # Chaos
 		# ── 필사즉생 10 (F×3 / A×2 / P×2 / C×2 / Chaos×1) ──
 		_miraculous_recovery(), _all_in(), _last_stand(),                 # F
-		_death_resolve(), _warriors_resolve(),                            # A
+		_death_resolve(), _fighting_spirit(),                             # A
 		_death_or_glory(), _crisis_breakthrough(),                        # P
 		_decisive_strike(), _bloody_battle(),                             # C
 		_phoenix(),                                                       # Chaos
@@ -71,7 +71,7 @@ static func _shield() -> Resource:
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.shield.archetype"
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.BLOCK; ea.value = 70; ea.base_value = 70
+	ea.effect_type = EffRes.EffectType.BLOCK; ea.value = 45; ea.base_value = 45
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW; eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c
@@ -91,7 +91,7 @@ static func _counter_strike() -> Resource:
 	c.effects = [ea, eb]; return c
 
 # ─────────────────────────────────────────
-# 거북선 10 — block_per_turn + token_bonus_dmg 스파인
+# 거북선 10 — block_per_turn + every_nth_attack_bonus 스파인
 # ─────────────────────────────────────────
 
 static func _turtle_shield() -> Resource:
@@ -136,7 +136,7 @@ static func _counter() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _turtle_power() -> Resource:
-	# [A] 거북의 권능 — RARE, 1코, POWER: 매 턴 시작 시 BLOCK +20
+	# [A] 거북의 권능 — RARE, 1코, POWER: 매 턴 시작 시 BLOCK +50
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.turtle_power.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.POWER
@@ -144,19 +144,20 @@ static func _turtle_power() -> Resource:
 	c.archetype = "card.yi_sun_sin.turtle_power.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.block_per_turn"; e.value = 20; e.base_value = 20; e.target = "SELF"
+	e.status_type = "power.block_per_turn"; e.value = 60; e.base_value = 60; e.target = "SELF"
 	c.effects = [e]; return c
 
-static func _fleet_alliance() -> Resource:
-	# [A] 함대 연합 — RARE, 2코, POWER: 토큰 1개당 피해 +10 (DAMAGE_PER_TOKEN 보너스)
+static func _cannon_rhythm() -> Resource:
+	# [A] 포격의 리듬 — RARE, 2코, POWER: 4번째 공격 카드마다 160 추가 피해
 	var c := CardRes.new()
-	c.card_name = "card.yi_sun_sin.fleet_alliance.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
+	c.card_name = "card.yi_sun_sin.cannon_rhythm.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.fleet_alliance.archetype"
+	c.archetype = "card.yi_sun_sin.cannon_rhythm.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.token_bonus_dmg"; e.value = 10; e.base_value = 10; e.target = "SELF"
+	e.status_type = "power.every_nth_attack_bonus"; e.value = 160; e.base_value = 160; e.target = "SELF"
+	e.bonus_value = 4; e.base_bonus_value = 4
 	c.effects = [e]; return c
 
 static func _volley_fire() -> Resource:
@@ -182,7 +183,7 @@ static func _fleet_fire() -> Resource:
 	c.archetype = "card.yi_sun_sin.fleet_fire.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_TOKEN
-	e.value = 40; e.base_value = 40; e.target = "ALL"
+	e.value = 45; e.base_value = 45; e.target = "ALL"
 	e.damage_type = "explosive"
 	c.effects = [e]; return c
 
@@ -214,32 +215,35 @@ static func _charge_stance() -> Resource:
 	eb.damage_type = "blunt"
 	c.effects = [ea, eb]; return c
 
-static func _turtle_launch() -> Resource:
-	# [Chaos] 귀선 출항 — LEGENDARY, 2코, POWER: 매 턴 시작 시 SUMMON_TOKEN 2
+static func _iron_ram() -> Resource:
+	# [Chaos] 철갑 충격 — LEGENDARY, 2코, ATTACK EXHAUST: DMG 150 ALL + BLOCK_ALL 80
 	var c := CardRes.new()
-	c.card_name = "card.yi_sun_sin.turtle_launch.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
-	c.card_type = CardRes.CardType.POWER
-	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.turtle_launch.archetype"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.summon_per_turn"; e.value = 2; e.base_value = 2; e.target = "SELF"
-	c.effects = [e]; return c
+	c.card_name = "card.yi_sun_sin.iron_ram.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
+	c.card_type = CardRes.CardType.ATTACK
+	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
+	c.archetype = "card.yi_sun_sin.iron_ram.archetype"
+	c.is_exhaust = true
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.DAMAGE; ea.value = 150; ea.base_value = 150; ea.target = "ALL"
+	ea.damage_type = "explosive"
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.BLOCK_ALL; eb.value = 80; eb.base_value = 80
+	c.effects = [ea, eb]; return c
 
 # ─────────────────────────────────────────
 # 학익진 10 — draw_per_turn + block_per_turn 스파인
 # ─────────────────────────────────────────
 
 static func _formation_bond() -> Resource:
-	# [F] 진형 결속 — COMMON, 0코, SKILL INNATE: FORMATION_BLOCK 20
+	# [F] 진형 결속 — COMMON, 1코, SKILL INNATE: FORMATION_BLOCK 45
 	var c := CardRes.new()
-	c.card_name = "card.yi_sun_sin.formation_bond.name"; c.owner_id = "yi_sun_sin"; c.cost = 0
+	c.card_name = "card.yi_sun_sin.formation_bond.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.formation_bond.archetype"
 	c.is_innate = true
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 20; e.base_value = 20
+	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 45; e.base_value = 45
 	c.effects = [e]; return c
 
 static func _formation_boost() -> Resource:
@@ -250,33 +254,35 @@ static func _formation_boost() -> Resource:
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.formation_boost.archetype"
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 40; e.base_value = 40
+	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 70; e.base_value = 70
 	c.effects = [e]; return c
 
 static func _discipline() -> Resource:
-	# [F] 군기 진작 — COMMON, 1코, SKILL: BLOCK 50 + GAIN_MORALE 1
+	# [F] 군기 진작 — COMMON, 1코, SKILL: GAIN_MORALE 2 + BLOCK 20 (adj=0.96)
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.discipline.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.discipline.archetype"
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.BLOCK; ea.value = 50; ea.base_value = 50
+	ea.effect_type = EffRes.EffectType.GAIN_MORALE; ea.value = 2; ea.base_value = 2
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.GAIN_MORALE; eb.value = 1; eb.base_value = 1
+	eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 20; eb.base_value = 20
 	c.effects = [ea, eb]; return c
 
 static func _fleet_command() -> Resource:
 	# [A] 함대 지휘 — RARE, 1코, POWER: 매 턴 시작 시 DRAW 1 추가
 	var c := CardRes.new()
-	c.card_name = "card.yi_sun_sin.fleet_command.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
+	c.card_name = "card.yi_sun_sin.fleet_command.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.fleet_command.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.draw_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
-	c.effects = [e]; return c
+	var es := EffRes.new()
+	es.effect_type = EffRes.EffectType.SACRIFICE_HP; es.value = 30; es.base_value = 30
+	c.effects = [e, es]; return c
 
 static func _formation_strength() -> Resource:
 	# [A] 진형의 힘 — RARE, 2코, POWER: 매 턴 시작 시 BLOCK +15 ALL
@@ -287,7 +293,7 @@ static func _formation_strength() -> Resource:
 	c.archetype = "card.yi_sun_sin.formation_strength.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.block_per_turn"; e.value = 15; e.base_value = 15; e.target = "SELF"
+	e.status_type = "power.block_per_turn"; e.value = 100; e.base_value = 100; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _hold_formation() -> Resource:
@@ -305,19 +311,17 @@ static func _hold_formation() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _command_instinct() -> Resource:
-	# [P] 지휘 본능 — LEGENDARY, 2코, SKILL: FORMATION_BLOCK 60 + GAIN_MORALE 2 + DRAW 1
+	# [P] 지휘 본능 — LEGENDARY, 2코, SKILL: FORMATION_BLOCK 125 + GAIN_MORALE 2
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.command_instinct.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.command_instinct.archetype"
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.FORMATION_BLOCK; ea.value = 60; ea.base_value = 60
+	ea.effect_type = EffRes.EffectType.FORMATION_BLOCK; ea.value = 125; ea.base_value = 125
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.GAIN_MORALE; eb.value = 2; eb.base_value = 2
-	var ec := EffRes.new()
-	ec.effect_type = EffRes.EffectType.DRAW; ec.value = 1; ec.base_value = 1
-	c.effects = [ea, eb, ec]; return c
+	c.effects = [ea, eb]; return c
 
 static func _naval_training() -> Resource:
 	# [C] 수군 훈련 — UNCOMMON, 1코, SKILL: DRAW 1 + FORMATION_BLOCK 30
@@ -346,16 +350,16 @@ static func _regroup() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _strict_training() -> Resource:
-	# [Chaos] 엄정한 훈련 — RARE, 1코, SKILL: DRAW 2 + HEAL_ALL 20 (카오스 드로우 스윙)
+	# [Chaos] 엄정한 훈련 — RARE, 2코, SKILL: DRAW 2 + HEAL_ALL 40 (카오스 드로우 스윙)
 	var c := CardRes.new()
-	c.card_name = "card.yi_sun_sin.strict_training.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
+	c.card_name = "card.yi_sun_sin.strict_training.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = "card.yi_sun_sin.strict_training.archetype"
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 2; ea.base_value = 2
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.HEAL_ALL; eb.value = 20; eb.base_value = 20
+	eb.effect_type = EffRes.EffectType.HEAL_ALL; eb.value = 40; eb.base_value = 40
 	c.effects = [ea, eb]; return c
 
 # ─────────────────────────────────────────
@@ -383,7 +387,7 @@ static func _all_in() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP; ea.value = 60; ea.base_value = 60; ea.target = "SELF"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.DAMAGE; eb.value = 188; eb.base_value = 188; eb.target = "SINGLE"
+	eb.effect_type = EffRes.EffectType.DAMAGE; eb.value = 150; eb.base_value = 150; eb.target = "SINGLE"
 	eb.damage_type = "slash"
 	c.effects = [ea, eb]; return c
 
@@ -397,7 +401,7 @@ static func _last_stand() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP; ea.value = 80; ea.base_value = 80; ea.target = "SELF"
 	var eb := EffRes.new()
-	eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 280; eb.base_value = 280
+	eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 200; eb.base_value = 200
 	c.effects = [ea, eb]; return c
 
 static func _death_resolve() -> Resource:
@@ -409,19 +413,20 @@ static func _death_resolve() -> Resource:
 	c.archetype = "card.yi_sun_sin.death_resolve.archetype"
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.morale_per_turn"; e.value = 2; e.base_value = 2; e.target = "SELF"
-	c.effects = [e]; return c
+	e.status_type = "power.morale_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	var es := EffRes.new()
+	es.effect_type = EffRes.EffectType.SACRIFICE_HP; es.value = 5; es.base_value = 5
+	c.effects = [e, es]; return c
 
-static func _warriors_resolve() -> Resource:
-	# [A] 전사의 각오 — RARE, 2코, POWER: 매 턴 시작 시 BLOCK +20
+static func _fighting_spirit() -> Resource:
+	# [A] 투지 — RARE, 1코, SKILL: 현재 사기 스택 × 50 방어도 (필사즉생 아키 사기 자원화)
 	var c := CardRes.new()
-	c.card_name = "card.yi_sun_sin.warriors_resolve.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
-	c.card_type = CardRes.CardType.POWER
+	c.card_name = "card.yi_sun_sin.fighting_spirit.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
+	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.warriors_resolve.archetype"
+	c.archetype = "card.yi_sun_sin.fighting_spirit.archetype"
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.block_per_turn"; e.value = 20; e.base_value = 20; e.target = "SELF"
+	e.effect_type = EffRes.EffectType.MORALE_TO_BLOCK; e.value = 50; e.base_value = 50
 	c.effects = [e]; return c
 
 static func _death_or_glory() -> Resource:

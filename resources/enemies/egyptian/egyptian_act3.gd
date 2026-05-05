@@ -1,4 +1,4 @@
-# resources/enemies/egyptian/egyptian_act3.gd
+﻿# resources/enemies/egyptian/egyptian_act3.gd
 # 이집트 신화 — Act3 엘리트 3종 + 보스(라-호라크티)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -72,7 +72,7 @@ static func ra_horakhty(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.egyptian.ra_horakhty"; e.max_hp = 5000; e.character_scene = scene
 	e.mythology = "egyptian"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.65, 0.3]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	# 페이즈0: ATK RANDOM / DEBUFF weak ALL / ATK RANDOM / ATK ALL
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 150; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "divine"

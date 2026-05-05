@@ -1,4 +1,4 @@
-# resources/enemies/chinese/chinese_act2.gd
+﻿# resources/enemies/chinese/chinese_act2.gd
 # 중국 신화 Act 2 — 엘리트 3종(홍해아·구룡 차장·천구 형제) + 보스(이랑신)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -14,7 +14,7 @@ static func red_boy(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 170; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "fire"
 	e.intent_pattern = [i1, i2, i3]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func nine_dragon_general(scene: PackedScene) -> Resource:
@@ -32,7 +32,7 @@ static func nine_dragon_general(scene: PackedScene) -> Resource:
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 220; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func heavenly_hound_brothers(scene: PackedScene) -> Resource:
@@ -55,7 +55,7 @@ static func heavenly_hound_brothers(scene: PackedScene) -> Resource:
 	i6.action_type = IntentRes.ActionType.DEBUFF; i6.value = 2; i6.status_type = "weak"
 	i6.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3, i4, i5, i6]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func erlang_shen(scene: PackedScene) -> Resource:
@@ -102,7 +102,7 @@ static func erlang_shen(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3, p2i4, p2i5]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 static func elites() -> Array:

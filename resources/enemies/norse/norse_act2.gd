@@ -1,4 +1,4 @@
-# resources/enemies/norse/norse_act2.gd
+﻿# resources/enemies/norse/norse_act2.gd
 # 북유럽 신화 — Act2 요툰헤임 침입 엘리트 3종 + 보스(수르트)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
@@ -92,7 +92,7 @@ static func surtr(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	return e
 
 # ──── API ────

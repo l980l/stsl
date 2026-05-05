@@ -1,4 +1,4 @@
-# resources/enemies/chinese/chinese_act3.gd
+﻿# resources/enemies/chinese/chinese_act3.gd
 # 중국 신화 Act 3 — 엘리트 3종(백호·주작·현무 신장) + 보스(반고)
 const EnemyRes   = preload("res://resources/enemy_resource.gd")
 const IntentRes  = preload("res://resources/intent_resource.gd")
@@ -16,7 +16,7 @@ static func white_tiger_general(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func vermilion_bird_general(scene: PackedScene) -> Resource:
@@ -33,7 +33,7 @@ static func vermilion_bird_general(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 2; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func black_tortoise_general(scene: PackedScene) -> Resource:
@@ -52,7 +52,7 @@ static func black_tortoise_general(scene: PackedScene) -> Resource:
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 210; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
-	e.charm_resistance = 1
+	e.charm_resistance = 20
 	return e
 
 static func pangu(scene: PackedScene) -> Resource:
@@ -109,7 +109,7 @@ static func pangu(scene: PackedScene) -> Resource:
 		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6, p2i7]
 	]
 	e.intent_pattern = e.phase_patterns[0]
-	e.charm_resistance = 2
+	e.charm_resistance = 20
 	# 카드 타입 카운터: 권능 카드 사용 때마다 영웅 전체에 약화 +2 부여
 	var _ptrigger := IntentRes.new()
 	_ptrigger.action_type = IntentRes.ActionType.DEBUFF
