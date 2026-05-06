@@ -24,14 +24,14 @@ const EgyptNormals    = preload("res://resources/enemies/egyptian/egyptian_norma
 const EgyptAct1       = preload("res://resources/enemies/egyptian/egyptian_act1.gd")
 const EgyptAct2       = preload("res://resources/enemies/egyptian/egyptian_act2.gd")
 const EgyptAct3       = preload("res://resources/enemies/egyptian/egyptian_act3.gd")
-const KoreanNormals   = preload("res://resources/enemies/korean/korean_normals.gd")
-const KoreanAct1      = preload("res://resources/enemies/korean/korean_act1.gd")
-const KoreanAct2      = preload("res://resources/enemies/korean/korean_act2.gd")
-const KoreanAct3      = preload("res://resources/enemies/korean/korean_act3.gd")
-const ChineseNormals  = preload("res://resources/enemies/chinese/chinese_normals.gd")
-const ChineseAct1     = preload("res://resources/enemies/chinese/chinese_act1.gd")
-const ChineseAct2     = preload("res://resources/enemies/chinese/chinese_act2.gd")
-const ChineseAct3     = preload("res://resources/enemies/chinese/chinese_act3.gd")
+const BuddhistNormals = preload("res://resources/enemies/buddhist/buddhist_normals.gd")
+const BuddhistAct1    = preload("res://resources/enemies/buddhist/buddhist_act1.gd")
+const BuddhistAct2    = preload("res://resources/enemies/buddhist/buddhist_act2.gd")
+const BuddhistAct3    = preload("res://resources/enemies/buddhist/buddhist_act3.gd")
+const DaoistNormals   = preload("res://resources/enemies/daoist/daoist_normals.gd")
+const DaoistAct1      = preload("res://resources/enemies/daoist/daoist_act1.gd")
+const DaoistAct2      = preload("res://resources/enemies/daoist/daoist_act2.gd")
+const DaoistAct3      = preload("res://resources/enemies/daoist/daoist_act3.gd")
 const JapaneseNormals = preload("res://resources/enemies/japanese/japanese_normals.gd")
 const JapaneseAct1    = preload("res://resources/enemies/japanese/japanese_act1.gd")
 const JapaneseAct2    = preload("res://resources/enemies/japanese/japanese_act2.gd")
@@ -41,9 +41,9 @@ const RelicsGd        = preload("res://resources/relics/relics.gd")
 const EventsAct1      = preload("res://resources/events/events_act1.gd")
 const EventsAct2      = preload("res://resources/events/events_act2.gd")
 const EventsAct3      = preload("res://resources/events/events_act3.gd")
-const EventsKorean    = preload("res://resources/events/events_korean.gd")
+const EventsBuddhist  = preload("res://resources/events/events_buddhist.gd")
 const EventsJapanese  = preload("res://resources/events/events_japanese.gd")
-const EventsChinese   = preload("res://resources/events/events_chinese.gd")
+const EventsDaoist    = preload("res://resources/events/events_daoist.gd")
 
 const CardRes  = preload("res://resources/card_resource.gd")
 const EffRes   = preload("res://resources/effect_resource.gd")
@@ -425,27 +425,27 @@ func _generate_enemies() -> void:
 		[EgyptAct3.apophis_serpent(null), EgyptAct3.set_tempest(null), EgyptAct3.isis_phantom(null)],
 		EgyptAct3.ra_horakhty(null))
 
-	# 한국 신화
-	md = _gen_mythology(md, csv_rows, 1, "한국 신화 (Korean)",
-		[KoreanNormals.death_reaper(null), KoreanNormals.cheoyong(null), KoreanNormals.dokkaebi(null),
-		 KoreanNormals.three_legged_crow(null), KoreanNormals.gumiho(null), KoreanNormals.bulgasari(null)],
-		[KoreanAct1.haechi(null), KoreanAct1.jangseung(null), KoreanAct1.haemosu(null)],
-		KoreanAct1.dangun(null),
-		[KoreanAct2.dokkaebi_chief(null), KoreanAct2.sea_dragon_general(null), KoreanAct2.dongmyeong(null)],
-		KoreanAct2.samsin_grandma(null),
-		[KoreanAct3.underworld_judge(null), KoreanAct3.gat_spirit(null), KoreanAct3.cheoyong_god(null)],
-		KoreanAct3.gusamseung_halmang(null))
+	# 불교 신화
+	md = _gen_mythology(md, csv_rows, 1, "불교 신화 (Buddhist)",
+		[BuddhistNormals.yaksha(null), BuddhistNormals.virudhaka(null), BuddhistNormals.asura(null),
+		 BuddhistNormals.garuda(null), BuddhistNormals.mara_soldier(null), BuddhistNormals.vajrapani(null)],
+		[BuddhistAct1.vaisravana(null), BuddhistAct1.deva_guardian(null), BuddhistAct1.dharma_general(null)],
+		BuddhistAct1.mahavairocana(null),
+		[BuddhistAct2.asura_king(null), BuddhistAct2.naga_king(null), BuddhistAct2.agni_buddha(null)],
+		BuddhistAct2.guanyin(null),
+		[BuddhistAct3.yama(null), BuddhistAct3.ksitigarbha(null), BuddhistAct3.vairocana(null)],
+		BuddhistAct3.acalanatha(null))
 
-	# 중국 신화
-	md = _gen_mythology(md, csv_rows, 1, "중국 신화 (Chinese)",
-		[ChineseNormals.yaksha(null), ChineseNormals.nezha_soldier(null), ChineseNormals.heavenly_king_soldier(null),
-		 ChineseNormals.shanhaijing_beast(null), ChineseNormals.immortal_trainee(null), ChineseNormals.azure_dragon_guard(null)],
-		[ChineseAct1.golden_horn_king(null), ChineseAct1.silver_horn_king(null), ChineseAct1.black_wind_demon(null)],
-		ChineseAct1.chiyou(null),
-		[ChineseAct2.red_boy(null), ChineseAct2.nine_dragon_general(null), ChineseAct2.heavenly_hound_brothers(null)],
-		ChineseAct2.erlang_shen(null),
-		[ChineseAct3.white_tiger_general(null), ChineseAct3.vermilion_bird_general(null), ChineseAct3.black_tortoise_general(null)],
-		ChineseAct3.pangu(null))
+	# 도교 신화
+	md = _gen_mythology(md, csv_rows, 1, "도교 신화 (Daoist)",
+		[DaoistNormals.hermit_ghost(null), DaoistNormals.child_immortal(null), DaoistNormals.celestial_soldier(null),
+		 DaoistNormals.mountain_spirit(null), DaoistNormals.dao_disciple(null), DaoistNormals.azure_guardian(null)],
+		[DaoistAct1.golden_elixir(null), DaoistAct1.silver_elixir(null), DaoistAct1.black_wind_immortal(null)],
+		DaoistAct1.eastern_king(null),
+		[DaoistAct2.crimson_immortal(null), DaoistAct2.nine_dragon(null), DaoistAct2.twin_immortals(null)],
+		DaoistAct2.xuanwu(null),
+		[DaoistAct3.white_tiger(null), DaoistAct3.vermilion_bird(null), DaoistAct3.black_tortoise(null)],
+		DaoistAct3.jade_emperor(null))
 
 	# 일본 신화
 	md = _gen_mythology(md, csv_rows, 1, "일본 신화 (Japanese)",
@@ -517,9 +517,9 @@ func _generate_events() -> void:
 		{ "label": "Act 1 (공용)", "act": 1, "pool": EventsAct1.build_pool() },
 		{ "label": "Act 2 (공용)", "act": 2, "pool": EventsAct2.build_pool() },
 		{ "label": "Act 3 (공용)", "act": 3, "pool": EventsAct3.build_pool() },
-		{ "label": "한국 신화",    "act": 1, "pool": EventsKorean.build_pool() },
+		{ "label": "불교 신화",    "act": 1, "pool": EventsBuddhist.build_pool() },
 		{ "label": "일본 신화",    "act": 1, "pool": EventsJapanese.build_pool() },
-		{ "label": "중국 신화",    "act": 1, "pool": EventsChinese.build_pool() },
+		{ "label": "도교 신화",    "act": 1, "pool": EventsDaoist.build_pool() },
 	]
 	for eset in event_sets:
 		var pool: Array = eset["pool"]
