@@ -608,7 +608,7 @@ func test_buddhist_normals_shape() -> void:
 	_assert(e1.mythology == "buddhist", "야차 mythology=buddhist")
 	_assert(e1.intent_pattern.size() == 3, "야차 인텐트 3개")
 	var e2: Resource = M.vajrapani(scene)
-	_assert(e2.max_hp == 900, "금강역사 HP 900")
+	_assert(e2.max_hp == 500, "금강역사 HP 500")
 	_assert(e2.intent_pattern.size() == 3, "금강역사 인텐트 3개")
 	var e3: Resource = M.garuda(scene)
 	_assert(e3.max_hp == 280, "가루다 HP 280")
