@@ -79,3 +79,15 @@ relic.niten_ichi_ryu.name,니텐이치류,Niten Ichi-ryu,Niten Ichi-ryu,Niten Ic
 relic.niten_ichi_ryu.desc,전투 시작 시 에너지 +1 (무사시 전용),Energy +1 (Musashi only),Énergie +1 (Musashi),Energia +1 (Musashi),Energía +1 (Musashi),戦闘開始時エネルギー+1（武蔵専用）,+1 Ενέργεια (Μόνο Μουσάσι),战斗开始能量 +1（武藏专用）,战斗开始能量 +1（武藏专用）
 relic.gorin_sho_relic.name,오륜서,Gorin-no-sho (Book of Five Rings),Gorin-no-sho (Traité des cinq roues),Gorin-no-sho (Libro dei Cinque Anelli),Gorin-no-sho (El libro de los cinco anillos),五輪書,Γκορίν-νο-σο (Το Βιβλίο των Πέντε Δαχτυλιδιών),五轮书,五轮书
 relic.gorin_sho_relic.desc,플레이어 턴 시작 시 카드 1장 추가 드로우 (무사시 전용),Draw extra card (Musashi only),Pioche bonus (Musashi),Pesca extra (Musashi),Roba extra (Musashi),ターン開始時カード1枚追加（武蔵専用）,+1 κάρτα (Μόνο Μουσάσι),回合开始额外抽牌（武藏专用）,回合开始额外抽牌（武藏专用）
+relic.dharma_seal.name,법인,Dharma Seal,Sceau du Dharma,Sigillo del Dharma,Sello del Dharma,法印,Σφραγίδα Ντάρμα,法印,法印
+relic.dharma_seal.desc,전투 시작 시 에너지 +1,Energy +1 at battle start,Énergie +1 au début du combat,Energia +1 all'inizio del combattimento,Energía +1 al inicio del combate,戦闘開始時エネルギー+1,+1 Ενέργεια στην αρχή,战斗开始时能量+1,戰鬥開始時能量+1
+relic.dharma_drum.name,법고,Dharma Drum,Tambour du Dharma,Tamburo del Dharma,Tambor del Dharma,法鼓,Τύμπανο Ντάρμα,法鼓,法鼓
+relic.dharma_drum.desc,전투 승리 시 사기 +3,Morale +3 on victory,Moral +3 à la victoire,Morale +3 alla vittoria,Moral +3 en victoria,戦闘勝利時士気+3,+3 Ηθικό στη νίκη,战斗胜利时士气+3,戰鬥勝利時士氣+3
+relic.prayer_beads.name,염주,Prayer Beads,Chapelet,Rosario,Rosario,念珠,Χάντρες Προσευχής,念珠,念珠
+relic.prayer_beads.desc,영웅이 피해를 받을 때 방어도 +10,Block +10 when a hero takes damage,Blocage +10 quand un héros reçoit des dégâts,Difesa +10 quando un eroe subisce danni,Defensa +10 cuando un héroe recibe daño,英雄がダメージを受けたとき防御+10,+10 Άμυνα όταν ο ήρωας λαμβάνει ζημιά,英雄受伤时护甲+10,英雄受傷時護甲+10
+relic.yin_yang_mirror.name,음양경,Yin Yang Mirror,Miroir Yin Yang,Specchio Yin Yang,Espejo Yin Yang,陰陽鏡,Καθρέπτης Γιν-Γιανγκ,阴阳镜,陰陽鏡
+relic.yin_yang_mirror.desc,전투 시작 시 카드 비용 -1,Reduce card cost by 1 at battle start,Coût de carte -1 au début,Costo carta -1 all'inizio,Coste de carta -1 al inicio,戦闘開始時カードコスト-1,-1 Κόστος Κάρτας στην αρχή,战斗开始时卡牌费用-1,戰鬥開始時卡牌費用-1
+relic.five_elements_jade.name,오행 옥,Five Elements Jade,Jade des Cinq Éléments,Giada dei Cinque Elementi,Jade de los Cinco Elementos,五行玉,Νεφρίτης Πέντε Στοιχείων,五行玉,五行玉
+relic.five_elements_jade.desc,플레이어 턴 종료 시 HP +15,HP +15 at end of player turn,PV +15 à la fin du tour,PF +15 alla fine del turno,PV +15 al final del turno,プレイヤーターン終了時HP+15,+15 HP στο τέλος του γύρου,玩家回合结束时HP+15,玩家回合結束時HP+15
+relic.immortal_crane_feather.name,선학 깃털,Immortal Crane Feather,Plume de Grue Immortelle,Piuma di Gru Immortale,Pluma de Grulla Inmortal,仙鶴の羽根,Φτερό Αθάνατου Γερανού,仙鹤羽毛,仙鶴羽毛
+relic.immortal_crane_feather.desc,전투 승리 시 최대 HP +10,Max HP +10 on victory,HP Max +10 à la victoire,HP Max +10 alla vittoria,HP Máx +10 en victoria,戦闘勝利時最大HP+10,+10 Μέγιστο HP στη νίκη,战斗胜利时最大HP+10,戰鬥勝利時最大HP+10

@@ -363,7 +363,7 @@ func _open_monster_pick_dialog() -> void:
 	var registry: Dictionary = GameManager._get_mythology_registry()
 	var opts: Array = []
 
-	for myth in ["greek", "egyptian", "norse", "korean", "chinese", "japanese"]:
+	for myth in ["greek", "egyptian", "norse", "buddhist", "daoist", "japanese"]:
 		var entry: Dictionary = registry.get(myth, {})
 		if entry.is_empty():
 			continue
@@ -410,8 +410,8 @@ func _open_event_enter_dialog() -> void:
 		"res://resources/events/events_act1.gd",
 		"res://resources/events/events_act2.gd",
 		"res://resources/events/events_act3.gd",
-		"res://resources/events/events_korean.gd",
-		"res://resources/events/events_chinese.gd",
+		"res://resources/events/events_buddhist.gd",
+		"res://resources/events/events_daoist.gd",
 		"res://resources/events/events_japanese.gd",
 	]
 	for path in event_paths:

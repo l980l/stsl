@@ -11,9 +11,9 @@ static func build_pool() -> Array:
 		_blood_oath(), _tacticians_map(), _iron_will(), _ancient_shield(),
 		_ankh_of_life(), _eye_of_horus(), _scarab_talisman(),
 		_rune_of_fate(), _mjolnir_shard(), _idun_apple(),
-		_underworld_talisman(), _dokkaebi_hammer_shard(), _samtaegeuk_charm(),
-		# 중국 신화 렐릭
-		_dragon_scale(), _eight_immortals_charm(), _queen_mother_peach_relic(),
+		_dharma_seal(), _dharma_drum(), _prayer_beads(),
+		# 도교 신화 렐릭
+		_yin_yang_mirror(), _five_elements_jade(), _immortal_crane_feather(),
 		# 일본 신화 렐릭
 		_ghost_talisman(), _tengu_feather(), _orochi_scale(),
 		# 잔다르크 전용 렐릭
@@ -194,43 +194,43 @@ static func _idun_apple() -> Resource:
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.HEAL; r.value = 15; return r
 
-# ──── 챕터 2 렐릭 (한국 신화) ────
+# ──── 챕터 2 렐릭 (불교 신화) ────
 
-static func _underworld_talisman() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "relic.underworld_talisman.name"
-	r.description = "relic.underworld_talisman.desc"
+static func _dharma_seal() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "relic.dharma_seal.name"
+	r.description = "relic.dharma_seal.desc"
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.ENERGY; r.value = 1; return r
 
-static func _dokkaebi_hammer_shard() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "relic.dokkaebi_hammer_shard.name"
-	r.description = "relic.dokkaebi_hammer_shard.desc"
+static func _dharma_drum() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "relic.dharma_drum.name"
+	r.description = "relic.dharma_drum.desc"
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.GAIN_MORALE; r.value = 3; return r
 
-static func _samtaegeuk_charm() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "relic.samtaegeuk_charm.name"
-	r.description = "relic.samtaegeuk_charm.desc"
+static func _prayer_beads() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "relic.prayer_beads.name"
+	r.description = "relic.prayer_beads.desc"
 	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
 	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 10; return r
 
-# ──── 챕터 2 렐릭 (중국 신화) ────
+# ──── 챕터 2 렐릭 (도교 신화) ────
 
-static func _dragon_scale() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "relic.dragon_scale.name"
-	r.description = "relic.dragon_scale.desc"
+static func _yin_yang_mirror() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "relic.yin_yang_mirror.name"
+	r.description = "relic.yin_yang_mirror.desc"
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.COST_REDUCTION; r.value = 1; return r
 
-static func _eight_immortals_charm() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "relic.eight_immortals_charm.name"
-	r.description = "relic.eight_immortals_charm.desc"
+static func _five_elements_jade() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "relic.five_elements_jade.name"
+	r.description = "relic.five_elements_jade.desc"
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
 	r.effect_type = RelicRes.EffectType.HEAL; r.value = 15; return r
 
-static func _queen_mother_peach_relic() -> Resource:
-	var r: Resource = RelicRes.new(); r.relic_name = "relic.queen_mother_peach_relic.name"
-	r.description = "relic.queen_mother_peach_relic.desc"
+static func _immortal_crane_feather() -> Resource:
+	var r: Resource = RelicRes.new(); r.relic_name = "relic.immortal_crane_feather.name"
+	r.description = "relic.immortal_crane_feather.desc"
 	r.trigger = RelicRes.TriggerType.BATTLE_WIN
 	r.effect_type = RelicRes.EffectType.MAX_HP; r.value = 10; return r
 

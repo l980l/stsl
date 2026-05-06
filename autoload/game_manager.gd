@@ -25,18 +25,18 @@ const _RelicData      = preload("res://resources/relics/relics.gd")
 const _EventsAct1     = preload("res://resources/events/events_act1.gd")
 const _EventsAct2     = preload("res://resources/events/events_act2.gd")
 const _EventsAct3     = preload("res://resources/events/events_act3.gd")
-const _EventsKorean   = preload("res://resources/events/events_korean.gd")
-const _EventsChinese  = preload("res://resources/events/events_chinese.gd")
+const _EventsBuddhist  = preload("res://resources/events/events_buddhist.gd")
+const _EventsDaoist    = preload("res://resources/events/events_daoist.gd")
 const _EventsJapanese = preload("res://resources/events/events_japanese.gd")
-const _MapNodeRes      = preload("res://resources/map_node_resource.gd")
-const _KoreanNormals   = preload("res://resources/enemies/korean/korean_normals.gd")
-const _KoreanAct1      = preload("res://resources/enemies/korean/korean_act1.gd")
-const _KoreanAct2      = preload("res://resources/enemies/korean/korean_act2.gd")
-const _KoreanAct3      = preload("res://resources/enemies/korean/korean_act3.gd")
-const _ChineseNormals  = preload("res://resources/enemies/chinese/chinese_normals.gd")
-const _ChineseAct1     = preload("res://resources/enemies/chinese/chinese_act1.gd")
-const _ChineseAct2     = preload("res://resources/enemies/chinese/chinese_act2.gd")
-const _ChineseAct3     = preload("res://resources/enemies/chinese/chinese_act3.gd")
+const _MapNodeRes       = preload("res://resources/map_node_resource.gd")
+const _BuddhistNormals  = preload("res://resources/enemies/buddhist/buddhist_normals.gd")
+const _BuddhistAct1     = preload("res://resources/enemies/buddhist/buddhist_act1.gd")
+const _BuddhistAct2     = preload("res://resources/enemies/buddhist/buddhist_act2.gd")
+const _BuddhistAct3     = preload("res://resources/enemies/buddhist/buddhist_act3.gd")
+const _DaoistNormals    = preload("res://resources/enemies/daoist/daoist_normals.gd")
+const _DaoistAct1       = preload("res://resources/enemies/daoist/daoist_act1.gd")
+const _DaoistAct2       = preload("res://resources/enemies/daoist/daoist_act2.gd")
+const _DaoistAct3       = preload("res://resources/enemies/daoist/daoist_act3.gd")
 const _JapaneseNormals = preload("res://resources/enemies/japanese/japanese_normals.gd")
 const _JapaneseAct1    = preload("res://resources/enemies/japanese/japanese_act1.gd")
 const _JapaneseAct2    = preload("res://resources/enemies/japanese/japanese_act2.gd")
@@ -557,14 +557,14 @@ func _get_chapter_mythology_pool(chapter: int) -> Array[String]:
 		return ["greek", "egyptian", "norse"]
 	if chapter == 2:
 		var available: Array[String] = []
-		if _KoreanAct1.elites().size() > 0:
-			available.append("korean")
-		if _ChineseAct1.elites().size() > 0:
-			available.append("chinese")
+		if _BuddhistAct1.elites().size() > 0:
+			available.append("buddhist")
+		if _DaoistAct1.elites().size() > 0:
+			available.append("daoist")
 		if _JapaneseAct1.elites().size() > 0:
 			available.append("japanese")
 		if available.is_empty():
-			available = ["korean"]
+			available = ["buddhist"]
 		var pool: Array[String] = []
 		for i in range(3):
 			pool.append(available[i % available.size()])
@@ -576,8 +576,8 @@ func _get_mythology_registry() -> Dictionary:
 		"greek":    {"normals": _GreekNormals,    "acts": [_GreekAct1,    _GreekAct2,    _GreekAct3]},
 		"egyptian": {"normals": _EgyptianNormals, "acts": [_EgyptianAct1, _EgyptianAct2, _EgyptianAct3]},
 		"norse":    {"normals": _NorseNormals,    "acts": [_NorseAct1,    _NorseAct2,    _NorseAct3]},
-		"korean":   {"normals": _KoreanNormals,   "acts": [_KoreanAct1,   _KoreanAct2,   _KoreanAct3]},
-		"chinese":  {"normals": _ChineseNormals,  "acts": [_ChineseAct1,  _ChineseAct2,  _ChineseAct3]},
+		"buddhist": {"normals": _BuddhistNormals,  "acts": [_BuddhistAct1,  _BuddhistAct2,  _BuddhistAct3]},
+		"daoist":   {"normals": _DaoistNormals,   "acts": [_DaoistAct1,   _DaoistAct2,   _DaoistAct3]},
 		"japanese": {"normals": _JapaneseNormals, "acts": [_JapaneseAct1, _JapaneseAct2, _JapaneseAct3]},
 	}
 
@@ -747,8 +747,8 @@ func _get_random_event() -> Resource:
 func _build_event_pool() -> Array:
 	var myth: String = act_mythologies[current_act - 1]
 	match myth:
-		"korean": return _EventsKorean.build_pool()
-		"chinese": return _EventsChinese.build_pool()
+		"buddhist": return _EventsBuddhist.build_pool()
+		"daoist": return _EventsDaoist.build_pool()
 		"japanese": return _EventsJapanese.build_pool()
 	match current_act:
 		2: return _EventsAct2.build_pool()

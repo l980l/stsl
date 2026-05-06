@@ -107,3 +107,41 @@ enemy.chinese.white_tiger_general,백호 신장,White Tiger General,Général du
 enemy.chinese.vermilion_bird_general,주작 신장,Vermilion Bird General,Général de l'Oiseau Vermillon,Generale dell'Uccello Vermiglio,General del Pájaro Vermellón,朱雀神将,Στρατηγός του Πορφυρού Πουλιού,朱雀神将,朱雀神将
 enemy.chinese.black_tortoise_general,현무 신장,Black Tortoise General,Général de la Tortue Noire,Generale della Tartaruga Nera,General de la Tortuga Negra,玄武神将,Στρατηγός της Μαύρης Χελώνας,玄武神将,玄武神将
 enemy.chinese.pangu,반고,Pangu,Pangu,Pangu,Pangu,盤古,Παν-γκού,盘古,盘古
+enemy.buddhist.yaksha,야차,Yaksha,Yaksha,Yaksha,Yaksha,夜叉,Γιάκσα,夜叉,夜叉
+enemy.buddhist.virudhaka,증장천,Virudhaka,Virudhaka,Virudhaka,Virudhaka,増長天,Βιρουντάκα,增长天,增長天
+enemy.buddhist.asura,아수라,Asura,Asura,Asura,Asura,阿修羅,Άσουρα,阿修罗,阿修羅
+enemy.buddhist.garuda,가루다,Garuda,Garuda,Garuda,Garuda,ガルーダ,Γκαρούντα,迦楼罗,迦樓羅
+enemy.buddhist.mara_soldier,마라 병졸,Mara Soldier,Soldat de Māra,Soldato di Māra,Soldado de Māra,魔羅の兵,Στρατιώτης Μάρα,魔罗士兵,魔羅士兵
+enemy.buddhist.vajrapani,금강역사,Vajrapani,Vajrapani,Vajrapani,Vajrapani,金剛力士,Βαγκραπάνι,金刚力士,金剛力士
+enemy.buddhist.vaisravana,다문천왕,Vaisravana,Vaisravana,Vaisravana,Vaisravana,多聞天王,Βαϊσραβάνα,多闻天王,多聞天王
+enemy.buddhist.deva_guardian,인왕역사,Deva Guardian,Gardien Deva,Guardiano Deva,Guardián Deva,仁王力士,Φρουρός Ντέβα,仁王力士,仁王力士
+enemy.buddhist.dharma_general,호법신중,Dharma Guardian,Gardien du Dharma,Guardiano del Dharma,Guardián del Dharma,護法神衆,Φρουρός Ντάρμα,护法神众,護法神眾
+enemy.buddhist.mahavairocana,대일여래,Mahavairocana,Mahavairocana,Mahavairocana,Mahavairocana,大日如来,Μαχαβαϊρόκανα,大日如来,大日如來
+enemy.buddhist.asura_king,아수라왕,Asura King,Roi Asura,Re degli Asura,Rey Asura,阿修羅王,Βασιλιάς Άσουρα,阿修罗王,阿修羅王
+enemy.buddhist.naga_king,용왕,Naga King,Roi Naga,Re Naga,Rey Naga,竜王,Βασιλιάς Νάγκα,龙王,龍王
+enemy.buddhist.agni_buddha,화신여래,Agni Buddha,Bouddha Agni,Buddha Agni,Buda Agni,火身如来,Άγκνι Βούδα,火身如来,火身如來
+enemy.buddhist.guanyin,관세음보살,Guanyin,Guanyin,Guanyin,Guanyin,観世音菩薩,Γκουανγίν,观世音菩萨,觀世音菩薩
+enemy.buddhist.yama,염라대왕,Yama,Yama,Yama,Yama,閻魔大王,Γιάμα,阎罗大王,閻羅大王
+enemy.buddhist.ksitigarbha,지장보살,Ksitigarbha,Ksitigarbha,Ksitigarbha,Ksitigarbha,地蔵菩薩,Κσιτιγκαρμπά,地藏菩萨,地藏菩薩
+enemy.buddhist.vairocana,비로자나불,Vairocana,Vairocana,Vairocana,Vairocana,毘盧遮那仏,Βαϊρόκανα,毗卢遮那佛,毘盧遮那佛
+enemy.buddhist.acalanatha,부동명왕,Acalanatha,Acalanatha,Acalanatha,Acalanatha,不動明王,Ακαλανάθα,不动明王,不動明王
+enemy.buddhist.yama.counter,공격 카드 4장마다: 최저체력 영웅에게 저주 피해,Every 4 Attack cards: Curse to lowest HP hero,Every 4 Attack cards: Curse to lowest HP hero,Every 4 Attack cards: Curse to lowest HP hero,Every 4 Attack cards: Curse to lowest HP hero,攻撃カード4枚ごとに最低HP英雄へ呪い,Κάθε 4 κάρτες Επίθεσης: Κατάρα στον ήρωα,每4张攻击牌：对最低生命值英雄造成诅咒伤害,每4張攻擊牌：對最低生命值英雄造成詛咒傷害
+enemy.daoist.hermit_ghost,시해선,Hermit Ghost,Fantôme Ermite,Fantasma Eremita,Fantasma Ermitaño,尸解仙,Ερημίτης Φάντασμα,尸解仙,尸解仙
+enemy.daoist.child_immortal,동자선,Child Immortal,Immortel Enfant,Immortale Bambino,Inmortal Niño,童子仙,Παιδί Αθάνατο,童子仙,童子仙
+enemy.daoist.celestial_soldier,천병,Celestial Soldier,Soldat Céleste,Soldato Celeste,Soldado Celestial,天兵,Ουράνιος Στρατιώτης,天兵,天兵
+enemy.daoist.mountain_spirit,산신,Mountain Spirit,Esprit de la Montagne,Spirito della Montagna,Espíritu de la Montaña,山神,Πνεύμα Βουνού,山神,山神
+enemy.daoist.dao_disciple,도사 수련생,Dao Disciple,Disciple du Tao,Discepolo del Tao,Discípulo del Tao,道士修練生,Μαθητής Τάο,道士学徒,道士學徒
+enemy.daoist.azure_guardian,청룡 호법,Azure Guardian,Gardien Azur,Guardiano Azzurro,Guardián Azur,青龍護法,Φρουρός Αζούρ,青龙护法,青龍護法
+enemy.daoist.golden_elixir,금단도사,Golden Elixir Daoist,Taoïste de l'Élixir d'Or,Taoista dell'Elisir d'Oro,Taoísta del Elixir Dorado,金丹道士,Ταοϊστής Χρυσού Ελιξιρίου,金丹道士,金丹道士
+enemy.daoist.silver_elixir,은단도사,Silver Elixir Daoist,Taoïste de l'Élixir d'Argent,Taoista dell'Elisir d'Argento,Taoísta del Elixir de Plata,銀丹道士,Ταοϊστής Αργυρού Ελιξιρίου,银丹道士,銀丹道士
+enemy.daoist.black_wind_immortal,흑풍선,Black Wind Immortal,Immortel du Vent Noir,Immortale del Vento Nero,Inmortal del Viento Negro,黒風仙,Αθάνατος Μαύρου Ανέμου,黑风仙,黑風仙
+enemy.daoist.eastern_king,동왕공,Eastern King,Roi de l'Est,Re dell'Est,Rey del Este,東王公,Βασιλιάς της Ανατολής,东王公,東王公
+enemy.daoist.crimson_immortal,적양선,Crimson Immortal,Immortel Cramoisi,Immortale Cremisi,Inmortal Carmesí,赤陽仙,Κόκκινος Αθάνατος,赤阳仙,赤陽仙
+enemy.daoist.nine_dragon,구룡선존,Nine Dragon Immortal,Immortel aux Neuf Dragons,Immortale dei Nove Draghi,Inmortal de los Nueve Dragones,九龍仙尊,Αθάνατος Εννέα Δράκων,九龙仙尊,九龍仙尊
+enemy.daoist.twin_immortals,쌍선인,Twin Immortals,Immortels Jumeaux,Immortali Gemelli,Inmortales Gemelos,双仙人,Δίδυμοι Αθάνατοι,双仙人,雙仙人
+enemy.daoist.xuanwu,진무대제,Xuanwu,Xuanwu,Xuanwu,Xuanwu,真武大帝,Σουανγού,真武大帝,真武大帝
+enemy.daoist.white_tiger,백호선군,White Tiger Immortal,Immortel du Tigre Blanc,Immortale della Tigre Bianca,Inmortal del Tigre Blanco,白虎仙君,Αθάνατη Λευκή Τίγρη,白虎仙君,白虎仙君
+enemy.daoist.vermilion_bird,주작선군,Vermilion Bird Immortal,Immortel de l'Oiseau Vermillon,Immortale dell'Uccello Vermiglio,Inmortal del Pájaro Bermellón,朱雀仙君,Αθάνατο Κόκκινο Πουλί,朱雀仙君,朱雀仙君
+enemy.daoist.black_tortoise,현무선군,Black Tortoise Immortal,Immortel de la Tortue Noire,Immortale della Tartaruga Nera,Inmortal de la Tortuga Negra,玄武仙君,Αθάνατη Μαύρη Χελώνα,玄武仙君,玄武仙君
+enemy.daoist.jade_emperor,옥황상제,Jade Emperor,Empereur de Jade,Imperatore di Giada,Emperador de Jade,玉皇上帝,Αυτοκράτωρ Νεφρίτη,玉皇上帝,玉皇上帝
+enemy.daoist.jade_emperor.counter,파워 카드 사용마다: 모든 영웅에게 약화 2 부여,Every POWER card played: Weak 2 to all heroes,Every POWER card played: Weak 2 to all heroes,Every POWER card played: Weak 2 to all heroes,Every POWER card played: Weak 2 to all heroes,パワーカード使用時：全英雄に弱体2を付与,Κάθε κάρτα ΔΥΝΑΜΗΣ: Αδύναμο 2 σε όλους,每打出一张强力牌：对所有英雄施加虚弱2,每打出一張強力牌：對所有英雄施加虛弱2
