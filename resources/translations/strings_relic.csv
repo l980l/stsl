@@ -49,18 +49,6 @@ relic.mjolnir_shard.name,묠니르의 파편,Mjolnir Shard,Éclat de Mjölnir,Fr
 relic.mjolnir_shard.desc,전투 시작 시 팀 전체 방어도 +10,Team Block +10 at start,Blocage +10 au début,Difesa +10 all'inizio,Defensa +10 al inicio,戦闘開始時、チーム全体の防御+10,+10 Άμυνα στην ομάδα στην αρχή,战斗开始时全队护甲 +10,战斗开始时全队护甲 +10
 relic.idun_apple.name,이둔의 사과,Idun's Apple,Pomme d'Idunn,Mela di Idun,Manzana de Idun,イズンのリンゴ,Μήλο της Ιντούν,伊登苹果,伊登苹果
 relic.idun_apple.desc,전투 승리 시 팀 전체 HP +15,Team HP +15 on victory,PV +15 après une victoire,PV +15 alla vittoria,PV +15 al ganar,勝利時、チーム全体のHP+15,+15 HP στην ομάδα μετά τη νίκη,战斗胜利时全队HP +15,战斗胜利时全队HP +15
-relic.underworld_talisman.name,저승 부적,Underworld Talisman,Talisman des enfers,Talismano dell'Oltretomba,Talismán del Inframundo,冥界の護符,Φυλαχτό του Κάτω Κόσμου,阴间护身符,阴间护身符
-relic.underworld_talisman.desc,전투 시작 시 에너지 +1,Energy +1 at start,Énergie +1 au début,Energia +1 all'inizio,Energía +1 al inicio,戦闘開始時、エネルギー+1,+1 Ενέργεια στην αρχή της μάχης,战斗开始时能量 +1,战斗开始时能量 +1
-relic.dokkaebi_hammer_shard.name,도깨비 방망이 파편,Dokkaebi Hammer Shard,Éclat de gourdin Dokkaebi,Frammento di Randello Dokkaebi,Fragmento de Maza Dokkaebi,トッケビの金棒の破片,Θραύσμα του Ροπάλου Ντοκάεμπι,独角鬼大棒碎片,独角鬼大棒碎片
-relic.dokkaebi_hammer_shard.desc,전투 승리 시 팀 사기 +3,Team Morale +3 on victory,Morale +3 après une victoire,Morale +3 alla vittoria,Moral +3 al ganar,勝利時、チーム全体の士気+3,+3 Ηθικό στην ομάδα μετά τη νίκη,战斗胜利时全队士气 +3,战斗胜利时全队士气 +3
-relic.samtaegeuk_charm.name,삼태극 부적,Samtaegeuk Charm,Talisman Samtaegeuk,Talismano Samtaegeuk,Talismán Samtaegeuk,三太極の守護札,Φυλαχτό Σαμταεγκέουκ,三太极护符,三太极护符
-relic.samtaegeuk_charm.desc,영웅이 피해를 받을 때 방어도 +10,Block +10 on taking DMG,Blocage +10 si dégâts reçus,Difesa +10 se colpito,Defensa +10 al recibir daño,ダメージを受けた時、防御+10,+10 Άμυνα όταν δέχεσαι ζημιά,英雄受到伤害时护甲 +10,英雄受到伤害时护甲 +10
-relic.dragon_scale.name,용의 비늘,Dragon Scale,Écaille de dragon,Scaglia di Drago,Escama de Dragón,竜の鱗,Λέπι Δράκου,龙鳞,龙鳞
-relic.dragon_scale.desc,전투 시작 시 다음 카드 코스트 -1,Next card cost -1 at start,Prochaine carte coût -1,Prossima carta costo -1,Próxima carta coste -1,戦闘開始時、次のカードコスト-1,Κόστος -1 στην επόμενη κάρτα,战斗开始时下一张牌消耗 -1,战斗开始时下一张牌消耗 -1
-relic.eight_immortals_charm.name,팔선의 부적,Eight Immortals Charm,Talisman des huit immortels,Talismano degli Otto Immortali,Talismán de los Ocho Inmortales,八仙の守護札,Φυλαχτό των Οκτώ Αθανάτων,八仙护符,八仙护符
-relic.eight_immortals_charm.desc,플레이어 턴 종료 시 팀 전체 HP +15,Team HP +15 at turn end,PV +15 en fin de tour,PV +15 a fine turno,PV +15 al fin del turno,ターン終了時、チーム全体のHP+15,+15 HP στην ομάδα στο τέλος του γύρου,玩家回合结束时全队HP +15,玩家回合结束时全队HP +15
-relic.queen_mother_peach_relic.name,서왕모의 복숭아,Queen Mother's Peach,Pêche de la Reine Mère,Pesca della Regina Madre,Melocotón de la Reina Madre,西王母の桃,Ροδάκινο της Βασίλισσας Μητέρας,西王母之桃,西王母之桃
-relic.queen_mother_peach_relic.desc,전투 승리 시 팀 최대 HP +10,Team Max HP +10 on win,PV Max +10 après une victoire,PV Max +10 alla vittoria,PV Máx +10 al ganar,勝利時、チーム全体の最大HP+10,+10 Μέγιστη HP στην ομάδα στη νίκη,战斗胜利时全队最大HP +10,战斗胜利时全队最大HP +10
 relic.ghost_talisman.name,귀신 부적,Ghost Talisman,Talisman spectral,Talismano Spettrale,Talismán Espectral,幽霊の護符,Φυλαχτό Φάντασμα,鬼神护符,鬼神护符
 relic.ghost_talisman.desc,플레이어 턴 종료 시 무작위 적에게 독 2 부여,Apply Poison 2 at turn end,Applique Poison 2 à la fin,Applica Veleno 2 a fine turno,Aplica Veneno 2 al final,ターン終了時、ランダムな敵に毒2を付与,2 Δηλητήριο σε τυχαίο εχθρό στο τέλος,玩家回合结束时随机敌方中毒 2,玩家回合结束时随机敌方中毒 2
 relic.tengu_feather.name,텐구의 깃털,Tengu Feather,Plume de Tengu,Piuma di Tengu,Pluma de Tengu,天狗の羽,Φτερό Τένγκου,天狗之羽,天狗之羽

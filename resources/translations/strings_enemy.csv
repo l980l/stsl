@@ -53,24 +53,6 @@ enemy.norse.fenrir_cub,펜리르 새끼,Fenrir Cub,Petit Fenrir,Cucciolo di Fenr
 enemy.norse.valkyrie,발키리,Valkyrie,Valkyrie,Valchiria,Valquiria,ヴァルキリー,Βαλκυρία,女武神,女武神
 enemy.norse.jormungandr_shard,요르문간드르 분신,Shard of Jormungandr,Éclat de Jormungandr,Frammento di Jormungandr,Fragmento de Jormungandr,ヨルムンガンドの分身,Θραύσμα του Γιόρμουνγκαντρ,耶梦加得碎片,耶梦加得碎片
 enemy.norse.jormungandr,요르문간드르,Jormungandr,Jormungandr,Jormungandr,Jormungandr,ヨルムンガンド,Γιόρμουνγκαντρ,耶梦加得,耶梦加得
-enemy.korean.death_reaper,저승사자,Grim Reaper (Jeoseung Saja),Faucheur des Enfers,Mietitore dell'Oltretomba,Segador de Almas,死神（チョスンサジャ）,Χάρος (Θεριστής),阴间使者,阴间使者
-enemy.korean.cheoyong,처용,Cheoyong,Cheoyong,Cheoyong,Cheoyong,処容,Τσεογιόνγκ,处容,处容
-enemy.korean.dokkaebi,도깨비,Dokkaebi,Dokkaebi,Dokkaebi,Dokkaebi,トッケビ,Ντοκάεμπι,独角鬼,独角鬼
-enemy.korean.three_legged_crow,삼족오,Three-Legged Crow,Corbeau à trois pattes,Corvo a tre zampe,Cuervo de tres patas,三足烏,Τρίποδο Κοράκι,三足乌,三足乌
-enemy.korean.gumiho,구미호,Gumiho (Nine-Tailed Fox),Gumiho (Renard à neuf queues),Gumiho (Volpe a nove code),Gumiho (Zorro de nueve colas),九尾の狐,Γκουμιχό,九尾狐,九尾狐
-enemy.korean.bulgasari,불가사리,Bulgasari,Bulgasari,Bulgasari,Bulgasari,プルガサリ,Μπουλγκασάρι,不可杀,不可杀
-enemy.korean.haechi,해치,Haechi,Haechi,Haechi,Haechi,ヘチ,Χαέτσι,獬豸,獬豸
-enemy.korean.jangseung,장승,Jangseung,Jangseung,Jangseung,Jangseung,チャンスン,Τζανγκσεόνγκ,长丞,长丞
-enemy.korean.haemosu,해모수,Haemosu,Haemosu,Haemosu,Haemosu,ヘモス,Χεμοσού,解慕漱,解慕漱
-enemy.korean.dangun,단군,Dangun,Dangun,Dangun,Dangun,タングン,Ντανγκούν,檀君,檀君
-enemy.korean.dokkaebi_chief,도깨비 대장,Dokkaebi Chief,Chef Dokkaebi,Capo Dokkaebi,Jefe Dokkaebi,トッケビの頭領,Αρχηγός Ντοκάεμπι,独角鬼首领,独角鬼首领
-enemy.korean.sea_dragon_general,용왕의 장군,General of the Sea King,Général du Roi Dragon,Generale del Re Dragone,General del Rey Dragón,竜王の将軍,Στρατηγός του Βασιλιά των Θαλασσών,龙王将军,龙王将军
-enemy.korean.dongmyeong,동명성왕,King Dongmyeong,Roi Dongmyeong,Re Dongmyeong,Rey Dongmyeong,東明聖王,Βασιλιάς Ντονγκμιόνγκ,东明圣王,东明圣王
-enemy.korean.samsin_grandma,삼신할미,Samsin Halmoni,Samsin Halmoni,Samsin Halmoni,Samsin Halmoni,三神ハルモニ,Γιαγιά Σαμσίν,三神奶奶,三神奶奶
-enemy.korean.underworld_judge,저승 판관,Underworld Judge,Juge des Enfers,Giudice dell'Oltretomba,Juez del Inframundo,冥府の判官,Δικαστής του Κάτω Κόσμου,阴间判官,阴间判官
-enemy.korean.gat_spirit,갓신,Gat Spirit,Esprit du Gat,Spirito del Gat,Espíritu del Gat,カッの神,Πνεύμα Γκατ,笠帽神,笠帽神
-enemy.korean.cheoyong_god,처용신,God Cheoyong,Dieu Cheoyong,Dio Cheoyong,Dios Cheoyong,処容神,Θεός Τσεογιόνγκ,处容神,处容神
-enemy.korean.gusamseung_halmang,구삼승할망,Gusamseung Halmang,Gusamseung Halmang,Gusamseung Halmang,Gusamseung Halmang,クサムスンハルマン,Γκουσαμσέουνγκ Χαλμάνγκ,九三丞奶奶,九三丞奶奶
 enemy.japanese.oni,오니,Oni,Oni,Oni,Oni,鬼（おに）,Όνι,鬼,鬼
 enemy.japanese.tengu,텐구,Tengu,Tengu,Tengu,Tengu,天狗,Τένγκου,天狗,天狗
 enemy.japanese.yuki_onna,유키온나,Yuki-onna,Yuki-onna,Yuki-onna,Yuki-onna,雪女,Γιούκι-όννα,雪女,雪女
@@ -89,24 +71,6 @@ enemy.japanese.iwato_guardian,아마노이와토 수문장,Amano-Iwato Guardian,
 enemy.japanese.susanoo_blade,스사노오의 검,Blade of Susanoo,Lame de Susanoo,Lama di Susanoo,Filo de Susanoo,スサノオの剣,Λεπίδα του Σουσανόο,素盏呜尊之剑,素盏呜尊之剑
 enemy.japanese.blizzard_queen,유키온나의 여왕,Blizzard Queen,Reine du blizzard,Regina della Tormenta,Reina de la Ventisca,雪女の女王,Βασίλισσα της Χιονοθύελλας,雪女之女王,雪女之女王
 enemy.japanese.yamata_no_orochi,야마타노오로치,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi,八岐大蛇,Γιαμάτα νο Ορότσι,八岐大蛇,八岐大蛇
-enemy.chinese.yaksha,야차,Yaksha,Yaksha,Yaksha,Yaksha,夜叉,Γιάκσα,夜叉,夜叉
-enemy.chinese.nezha_soldier,나타 병사,Nezha Soldier,Soldat de Nezha,Soldato di Nezha,Soldado de Nezha,哪吒の兵士,Στρατιώτης του Νέζα,哪吒士兵,哪吒士兵
-enemy.chinese.heavenly_king_soldier,사대천왕 병사,Heavenly King Soldier,Soldat du Roi Céleste,Soldato del Re Celeste,Soldado del Rey Celestial,四天王の兵士,Στρατιώτης του Ουράνιου Βασιλιά,四大天王士兵,四大天王士兵
-enemy.chinese.shanhaijing_beast,산해경 괴수,Shanhaijing Beast,Bête du Shanhaijing,Bestia del Shanhaijing,Bestia de Shanhaijing,山海経の怪獣,Θηρίο του Σανχαϊτζίνγκ,山海经怪兽,山海经怪兽
-enemy.chinese.immortal_trainee,선인 수련생,Immortal Trainee,Apprenti Immortel,Apprendista Immortale,Aprendiz Inmortal,仙人の見習い,Μαθητευόμενος Αθάνατος,仙人修炼生,仙人修炼生
-enemy.chinese.azure_dragon_guard,청룡 수호병,Azure Dragon Guard,Garde du Dragon d'Azur,Guardia del Dragone Azzurro,Guardia del Dragón Azur,青龍の守護兵,Φρουρός του Γαλάζιου Δράκου,青龙卫士,青龙卫士
-enemy.chinese.golden_horn_king,금각 대왕,Golden Horn King,Roi à la corne d'or,Re dal Corno d'Oro,Rey del Cuerno de Oro,金角大王,Βασιλιάς με το Χρυσό Κέρας,金角大王,金角大王
-enemy.chinese.silver_horn_king,은각 대왕,Silver Horn King,Roi à la corne d'argent,Re dal Corno d'Argento,Rey del Cuerno de Plata,銀角大王,Βασιλιάς με το Ασημένιο Κέρας,银角大王,银角大王
-enemy.chinese.black_wind_demon,흑풍괴,Black Wind Demon,Démon du vent noir,Demone del Vento Nero,Demonio del Viento Negro,黒風怪,Δαίμονας του Μαύρου Ανέμου,黑风怪,黑风怪
-enemy.chinese.chiyou,치우,Chiyou,Chiyou,Chiyou,Chiyou,蚩尤,Τσι-γιού,蚩尤,蚩尤
-enemy.chinese.red_boy,홍해아,Red Boy,Enfant Rouge,Ragazzo Rosso,Niño Rojo,紅孩児,Κόκκινο Αγόρι,红孩儿,红孩儿
-enemy.chinese.nine_dragon_general,구룡 차장,Nine Dragon General,Général aux Neuf Dragons,Generale dei Nove Draghi,General de los Nueve Dragones,九龍の将軍,Στρατηγός των Εννέα Δράκων,九龙将军,九龙将军
-enemy.chinese.heavenly_hound_brothers,천구 형제,Heavenly Hound Brothers,Frères Chiens Célestes,Fratelli Segugi Celesti,Hermanos Sabuesos Celestiales,天狗の兄弟,Αδελφοί Ουράνιοι Σκύλοι,天狗兄弟,天狗兄弟
-enemy.chinese.erlang_shen,이랑신,Erlang Shen,Erlang Shen,Erlang Shen,Erlang Shen,二郎神,Ερλάνγκ Σεν,二郎神,二郎神
-enemy.chinese.white_tiger_general,백호 신장,White Tiger General,Général du Tigre Blanc,Generale della Tigre Bianca,General del Tigre Blanco,白虎神将,Στρατηγός της Λευκής Τίγρης,白虎神将,白虎神将
-enemy.chinese.vermilion_bird_general,주작 신장,Vermilion Bird General,Général de l'Oiseau Vermillon,Generale dell'Uccello Vermiglio,General del Pájaro Vermellón,朱雀神将,Στρατηγός του Πορφυρού Πουλιού,朱雀神将,朱雀神将
-enemy.chinese.black_tortoise_general,현무 신장,Black Tortoise General,Général de la Tortue Noire,Generale della Tartaruga Nera,General de la Tortuga Negra,玄武神将,Στρατηγός της Μαύρης Χελώνας,玄武神将,玄武神将
-enemy.chinese.pangu,반고,Pangu,Pangu,Pangu,Pangu,盤古,Παν-γκού,盘古,盘古
 enemy.buddhist.yaksha,야차,Yaksha,Yaksha,Yaksha,Yaksha,夜叉,Γιάκσα,夜叉,夜叉
 enemy.buddhist.virudhaka,증장천,Virudhaka,Virudhaka,Virudhaka,Virudhaka,増長天,Βιρουντάκα,增长天,增長天
 enemy.buddhist.asura,아수라,Asura,Asura,Asura,Asura,阿修羅,Άσουρα,阿修罗,阿修羅
