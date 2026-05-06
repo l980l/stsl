@@ -39,7 +39,7 @@ func test_chapter_pool_dispatch() -> void:
 	# 챕터 2 풀: 구현된 신화만 포함 (빈 스텁은 자동 필터)
 	_assert(pool2.size() == 3, "챕터 2 풀 크기 3")
 	for myth in pool2:
-		_assert(myth in ["korean", "chinese", "japanese"], "챕터 2 풀 원소는 아시아 신화: " + myth)
+		_assert(myth in ["buddhist", "daoist", "japanese"], "챕터 2 풀 원소는 아시아 신화: " + myth)
 
 func test_reset_uses_current_chapter_pool() -> void:
 	print("[TestChapterSystem] test_reset_uses_current_chapter_pool")
@@ -48,7 +48,7 @@ func test_reset_uses_current_chapter_pool() -> void:
 	gm.current_chapter = 2
 	gm.reset()
 	for myth in gm.act_mythologies:
-		_assert(myth in ["korean", "chinese", "japanese"], "reset 후 act_mythologies 원소는 아시아 신화: " + myth)
+		_assert(myth in ["buddhist", "daoist", "japanese"], "reset 후 act_mythologies 원소는 아시아 신화: " + myth)
 	_assert(gm.act_mythologies.size() == 3, "act_mythologies 크기 3")
 
 func test_start_run_sets_chapter() -> void:
@@ -68,7 +68,7 @@ func test_chapter2_pool_filters_empty_stubs() -> void:
 	var pool := gm._get_chapter_mythology_pool(2)
 	_assert(pool.size() == 3, "챕터2 풀은 항상 3개")
 	for myth in pool:
-		_assert(myth in ["korean", "chinese", "japanese"], "챕터2 풀 — 한·중·일 신화: " + myth)
+		_assert(myth in ["buddhist", "daoist", "japanese"], "챕터2 풀 — 불교·도교·일본 신화: " + myth)
 
 func test_chapter2_has_all_three_mythologies() -> void:
 	print("[TestChapterSystem] test_chapter2_has_all_three_mythologies")
@@ -79,6 +79,6 @@ func test_chapter2_has_all_three_mythologies() -> void:
 		var pool := gm._get_chapter_mythology_pool(2)
 		for myth in pool:
 			seen[myth] = true
-	_assert("korean" in seen, "한국 신화 챕터2 풀에 포함")
-	_assert("chinese" in seen, "중국 신화 챕터2 풀에 포함")
+	_assert("buddhist" in seen, "불교 신화 챕터2 풀에 포함")
+	_assert("daoist" in seen, "도교 신화 챕터2 풀에 포함")
 	_assert("japanese" in seen, "일본 신화 챕터2 풀에 포함")

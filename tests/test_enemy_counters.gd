@@ -25,8 +25,8 @@ func run_all() -> Dictionary:
 	test_setup_battle_resets_counter()
 	test_dead_enemy_does_not_count()
 	test_kronos_skill_5_triggers_vulnerable()
-	test_underworld_judge_attack_4_triggers_damage()
-	test_pangu_power_1_triggers_weak()
+	test_yama_attack_4_triggers_damage()
+	test_jade_emperor_power_1_triggers_weak()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -226,36 +226,36 @@ func test_kronos_skill_5_triggers_vulnerable() -> void:
 	_assert(ctr.get("fired_count", 0) == 1, "크로노스: SKILL 5장 후 fired_count == 1")
 
 # ────────────────────────────────────────────
-# 9. 저승 판관 — ATTACK 4장 → fired_count == 1
+# 9. 염라대왕 — ATTACK 4장 → fired_count == 1
 # ────────────────────────────────────────────
-func test_underworld_judge_attack_4_triggers_damage() -> void:
-	print("[TestEnemyCounters] test_underworld_judge_attack_4_triggers_damage")
+func test_yama_attack_4_triggers_damage() -> void:
+	print("[TestEnemyCounters] test_yama_attack_4_triggers_damage")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("test_hero", 50))
-	var M = load("res://resources/enemies/korean/korean_act3.gd")
-	var judge = M.underworld_judge(null)
-	bm.setup_battle([judge])
+	var M = load("res://resources/enemies/buddhist/buddhist_act3.gd")
+	var yama_enemy = M.yama(null)
+	bm.setup_battle([yama_enemy])
 
 	for i in range(4):
 		_track(bm, CardRes.CardType.ATTACK)
 
 	var ctr: Dictionary = bm._enemy_card_counters.get(0, {})
-	_assert(ctr.get("count", -1) == 0, "저승 판관: ATTACK 4장 후 발동 → count 리셋 == 0")
-	_assert(ctr.get("fired_count", 0) == 1, "저승 판관: ATTACK 4장 후 fired_count == 1")
+	_assert(ctr.get("count", -1) == 0, "염라대왕: ATTACK 4장 후 발동 → count 리셋 == 0")
+	_assert(ctr.get("fired_count", 0) == 1, "염라대왕: ATTACK 4장 후 fired_count == 1")
 
 # ────────────────────────────────────────────
-# 10. 반고 — POWER 1장 → fired_count == 1
+# 10. 옥황상제 — POWER 1장 → fired_count == 1
 # ────────────────────────────────────────────
-func test_pangu_power_1_triggers_weak() -> void:
-	print("[TestEnemyCounters] test_pangu_power_1_triggers_weak")
+func test_jade_emperor_power_1_triggers_weak() -> void:
+	print("[TestEnemyCounters] test_jade_emperor_power_1_triggers_weak")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("test_hero", 50))
-	var M = load("res://resources/enemies/chinese/chinese_act3.gd")
-	var pangu_enemy = M.pangu(null)
-	bm.setup_battle([pangu_enemy])
+	var M = load("res://resources/enemies/daoist/daoist_act3.gd")
+	var jade_emperor_enemy = M.jade_emperor(null)
+	bm.setup_battle([jade_emperor_enemy])
 
 	_track(bm, CardRes.CardType.POWER)
 
 	var ctr: Dictionary = bm._enemy_card_counters.get(0, {})
-	_assert(ctr.get("count", -1) == 0, "반고: POWER 1장 후 발동 → count 리셋 == 0")
-	_assert(ctr.get("fired_count", 0) == 1, "반고: POWER 1장 후 fired_count == 1 (threshold=1)")
+	_assert(ctr.get("count", -1) == 0, "옥황상제: POWER 1장 후 발동 → count 리셋 == 0")
+	_assert(ctr.get("fired_count", 0) == 1, "옥황상제: POWER 1장 후 fired_count == 1 (threshold=1)")
