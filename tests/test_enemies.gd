@@ -70,6 +70,9 @@ func run_all() -> Dictionary:
 	test_japanese_act1_shape()
 	test_japanese_act2_shape()
 	test_japanese_act3_shape()
+	test_normals_encounter_count()
+	test_normals_monster_count()
+	test_normals_no_key_overlap()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -758,3 +761,60 @@ func test_japanese_act3_shape() -> void:
 	_assert(b.phase_thresholds.size() == 2, "야마타노오로치 3페이즈")
 	_assert(b.mythology == "japanese", "야마타노오로치 mythology=japanese")
 	_assert(b.charm_resistance == 20, "야마타노오로치 charm_resistance=20")
+
+func _get_all_normals_modules() -> Array:
+	return [
+		load("res://resources/enemies/greek/greek_normals.gd"),
+		load("res://resources/enemies/norse/norse_normals.gd"),
+		load("res://resources/enemies/egyptian/egyptian_normals.gd"),
+		load("res://resources/enemies/buddhist/buddhist_normals.gd"),
+		load("res://resources/enemies/daoist/daoist_normals.gd"),
+		load("res://resources/enemies/japanese/japanese_normals.gd"),
+	]
+
+func _get_all_normals_names() -> Array:
+	return ["greek", "norse", "egyptian", "buddhist", "daoist", "japanese"]
+
+func test_normals_encounter_count() -> void:
+	print("[TestEnemies] test_normals_encounter_count")
+	var modules: Array = _get_all_normals_modules()
+	var names: Array = _get_all_normals_names()
+	for i in range(modules.size()):
+		var encs: Array = modules[i].encounters()
+		_assert(encs.size() == 10, "%s 인카운터 정확히 10개 (실제: %d)" % [names[i], encs.size()])
+
+func test_normals_monster_count() -> void:
+	print("[TestEnemies] test_normals_monster_count")
+	var modules: Array = _get_all_normals_modules()
+	var names: Array = _get_all_normals_names()
+	var scene: PackedScene = load("res://characters/summons/soldier/soldier.tscn")
+	for i in range(modules.size()):
+		var encs: Array = modules[i].encounters()
+		var all_keys: Array = []
+		for combo in encs:
+			for key in combo:
+				if not all_keys.has(key):
+					all_keys.append(key)
+		_assert(all_keys.size() == 20, "%s 몬스터 종 정확히 20개 (실제: %d)" % [names[i], all_keys.size()])
+
+func test_normals_no_key_overlap() -> void:
+	print("[TestEnemies] test_normals_no_key_overlap")
+	var modules: Array = _get_all_normals_modules()
+	var names: Array = _get_all_normals_names()
+	for i in range(modules.size()):
+		var encs: Array = modules[i].encounters()
+		var seen_keys: Dictionary = {}
+		var overlap_found: bool = false
+		for enc_idx in range(encs.size()):
+			var combo: Array = encs[enc_idx]
+			var unique_in_combo: Array = []
+			for key in combo:
+				if not unique_in_combo.has(key):
+					unique_in_combo.append(key)
+			for key in unique_in_combo:
+				if seen_keys.has(key):
+					overlap_found = true
+					push_error("  키 중복: %s.%s — 인카운터 %d와 %d에 동시 등장" % [names[i], key, seen_keys[key], enc_idx])
+				else:
+					seen_keys[key] = enc_idx
+		_assert(not overlap_found, "%s 키 중복 없음" % names[i])
