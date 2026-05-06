@@ -11,20 +11,22 @@
 
 ## 표준 인카운터 모양 (신화 공통)
 
-| # | 모양 | 예상 총 HP |
-|---|---|---|
-| 1 | A 단독 (최약 솔로) | 220~330 |
-| 2 | B × 2 (약한 종 2마리) | 500~660 |
-| 3 | C 단독 (중간 솔로) | 330~450 |
-| 4 | D + E (2종 혼합) | 580~760 |
-| 5 | F × 3 (약한 종 3마리) | 780~960 |
-| 6 | G + H + I (3종 혼합) | 840~1080 |
-| 7 | J × 2 + K (강한 종 혼합) | 1150~1300 |
-| 8 | L + M + N + O (4종 혼합) | 1150~1320 |
-| 9 | P + Q + R (고강도 3종) | 1200~1500 |
-| 10 | S + T (최강 2종) | 1350~1550 |
+| # | 난이도 | 모양 | 예상 총 HP |
+|---|---|---|---|
+| 1 | 매우 약함 | A 단독 | 220~330 |
+| 2 | 약함 | B × 2 | 500~660 |
+| 3 | 약함+ | C 단독 (중간 솔로) | 330~450 |
+| 4 | 보통 | D + E | 580~760 |
+| 5 | 보통+ | F × 3 | 780~960 |
+| 6 | 다소 강함 | G + H + I | 840~1080 |
+| 7 | 강함 | J × 2 + K | 1100~1300 |
+| 8 | 강함 | L + M + N + O | 1100~1320 |
+| 9 | 강함+ | P + Q + R | 1200~1400 |
+| 10 | 매우 강함 | S + T | 1300~1450 |
 
 총 슬롯: 1+1+1+2+1+3+2+4+3+2 = **20종** / 신화
+
+> **제약**: #10 총 HP는 Act1 엘리트 최저(1600) 이하. 일반 인카운터는 어떤 경우에도 엘리트보다 강해서는 안 됨.
 
 ---
 
@@ -80,7 +82,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | 7 | centaur × 2 + ares_soldier | 1180 |
 | 8 | griffin_cub + medusid + fire_crab + stone_shard | 1240 |
 | 9 | cyclops + chimera_cub + hydra_head | 1450 |
-| 10 | cerberus + tartaros_shade | 1480 |
+| 10 | cerberus + tartaros_shade | 1400 |
 
 ### 몬스터 명세 (20종)
 
@@ -112,7 +114,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | stone_shard | 석상 파편 | 340 | BUFF block 30 → ATK 90 RANDOM blunt → ATK 90 RANDOM blunt |
 | chimera_cub | 키마이라 새끼 | 400 | ATK 110 ALL fire → BUFF strength 1 → ATK 130 RANDOM fire |
 | hydra_head | 히드라의 머리 | 350 | ATK 100 RANDOM poison → ATK 100 RANDOM slash → DEBUFF weak 2 |
-| tartaros_shade | 타르타로스의 망령 | 580 | BUFF strength 2 → ATK 140 LOWEST_HP curse → ATK 140 LOWEST_HP curse |
+| tartaros_shade | 타르타로스의 망령 | 500 | BUFF strength 2 → ATK 130 LOWEST_HP curse → ATK 130 LOWEST_HP curse |
 
 ---
 
@@ -131,7 +133,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | 7 | draugr × 2 + berserker | 1290 |
 | 8 | runestone_golem + night_hag + lindworm_spawn + einherjar_ghost | 1250 |
 | 9 | jotun_soldier + fenrir_pup + nidhogg_scale | 1450 |
-| 10 | frost_giant + ragnarok_herald | 1450 |
+| 10 | frost_giant + ragnarok_herald | 1350 |
 
 ※ 9/10번 총 HP가 같으나 10번 몬스터의 단일 데미지가 더 높음 (강도 차별화).
 
@@ -164,8 +166,8 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | einherjar_ghost | 전사의 유령 | 300 | BUFF strength 1 → ATK 80 RANDOM slash → ATK 80 RANDOM slash |
 | fenrir_pup | 펜리르 강아지 | 450 | ATK 110 RANDOM blunt → BUFF strength 1 → ATK 130 LOWEST_HP blunt |
 | nidhogg_scale | 니드호그의 비늘 | 400 | ATK 90 RANDOM poison → DEBUFF poison 3 → ATK 90 RANDOM slash |
-| frost_giant | 서리 거인 | 750 | BUFF block 60 → ATK 160 RANDOM blunt → ATK 120 ALL blunt |
-| ragnarok_herald | 라그나로크 전령 | 700 | BUFF strength 2 → ATK 150 RANDOM slash → ATK 150 LOWEST_HP slash → ATK 90 ALL slash |
+| frost_giant | 서리 거인 | 680 | BUFF block 60 → ATK 150 RANDOM blunt → ATK 110 ALL blunt |
+| ragnarok_herald | 라그나로크 전령 | 670 | BUFF strength 2 → ATK 140 RANDOM slash → ATK 140 LOWEST_HP slash → ATK 80 ALL slash |
 
 ---
 
@@ -184,7 +186,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | 7 | clay_soldier × 2 + sand_ifrit | 1210 |
 | 8 | tomb_wraith + khopesh_warrior + jackal_priest + desert_ghoul | 1230 |
 | 9 | mummy_warrior + sobek_spawn + ammit_cub | 1450 |
-| 10 | sphinx_adult + pyramid_golem | 1500 |
+| 10 | sphinx_adult + pyramid_golem | 1400 |
 
 ### 몬스터 명세 (20종)
 
@@ -215,8 +217,8 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | desert_ghoul | 사막 구울 | 290 | ATK 65 RANDOM slash → ATK 65 RANDOM slash → BUFF strength 1 |
 | sobek_spawn | 소베크의 자식 | 450 | ATK 110 RANDOM blunt → ATK 110 LOWEST_HP blunt → DEBUFF vulnerable 2 |
 | ammit_cub | 암밋 새끼 | 400 | BUFF strength 1 → ATK 100 RANDOM slash → ATK 100 ALL slash |
-| sphinx_adult | 성체 스핑크스 | 800 | ATK 130 RANDOM slash × 3 → SPECIAL 1 → ATK 160 LOWEST_HP slash |
-| pyramid_golem | 피라미드 골렘 | 700 | BUFF block 80 → ATK 170 RANDOM blunt → ATK 130 ALL blunt |
+| sphinx_adult | 성체 스핑크스 | 720 | ATK 120 RANDOM slash × 3 → SPECIAL 1 → ATK 150 LOWEST_HP slash |
+| pyramid_golem | 피라미드 골렘 | 680 | BUFF block 70 → ATK 160 RANDOM blunt → ATK 120 ALL blunt |
 
 ---
 
@@ -235,7 +237,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | 7 | virudhaka × 2 + karmic_fiend | 1270 |
 | 8 | sky_beast + earth_spirit + wrathful_spirit + cursed_monk | 1210 |
 | 9 | vajrapani + deva_soldier + ashura_warrior | 1230 |
-| 10 | mara_general + hell_guardian | 1450 |
+| 10 | mara_general + hell_guardian | 1370 |
 
 ※ vajrapani HP 500으로 리밸런싱 (기존 900 → 일반 인카운터 적정 수준 조정). intent는 유지.
 
@@ -268,8 +270,8 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | cursed_monk | 저주 승려 | 280 | SPECIAL 1 → ATK 65 RANDOM curse → ATK 65 RANDOM curse |
 | deva_soldier | 천병 | 380 | BUFF strength 1 → ATK 90 RANDOM divine → ATK 90 RANDOM divine |
 | ashura_warrior | 아수라 전사 | 350 | BUFF strength 2 → ATK 95 RANDOM blunt → ATK 120 RANDOM blunt |
-| mara_general | 마라 대장 | 720 | BUFF strength 2 → ATK 150 RANDOM curse → ATK 150 LOWEST_HP curse → ATK 100 ALL curse |
-| hell_guardian | 지옥 수호자 | 730 | BUFF block 60 → ATK 160 RANDOM divine → ATK 130 ALL divine |
+| mara_general | 마라 대장 | 680 | BUFF strength 2 → ATK 140 RANDOM curse → ATK 140 LOWEST_HP curse → ATK 90 ALL curse |
+| hell_guardian | 지옥 수호자 | 690 | BUFF block 60 → ATK 150 RANDOM divine → ATK 120 ALL divine |
 
 ---
 
@@ -288,7 +290,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | 7 | elder_hermit × 2 + celestial_soldier | 1230 |
 | 8 | fire_salamander + iron_guard + wind_sprite + earth_dragon | 1260 |
 | 9 | azure_guardian + celestial_lion + nine_tailed_spirit | 1450 |
-| 10 | dragon_king_child + immortal_warrior | 1500 |
+| 10 | dragon_king_child + immortal_warrior | 1400 |
 
 ### 몬스터 명세 (20종)
 
@@ -319,8 +321,8 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | earth_dragon | 지룡 | 310 | BUFF strength 1 → ATK 75 RANDOM blunt → ATK 75 RANDOM slash |
 | celestial_lion | 천사자 | 480 | BUFF strength 1 → ATK 110 RANDOM divine → ATK 110 LOWEST_HP divine |
 | nine_tailed_spirit | 구미호 선 | 450 | DEBUFF weak 2 → ATK 105 RANDOM curse → ATK 105 RANDOM curse |
-| dragon_king_child | 용왕의 아들 | 800 | BUFF block 60 → ATK 170 RANDOM divine → ATK 130 ALL divine |
-| immortal_warrior | 선인 전사 | 700 | BUFF strength 2 → ATK 155 RANDOM slash → ATK 155 LOWEST_HP slash |
+| dragon_king_child | 용왕의 아들 | 720 | BUFF block 60 → ATK 150 RANDOM divine → ATK 120 ALL divine |
+| immortal_warrior | 선인 전사 | 680 | BUFF strength 2 → ATK 140 RANDOM slash → ATK 140 LOWEST_HP slash |
 
 ---
 
@@ -339,7 +341,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | 7 | oni × 2 + samurai_ghost | 1270 |
 | 8 | river_kappa + snow_woman + cursed_scroll + tatami_monster | 1260 |
 | 9 | ronin_ghost + yamabushi_ghost + dragon_serpent | 1370 |
-| 10 | oni_king + hannya | 1480 |
+| 10 | oni_king + hannya | 1380 |
 
 ### 몬스터 명세 (20종)
 
@@ -370,8 +372,8 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | tatami_monster | 다다미 괴물 | 330 | BUFF block 30 → ATK 80 RANDOM blunt → ATK 95 RANDOM blunt |
 | yamabushi_ghost | 야마부시 영령 | 480 | BUFF strength 1 → ATK 110 RANDOM slash → ATK 110 RANDOM slash → ATK 80 ALL slash |
 | dragon_serpent | 수룡 | 440 | ATK 100 RANDOM blunt → DEBUFF vulnerable 2 → ATK 100 RANDOM blunt |
-| oni_king | 오니 왕 | 780 | BUFF strength 2 → ATK 160 RANDOM blunt → ATK 130 ALL blunt |
-| hannya | 한냐 | 700 | BUFF strength 1 → ATK 150 LOWEST_HP curse → ATK 150 LOWEST_HP curse → ATK 100 ALL curse |
+| oni_king | 오니 왕 | 700 | BUFF strength 2 → ATK 150 RANDOM blunt → ATK 120 ALL blunt |
+| hannya | 한냐 | 680 | BUFF strength 1 → ATK 140 LOWEST_HP curse → ATK 140 LOWEST_HP curse → ATK 90 ALL curse |
 
 ---
 
