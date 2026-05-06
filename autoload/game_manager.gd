@@ -592,13 +592,36 @@ func _make_normal_enemies() -> Array:
 	if encounters.is_empty():
 		push_warning("신화 %s 에 일반 인카운터가 없음" % myth)
 		return []
-	var encounter: Array = encounters.pick_random()
+	var encounter: Array = _pick_weighted_encounter(encounters, current_floor)
 	var result: Array = []
 	for fn_name in encounter:
 		var scene: PackedScene = _scene_for(myth, fn_name)
 		var enemy: Resource = normals_mod.call(fn_name, scene)
 		result.append(enemy)
 	return result
+
+func _pick_weighted_encounter(encounters: Array, floor_idx: int) -> Array:
+	var progress: float = clamp(float(floor_idx) / 9.0, 0.0, 1.0)
+	var target: float = progress * float(encounters.size() - 1)
+	var weights: Array[float] = []
+	for i in range(encounters.size()):
+		var dist: float = abs(float(i) - target)
+		weights.append(maxf(0.0, 4.0 - dist))
+	return _weighted_pick(encounters, weights)
+
+func _weighted_pick(items: Array, weights: Array[float]) -> Variant:
+	var total: float = 0.0
+	for w in weights:
+		total += w
+	if total <= 0.0:
+		return items.pick_random()
+	var roll: float = randf() * total
+	var cumulative: float = 0.0
+	for i in range(items.size()):
+		cumulative += weights[i]
+		if roll < cumulative:
+			return items[i]
+	return items[-1]
 
 const _ACT_HP_MULT: Dictionary = {1: 1.0, 2: 1.3, 3: 1.6}
 const _ACT_DMG_MULT: Dictionary = {1: 1.0, 2: 1.2, 3: 1.4}
