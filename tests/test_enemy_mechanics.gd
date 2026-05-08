@@ -10,6 +10,7 @@ const EnemyRes = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const HeroRes = preload("res://resources/hero_resource.gd")
 const CardRes = preload("res://resources/card_resource.gd")
+const InteractionSys = preload("res://autoload/enemy_interaction_system.gd")
 
 const GreekNormals = preload("res://resources/enemies/greek/greek_normals.gd")
 
@@ -23,6 +24,11 @@ func run_all() -> Dictionary:
 	test_special_unknown_variant_no_crash()
 	test_ares_soldier_berserk_strength_on_phase()
 	test_dryad_phase_transforms_pattern()
+	# Phase 2 — 적간 상호작용
+	test_heal_ally_recovers_hp()
+	test_buff_ally_strength_on_ally()
+	test_interaction_no_op_when_alone()
+	test_pick_lowest_hp_ally_excludes_self()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -149,3 +155,77 @@ func test_dryad_phase_transforms_pattern() -> void:
 	var p1_pattern: Array = bm._get_active_pattern(0)
 	_assert(p1_pattern[0].action_type == IntentRes.ActionType.ATTACK, "dryad 페이즈 1 첫 액션 = ATTACK (광기 ALL)")
 	_assert(p1_pattern[0].target == IntentRes.TargetType.ALL, "dryad 페이즈 1 첫 액션 ALL 타겟")
+
+# ─────────────── Phase 2: 적간 상호작용 ───────────────
+
+# HEAL_ALLY 인텐트 → 살아있는 동료 HP 회복
+func test_heal_ally_recovers_hp() -> void:
+	print("[TestEnemyMechanics] test_heal_ally_recovers_hp")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	# 적 0: 힐러 (HEAL_ALLY 30, LOWEST_HP 동료)
+	var heal_intent := _make_intent(IntentRes.ActionType.HEAL_ALLY, 30, IntentRes.TargetType.LOWEST_HP)
+	var healer := EnemyRes.new()
+	healer.max_hp = 100
+	healer.intent_pattern = [heal_intent]
+	# 적 1: 평범 (HP 손상 상태)
+	var ally_intent := _make_intent(IntentRes.ActionType.ATTACK, 5)
+	var ally := EnemyRes.new()
+	ally.max_hp = 100
+	ally.intent_pattern = [ally_intent]
+	bm.setup_battle([healer, ally])
+	bm._enemy_hp[1] = 40  # 동료를 HP 40으로 손상시켜둠
+	bm.start_player_turn()
+	bm.end_player_turn()  # healer 턴 — HEAL_ALLY 발동
+	_assert(bm._enemy_hp[1] == 70, "HEAL_ALLY 30 → 동료 HP 40 → 70 회복")
+
+# BUFF_ALLY 인텐트 → 동료에게 strength 부여
+func test_buff_ally_strength_on_ally() -> void:
+	print("[TestEnemyMechanics] test_buff_ally_strength_on_ally")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var buff_intent := _make_intent(IntentRes.ActionType.BUFF_ALLY, 2)
+	buff_intent.status_type = "strength"
+	var buffer := EnemyRes.new()
+	buffer.max_hp = 100
+	buffer.intent_pattern = [buff_intent]
+	var atk_intent := _make_intent(IntentRes.ActionType.ATTACK, 5)
+	var ally := EnemyRes.new()
+	ally.max_hp = 100
+	ally.intent_pattern = [atk_intent]
+	bm.setup_battle([buffer, ally])
+	bm.start_player_turn()
+	bm.end_player_turn()
+	_assert(bm._enemy_status[1].get("strength", 0) == 2, "BUFF_ALLY strength 2 → 동료 strength = 2")
+	_assert(bm._enemy_status[0].get("strength", 0) == 0, "buffer 자기 자신엔 부여 안 됨")
+
+# 동료 0명일 때 HEAL_ALLY/BUFF_ALLY no-op
+func test_interaction_no_op_when_alone() -> void:
+	print("[TestEnemyMechanics] test_interaction_no_op_when_alone")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var heal_intent := _make_intent(IntentRes.ActionType.HEAL_ALLY, 50, IntentRes.TargetType.LOWEST_HP)
+	var solo := EnemyRes.new()
+	solo.max_hp = 100
+	solo.intent_pattern = [heal_intent]
+	bm.setup_battle([solo])
+	bm._enemy_hp[0] = 30  # 자기 자신 HP 깎아둠
+	bm.start_player_turn()
+	bm.end_player_turn()
+	_assert(bm._enemy_hp[0] == 30, "동료 없을 때 HEAL_ALLY no-op — 자기 자신 회복 X")
+
+# pick_lowest_hp_ally가 자기 자신 제외하는지
+func test_pick_lowest_hp_ally_excludes_self() -> void:
+	print("[TestEnemyMechanics] test_pick_lowest_hp_ally_excludes_self")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var dummy := _make_intent(IntentRes.ActionType.ATTACK, 5)
+	var e0 := EnemyRes.new(); e0.max_hp = 100; e0.intent_pattern = [dummy]
+	var e1 := EnemyRes.new(); e1.max_hp = 100; e1.intent_pattern = [dummy]
+	var e2 := EnemyRes.new(); e2.max_hp = 100; e2.intent_pattern = [dummy]
+	bm.setup_battle([e0, e1, e2])
+	bm._enemy_hp[0] = 10  # 가장 낮은 HP는 자기 자신
+	bm._enemy_hp[1] = 50
+	bm._enemy_hp[2] = 80
+	var picked: int = InteractionSys.pick_lowest_hp_ally(bm, 0)
+	_assert(picked == 1, "자기(idx 0, HP 10) 제외 → 동료 중 LOWEST_HP는 idx 1 (HP 50)")

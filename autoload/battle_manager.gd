@@ -6,6 +6,7 @@ const EffectRes = preload("res://resources/effect_resource.gd")
 const CardRes  = preload("res://resources/card_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const RelicRes = preload("res://resources/relic_resource.gd")
+const InteractionSys = preload("res://autoload/enemy_interaction_system.gd")
 
 const POISON_DMG_PER_STACK: int = 10
 const TOKEN_DMG_PER_STACK: int = 25
@@ -1080,6 +1081,24 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			_execute_special(enemy_index, intent)
 		IntentRes.ActionType.PREPARE:
 			pass  # 준비 턴 — 아무 효과 없음
+		IntentRes.ActionType.HEAL_ALLY:
+			# 동료 1명 HP 회복 (target=LOWEST_HP 우선, 그 외 무작위)
+			var target_idx: int = -1
+			if intent.target == IntentRes.TargetType.LOWEST_HP:
+				target_idx = InteractionSys.pick_lowest_hp_ally(self, enemy_index)
+			else:
+				target_idx = InteractionSys.pick_random_ally(self, enemy_index)
+			if target_idx >= 0:
+				InteractionSys.heal_ally(self, enemy_index, target_idx, intent.value)
+		IntentRes.ActionType.BUFF_ALLY:
+			# 동료 1명에게 status 부여 (strength/block/weak 무관 status_type 따름)
+			var target_idx: int = -1
+			if intent.target == IntentRes.TargetType.LOWEST_HP:
+				target_idx = InteractionSys.pick_lowest_hp_ally(self, enemy_index)
+			else:
+				target_idx = InteractionSys.pick_random_ally(self, enemy_index)
+			if target_idx >= 0:
+				InteractionSys.buff_ally(self, enemy_index, target_idx, intent.status_type, intent.value)
 
 # SPECIAL 액션 분기 — status_type 으로 변종 식별.
 # 하위 호환: IntentResource.status_type 기본값 "weak"는 DEBUFF용으로, SPECIAL에선 미설정과 동일 취급 → remove_card.

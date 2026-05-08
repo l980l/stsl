@@ -62,6 +62,7 @@ static func hrimfaxi_rider(scene: PackedScene) -> Resource:
 	return e
 
 static func draugr(scene: PackedScene) -> Resource:
+	# T1-DESPERATE: HP 30% 미만 도달 시 strength +2 자동 (망령의 마지막 항전)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.draugr"; e.max_hp = 420; e.character_scene = scene
 	e.mythology = "norse"
@@ -70,8 +71,10 @@ static func draugr(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 90; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.BUFF; i3.status_type = "strength"; i3.value = 10
+	i3.action_type = IntentRes.ActionType.BUFF; i3.status_type = "strength"; i3.value = 1
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.3]
+	e.phase_buffs = [[{"status": "strength", "value": 2}]]
 	return e
 
 static func jotun_soldier(scene: PackedScene) -> Resource:
@@ -90,28 +93,30 @@ static func jotun_soldier(scene: PackedScene) -> Resource:
 # ──── 신규 14종 ────
 
 static func ice_wolf(scene: PackedScene) -> Resource:
+	# T0-RAMP: 매 사이클 strength +1, 사냥감 추격 (LOWEST_HP 마지막 한 방)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.ice_wolf"; e.max_hp = 350; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 75; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 75; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 65; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "weak"; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 65; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
 static func raven_scout(scene: PackedScene) -> Resource:
+	# T0-CHARGE: 평타 → PREPARE → 큰 한 방. 3마리가 시간차로 텔레그래프
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.raven_scout"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 55; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "poison"; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.PREPARE; i2.value = 0
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 110; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
@@ -129,32 +134,45 @@ static func frost_giant_pup(scene: PackedScene) -> Resource:
 	return e
 
 static func bone_archer(scene: PackedScene) -> Resource:
+	# T0-DEBUFF누적: vulnerable 2회 적층 → slash 큰 한 방
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.bone_archer"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "vulnerable"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 1; i2.status_type = "vulnerable"; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 55; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 60; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "vulnerable"; i3.target = IntentRes.TargetType.RANDOM
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 90; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "slash"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func dark_elf(scene: PackedScene) -> Resource:
+	# T1-PHASE: HP 50% 미만 시 그림자 광기 — ALL curse 분출
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.dark_elf"; e.max_hp = 295; e.character_scene = scene
 	e.mythology = "norse"
-	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"; i1.target = IntentRes.TargetType.RANDOM
-	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 65; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "curse"
-	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 65; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
-	e.intent_pattern = [i1, i2, i3]
+	var p0i1 := IntentRes.new()
+	p0i1.action_type = IntentRes.ActionType.DEBUFF; p0i1.value = 2; p0i1.status_type = "weak"; p0i1.target = IntentRes.TargetType.RANDOM
+	var p0i2 := IntentRes.new()
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 65; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "curse"
+	var p0i3 := IntentRes.new()
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 65; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "curse"
+	var p1i1 := IntentRes.new()
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 75; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "curse"
+	var p1i2 := IntentRes.new()
+	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 2; p1i2.status_type = "weak"; p1i2.target = IntentRes.TargetType.ALL
+	var p1i3 := IntentRes.new()
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 80; p1i3.target = IntentRes.TargetType.RANDOM; p1i3.damage_type = "curse"
+	e.phase_thresholds = [0.5]
+	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i2, p1i3]]
+	e.intent_pattern = e.phase_patterns[0]
 	return e
 
 static func berserker(scene: PackedScene) -> Resource:
+	# T1-BERSERK: 이름 그대로 — HP 50% 미만에서 strength +4 자동 (그리스 ares보다 강함)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.berserker"; e.max_hp = 450; e.character_scene = scene
 	e.mythology = "norse"
@@ -165,18 +183,21 @@ static func berserker(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 4}]]
 	return e
 
 static func runestone_golem(scene: PackedScene) -> Resource:
+	# T2-GUARD: 매 사이클 동료에게 block 부여 + 자기 block (룬 결계)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.runestone_golem"; e.max_hp = 350; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 40; i1.status_type = "block"
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 30; i1.status_type = "block"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 95; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.BUFF_ALLY; i2.value = 20; i2.status_type = "block"; i2.target = IntentRes.TargetType.LOWEST_HP
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 95; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
@@ -207,15 +228,16 @@ static func lindworm_spawn(scene: PackedScene) -> Resource:
 	return e
 
 static func einherjar_ghost(scene: PackedScene) -> Resource:
+	# T2-HEALER: 발할라 망령 — 매 사이클 LOWEST_HP 동료 HP +30 회복 + 동료 strength +1
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.einherjar_ghost"; e.max_hp = 300; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.HEAL_ALLY; i1.value = 30; i1.target = IntentRes.TargetType.LOWEST_HP
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.BUFF_ALLY; i2.value = 1; i2.status_type = "strength"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 80; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 65; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 

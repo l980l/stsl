@@ -116,32 +116,37 @@ static func sand_wraith(scene: PackedScene) -> Resource:
 	return e
 
 static func sand_rat(scene: PackedScene) -> Resource:
+	# T0-CHARGE: 짧은 PREPARE → LOWEST_HP 큰 한 방. 3마리 동시 출현 (#5)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.sand_rat"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 55; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 55; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.PREPARE; i2.value = 0
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "poison"; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 100; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
 static func anubis_guard(scene: PackedScene) -> Resource:
+	# T2-GUARD: 동료에게 block 부여 + 자기 block. 인카운터 #6 보호자 역할
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.anubis_guard"; e.max_hp = 330; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 30; i1.status_type = "block"
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 25; i1.status_type = "block"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.BUFF_ALLY; i2.value = 15; i2.status_type = "block"; i2.target = IntentRes.TargetType.LOWEST_HP
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 80; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
-	e.intent_pattern = [i1, i2, i3]
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 80; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "slash"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func nile_crocodile(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 도달 시 strength +3 자동 (배고픈 짐승)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.nile_crocodile"; e.max_hp = 360; e.character_scene = scene
 	e.mythology = "egyptian"
@@ -152,6 +157,8 @@ static func nile_crocodile(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "vulnerable"; i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
 static func clay_soldier(scene: PackedScene) -> Resource:
@@ -181,28 +188,30 @@ static func tomb_wraith(scene: PackedScene) -> Resource:
 	return e
 
 static func khopesh_warrior(scene: PackedScene) -> Resource:
+	# T2-BUFFER: 매 사이클 동료에게 strength +1 부여. 자기 공격은 작게
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.khopesh_warrior"; e.max_hp = 340; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.BUFF_ALLY; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 85; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 110; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
 static func jackal_priest(scene: PackedScene) -> Resource:
+	# T2-HEALER: 매 사이클 LOWEST_HP 동료 HP +25 회복 (자칼 신관)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.jackal_priest"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.HEAL_ALLY; i1.value = 25; i1.target = IntentRes.TargetType.LOWEST_HP
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 65; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "curse"
+	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 1; i2.status_type = "weak"; i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "weak"; i3.target = IntentRes.TargetType.RANDOM
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 55; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
