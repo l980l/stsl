@@ -25,11 +25,11 @@ func run_all() -> Dictionary:
 	test_act2_mummy_curse_gamble()
 	test_act2_oasis_three_choices()
 	test_act2_no_greek_names()
-	test_korean_event_pool_size()
-	test_korean_death_reaper_event()
-	test_korean_samsin_blessing_uses_max_hp()
-	test_chinese_event_pool_size()
-	test_chinese_queen_mother_peach_event()
+	test_buddhist_event_pool_size()
+	test_buddhist_yama_toll_event()
+	test_buddhist_guanyin_mercy_event()
+	test_daoist_event_pool_size()
+	test_daoist_peach_of_immortality_event()
 	test_japanese_event_pool_size()
 	test_japanese_ise_shrine_event()
 	return {"passed": passed, "failed": failed}
@@ -341,57 +341,58 @@ func test_act2_no_greek_names() -> void:
 				has_greek = true
 	_assert(not has_greek, "Act2 풀에 그리스 고유 이름 없음")
 
-func test_korean_event_pool_size() -> void:
-	print("[TestEvent] test_korean_event_pool_size")
-	var KoreanEvents = load("res://resources/events/events_korean.gd")
-	var pool: Array = KoreanEvents.build_pool()
-	_assert(pool.size() == 10, "한국 이벤트 풀 10종")
+func test_buddhist_event_pool_size() -> void:
+	print("[TestEvent] test_buddhist_event_pool_size")
+	var BuddhistEvents = load("res://resources/events/events_buddhist.gd")
+	var pool: Array = BuddhistEvents.build_pool()
+	_assert(pool.size() == 10, "불교 이벤트 풀 10종")
 
-func test_korean_death_reaper_event() -> void:
-	print("[TestEvent] test_korean_death_reaper_event")
-	var KoreanEvents = load("res://resources/events/events_korean.gd")
-	var pool: Array = KoreanEvents.build_pool()
+func test_buddhist_yama_toll_event() -> void:
+	print("[TestEvent] test_buddhist_yama_toll_event")
+	var BuddhistEvents = load("res://resources/events/events_buddhist.gd")
+	var pool: Array = BuddhistEvents.build_pool()
 	var ChoiceRes = load("res://resources/event_choice_resource.gd")
 	var found := false
 	for e in pool:
-		if e.event_name == "저승사자의 방문":
+		if e.event_name == "event.buddhist.yama_toll.name":
 			found = true
 			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.GOLD, "선택A: GOLD")
 			_assert(e.choices[0].value == 70, "GOLD +70")
 			_assert(e.choices[0].cost_hp == 40, "HP -40")
-	_assert(found, "저승사자의 방문 이벤트 존재")
+	_assert(found, "염라의 통행세 이벤트 존재")
 
-func test_korean_samsin_blessing_uses_max_hp() -> void:
-	print("[TestEvent] test_korean_samsin_blessing_uses_max_hp")
-	var KoreanEvents = load("res://resources/events/events_korean.gd")
-	var pool: Array = KoreanEvents.build_pool()
+func test_buddhist_guanyin_mercy_event() -> void:
+	print("[TestEvent] test_buddhist_guanyin_mercy_event")
+	var BuddhistEvents = load("res://resources/events/events_buddhist.gd")
+	var pool: Array = BuddhistEvents.build_pool()
 	var ChoiceRes = load("res://resources/event_choice_resource.gd")
 	var found := false
 	for e in pool:
-		if e.event_name == "삼신할머니의 축복":
+		if e.event_name == "event.buddhist.guanyin_mercy.name":
 			found = true
 			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.HEAL, "선택A: HEAL")
-	_assert(found, "삼신할머니의 축복 이벤트 존재")
+			_assert(e.choices[0].value == 30, "HEAL +30")
+	_assert(found, "관음의 자비 이벤트 존재")
 
-func test_chinese_event_pool_size() -> void:
-	print("[TestEvent] test_chinese_event_pool_size")
-	var ChineseEvents = load("res://resources/events/events_chinese.gd")
-	var pool: Array = ChineseEvents.build_pool()
-	_assert(pool.size() == 10, "중국 이벤트 풀 10종")
+func test_daoist_event_pool_size() -> void:
+	print("[TestEvent] test_daoist_event_pool_size")
+	var DaoistEvents = load("res://resources/events/events_daoist.gd")
+	var pool: Array = DaoistEvents.build_pool()
+	_assert(pool.size() == 10, "도교 이벤트 풀 10종")
 
-func test_chinese_queen_mother_peach_event() -> void:
-	print("[TestEvent] test_chinese_queen_mother_peach_event")
-	var ChineseEvents = load("res://resources/events/events_chinese.gd")
-	var pool: Array = ChineseEvents.build_pool()
+func test_daoist_peach_of_immortality_event() -> void:
+	print("[TestEvent] test_daoist_peach_of_immortality_event")
+	var DaoistEvents = load("res://resources/events/events_daoist.gd")
+	var pool: Array = DaoistEvents.build_pool()
 	var ChoiceRes = load("res://resources/event_choice_resource.gd")
 	var found := false
 	for e in pool:
-		if e.event_name == "서왕모의 복숭아나무":
+		if e.event_name == "event.daoist.peach_of_immortality.name":
 			found = true
 			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.HEAL, "선택A: HEAL")
 			_assert(e.choices[0].value == 40, "HEAL +40")
 			_assert(e.choices[1].effect_type == ChoiceRes.EffectType.NONE, "선택B: NONE")
-	_assert(found, "서왕모의 복숭아나무 이벤트 존재")
+	_assert(found, "불로장생의 복숭아 이벤트 존재")
 
 func test_japanese_event_pool_size() -> void:
 	print("[TestEvent] test_japanese_event_pool_size")

@@ -1,12 +1,11 @@
-﻿# resources/enemies/chinese/chinese_act2.gd
-# 중국 신화 Act 2 — 엘리트 3종(홍해아·구룡 차장·천구 형제) + 보스(이랑신)
+# resources/enemies/daoist/daoist_act2.gd
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
-static func red_boy(scene: PackedScene) -> Resource:
+static func crimson_immortal(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.red_boy"; e.max_hp = 1800; e.character_scene = scene
-	e.mythology = "chinese"
+	e.enemy_name = "enemy.daoist.crimson_immortal"; e.max_hp = 1800; e.character_scene = scene
+	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
@@ -17,10 +16,10 @@ static func red_boy(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func nine_dragon_general(scene: PackedScene) -> Resource:
+static func nine_dragon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.nine_dragon_general"; e.max_hp = 1900; e.character_scene = scene
-	e.mythology = "chinese"
+	e.enemy_name = "enemy.daoist.nine_dragon"; e.max_hp = 1900; e.character_scene = scene
+	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
 	var i2 := IntentRes.new()
@@ -35,10 +34,10 @@ static func nine_dragon_general(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func heavenly_hound_brothers(scene: PackedScene) -> Resource:
+static func twin_immortals(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.heavenly_hound_brothers"; e.max_hp = 1700; e.character_scene = scene
-	e.mythology = "chinese"
+	e.enemy_name = "enemy.daoist.twin_immortals"; e.max_hp = 1700; e.character_scene = scene
+	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 130; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
@@ -58,12 +57,11 @@ static func heavenly_hound_brothers(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func erlang_shen(scene: PackedScene) -> Resource:
+static func xuanwu(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.erlang_shen"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "chinese"; e.grade = EnemyRes.Grade.BOSS
+	e.enemy_name = "enemy.daoist.xuanwu"; e.max_hp = 4800; e.character_scene = scene
+	e.mythology = "daoist"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
-	# Phase 0 — 지휘
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.BUFF; p0i1.value = 1; p0i1.status_type = "strength"
 	var p0i2 := IntentRes.new()
@@ -72,7 +70,6 @@ static func erlang_shen(scene: PackedScene) -> Resource:
 	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 170; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "divine"
 	var p0i4 := IntentRes.new()
 	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 140; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "divine"
-	# Phase 1 — 삼안 개안
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "divine"
 	var p1i2 := IntentRes.new()
@@ -84,7 +81,6 @@ static func erlang_shen(scene: PackedScene) -> Resource:
 	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 180; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "divine"
 	var p1i5 := IntentRes.new()
 	p1i5.action_type = IntentRes.ActionType.BUFF; p1i5.value = 2; p1i5.status_type = "strength"
-	# Phase 2 — 천군 강림
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 180; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "divine"
 	var p2i2 := IntentRes.new()
@@ -106,7 +102,7 @@ static func erlang_shen(scene: PackedScene) -> Resource:
 	return e
 
 static func elites() -> Array:
-	return ["red_boy", "nine_dragon_general", "heavenly_hound_brothers"]
+	return ["crimson_immortal", "nine_dragon", "twin_immortals"]
 
 static func boss() -> String:
-	return "erlang_shen"
+	return "xuanwu"

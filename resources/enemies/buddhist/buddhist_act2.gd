@@ -1,12 +1,11 @@
-﻿# resources/enemies/korean/korean_act2.gd
-# 한국 신화 — Act 2 엘리트 3종(도깨비 대장·용왕의 장군·동명성왕) + 보스(삼신할미)
+# resources/enemies/buddhist/buddhist_act2.gd
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
-static func dokkaebi_chief(scene: PackedScene) -> Resource:
+static func asura_king(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.korean.dokkaebi_chief"; e.max_hp = 1800; e.character_scene = scene
-	e.mythology = "korean"
+	e.enemy_name = "enemy.buddhist.asura_king"; e.max_hp = 1800; e.character_scene = scene
+	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
 	var i2 := IntentRes.new()
@@ -19,10 +18,10 @@ static func dokkaebi_chief(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func sea_dragon_general(scene: PackedScene) -> Resource:
+static func naga_king(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.korean.sea_dragon_general"; e.max_hp = 1900; e.character_scene = scene
-	e.mythology = "korean"
+	e.enemy_name = "enemy.buddhist.naga_king"; e.max_hp = 1900; e.character_scene = scene
+	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
 	var i2 := IntentRes.new()
@@ -35,10 +34,10 @@ static func sea_dragon_general(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func dongmyeong(scene: PackedScene) -> Resource:
+static func agni_buddha(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.korean.dongmyeong"; e.max_hp = 1900; e.character_scene = scene
-	e.mythology = "korean"
+	e.enemy_name = "enemy.buddhist.agni_buddha"; e.max_hp = 1900; e.character_scene = scene
+	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "divine"
 	var i2 := IntentRes.new()
@@ -54,13 +53,11 @@ static func dongmyeong(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func samsin_grandma(scene: PackedScene) -> Resource:
-	# 생명·점지의 여신 — Phase 0 "점지의 손길" → Phase 1 "축복과 저주" → Phase 2 "삼신의 분노"
+static func guanyin(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.korean.samsin_grandma"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "korean"; e.grade = EnemyRes.Grade.BOSS
+	e.enemy_name = "enemy.buddhist.guanyin"; e.max_hp = 4800; e.character_scene = scene
+	e.mythology = "buddhist"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
-	# Phase 0: 점지의 손길
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.DEBUFF; p0i1.value = 2; p0i1.status_type = "weak"
 	p0i1.target = IntentRes.TargetType.ALL
@@ -71,7 +68,6 @@ static func samsin_grandma(scene: PackedScene) -> Resource:
 	var p0i4 := IntentRes.new()
 	p0i4.action_type = IntentRes.ActionType.DEBUFF; p0i4.value = 3; p0i4.status_type = "poison"
 	p0i4.target = IntentRes.TargetType.ALL
-	# Phase 1: 축복과 저주
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.DEBUFF; p1i1.value = 2; p1i1.status_type = "vulnerable"
 	p1i1.target = IntentRes.TargetType.ALL
@@ -84,7 +80,6 @@ static func samsin_grandma(scene: PackedScene) -> Resource:
 	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 160; p1i4.target = IntentRes.TargetType.RANDOM; p1i4.damage_type = "divine"
 	var p1i5 := IntentRes.new()
 	p1i5.action_type = IntentRes.ActionType.BUFF; p1i5.value = 1; p1i5.status_type = "strength"
-	# Phase 2: 삼신의 분노
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.DEBUFF; p2i1.value = 3; p2i1.status_type = "vulnerable"
 	p2i1.target = IntentRes.TargetType.ALL
@@ -110,7 +105,7 @@ static func samsin_grandma(scene: PackedScene) -> Resource:
 	return e
 
 static func elites() -> Array:
-	return ["dokkaebi_chief", "sea_dragon_general", "dongmyeong"]
+	return ["asura_king", "naga_king", "agni_buddha"]
 
 static func boss() -> String:
-	return "samsin_grandma"
+	return "guanyin"

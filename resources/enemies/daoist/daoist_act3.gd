@@ -1,12 +1,11 @@
-﻿# resources/enemies/chinese/chinese_act3.gd
-# 중국 신화 Act 3 — 엘리트 3종(백호·주작·현무 신장) + 보스(반고)
+# resources/enemies/daoist/daoist_act3.gd
 const EnemyRes   = preload("res://resources/enemy_resource.gd")
 const IntentRes  = preload("res://resources/intent_resource.gd")
 
-static func white_tiger_general(scene: PackedScene) -> Resource:
+static func white_tiger(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.white_tiger_general"; e.max_hp = 1900; e.character_scene = scene
-	e.mythology = "chinese"
+	e.enemy_name = "enemy.daoist.white_tiger"; e.max_hp = 1900; e.character_scene = scene
+	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 3; i1.status_type = "strength"
 	var i2 := IntentRes.new()
@@ -19,10 +18,10 @@ static func white_tiger_general(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func vermilion_bird_general(scene: PackedScene) -> Resource:
+static func vermilion_bird(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.vermilion_bird_general"; e.max_hp = 2000; e.character_scene = scene
-	e.mythology = "chinese"
+	e.enemy_name = "enemy.daoist.vermilion_bird"; e.max_hp = 2000; e.character_scene = scene
+	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"
 	i1.target = IntentRes.TargetType.ALL
@@ -36,10 +35,10 @@ static func vermilion_bird_general(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func black_tortoise_general(scene: PackedScene) -> Resource:
+static func black_tortoise(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.black_tortoise_general"; e.max_hp = 1800; e.character_scene = scene
-	e.mythology = "chinese"
+	e.enemy_name = "enemy.daoist.black_tortoise"; e.max_hp = 1800; e.character_scene = scene
+	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 70; i1.status_type = "block"
 	var i2 := IntentRes.new()
@@ -55,12 +54,11 @@ static func black_tortoise_general(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func pangu(scene: PackedScene) -> Resource:
+static func jade_emperor(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.pangu"; e.max_hp = 4800; e.character_scene = scene
-	e.mythology = "chinese"; e.grade = EnemyRes.Grade.BOSS
+	e.enemy_name = "enemy.daoist.jade_emperor"; e.max_hp = 4800; e.character_scene = scene
+	e.mythology = "daoist"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
-	# Phase 0 — 혼돈
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.BUFF; p0i1.value = 50; p0i1.status_type = "block"
 	var p0i2 := IntentRes.new()
@@ -72,7 +70,6 @@ static func pangu(scene: PackedScene) -> Resource:
 	var p0i5 := IntentRes.new()
 	p0i5.action_type = IntentRes.ActionType.DEBUFF; p0i5.value = 2; p0i5.status_type = "vulnerable"
 	p0i5.target = IntentRes.TargetType.RANDOM
-	# Phase 1 — 천지개벽
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 220; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "divine"
 	var p1i2 := IntentRes.new()
@@ -87,7 +84,6 @@ static func pangu(scene: PackedScene) -> Resource:
 	p1i5.target = IntentRes.TargetType.ALL
 	var p1i6 := IntentRes.new()
 	p1i6.action_type = IntentRes.ActionType.BUFF; p1i6.value = 2; p1i6.status_type = "strength"
-	# Phase 2 — 만물 창조
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 160; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "divine"
 	var p2i2 := IntentRes.new()
@@ -110,24 +106,23 @@ static func pangu(scene: PackedScene) -> Resource:
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20
-	# 카드 타입 카운터: 권능 카드 사용 때마다 영웅 전체에 약화 +2 부여
-	var _ptrigger := IntentRes.new()
-	_ptrigger.action_type = IntentRes.ActionType.DEBUFF
-	_ptrigger.value = 2
-	_ptrigger.target = IntentRes.TargetType.ALL
-	_ptrigger.status_type = "weak"
-	_ptrigger.play_animation = "buff"
+	var _trigger := IntentRes.new()
+	_trigger.action_type = IntentRes.ActionType.DEBUFF
+	_trigger.value = 2
+	_trigger.target = IntentRes.TargetType.ALL
+	_trigger.status_type = "weak"
+	_trigger.play_animation = "buff"
 	e.card_count_trigger = {
 		"card_type": CardResource.CardType.POWER,
 		"threshold": 1,
-		"intent": _ptrigger,
+		"intent": _trigger,
 		"repeat": true,
-		"tooltip_key": "enemy.chinese.pangu.counter",
+		"tooltip_key": "enemy.daoist.jade_emperor.counter",
 	}
 	return e
 
 static func elites() -> Array:
-	return ["white_tiger_general", "vermilion_bird_general", "black_tortoise_general"]
+	return ["white_tiger", "vermilion_bird", "black_tortoise"]
 
 static func boss() -> String:
-	return "pangu"
+	return "jade_emperor"

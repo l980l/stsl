@@ -53,24 +53,6 @@ enemy.norse.fenrir_cub,펜리르 새끼,Fenrir Cub,Petit Fenrir,Cucciolo di Fenr
 enemy.norse.valkyrie,발키리,Valkyrie,Valkyrie,Valchiria,Valquiria,ヴァルキリー,Βαλκυρία,女武神,女武神
 enemy.norse.jormungandr_shard,요르문간드르 분신,Shard of Jormungandr,Éclat de Jormungandr,Frammento di Jormungandr,Fragmento de Jormungandr,ヨルムンガンドの分身,Θραύσμα του Γιόρμουνγκαντρ,耶梦加得碎片,耶梦加得碎片
 enemy.norse.jormungandr,요르문간드르,Jormungandr,Jormungandr,Jormungandr,Jormungandr,ヨルムンガンド,Γιόρμουνγκαντρ,耶梦加得,耶梦加得
-enemy.korean.death_reaper,저승사자,Grim Reaper (Jeoseung Saja),Faucheur des Enfers,Mietitore dell'Oltretomba,Segador de Almas,死神（チョスンサジャ）,Χάρος (Θεριστής),阴间使者,阴间使者
-enemy.korean.cheoyong,처용,Cheoyong,Cheoyong,Cheoyong,Cheoyong,処容,Τσεογιόνγκ,处容,处容
-enemy.korean.dokkaebi,도깨비,Dokkaebi,Dokkaebi,Dokkaebi,Dokkaebi,トッケビ,Ντοκάεμπι,独角鬼,独角鬼
-enemy.korean.three_legged_crow,삼족오,Three-Legged Crow,Corbeau à trois pattes,Corvo a tre zampe,Cuervo de tres patas,三足烏,Τρίποδο Κοράκι,三足乌,三足乌
-enemy.korean.gumiho,구미호,Gumiho (Nine-Tailed Fox),Gumiho (Renard à neuf queues),Gumiho (Volpe a nove code),Gumiho (Zorro de nueve colas),九尾の狐,Γκουμιχό,九尾狐,九尾狐
-enemy.korean.bulgasari,불가사리,Bulgasari,Bulgasari,Bulgasari,Bulgasari,プルガサリ,Μπουλγκασάρι,不可杀,不可杀
-enemy.korean.haechi,해치,Haechi,Haechi,Haechi,Haechi,ヘチ,Χαέτσι,獬豸,獬豸
-enemy.korean.jangseung,장승,Jangseung,Jangseung,Jangseung,Jangseung,チャンスン,Τζανγκσεόνγκ,长丞,长丞
-enemy.korean.haemosu,해모수,Haemosu,Haemosu,Haemosu,Haemosu,ヘモス,Χεμοσού,解慕漱,解慕漱
-enemy.korean.dangun,단군,Dangun,Dangun,Dangun,Dangun,タングン,Ντανγκούν,檀君,檀君
-enemy.korean.dokkaebi_chief,도깨비 대장,Dokkaebi Chief,Chef Dokkaebi,Capo Dokkaebi,Jefe Dokkaebi,トッケビの頭領,Αρχηγός Ντοκάεμπι,独角鬼首领,独角鬼首领
-enemy.korean.sea_dragon_general,용왕의 장군,General of the Sea King,Général du Roi Dragon,Generale del Re Dragone,General del Rey Dragón,竜王の将軍,Στρατηγός του Βασιλιά των Θαλασσών,龙王将军,龙王将军
-enemy.korean.dongmyeong,동명성왕,King Dongmyeong,Roi Dongmyeong,Re Dongmyeong,Rey Dongmyeong,東明聖王,Βασιλιάς Ντονγκμιόνγκ,东明圣王,东明圣王
-enemy.korean.samsin_grandma,삼신할미,Samsin Halmoni,Samsin Halmoni,Samsin Halmoni,Samsin Halmoni,三神ハルモニ,Γιαγιά Σαμσίν,三神奶奶,三神奶奶
-enemy.korean.underworld_judge,저승 판관,Underworld Judge,Juge des Enfers,Giudice dell'Oltretomba,Juez del Inframundo,冥府の判官,Δικαστής του Κάτω Κόσμου,阴间判官,阴间判官
-enemy.korean.gat_spirit,갓신,Gat Spirit,Esprit du Gat,Spirito del Gat,Espíritu del Gat,カッの神,Πνεύμα Γκατ,笠帽神,笠帽神
-enemy.korean.cheoyong_god,처용신,God Cheoyong,Dieu Cheoyong,Dio Cheoyong,Dios Cheoyong,処容神,Θεός Τσεογιόνγκ,处容神,处容神
-enemy.korean.gusamseung_halmang,구삼승할망,Gusamseung Halmang,Gusamseung Halmang,Gusamseung Halmang,Gusamseung Halmang,クサムスンハルマン,Γκουσαμσέουνγκ Χαλμάνγκ,九三丞奶奶,九三丞奶奶
 enemy.japanese.oni,오니,Oni,Oni,Oni,Oni,鬼（おに）,Όνι,鬼,鬼
 enemy.japanese.tengu,텐구,Tengu,Tengu,Tengu,Tengu,天狗,Τένγκου,天狗,天狗
 enemy.japanese.yuki_onna,유키온나,Yuki-onna,Yuki-onna,Yuki-onna,Yuki-onna,雪女,Γιούκι-όννα,雪女,雪女
@@ -89,21 +71,125 @@ enemy.japanese.iwato_guardian,아마노이와토 수문장,Amano-Iwato Guardian,
 enemy.japanese.susanoo_blade,스사노오의 검,Blade of Susanoo,Lame de Susanoo,Lama di Susanoo,Filo de Susanoo,スサノオの剣,Λεπίδα του Σουσανόο,素盏呜尊之剑,素盏呜尊之剑
 enemy.japanese.blizzard_queen,유키온나의 여왕,Blizzard Queen,Reine du blizzard,Regina della Tormenta,Reina de la Ventisca,雪女の女王,Βασίλισσα της Χιονοθύελλας,雪女之女王,雪女之女王
 enemy.japanese.yamata_no_orochi,야마타노오로치,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi,八岐大蛇,Γιαμάτα νο Ορότσι,八岐大蛇,八岐大蛇
-enemy.chinese.yaksha,야차,Yaksha,Yaksha,Yaksha,Yaksha,夜叉,Γιάκσα,夜叉,夜叉
-enemy.chinese.nezha_soldier,나타 병사,Nezha Soldier,Soldat de Nezha,Soldato di Nezha,Soldado de Nezha,哪吒の兵士,Στρατιώτης του Νέζα,哪吒士兵,哪吒士兵
-enemy.chinese.heavenly_king_soldier,사대천왕 병사,Heavenly King Soldier,Soldat du Roi Céleste,Soldato del Re Celeste,Soldado del Rey Celestial,四天王の兵士,Στρατιώτης του Ουράνιου Βασιλιά,四大天王士兵,四大天王士兵
-enemy.chinese.shanhaijing_beast,산해경 괴수,Shanhaijing Beast,Bête du Shanhaijing,Bestia del Shanhaijing,Bestia de Shanhaijing,山海経の怪獣,Θηρίο του Σανχαϊτζίνγκ,山海经怪兽,山海经怪兽
-enemy.chinese.immortal_trainee,선인 수련생,Immortal Trainee,Apprenti Immortel,Apprendista Immortale,Aprendiz Inmortal,仙人の見習い,Μαθητευόμενος Αθάνατος,仙人修炼生,仙人修炼生
-enemy.chinese.azure_dragon_guard,청룡 수호병,Azure Dragon Guard,Garde du Dragon d'Azur,Guardia del Dragone Azzurro,Guardia del Dragón Azur,青龍の守護兵,Φρουρός του Γαλάζιου Δράκου,青龙卫士,青龙卫士
-enemy.chinese.golden_horn_king,금각 대왕,Golden Horn King,Roi à la corne d'or,Re dal Corno d'Oro,Rey del Cuerno de Oro,金角大王,Βασιλιάς με το Χρυσό Κέρας,金角大王,金角大王
-enemy.chinese.silver_horn_king,은각 대왕,Silver Horn King,Roi à la corne d'argent,Re dal Corno d'Argento,Rey del Cuerno de Plata,銀角大王,Βασιλιάς με το Ασημένιο Κέρας,银角大王,银角大王
-enemy.chinese.black_wind_demon,흑풍괴,Black Wind Demon,Démon du vent noir,Demone del Vento Nero,Demonio del Viento Negro,黒風怪,Δαίμονας του Μαύρου Ανέμου,黑风怪,黑风怪
-enemy.chinese.chiyou,치우,Chiyou,Chiyou,Chiyou,Chiyou,蚩尤,Τσι-γιού,蚩尤,蚩尤
-enemy.chinese.red_boy,홍해아,Red Boy,Enfant Rouge,Ragazzo Rosso,Niño Rojo,紅孩児,Κόκκινο Αγόρι,红孩儿,红孩儿
-enemy.chinese.nine_dragon_general,구룡 차장,Nine Dragon General,Général aux Neuf Dragons,Generale dei Nove Draghi,General de los Nueve Dragones,九龍の将軍,Στρατηγός των Εννέα Δράκων,九龙将军,九龙将军
-enemy.chinese.heavenly_hound_brothers,천구 형제,Heavenly Hound Brothers,Frères Chiens Célestes,Fratelli Segugi Celesti,Hermanos Sabuesos Celestiales,天狗の兄弟,Αδελφοί Ουράνιοι Σκύλοι,天狗兄弟,天狗兄弟
-enemy.chinese.erlang_shen,이랑신,Erlang Shen,Erlang Shen,Erlang Shen,Erlang Shen,二郎神,Ερλάνγκ Σεν,二郎神,二郎神
-enemy.chinese.white_tiger_general,백호 신장,White Tiger General,Général du Tigre Blanc,Generale della Tigre Bianca,General del Tigre Blanco,白虎神将,Στρατηγός της Λευκής Τίγρης,白虎神将,白虎神将
-enemy.chinese.vermilion_bird_general,주작 신장,Vermilion Bird General,Général de l'Oiseau Vermillon,Generale dell'Uccello Vermiglio,General del Pájaro Vermellón,朱雀神将,Στρατηγός του Πορφυρού Πουλιού,朱雀神将,朱雀神将
-enemy.chinese.black_tortoise_general,현무 신장,Black Tortoise General,Général de la Tortue Noire,Generale della Tartaruga Nera,General de la Tortuga Negra,玄武神将,Στρατηγός της Μαύρης Χελώνας,玄武神将,玄武神将
-enemy.chinese.pangu,반고,Pangu,Pangu,Pangu,Pangu,盤古,Παν-γκού,盘古,盘古
+enemy.buddhist.yaksha,야차,Yaksha,Yaksha,Yaksha,Yaksha,夜叉,Γιάκσα,夜叉,夜叉
+enemy.buddhist.virudhaka,증장천,Virudhaka,Virudhaka,Virudhaka,Virudhaka,増長天,Βιρουντάκα,增长天,增長天
+enemy.buddhist.asura,아수라,Asura,Asura,Asura,Asura,阿修羅,Άσουρα,阿修罗,阿修羅
+enemy.buddhist.garuda,가루다,Garuda,Garuda,Garuda,Garuda,ガルーダ,Γκαρούντα,迦楼罗,迦樓羅
+enemy.buddhist.mara_soldier,마라 병졸,Mara Soldier,Soldat de Māra,Soldato di Māra,Soldado de Māra,魔羅の兵,Στρατιώτης Μάρα,魔罗士兵,魔羅士兵
+enemy.buddhist.vajrapani,금강역사,Vajrapani,Vajrapani,Vajrapani,Vajrapani,金剛力士,Βαγκραπάνι,金刚力士,金剛力士
+enemy.buddhist.vaisravana,다문천왕,Vaisravana,Vaisravana,Vaisravana,Vaisravana,多聞天王,Βαϊσραβάνα,多闻天王,多聞天王
+enemy.buddhist.deva_guardian,인왕역사,Deva Guardian,Gardien Deva,Guardiano Deva,Guardián Deva,仁王力士,Φρουρός Ντέβα,仁王力士,仁王力士
+enemy.buddhist.dharma_general,호법신중,Dharma Guardian,Gardien du Dharma,Guardiano del Dharma,Guardián del Dharma,護法神衆,Φρουρός Ντάρμα,护法神众,護法神眾
+enemy.buddhist.mahavairocana,대일여래,Mahavairocana,Mahavairocana,Mahavairocana,Mahavairocana,大日如来,Μαχαβαϊρόκανα,大日如来,大日如來
+enemy.buddhist.asura_king,아수라왕,Asura King,Roi Asura,Re degli Asura,Rey Asura,阿修羅王,Βασιλιάς Άσουρα,阿修罗王,阿修羅王
+enemy.buddhist.naga_king,용왕,Naga King,Roi Naga,Re Naga,Rey Naga,竜王,Βασιλιάς Νάγκα,龙王,龍王
+enemy.buddhist.agni_buddha,화신여래,Agni Buddha,Bouddha Agni,Buddha Agni,Buda Agni,火身如来,Άγκνι Βούδα,火身如来,火身如來
+enemy.buddhist.guanyin,관세음보살,Guanyin,Guanyin,Guanyin,Guanyin,観世音菩薩,Γκουανγίν,观世音菩萨,觀世音菩薩
+enemy.buddhist.yama,염라대왕,Yama,Yama,Yama,Yama,閻魔大王,Γιάμα,阎罗大王,閻羅大王
+enemy.buddhist.ksitigarbha,지장보살,Ksitigarbha,Ksitigarbha,Ksitigarbha,Ksitigarbha,地蔵菩薩,Κσιτιγκαρμπά,地藏菩萨,地藏菩薩
+enemy.buddhist.vairocana,비로자나불,Vairocana,Vairocana,Vairocana,Vairocana,毘盧遮那仏,Βαϊρόκανα,毗卢遮那佛,毘盧遮那佛
+enemy.buddhist.acalanatha,부동명왕,Acalanatha,Acalanatha,Acalanatha,Acalanatha,不動明王,Ακαλανάθα,不动明王,不動明王
+enemy.buddhist.yama.counter,공격 카드 4장마다: 최저체력 영웅에게 저주 피해,Every 4 Attack cards: Curse to lowest HP hero,Every 4 Attack cards: Curse to lowest HP hero,Every 4 Attack cards: Curse to lowest HP hero,Every 4 Attack cards: Curse to lowest HP hero,攻撃カード4枚ごとに最低HP英雄へ呪い,Κάθε 4 κάρτες Επίθεσης: Κατάρα στον ήρωα,每4张攻击牌：对最低生命值英雄造成诅咒伤害,每4張攻擊牌：對最低生命值英雄造成詛咒傷害
+enemy.daoist.hermit_ghost,시해선,Hermit Ghost,Fantôme Ermite,Fantasma Eremita,Fantasma Ermitaño,尸解仙,Ερημίτης Φάντασμα,尸解仙,尸解仙
+enemy.daoist.child_immortal,동자선,Child Immortal,Immortel Enfant,Immortale Bambino,Inmortal Niño,童子仙,Παιδί Αθάνατο,童子仙,童子仙
+enemy.daoist.celestial_soldier,천병,Celestial Soldier,Soldat Céleste,Soldato Celeste,Soldado Celestial,天兵,Ουράνιος Στρατιώτης,天兵,天兵
+enemy.daoist.mountain_spirit,산신,Mountain Spirit,Esprit de la Montagne,Spirito della Montagna,Espíritu de la Montaña,山神,Πνεύμα Βουνού,山神,山神
+enemy.daoist.dao_disciple,도사 수련생,Dao Disciple,Disciple du Tao,Discepolo del Tao,Discípulo del Tao,道士修練生,Μαθητής Τάο,道士学徒,道士學徒
+enemy.daoist.azure_guardian,청룡 호법,Azure Guardian,Gardien Azur,Guardiano Azzurro,Guardián Azur,青龍護法,Φρουρός Αζούρ,青龙护法,青龍護法
+enemy.daoist.golden_elixir,금단도사,Golden Elixir Daoist,Taoïste de l'Élixir d'Or,Taoista dell'Elisir d'Oro,Taoísta del Elixir Dorado,金丹道士,Ταοϊστής Χρυσού Ελιξιρίου,金丹道士,金丹道士
+enemy.daoist.silver_elixir,은단도사,Silver Elixir Daoist,Taoïste de l'Élixir d'Argent,Taoista dell'Elisir d'Argento,Taoísta del Elixir de Plata,銀丹道士,Ταοϊστής Αργυρού Ελιξιρίου,银丹道士,銀丹道士
+enemy.daoist.black_wind_immortal,흑풍선,Black Wind Immortal,Immortel du Vent Noir,Immortale del Vento Nero,Inmortal del Viento Negro,黒風仙,Αθάνατος Μαύρου Ανέμου,黑风仙,黑風仙
+enemy.daoist.eastern_king,동왕공,Eastern King,Roi de l'Est,Re dell'Est,Rey del Este,東王公,Βασιλιάς της Ανατολής,东王公,東王公
+enemy.daoist.crimson_immortal,적양선,Crimson Immortal,Immortel Cramoisi,Immortale Cremisi,Inmortal Carmesí,赤陽仙,Κόκκινος Αθάνατος,赤阳仙,赤陽仙
+enemy.daoist.nine_dragon,구룡선존,Nine Dragon Immortal,Immortel aux Neuf Dragons,Immortale dei Nove Draghi,Inmortal de los Nueve Dragones,九龍仙尊,Αθάνατος Εννέα Δράκων,九龙仙尊,九龍仙尊
+enemy.daoist.twin_immortals,쌍선인,Twin Immortals,Immortels Jumeaux,Immortali Gemelli,Inmortales Gemelos,双仙人,Δίδυμοι Αθάνατοι,双仙人,雙仙人
+enemy.daoist.xuanwu,진무대제,Xuanwu,Xuanwu,Xuanwu,Xuanwu,真武大帝,Σουανγού,真武大帝,真武大帝
+enemy.daoist.white_tiger,백호선군,White Tiger Immortal,Immortel du Tigre Blanc,Immortale della Tigre Bianca,Inmortal del Tigre Blanco,白虎仙君,Αθάνατη Λευκή Τίγρη,白虎仙君,白虎仙君
+enemy.daoist.vermilion_bird,주작선군,Vermilion Bird Immortal,Immortel de l'Oiseau Vermillon,Immortale dell'Uccello Vermiglio,Inmortal del Pájaro Bermellón,朱雀仙君,Αθάνατο Κόκκινο Πουλί,朱雀仙君,朱雀仙君
+enemy.daoist.black_tortoise,현무선군,Black Tortoise Immortal,Immortel de la Tortue Noire,Immortale della Tartaruga Nera,Inmortal de la Tortuga Negra,玄武仙君,Αθάνατη Μαύρη Χελώνα,玄武仙君,玄武仙君
+enemy.daoist.jade_emperor,옥황상제,Jade Emperor,Empereur de Jade,Imperatore di Giada,Emperador de Jade,玉皇上帝,Αυτοκράτωρ Νεφρίτη,玉皇上帝,玉皇上帝
+enemy.daoist.jade_emperor.counter,파워 카드 사용마다: 모든 영웅에게 약화 2 부여,Every POWER card played: Weak 2 to all heroes,Every POWER card played: Weak 2 to all heroes,Every POWER card played: Weak 2 to all heroes,Every POWER card played: Weak 2 to all heroes,パワーカード使用時：全英雄に弱体2を付与,Κάθε κάρτα ΔΥΝΑΜΗΣ: Αδύναμο 2 σε όλους,每打出一张强力牌：对所有英雄施加虚弱2,每打出一張強力牌：對所有英雄施加虛弱2
+enemy.greek.fly_harpy,소형 하르피아,Small Harpy,Petite Harpie,Piccola Arpia,Pequeña Arpía,小ハルピュイア,Μικρή Άρπυια,小哈耳庇厄,小哈耳庇厄
+enemy.greek.lamia,라미아,Lamia,Lamie,Lamia,Lamia,ラミア,Λάμια,拉弥亚,拉彌亞
+enemy.greek.stymphalian_bird,스팀팔리데스,Stymphalian Bird,Oiseau de Stymphale,Uccello Stinfalide,Pájaro Estinfálide,ステュムパーリデスの鳥,Στυμφαλίδα Όρνιθα,斯廷法利斯鸟,斯廷法利斯鳥
+enemy.greek.giant_ant,거인 개미,Giant Ant,Fourmi Géante,Formica Gigante,Hormiga Gigante,巨大アリ,Γιγάντιο Μυρμήγκι,巨型蚂蚁,巨型螞蟻
+enemy.greek.dryad,드리아드,Dryad,Dryade,Driade,Dríada,ドリュアス,Δρυάδα,树妖,樹妖
+enemy.greek.centaur,켄타우로스,Centaur,Centaure,Centauro,Centauro,ケンタウロス,Κένταυρος,半人马,半人馬
+enemy.greek.ares_soldier,아레스 병사,Ares Soldier,Soldat d'Arès,Soldato di Ares,Soldado de Ares,アレスの兵士,Στρατιώτης του Άρη,阿瑞斯士兵,阿瑞斯士兵
+enemy.greek.griffin_cub,그리핀 새끼,Griffin Cub,Jeune Griffon,Cucciolo di Grifone,Cría de Grifo,グリフィンの仔,Νεαρό Γκρίφον,幼年狮鹫,幼年獅鷲
+enemy.greek.medusid,메두사 화신,Medusid,Méduside,Medusid,Medúsida,メドゥーサの化身,Μεδουσίδα,美杜莎化身,美杜莎化身
+enemy.greek.fire_crab,헤파이스토스 불게,Fire Crab,Crabe de Feu,Granchio di Fuoco,Cangrejo de Fuego,ヘファイストスの火蟹,Πύρινο Καβούρι,火焰蟹,火焰蟹
+enemy.greek.stone_shard,석상 파편,Stone Shard,Éclat de Pierre,Frammento di Pietra,Fragmento de Piedra,石像の破片,Πέτρινο Θραύσμα,石像碎片,石像碎片
+enemy.greek.chimera_cub,키마이라 새끼,Chimera Cub,Jeune Chimère,Cucciolo di Chimera,Cría de Quimera,キマイラの仔,Νεαρή Χίμαιρα,奇美拉幼崽,奇美拉幼崽
+enemy.greek.hydra_head,히드라의 머리,Hydra Head,Tête d'Hydre,Testa di Idra,Cabeza de Hidra,ヒュドラの首,Κεφαλή Ύδρας,许德拉之首,許德拉之首
+enemy.greek.tartaros_shade,타르타로스의 망령,Tartaros Shade,Ombre du Tartare,Ombra del Tartaro,Sombra del Tártaro,タルタロスの亡霊,Σκιά του Τάρταρου,塔尔塔洛斯幽灵,塔爾塔洛斯幽靈
+enemy.norse.ice_wolf,얼음 늑대,Ice Wolf,Loup de Glace,Lupo di Ghiaccio,Lobo de Hielo,アイスウルフ,Παγωμένος Λύκος,冰狼,冰狼
+enemy.norse.raven_scout,라그나로크 까마귀,Raven Scout,Corbeau Éclaireur,Corvo Esploratore,Cuervo Explorador,レイヴンの斥候,Κόρακας Αναγνωριστικός,拉格纳洛克渡鸦,拉格納洛克渡鴉
+enemy.norse.frost_giant_pup,서리 거인 새끼,Frost Giant Pup,Jeune Géant du Givre,Cucciolo di Gigante del Gelo,Cría de Gigante de Hielo,霜の巨人の子,Νεαρός Παγωμένος Γίγαντας,霜巨人幼崽,霜巨人幼崽
+enemy.norse.bone_archer,뼈 궁수,Bone Archer,Archer d'Os,Arciere d'Ossa,Arquero de Hueso,骨の弓手,Τοξότης από Κόκαλα,骸骨弓手,骸骨弓手
+enemy.norse.dark_elf,다크 엘프,Dark Elf,Elfe Sombre,Elfo Oscuro,Elfo Oscuro,ダークエルフ,Σκοτεινός Ξωτικό,暗黑精灵,暗黑精靈
+enemy.norse.berserker,버서커,Berserker,Berserker,Berserker,Berserker,バーサーカー,Μπέρσερκερ,狂战士,狂戰士
+enemy.norse.runestone_golem,룬 골렘,Runestone Golem,Golem de Runes,Golem delle Rune,Gólem Rúnico,ルーン石のゴーレム,Ρουνικός Γκόλεμ,符文石魔像,符文石魔像
+enemy.norse.night_hag,밤 마녀,Night Hag,Sorcière de Nuit,Strega della Notte,Bruja Nocturna,夜の老婆,Νυχτερινή Μάγισσα,夜巫,夜巫
+enemy.norse.lindworm_spawn,린드웜 새끼,Lindworm Spawn,Rejeton de Lindworm,Piccolo Lindworm,Cría de Lindworm,リンドウームの子,Νεαρό Λίντβορμ,林德虫幼体,林德蟲幼體
+enemy.norse.einherjar_ghost,전사의 유령,Einherjar Ghost,Fantôme Einherjar,Fantasma Einherjar,Fantasma Einherjar,エインヘルヤルの霊,Φάντασμα Εϊνχέρι,英灵战士幽灵,英靈戰士幽靈
+enemy.norse.fenrir_pup,펜리르 강아지,Fenrir Pup,Jeune Fenrir,Cucciolo di Fenrir,Cría de Fenrir,フェンリルの仔,Νεαρό Φένρι,芬尼尔幼崽,芬尼爾幼崽
+enemy.norse.nidhogg_scale,니드호그의 비늘,Nidhogg Scale,Écaille de Nidhogg,Scaglia di Nidhogg,Escama de Nidhogg,ニードホッグの鱗,Λέπι του Νίδχεγκ,尼德霍格之鳞,尼德霍格之鱗
+enemy.norse.frost_giant,서리 거인,Frost Giant,Géant du Givre,Gigante del Gelo,Gigante de Hielo,霜の巨人,Παγωμένος Γίγαντας,霜巨人,霜巨人
+enemy.norse.ragnarok_herald,라그나로크 전령,Ragnarok Herald,Héraut du Ragnarök,Araldo del Ragnarök,Heraldo del Ragnarök,ラグナロクの使者,Κήρυκας Ραγκνάρεκ,诸神黄昏先驱,諸神黃昏先驅
+enemy.egyptian.scarab,스카라베,Scarab,Scarabée,Scarabeo,Escarabajo,スカラベ,Σκαραβαίος,圣甲虫,聖甲蟲
+enemy.egyptian.sand_wraith,모래 망령,Sand Wraith,Spectre des Sables,Spettro delle Sabbie,Espectro de Arena,砂漠の亡霊,Φάντασμα της Άμμου,沙漠幽灵,沙漠幽靈
+enemy.egyptian.sand_rat,사막 들쥐,Sand Rat,Rat des Sables,Topo delle Sabbie,Rata de Arena,砂漠のネズミ,Αρουραίος της Άμμου,沙漠鼠,沙漠鼠
+enemy.egyptian.anubis_guard,아누비스 수호병,Anubis Guard,Garde d'Anubis,Guardia di Anubi,Guardia de Anubis,アヌビスの衛兵,Φρουρός Άνουβις,阿努比斯守卫,阿努比斯守衛
+enemy.egyptian.nile_crocodile,나일 악어,Nile Crocodile,Crocodile du Nil,Coccodrillo del Nilo,Cocodrilo del Nilo,ナイル鰐,Κροκόδειλος του Νείλου,尼罗河鳄鱼,尼羅河鱷魚
+enemy.egyptian.clay_soldier,점토 병사,Clay Soldier,Soldat d'Argile,Soldato di Argilla,Soldado de Arcilla,粘土の兵士,Πήλινος Στρατιώτης,泥土士兵,泥土士兵
+enemy.egyptian.tomb_wraith,무덤 망령,Tomb Wraith,Spectre de Tombeau,Spettro della Tomba,Espectro de Tumba,墓の亡霊,Φάντασμα Τάφου,墓地幽灵,墓地幽靈
+enemy.egyptian.khopesh_warrior,코페쉬 전사,Khopesh Warrior,Guerrier Khépesh,Guerriero Khopesh,Guerrero Khopesh,コペシュの戦士,Πολεμιστής Κόπεσ,科佩什战士,科佩什戰士
+enemy.egyptian.jackal_priest,자칼 사제,Jackal Priest,Prêtre Chacal,Sacerdote Sciacallo,Sacerdote Chacal,ジャッカルの祭司,Ιερέας Τσακάλι,豺狼祭司,豺狼祭司
+enemy.egyptian.desert_ghoul,사막 구울,Desert Ghoul,Goule du Désert,Ghoul del Deserto,Ghoul del Desierto,砂漠のグール,Γκουλ της Ερήμου,沙漠食尸鬼,沙漠食屍鬼
+enemy.egyptian.sobek_spawn,소베크의 자식,Sobek Spawn,Rejeton de Sobek,Figlio di Sobek,Cría de Sobek,ソベクの子,Απόγονος Σόβεκ,索贝克之子,索貝克之子
+enemy.egyptian.ammit_cub,암밋 새끼,Ammit Cub,Jeune Ammit,Cucciolo di Ammit,Cría de Ammit,アンミットの仔,Νεαρή Άμμιτ,阿米特幼崽,阿米特幼崽
+enemy.egyptian.sphinx_adult,성체 스핑크스,Adult Sphinx,Sphinx Adulte,Sfinge Adulta,Esfinge Adulta,成体スフィンクス,Ενήλικη Σφίγγα,成年狮身人面像,成年獅身人面像
+enemy.egyptian.pyramid_golem,피라미드 골렘,Pyramid Golem,Golem de la Pyramide,Golem della Piramide,Gólem de la Pirámide,ピラミッドのゴーレム,Γκόλεμ της Πυραμίδας,金字塔魔像,金字塔魔像
+enemy.buddhist.dharma_puppet,법 꼭두각시,Dharma Puppet,Marionnette du Dharma,Burattino del Dharma,Marioneta del Dharma,ダルマ人形,Κούκλα Ντάρμα,法偶,法偶
+enemy.buddhist.lotus_spirit,연꽃 정령,Lotus Spirit,Esprit du Lotus,Spirito del Loto,Espíritu del Loto,蓮の精霊,Πνεύμα Λωτού,莲花精灵,蓮花精靈
+enemy.buddhist.hungry_ghost,아귀,Hungry Ghost,Fantôme Affamé,Fantasma Affamato,Fantasma Hambriento,餓鬼,Πεινασμένο Φάντασμα,饿鬼,餓鬼
+enemy.buddhist.naga_spawn,나가 알,Naga Spawn,Rejeton Naga,Figlio Naga,Cría Naga,ナーガの子,Απόγονος Νάγκα,那伽幼体,那伽幼體
+enemy.buddhist.demon_soldier,마군 병사,Demon Soldier,Soldat Démon,Soldato Demone,Soldado Demonio,魔軍の兵士,Δαίμονας Στρατιώτης,魔军士兵,魔軍士兵
+enemy.buddhist.karmic_fiend,업 마귀,Karmic Fiend,Démon Karmique,Demone Karmico,Demonio Kármico,業の悪鬼,Καρμικός Δαίμονας,业障恶魔,業障惡魔
+enemy.buddhist.sky_beast,천신 짐승,Sky Beast,Bête Céleste,Bestia Celeste,Bestia Celestial,天神の獣,Ουράνιο Τέρας,天神兽,天神獸
+enemy.buddhist.earth_spirit,지령,Earth Spirit,Esprit de la Terre,Spirito della Terra,Espíritu de la Tierra,地霊,Πνεύμα της Γης,地灵,地靈
+enemy.buddhist.wrathful_spirit,분노 유령,Wrathful Spirit,Esprit Courroucé,Spirito Iracondo,Espíritu Iracundo,憤怒の霊,Οργισμένο Πνεύμα,嗔怒幽灵,嗔怒幽靈
+enemy.buddhist.cursed_monk,저주 승려,Cursed Monk,Moine Maudit,Monaco Maledetto,Monje Maldito,呪われた僧,Καταραμένος Μοναχός,被诅咒的僧侣,被詛咒的僧侶
+enemy.buddhist.deva_soldier,천병,Deva Soldier,Soldat Deva,Soldato Deva,Soldado Deva,天兵,Στρατιώτης Ντέβα,天兵,天兵
+enemy.buddhist.ashura_warrior,아수라 전사,Ashura Warrior,Guerrier Ashura,Guerriero Ashura,Guerrero Ashura,阿修羅の戦士,Πολεμιστής Ασούρα,阿修罗战士,阿修羅戰士
+enemy.buddhist.mara_general,마라 대장,Mara General,Général de Mara,Generale di Mara,General de Mara,マーラの将軍,Στρατηγός Μάρα,魔罗将军,魔羅將軍
+enemy.buddhist.hell_guardian,지옥 수호자,Hell Guardian,Gardien de l'Enfer,Guardiano dell'Inferno,Guardián del Infierno,地獄の守護者,Φύλακας της Κόλασης,地狱守护者,地獄守護者
+enemy.daoist.thunder_messenger,뇌신 전령,Thunder Messenger,Messager du Tonnerre,Messaggero del Tuono,Mensajero del Trueno,雷神の使者,Αγγελιαφόρος Κεραυνού,雷神使者,雷神使者
+enemy.daoist.immortal_sprite,선신 정령,Immortal Sprite,Lutin Immortel,Spiritello Immortale,Duende Inmortal,仙神の精霊,Πνεύμα Αθάνατο,仙神精灵,仙神精靈
+enemy.daoist.cloud_beast,구름 짐승,Cloud Beast,Bête Nuage,Bestia Nuvola,Bestia Nube,雲の獣,Τέρας Σύννεφο,云兽,雲獸
+enemy.daoist.jade_puppet,옥 꼭두각시,Jade Puppet,Marionnette de Jade,Burattino di Giada,Marioneta de Jade,翡翠人形,Κούκλα Νεφρίτη,玉偶,玉偶
+enemy.daoist.river_spirit,하천 신,River Spirit,Esprit de Rivière,Spirito del Fiume,Espíritu del Río,河川の神,Πνεύμα Ποταμού,河神,河神
+enemy.daoist.elder_hermit,고령 선인,Elder Hermit,Ermite Ancien,Eremita Anziano,Ermitaño Anciano,老齢仙人,Γηραιός Ερημίτης,高龄仙人,高齡仙人
+enemy.daoist.fire_salamander,불 도롱뇽,Fire Salamander,Salamandre de Feu,Salamandra di Fuoco,Salamandra de Fuego,火の山椒魚,Φλεγόμενη Σαλαμάνδρα,火蝾螈,火蠑螈
+enemy.daoist.iron_guard,철 수호병,Iron Guard,Garde de Fer,Guardia di Ferro,Guardia de Hierro,鉄の衛兵,Σιδερένιος Φρουρός,铁卫士,鐵衛士
+enemy.daoist.wind_sprite,바람 요정,Wind Sprite,Lutin du Vent,Spiritello del Vento,Duende del Viento,風の精,Πνεύμα Ανέμου,风精灵,風精靈
+enemy.daoist.earth_dragon,지룡,Earth Dragon,Dragon de Terre,Drago della Terra,Dragón de Tierra,地龍,Δράκος της Γης,地龙,地龍
+enemy.daoist.celestial_lion,천사자,Celestial Lion,Lion Céleste,Leone Celeste,León Celestial,天の獅子,Ουράνιο Λιοντάρι,天狮,天獅
+enemy.daoist.nine_tailed_spirit,구미호 선,Nine-Tailed Spirit,Esprit à Neuf Queues,Spirito dalle Nove Code,Espíritu de Nueve Colas,九尾の霊,Πνεύμα Εννέα Ουρών,九尾仙狐,九尾仙狐
+enemy.daoist.dragon_king_child,용왕의 아들,Dragon King's Child,Enfant du Roi Dragon,Figlio del Re Drago,Hijo del Rey Dragón,龍王の子,Παιδί του Βασιλιά Δράκου,龙王之子,龍王之子
+enemy.daoist.immortal_warrior,선인 전사,Immortal Warrior,Guerrier Immortel,Guerriero Immortale,Guerrero Inmortal,仙人戦士,Αθάνατος Πολεμιστής,仙人战士,仙人戰士
+enemy.japanese.foxfire,여우불,Foxfire,Feu Follet du Renard,Fuoco di Volpe,Fuego de Zorro,狐火,Φωτιά Αλεπούς,狐火,狐火
+enemy.japanese.koropokkuru,코로포쿠루,Koropokkuru,Koropokkuru,Koropokkuru,Koropokkuru,コロポックル,Κοροπόκκουρου,科罗博克鲁,科羅博克魯
+enemy.japanese.yamabiko,야마비코,Yamabiko,Yamabiko,Yamabiko,Yamabiko,ヤマビコ,Γιαμαμπίκο,山彦,山彥
+enemy.japanese.ittan_momen,잇탄모멘,Ittan-Momen,Ittan-Momen,Ittan-Momen,Ittan-Momen,一反木綿,Ίτταν-Μόμεν,一反木棉,一反木棉
+enemy.japanese.azuki_washer,아즈키 씻는 귀신,Azuki Washer,Laveur d'Azuki,Lavatore di Azuki,Lavador de Azuki,小豆洗い,Νιφτήρας Αζούκι,红豆洗鬼,紅豆洗鬼
+enemy.japanese.samurai_ghost,사무라이 영령,Samurai Ghost,Fantôme Samouraï,Fantasma Samurai,Fantasma Samurai,武者の霊,Φάντασμα Σαμουράι,武士幽灵,武士幽靈
+enemy.japanese.river_kappa,강물 갓파,River Kappa,Kappa de Rivière,Kappa del Fiume,Kappa del Río,川の河童,Κάππα Ποταμού,河流河童,河流河童
+enemy.japanese.snow_woman,눈의 여인,Snow Woman,Femme des Neiges,Donna della Neve,Mujer de las Nieves,雪の女,Γυναίκα του Χιονιού,雪女,雪女
+enemy.japanese.cursed_scroll,저주 두루마리,Cursed Scroll,Parchemin Maudit,Pergamena Maledetta,Pergamino Maldito,呪いの巻物,Καταραμένο Κύλινδρο,诅咒卷轴,詛咒卷軸
+enemy.japanese.tatami_monster,다다미 괴물,Tatami Monster,Monstre de Tatami,Mostro di Tatami,Monstruo Tatami,畳の怪物,Τέρας Τατάμι,榻榻米怪物,榻榻米怪物
+enemy.japanese.yamabushi_ghost,야마부시 영령,Yamabushi Ghost,Fantôme Yamabushi,Fantasma Yamabushi,Fantasma Yamabushi,山伏の霊,Φάντασμα Γιαμαμπούσι,山伏幽灵,山伏幽靈
+enemy.japanese.dragon_serpent,수룡,Dragon Serpent,Dragon Serpentin,Serpente Drago,Serpiente Dragón,水龍,Δρακόφιδο,水龙,水龍
+enemy.japanese.oni_king,오니 왕,Oni King,Roi Oni,Re Oni,Rey Oni,鬼王,Βασιλιάς Ονι,鬼王,鬼王
+enemy.japanese.hannya,한냐,Hannya,Hannya,Hannya,Hannya,般若,Χάνια,般若,般若

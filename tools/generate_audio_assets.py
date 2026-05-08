@@ -181,26 +181,26 @@ BGM_PROMPTS: dict[str, dict] = {
         "frost battle, deep horns, battle percussion, ominous, nordic harsh, no vocals",
         105, "Dm"),
 
-    # ── 한국 일반 전투 ×3 ──
-    "bgm_battle_korean_1": _bgm(
-        "korean epic war battle, fierce taepyeongso, thunderous buk drums, haegeum tension, dark intense ferocious, no vocals",
+    # ── 불교 일반 전투 ×3 ──
+    "bgm_battle_buddhist_1": _bgm(
+        "buddhist temple battle, fierce dharma percussion, thunderous war gongs, dark chanting tension, intense ferocious, no vocals",
         115, "Am"),
-    "bgm_battle_korean_2": _bgm(
-        "joseon fierce battle, driving janggu percussion, daegeum war cry, dark ominous strings, relentless intense, no vocals",
+    "bgm_battle_buddhist_2": _bgm(
+        "bodhisattva wrath, driving ritual drums, dark ominous shakuhachi, relentless intense, no vocals",
         120, "Em"),
-    "bgm_battle_korean_3": _bgm(
-        "korean warring states, massive war drums ensemble, haegeum dark tension, geomungo low drones, brutal ferocious, no vocals",
+    "bgm_battle_buddhist_3": _bgm(
+        "underworld judgement, massive temple bell ensemble, dark low drone strings, brutal ferocious, no vocals",
         112, "Dm"),
 
-    # ── 중국 일반 전투 ×3 ──
-    "bgm_battle_chinese_1": _bgm(
-        "ancient chinese battle, erhu, dizi, war gongs, dragon epic, no vocals, intense",
+    # ── 도교 일반 전투 ×3 ──
+    "bgm_battle_daoist_1": _bgm(
+        "ancient daoist battle, erhu, dizi, war gongs, immortal epic, no vocals, intense",
         110, "Am"),
-    "bgm_battle_chinese_2": _bgm(
-        "chinese imperial war, pipa, suona, large drum, relentless, no vocals, driving",
+    "bgm_battle_daoist_2": _bgm(
+        "celestial court war, pipa, suona, large drum, relentless, no vocals, driving",
         118, "Em"),
-    "bgm_battle_chinese_3": _bgm(
-        "chinese epic battle, guqin, bronze bells, war percussion, modal tense, no vocals",
+    "bgm_battle_daoist_3": _bgm(
+        "daoist epic battle, guqin, bronze bells, war percussion, modal tense, no vocals",
         106, "Dm"),
 
     # ── 일본 일반 전투 ×3 ──
@@ -283,47 +283,47 @@ BGM_PROMPTS: dict[str, dict] = {
         "jormungandr ragnarok, absolute orchestral apocalypse, catastrophic brass, world-shattering percussion, ultimate overwhelming climax, no vocals",
         168, "Dm"),
 
-    # ── 한국 보스 ──
-    "bgm_boss_dangun": _bgm(
-        "korean god-king battle, grand orchestral ensemble, daegeum and taepyeongso, heroic brass, janggu war drums, divine majesty, no vocals",
+    # ── 불교 보스 ──
+    "bgm_boss_mahavairocana": _bgm(
+        "vairocana buddha battle, grand orchestral ensemble, temple bells and brass, dharma war drums, divine cosmic majesty, no vocals",
         112, "Am"),
-    "bgm_boss_dangun_p2": _bgm(
-        "dangun divine wrath, full orchestral climax, frantic daegeum ensemble, thunderous buk drums, overwhelming divine power, no vocals",
+    "bgm_boss_mahavairocana_p2": _bgm(
+        "mahavairocana divine wrath, full orchestral climax, frantic temple bell ensemble, thunderous dharma drums, overwhelming divine light, no vocals",
         155, "Am"),
-    "bgm_boss_samsin_grandma": _bgm(
-        "korean fate goddess, grand orchestral ensemble, haegeum and gayageum, mysterious strings, ominous percussion, dark mystical majesty, no vocals",
+    "bgm_boss_guanyin": _bgm(
+        "thousand-armed guanyin battle, grand orchestral ensemble, ethereal strings, ominous percussion, dark mystical majesty, no vocals",
         95, "Em"),
-    "bgm_boss_samsin_grandma_p2": _bgm(
-        "samsin grandma fate wrath, full orchestral eruption, frantic haegeum ensemble, fate percussion climax, overwhelming darkness, no vocals",
+    "bgm_boss_guanyin_p2": _bgm(
+        "guanyin divine fury, full orchestral eruption, frantic string ensemble, fate percussion climax, overwhelming compassion turned wrath, no vocals",
         148, "Em"),
-    "bgm_boss_gusamseung_halmang": _bgm(
-        "korean sea goddess boss battle, no intro, starts immediately full energy, grand orchestral gayageum haegeum, thunderous janggu drums from bar one, intense relentless, no vocals",
+    "bgm_boss_acalanatha": _bgm(
+        "acalanatha fudo myoo boss battle, no intro, starts immediately full energy, grand orchestral fire ensemble, thunderous war drums from bar one, intense relentless, no vocals",
         100, "Dm"),
-    "bgm_boss_gusamseung_halmang_p2": _bgm(
-        "sea goddess ocean fury, no intro, full energy from start, frantic gayageum orchestral storm, thunderous ocean drums immediately, overwhelming climax, no vocals",
+    "bgm_boss_acalanatha_p2": _bgm(
+        "acalanatha immovable fury, no intro, full energy from start, frantic fire orchestral storm, thunderous divine percussion immediately, overwhelming climax, no vocals",
         150, "Dm"),
-    "bgm_boss_gusamseung_halmang_p3": _bgm(
-        "sea goddess final wrath, no intro, maximum intensity from first beat, absolute orchestral tempest, catastrophic percussion ensemble, ultimate overwhelming, no vocals",
+    "bgm_boss_acalanatha_p3": _bgm(
+        "acalanatha final wrath, no intro, maximum intensity from first beat, absolute orchestral tempest, catastrophic sacred percussion ensemble, ultimate overwhelming, no vocals",
         165, "Dm"),
 
-    # ── 중국 보스 ──
-    "bgm_boss_chiyou": _bgm(
-        "chinese war god, grand orchestral ensemble, fierce erhu and dizi, war gongs and brass, battle drums, ancient warrior majesty, no vocals",
+    # ── 도교 보스 ──
+    "bgm_boss_eastern_king": _bgm(
+        "daoist sky king battle, grand orchestral ensemble, fierce erhu and dizi, celestial gongs and brass, battle drums, ancient immortal majesty, no vocals",
         118, "Am"),
-    "bgm_boss_chiyou_p2": _bgm(
-        "chiyou berserker fury, full orchestral battle, frantic erhu ensemble, thunderous gongs, overwhelming ancient war climax, no vocals",
+    "bgm_boss_eastern_king_p2": _bgm(
+        "eastern king celestial fury, full orchestral battle, frantic erhu ensemble, thunderous gongs, overwhelming celestial war climax, no vocals",
         160, "Am"),
-    "bgm_boss_erlang_shen": _bgm(
-        "chinese divine warrior, grand orchestral ensemble, dizi and pipa, heroic brass, battle drums, divine warrior majesty, no vocals",
+    "bgm_boss_xuanwu": _bgm(
+        "true warrior emperor battle, grand orchestral ensemble, dizi and pipa, heroic brass, battle drums, divine warrior majesty, no vocals",
         116, "Em"),
-    "bgm_boss_erlang_shen_p2": _bgm(
-        "erlang shen divine strike, full orchestral power, frantic dizi ensemble, thunderous percussion, overwhelming divine climax, no vocals",
+    "bgm_boss_xuanwu_p2": _bgm(
+        "xuanwu divine strike, full orchestral power, frantic dizi ensemble, thunderous percussion, overwhelming divine climax, no vocals",
         158, "Em"),
-    "bgm_boss_pangu": _bgm(
-        "world creation god, colossal full orchestra, massive brass ensemble, epic choir, ancient tympani, primal creation majesty, no vocals",
+    "bgm_boss_jade_emperor": _bgm(
+        "jade emperor heavenly court, colossal full orchestra, massive brass ensemble, celestial choir, ancient tympani, sovereign cosmic majesty, no vocals",
         95, "Dm"),
-    "bgm_boss_pangu_p2": _bgm(
-        "pangu world-splitting fury, full orchestral eruption, thunderous brass ensemble, colossal percussion, overwhelming creation climax, no vocals",
+    "bgm_boss_jade_emperor_p2": _bgm(
+        "jade emperor divine decree, full orchestral eruption, thunderous brass ensemble, colossal heavenly percussion, overwhelming cosmic climax, no vocals",
         148, "Dm"),
     "bgm_boss_pangu_p3": _bgm(
         "pangu absolute creation, catastrophic orchestral power, world-shattering brass ensemble, ultimate percussion climax, no vocals",

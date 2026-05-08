@@ -1,12 +1,11 @@
-﻿# resources/enemies/chinese/chinese_act1.gd
-# 중국 신화 Act 1 — 엘리트 3종(금각·은각·흑풍괴) + 보스(치우)
+# resources/enemies/daoist/daoist_act1.gd
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
-static func golden_horn_king(scene: PackedScene) -> Resource:
+static func golden_elixir(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.golden_horn_king"; e.max_hp = 1600; e.character_scene = scene
-	e.mythology = "chinese"
+	e.enemy_name = "enemy.daoist.golden_elixir"; e.max_hp = 1600; e.character_scene = scene
+	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 40; i1.status_type = "block"
 	var i2 := IntentRes.new()
@@ -25,10 +24,10 @@ static func golden_horn_king(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func silver_horn_king(scene: PackedScene) -> Resource:
+static func silver_elixir(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.silver_horn_king"; e.max_hp = 1700; e.character_scene = scene
-	e.mythology = "chinese"
+	e.enemy_name = "enemy.daoist.silver_elixir"; e.max_hp = 1700; e.character_scene = scene
+	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"
 	i1.target = IntentRes.TargetType.ALL
@@ -42,10 +41,10 @@ static func silver_horn_king(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func black_wind_demon(scene: PackedScene) -> Resource:
+static func black_wind_immortal(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.black_wind_demon"; e.max_hp = 1800; e.character_scene = scene
-	e.mythology = "chinese"
+	e.enemy_name = "enemy.daoist.black_wind_immortal"; e.max_hp = 1800; e.character_scene = scene
+	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"
 	i1.target = IntentRes.TargetType.RANDOM
@@ -62,12 +61,11 @@ static func black_wind_demon(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func chiyou(scene: PackedScene) -> Resource:
+static func eastern_king(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.chinese.chiyou"; e.max_hp = 4500; e.character_scene = scene
-	e.mythology = "chinese"; e.grade = EnemyRes.Grade.BOSS
+	e.enemy_name = "enemy.daoist.eastern_king"; e.max_hp = 4500; e.character_scene = scene
+	e.mythology = "daoist"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
-	# Phase 0 — 청동 창
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 160; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "blunt"
 	var p0i2 := IntentRes.new()
@@ -76,7 +74,6 @@ static func chiyou(scene: PackedScene) -> Resource:
 	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 130; p0i3.target = IntentRes.TargetType.ALL; p0i3.damage_type = "blunt"
 	var p0i4 := IntentRes.new()
 	p0i4.action_type = IntentRes.ActionType.BUFF; p0i4.value = 1; p0i4.status_type = "strength"
-	# Phase 1 — 혈철 도끼
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "blunt"
 	var p1i2 := IntentRes.new()
@@ -88,7 +85,6 @@ static func chiyou(scene: PackedScene) -> Resource:
 	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 180; p1i4.target = IntentRes.TargetType.RANDOM; p1i4.damage_type = "blunt"
 	var p1i5 := IntentRes.new()
 	p1i5.action_type = IntentRes.ActionType.BUFF; p1i5.value = 2; p1i5.status_type = "strength"
-	# Phase 2 — 천계 혈창
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 240; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "blunt"
 	var p2i2 := IntentRes.new()
@@ -108,7 +104,7 @@ static func chiyou(scene: PackedScene) -> Resource:
 	return e
 
 static func elites() -> Array:
-	return ["golden_horn_king", "silver_horn_king", "black_wind_demon"]
+	return ["golden_elixir", "silver_elixir", "black_wind_immortal"]
 
 static func boss() -> String:
-	return "chiyou"
+	return "eastern_king"
