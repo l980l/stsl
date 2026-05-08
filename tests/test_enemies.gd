@@ -111,8 +111,10 @@ func test_harpy_pattern_length() -> void:
 	print("[TestEnemies] test_harpy_pattern_length")
 	var gm := _make_gm()
 	var harpy: Resource = GreekNormals.harpy(_make_dummy_scene())
-	_assert(harpy.intent_pattern.size() == 5, "하르피아 패턴 5개")
-	_assert(harpy.enemy_name == "하르피아", "하르피아 이름")
+	# T0-CHARGE 적용: ATK → PREPARE → big ATK LOWEST_HP → SPECIAL remove_card (4종)
+	_assert(harpy.intent_pattern.size() == 4, "하르피아 패턴 4개 (T0-CHARGE)")
+	_assert(harpy.intent_pattern[1].action_type == IntentRes.ActionType.PREPARE, "두 번째 의도 = PREPARE (차징)")
+	_assert(harpy.intent_pattern[3].status_type == "remove_card", "네 번째 의도 = SPECIAL remove_card (정체성 보존)")
 	_assert(harpy.max_hp == 280, "하르피아 HP = 280")
 
 func test_cyclops_first_intent_is_buff() -> void:

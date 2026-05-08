@@ -1077,6 +1077,18 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				if target_id != "":
 					_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
+			_execute_special(enemy_index, intent)
+		IntentRes.ActionType.PREPARE:
+			pass  # 준비 턴 — 아무 효과 없음
+
+# SPECIAL 액션 분기 — status_type 으로 변종 식별.
+# 하위 호환: IntentResource.status_type 기본값 "weak"는 DEBUFF용으로, SPECIAL에선 미설정과 동일 취급 → remove_card.
+func _execute_special(_enemy_index: int, intent: Resource) -> void:
+	var variant: String = intent.status_type
+	if variant == "" or variant == "weak":
+		variant = "remove_card"
+	match variant:
+		"remove_card":
 			# 플레이어 덱에서 카드 영구 제거 (손패가 아닌 전체 덱 기준)
 			if deck_mgr:
 				var full: Array = deck_mgr.get_full_deck()
@@ -1086,8 +1098,8 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 					var idx: int = randi() % full.size()
 					deck_mgr.remove_from_deck(full[idx])
 					full.remove_at(idx)
-		IntentRes.ActionType.PREPARE:
-			pass  # 준비 턴 — 아무 효과 없음
+		_:
+			push_warning("[battle_manager] 알 수 없는 SPECIAL variant: %s" % variant)
 
 func _get_taunting_heroes() -> Array:
 	var result: Array = []
@@ -1290,6 +1302,11 @@ func _check_phase_transition(enemy_index: int) -> void:
 			if heal_ratio > 0.0:
 				_enemy_hp[enemy_index] = int(enemy.max_hp * heal_ratio)
 				enemy_damaged.emit(enemy_index, _enemy_hp[enemy_index], "")
+		# Phase 전환 시 자동 status 부여 (광폭화·디스트레스 등)
+		if enemy.get("phase_buffs") != null and current_phase < enemy.phase_buffs.size():
+			var buffs: Array = enemy.phase_buffs[current_phase]
+			for buff in buffs:
+				_apply_status_to_enemy(enemy_index, buff.get("status", ""), int(buff.get("value", 0)))
 
 
 func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:

@@ -54,20 +54,19 @@ static func snake(scene: PackedScene) -> Resource:
 	return e
 
 static func harpy(scene: PackedScene) -> Resource:
+	# T0-CHARGE: 평타 → PREPARE → LOWEST_HP 대상 큰 한 방. 카드 약탈은 보존(remove_card SPECIAL).
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.harpy"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 45; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 45; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.PREPARE; i2.value = 0
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 45; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 45; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "slash"
-	var i5 := IntentRes.new()
-	i5.action_type = IntentRes.ActionType.SPECIAL; i5.value = 0
-	e.intent_pattern = [i1, i2, i3, i4, i5]
+	i4.action_type = IntentRes.ActionType.SPECIAL; i4.value = 1; i4.status_type = "remove_card"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func cyclops(scene: PackedScene) -> Resource:
@@ -103,58 +102,77 @@ static func cerberus(scene: PackedScene) -> Resource:
 # ──── 신규 14종 ────
 
 static func lamia(scene: PackedScene) -> Resource:
+	# T0-DEBUFF누적: vulnerable 2회 적층 → poison 큰 한 방 (LOWEST_HP)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.lamia"; e.max_hp = 290; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "vulnerable"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 60; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "poison"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "vulnerable"; i3.target = IntentRes.TargetType.RANDOM
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 100; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "poison"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func stymphalian_bird(scene: PackedScene) -> Resource:
+	# T0-RAMP: 매 사이클 strength +1 누적 → 후반에 점점 더 위협적
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.stymphalian_bird"; e.max_hp = 290; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 55; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 1; i2.status_type = "weak"; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 50; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 55; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "weak"; i3.target = IntentRes.TargetType.RANDOM
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 50; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "slash"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func giant_ant(scene: PackedScene) -> Resource:
+	# T0-CHARGE: PREPARE 한 턴 → ALL 큰 한 방. 텔레그래프 분명한 위협
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.giant_ant"; e.max_hp = 310; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 55; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 1; i2.status_type = "strength"
+	i2.action_type = IntentRes.ActionType.PREPARE; i2.value = 0
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 80; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 100; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
 static func dryad(scene: PackedScene) -> Resource:
+	# T1-PHASE: HP 50% 미만에서 광기 페이즈 — 패턴 풀 완전 교체 + ALL 공격 위주
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.dryad"; e.max_hp = 270; e.character_scene = scene
 	e.mythology = "greek"
-	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "vulnerable"; i1.target = IntentRes.TargetType.RANDOM
-	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 50; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "curse"
-	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "weak"; i3.target = IntentRes.TargetType.RANDOM
-	e.intent_pattern = [i1, i2, i3]
+	# 페이즈 0 (정상): 디버프 + 약한 curse 단일
+	var p0i1 := IntentRes.new()
+	p0i1.action_type = IntentRes.ActionType.DEBUFF; p0i1.value = 1; p0i1.status_type = "vulnerable"; p0i1.target = IntentRes.TargetType.RANDOM
+	var p0i2 := IntentRes.new()
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 50; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "curse"
+	var p0i3 := IntentRes.new()
+	p0i3.action_type = IntentRes.ActionType.DEBUFF; p0i3.value = 2; p0i3.status_type = "weak"; p0i3.target = IntentRes.TargetType.RANDOM
+	# 페이즈 1 (광기): ALL 공격 + 디버프 누적 가속
+	var p1i1 := IntentRes.new()
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 70; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "curse"
+	var p1i2 := IntentRes.new()
+	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 2; p1i2.status_type = "vulnerable"; p1i2.target = IntentRes.TargetType.ALL
+	var p1i3 := IntentRes.new()
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 65; p1i3.target = IntentRes.TargetType.RANDOM; p1i3.damage_type = "curse"
+	e.phase_thresholds = [0.5]
+	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i2, p1i3]]
+	e.intent_pattern = e.phase_patterns[0]
 	return e
 
 static func centaur(scene: PackedScene) -> Resource:
+	# T1-DESPERATE: HP 30% 미만 도달 시 마지막 항전 — strength +2 자동 (광폭화보다 늦게 발동)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.centaur"; e.max_hp = 400; e.character_scene = scene
 	e.mythology = "greek"
@@ -165,9 +183,12 @@ static func centaur(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 110; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.3]
+	e.phase_buffs = [[{"status": "strength", "value": 2}]]
 	return e
 
 static func ares_soldier(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 도달 시 strength +3 자동 (광폭화). 패턴은 그대로.
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.ares_soldier"; e.max_hp = 380; e.character_scene = scene
 	e.mythology = "greek"
@@ -178,6 +199,8 @@ static func ares_soldier(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 100; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
 static func griffin_cub(scene: PackedScene) -> Resource:
