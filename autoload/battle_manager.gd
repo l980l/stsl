@@ -38,6 +38,9 @@ var debug_hero_invincible: bool = false
 # 전투 통계 (보상 씬에서 TALLY 표시용)
 var turn_count: int = 0
 var damage_taken_this_battle: int = 0
+# T3-MIMIC: 플레이어 턴 동안 적에게 가한 누적 데미지 — start_player_turn에서 리셋, MIMIC 인텐트가 비율로 반사
+var _player_damage_this_turn: int = 0
+var _in_player_turn: bool = false  # MIMIC 트래커 게이트
 
 # 영웅 상태 (HP는 TeamManager가 관리)
 var _hero_block: Dictionary = {}
@@ -121,6 +124,8 @@ func start_player_turn() -> void:
 	if not is_battle_active:
 		return
 	turn_count += 1
+	_player_damage_this_turn = 0  # T3-MIMIC 트래커 리셋
+	_in_player_turn = true
 	var pre_did: bool = _phase_player_pre()
 	if pre_did and turn_interval > 0.0:
 		await get_tree().create_timer(turn_interval).timeout
@@ -854,6 +859,9 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	amount -= absorbed
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - amount)
 	enemy_damaged.emit(enemy_index, amount, damage_type)
+	# T3-MIMIC: 플레이어 턴 동안 가한 데미지 누적 (MIMIC 인텐트가 비율로 반사)
+	if amount > 0 and _in_player_turn:
+		_player_damage_this_turn += amount
 	# T3-COUNTER: counter_ratio 설정된 적은 받은 데미지의 N% counter_pool에 누적
 	if amount > 0:
 		var counter_ratio: float = _enemy_status[enemy_index].get("counter_ratio", 0.0)
@@ -998,6 +1006,7 @@ func _phase_enemy_pre() -> bool:
 	return false
 
 func _phase_enemy_main() -> void:
+	_in_player_turn = false  # MIMIC 트래커 게이트 종료
 	enemy_turn_started.emit()
 	var first: bool = true
 	for i in range(_enemies.size()):
@@ -1172,6 +1181,14 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 						var spawned: Resource = module.call(factory_name, null)
 						if spawned != null:
 							_add_enemy_to_battle(spawned)
+		IntentRes.ActionType.MIMIC:
+			# T3-MIMIC: 이전 플레이어 턴 누적 데미지의 N% 반사 (intent.value = 퍼센트, 50 = 50%)
+			var ratio: float = float(intent.value) / 100.0
+			var dmg: int = int(_player_damage_this_turn * ratio)
+			if dmg > 0:
+				var target_id: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
+				if target_id != "":
+					_deal_damage_to_hero(target_id, dmg, intent.damage_type)
 
 # T3-SUMMON: 런타임에 적 1마리를 전투에 추가. 모든 _enemy_* 배열 동기화 + 시그널 발화.
 func _add_enemy_to_battle(enemy: Resource) -> void:

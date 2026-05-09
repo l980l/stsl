@@ -799,6 +799,7 @@ func _connect_signals() -> void:
 	BattleManager.enemy_counter_changed.connect(_on_enemy_counter_changed)
 	BattleManager.card_pick_requested.connect(_on_card_pick_requested)
 	BattleManager.boss_phase_changed.connect(_on_boss_phase_changed)
+	BattleManager.enemy_spawned.connect(_on_enemy_spawned)
 
 var _bgm_boss_id: String = ""
 
@@ -816,6 +817,37 @@ func _play_battle_bgm() -> void:
 func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
 	if new_phase >= 1 and not _bgm_boss_id.is_empty():
 		AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, new_phase)
+
+# T3-SUMMON: 런타임에 spawn된 적의 UI 패널 + 캐릭터 노드 추가
+func _on_enemy_spawned(enemy_index: int) -> void:
+	var enemy: Resource = BattleManager.get_enemy(enemy_index)
+	if enemy == null:
+		return
+	var total: int = enemy_index + 1  # 신규 적 포함 총 슬롯 수
+	var entry: Dictionary = _make_enemy_slot(enemy_index, total)
+	_enemy_nodes.append(entry)
+	_enemy_char_nodes.append(null)
+	_enemy_status_containers.append(entry["status_box"])
+	entry["panel"].visible = true
+	entry["btn"].visible = true
+	entry["btn"].disabled = false
+	entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
+	var slot_pos: Vector2 = _enemy_slot_pos(enemy_index, total)
+	if enemy.character_scene != null:
+		var char_node = enemy.character_scene.instantiate()
+		char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
+		char_node.scale = Vector2(-1.44, 2.4)
+		add_child(char_node)
+		_enemy_char_nodes[enemy_index] = char_node
+	else:
+		var placeholder := ColorRect.new()
+		placeholder.color = Color(0.45, 0.45, 0.5, 0.6)
+		placeholder.size = Vector2(60, 120)
+		placeholder.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 30, slot_pos.y + 40)
+		add_child(placeholder)
+		_enemy_char_nodes[enemy_index] = placeholder
+	_update_enemy_ui(enemy_index)
+	_refresh_enemy_counter(enemy_index)
 
 # ─────────────────────────────────────────────
 # 배틀 초기화
@@ -1087,6 +1119,24 @@ func _update_enemy_ui(index: int) -> void:
 				entry["intent_lbl"].text = tr("battle.intent.debuff")
 			IntentRes.ActionType.PREPARE:
 				entry["intent_lbl"].text = tr("battle.intent.prepare")
+			IntentRes.ActionType.HEAL_ALLY:
+				entry["intent_lbl"].text = _trf("battle.intent.heal_ally", intent.value)
+			IntentRes.ActionType.BUFF_ALLY:
+				entry["intent_lbl"].text = _trf("battle.intent.buff_ally", intent.value)
+			IntentRes.ActionType.COUNTER_PREPARE:
+				entry["intent_lbl"].text = _trf("battle.intent.counter_prepare", intent.value)
+			IntentRes.ActionType.MARK_TARGET:
+				entry["intent_lbl"].text = tr("battle.intent.mark_target")
+			IntentRes.ActionType.SACRIFICE:
+				entry["intent_lbl"].text = _trf("battle.intent.sacrifice", intent.value)
+			IntentRes.ActionType.WARD:
+				entry["intent_lbl"].text = _trf("battle.intent.ward", intent.value)
+			IntentRes.ActionType.SUMMON:
+				entry["intent_lbl"].text = _trf("battle.intent.summon", max(1, intent.value))
+			IntentRes.ActionType.MIMIC:
+				entry["intent_lbl"].text = _trf("battle.intent.mimic", intent.value)
+			IntentRes.ActionType.SPECIAL:
+				entry["intent_lbl"].text = tr("battle.intent.special")
 			_:
 				entry["intent_lbl"].text = "?"
 

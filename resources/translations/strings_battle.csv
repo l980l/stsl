@@ -15,6 +15,15 @@ battle.intent.buff.block,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,�
 battle.intent.debuff,👿 디버프,👿 Debuff,👿 Débuff,👿 Debuff,👿 Debuff,👿 デバフ,👿 Εξασθένηση,👿 减益,👿 减益
 battle.intent.prepare,⏳ 준비 중,⏳ Preparing,⏳ Préparation,⏳ Preparazione,⏳ Preparando,⏳ 準備中,⏳ Προετοιμασία,⏳ 准备中,⏳ 准备中
 battle.intent.dead,💀 사망,💀 Dead,💀 Mort,💀 Morto,💀 Muerto,💀 死亡,💀 Νεκρός,💀 死亡,💀 死亡
+battle.intent.heal_ally,💚 동료 회복 +%d,💚 Heal Ally +%d,💚 Soin allié +%d,💚 Cura alleato +%d,💚 Curar aliado +%d,💚 仲間回復 +%d,💚 Θεραπεία +%d,💚 治疗盟友 +%d,💚 治療盟友 +%d
+battle.intent.buff_ally,✨ 동료 강화 +%d,✨ Buff Ally +%d,✨ Renforcer allié +%d,✨ Buff alleato +%d,✨ Reforzar aliado +%d,✨ 仲間強化 +%d,✨ Ενίσχυση +%d,✨ 强化盟友 +%d,✨ 強化盟友 +%d
+battle.intent.counter_prepare,🔄 반격 준비 %d%%,🔄 Counter %d%%,🔄 Contre-attaque %d%%,🔄 Contrattacco %d%%,🔄 Contraataque %d%%,🔄 反撃準備 %d%%,🔄 Αντεπίθεση %d%%,🔄 准备反击 %d%%,🔄 準備反擊 %d%%
+battle.intent.mark_target,🎯 표적 마킹,🎯 Mark Target,🎯 Marquage,🎯 Marca bersaglio,🎯 Marcar objetivo,🎯 標的指定,🎯 Σημάδι,🎯 标记目标,🎯 標記目標
+battle.intent.sacrifice,🩸 자해 강화 +%d,🩸 Sacrifice +%d,🩸 Sacrifice +%d,🩸 Sacrificio +%d,🩸 Sacrificio +%d,🩸 自傷強化 +%d,🩸 Θυσία +%d,🩸 自损强化 +%d,🩸 自損強化 +%d
+battle.intent.ward,🛡 결계 %d턴,🛡 Ward %dT,🛡 Bouclier %dT,🛡 Schermo %dT,🛡 Escudo %dT,🛡 結界 %dT,🛡 Φύλακας %dΣ,🛡 结界 %d回,🛡 結界 %d回
+battle.intent.summon,🐾 소환 ×%d,🐾 Summon ×%d,🐾 Invocation ×%d,🐾 Evoca ×%d,🐾 Invocar ×%d,🐾 召喚 ×%d,🐾 Επίκληση ×%d,🐾 召唤 ×%d,🐾 召喚 ×%d
+battle.intent.mimic,🪞 메아리 %d%%,🪞 Mimic %d%%,🪞 Mimétisme %d%%,🪞 Mimica %d%%,🪞 Imitar %d%%,🪞 模倣 %d%%,🪞 Μίμηση %d%%,🪞 模仿 %d%%,🪞 模仿 %d%%
+battle.intent.special,❓ 특수,❓ Special,❓ Spécial,❓ Speciale,❓ Especial,❓ 特殊,❓ Ειδικό,❓ 特殊,❓ 特殊
 battle.target.ally,아군,Ally,Allié,Alleato,Aliado,味方,Σύμμαχος,队友,队友
 battle.target.all_ally,아군 전체,All Allies,Tous les alliés,Tutti gli Alleati,Todos los Aliados,全味方,Όλοι οι Σύμμαχοι,全队友,全队友
 battle.target.lowest_hp_ally,최저 HP 아군,Lowest HP Ally,Allié HP le plus bas,Alleato HP più basso,Aliado con HP más bajo,最低HP味方,Σύμμαχος με Χαμηλότερο HP,最低HP队友,最低HP队友

@@ -129,14 +129,14 @@ static func koropokkuru(scene: PackedScene) -> Resource:
 	return e
 
 static func yamabiko(scene: PackedScene) -> Resource:
-	# DEATH-RATTLE: 죽을 때 ALL weak +1 (산울림의 마지막 메아리)
+	# T3-MIMIC + DEATH-RATTLE: 산울림 — 이전 턴 플레이어 데미지의 50% 메아리. 죽을 때 ALL weak +1.
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.yamabiko"; e.max_hp = 300; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 65; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "curse"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "curse"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 65; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "curse"
+	i2.action_type = IntentRes.ActionType.MIMIC; i2.value = 50; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "curse"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "weak"; i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]
