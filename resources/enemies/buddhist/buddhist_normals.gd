@@ -8,7 +8,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 static func garuda(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.garuda"; e.max_hp = 280; e.character_scene = scene
-	e.mythology = "buddhist"
+	e.mythology = "buddhist"; e.signatures_enabled = false  # 인카운터 #1
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
@@ -19,7 +19,7 @@ static func garuda(scene: PackedScene) -> Resource:
 static func yaksha(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.yaksha"; e.max_hp = 320; e.character_scene = scene
-	e.mythology = "buddhist"
+	e.mythology = "buddhist"; e.signatures_enabled = false  # 인카운터 #2
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.LOWEST_HP; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
@@ -32,7 +32,7 @@ static func yaksha(scene: PackedScene) -> Resource:
 static func mara_soldier(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.mara_soldier"; e.max_hp = 350; e.character_scene = scene
-	e.mythology = "buddhist"
+	e.mythology = "buddhist"; e.signatures_enabled = false  # 인카운터 #3
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "vulnerable"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
@@ -58,17 +58,18 @@ static func asura(scene: PackedScene) -> Resource:
 	return e
 
 static func virudhaka(scene: PackedScene) -> Resource:
+	# T2-GUARD: 매 사이클 동료에게 block 부여 + 자기 block (사천왕 광목천)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.virudhaka"; e.max_hp = 450; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 40; i1.status_type = "block"
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 30; i1.status_type = "block"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
+	i2.action_type = IntentRes.ActionType.BUFF_ALLY; i2.value = 20; i2.status_type = "block"; i2.target = IntentRes.TargetType.LOWEST_HP
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 100; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 20; i4.status_type = "block"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
@@ -140,6 +141,7 @@ static func naga_spawn(scene: PackedScene) -> Resource:
 	return e
 
 static func demon_soldier(scene: PackedScene) -> Resource:
+	# T1-DESPERATE: HP 30% 미만 strength +2
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.demon_soldier"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "buddhist"
@@ -150,9 +152,12 @@ static func demon_soldier(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.3]
+	e.phase_buffs = [[{"status": "strength", "value": 2}]]
 	return e
 
 static func karmic_fiend(scene: PackedScene) -> Resource:
+	# T2-DEATH-RATTLE: 죽을 때 업의 저주 — ALL vulnerable +2
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.karmic_fiend"; e.max_hp = 370; e.character_scene = scene
 	e.mythology = "buddhist"
@@ -163,18 +168,22 @@ static func karmic_fiend(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 2; dt.status_type = "vulnerable"; dt.target = IntentRes.TargetType.ALL
+	e.death_trigger = dt
 	return e
 
 static func sky_beast(scene: PackedScene) -> Resource:
+	# T2-BUFFER: 매 사이클 동료 strength +1 부여
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.sky_beast"; e.max_hp = 330; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.BUFF_ALLY; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 80; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
@@ -192,16 +201,25 @@ static func earth_spirit(scene: PackedScene) -> Resource:
 	return e
 
 static func wrathful_spirit(scene: PackedScene) -> Resource:
+	# T1-PHASE: HP 50% 미만 → 분노 페이즈 (ALL curse)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.wrathful_spirit"; e.max_hp = 310; e.character_scene = scene
 	e.mythology = "buddhist"
-	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 75; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "curse"
-	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 1; i2.status_type = "weak"; i2.target = IntentRes.TargetType.RANDOM
-	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
-	e.intent_pattern = [i1, i2, i3]
+	var p0i1 := IntentRes.new()
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 75; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "curse"
+	var p0i2 := IntentRes.new()
+	p0i2.action_type = IntentRes.ActionType.DEBUFF; p0i2.value = 1; p0i2.status_type = "weak"; p0i2.target = IntentRes.TargetType.RANDOM
+	var p0i3 := IntentRes.new()
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 90; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "curse"
+	var p1i1 := IntentRes.new()
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 80; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "curse"
+	var p1i2 := IntentRes.new()
+	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 2; p1i2.status_type = "weak"; p1i2.target = IntentRes.TargetType.ALL
+	var p1i3 := IntentRes.new()
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 80; p1i3.target = IntentRes.TargetType.RANDOM; p1i3.damage_type = "curse"
+	e.phase_thresholds = [0.5]
+	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i2, p1i3]]
+	e.intent_pattern = e.phase_patterns[0]
 	return e
 
 static func cursed_monk(scene: PackedScene) -> Resource:

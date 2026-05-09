@@ -8,7 +8,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 static func yuki_onna(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.yuki_onna"; e.max_hp = 300; e.character_scene = scene
-	e.mythology = "japanese"
+	e.mythology = "japanese"; e.signatures_enabled = false  # 인카운터 #1
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"; i1.target = IntentRes.TargetType.ALL
 	var i2 := IntentRes.new()
@@ -21,7 +21,7 @@ static func yuki_onna(scene: PackedScene) -> Resource:
 static func tengu(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.tengu"; e.max_hp = 320; e.character_scene = scene
-	e.mythology = "japanese"
+	e.mythology = "japanese"; e.signatures_enabled = false  # 인카운터 #2
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "weak"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
@@ -36,7 +36,7 @@ static func tengu(scene: PackedScene) -> Resource:
 static func shuten_minion(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.shuten_minion"; e.max_hp = 350; e.character_scene = scene
-	e.mythology = "japanese"
+	e.mythology = "japanese"; e.signatures_enabled = false  # 인카운터 #3
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
 	var i2 := IntentRes.new()
@@ -49,21 +49,23 @@ static func shuten_minion(scene: PackedScene) -> Resource:
 	return e
 
 static func kappa(scene: PackedScene) -> Resource:
+	# T0-DEBUFF누적: weak 2회 적층 → 큰 한 방
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.kappa"; e.max_hp = 380; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 30; i1.status_type = "block"
+	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "weak"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "weak"; i3.target = IntentRes.TargetType.RANDOM
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.DEBUFF; i4.value = 1; i4.status_type = "weak"; i4.target = IntentRes.TargetType.ALL
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 110; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func oni(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 strength +4 (오니의 본성)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.oni"; e.max_hp = 420; e.character_scene = scene
 	e.mythology = "japanese"
@@ -74,6 +76,8 @@ static func oni(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 110; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 4}]]
 	return e
 
 static func ronin_ghost(scene: PackedScene) -> Resource:
@@ -196,29 +200,42 @@ static func snow_woman(scene: PackedScene) -> Resource:
 	return e
 
 static func cursed_scroll(scene: PackedScene) -> Resource:
+	# T2-DEATH-RATTLE: 죽을 때 저주 두루마리 폭발 — ALL vulnerable +2
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.cursed_scroll"; e.max_hp = 270; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.SPECIAL; i1.value = 1
+	i1.action_type = IntentRes.ActionType.SPECIAL; i1.value = 1; i1.status_type = "remove_card"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 65; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "curse"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 65; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 2; dt.status_type = "vulnerable"; dt.target = IntentRes.TargetType.ALL
+	e.death_trigger = dt
 	return e
 
 static func tatami_monster(scene: PackedScene) -> Resource:
+	# T1-PHASE: HP 50% 미만 → 폭주 페이즈 (block 포기, ALL 공격)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.tatami_monster"; e.max_hp = 330; e.character_scene = scene
 	e.mythology = "japanese"
-	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 30; i1.status_type = "block"
-	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
-	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 95; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
-	e.intent_pattern = [i1, i2, i3]
+	var p0i1 := IntentRes.new()
+	p0i1.action_type = IntentRes.ActionType.BUFF; p0i1.value = 30; p0i1.status_type = "block"
+	var p0i2 := IntentRes.new()
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 80; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "blunt"
+	var p0i3 := IntentRes.new()
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 95; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "blunt"
+	var p1i1 := IntentRes.new()
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 70; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "blunt"
+	var p1i2 := IntentRes.new()
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 110; p1i2.target = IntentRes.TargetType.LOWEST_HP; p1i2.damage_type = "blunt"
+	var p1i3 := IntentRes.new()
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 90; p1i3.target = IntentRes.TargetType.RANDOM; p1i3.damage_type = "blunt"
+	e.phase_thresholds = [0.5]
+	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i2, p1i3]]
+	e.intent_pattern = e.phase_patterns[0]
 	return e
 
 static func yamabushi_ghost(scene: PackedScene) -> Resource:
@@ -237,6 +254,7 @@ static func yamabushi_ghost(scene: PackedScene) -> Resource:
 	return e
 
 static func dragon_serpent(scene: PackedScene) -> Resource:
+	# T1-DESPERATE: HP 30% 미만 strength +3 (용뱀의 마지막 항전)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.dragon_serpent"; e.max_hp = 440; e.character_scene = scene
 	e.mythology = "japanese"
@@ -247,6 +265,8 @@ static func dragon_serpent(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 100; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.3]
+	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
 static func oni_king(scene: PackedScene) -> Resource:

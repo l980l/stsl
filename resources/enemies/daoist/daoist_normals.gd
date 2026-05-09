@@ -8,7 +8,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 static func child_immortal(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.child_immortal"; e.max_hp = 280; e.character_scene = scene
-	e.mythology = "daoist"
+	e.mythology = "daoist"; e.signatures_enabled = false  # 인카운터 #1
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
@@ -21,7 +21,7 @@ static func child_immortal(scene: PackedScene) -> Resource:
 static func dao_disciple(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.dao_disciple"; e.max_hp = 300; e.character_scene = scene
-	e.mythology = "daoist"
+	e.mythology = "daoist"; e.signatures_enabled = false  # 인카운터 #2
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
@@ -36,7 +36,7 @@ static func dao_disciple(scene: PackedScene) -> Resource:
 static func hermit_ghost(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.hermit_ghost"; e.max_hp = 340; e.character_scene = scene
-	e.mythology = "daoist"
+	e.mythology = "daoist"; e.signatures_enabled = false  # 인카운터 #3
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
@@ -47,6 +47,7 @@ static func hermit_ghost(scene: PackedScene) -> Resource:
 	return e
 
 static func mountain_spirit(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 strength +2 (산신령의 분노)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.mountain_spirit"; e.max_hp = 380; e.character_scene = scene
 	e.mythology = "daoist"
@@ -59,6 +60,8 @@ static func mountain_spirit(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.DEBUFF; i4.value = 1; i4.status_type = "vulnerable"; i4.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [i1, i2, i3, i4]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 2}]]
 	return e
 
 static func celestial_soldier(scene: PackedScene) -> Resource:
@@ -118,6 +121,7 @@ static func immortal_sprite(scene: PackedScene) -> Resource:
 	return e
 
 static func cloud_beast(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 strength +3 (구름 짐승의 광기)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.cloud_beast"; e.max_hp = 310; e.character_scene = scene
 	e.mythology = "daoist"
@@ -128,6 +132,8 @@ static func cloud_beast(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 75; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
 static func jade_puppet(scene: PackedScene) -> Resource:
@@ -157,15 +163,16 @@ static func river_spirit(scene: PackedScene) -> Resource:
 	return e
 
 static func elder_hermit(scene: PackedScene) -> Resource:
+	# T2-HEALER: 매 사이클 LOWEST_HP 동료 HP +25 회복 (도사 장로)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.elder_hermit"; e.max_hp = 390; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.HEAL_ALLY; i1.value = 25; i1.target = IntentRes.TargetType.LOWEST_HP
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 95; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 95; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 80; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
@@ -185,13 +192,14 @@ static func fire_salamander(scene: PackedScene) -> Resource:
 	return e
 
 static func iron_guard(scene: PackedScene) -> Resource:
+	# T2-GUARD: 매 사이클 동료에게 block 부여 + 자기 block (철위 수호)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.iron_guard"; e.max_hp = 350; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 40; i1.status_type = "block"
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 30; i1.status_type = "block"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 90; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.BUFF_ALLY; i2.value = 20; i2.status_type = "block"; i2.target = IntentRes.TargetType.LOWEST_HP
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
@@ -237,6 +245,7 @@ static func celestial_lion(scene: PackedScene) -> Resource:
 	return e
 
 static func nine_tailed_spirit(scene: PackedScene) -> Resource:
+	# T2-DEATH-RATTLE: 죽을 때 구미호의 원한 — 동료 strength +3
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.nine_tailed_spirit"; e.max_hp = 450; e.character_scene = scene
 	e.mythology = "daoist"
@@ -247,6 +256,9 @@ static func nine_tailed_spirit(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 105; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.BUFF_ALLY; dt.value = 3; dt.status_type = "strength"
+	e.death_trigger = dt
 	return e
 
 static func dragon_king_child(scene: PackedScene) -> Resource:
