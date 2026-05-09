@@ -2,7 +2,7 @@
 class_name IntentResource
 extends Resource
 
-enum ActionType { ATTACK, BUFF, DEBUFF, SPECIAL, PREPARE, HEAL_ALLY, BUFF_ALLY }
+enum ActionType { ATTACK, BUFF, DEBUFF, SPECIAL, PREPARE, HEAL_ALLY, BUFF_ALLY, COUNTER_PREPARE, MARK_TARGET }
 enum TargetType { LOWEST_HP, LAST_ATTACKER, RANDOM, ALL }
 
 @export var action_type: ActionType = ActionType.ATTACK

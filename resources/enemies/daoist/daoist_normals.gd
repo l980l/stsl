@@ -262,16 +262,19 @@ static func nine_tailed_spirit(scene: PackedScene) -> Resource:
 	return e
 
 static func dragon_king_child(scene: PackedScene) -> Resource:
+	# T3-MARK: 용왕 자식의 봉인 — LOWEST_HP 영웅 마킹 → 이후 ATTACK +50%
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.dragon_king_child"; e.max_hp = 720; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 60; i1.status_type = "block"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
+	i2.action_type = IntentRes.ActionType.MARK_TARGET; i2.target = IntentRes.TargetType.LOWEST_HP
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "divine"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "divine"
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 100; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "divine"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func immortal_warrior(scene: PackedScene) -> Resource:

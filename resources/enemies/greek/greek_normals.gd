@@ -284,16 +284,19 @@ static func hydra_head(scene: PackedScene) -> Resource:
 	return e
 
 static func tartaros_shade(scene: PackedScene) -> Resource:
+	# T3-COUNTER: COUNTER_PREPARE 후 받은 데미지 40% 누적 → 다음 ATTACK에 가산 (저주의 반사)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.tartaros_shade"; e.max_hp = 500; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.COUNTER_PREPARE; i1.value = 40
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 130; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "curse"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 110; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "curse"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "curse"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.BUFF; i3.value = 2; i3.status_type = "strength"
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 130; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "curse"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 # ──── 인카운터 조합 테이블 (난이도 오름차순 1~10) ────

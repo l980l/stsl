@@ -40,6 +40,11 @@ func run_all() -> Dictionary:
 	test_signature_daoist_yin_yang()
 	test_signature_japanese_ward()
 	test_signatures_disabled_for_easy_encounter()
+	# Phase 3-3 — T3-COUNTER + T3-MARK
+	test_counter_prepare_accumulates_and_consumes()
+	test_counter_pool_clears_on_attack()
+	test_mark_target_increases_attack_damage()
+	test_mark_target_does_not_affect_unmarked_hero()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -404,3 +409,87 @@ func test_signatures_disabled_for_easy_encounter() -> void:
 	bm.end_player_turn()
 	_assert(bm._enemy_status[0].get("strength", 0) == 0, "signatures_enabled=false → 휴브리스 미발동")
 	_assert(not bm._enemy_status[0].get("greek_hubris_pending", false), "pending 플래그도 미설정")
+
+# ─────────────── Phase 3-3: T3-COUNTER + T3-MARK ───────────────
+
+# COUNTER_PREPARE 후 받은 데미지 누적, 다음 ATTACK에 가산
+func test_counter_prepare_accumulates_and_consumes() -> void:
+	print("[TestEnemyMechanics] test_counter_prepare_accumulates_and_consumes")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	# 적 패턴: COUNTER_PREPARE(50%) → ATTACK(20)
+	var i_counter := _make_intent(IntentRes.ActionType.COUNTER_PREPARE, 50)
+	var i_atk := _make_intent(IntentRes.ActionType.ATTACK, 20)
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 200
+	enemy.intent_pattern = [i_counter, i_atk]
+	enemy.signatures_enabled = false  # 시그니처 영향 배제
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm.end_player_turn()  # 적 턴 1: COUNTER_PREPARE 발동 (counter_ratio=0.5)
+	_assert(abs(bm._enemy_status[0].get("counter_ratio", 0.0) - 0.5) < 0.001, "counter_ratio 0.5 설정")
+	# 플레이어 턴: 40 데미지 → counter_pool += 20
+	bm._deal_damage_to_enemy(0, 40)
+	_assert(bm._enemy_status[0].get("counter_pool", 0) == 20, "counter_pool = 20 (40 × 0.5)")
+	bm.end_player_turn()  # 적 턴 2: ATTACK 20 + counter 20 = 40 데미지
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 160, "ATTACK 20 + counter 20 = 40 데미지 (200 → 160)")
+
+# counter_pool 소진 후 다음 ATTACK은 정상
+func test_counter_pool_clears_on_attack() -> void:
+	print("[TestEnemyMechanics] test_counter_pool_clears_on_attack")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	var i_counter := _make_intent(IntentRes.ActionType.COUNTER_PREPARE, 100)
+	var i_atk := _make_intent(IntentRes.ActionType.ATTACK, 10)
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 200
+	enemy.intent_pattern = [i_counter, i_atk, i_atk]
+	enemy.signatures_enabled = false
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm.end_player_turn()  # COUNTER_PREPARE
+	bm._deal_damage_to_enemy(0, 30)  # counter_pool += 30
+	bm.end_player_turn()  # ATTACK 10 + counter 30 = 40 → napoleon HP 200-40=160
+	bm.end_player_turn()  # ATTACK 10 (counter_pool 소진됨) → napoleon HP 160-10=150
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 150, "두 번째 ATTACK은 counter 없이 10 데미지만")
+	_assert(bm._enemy_status[0].get("counter_pool", 0) == 0, "counter_pool 0 유지")
+
+# MARK_TARGET → 마킹된 영웅 공격 시 +50%
+func test_mark_target_increases_attack_damage() -> void:
+	print("[TestEnemyMechanics] test_mark_target_increases_attack_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	var i_mark := _make_intent(IntentRes.ActionType.MARK_TARGET, 0, IntentRes.TargetType.LOWEST_HP)
+	var i_atk := _make_intent(IntentRes.ActionType.ATTACK, 40, IntentRes.TargetType.LOWEST_HP)
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 200
+	enemy.intent_pattern = [i_mark, i_atk]
+	enemy.signatures_enabled = false
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm.end_player_turn()  # MARK 발동
+	_assert(bm._hero_status.get("napoleon", {}).get("marked_by", []).has(0), "napoleon에 marked_by[0] 추가")
+	bm.end_player_turn()  # ATTACK 40 × 1.5 = 60 → napoleon HP 140
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 140, "마킹된 영웅 공격 → 40 × 1.5 = 60 데미지")
+
+# 마킹 안 된 영웅엔 보너스 미적용
+func test_mark_target_does_not_affect_unmarked_hero() -> void:
+	print("[TestEnemyMechanics] test_mark_target_does_not_affect_unmarked_hero")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 50))  # LOWEST_HP — 마킹 대상
+	var i_mark := _make_intent(IntentRes.ActionType.MARK_TARGET, 0, IntentRes.TargetType.LOWEST_HP)
+	# napoleon 타겟 ATTACK (마킹 안 됨)
+	var i_atk_napoleon := IntentRes.new()
+	i_atk_napoleon.action_type = IntentRes.ActionType.ATTACK
+	i_atk_napoleon.value = 40
+	i_atk_napoleon.target = IntentRes.TargetType.LAST_ATTACKER  # 가짜 타겟 — 첫 사이클엔 random fallback
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 200
+	enemy.intent_pattern = [i_mark]
+	enemy.signatures_enabled = false
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm.end_player_turn()  # MARK yi_sun_sin
+	_assert(bm._hero_status.get("yi_sun_sin", {}).get("marked_by", []).has(0), "yi_sun_sin 마킹됨")
+	_assert(not bm._hero_status.get("napoleon", {}).get("marked_by", []).has(0), "napoleon은 미마킹")

@@ -294,15 +294,16 @@ static func frost_giant(scene: PackedScene) -> Resource:
 	return e
 
 static func ragnarok_herald(scene: PackedScene) -> Resource:
+	# T3-MARK: 라그나로크의 저주 — LOWEST_HP 영웅 마킹 → 이후 ATTACK +50% 데미지
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.ragnarok_herald"; e.max_hp = 670; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.MARK_TARGET; i1.target = IntentRes.TargetType.LOWEST_HP
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 130; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 80; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3, i4]

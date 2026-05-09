@@ -277,16 +277,19 @@ static func mara_general(scene: PackedScene) -> Resource:
 	return e
 
 static func hell_guardian(scene: PackedScene) -> Resource:
+	# T3-COUNTER: 지옥 수호자 — 받은 데미지 50% 누적 → 다음 ATTACK 폭발 가산
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.hell_guardian"; e.max_hp = 690; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 60; i1.status_type = "block"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
+	i2.action_type = IntentRes.ActionType.COUNTER_PREPARE; i2.value = 50
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "divine"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 100; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "divine"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 # ──── 인카운터 조합 테이블 (난이도 오름차순 1~10) ────

@@ -849,6 +849,11 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	amount -= absorbed
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - amount)
 	enemy_damaged.emit(enemy_index, amount, damage_type)
+	# T3-COUNTER: counter_ratio 설정된 적은 받은 데미지의 N% counter_pool에 누적
+	if amount > 0:
+		var counter_ratio: float = _enemy_status[enemy_index].get("counter_ratio", 0.0)
+		if counter_ratio > 0.0:
+			_enemy_status[enemy_index]["counter_pool"] = _enemy_status[enemy_index].get("counter_pool", 0) + int(amount * counter_ratio)
 	# 시그니처 hook: 받음 (휴브리스/라그나로크/damage_taken 누적)
 	if amount > 0:
 		SignatureSys.on_enemy_damaged(self, enemy_index, amount)
@@ -1062,6 +1067,12 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				dmg = int(dmg * (1.0 + 0.1 * strength))
 			if _enemy_status[enemy_index].get("weak", 0) > 0:
 				dmg = int(dmg * 0.75)
+			# T3-COUNTER: 누적된 counter_pool 가산 후 소진
+			var counter_pool: int = _enemy_status[enemy_index].get("counter_pool", 0)
+			if counter_pool > 0:
+				dmg += counter_pool
+				_enemy_status[enemy_index]["counter_pool"] = 0
+				_enemy_status[enemy_index]["counter_ratio"] = 0.0
 			if intent.target == IntentRes.TargetType.ALL:
 				if team_mgr:
 					for hero in team_mgr.get_living_heroes():
@@ -1070,6 +1081,10 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			else:
 				var target_id: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 				if target_id != "":
+					# T3-MARK: 마킹한 영웅 공격 시 데미지 +50%
+					var marked_by: Array = _hero_status.get(target_id, {}).get("marked_by", [])
+					if marked_by.has(enemy_index):
+						dmg = int(dmg * 1.5)
 					_deal_damage_to_hero(target_id, dmg, intent.damage_type)
 					# 시그니처 hook: 적의 단일 타겟 공격 (이집트 저주 누적)
 					SignatureSys.on_enemy_attack(self, enemy_index, target_id)
@@ -1111,6 +1126,20 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				target_idx = InteractionSys.pick_random_ally(self, enemy_index)
 			if target_idx >= 0:
 				InteractionSys.buff_ally(self, enemy_index, target_idx, intent.status_type, intent.value)
+		IntentRes.ActionType.COUNTER_PREPARE:
+			# T3-COUNTER: 다음 ATTACK까지 받은 데미지의 N% 누적 (intent.value = 퍼센트, 30 = 30%)
+			_enemy_status[enemy_index]["counter_ratio"] = float(intent.value) / 100.0
+			_enemy_status[enemy_index]["counter_pool"] = 0
+		IntentRes.ActionType.MARK_TARGET:
+			# T3-MARK: 한 영웅 마킹 — 마킹 동안 그 enemy의 ATTACK +50% 데미지
+			var mark_target: String = _pick_hero_target(intent.target, enemy_index)
+			if mark_target != "" and team_mgr:
+				if not _hero_status.has(mark_target):
+					_hero_status[mark_target] = {}
+				if not _hero_status[mark_target].has("marked_by"):
+					_hero_status[mark_target]["marked_by"] = []
+				if not _hero_status[mark_target]["marked_by"].has(enemy_index):
+					_hero_status[mark_target]["marked_by"].append(enemy_index)
 
 # DEATH-RATTLE: 사망 직후 1회 실행. 자기 자신은 이미 _enemy_alive=false 상태이므로
 # BUFF_ALLY 등 동료 효과는 자신을 제외한 살아있는 동료에게만 적용됨.
