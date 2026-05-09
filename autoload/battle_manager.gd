@@ -7,6 +7,7 @@ const CardRes  = preload("res://resources/card_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const RelicRes = preload("res://resources/relic_resource.gd")
 const InteractionSys = preload("res://autoload/enemy_interaction_system.gd")
+const SignatureSys = preload("res://autoload/enemy_signature_system.gd")
 
 const POISON_DMG_PER_STACK: int = 10
 const TOKEN_DMG_PER_STACK: int = 25
@@ -848,10 +849,15 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	amount -= absorbed
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - amount)
 	enemy_damaged.emit(enemy_index, amount, damage_type)
+	# 시그니처 hook: 받음 (휴브리스/라그나로크/damage_taken 누적)
+	if amount > 0:
+		SignatureSys.on_enemy_damaged(self, enemy_index, amount)
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
 		_kills_this_card += 1
 		_fire_death_trigger(enemy_index)
+		# 시그니처 hook: 사망 (불교 인과응보)
+		SignatureSys.on_enemy_death(self, enemy_index)
 		enemy_died.emit(enemy_index)
 		for _pke in _active_powers:
 			if _pke.split(":")[0] == "power.on_kill_energy":
@@ -991,6 +997,8 @@ func _phase_enemy_main() -> void:
 			await get_tree().create_timer(turn_interval).timeout
 		first = false
 		_enemy_block[i] = 0
+		# 시그니처 hook: 턴 시작 (휴브리스 pending 처리, 도교 음양, 일본 결계)
+		SignatureSys.on_enemy_turn_start(self, i)
 		for stype: String in ["weak", "vulnerable"]:
 			if _enemy_status[i].get(stype, 0) > 0:
 				_enemy_status[i][stype] -= 1
@@ -1063,6 +1071,8 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				var target_id: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 				if target_id != "":
 					_deal_damage_to_hero(target_id, dmg, intent.damage_type)
+					# 시그니처 hook: 적의 단일 타겟 공격 (이집트 저주 누적)
+					SignatureSys.on_enemy_attack(self, enemy_index, target_id)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": target_id})
 		IntentRes.ActionType.BUFF:
 			if intent.status_type == "block" or intent.status_type == "":

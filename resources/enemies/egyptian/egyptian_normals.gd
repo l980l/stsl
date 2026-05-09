@@ -8,7 +8,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 static func ka_spirit(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.ka_spirit"; e.max_hp = 320; e.character_scene = scene
-	e.mythology = "egyptian"
+	e.mythology = "egyptian"; e.signatures_enabled = false  # 인카운터 #1
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 55; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "curse"
 	var i2 := IntentRes.new()
@@ -23,7 +23,7 @@ static func ka_spirit(scene: PackedScene) -> Resource:
 static func sphinx_cub(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.sphinx_cub"; e.max_hp = 350; e.character_scene = scene
-	e.mythology = "egyptian"
+	e.mythology = "egyptian"; e.signatures_enabled = false  # 인카운터 #3
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 80; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
@@ -95,7 +95,7 @@ static func mummy_warrior(scene: PackedScene) -> Resource:
 static func scarab(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.scarab"; e.max_hp = 260; e.character_scene = scene
-	e.mythology = "egyptian"
+	e.mythology = "egyptian"; e.signatures_enabled = false  # 인카운터 #2
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()

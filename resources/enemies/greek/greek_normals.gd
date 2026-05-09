@@ -8,7 +8,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 static func fly_harpy(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.fly_harpy"; e.max_hp = 220; e.character_scene = scene
-	e.mythology = "greek"
+	e.mythology = "greek"; e.signatures_enabled = false  # 인카운터 #1 (매우 약함)
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
@@ -19,7 +19,7 @@ static func fly_harpy(scene: PackedScene) -> Resource:
 static func myrmidon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.myrmidon"; e.max_hp = 250; e.character_scene = scene
-	e.mythology = "greek"
+	e.mythology = "greek"; e.signatures_enabled = false  # 인카운터 #2 (약함)
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
@@ -34,7 +34,7 @@ static func myrmidon(scene: PackedScene) -> Resource:
 static func satyr(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.satyr"; e.max_hp = 350; e.character_scene = scene
-	e.mythology = "greek"
+	e.mythology = "greek"; e.signatures_enabled = false  # 인카운터 #3 (약함)
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 80; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
 	var i2 := IntentRes.new()

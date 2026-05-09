@@ -32,6 +32,14 @@ func run_all() -> Dictionary:
 	# Phase 2 — DEATH-RATTLE
 	test_death_trigger_fires_on_death()
 	test_death_trigger_buff_ally_to_remaining()
+	# Phase 3 — 신화 시그니처 6종
+	test_signature_greek_hubris()
+	test_signature_norse_ragnarok()
+	test_signature_egyptian_curse_stack()
+	test_signature_buddhist_karma()
+	test_signature_daoist_yin_yang()
+	test_signature_japanese_ward()
+	test_signatures_disabled_for_easy_encounter()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -278,3 +286,121 @@ func test_death_trigger_buff_ally_to_remaining() -> void:
 	_assert(not bm._enemy_alive[0], "적 0 사망")
 	_assert(bm._enemy_status[1].get("strength", 0) == 3, "death_trigger BUFF_ALLY → 동료 strength +3")
 	_assert(bm._enemy_status[0].get("strength", 0) == 0, "사망한 자기 자신엔 부여 안 됨")
+
+# ─────────────── Phase 3: 신화 시그니처 6종 ───────────────
+
+func _make_signature_enemy(myth: String, hp: int = 100) -> Resource:
+	var dummy := _make_intent(IntentRes.ActionType.ATTACK, 5)
+	var e := EnemyRes.new()
+	e.max_hp = hp
+	e.mythology = myth
+	e.intent_pattern = [dummy]
+	e.signatures_enabled = true
+	return e
+
+# 그리스 휴브리스 — 단일 25+ 피해 받음 → 다음 턴 strength +2
+func test_signature_greek_hubris() -> void:
+	print("[TestEnemyMechanics] test_signature_greek_hubris")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var greek_enemy := _make_signature_enemy("greek", 200)
+	bm.setup_battle([greek_enemy])
+	bm.start_player_turn()
+	bm._deal_damage_to_enemy(0, 30)  # 25+ 임계 충족
+	_assert(bm._enemy_status[0].get("greek_hubris_pending", false), "휴브리스 pending 설정")
+	bm.end_player_turn()  # 적 턴 시작 → 시그니처 발동
+	_assert(bm._enemy_status[0].get("strength", 0) == 2, "다음 턴 strength +2 자동")
+	_assert(not bm._enemy_status[0].get("greek_hubris_pending", false), "pending 플래그 해제")
+
+# 북유럽 라그나로크 — HP 30% 미만 → 모든 적 strength +1 (1회)
+func test_signature_norse_ragnarok() -> void:
+	print("[TestEnemyMechanics] test_signature_norse_ragnarok")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var e0 := _make_signature_enemy("norse", 100)
+	var e1 := _make_signature_enemy("norse", 100)
+	bm.setup_battle([e0, e1])
+	bm.start_player_turn()
+	# e0 HP 100 → 25 (25%, < 30%)
+	bm._deal_damage_to_enemy(0, 75)
+	_assert(bm._enemy_status[0].get("strength", 0) == 1, "라그나로크 발동 → 자기 strength +1")
+	_assert(bm._enemy_status[1].get("strength", 0) == 1, "라그나로크 발동 → 동료 strength +1")
+	# 다시 한번 데미지 — 1회 제한
+	bm._deal_damage_to_enemy(0, 5)
+	_assert(bm._enemy_status[0].get("strength", 0) == 1, "두 번째 발동 차단 (1회 제한)")
+
+# 이집트 저주 누적 — ATTACK 시 타겟에 vulnerable +1 자동
+func test_signature_egyptian_curse_stack() -> void:
+	print("[TestEnemyMechanics] test_signature_egyptian_curse_stack")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var atk := _make_intent(IntentRes.ActionType.ATTACK, 10, IntentRes.TargetType.RANDOM)
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 100
+	enemy.mythology = "egyptian"
+	enemy.intent_pattern = [atk]
+	enemy.signatures_enabled = true
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm.end_player_turn()  # 적 ATTACK 발동
+	_assert(bm._hero_status["napoleon"].get("vulnerable", 0) >= 1, "이집트 ATTACK → vulnerable 자동 부여")
+
+# 불교 인과응보 — 사망 시 받은 누적 피해 25%를 ALL 영웅에 반환
+func test_signature_buddhist_karma() -> void:
+	print("[TestEnemyMechanics] test_signature_buddhist_karma")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	var buddhist_enemy := _make_signature_enemy("buddhist", 100)
+	bm.setup_battle([buddhist_enemy])
+	bm.start_player_turn()
+	bm._deal_damage_to_enemy(0, 100)  # 즉사 — damage_taken = 100
+	_assert(not bm._enemy_alive[0], "불교 적 사망")
+	# 25% 반환 = 25
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 175, "인과응보 → napoleon HP 200 - 25 = 175")
+
+# 도교 음양 — 매 턴 공격형(strength +1) ↔ 방어형(block +15) 자동 교대
+func test_signature_daoist_yin_yang() -> void:
+	print("[TestEnemyMechanics] test_signature_daoist_yin_yang")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	var daoist := _make_signature_enemy("daoist", 200)
+	bm.setup_battle([daoist])
+	bm.start_player_turn()
+	bm.end_player_turn()  # 1번째 적 턴 — 공격형
+	_assert(bm._enemy_status[0].get("strength", 0) == 1, "1턴 공격형 → strength +1")
+	_assert(bm._enemy_status[0].get("daoist_stance", -1) == 1, "다음 자세 = 방어형")
+	bm.end_player_turn()  # 2번째 적 턴 — 방어형
+	_assert(bm._enemy_block[0] >= 15, "2턴 방어형 → block +15")
+	_assert(bm._enemy_status[0].get("daoist_stance", -1) == 0, "다음 자세 = 공격형")
+
+# 일본 결계 — 매 5턴마다 자기 block +20
+func test_signature_japanese_ward() -> void:
+	print("[TestEnemyMechanics] test_signature_japanese_ward")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	var japanese := _make_signature_enemy("japanese", 300)
+	bm.setup_battle([japanese])
+	bm.start_player_turn()
+	# 4턴 진행 — 결계 미발동
+	for _t in range(4):
+		bm.end_player_turn()
+		bm.start_player_turn()
+	_assert(bm._enemy_status[0].get("japanese_turn_count", 0) == 4, "4턴 카운트")
+	_assert(bm._enemy_block[0] < 20, "5턴 전엔 결계 미발동")
+	bm.end_player_turn()  # 5턴째 — 결계 발동
+	_assert(bm._enemy_status[0].get("japanese_turn_count", 0) == 5, "5턴 카운트")
+	_assert(bm._enemy_block[0] >= 20, "5턴마다 결계 → block +20")
+
+# signatures_enabled = false 인 적은 모든 시그니처 미발동
+func test_signatures_disabled_for_easy_encounter() -> void:
+	print("[TestEnemyMechanics] test_signatures_disabled_for_easy_encounter")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var greek_easy := _make_signature_enemy("greek", 200)
+	greek_easy.signatures_enabled = false
+	bm.setup_battle([greek_easy])
+	bm.start_player_turn()
+	bm._deal_damage_to_enemy(0, 50)
+	bm.end_player_turn()
+	_assert(bm._enemy_status[0].get("strength", 0) == 0, "signatures_enabled=false → 휴브리스 미발동")
+	_assert(not bm._enemy_status[0].get("greek_hubris_pending", false), "pending 플래그도 미설정")

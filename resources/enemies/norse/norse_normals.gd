@@ -8,7 +8,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 static func urdr_spider(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.urdr_spider"; e.max_hp = 300; e.character_scene = scene
-	e.mythology = "norse"
+	e.mythology = "norse"; e.signatures_enabled = false  # 인카운터 #1
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
 	var i2 := IntentRes.new()
@@ -25,7 +25,7 @@ static func urdr_spider(scene: PackedScene) -> Resource:
 static func volva_witch(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.volva_witch"; e.max_hp = 320; e.character_scene = scene
-	e.mythology = "norse"
+	e.mythology = "norse"; e.signatures_enabled = false  # 인카운터 #2
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.status_type = "weak"; i1.value = 2; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
@@ -38,7 +38,7 @@ static func volva_witch(scene: PackedScene) -> Resource:
 static func garlarr_snake(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.garlarr_snake"; e.max_hp = 340; e.character_scene = scene
-	e.mythology = "norse"
+	e.mythology = "norse"; e.signatures_enabled = false  # 인카운터 #3
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.SPECIAL; i1.value = 1
 	var i2 := IntentRes.new()
