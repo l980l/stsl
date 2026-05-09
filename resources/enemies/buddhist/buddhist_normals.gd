@@ -45,6 +45,7 @@ static func mara_soldier(scene: PackedScene) -> Resource:
 	return e
 
 static func asura(scene: PackedScene) -> Resource:
+	# T1-DESPERATE: HP 30% 미만 strength +2 (아수라의 분노)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.asura"; e.max_hp = 380; e.character_scene = scene
 	e.mythology = "buddhist"
@@ -55,6 +56,8 @@ static func asura(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.3]
+	e.phase_buffs = [[{"status": "strength", "value": 2}]]
 	return e
 
 static func virudhaka(scene: PackedScene) -> Resource:
@@ -74,6 +77,7 @@ static func virudhaka(scene: PackedScene) -> Resource:
 	return e
 
 static func vajrapani(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 strength +3 (금강 분노)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.vajrapani"; e.max_hp = 500; e.character_scene = scene
 	e.mythology = "buddhist"
@@ -84,11 +88,14 @@ static func vajrapani(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
 # ──── 신규 14종 ────
 
 static func dharma_puppet(scene: PackedScene) -> Resource:
+	# DEATH-RATTLE: 죽을 때 ALL vulnerable +1 (다르마 인형 파편)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.dharma_puppet"; e.max_hp = 300; e.character_scene = scene
 	e.mythology = "buddhist"
@@ -99,22 +106,27 @@ static func dharma_puppet(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 1; dt.status_type = "vulnerable"; dt.target = IntentRes.TargetType.ALL
+	e.death_trigger = dt
 	return e
 
 static func lotus_spirit(scene: PackedScene) -> Resource:
+	# T2-HEALER: 매 사이클 LOWEST_HP 동료 HP +20 (연꽃 정령의 자비)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.lotus_spirit"; e.max_hp = 310; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.HEAL_ALLY; i1.value = 20; i1.target = IntentRes.TargetType.LOWEST_HP
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
+	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "weak"; i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
 static func hungry_ghost(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 strength +2 (배고픈 귀신의 광기)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.hungry_ghost"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "buddhist"
@@ -125,9 +137,12 @@ static func hungry_ghost(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "vulnerable"; i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 2}]]
 	return e
 
 static func naga_spawn(scene: PackedScene) -> Resource:
+	# DEATH-RATTLE: 죽을 때 ALL poison +2 (나가 자식의 마지막 독)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.naga_spawn"; e.max_hp = 310; e.character_scene = scene
 	e.mythology = "buddhist"
@@ -138,6 +153,9 @@ static func naga_spawn(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 2; dt.status_type = "poison"; dt.target = IntentRes.TargetType.ALL
+	e.death_trigger = dt
 	return e
 
 static func demon_soldier(scene: PackedScene) -> Resource:
@@ -188,11 +206,12 @@ static func sky_beast(scene: PackedScene) -> Resource:
 	return e
 
 static func earth_spirit(scene: PackedScene) -> Resource:
+	# T2-GUARD: 동료에게 block 부여 (대지의 가호)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.earth_spirit"; e.max_hp = 290; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.BUFF_ALLY; i1.value = 18; i1.status_type = "block"; i1.target = IntentRes.TargetType.LOWEST_HP
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()
@@ -236,11 +255,12 @@ static func cursed_monk(scene: PackedScene) -> Resource:
 	return e
 
 static func deva_soldier(scene: PackedScene) -> Resource:
+	# T2-BUFFER: 동료 strength +1 (천신 병사의 가르침)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.deva_soldier"; e.max_hp = 380; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.BUFF_ALLY; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 90; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
 	var i3 := IntentRes.new()

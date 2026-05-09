@@ -207,11 +207,12 @@ static func ares_soldier(scene: PackedScene) -> Resource:
 	return e
 
 static func griffin_cub(scene: PackedScene) -> Resource:
+	# T2-BUFFER: 동료 strength +1 (그리핀 새끼의 가르침)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.griffin_cub"; e.max_hp = 320; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.BUFF_ALLY; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 75; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
@@ -239,6 +240,7 @@ static func medusid(scene: PackedScene) -> Resource:
 	return e
 
 static func fire_crab(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 strength +2 (불게 분노)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.fire_crab"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "greek"
@@ -249,6 +251,8 @@ static func fire_crab(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "fire"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 2}]]
 	return e
 
 static func stone_shard(scene: PackedScene) -> Resource:
@@ -266,6 +270,7 @@ static func stone_shard(scene: PackedScene) -> Resource:
 	return e
 
 static func chimera_cub(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 strength +3 (키마이라 새끼의 광기)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.chimera_cub"; e.max_hp = 400; e.character_scene = scene
 	e.mythology = "greek"
@@ -276,6 +281,8 @@ static func chimera_cub(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "fire"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
 static func hydra_head(scene: PackedScene) -> Resource:

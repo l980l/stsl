@@ -38,6 +38,7 @@ static func sphinx_cub(scene: PackedScene) -> Resource:
 	return e
 
 static func desert_scorpion(scene: PackedScene) -> Resource:
+	# DEATH-RATTLE: 죽을 때 ALL poison +2 (사막 전갈의 마지막 독)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.desert_scorpion"; e.max_hp = 420; e.character_scene = scene
 	e.mythology = "egyptian"
@@ -48,6 +49,9 @@ static func desert_scorpion(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "poison"
 	e.intent_pattern = [i1, i2, i3]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 2; dt.status_type = "poison"; dt.target = IntentRes.TargetType.ALL
+	e.death_trigger = dt
 	return e
 
 static func sand_scout(scene: PackedScene) -> Resource:
@@ -104,6 +108,7 @@ static func scarab(scene: PackedScene) -> Resource:
 	return e
 
 static func sand_wraith(scene: PackedScene) -> Resource:
+	# T1-DESPERATE: HP 30% 미만 strength +2 (모래 망령 마지막 저주)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.sand_wraith"; e.max_hp = 310; e.character_scene = scene
 	e.mythology = "egyptian"
@@ -116,6 +121,8 @@ static func sand_wraith(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 70; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4]
+	e.phase_thresholds = [0.3]
+	e.phase_buffs = [[{"status": "strength", "value": 2}]]
 	return e
 
 static func sand_rat(scene: PackedScene) -> Resource:
@@ -290,16 +297,19 @@ static func sphinx_adult(scene: PackedScene) -> Resource:
 	return e
 
 static func pyramid_golem(scene: PackedScene) -> Resource:
+	# T2-GUARD: 동료에게 block 부여 + 자기 큰 block (피라미드 골렘 방어)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.pyramid_golem"; e.max_hp = 680; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 70; i1.status_type = "block"
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 50; i1.status_type = "block"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 160; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.BUFF_ALLY; i2.value = 30; i2.status_type = "block"; i2.target = IntentRes.TargetType.LOWEST_HP
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "blunt"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 150; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 100; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "blunt"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 # ──── 인카운터 조합 테이블 (난이도 오름차순 1~10) ────
