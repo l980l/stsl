@@ -77,6 +77,7 @@ signal enemy_counter_changed(enemy_index: int)
 signal card_pick_requested(action: String, draw_count: int)
 signal boss_phase_changed(enemy_index: int, new_phase: int)
 signal enemy_spawned(enemy_index: int)  # T3-SUMMON: 런타임 적 추가 알림 (UI 갱신용)
+signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시그니처 발동 알림 (UI 토스트용)
 
 func setup_battle(enemies: Array) -> void:
 	if deck_mgr != null:

@@ -16,8 +16,9 @@ static func on_enemy_damaged(bm: Object, idx: int, amount: int) -> void:
 	bm._enemy_status[idx]["damage_taken"] = bm._enemy_status[idx].get("damage_taken", 0) + amount
 	match enemy.mythology:
 		"greek":
-			if amount >= 25:
+			if amount >= 25 and not bm._enemy_status[idx].get("greek_hubris_pending", false):
 				bm._enemy_status[idx]["greek_hubris_pending"] = true
+				bm.signature_fired.emit(idx, "hubris")  # 토스트용
 		"norse":
 			if not bm._enemy_status[idx].get("norse_ragnarok_fired", false) and bm._enemy_alive[idx]:
 				var hp_ratio: float = float(bm._enemy_hp[idx]) / float(enemy.max_hp)
@@ -26,6 +27,7 @@ static func on_enemy_damaged(bm: Object, idx: int, amount: int) -> void:
 					for i in range(bm._enemy_alive.size()):
 						if bm._enemy_alive[i]:
 							bm._apply_status_to_enemy(i, "strength", 1)
+					bm.signature_fired.emit(idx, "ragnarok")  # 토스트용 (전투당 1회)
 
 # ─── Hook: 적이 영웅에게 ATTACK ───
 # 이집트 저주 누적 — 자기 ATTACK 적중 시 타겟에 vulnerable +1 자동 부여
@@ -50,6 +52,7 @@ static func on_enemy_death(bm: Object, idx: int) -> void:
 		if reflect > 0 and bm.team_mgr:
 			for hero in bm.team_mgr.get_living_heroes():
 				bm._deal_damage_to_hero(hero.hero_id, reflect, "")
+			bm.signature_fired.emit(idx, "karma")  # 토스트용 (사망 시 1회)
 
 # ─── Hook: 적 턴 시작 ───
 # 그리스 휴브리스 pending 처리 — strength +2 부여 후 플래그 해제
@@ -77,6 +80,7 @@ static func on_enemy_turn_start(bm: Object, idx: int) -> void:
 		bm._enemy_status[idx]["japanese_turn_count"] = turn_count
 		if turn_count % 5 == 0:
 			bm._enemy_block[idx] += 20
+			bm.signature_fired.emit(idx, "kekkai")  # 토스트용 (5턴마다)
 
 # ─── 헬퍼 ───
 static func _signatures_enabled(bm: Object, idx: int) -> bool:

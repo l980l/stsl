@@ -24,6 +24,10 @@ battle.intent.ward,🛡 결계 %d턴,🛡 Ward %dT,🛡 Bouclier %dT,🛡 Scherm
 battle.intent.summon,🐾 소환 ×%d,🐾 Summon ×%d,🐾 Invocation ×%d,🐾 Evoca ×%d,🐾 Invocar ×%d,🐾 召喚 ×%d,🐾 Επίκληση ×%d,🐾 召唤 ×%d,🐾 召喚 ×%d
 battle.intent.mimic,🪞 메아리 %d%%,🪞 Mimic %d%%,🪞 Mimétisme %d%%,🪞 Mimica %d%%,🪞 Imitar %d%%,🪞 模倣 %d%%,🪞 Μίμηση %d%%,🪞 模仿 %d%%,🪞 模仿 %d%%
 battle.intent.special,❓ 특수,❓ Special,❓ Spécial,❓ Speciale,❓ Especial,❓ 特殊,❓ Ειδικό,❓ 特殊,❓ 特殊
+battle.signature.hubris.toast,⚔ 휴브리스!,⚔ Hubris!,⚔ Hybris !,⚔ Hubris!,⚔ ¡Hibris!,⚔ ヒュブリス！,⚔ Ύβρις!,⚔ 傲慢！,⚔ 傲慢！
+battle.signature.ragnarok.toast,🌪 라그나로크!,🌪 Ragnarok!,🌪 Ragnarök !,🌪 Ragnarök!,🌪 ¡Ragnarök!,🌪 ラグナロク！,🌪 Ραγκναρόκ!,🌪 诸神黄昏！,🌪 諸神黃昏！
+battle.signature.karma.toast,☸ 인과응보!,☸ Karma!,☸ Karma !,☸ Karma!,☸ ¡Karma!,☸ 因果応報！,☸ Κάρμα!,☸ 因果报应！,☸ 因果報應！
+battle.signature.kekkai.toast,🛡 결계!,🛡 Kekkai!,🛡 Kekkai !,🛡 Kekkai!,🛡 ¡Kekkai!,🛡 結界！,🛡 Κεκκάι!,🛡 结界！,🛡 結界！
 battle.target.ally,아군,Ally,Allié,Alleato,Aliado,味方,Σύμμαχος,队友,队友
 battle.target.all_ally,아군 전체,All Allies,Tous les alliés,Tutti gli Alleati,Todos los Aliados,全味方,Όλοι οι Σύμμαχοι,全队友,全队友
 battle.target.lowest_hp_ally,최저 HP 아군,Lowest HP Ally,Allié HP le plus bas,Alleato HP più basso,Aliado con HP más bajo,最低HP味方,Σύμμαχος με Χαμηλότερο HP,最低HP队友,最低HP队友

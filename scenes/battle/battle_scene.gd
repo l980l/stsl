@@ -80,8 +80,16 @@ var _card_pick_in_progress: bool = false
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
 	"morale": "★", "charm": "♥", "strength": "↑",
-	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜"
+	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜",
+	"invuln": "🛡", "counter_pool": "🔄", "marked_by": "🎯"
 }
+
+# 내부 시그니처/메커니즘 추적 키 — 의도/상태 UI에 노출 안 함
+const STATUS_INTERNAL_KEYS := [
+	"poison_dur", "tokens", "counter_ratio", "damage_taken",
+	"greek_hubris_pending", "norse_ragnarok_fired",
+	"daoist_stance", "japanese_turn_count"
+]
 
 func _trf(key: String, args) -> String:
 	var s := tr(key)
@@ -800,6 +808,7 @@ func _connect_signals() -> void:
 	BattleManager.card_pick_requested.connect(_on_card_pick_requested)
 	BattleManager.boss_phase_changed.connect(_on_boss_phase_changed)
 	BattleManager.enemy_spawned.connect(_on_enemy_spawned)
+	BattleManager.signature_fired.connect(_on_signature_fired)
 
 var _bgm_boss_id: String = ""
 
@@ -817,6 +826,26 @@ func _play_battle_bgm() -> void:
 func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
 	if new_phase >= 1 and not _bgm_boss_id.is_empty():
 		AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, new_phase)
+
+# 신화 시그니처 발동 시 화면 중앙에 짧은 토스트 표시 (~1.5초 페이드)
+func _on_signature_fired(_enemy_index: int, signature_name: String) -> void:
+	var toast := Label.new()
+	toast.text = tr("battle.signature.%s.toast" % signature_name)
+	toast.theme_type_variation = "TitleLabel"
+	toast.add_theme_font_size_override("font_size", 32)
+	toast.modulate = Color(1.0, 0.85, 0.3, 1.0)
+	toast.z_index = 100
+	toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	toast.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	toast.position = Vector2(WINDOW_W / 2.0 - 200, 280)
+	toast.size = Vector2(400, 60)
+	add_child(toast)
+	var tw := create_tween()
+	tw.tween_property(toast, "modulate:a", 1.0, 0.15)
+	tw.tween_interval(1.0)
+	tw.tween_property(toast, "modulate:a", 0.0, 0.35)
+	tw.tween_callback(toast.queue_free)
 
 # T3-SUMMON: 런타임에 spawn된 적의 UI 패널 + 캐릭터 노드 추가
 func _on_enemy_spawned(enemy_index: int) -> void:
@@ -1906,8 +1935,14 @@ func _refresh_status_icons_hero(hero_id: String) -> void:
 	for child in box.get_children():
 		child.queue_free()
 	var status: Dictionary = BattleManager.get_hero_status(hero_id)
+	# T3-MARK: marked_by Array — 비어있지 않으면 마커 아이콘 별도 표시
+	var marked_by: Array = status.get("marked_by", [])
+	if marked_by.size() > 0:
+		box.add_child(_make_status_label("marked_by", marked_by.size(), status))
 	for key in status:
-		if key == "poison_dur" or key == "tokens":
+		if key in STATUS_INTERNAL_KEYS or key == "marked_by":
+			continue
+		if typeof(status[key]) != TYPE_INT:
 			continue
 		var val: int = status[key]
 		if val <= 0:
@@ -1949,7 +1984,9 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		box.add_child(hbox)
 	var status: Dictionary = BattleManager.get_enemy_status(index)
 	for key in status:
-		if key == "poison_dur":
+		if key in STATUS_INTERNAL_KEYS:
+			continue
+		if typeof(status[key]) != TYPE_INT:
 			continue
 		var val: int = status[key]
 		if val <= 0:
