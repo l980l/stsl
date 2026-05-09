@@ -1,9 +1,32 @@
 # 몬스터 메커니즘 레이어 v1 — 디자인 스펙
 
 > 작성일: 2026-05-08
+> **구현 완료: 2026-05-09 (PR #97 머지)**
 > 대상: M6.5-2 (production_roadmap.md)
 > 선행 작업: 인카운터 v2 (PR #95) — 6 신화 × 20 몬스터 × 10 인카운터, 중복 0
-> 진행 브랜치: `monster-refactor` (Phase 1~4 통합 후 단일 PR)
+> 진행 브랜치: `monster-refactor` → main (11 commit 통합)
+
+---
+
+## 0. 구현 후 동기화 (2026-05-09)
+
+이 스펙은 **구현 완료 후 실제 결과를 반영해 갱신**됨. 원본 스펙 대비 주요 조정 사항:
+
+**축약/통합**
+- §6.1 `EnemyTriggerSystem` 별도 autoload 미신설 — 기존 `phase_thresholds`로 HP 트리거 처리 + 신규 `EnemyResource.phase_buffs` 필드 추가로 phase 전환 시 자동 status 부여. 시그니처용 받음/사망/N턴 트리거는 `EnemySignatureSystem`에 직접 hook (별도 시스템 불필요).
+- §4 T3-MIMIC, T3-STANCE 미구현 — 도교 음양 시그니처가 STANCE 효과(공격형↔방어형 자세)를 자동 제공하므로 명시적 STANCE 액션 불필요. T3-MIMIC은 우선순위 낮아 미구현.
+
+**추가**
+- `EnemyResource.death_trigger: Resource` 필드 — DEATH-RATTLE 시 1회 실행할 IntentResource (스펙 §4 T2-DEATH-RATTLE 구현 형식)
+- `enemy_spawned(enemy_index)` 시그널 — T3-SUMMON 런타임 spawn 알림 (UI 갱신용)
+
+**Phase 분할 실제 vs 원본**
+- 원본: Phase 1 TriggerSystem 신설. 실제: phase_buffs로 대체.
+- 원본: Phase 3 SignatureSystem. 실제: Phase 3-1로 명확히 분리, 4 hook (damaged/attack/death/turn_start)으로 6 신화 직접 처리.
+
+**적용 비율**: 120 monsters 중 **~115종 (96%)** 명시적 tier 메커니즘 적용. 미적용 5종(cursed_monk SPECIAL, snake, cyclops, sand_scout, sand_ifrit)은 자체 특수 패턴 보유로 의도적 단순 유지.
+
+**테스트**: `tests/test_enemy_mechanics.gd` 25 함수 / 60+ assertion. 1269 passed / 38 failed (베이스라인 유지).
 
 ---
 
