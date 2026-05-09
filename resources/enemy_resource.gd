@@ -24,3 +24,7 @@ enum Grade { NORMAL, ELITE, BOSS }
 
 # 신화 시그니처 활성화 게이트 — Phase 3에서 사용. #1~3 인카운터 풀에선 false.
 @export var signatures_enabled: bool = true
+
+# DEATH-RATTLE: 사망 시 1회 실행할 인텐트 (T2 단말마)
+# IntentResource 1개. ATTACK ALL / DEBUFF ALL / BUFF_ALLY 등 사용 가능.
+@export var death_trigger: Resource = null

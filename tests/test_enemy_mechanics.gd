@@ -29,6 +29,9 @@ func run_all() -> Dictionary:
 	test_buff_ally_strength_on_ally()
 	test_interaction_no_op_when_alone()
 	test_pick_lowest_hp_ally_excludes_self()
+	# Phase 2 — DEATH-RATTLE
+	test_death_trigger_fires_on_death()
+	test_death_trigger_buff_ally_to_remaining()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -229,3 +232,49 @@ func test_pick_lowest_hp_ally_excludes_self() -> void:
 	bm._enemy_hp[2] = 80
 	var picked: int = InteractionSys.pick_lowest_hp_ally(bm, 0)
 	_assert(picked == 1, "자기(idx 0, HP 10) 제외 → 동료 중 LOWEST_HP는 idx 1 (HP 50)")
+
+# ─────────────── Phase 2: DEATH-RATTLE ───────────────
+
+# 사망 시 death_trigger DEBUFF ALL 발동 → 영웅 모두 weak 부여
+func test_death_trigger_fires_on_death() -> void:
+	print("[TestEnemyMechanics] test_death_trigger_fires_on_death")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 100))
+	var dummy := _make_intent(IntentRes.ActionType.ATTACK, 5)
+	var dt := _make_intent(IntentRes.ActionType.DEBUFF, 2, IntentRes.TargetType.ALL)
+	dt.status_type = "weak"
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 30
+	enemy.intent_pattern = [dummy]
+	enemy.death_trigger = dt
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm._deal_damage_to_enemy(0, 30)  # 즉사
+	_assert(not bm._enemy_alive[0], "적 사망")
+	_assert(bm._hero_status["napoleon"].get("weak", 0) == 2, "death_trigger DEBUFF ALL → napoleon weak 2")
+	_assert(bm._hero_status["yi_sun_sin"].get("weak", 0) == 2, "death_trigger DEBUFF ALL → yi_sun_sin weak 2")
+
+# DEATH-RATTLE 의 BUFF_ALLY 가 자기 자신은 제외하고 동료에만 부여
+func test_death_trigger_buff_ally_to_remaining() -> void:
+	print("[TestEnemyMechanics] test_death_trigger_buff_ally_to_remaining")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var dummy := _make_intent(IntentRes.ActionType.ATTACK, 5)
+	# 적 0: 죽으면 동료 strength +3
+	var dt := _make_intent(IntentRes.ActionType.BUFF_ALLY, 3)
+	dt.status_type = "strength"
+	var dying := EnemyRes.new()
+	dying.max_hp = 30
+	dying.intent_pattern = [dummy]
+	dying.death_trigger = dt
+	# 적 1: 살아남는 동료
+	var ally := EnemyRes.new()
+	ally.max_hp = 100
+	ally.intent_pattern = [dummy]
+	bm.setup_battle([dying, ally])
+	bm.start_player_turn()
+	bm._deal_damage_to_enemy(0, 30)
+	_assert(not bm._enemy_alive[0], "적 0 사망")
+	_assert(bm._enemy_status[1].get("strength", 0) == 3, "death_trigger BUFF_ALLY → 동료 strength +3")
+	_assert(bm._enemy_status[0].get("strength", 0) == 0, "사망한 자기 자신엔 부여 안 됨")

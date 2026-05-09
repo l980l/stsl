@@ -78,16 +78,19 @@ static func draugr(scene: PackedScene) -> Resource:
 	return e
 
 static func jotun_soldier(scene: PackedScene) -> Resource:
+	# T2-GUARD: 매 사이클 동료에게 block 부여 + 자기 큰 block (요툰 거인 방패)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.jotun_soldier"; e.max_hp = 600; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.status_type = "block"; i1.value = 80
+	i1.action_type = IntentRes.ActionType.BUFF; i1.status_type = "block"; i1.value = 60
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 180; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.BUFF_ALLY; i2.status_type = "block"; i2.value = 30; i2.target = IntentRes.TargetType.LOWEST_HP
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "blunt"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 160; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 100; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "blunt"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 # ──── 신규 14종 ────
@@ -202,6 +205,7 @@ static func runestone_golem(scene: PackedScene) -> Resource:
 	return e
 
 static func night_hag(scene: PackedScene) -> Resource:
+	# T2-DEATH-RATTLE: 죽을 때 마지막 저주 — ALL weak +2
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.night_hag"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "norse"
@@ -212,6 +216,9 @@ static func night_hag(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 80; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 2; dt.status_type = "weak"; dt.target = IntentRes.TargetType.ALL
+	e.death_trigger = dt
 	return e
 
 static func lindworm_spawn(scene: PackedScene) -> Resource:
@@ -242,6 +249,7 @@ static func einherjar_ghost(scene: PackedScene) -> Resource:
 	return e
 
 static func fenrir_pup(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 strength +4 자동 (펜리르 새끼의 본성)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.fenrir_pup"; e.max_hp = 450; e.character_scene = scene
 	e.mythology = "norse"
@@ -252,19 +260,24 @@ static func fenrir_pup(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 4}]]
 	return e
 
 static func nidhogg_scale(scene: PackedScene) -> Resource:
+	# T0-DEBUFF누적: poison 디버프 2회 적층 → 큰 poison 한 방
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.nidhogg_scale"; e.max_hp = 400; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
+	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "poison"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 3; i2.status_type = "poison"; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "poison"; i3.target = IntentRes.TargetType.RANDOM
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "poison"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func frost_giant(scene: PackedScene) -> Resource:

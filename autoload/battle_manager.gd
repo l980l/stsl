@@ -851,6 +851,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
 		_kills_this_card += 1
+		_fire_death_trigger(enemy_index)
 		enemy_died.emit(enemy_index)
 		for _pke in _active_powers:
 			if _pke.split(":")[0] == "power.on_kill_energy":
@@ -953,6 +954,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 		_enemy_status[enemy_index]["poison_dur"] = dur
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
+		_fire_death_trigger(enemy_index)
 		enemy_died.emit(enemy_index)
 		_check_win_condition()
 
@@ -1099,6 +1101,14 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				target_idx = InteractionSys.pick_random_ally(self, enemy_index)
 			if target_idx >= 0:
 				InteractionSys.buff_ally(self, enemy_index, target_idx, intent.status_type, intent.value)
+
+# DEATH-RATTLE: 사망 직후 1회 실행. 자기 자신은 이미 _enemy_alive=false 상태이므로
+# BUFF_ALLY 등 동료 효과는 자신을 제외한 살아있는 동료에게만 적용됨.
+func _fire_death_trigger(enemy_index: int) -> void:
+	var enemy: Resource = _enemies[enemy_index]
+	if enemy.get("death_trigger") == null:
+		return
+	_execute_intent(enemy_index, enemy.death_trigger)
 
 # SPECIAL 액션 분기 — status_type 으로 변종 식별.
 # 하위 호환: IntentResource.status_type 기본값 "weak"는 DEBUFF용으로, SPECIAL에선 미설정과 동일 취급 → remove_card.

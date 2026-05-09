@@ -75,16 +75,19 @@ static func sand_ifrit(scene: PackedScene) -> Resource:
 	return e
 
 static func mummy_warrior(scene: PackedScene) -> Resource:
+	# T0-DEBUFF누적: weak 2회 적층 → 큰 한 방 (붕대 감긴 전사의 함정)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.mummy_warrior"; e.max_hp = 600; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 110; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
+	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "weak"; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "weak"; i3.target = IntentRes.TargetType.RANDOM
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 160; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "blunt"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 # ──── 신규 14종 ────
@@ -162,19 +165,21 @@ static func nile_crocodile(scene: PackedScene) -> Resource:
 	return e
 
 static func clay_soldier(scene: PackedScene) -> Resource:
+	# T2-GUARD: 매 사이클 동료에게 block 부여 + 자기 block (점토 진형)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.clay_soldier"; e.max_hp = 380; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 35; i1.status_type = "block"
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 25; i1.status_type = "block"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 90; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.BUFF_ALLY; i2.value = 20; i2.status_type = "block"; i2.target = IntentRes.TargetType.LOWEST_HP
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 85; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
 static func tomb_wraith(scene: PackedScene) -> Resource:
+	# T2-DEATH-RATTLE: 죽을 때 무덤의 저주 — ALL vulnerable +2
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.tomb_wraith"; e.max_hp = 320; e.character_scene = scene
 	e.mythology = "egyptian"
@@ -185,6 +190,9 @@ static func tomb_wraith(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 75; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 2; dt.status_type = "vulnerable"; dt.target = IntentRes.TargetType.ALL
+	e.death_trigger = dt
 	return e
 
 static func khopesh_warrior(scene: PackedScene) -> Resource:
@@ -216,6 +224,7 @@ static func jackal_priest(scene: PackedScene) -> Resource:
 	return e
 
 static func desert_ghoul(scene: PackedScene) -> Resource:
+	# T2-DEATH-RATTLE: 죽을 때 원혼의 분노 — 동료에게 strength +2 부여
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.desert_ghoul"; e.max_hp = 290; e.character_scene = scene
 	e.mythology = "egyptian"
@@ -226,9 +235,13 @@ static func desert_ghoul(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.BUFF; i3.value = 1; i3.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.BUFF_ALLY; dt.value = 2; dt.status_type = "strength"
+	e.death_trigger = dt
 	return e
 
 static func sobek_spawn(scene: PackedScene) -> Resource:
+	# T1-DESPERATE: HP 30% 미만 도달 시 strength +3 (소벡의 마지막 광기)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.sobek_spawn"; e.max_hp = 450; e.character_scene = scene
 	e.mythology = "egyptian"
@@ -239,9 +252,12 @@ static func sobek_spawn(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "vulnerable"; i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.3]
+	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
 static func ammit_cub(scene: PackedScene) -> Resource:
+	# T1-BERSERK: HP 50% 미만 strength +3 (영혼 포식자의 광기)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.ammit_cub"; e.max_hp = 400; e.character_scene = scene
 	e.mythology = "egyptian"
@@ -252,6 +268,8 @@ static func ammit_cub(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 100; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
 static func sphinx_adult(scene: PackedScene) -> Resource:
