@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <filter id="ward-glow">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="ward-grad" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#aaeeff"/>
+      <stop offset="60%" stop-color="#3399ee"/>
+      <stop offset="100%" stop-color="#112266"/>
+    </radialGradient>
+    <radialGradient id="ward-inner" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 외곽 링 -->
+  <circle cx="128" cy="128" r="112" fill="#080c18" stroke="#c9a84c" stroke-width="7"/>
+
+  <!-- 결계 외곽 옥타곤 -->
+  <polygon points="128,30 192,60 226,128 192,196 128,226 64,196 30,128 64,60"
+           fill="url(#ward-grad)" stroke="#c9a84c" stroke-width="5"
+           filter="url(#ward-glow)"/>
+
+  <!-- 결계 내부 옥타곤 (점선) -->
+  <polygon points="128,52 178,76 204,128 178,180 128,204 78,180 52,128 78,76"
+           fill="none" stroke="#aaeeff" stroke-width="2" stroke-dasharray="6 4" opacity="0.7"/>
+
+  <!-- 중앙 별 광채 -->
+  <g transform="translate(128 128)" filter="url(#ward-glow)">
+    <circle r="36" fill="url(#ward-inner)"/>
+    <polygon points="0,-30 7,-9 30,-9 12,5 19,28 0,14 -19,28 -12,5 -30,-9 -7,-9"
+             fill="#ffffff" opacity="0.95"/>
+  </g>
+
+  <!-- 4 방향 결계 입자 -->
+  <circle cx="128" cy="44" r="5" fill="#aaeeff" filter="url(#ward-glow)"/>
+  <circle cx="128" cy="212" r="5" fill="#aaeeff" filter="url(#ward-glow)"/>
+  <circle cx="44" cy="128" r="5" fill="#aaeeff" filter="url(#ward-glow)"/>
+  <circle cx="212" cy="128" r="5" fill="#aaeeff" filter="url(#ward-glow)"/>
+</svg>
