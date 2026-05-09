@@ -249,11 +249,12 @@ static func deva_soldier(scene: PackedScene) -> Resource:
 	return e
 
 static func ashura_warrior(scene: PackedScene) -> Resource:
+	# T3-SACRIFICE: 자기 HP -50 → strength +5 (아수라의 광폭한 헌신)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.buddhist.ashura_warrior"; e.max_hp = 350; e.character_scene = scene
+	e.enemy_name = "enemy.buddhist.ashura_warrior"; e.max_hp = 450; e.character_scene = scene  # HP 상향 (희생 보상)
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.SACRIFICE; i1.value = 5  # HP -50, strength +5
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 95; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()

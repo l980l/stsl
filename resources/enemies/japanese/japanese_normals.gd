@@ -283,11 +283,12 @@ static func oni_king(scene: PackedScene) -> Resource:
 	return e
 
 static func hannya(scene: PackedScene) -> Resource:
+	# T3-WARD: 한냐 가면의 결계 — WARD 1턴 사이클로 무적 윈도우
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.hannya"; e.max_hp = 680; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.WARD; i1.value = 1  # 1턴 무적
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "curse"
 	var i3 := IntentRes.new()

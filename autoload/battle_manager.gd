@@ -841,6 +841,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "") -> void:
 	if not _enemy_alive[enemy_index]:
 		return
+	# T3-WARD: invuln 활성화 시 모든 데미지 무시
+	if _enemy_status[enemy_index].get("invuln", 0) > 0:
+		enemy_damaged.emit(enemy_index, 0, damage_type)
+		return
 	amount = _consume_double_next_damage(amount)
 	if _enemy_status[enemy_index].get("vulnerable", 0) > 0:
 		amount = int(amount * 1.5)
@@ -1007,6 +1011,9 @@ func _phase_enemy_main() -> void:
 		for stype: String in ["weak", "vulnerable"]:
 			if _enemy_status[i].get(stype, 0) > 0:
 				_enemy_status[i][stype] -= 1
+		# T3-WARD: invuln 카운트 매 턴 감소 (만료 시 0)
+		if _enemy_status[i].get("invuln", 0) > 0:
+			_enemy_status[i]["invuln"] -= 1
 		var charm: int = _enemy_status[i].get("charm", 0)
 		var _charm_reduce_turn: int = 0
 		for _cpk2 in _active_powers:
@@ -1140,6 +1147,15 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 					_hero_status[mark_target]["marked_by"] = []
 				if not _hero_status[mark_target]["marked_by"].has(enemy_index):
 					_hero_status[mark_target]["marked_by"].append(enemy_index)
+		IntentRes.ActionType.SACRIFICE:
+			# T3-SACRIFICE: 자기 HP -10×value 깎고 strength +value (intent.value = strength gain)
+			var hp_cost: int = intent.value * 10
+			_enemy_hp[enemy_index] = max(1, _enemy_hp[enemy_index] - hp_cost)
+			_apply_status_to_enemy(enemy_index, "strength", intent.value)
+			enemy_damaged.emit(enemy_index, hp_cost, "")
+		IntentRes.ActionType.WARD:
+			# T3-WARD: N턴(intent.value) 동안 자기 invuln (모든 데미지 무시)
+			_enemy_status[enemy_index]["invuln"] = intent.value
 
 # DEATH-RATTLE: 사망 직후 1회 실행. 자기 자신은 이미 _enemy_alive=false 상태이므로
 # BUFF_ALLY 등 동료 효과는 자신을 제외한 살아있는 동료에게만 적용됨.

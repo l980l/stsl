@@ -45,6 +45,11 @@ func run_all() -> Dictionary:
 	test_counter_pool_clears_on_attack()
 	test_mark_target_increases_attack_damage()
 	test_mark_target_does_not_affect_unmarked_hero()
+	# Phase 3-4 — T3-SACRIFICE + T3-WARD
+	test_sacrifice_self_hp_and_strength()
+	test_ward_blocks_damage()
+	test_ward_decrements_each_turn()
+	test_ward_expires_then_normal_damage()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -493,3 +498,77 @@ func test_mark_target_does_not_affect_unmarked_hero() -> void:
 	bm.end_player_turn()  # MARK yi_sun_sin
 	_assert(bm._hero_status.get("yi_sun_sin", {}).get("marked_by", []).has(0), "yi_sun_sin 마킹됨")
 	_assert(not bm._hero_status.get("napoleon", {}).get("marked_by", []).has(0), "napoleon은 미마킹")
+
+# ─────────────── Phase 3-4: T3-SACRIFICE + T3-WARD ───────────────
+
+# SACRIFICE → 자기 HP -10×value, strength +value
+func test_sacrifice_self_hp_and_strength() -> void:
+	print("[TestEnemyMechanics] test_sacrifice_self_hp_and_strength")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var sac := _make_intent(IntentRes.ActionType.SACRIFICE, 5)  # HP -50, strength +5
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 200
+	enemy.intent_pattern = [sac]
+	enemy.signatures_enabled = false
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm.end_player_turn()  # SACRIFICE 발동
+	_assert(bm._enemy_hp[0] == 150, "SACRIFICE → HP 200 - 50 = 150")
+	_assert(bm._enemy_status[0].get("strength", 0) == 5, "SACRIFICE → strength +5")
+
+# WARD → invuln 동안 받은 데미지 0
+func test_ward_blocks_damage() -> void:
+	print("[TestEnemyMechanics] test_ward_blocks_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var ward := _make_intent(IntentRes.ActionType.WARD, 2)  # 2턴 무적
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 100
+	enemy.intent_pattern = [ward]
+	enemy.signatures_enabled = false
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm.end_player_turn()  # WARD 발동 → invuln=2, 그 후 턴 종료에서 -1 → invuln=1
+	_assert(bm._enemy_status[0].get("invuln", 0) >= 1, "WARD 후 invuln 활성")
+	bm._deal_damage_to_enemy(0, 50)
+	_assert(bm._enemy_hp[0] == 100, "invuln 중엔 데미지 무시")
+
+# WARD 카운트 매 턴 감소 — 적용 시 N, 다음 적 턴 시작에서 -1
+func test_ward_decrements_each_turn() -> void:
+	print("[TestEnemyMechanics] test_ward_decrements_each_turn")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var ward := _make_intent(IntentRes.ActionType.WARD, 3)
+	var dummy := _make_intent(IntentRes.ActionType.PREPARE, 0)
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 100
+	enemy.intent_pattern = [ward, dummy, dummy, dummy]
+	enemy.signatures_enabled = false
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm.end_player_turn()  # WARD 적용 → invuln=3
+	_assert(bm._enemy_status[0].get("invuln", 0) == 3, "WARD 적용 직후 invuln=3")
+	bm.end_player_turn()  # 다음 적 턴 시작 → 3→2
+	_assert(bm._enemy_status[0].get("invuln", 0) == 2, "다음 턴 시작 invuln=2")
+	bm.end_player_turn()  # 다음 적 턴 시작 → 2→1
+	_assert(bm._enemy_status[0].get("invuln", 0) == 1, "다음 턴 시작 invuln=1")
+
+# WARD 만료 후 정상 데미지 — invuln=1 적용 후 다음 턴 시작에서 0으로 감소
+func test_ward_expires_then_normal_damage() -> void:
+	print("[TestEnemyMechanics] test_ward_expires_then_normal_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var ward := _make_intent(IntentRes.ActionType.WARD, 1)  # 1턴만 무적
+	var dummy := _make_intent(IntentRes.ActionType.PREPARE, 0)
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 100
+	enemy.intent_pattern = [ward, dummy, dummy]
+	enemy.signatures_enabled = false
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm.end_player_turn()  # WARD 적용 → invuln=1
+	bm.end_player_turn()  # 다음 적 턴 시작 → invuln 1→0
+	_assert(bm._enemy_status[0].get("invuln", 0) == 0, "WARD 만료 (invuln=0)")
+	bm._deal_damage_to_enemy(0, 30)
+	_assert(bm._enemy_hp[0] == 70, "WARD 만료 후 정상 데미지 (100 → 70)")
