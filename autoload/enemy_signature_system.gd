@@ -39,6 +39,7 @@ static func on_enemy_attack(bm: Object, idx: int, target_hero_id: String) -> voi
 	var enemy: Resource = bm._enemies[idx]
 	if enemy.mythology == "egyptian":
 		bm._apply_status_to_hero(target_hero_id, "vulnerable", 1)
+		bm.signature_fired.emit(idx, "egyptian_curse")  # 토스트 (battle_scene 에서 1턴 1회 throttle)
 
 # ─── Hook: 적 사망 ───
 # 불교 인과응보 — 받은 누적 피해의 25%를 ALL 영웅에 반환 (1회)
@@ -74,6 +75,7 @@ static func on_enemy_turn_start(bm: Object, idx: int) -> void:
 		else:
 			bm._enemy_block[idx] += 15
 		bm._enemy_status[idx]["daoist_stance"] = 1 - stance
+		bm.signature_fired.emit(idx, "yin_yang")  # 토스트 (1턴 1회 throttle)
 	# Japanese: 결계 매 5턴마다
 	elif enemy.mythology == "japanese":
 		var turn_count: int = bm._enemy_status[idx].get("japanese_turn_count", 0) + 1

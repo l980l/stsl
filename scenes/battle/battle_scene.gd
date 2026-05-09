@@ -33,6 +33,7 @@ const TOKEN_TILE_GAP := 4
 # enemy entry: {panel, intent_lbl, btn, name_lbl, hp_lbl, block_lbl}
 var _hero_nodes: Array = []
 var _enemy_nodes: Array = []
+var _signatures_shown_this_turn: Dictionary = {}  # 시그니처 토스트 1회/턴 throttle
 var _card_buttons: Array = []
 var _hero_char_nodes: Dictionary = {}  # hero_id → Node2D
 var _enemy_char_nodes: Array = []      # index → Node2D
@@ -828,7 +829,11 @@ func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
 		AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, new_phase)
 
 # 신화 시그니처 발동 시 화면 중앙에 짧은 토스트 표시 (~1.5초 페이드)
+# Throttle: 같은 시그니처는 1턴에 1회만 (다중 적 동시 발동 시 중복 방지)
 func _on_signature_fired(_enemy_index: int, signature_name: String) -> void:
+	if _signatures_shown_this_turn.has(signature_name):
+		return
+	_signatures_shown_this_turn[signature_name] = true
 	var toast := Label.new()
 	toast.text = tr("battle.signature.%s.toast" % signature_name)
 	toast.theme_type_variation = "TitleLabel"
@@ -1435,6 +1440,7 @@ func _on_enemy_turn_started() -> void:
 	_selected_card = null
 	_message_label.text = tr("battle.msg_enemy_turn")
 	_last_card_play_pos = Vector2.ZERO
+	_signatures_shown_this_turn.clear()  # 시그니처 토스트 throttle 리셋 (1회/턴)
 	# 적 클릭 버튼 비활성
 	for entry in _enemy_nodes:
 		if entry["panel"].visible and not entry["btn"].disabled:
