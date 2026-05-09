@@ -263,11 +263,12 @@ static func ashura_warrior(scene: PackedScene) -> Resource:
 	return e
 
 static func mara_general(scene: PackedScene) -> Resource:
+	# T3-SUMMON: 마라 군단 — mara_soldier 1마리 소환 후 강력한 공격 사이클
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.mara_general"; e.max_hp = 680; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.SUMMON; i1.value = 1; i1.status_type = "mara_soldier"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "curse"
 	var i3 := IntentRes.new()

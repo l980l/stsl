@@ -281,16 +281,19 @@ static func nidhogg_scale(scene: PackedScene) -> Resource:
 	return e
 
 static func frost_giant(scene: PackedScene) -> Resource:
+	# T3-SUMMON: 서리 거인 — frost_giant_pup 새끼 1마리 소환 + 자기 block + 강타
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.frost_giant"; e.max_hp = 680; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 60; i1.status_type = "block"
+	i1.action_type = IntentRes.ActionType.SUMMON; i1.value = 1; i1.status_type = "frost_giant_pup"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 60; i2.status_type = "block"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 110; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "blunt"
-	e.intent_pattern = [i1, i2, i3]
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 150; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
+	var i4 := IntentRes.new()
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 110; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "blunt"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func ragnarok_herald(scene: PackedScene) -> Resource:

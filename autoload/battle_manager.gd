@@ -73,6 +73,7 @@ signal active_powers_changed()
 signal enemy_counter_changed(enemy_index: int)
 signal card_pick_requested(action: String, draw_count: int)
 signal boss_phase_changed(enemy_index: int, new_phase: int)
+signal enemy_spawned(enemy_index: int)  # T3-SUMMON: 런타임 적 추가 알림 (UI 갱신용)
 
 func setup_battle(enemies: Array) -> void:
 	if deck_mgr != null:
@@ -1156,6 +1157,34 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 		IntentRes.ActionType.WARD:
 			# T3-WARD: N턴(intent.value) 동안 자기 invuln (모든 데미지 무시)
 			_enemy_status[enemy_index]["invuln"] = intent.value
+		IntentRes.ActionType.SUMMON:
+			# T3-SUMMON: 같은 mythology 의 normals 모듈에서 팩토리 호출, value 마릿수 spawn
+			# intent.status_type = 팩토리 함수 이름 (예: "scarab")
+			var src: Resource = _enemies[enemy_index]
+			var factory_name: String = intent.status_type
+			if factory_name == "" or src == null or src.mythology == "":
+				push_warning("[battle_manager] SUMMON 누락: factory_name 또는 mythology 미설정")
+			else:
+				var module_path: String = "res://resources/enemies/%s/%s_normals.gd" % [src.mythology, src.mythology]
+				var module: GDScript = load(module_path)
+				if module != null:
+					for _i in range(max(1, intent.value)):
+						var spawned: Resource = module.call(factory_name, null)
+						if spawned != null:
+							_add_enemy_to_battle(spawned)
+
+# T3-SUMMON: 런타임에 적 1마리를 전투에 추가. 모든 _enemy_* 배열 동기화 + 시그널 발화.
+func _add_enemy_to_battle(enemy: Resource) -> void:
+	if enemy == null:
+		return
+	_enemies.append(enemy)
+	_enemy_alive.append(true)
+	_enemy_hp.append(enemy.max_hp)
+	_enemy_block.append(0)
+	_enemy_status.append({})
+	_enemy_phase.append(0)
+	_enemy_intent_index.append(0)
+	enemy_spawned.emit(_enemies.size() - 1)
 
 # DEATH-RATTLE: 사망 직후 1회 실행. 자기 자신은 이미 _enemy_alive=false 상태이므로
 # BUFF_ALLY 등 동료 효과는 자신을 제외한 살아있는 동료에게만 적용됨.

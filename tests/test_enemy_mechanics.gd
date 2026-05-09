@@ -50,6 +50,10 @@ func run_all() -> Dictionary:
 	test_ward_blocks_damage()
 	test_ward_decrements_each_turn()
 	test_ward_expires_then_normal_damage()
+	# Phase 3-5 — T3-SUMMON
+	test_summon_adds_enemy_to_battle()
+	test_summon_value_2_adds_two_enemies()
+	test_summon_emits_enemy_spawned_signal()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -572,3 +576,70 @@ func test_ward_expires_then_normal_damage() -> void:
 	_assert(bm._enemy_status[0].get("invuln", 0) == 0, "WARD 만료 (invuln=0)")
 	bm._deal_damage_to_enemy(0, 30)
 	_assert(bm._enemy_hp[0] == 70, "WARD 만료 후 정상 데미지 (100 → 70)")
+
+# ─────────────── Phase 3-5: T3-SUMMON ───────────────
+
+# SUMMON value=1 → _enemies 길이 +1, 새 적 정상 등록
+func test_summon_adds_enemy_to_battle() -> void:
+	print("[TestEnemyMechanics] test_summon_adds_enemy_to_battle")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	# 부모 적: norse, frost_giant_pup 1마리 소환
+	var summon := IntentRes.new()
+	summon.action_type = IntentRes.ActionType.SUMMON
+	summon.value = 1
+	summon.status_type = "frost_giant_pup"
+	var parent := EnemyRes.new()
+	parent.max_hp = 100
+	parent.mythology = "norse"
+	parent.intent_pattern = [summon]
+	parent.signatures_enabled = false
+	bm.setup_battle([parent])
+	bm.start_player_turn()
+	_assert(bm._enemies.size() == 1, "초기 적 1마리")
+	bm.end_player_turn()  # SUMMON 발동
+	_assert(bm._enemies.size() == 2, "SUMMON 후 적 2마리")
+	_assert(bm._enemy_alive[1], "신규 적 alive")
+	_assert(bm._enemy_hp[1] == bm._enemies[1].max_hp, "신규 적 HP = max_hp (frost_giant_pup 기본 HP)")
+	_assert(bm._enemy_status[1].is_empty(), "신규 적 status 빈 dict")
+
+# SUMMON value=2 → 2마리 추가
+func test_summon_value_2_adds_two_enemies() -> void:
+	print("[TestEnemyMechanics] test_summon_value_2_adds_two_enemies")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var summon := IntentRes.new()
+	summon.action_type = IntentRes.ActionType.SUMMON
+	summon.value = 2
+	summon.status_type = "mara_soldier"
+	var parent := EnemyRes.new()
+	parent.max_hp = 100
+	parent.mythology = "buddhist"
+	parent.intent_pattern = [summon]
+	parent.signatures_enabled = false
+	bm.setup_battle([parent])
+	bm.start_player_turn()
+	bm.end_player_turn()
+	_assert(bm._enemies.size() == 3, "SUMMON value=2 → 적 3마리 (1 + 2)")
+
+# SUMMON 발동 시 enemy_spawned 시그널 발화
+func test_summon_emits_enemy_spawned_signal() -> void:
+	print("[TestEnemyMechanics] test_summon_emits_enemy_spawned_signal")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var summon := IntentRes.new()
+	summon.action_type = IntentRes.ActionType.SUMMON
+	summon.value = 1
+	summon.status_type = "yuki_onna"
+	var parent := EnemyRes.new()
+	parent.max_hp = 100
+	parent.mythology = "japanese"
+	parent.intent_pattern = [summon]
+	parent.signatures_enabled = false
+	var spawned_indices: Array = []
+	bm.enemy_spawned.connect(func(idx): spawned_indices.append(idx))
+	bm.setup_battle([parent])
+	bm.start_player_turn()
+	bm.end_player_turn()
+	_assert(spawned_indices.size() == 1, "enemy_spawned 1회 발화")
+	_assert(spawned_indices[0] == 1, "spawn 시그널의 인덱스 = 1 (적 두 번째 슬롯)")
