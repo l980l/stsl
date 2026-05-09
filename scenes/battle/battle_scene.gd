@@ -33,6 +33,7 @@ const TOKEN_TILE_GAP := 4
 # enemy entry: {panel, intent_lbl, btn, name_lbl, hp_lbl, block_lbl}
 var _hero_nodes: Array = []
 var _enemy_nodes: Array = []
+var _signatures_shown_this_turn: Dictionary = {}  # 시그니처 토스트 1회/턴 throttle
 var _card_buttons: Array = []
 var _hero_char_nodes: Dictionary = {}  # hero_id → Node2D
 var _enemy_char_nodes: Array = []      # index → Node2D
@@ -80,8 +81,16 @@ var _card_pick_in_progress: bool = false
 const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
 	"morale": "★", "charm": "♥", "strength": "↑",
-	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜"
+	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜",
+	"invuln": "🛡", "counter_pool": "🔄", "marked_by": "🎯"
 }
+
+# 내부 시그니처/메커니즘 추적 키 — 의도/상태 UI에 노출 안 함
+const STATUS_INTERNAL_KEYS := [
+	"poison_dur", "tokens", "counter_ratio", "damage_taken",
+	"greek_hubris_pending", "norse_ragnarok_fired",
+	"daoist_stance", "japanese_turn_count"
+]
 
 func _trf(key: String, args) -> String:
 	var s := tr(key)
@@ -799,6 +808,8 @@ func _connect_signals() -> void:
 	BattleManager.enemy_counter_changed.connect(_on_enemy_counter_changed)
 	BattleManager.card_pick_requested.connect(_on_card_pick_requested)
 	BattleManager.boss_phase_changed.connect(_on_boss_phase_changed)
+	BattleManager.enemy_spawned.connect(_on_enemy_spawned)
+	BattleManager.signature_fired.connect(_on_signature_fired)
 
 var _bgm_boss_id: String = ""
 
@@ -816,6 +827,61 @@ func _play_battle_bgm() -> void:
 func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
 	if new_phase >= 1 and not _bgm_boss_id.is_empty():
 		AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, new_phase)
+
+# 신화 시그니처 발동 시 화면 중앙에 짧은 토스트 표시 (~1.5초 페이드)
+# Throttle: 같은 시그니처는 1턴에 1회만 (다중 적 동시 발동 시 중복 방지)
+func _on_signature_fired(_enemy_index: int, signature_name: String) -> void:
+	if _signatures_shown_this_turn.has(signature_name):
+		return
+	_signatures_shown_this_turn[signature_name] = true
+	var toast := Label.new()
+	toast.text = tr("battle.signature.%s.toast" % signature_name)
+	toast.theme_type_variation = "TitleLabel"
+	toast.add_theme_font_size_override("font_size", 32)
+	toast.modulate = Color(1.0, 0.85, 0.3, 1.0)
+	toast.z_index = 100
+	toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	toast.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	toast.position = Vector2(WINDOW_W / 2.0 - 200, 280)
+	toast.size = Vector2(400, 60)
+	add_child(toast)
+	var tw := create_tween()
+	tw.tween_property(toast, "modulate:a", 1.0, 0.15)
+	tw.tween_interval(1.0)
+	tw.tween_property(toast, "modulate:a", 0.0, 0.35)
+	tw.tween_callback(toast.queue_free)
+
+# T3-SUMMON: 런타임에 spawn된 적의 UI 패널 + 캐릭터 노드 추가
+func _on_enemy_spawned(enemy_index: int) -> void:
+	var enemy: Resource = BattleManager.get_enemy(enemy_index)
+	if enemy == null:
+		return
+	var total: int = enemy_index + 1  # 신규 적 포함 총 슬롯 수
+	var entry: Dictionary = _make_enemy_slot(enemy_index, total)
+	_enemy_nodes.append(entry)
+	_enemy_char_nodes.append(null)
+	_enemy_status_containers.append(entry["status_box"])
+	entry["panel"].visible = true
+	entry["btn"].visible = true
+	entry["btn"].disabled = false
+	entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
+	var slot_pos: Vector2 = _enemy_slot_pos(enemy_index, total)
+	if enemy.character_scene != null:
+		var char_node = enemy.character_scene.instantiate()
+		char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
+		char_node.scale = Vector2(-1.44, 2.4)
+		add_child(char_node)
+		_enemy_char_nodes[enemy_index] = char_node
+	else:
+		var placeholder := ColorRect.new()
+		placeholder.color = Color(0.45, 0.45, 0.5, 0.6)
+		placeholder.size = Vector2(60, 120)
+		placeholder.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 30, slot_pos.y + 40)
+		add_child(placeholder)
+		_enemy_char_nodes[enemy_index] = placeholder
+	_update_enemy_ui(enemy_index)
+	_refresh_enemy_counter(enemy_index)
 
 # ─────────────────────────────────────────────
 # 배틀 초기화
@@ -1087,6 +1153,24 @@ func _update_enemy_ui(index: int) -> void:
 				entry["intent_lbl"].text = tr("battle.intent.debuff")
 			IntentRes.ActionType.PREPARE:
 				entry["intent_lbl"].text = tr("battle.intent.prepare")
+			IntentRes.ActionType.HEAL_ALLY:
+				entry["intent_lbl"].text = _trf("battle.intent.heal_ally", intent.value)
+			IntentRes.ActionType.BUFF_ALLY:
+				entry["intent_lbl"].text = _trf("battle.intent.buff_ally", intent.value)
+			IntentRes.ActionType.COUNTER_PREPARE:
+				entry["intent_lbl"].text = _trf("battle.intent.counter_prepare", intent.value)
+			IntentRes.ActionType.MARK_TARGET:
+				entry["intent_lbl"].text = tr("battle.intent.mark_target")
+			IntentRes.ActionType.SACRIFICE:
+				entry["intent_lbl"].text = _trf("battle.intent.sacrifice", intent.value)
+			IntentRes.ActionType.WARD:
+				entry["intent_lbl"].text = _trf("battle.intent.ward", intent.value)
+			IntentRes.ActionType.SUMMON:
+				entry["intent_lbl"].text = _trf("battle.intent.summon", max(1, intent.value))
+			IntentRes.ActionType.MIMIC:
+				entry["intent_lbl"].text = _trf("battle.intent.mimic", intent.value)
+			IntentRes.ActionType.SPECIAL:
+				entry["intent_lbl"].text = tr("battle.intent.special")
 			_:
 				entry["intent_lbl"].text = "?"
 
@@ -1356,6 +1440,7 @@ func _on_enemy_turn_started() -> void:
 	_selected_card = null
 	_message_label.text = tr("battle.msg_enemy_turn")
 	_last_card_play_pos = Vector2.ZERO
+	_signatures_shown_this_turn.clear()  # 시그니처 토스트 throttle 리셋 (1회/턴)
 	# 적 클릭 버튼 비활성
 	for entry in _enemy_nodes:
 		if entry["panel"].visible and not entry["btn"].disabled:
@@ -1856,8 +1941,14 @@ func _refresh_status_icons_hero(hero_id: String) -> void:
 	for child in box.get_children():
 		child.queue_free()
 	var status: Dictionary = BattleManager.get_hero_status(hero_id)
+	# T3-MARK: marked_by Array — 비어있지 않으면 마커 아이콘 별도 표시
+	var marked_by: Array = status.get("marked_by", [])
+	if marked_by.size() > 0:
+		box.add_child(_make_status_label("marked_by", marked_by.size(), status))
 	for key in status:
-		if key == "poison_dur" or key == "tokens":
+		if key in STATUS_INTERNAL_KEYS or key == "marked_by":
+			continue
+		if typeof(status[key]) != TYPE_INT:
 			continue
 		var val: int = status[key]
 		if val <= 0:
@@ -1899,7 +1990,9 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		box.add_child(hbox)
 	var status: Dictionary = BattleManager.get_enemy_status(index)
 	for key in status:
-		if key == "poison_dur":
+		if key in STATUS_INTERNAL_KEYS:
+			continue
+		if typeof(status[key]) != TYPE_INT:
 			continue
 		var val: int = status[key]
 		if val <= 0:

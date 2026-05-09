@@ -1,7 +1,7 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-08 v12)
-> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) 기준
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-09 v13)
+> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
 ---
@@ -437,27 +437,32 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - ✅ Floor 분포 검증 (`test_encounter_weighting.gd`): floor 0/5/9 각 1000회 샘플링
 - ✅ 결과 요약 CSV (`docs/balance/normal_monsters.csv`, `normal_encounters.csv`)
 
-### 6.5-2. 몬스터 메커니즘 레이어 🔲 (예정)
-**목표**: 일반 몬스터 패턴 다양화 — 단순 ATTACK/BUFF/DEBUFF 시퀀스를 넘어 트리거·적간 상호작용·신규 액션 도입.
+### 6.5-2. 몬스터 메커니즘 레이어 ✅ (PR #97)
+**달성**: 일반 몬스터 패턴 다양화 — 6 신화 시그니처 자동 + 4 티어 (시퀀스 / HP 트리거 / 적간 상호작용 / 신규 액션) + 인카운터 #8~10 테마 시너지. ~115/120 monsters (96%) 명시적 tier 적용.
 
-**디자인 합의**
-- 스코프: **티어 0~3 풀스펙** (기존 시스템 + HP 트리거 + 적간 상호작용 + 신규 액션)
-- 단위: **B + A 하이브리드** — 개별 몬스터 시그니처 + 옅은 신화 시그니처 + 인카운터 #8~10 테마 시너지
-- 템플릿 규모: **60+** (신화당 ~10 고유)
-- 신화 시그니처: 모든 몬스터 자동 적용 (휴브리스/라그나로크/저주누적/인과응보/음양/결계)
+**구현 결과**
+- 신규 인프라: `EnemyInteractionSystem` / `EnemySignatureSystem` autoload, `EnemyResource` 3 필드(phase_buffs / signatures_enabled / death_trigger), `battle_manager` 시그니처 hook 4종 + invuln/marker/counter/SUMMON 처리
+- 신규 IntentResource ActionType **7종**: HEAL_ALLY / BUFF_ALLY / COUNTER_PREPARE / MARK_TARGET / SACRIFICE / WARD / SUMMON
+- 6 신화 시그니처 자동 적용: 휴브리스(그리스) / 라그나로크(북유럽) / 저주누적(이집트) / 인과응보(불교) / 음양(도교) / 결계(일본)
+- 인카운터 #1~3 (9종) `signatures_enabled=false` 게이트
+- 인카운터 #10 보스급에 T3 적용 (COUNTER/MARK/SACRIFICE/WARD/SUMMON 시범)
+- `tests/test_enemy_mechanics.gd` 25 함수 / 60+ assertion 신규
 
-**Phase 분할** (각 phase 별도 PR, 순차 진행)
+**Phase 분할 (실제 11 commit, 약 5 시간 압축)**
 
-| Phase | 내용 | 핵심 산출물 |
+| Phase | 내용 | 결과 |
 |---|---|---|
-| 1 | 🔲 TriggerSystem + 티어 0~1 (램프·차지·디버프누적·HP 트리거·분열·변신) | 신규 `autoload/enemy_trigger_system.gd`, 그리스 신화 프로토타입 |
-| 2 | 🔲 EnemyInteractionSystem + 티어 2 (버퍼·힐러·가드·데스 트리거·콤보 인스티게이터) | 적→적 시너지, 북유럽·이집트 확장 |
-| 3 | 🔲 MarkerSystem + CounterSystem + 티어 3 + 신화 시그니처 | IntentRes 신규 액션(HEAL_ALLY/MARK_TARGET/COUNTER_PREPARE/STANCE_SWITCH/SUMMON), 챕터 1 완료 |
-| 4 | 🔲 인카운터 #8~10 테마 시너지 (탱힐딜·콤보트라이앵글·데스체인·서몬보스·분열재결합·무적로테이션) | 18 테마 슬롯, 챕터 2 완료 |
+| 1 ✅ | phase_buffs 필드 + SPECIAL 일반화 + 그리스 7종 tier | 1057aeb — TriggerSystem 별도 신설은 phase_buffs로 대체 (실용적 축약) |
+| 2 ✅ | EnemyInteractionSystem + 북유럽·이집트 13종 + DEATH-RATTLE | c4f164b, f5b9510 |
+| 3 ✅ | 6 신화 시그니처 + 챕터 2 + T3 액션 5종 | 2fbb8f1, edcbda0, 06264ec, 6e4be13, 9a4cbc3 |
+| 4 ✅ | #8~10 테마 시너지 + 챕터 1·2 잔여 34종 (완벽 대칭) | 484ea82, c621dbc |
 
-**작업 규모 추정**: ~1400줄 GDScript + 120 몬스터 명세 + 24 테스트 ≈ 3주
+**스펙 대비 조정 사항**
+- EnemyTriggerSystem 별도 autoload 미신설 — 기존 `phase_thresholds` + 신규 `phase_buffs`로 HP 트리거 처리, 시그니처용 받음/사망/N턴 트리거는 `EnemySignatureSystem`에 직접 hook
+- T3-MIMIC, T3-STANCE 미구현 — 도교 음양 시그니처가 STANCE 효과를 자동으로 제공
+- 미적용 5 monsters (cursed_monk SPECIAL, snake, cyclops, sand_scout, sand_ifrit)는 자체 특수 패턴 보유로 의도적 단순 유지
 
-**선행 작업**: 디자인 스펙 문서 작성 (`docs/game_design/monster_mechanics_v1.md`) — Phase 1 진입 전.
+**디자인 스펙**: `docs/game_design/monster_mechanics_v1.md`
 
 ---
 
@@ -723,7 +728,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-05-08 v12. PR #95 반영 — 인카운터 v2(신화당 20종 × 10 인카운터·중복 0·floor 가중치) + 몬스터 메커니즘 레이어 4 phase 신규 등록.
+> 최종 갱신: 2026-05-09 v13. PR #97 반영 — 몬스터 메커니즘 레이어 v1 완료 (6 신화 시그니처 자동 적용, IntentRes ActionType 7종 신규, ~115/120 monsters tier 적용, 25 테스트 함수).
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -747,7 +752,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 이벤트 선택지 i18n (M8.5) | PR #92. 하드코딩 한국어 → tr() 10개 키 신설, 8언어 |
 | ✅ 완료 | 오디오 시스템 V2 (M7-6) | PR #94. AudioManager·UISound·SFX 24종·BGM 70종·동적 선택·루프·정규화 |
 | ✅ 완료 | 인카운터 v2 (M6.5-1) | PR #95. 6 신화 × 20 몬스터 × 10 인카운터 (중복 0), floor 가중치 선택, 검증 3종 |
-| 🟡 중기 | 몬스터 메커니즘 레이어 (M6.5-2) | 4 phase — 트리거·적간 상호작용·신규 액션·테마 시너지. ~1400줄 GDScript / ~3주 |
+| ✅ 완료 | 몬스터 메커니즘 레이어 (M6.5-2) | PR #97. 6 신화 시그니처 자동 + IntentRes ActionType 7종 신규 + ~115/120 monsters tier 적용. 25 테스트 함수, 1269 통과 |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
 | 🟡 중기 | 이벤트 BGM 나머지 생성 (M7-6) | dark×3·encounter×2·fortune×2 미생성분 |
 | 🟢 장기 | 비주얼 (M7-1~7-5) 캐릭터·카드 아트, 이펙트 | 몰입감 |

@@ -61,6 +61,10 @@ func run_all() -> Dictionary:
 	test_theme_tank_heal_dps_norse_8()
 	test_theme_summon_boss_buddhist_10()
 	test_theme_ward_rotate_japanese_10()
+	# Phase 5-1 — T3-MIMIC
+	test_mimic_reflects_player_turn_damage()
+	test_mimic_no_damage_when_no_player_damage()
+	test_mimic_resets_on_player_turn_start()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -713,3 +717,58 @@ func test_theme_ward_rotate_japanese_10() -> void:
 	]
 	var wards: Array = _find_action_type_in_encounter(enemies, IntentRes.ActionType.WARD)
 	_assert(wards.size() == 2, "Japanese #10 TH-WARD-ROTATE — WARD 보유 적 정확히 2 (oni_king + hannya)")
+
+# ─────────────── Phase 5-1: T3-MIMIC ───────────────
+
+# 플레이어 턴 동안 가한 데미지가 누적되어 MIMIC 인텐트 발동 시 비율로 반사
+func test_mimic_reflects_player_turn_damage() -> void:
+	print("[TestEnemyMechanics] test_mimic_reflects_player_turn_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	# MIMIC 50% 인텐트만 가진 적
+	var mimic := _make_intent(IntentRes.ActionType.MIMIC, 50, IntentRes.TargetType.LOWEST_HP)
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 300
+	enemy.intent_pattern = [mimic]
+	enemy.signatures_enabled = false
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	# 플레이어 턴: 적에게 100 데미지 가함
+	bm._deal_damage_to_enemy(0, 100)
+	_assert(bm._player_damage_this_turn == 100, "_player_damage_this_turn 100 누적")
+	bm.end_player_turn()  # 적 턴 — MIMIC 발동 → 100 × 0.5 = 50 데미지
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 150, "MIMIC 50% → napoleon HP 200 - 50 = 150")
+
+# 플레이어가 데미지 없이 턴 종료하면 MIMIC도 0 데미지
+func test_mimic_no_damage_when_no_player_damage() -> void:
+	print("[TestEnemyMechanics] test_mimic_no_damage_when_no_player_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	var mimic := _make_intent(IntentRes.ActionType.MIMIC, 50, IntentRes.TargetType.LOWEST_HP)
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 300
+	enemy.intent_pattern = [mimic]
+	enemy.signatures_enabled = false
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	# 데미지 없이 턴 종료
+	bm.end_player_turn()
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 200, "MIMIC — 데미지 없음 → 영웅 HP 불변")
+
+# _player_damage_this_turn 은 매 플레이어 턴 시작 시 리셋
+func test_mimic_resets_on_player_turn_start() -> void:
+	print("[TestEnemyMechanics] test_mimic_resets_on_player_turn_start")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	var dummy := _make_intent(IntentRes.ActionType.PREPARE, 0)
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 300
+	enemy.intent_pattern = [dummy]
+	enemy.signatures_enabled = false
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	bm._deal_damage_to_enemy(0, 80)
+	_assert(bm._player_damage_this_turn == 80, "1턴 차 80 누적")
+	bm.end_player_turn()  # 적 턴
+	bm.start_player_turn()  # 다음 플레이어 턴 시작
+	_assert(bm._player_damage_this_turn == 0, "다음 플레이어 턴 시작 시 0 리셋")
