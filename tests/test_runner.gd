@@ -26,6 +26,7 @@ var TestRevive = preload("res://tests/test_revive.gd")
 var TestTaunt = preload("res://tests/test_taunt.gd")
 var TestSecretRoom = preload("res://tests/test_secret_room.gd")
 var TestEncounterWeighting = preload("res://tests/test_encounter_weighting.gd")
+var TestEnemyMechanics = preload("res://tests/test_enemy_mechanics.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -56,6 +57,7 @@ func _init() -> void:
 		TestTaunt.new(),
 		TestSecretRoom.new(),
 		TestEncounterWeighting.new(),
+		TestEnemyMechanics.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()

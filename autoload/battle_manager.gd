@@ -6,6 +6,8 @@ const EffectRes = preload("res://resources/effect_resource.gd")
 const CardRes  = preload("res://resources/card_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const RelicRes = preload("res://resources/relic_resource.gd")
+const InteractionSys = preload("res://autoload/enemy_interaction_system.gd")
+const SignatureSys = preload("res://autoload/enemy_signature_system.gd")
 
 const POISON_DMG_PER_STACK: int = 10
 const TOKEN_DMG_PER_STACK: int = 25
@@ -71,6 +73,7 @@ signal active_powers_changed()
 signal enemy_counter_changed(enemy_index: int)
 signal card_pick_requested(action: String, draw_count: int)
 signal boss_phase_changed(enemy_index: int, new_phase: int)
+signal enemy_spawned(enemy_index: int)  # T3-SUMMON: 런타임 적 추가 알림 (UI 갱신용)
 
 func setup_battle(enemies: Array) -> void:
 	if deck_mgr != null:
@@ -839,6 +842,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "") -> void:
 	if not _enemy_alive[enemy_index]:
 		return
+	# T3-WARD: invuln 활성화 시 모든 데미지 무시
+	if _enemy_status[enemy_index].get("invuln", 0) > 0:
+		enemy_damaged.emit(enemy_index, 0, damage_type)
+		return
 	amount = _consume_double_next_damage(amount)
 	if _enemy_status[enemy_index].get("vulnerable", 0) > 0:
 		amount = int(amount * 1.5)
@@ -847,9 +854,20 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	amount -= absorbed
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - amount)
 	enemy_damaged.emit(enemy_index, amount, damage_type)
+	# T3-COUNTER: counter_ratio 설정된 적은 받은 데미지의 N% counter_pool에 누적
+	if amount > 0:
+		var counter_ratio: float = _enemy_status[enemy_index].get("counter_ratio", 0.0)
+		if counter_ratio > 0.0:
+			_enemy_status[enemy_index]["counter_pool"] = _enemy_status[enemy_index].get("counter_pool", 0) + int(amount * counter_ratio)
+	# 시그니처 hook: 받음 (휴브리스/라그나로크/damage_taken 누적)
+	if amount > 0:
+		SignatureSys.on_enemy_damaged(self, enemy_index, amount)
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
 		_kills_this_card += 1
+		_fire_death_trigger(enemy_index)
+		# 시그니처 hook: 사망 (불교 인과응보)
+		SignatureSys.on_enemy_death(self, enemy_index)
 		enemy_died.emit(enemy_index)
 		for _pke in _active_powers:
 			if _pke.split(":")[0] == "power.on_kill_energy":
@@ -952,6 +970,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 		_enemy_status[enemy_index]["poison_dur"] = dur
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
+		_fire_death_trigger(enemy_index)
 		enemy_died.emit(enemy_index)
 		_check_win_condition()
 
@@ -988,9 +1007,14 @@ func _phase_enemy_main() -> void:
 			await get_tree().create_timer(turn_interval).timeout
 		first = false
 		_enemy_block[i] = 0
+		# 시그니처 hook: 턴 시작 (휴브리스 pending 처리, 도교 음양, 일본 결계)
+		SignatureSys.on_enemy_turn_start(self, i)
 		for stype: String in ["weak", "vulnerable"]:
 			if _enemy_status[i].get(stype, 0) > 0:
 				_enemy_status[i][stype] -= 1
+		# T3-WARD: invuln 카운트 매 턴 감소 (만료 시 0)
+		if _enemy_status[i].get("invuln", 0) > 0:
+			_enemy_status[i]["invuln"] -= 1
 		var charm: int = _enemy_status[i].get("charm", 0)
 		var _charm_reduce_turn: int = 0
 		for _cpk2 in _active_powers:
@@ -1051,6 +1075,12 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				dmg = int(dmg * (1.0 + 0.1 * strength))
 			if _enemy_status[enemy_index].get("weak", 0) > 0:
 				dmg = int(dmg * 0.75)
+			# T3-COUNTER: 누적된 counter_pool 가산 후 소진
+			var counter_pool: int = _enemy_status[enemy_index].get("counter_pool", 0)
+			if counter_pool > 0:
+				dmg += counter_pool
+				_enemy_status[enemy_index]["counter_pool"] = 0
+				_enemy_status[enemy_index]["counter_ratio"] = 0.0
 			if intent.target == IntentRes.TargetType.ALL:
 				if team_mgr:
 					for hero in team_mgr.get_living_heroes():
@@ -1059,7 +1089,13 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			else:
 				var target_id: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 				if target_id != "":
+					# T3-MARK: 마킹한 영웅 공격 시 데미지 +50%
+					var marked_by: Array = _hero_status.get(target_id, {}).get("marked_by", [])
+					if marked_by.has(enemy_index):
+						dmg = int(dmg * 1.5)
 					_deal_damage_to_hero(target_id, dmg, intent.damage_type)
+					# 시그니처 hook: 적의 단일 타겟 공격 (이집트 저주 누적)
+					SignatureSys.on_enemy_attack(self, enemy_index, target_id)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": target_id})
 		IntentRes.ActionType.BUFF:
 			if intent.status_type == "block" or intent.status_type == "":
@@ -1077,6 +1113,95 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				if target_id != "":
 					_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
+			_execute_special(enemy_index, intent)
+		IntentRes.ActionType.PREPARE:
+			pass  # 준비 턴 — 아무 효과 없음
+		IntentRes.ActionType.HEAL_ALLY:
+			# 동료 1명 HP 회복 (target=LOWEST_HP 우선, 그 외 무작위)
+			var target_idx: int = -1
+			if intent.target == IntentRes.TargetType.LOWEST_HP:
+				target_idx = InteractionSys.pick_lowest_hp_ally(self, enemy_index)
+			else:
+				target_idx = InteractionSys.pick_random_ally(self, enemy_index)
+			if target_idx >= 0:
+				InteractionSys.heal_ally(self, enemy_index, target_idx, intent.value)
+		IntentRes.ActionType.BUFF_ALLY:
+			# 동료 1명에게 status 부여 (strength/block/weak 무관 status_type 따름)
+			var target_idx: int = -1
+			if intent.target == IntentRes.TargetType.LOWEST_HP:
+				target_idx = InteractionSys.pick_lowest_hp_ally(self, enemy_index)
+			else:
+				target_idx = InteractionSys.pick_random_ally(self, enemy_index)
+			if target_idx >= 0:
+				InteractionSys.buff_ally(self, enemy_index, target_idx, intent.status_type, intent.value)
+		IntentRes.ActionType.COUNTER_PREPARE:
+			# T3-COUNTER: 다음 ATTACK까지 받은 데미지의 N% 누적 (intent.value = 퍼센트, 30 = 30%)
+			_enemy_status[enemy_index]["counter_ratio"] = float(intent.value) / 100.0
+			_enemy_status[enemy_index]["counter_pool"] = 0
+		IntentRes.ActionType.MARK_TARGET:
+			# T3-MARK: 한 영웅 마킹 — 마킹 동안 그 enemy의 ATTACK +50% 데미지
+			var mark_target: String = _pick_hero_target(intent.target, enemy_index)
+			if mark_target != "" and team_mgr:
+				if not _hero_status.has(mark_target):
+					_hero_status[mark_target] = {}
+				if not _hero_status[mark_target].has("marked_by"):
+					_hero_status[mark_target]["marked_by"] = []
+				if not _hero_status[mark_target]["marked_by"].has(enemy_index):
+					_hero_status[mark_target]["marked_by"].append(enemy_index)
+		IntentRes.ActionType.SACRIFICE:
+			# T3-SACRIFICE: 자기 HP -10×value 깎고 strength +value (intent.value = strength gain)
+			var hp_cost: int = intent.value * 10
+			_enemy_hp[enemy_index] = max(1, _enemy_hp[enemy_index] - hp_cost)
+			_apply_status_to_enemy(enemy_index, "strength", intent.value)
+			enemy_damaged.emit(enemy_index, hp_cost, "")
+		IntentRes.ActionType.WARD:
+			# T3-WARD: N턴(intent.value) 동안 자기 invuln (모든 데미지 무시)
+			_enemy_status[enemy_index]["invuln"] = intent.value
+		IntentRes.ActionType.SUMMON:
+			# T3-SUMMON: 같은 mythology 의 normals 모듈에서 팩토리 호출, value 마릿수 spawn
+			# intent.status_type = 팩토리 함수 이름 (예: "scarab")
+			var src: Resource = _enemies[enemy_index]
+			var factory_name: String = intent.status_type
+			if factory_name == "" or src == null or src.mythology == "":
+				push_warning("[battle_manager] SUMMON 누락: factory_name 또는 mythology 미설정")
+			else:
+				var module_path: String = "res://resources/enemies/%s/%s_normals.gd" % [src.mythology, src.mythology]
+				var module: GDScript = load(module_path)
+				if module != null:
+					for _i in range(max(1, intent.value)):
+						var spawned: Resource = module.call(factory_name, null)
+						if spawned != null:
+							_add_enemy_to_battle(spawned)
+
+# T3-SUMMON: 런타임에 적 1마리를 전투에 추가. 모든 _enemy_* 배열 동기화 + 시그널 발화.
+func _add_enemy_to_battle(enemy: Resource) -> void:
+	if enemy == null:
+		return
+	_enemies.append(enemy)
+	_enemy_alive.append(true)
+	_enemy_hp.append(enemy.max_hp)
+	_enemy_block.append(0)
+	_enemy_status.append({})
+	_enemy_phase.append(0)
+	_enemy_intent_index.append(0)
+	enemy_spawned.emit(_enemies.size() - 1)
+
+# DEATH-RATTLE: 사망 직후 1회 실행. 자기 자신은 이미 _enemy_alive=false 상태이므로
+# BUFF_ALLY 등 동료 효과는 자신을 제외한 살아있는 동료에게만 적용됨.
+func _fire_death_trigger(enemy_index: int) -> void:
+	var enemy: Resource = _enemies[enemy_index]
+	if enemy.get("death_trigger") == null:
+		return
+	_execute_intent(enemy_index, enemy.death_trigger)
+
+# SPECIAL 액션 분기 — status_type 으로 변종 식별.
+# 하위 호환: IntentResource.status_type 기본값 "weak"는 DEBUFF용으로, SPECIAL에선 미설정과 동일 취급 → remove_card.
+func _execute_special(_enemy_index: int, intent: Resource) -> void:
+	var variant: String = intent.status_type
+	if variant == "" or variant == "weak":
+		variant = "remove_card"
+	match variant:
+		"remove_card":
 			# 플레이어 덱에서 카드 영구 제거 (손패가 아닌 전체 덱 기준)
 			if deck_mgr:
 				var full: Array = deck_mgr.get_full_deck()
@@ -1086,8 +1211,8 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 					var idx: int = randi() % full.size()
 					deck_mgr.remove_from_deck(full[idx])
 					full.remove_at(idx)
-		IntentRes.ActionType.PREPARE:
-			pass  # 준비 턴 — 아무 효과 없음
+		_:
+			push_warning("[battle_manager] 알 수 없는 SPECIAL variant: %s" % variant)
 
 func _get_taunting_heroes() -> Array:
 	var result: Array = []
@@ -1290,6 +1415,11 @@ func _check_phase_transition(enemy_index: int) -> void:
 			if heal_ratio > 0.0:
 				_enemy_hp[enemy_index] = int(enemy.max_hp * heal_ratio)
 				enemy_damaged.emit(enemy_index, _enemy_hp[enemy_index], "")
+		# Phase 전환 시 자동 status 부여 (광폭화·디스트레스 등)
+		if enemy.get("phase_buffs") != null and current_phase < enemy.phase_buffs.size():
+			var buffs: Array = enemy.phase_buffs[current_phase]
+			for buff in buffs:
+				_apply_status_to_enemy(enemy_index, buff.get("status", ""), int(buff.get("value", 0)))
 
 
 func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
