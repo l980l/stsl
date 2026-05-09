@@ -81,6 +81,7 @@ static func cyclops(scene: PackedScene) -> Resource:
 	return e
 
 static func cerberus(scene: PackedScene) -> Resource:
+	# T1-DESPERATE: HP 30% 미만 strength +3 (지옥 개의 마지막 광기) + 인카운터 #10 보스급
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.cerberus"; e.max_hp = 900; e.character_scene = scene
 	e.mythology = "greek"
@@ -97,6 +98,8 @@ static func cerberus(scene: PackedScene) -> Resource:
 	var i6 := IntentRes.new()
 	i6.action_type = IntentRes.ActionType.ATTACK; i6.value = 90; i6.target = IntentRes.TargetType.ALL; i6.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3, i4, i5, i6]
+	e.phase_thresholds = [0.3]
+	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
 # ──── 신규 14종 ────
@@ -217,6 +220,7 @@ static func griffin_cub(scene: PackedScene) -> Resource:
 	return e
 
 static func medusid(scene: PackedScene) -> Resource:
+	# T2-DEATH-RATTLE: 죽을 때 메두스 응시 — ALL weak +1 (인카운터 #8 사망 체인)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.medusid"; e.max_hp = 300; e.character_scene = scene
 	e.mythology = "greek"
@@ -229,6 +233,9 @@ static func medusid(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 65; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 1; dt.status_type = "weak"; dt.target = IntentRes.TargetType.ALL
+	e.death_trigger = dt
 	return e
 
 static func fire_crab(scene: PackedScene) -> Resource:
@@ -245,15 +252,16 @@ static func fire_crab(scene: PackedScene) -> Resource:
 	return e
 
 static func stone_shard(scene: PackedScene) -> Resource:
+	# T2-GUARD: 동료에게 block 부여 + 자기 block (석화 방어진)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.stone_shard"; e.max_hp = 340; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 30; i1.status_type = "block"
+	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 25; i1.status_type = "block"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 90; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.BUFF_ALLY; i2.value = 20; i2.status_type = "block"; i2.target = IntentRes.TargetType.LOWEST_HP
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 85; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
@@ -271,6 +279,7 @@ static func chimera_cub(scene: PackedScene) -> Resource:
 	return e
 
 static func hydra_head(scene: PackedScene) -> Resource:
+	# T2-DEATH-RATTLE: 머리 잘리면 동료 strength +2 (히드라 신화 — 머리 자르면 더 강해짐)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.hydra_head"; e.max_hp = 350; e.character_scene = scene
 	e.mythology = "greek"
@@ -281,6 +290,9 @@ static func hydra_head(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "weak"; i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]
+	var dt := IntentRes.new()
+	dt.action_type = IntentRes.ActionType.BUFF_ALLY; dt.value = 2; dt.status_type = "strength"
+	e.death_trigger = dt
 	return e
 
 static func tartaros_shade(scene: PackedScene) -> Resource:
@@ -300,6 +312,10 @@ static func tartaros_shade(scene: PackedScene) -> Resource:
 	return e
 
 # ──── 인카운터 조합 테이블 (난이도 오름차순 1~10) ────
+# #8~10 테마 시너지 (Phase 4):
+#   #8 — griffin_cub + medusid(DEATH-RATTLE) + fire_crab + stone_shard(GUARD)
+#   #9 — cyclops(CHARGE) + chimera_cub + hydra_head(DEATH-RATTLE)
+#   #10 — cerberus(DESPERATE) + tartaros_shade(COUNTER)
 
 static func encounters() -> Array:
 	return [

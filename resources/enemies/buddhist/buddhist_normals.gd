@@ -295,6 +295,10 @@ static func hell_guardian(scene: PackedScene) -> Resource:
 	return e
 
 # ──── 인카운터 조합 테이블 (난이도 오름차순 1~10) ────
+# #8~10 테마 시너지 (Phase 4):
+#   #8 — sky_beast(BUFFER) + earth_spirit + wrathful_spirit(PHASE) + cursed_monk(SPECIAL)
+#   #9 — vajrapani + deva_soldier + ashura_warrior(SACRIFICE)
+#   #10 TH-SUMMON-BOSS — mara_general(SUMMON) + hell_guardian(COUNTER)
 
 static func encounters() -> Array:
 	return [

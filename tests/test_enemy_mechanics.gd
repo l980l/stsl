@@ -13,6 +13,9 @@ const CardRes = preload("res://resources/card_resource.gd")
 const InteractionSys = preload("res://autoload/enemy_interaction_system.gd")
 
 const GreekNormals = preload("res://resources/enemies/greek/greek_normals.gd")
+const NorseNormals = preload("res://resources/enemies/norse/norse_normals.gd")
+const BuddhistNormals = preload("res://resources/enemies/buddhist/buddhist_normals.gd")
+const JapaneseNormals = preload("res://resources/enemies/japanese/japanese_normals.gd")
 
 var passed: int = 0
 var failed: int = 0
@@ -54,6 +57,10 @@ func run_all() -> Dictionary:
 	test_summon_adds_enemy_to_battle()
 	test_summon_value_2_adds_two_enemies()
 	test_summon_emits_enemy_spawned_signal()
+	# Phase 4 — 인카운터 #8~10 테마 시너지 통합
+	test_theme_tank_heal_dps_norse_8()
+	test_theme_summon_boss_buddhist_10()
+	test_theme_ward_rotate_japanese_10()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -643,3 +650,66 @@ func test_summon_emits_enemy_spawned_signal() -> void:
 	bm.end_player_turn()
 	_assert(spawned_indices.size() == 1, "enemy_spawned 1회 발화")
 	_assert(spawned_indices[0] == 1, "spawn 시그널의 인덱스 = 1 (적 두 번째 슬롯)")
+
+# ─────────────── Phase 4: 인카운터 #8~10 테마 시너지 ───────────────
+
+# 헬퍼: 인카운터 패턴에서 특정 ActionType 가진 적 인덱스 찾기
+func _find_action_type_in_encounter(encounter: Array, action_type: int) -> Array:
+	var indices: Array = []
+	for i in range(encounter.size()):
+		var enemy: Resource = encounter[i]
+		var pat: Array = enemy.intent_pattern
+		for intent in pat:
+			if intent.action_type == action_type:
+				indices.append(i)
+				break
+	return indices
+
+# Norse #8 — TH-TANK-HEAL-DPS: GUARD + HEALER + DPS 구성 검증
+func test_theme_tank_heal_dps_norse_8() -> void:
+	print("[TestEnemyMechanics] test_theme_tank_heal_dps_norse_8")
+	var enemies: Array = [
+		NorseNormals.runestone_golem(null),
+		NorseNormals.night_hag(null),
+		NorseNormals.lindworm_spawn(null),
+		NorseNormals.einherjar_ghost(null),
+	]
+	# GUARD 역할 (BUFF_ALLY block)
+	var guards: Array = _find_action_type_in_encounter(enemies, IntentRes.ActionType.BUFF_ALLY)
+	_assert(guards.size() >= 1, "Norse #8 TH-TANK-HEAL-DPS — BUFF_ALLY 보유 적 1+ (GUARD)")
+	# HEALER 역할 (HEAL_ALLY)
+	var healers: Array = _find_action_type_in_encounter(enemies, IntentRes.ActionType.HEAL_ALLY)
+	_assert(healers.size() >= 1, "Norse #8 — HEAL_ALLY 보유 적 1+ (HEALER)")
+	# DEATH-RATTLE 보유 적 (night_hag)
+	var death_carriers: int = 0
+	for e in enemies:
+		if e.death_trigger != null:
+			death_carriers += 1
+	_assert(death_carriers >= 1, "Norse #8 — death_trigger 보유 적 1+")
+
+# Buddhist #10 — TH-SUMMON-BOSS: SUMMON 보유 적이 인카운터 구성에 있고 spawn이 동작
+func test_theme_summon_boss_buddhist_10() -> void:
+	print("[TestEnemyMechanics] test_theme_summon_boss_buddhist_10")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	var enemies: Array = [
+		BuddhistNormals.mara_general(null),
+		BuddhistNormals.hell_guardian(null),
+	]
+	var summons: Array = _find_action_type_in_encounter(enemies, IntentRes.ActionType.SUMMON)
+	_assert(summons.size() >= 1, "Buddhist #10 TH-SUMMON-BOSS — SUMMON 보유 적 1+")
+	bm.setup_battle(enemies)
+	var initial_count: int = bm._enemies.size()
+	bm.start_player_turn()
+	bm.end_player_turn()  # 적 턴 — mara_general SUMMON 발동 예상
+	_assert(bm._enemies.size() > initial_count, "Buddhist #10 — 적 턴 후 새 적 spawn (size 증가)")
+
+# Japanese #10 — TH-WARD-ROTATE: 두 마리 모두 WARD 보유
+func test_theme_ward_rotate_japanese_10() -> void:
+	print("[TestEnemyMechanics] test_theme_ward_rotate_japanese_10")
+	var enemies: Array = [
+		JapaneseNormals.oni_king(null),
+		JapaneseNormals.hannya(null),
+	]
+	var wards: Array = _find_action_type_in_encounter(enemies, IntentRes.ActionType.WARD)
+	_assert(wards.size() == 2, "Japanese #10 TH-WARD-ROTATE — WARD 보유 적 정확히 2 (oni_king + hannya)")

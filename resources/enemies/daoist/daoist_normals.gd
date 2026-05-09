@@ -278,11 +278,12 @@ static func dragon_king_child(scene: PackedScene) -> Resource:
 	return e
 
 static func immortal_warrior(scene: PackedScene) -> Resource:
+	# T3-SACRIFICE: 자기 HP -40 → strength +4 (불사 전사의 헌신) + 인카운터 #10 보스급
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.immortal_warrior"; e.max_hp = 680; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.SACRIFICE; i1.value = 4
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()

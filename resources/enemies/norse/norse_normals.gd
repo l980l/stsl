@@ -313,6 +313,10 @@ static func ragnarok_herald(scene: PackedScene) -> Resource:
 	return e
 
 # ──── 인카운터 조합 테이블 (난이도 오름차순 1~10) ────
+# #8~10 테마 시너지 (Phase 4):
+#   #8 TH-TANK-HEAL-DPS — runestone_golem(GUARD) + einherjar_ghost(HEALER) + night_hag(DEATH-RATTLE) + lindworm_spawn(DPS)
+#   #9 — jotun_soldier(GUARD) + fenrir_pup(BERSERK) + nidhogg_scale(DEBUFF누적). 강한 단일 적
+#   #10 TH-SUMMON-BOSS — frost_giant(SUMMON) + ragnarok_herald(MARK)
 
 static func encounters() -> Array:
 	return [

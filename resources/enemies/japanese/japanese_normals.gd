@@ -270,11 +270,12 @@ static func dragon_serpent(scene: PackedScene) -> Resource:
 	return e
 
 static func oni_king(scene: PackedScene) -> Resource:
+	# T3-WARD: 오니 왕의 결계 — hannya와 함께 TH-WARD-ROTATE 테마 (인카운터 #10)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.oni_king"; e.max_hp = 700; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.WARD; i1.value = 1
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()
@@ -299,6 +300,10 @@ static func hannya(scene: PackedScene) -> Resource:
 	return e
 
 # ──── 인카운터 조합 테이블 (난이도 오름차순 1~10) ────
+# #8~10 테마 시너지 (Phase 4):
+#   #8 — river_kappa + snow_woman + cursed_scroll(DEATH-RATTLE) + tatami_monster(PHASE)
+#   #9 — ronin_ghost + yamabushi_ghost + dragon_serpent(DESPERATE)
+#   #10 TH-WARD-ROTATE — oni_king(WARD) + hannya(WARD) — 2 마리 무적 사이클
 
 static func encounters() -> Array:
 	return [
