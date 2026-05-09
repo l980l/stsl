@@ -34,6 +34,16 @@ const TOKEN_TILE_GAP := 4
 var _hero_nodes: Array = []
 var _enemy_nodes: Array = []
 var _signatures_shown_this_turn: Dictionary = {}  # 시그니처 토스트 1회/턴 throttle
+
+# 시그니처 발동 시 적 위치에 표시할 색상 (D — 시각 효과)
+const SIGNATURE_COLORS := {
+	"hubris":         Color(1.0, 0.45, 0.2),   # 그리스 — 붉은 분노
+	"ragnarok":       Color(0.7, 0.25, 0.85),  # 북유럽 — 자주 운명
+	"egyptian_curse": Color(0.45, 0.95, 0.4),  # 이집트 — 녹색 저주
+	"karma":          Color(1.0, 0.85, 0.3),   # 불교 — 황금
+	"yin_yang":       Color(0.85, 0.95, 1.0),  # 도교 — 청백
+	"kekkai":         Color(0.3, 0.7, 1.0),    # 일본 — 푸른 결계
+}
 var _card_buttons: Array = []
 var _hero_char_nodes: Dictionary = {}  # hero_id → Node2D
 var _enemy_char_nodes: Array = []      # index → Node2D
@@ -830,15 +840,17 @@ func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
 
 # 신화 시그니처 발동 시 화면 중앙에 짧은 토스트 표시 (~1.5초 페이드)
 # Throttle: 같은 시그니처는 1턴에 1회만 (다중 적 동시 발동 시 중복 방지)
-func _on_signature_fired(_enemy_index: int, signature_name: String) -> void:
+func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	if _signatures_shown_this_turn.has(signature_name):
 		return
 	_signatures_shown_this_turn[signature_name] = true
+	# 토스트 라벨 (화면 중앙 페이드)
+	var color: Color = SIGNATURE_COLORS.get(signature_name, Color(1.0, 0.85, 0.3))
 	var toast := Label.new()
 	toast.text = tr("battle.signature.%s.toast" % signature_name)
 	toast.theme_type_variation = "TitleLabel"
 	toast.add_theme_font_size_override("font_size", 32)
-	toast.modulate = Color(1.0, 0.85, 0.3, 1.0)
+	toast.modulate = color
 	toast.z_index = 100
 	toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -851,6 +863,32 @@ func _on_signature_fired(_enemy_index: int, signature_name: String) -> void:
 	tw.tween_interval(1.0)
 	tw.tween_property(toast, "modulate:a", 0.0, 0.35)
 	tw.tween_callback(toast.queue_free)
+	# 적 위치에 색상 플래시 (시그니처 색상)
+	_burst_signature_at_enemy(enemy_index, color)
+
+# 적 panel 중앙에 확장하는 색상 사각형 (페이드 아웃)
+func _burst_signature_at_enemy(enemy_index: int, color: Color) -> void:
+	if enemy_index < 0 or enemy_index >= _enemy_nodes.size():
+		return
+	var panel: ColorRect = _enemy_nodes[enemy_index]["panel"]
+	if panel == null or not panel.visible:
+		return
+	var center: Vector2 = panel.global_position + panel.size / 2.0
+	var burst := ColorRect.new()
+	var col: Color = color
+	col.a = 0.55
+	burst.color = col
+	burst.size = Vector2(140, 140)
+	burst.position = center - Vector2(70, 70)
+	burst.pivot_offset = Vector2(70, 70)
+	burst.scale = Vector2(0.3, 0.3)
+	burst.z_index = 50
+	burst.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(burst)
+	var tw := create_tween().set_parallel(true)
+	tw.tween_property(burst, "scale", Vector2(2.6, 2.6), 0.55)
+	tw.tween_property(burst, "modulate:a", 0.0, 0.55)
+	tw.chain().tween_callback(burst.queue_free)
 
 # T3-SUMMON: 런타임에 spawn된 적의 UI 패널 + 캐릭터 노드 추가
 func _on_enemy_spawned(enemy_index: int) -> void:

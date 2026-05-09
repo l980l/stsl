@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <filter id="counter-glow">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="counter-grad" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#ff8844"/>
+      <stop offset="60%" stop-color="#cc3322"/>
+      <stop offset="100%" stop-color="#441100"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 외곽 링 -->
+  <circle cx="128" cy="128" r="112" fill="#080c18" stroke="#c9a84c" stroke-width="7"/>
+
+  <!-- 회전 화살 사이클 (반격 의미) -->
+  <g transform="translate(128 128)">
+    <!-- 외부 회전 호 -->
+    <path d="M -70,0 A 70,70 0 1 1 50,50"
+          fill="none" stroke="#cc4422" stroke-width="14" stroke-linecap="round"
+          filter="url(#counter-glow)"/>
+    <!-- 화살촉 -->
+    <polygon points="60,38 32,72 72,62" fill="#ff6633" filter="url(#counter-glow)"/>
+  </g>
+
+  <!-- 중앙 누적 결정 (다이아몬드) -->
+  <g transform="translate(128 128)" filter="url(#counter-glow)">
+    <polygon points="0,-32 22,0 0,32 -22,0" fill="url(#counter-grad)" stroke="#c9a84c" stroke-width="3"/>
+    <polygon points="0,-22 14,0 0,22 -14,0" fill="#ffaa66" opacity="0.6"/>
+    <line x1="0" y1="-32" x2="0" y2="32" stroke="#ffeeaa" stroke-width="2" opacity="0.4"/>
+  </g>
+
+  <!-- 누적 입자 -->
+  <circle cx="86" cy="86" r="4" fill="#ff8844" opacity="0.9"/>
+  <circle cx="170" cy="80" r="3" fill="#ff8844" opacity="0.7"/>
+  <circle cx="180" cy="160" r="4" fill="#ff8844" opacity="0.85"/>
+  <circle cx="74" cy="170" r="3" fill="#ff8844" opacity="0.7"/>
+</svg>

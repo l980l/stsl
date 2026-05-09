@@ -19,7 +19,10 @@ assets/art/heroes/
 assets/art/scenes/
 assets/art/ui/intent/
 assets/art/ui/relic/
-assets/art/ui/status/
+assets/art/ui/status/*
+!assets/art/ui/status/invuln.svg
+!assets/art/ui/status/counter_pool.svg
+!assets/art/ui/status/marked_by.svg
 assets/art/ui/synergy/
 # assets/art/ui/icon_settings.svg 및 assets/art/ui/map/ 은 추적 대상
 
