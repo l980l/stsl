@@ -300,7 +300,7 @@ func test_act2_pharaoh_tomb_relic() -> void:
 	var pool := EventsAct2.build_pool()
 	var found := false
 	for e in pool:
-		if e.event_name == "파라오의 무덤":
+		if e.event_name == "event.act2.pharaoh_tomb.name":
 			found = true
 			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.ADD_RELIC, "선택 A: ADD_RELIC")
 			_assert(e.choices[0].cost_hp == 35, "cost_hp == 35")
@@ -312,7 +312,7 @@ func test_act2_ra_sunboat_add_hero() -> void:
 	var pool := EventsAct2.build_pool()
 	var found := false
 	for e in pool:
-		if e.event_name == "라의 태양선":
+		if e.event_name == "event.act2.ra_sunboat.name":
 			found = true
 			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.ADD_HERO, "선택 A: ADD_HERO")
 	_assert(found, "라의 태양선 이벤트 존재")
@@ -336,7 +336,7 @@ func test_act2_oasis_three_choices() -> void:
 	var pool := EventsAct2.build_pool()
 	var found := false
 	for e in pool:
-		if e.event_name == "오아시스 상인":
+		if e.event_name == "event.act2.oasis_merchant.name":
 			found = true
 			_assert(e.choices.size() == 3, "오아시스 상인 선택지 3개")
 	_assert(found, "오아시스 상인 이벤트 존재")
@@ -418,7 +418,7 @@ func test_japanese_ise_shrine_event() -> void:
 	var ChoiceRes = load("res://resources/event_choice_resource.gd")
 	var found := false
 	for e in pool:
-		if e.event_name == "이세 신궁의 축복":
+		if e.event_name == "event.japanese.ise_shrine_blessing.name":
 			found = true
 			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.HEAL, "선택A: HEAL")
 			_assert(e.choices[0].value == 50, "HEAL +50")

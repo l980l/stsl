@@ -37,7 +37,7 @@ func _make_lm() -> LocaleManagerClass:
 
 func test_locales_list_contains_all_eight() -> void:
 	var lm := _make_lm()
-	_assert(lm.LOCALES.size() == 8, "LOCALES 8개 (ko en fr it es ja el zh)")
+	_assert(lm.LOCALES.size() == 9, "LOCALES 9개 (el en es fr it ja ko zh zh_TW)")
 	_assert("ko" in lm.LOCALES, "ko 포함")
 	_assert("es" in lm.LOCALES, "es(스페인어) 포함")
 	_assert(not "ar" in lm.LOCALES, "ar(아랍어) 미지원 — RTL 미구현")

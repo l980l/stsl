@@ -700,7 +700,9 @@ func test_hero_status_decrements_on_player_turn() -> void:
 	bm._hero_status["napoleon"] = {"weak": 2, "vulnerable": 1}
 	bm.is_battle_active = true
 	bm.start_player_turn()
-	_assert(bm._hero_status["napoleon"].get("weak", -1) == 1, "영웅 weak 2 → 1 (플레이어 턴마다 감소)")
+	# 영웅 status 감소는 플레이어 턴 종료 시(_phase_player_post)에 일어남 — 적 status 감소(_execute_enemy_turn)와 대칭
+	bm.end_player_turn()
+	_assert(bm._hero_status["napoleon"].get("weak", -1) == 1, "영웅 weak 2 → 1 (플레이어 턴 종료 시 감소)")
 	_assert(bm._hero_status["napoleon"].get("vulnerable", -1) == 0, "영웅 vulnerable 1 → 0")
 
 func test_synergy_joan_napoleon_heal_all() -> void:

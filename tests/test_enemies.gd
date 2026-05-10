@@ -131,7 +131,7 @@ func test_snake_pattern_length() -> void:
 	var gm := _make_gm()
 	var snake: Resource = GreekNormals.snake(_make_dummy_scene())
 	_assert(snake.intent_pattern.size() == 2, "메두사의 뱀 패턴 2개")
-	_assert(snake.enemy_name == "메두사의 뱀", "메두사의 뱀 이름")
+	_assert(snake.enemy_name == "enemy.greek.snake", "메두사의 뱀 이름")
 	_assert(snake.intent_pattern[1].status_type == "vulnerable", "메두사의 뱀 DEBUFF = vulnerable")
 
 func test_elite_enemy_hp() -> void:
@@ -161,7 +161,7 @@ func test_scylla_pattern() -> void:
 	print("[TestEnemies] test_scylla_pattern")
 	var gm := _make_gm()
 	var s: Resource = GreekAct1.scylla(_make_dummy_scene())
-	_assert(s.enemy_name == "스킬라", "스킬라 이름")
+	_assert(s.enemy_name == "enemy.greek.scylla", "스킬라 이름")
 	_assert(s.max_hp == 1900, "스킬라 HP = 1900")
 	_assert(s.phase_thresholds.size() == 1, "스킬라 페이즈 임계값 1개")
 	_assert(s.phase_patterns.size() == 2, "스킬라 페이즈 패턴 2개")
@@ -280,7 +280,7 @@ func _make_bm_with_hero() -> Node:
 func test_act2_boss_name() -> void:
 	print("[TestEnemies] test_act2_boss_name")
 	var e := EgyptianAct2.osiris(_make_dummy_scene())
-	_assert(e.enemy_name == "오시리스", "Act2 보스 이름 오시리스")
+	_assert(e.enemy_name == "enemy.egyptian.osiris", "Act2 보스 이름 오시리스")
 
 func test_act2_boss_phase_heal_ratios() -> void:
 	print("[TestEnemies] test_act2_boss_phase_heal_ratios")
@@ -291,7 +291,7 @@ func test_act2_boss_phase_heal_ratios() -> void:
 func test_act2_normal_sand_scout() -> void:
 	print("[TestEnemies] test_act2_normal_sand_scout")
 	var e := EgyptianNormals.sand_scout(_make_dummy_scene())
-	_assert(e.enemy_name == "사막 척후병", "이름 확인")
+	_assert(e.enemy_name == "enemy.egyptian.sand_scout", "이름 확인")
 	_assert(e.max_hp == 380, "HP 380")
 	_assert(e.intent_pattern.size() == 3, "인텐트 3개")
 	var has_buff := false
@@ -399,10 +399,10 @@ func test_act2_gm_act_switch() -> void:
 	gm.act_mythologies = ["greek", "egyptian"]
 	gm.current_act = 1
 	var boss_act1 := gm._make_boss_enemies()
-	_assert(boss_act1[0].enemy_name == "히드라", "Act1 보스: 히드라")
+	_assert(boss_act1[0].enemy_name == "enemy.greek.hydra", "Act1 보스: 히드라")
 	gm.current_act = 2
 	var boss_act2 := gm._make_boss_enemies()
-	_assert(boss_act2[0].enemy_name == "오시리스", "Act2 보스: 오시리스")
+	_assert(boss_act2[0].enemy_name == "enemy.egyptian.osiris", "Act2 보스: 오시리스")
 
 func test_greek_normals_encounters() -> void:
 	print("[TestEnemies] test_greek_normals_encounters")
@@ -456,7 +456,7 @@ func test_norse_encounters_shape() -> void:
 func test_norse_act3_boss_name() -> void:
 	print("[TestEnemies] test_norse_act3_boss_name")
 	var e := NorseAct3.jormungandr(_make_dummy_scene())
-	_assert(e.enemy_name == "요르문간드르", "보스 이름 요르문간드르")
+	_assert(e.enemy_name == "enemy.norse.jormungandr", "보스 이름 요르문간드르")
 	_assert(e.max_hp == 5000, "보스 HP 5000")
 	_assert(e.phase_thresholds.size() == 2, "보스 페이즈 임계값 2개 (3페이즈)")
 	_assert(e.phase_patterns.size() == 3, "보스 페이즈 패턴 3개")

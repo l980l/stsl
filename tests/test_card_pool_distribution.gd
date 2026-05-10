@@ -50,9 +50,9 @@ func test_napoleon_rarity_distribution() -> void:
 	_assert(pool.size() == 30, "나폴레옹 풀 30장 (H6 재설계)")
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 4: 기병위협, 참호구축, 전열재편, 진격나팔
-	_assert(counts["COMMON"] == 4, "나폴레옹 COMMON 4장 (실제: %d)" % counts["COMMON"])
-	# UNCOMMON 10: 경기병돌격, 황제의권능, 근위대돌격, 포병집결, 황실포병대, 군단진격, 그랑다르메방패, 황제의의지, 영광의함성, 정찰
-	_assert(counts["UNCOMMON"] == 10, "나폴레옹 UNCOMMON 10장 (실제: %d)" % counts["UNCOMMON"])
+	_assert(counts["COMMON"] == 5, "나폴레옹 COMMON 5장 (실제: %d)" % counts["COMMON"])
+	# UNCOMMON 9: 경기병돌격, 황제의권능, 근위대돌격, 포병집결, 황실포병대, 군단진격, 그랑다르메방패, 황제의의지, 영광의함성 (정찰 → COMMON 이동)
+	_assert(counts["UNCOMMON"] == 9, "나폴레옹 UNCOMMON 9장 (실제: %d)" % counts["UNCOMMON"])
 	# RARE 12: 아우스터리츠기동, 정복칙령, 일기당천, 아르콜레돌파, 알프스횡단, 제국보병소집, 황제군단, 포병일제사격, 보로디노포격, 독수리군기, 승리포고, 황제포위령
 	_assert(counts["RARE"] == 12, "나폴레옹 RARE 12장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 2: 황제돌격, 황제명령
@@ -152,7 +152,7 @@ func test_joan_archetype_distribution() -> void:
 		if a in archetypes:
 			archetypes[a] += 1
 	_assert(archetypes["신성"] == 11, "잔다르크 신성 11장 (실제: %d)" % archetypes["신성"])
-	_assert(archetypes["부활"] == 10, "잔다르크 부활 10장 (실제: %d)" % archetypes["부활"])
+	_assert(archetypes["부활"] == 4, "잔다르크 부활 4장 (실제: %d)" % archetypes["부활"])
 	_assert(archetypes["순교"] == 9, "잔다르크 순교 9장 (실제: %d)" % archetypes["순교"])
 
 func test_genghis_rarity_distribution() -> void:
