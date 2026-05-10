@@ -291,6 +291,7 @@ static func nine_tailed_spirit(scene: PackedScene) -> Resource:
 
 static func dragon_king_child(scene: PackedScene) -> Resource:
 	# T3-MARK: 용왕 자식의 봉인 — LOWEST_HP 영웅 마킹 → 이후 ATTACK +50%
+	# 밸런스 튜닝: ATK 130→160, ALL 100→120 (daoist #9 평탄 해결)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.dragon_king_child"; e.max_hp = 720; e.character_scene = scene
 	e.mythology = "daoist"
@@ -299,23 +300,24 @@ static func dragon_king_child(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.MARK_TARGET; i2.target = IntentRes.TargetType.LOWEST_HP
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "divine"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 160; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "divine"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 100; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "divine"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "divine"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func immortal_warrior(scene: PackedScene) -> Resource:
 	# T3-SACRIFICE: 자기 HP -40 → strength +4 (불사 전사의 헌신) + 인카운터 #10 보스급
+	# 밸런스 튜닝: ATK 140→160 (daoist #9 강화)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.immortal_warrior"; e.max_hp = 680; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.SACRIFICE; i1.value = 4
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 160; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 160; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 

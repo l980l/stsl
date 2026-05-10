@@ -96,15 +96,16 @@ static func vajrapani(scene: PackedScene) -> Resource:
 
 static func dharma_puppet(scene: PackedScene) -> Resource:
 	# DEATH-RATTLE: 죽을 때 ALL vulnerable +1 (다르마 인형 파편)
+	# 밸런스 튜닝: HP 300→260, ATK 70→55 (#4 lotus_spirit T2-HEALER 동시 부담 완화)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.buddhist.dharma_puppet"; e.max_hp = 300; e.character_scene = scene
+	e.enemy_name = "enemy.buddhist.dharma_puppet"; e.max_hp = 260; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "vulnerable"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 70; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "curse"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 55; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "curse"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 55; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3]
 	var dt := IntentRes.new()
 	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 1; dt.status_type = "vulnerable"; dt.target = IntentRes.TargetType.ALL

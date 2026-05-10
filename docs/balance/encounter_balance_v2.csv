@@ -7,7 +7,7 @@ greek,4,보통,3,840,525,6,0,0,0,all,18,harpy|harpy|harpy,-
 greek,5,다소강함,3,870,505,5,1,0,0,all,23,stymphalian_bird|giant_ant|dryad,PHASE_TRIGGER
 greek,6,강함,3,1180,960,8,3,0,0,all,45,centaur|centaur|ares_soldier,PHASE_TRIGGER
 greek,7,강함,4,1240,490,7,1,2,1,all,46,griffin_cub|medusid|fire_crab|stone_shard,BUFF_ALLY|DEATH_RATTLE|PHASE_TRIGGER
-greek,8,매우강함,3,1450,860,5,1,0,1,all,40,cyclops|chimera_cub|hydra_head,PHASE_TRIGGER|DEATH_RATTLE
+greek,8,매우강함,3,1650,930,5,1,0,1,all,43,cyclops|chimera_cub|hydra_head,PHASE_TRIGGER|DEATH_RATTLE
 greek,9,최강,2,1400,860,8,1,1,0,all,44,cerberus|tartaros_shade,PHASE_TRIGGER|COUNTER_PREPARE
 norse,0,매우약함,1,300,180,3,0,0,0,1 disabled,3,urdr_spider,-
 norse,1,약함,2,640,220,2,0,0,0,2 disabled,4,volva_witch|volva_witch,-
@@ -21,18 +21,18 @@ norse,8,매우강함,3,1450,900,6,1,1,0,all,45,jotun_soldier|fenrir_pup|nidhogg_
 norse,9,최강,2,1350,980,5,0,2,0,all,48,frost_giant|ragnarok_herald,SUMMON|MARK_TARGET
 egyptian,0,매우약함,1,320,110,2,0,0,0,1 disabled,2,ka_spirit,-
 egyptian,1,약함,2,520,230,4,0,0,0,2 disabled,3,scarab|scarab,-
-egyptian,2,약함,1,350,320,4,0,0,0,1 disabled,6,sphinx_cub,-
-egyptian,3,보통,2,730,280,4,1,0,1,all,21,desert_scorpion|sand_wraith,DEATH_RATTLE|PHASE_TRIGGER
+egyptian,2,약함,1,350,240,3,0,0,0,1 disabled,4,sphinx_cub,-
+egyptian,3,보통,2,730,320,4,1,0,1,all,22,desert_scorpion|sand_wraith,DEATH_RATTLE|PHASE_TRIGGER
 egyptian,4,보통,3,840,450,6,0,0,0,all,17,sand_rat|sand_rat|sand_rat,-
 egyptian,5,다소강함,3,1070,510,6,1,1,0,all,33,anubis_guard|sand_scout|nile_crocodile,BUFF_ALLY|PHASE_TRIGGER
-egyptian,6,강함,3,1210,860,3,0,2,0,all,45,clay_soldier|clay_soldier|sand_ifrit,BUFF_ALLY
+egyptian,6,강함,3,1210,710,3,0,2,0,all,42,clay_soldier|clay_soldier|sand_ifrit,BUFF_ALLY
 egyptian,7,강함,4,1230,475,7,0,2,2,all,45,tomb_wraith|khopesh_warrior|jackal_priest|desert_ghoul,DEATH_RATTLE|BUFF_ALLY|HEAL_ALLY
 egyptian,8,매우강함,3,1450,880,6,2,0,0,all,41,mummy_warrior|sobek_spawn|ammit_cub,PHASE_TRIGGER
-egyptian,9,최강,2,1400,960,6,0,1,0,all,41,sphinx_adult|pyramid_golem,BUFF_ALLY
+egyptian,9,최강,2,1400,1050,6,1,1,0,all,48,sphinx_adult|pyramid_golem,PHASE_TRIGGER|BUFF_ALLY
 buddhist,0,매우약함,1,280,180,1,0,0,0,1 disabled,2,garuda,-
 buddhist,1,약함,2,640,320,4,0,0,0,2 disabled,6,yaksha|yaksha,-
 buddhist,2,약함,1,350,140,2,0,0,0,1 disabled,2,mara_soldier,-
-buddhist,3,보통,2,610,210,3,0,1,1,all,22,dharma_puppet|lotus_spirit,DEATH_RATTLE|HEAL_ALLY
+buddhist,3,보통,2,570,180,3,0,1,1,all,20,dharma_puppet|lotus_spirit,DEATH_RATTLE|HEAL_ALLY
 buddhist,4,보통,3,840,360,6,3,0,0,all,30,hungry_ghost|hungry_ghost|hungry_ghost,PHASE_TRIGGER
 buddhist,5,다소강함,3,970,370,5,2,0,1,all,30,asura|naga_spawn|demon_soldier,PHASE_TRIGGER|DEATH_RATTLE
 buddhist,6,강함,3,1270,530,5,0,2,1,all,42,virudhaka|virudhaka|karmic_fiend,BUFF_ALLY|DEATH_RATTLE
@@ -48,7 +48,7 @@ daoist,5,다소강함,3,900,350,5,1,1,1,all,33,cloud_beast|jade_puppet|river_spi
 daoist,6,강함,3,1230,520,6,1,2,0,all,43,elder_hermit|elder_hermit|celestial_soldier,HEAL_ALLY|PHASE_TRIGGER
 daoist,7,강함,4,1260,520,7,2,1,1,all,44,fire_salamander|iron_guard|wind_sprite|earth_dragon,PHASE_TRIGGER|BUFF_ALLY|DEATH_RATTLE
 daoist,8,매우강함,3,1450,650,6,1,1,1,all,44,azure_guardian|celestial_lion|nine_tailed_spirit,BUFF_ALLY|PHASE_TRIGGER|DEATH_RATTLE
-daoist,9,최강,2,1400,710,4,0,2,0,all,44,dragon_king_child|immortal_warrior,MARK_TARGET|SACRIFICE
+daoist,9,최강,2,1400,840,4,0,2,0,all,46,dragon_king_child|immortal_warrior,MARK_TARGET|SACRIFICE
 japanese,0,매우약함,1,300,70,1,0,0,0,1 disabled,1,yuki_onna,-
 japanese,1,약함,2,640,300,4,0,0,0,2 disabled,6,tengu|tengu,-
 japanese,2,약함,1,350,240,3,0,0,0,1 disabled,4,shuten_minion,-
