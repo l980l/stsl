@@ -68,14 +68,15 @@ static func sand_scout(scene: PackedScene) -> Resource:
 	return e
 
 static func sand_ifrit(scene: PackedScene) -> Resource:
-	# 밸런스 튜닝: ATK ALL 230→180 (#7 ≥ #8 역전 해결, 단발이 아니라 ALL이라 영향 큼)
+	# 밸런스 튜닝 v2 (시뮬레이션 발견): ATK ALL 180→130 추가 nerf — egyptian #6이 #7~9보다 어렵던 outlier 해결
+	# (1062 dmg → 예상 ~600 dmg, 다른 #6 monsters와 균형)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.sand_ifrit"; e.max_hp = 450; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"; i1.condition = "준비"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 180; i2.target = IntentRes.TargetType.ALL; i2.damage_type = "fire"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 130; i2.target = IntentRes.TargetType.ALL; i2.damage_type = "fire"
 	e.intent_pattern = [i1, i2]
 	return e
 
