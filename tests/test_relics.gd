@@ -236,7 +236,7 @@ func test_hero_relics_second_set() -> void:
 
 func test_act2_relics_exist() -> void:
 	print("[TestRelics] test_act2_relics_exist")
-	var act2_names := ["앙크의 생명", "호루스의 눈", "스카라베 부적"]
+	var act2_names := ["relic.ankh_of_life.name", "relic.eye_of_horus.name", "relic.scarab_talisman.name"]
 	var RelicsGd = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicsGd.build_pool()
 	for name in act2_names:
@@ -248,7 +248,7 @@ func test_act2_relics_exist() -> void:
 		_assert(found, "Act2 렐릭 존재: %s" % name)
 	var eye: Resource = null
 	for r in pool:
-		if r.relic_name == "호루스의 눈": eye = r
+		if r.relic_name == "relic.eye_of_horus.name": eye = r
 	_assert(eye != null and eye.owner_hero_id == "cleopatra", "호루스의 눈 — 클레오파트라 전용")
 
 func test_buddhist_relics_exist() -> void:
@@ -287,11 +287,12 @@ func test_japanese_relics_exist() -> void:
 	var pool: Array = RelicsGd.build_pool()
 	_assert(pool.size() == 40, "릴릭 풀 40종")
 	var names := pool.map(func(r): return r.relic_name)
-	_assert("귀신 부적" in names, "귀신 부적 존재")
-	_assert("텐구의 깃털" in names, "텐구의 깃털 존재")
-	_assert("오로치의 비늘" in names, "오로치의 비늘 존재")
+	_assert("relic.ghost_talisman.name" in names, "귀신 부적 존재")
+	_assert("relic.tengu_feather.name" in names, "텐구의 깃털 존재")
+	_assert("relic.orochi_scale.name" in names, "오로치의 비늘 존재")
 	var RelicRes2 = load("res://resources/relic_resource.gd")
-	var feather = pool.filter(func(r): return r.relic_name == "텐구의 깃털")[0]
-	_assert(feather.trigger == RelicRes2.TriggerType.BATTLE_START, "텐구의 깃털 트리거=BATTLE_START")
+	# Phase 3 차별화: BATTLE_START → DRAW 1 (tacticians_map과 동일) → BATTLE_WIN → DRAW 2
+	var feather = pool.filter(func(r): return r.relic_name == "relic.tengu_feather.name")[0]
+	_assert(feather.trigger == RelicRes2.TriggerType.BATTLE_WIN, "텐구의 깃털 트리거=BATTLE_WIN")
 	_assert(feather.effect_type == RelicRes2.EffectType.DRAW, "텐구의 깃털 효과=DRAW")
-	_assert(feather.value == 1, "텐구의 깃털 value=1")
+	_assert(feather.value == 2, "텐구의 깃털 value=2")

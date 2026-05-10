@@ -981,9 +981,11 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 		RelicRes.EffectType.APPLY_STATUS_ENEMY:
 			var bm_ase := _get_bm()
 			if is_inside_tree() and bm_ase and bm_ase.is_battle_active:
+				# relic.status_type 사용. 빈 문자열이면 fallback으로 poison (기존 동작)
+				var stype: String = relic.status_type if relic.status_type != "" else "poison"
 				for i in range(bm_ase._enemies.size()):
 					if bm_ase._enemy_alive[i]:
-						bm_ase._apply_status_to_enemy(i, "poison", value)
+						bm_ase._apply_status_to_enemy(i, stype, value)
 		RelicRes.EffectType.GAIN_MORALE:
 			var bm_gm := _get_bm()
 			if is_inside_tree() and bm_gm:

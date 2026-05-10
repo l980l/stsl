@@ -23,26 +23,31 @@ func _assert(cond: bool, msg: String) -> void:
 		failed += 1
 		push_error("  FAIL: " + msg)
 
+const MIN_NODES := 30  # FLOORS=15 확장 후 실측 최소값 ~45 — 여유 두고 30 하한
+const MAX_NODES := 100
+
 func test_node_count() -> void:
 	print("[TestMapGenerator] test_node_count")
 	var map := MapGen.generate()
-	_assert(map.size() == 28, "노드 수 == 28 (floor 0~8 × 3 + 보스 1)")
+	_assert(map.size() >= MIN_NODES and map.size() <= MAX_NODES,
+		"노드 수 %d ∈ [%d, %d] (FLOORS=15)" % [map.size(), MIN_NODES, MAX_NODES])
 
 func test_boss_node() -> void:
 	print("[TestMapGenerator] test_boss_node")
 	var map := MapGen.generate()
-	_assert(map.size() == 28, "보스 테스트를 위해 노드 수 확인")
-	if map.size() < 28:
+	_assert(map.size() >= MIN_NODES, "보스 테스트를 위해 노드 수 확인")
+	if map.size() < MIN_NODES:
 		return
-	var boss = map[27]
-	_assert(boss.room_type == MapNodeRes.RoomType.BOSS, "ID 27 = BOSS 타입")
-	_assert(boss.floor_num == 9, "보스 층 == 9")
+	# 보스는 마지막 노드 (map_generator.gd Phase 3에서 마지막에 추가)
+	var boss = map[-1]
+	_assert(boss.room_type == MapNodeRes.RoomType.BOSS, "마지막 노드 = BOSS 타입")
+	_assert(boss.floor_num == MapGen.FLOORS - 1, "보스 층 == %d" % (MapGen.FLOORS - 1))
 	_assert(boss.connections.is_empty(), "보스는 연결 없음")
 
 func test_connections_valid() -> void:
 	print("[TestMapGenerator] test_connections_valid")
 	var map := MapGen.generate()
-	if map.size() < 28:
+	if map.size() < MIN_NODES:
 		_assert(false, "노드 부족으로 건너뜀")
 		return
 	for node in map:
@@ -58,7 +63,14 @@ func test_floor0_nodes() -> void:
 	if map.size() < 3:
 		_assert(false, "노드 부족")
 		return
-	_assert(map[0].floor_num == 0 and map[0].column == 0, "ID 0: floor 0, col 0")
-	_assert(map[1].floor_num == 0 and map[1].column == 1, "ID 1: floor 0, col 1")
-	_assert(map[2].floor_num == 0 and map[2].column == 2, "ID 2: floor 0, col 2")
+	# Phase 1에서 시작 컬럼이 무작위 (distinct >= 2 보장). floor 0 노드들의 ID는 항상
+	# 0부터 연속이지만 컬럼은 가변. floor_num 검증만 결정적.
+	var floor0_count := 0
+	for node in map:
+		if node.floor_num == 0:
+			floor0_count += 1
+			_assert(node.column >= 0 and node.column < MapGen.COLS,
+				"floor 0 노드 col %d ∈ [0, %d)" % [node.column, MapGen.COLS])
+	_assert(floor0_count >= 2 and floor0_count <= MapGen.PATHS,
+		"floor 0 노드 수 %d ∈ [2, %d] (distinct starts)" % [floor0_count, MapGen.PATHS])
 	_assert(not map[0].connections.is_empty(), "floor 0 노드에 연결 있음")

@@ -57,8 +57,11 @@ func _make_gm() -> GameManagerClass:
 func test_run_map_initialized() -> void:
 	print("[TestGameManager] test_run_map_initialized")
 	var gm := _make_gm()
-	_assert(gm.run_map.size() == 28, "맵 28개 노드")
-	_assert(gm.available_node_ids == [0, 1, 2], "초기 접근 가능 노드 [0,1,2]")
+	# FLOORS=15 확장 후 노드 수는 가변 (~45-65). 맵이 생성됐는지만 검증.
+	_assert(gm.run_map.size() >= 30, "맵 노드 30+ 생성 (실제: %d)" % gm.run_map.size())
+	# 초기 접근 가능 노드는 floor 0 노드들 (시작 컬럼이 무작위, distinct >= 2)
+	_assert(gm.available_node_ids.size() >= 2 and gm.available_node_ids.size() <= 6,
+		"초기 접근 가능 노드 2~6개")
 
 func test_enter_node_marks_visited() -> void:
 	print("[TestGameManager] test_enter_node_marks_visited")
@@ -211,8 +214,9 @@ func test_start_run_with_cleopatra() -> void:
 	var gm := _make_gm()
 	# start_run은 싱글톤(TeamManager/DeckManager) 없이도 크래시 없이 완료돼야 함
 	gm.start_run("cleopatra")
-	_assert(gm.run_map.size() == 28, "클레오파트라로 시작해도 맵 28개 노드")
-	_assert(gm.available_node_ids == [0, 1, 2], "초기 접근 가능 노드 [0,1,2]")
+	_assert(gm.run_map.size() >= 30, "클레오파트라로 시작해도 맵 30+ 노드")
+	_assert(gm.available_node_ids.size() >= 2 and gm.available_node_ids.size() <= 6,
+		"초기 접근 가능 노드 2~6개")
 
 func test_act_serialization() -> void:
 	print("[TestGameManager] test_act_serialization")
@@ -233,8 +237,9 @@ func test_act_transition() -> void:
 	_assert(gm.current_act == 2, "act incremented to 2")
 	_assert(gm.current_floor == 0, "floor reset")
 	_assert(gm.current_node_id == -1, "node_id reset")
-	_assert(gm.run_map.size() == 28, "Act 2 map generated (28 nodes)")
-	_assert(gm.available_node_ids == [0, 1, 2], "available nodes reset")
+	_assert(gm.run_map.size() >= 30, "Act 2 map generated (30+ nodes)")
+	_assert(gm.available_node_ids.size() >= 2 and gm.available_node_ids.size() <= 6,
+		"available nodes reset (2~6개)")
 	passed += 1
 
 func test_act_difficulty() -> void:
