@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <filter id="dr-glow">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="dr-grad" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#cc4488"/>
+      <stop offset="60%" stop-color="#661133"/>
+      <stop offset="100%" stop-color="#220011"/>
+    </radialGradient>
+    <radialGradient id="skull-grad" cx="50%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#f8f0e8"/>
+      <stop offset="100%" stop-color="#a89890"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 외곽 링 -->
+  <circle cx="128" cy="128" r="112" fill="#080c18" stroke="#c9a84c" stroke-width="7"/>
+
+  <!-- 영기 (배경) -->
+  <circle cx="128" cy="128" r="92" fill="url(#dr-grad)" filter="url(#dr-glow)" opacity="0.9"/>
+
+  <!-- 해골 두개 -->
+  <g transform="translate(128 118)" filter="url(#dr-glow)">
+    <ellipse rx="50" ry="46" fill="url(#skull-grad)" stroke="#5a4a40" stroke-width="3"/>
+    <!-- 눈 구멍 -->
+    <ellipse cx="-18" cy="-6" rx="11" ry="14" fill="#0a0a14"/>
+    <ellipse cx="18" cy="-6" rx="11" ry="14" fill="#0a0a14"/>
+    <!-- 눈 안 빛 -->
+    <circle cx="-18" cy="-4" r="3" fill="#ff5577" filter="url(#dr-glow)"/>
+    <circle cx="18" cy="-4" r="3" fill="#ff5577" filter="url(#dr-glow)"/>
+    <!-- 코 -->
+    <polygon points="0,8 -5,18 5,18" fill="#0a0a14"/>
+    <!-- 이빨 -->
+    <rect x="-22" y="22" width="44" height="14" rx="2" fill="#0a0a14"/>
+    <line x1="-15" y1="22" x2="-15" y2="36" stroke="#f8f0e8" stroke-width="2"/>
+    <line x1="-7"  y1="22" x2="-7"  y2="36" stroke="#f8f0e8" stroke-width="2"/>
+    <line x1="0"   y1="22" x2="0"   y2="36" stroke="#f8f0e8" stroke-width="2"/>
+    <line x1="7"   y1="22" x2="7"   y2="36" stroke="#f8f0e8" stroke-width="2"/>
+    <line x1="15"  y1="22" x2="15"  y2="36" stroke="#f8f0e8" stroke-width="2"/>
+  </g>
+
+  <!-- 폭발 광선 4방향 (사망 시 발동 의미) -->
+  <g filter="url(#dr-glow)">
+    <line x1="128" y1="34"  x2="128" y2="56"  stroke="#ff5577" stroke-width="4" stroke-linecap="round"/>
+    <line x1="128" y1="200" x2="128" y2="222" stroke="#ff5577" stroke-width="4" stroke-linecap="round"/>
+    <line x1="34"  y1="128" x2="56"  y2="128" stroke="#ff5577" stroke-width="4" stroke-linecap="round"/>
+    <line x1="200" y1="128" x2="222" y2="128" stroke="#ff5577" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>
