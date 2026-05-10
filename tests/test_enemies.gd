@@ -329,7 +329,7 @@ func test_act2_normal_sand_ifrit() -> void:
 	_assert(e.intent_pattern.size() == 2, "인텐트 2개 (준비+강타)")
 	_assert(e.intent_pattern[0].action_type == IntentRes.ActionType.BUFF, "첫 턴 BUFF(준비)")
 	_assert(e.intent_pattern[1].target == IntentRes.TargetType.ALL, "강타 ALL 타겟")
-	_assert(e.intent_pattern[1].value >= 150, "강타 150 이상 (밸런스 튜닝 230→180)")
+	_assert(e.intent_pattern[1].value >= 100, "강타 100 이상 (밸런스 튜닝 230→180→130)")
 
 func test_act2_normal_ka_spirit() -> void:
 	print("[TestEnemies] test_act2_normal_ka_spirit")
