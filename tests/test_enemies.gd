@@ -124,7 +124,7 @@ func test_cyclops_first_intent_is_buff() -> void:
 	_assert(cyclops.intent_pattern.size() == 2, "사이클롭스 패턴 2개")
 	_assert(cyclops.intent_pattern[0].action_type == IntentRes.ActionType.PREPARE,
 		"사이클롭스 첫 행동 = PREPARE(준비)")
-	_assert(cyclops.intent_pattern[1].value == 200, "사이클롭스 강타 = 200")
+	_assert(cyclops.intent_pattern[1].value == 240, "사이클롭스 강타 = 240 (밸런스 튜닝 200→240)")
 
 func test_snake_pattern_length() -> void:
 	print("[TestEnemies] test_snake_pattern_length")
@@ -329,7 +329,7 @@ func test_act2_normal_sand_ifrit() -> void:
 	_assert(e.intent_pattern.size() == 2, "인텐트 2개 (준비+강타)")
 	_assert(e.intent_pattern[0].action_type == IntentRes.ActionType.BUFF, "첫 턴 BUFF(준비)")
 	_assert(e.intent_pattern[1].target == IntentRes.TargetType.ALL, "강타 ALL 타겟")
-	_assert(e.intent_pattern[1].value >= 200, "강타 200 이상")
+	_assert(e.intent_pattern[1].value >= 150, "강타 150 이상 (밸런스 튜닝 230→180)")
 
 func test_act2_normal_ka_spirit() -> void:
 	print("[TestEnemies] test_act2_normal_ka_spirit")

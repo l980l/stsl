@@ -70,13 +70,14 @@ static func harpy(scene: PackedScene) -> Resource:
 	return e
 
 static func cyclops(scene: PackedScene) -> Resource:
+	# 밸런스 튜닝: HP 700→850, ATK 200→240 (#8 outlier 보강)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.greek.cyclops"; e.max_hp = 700; e.character_scene = scene
+	e.enemy_name = "enemy.greek.cyclops"; e.max_hp = 850; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.PREPARE; i1.value = 0; i1.condition = "준비"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 200; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 240; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	e.intent_pattern = [i1, i2]
 	return e
 
@@ -287,13 +288,14 @@ static func chimera_cub(scene: PackedScene) -> Resource:
 
 static func hydra_head(scene: PackedScene) -> Resource:
 	# T2-DEATH-RATTLE: 머리 잘리면 동료 strength +2 (히드라 신화 — 머리 자르면 더 강해짐)
+	# 밸런스 튜닝: HP 350→400, ATK 100→115 (#8 보강)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.greek.hydra_head"; e.max_hp = 350; e.character_scene = scene
+	e.enemy_name = "enemy.greek.hydra_head"; e.max_hp = 400; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 100; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 115; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 115; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "weak"; i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]

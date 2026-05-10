@@ -21,6 +21,7 @@ static func ka_spirit(scene: PackedScene) -> Resource:
 	return e
 
 static func sphinx_cub(scene: PackedScene) -> Resource:
+	# 밸런스 튜닝: 5×ATK → 3×ATK + SPECIAL — #3 약함 tier에 맞게 사이클 데미지 축소
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.sphinx_cub"; e.max_hp = 350; e.character_scene = scene
 	e.mythology = "egyptian"; e.signatures_enabled = false  # 인카운터 #3
@@ -31,23 +32,22 @@ static func sphinx_cub(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 80; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 80; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "slash"
-	var i5 := IntentRes.new()
-	i5.action_type = IntentRes.ActionType.SPECIAL; i5.value = 1
-	e.intent_pattern = [i1, i2, i3, i4, i5]
+	i4.action_type = IntentRes.ActionType.SPECIAL; i4.value = 1; i4.status_type = "remove_card"
+	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
 static func desert_scorpion(scene: PackedScene) -> Resource:
 	# DEATH-RATTLE: 죽을 때 ALL poison +2 (사막 전갈의 마지막 독)
+	# 밸런스 튜닝: ATK 70→90 (#4 #3 비monotonic 해결)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.desert_scorpion"; e.max_hp = 420; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 4; i2.status_type = "poison"; i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "poison"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "poison"
 	e.intent_pattern = [i1, i2, i3]
 	var dt := IntentRes.new()
 	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 2; dt.status_type = "poison"; dt.target = IntentRes.TargetType.ALL
@@ -68,13 +68,14 @@ static func sand_scout(scene: PackedScene) -> Resource:
 	return e
 
 static func sand_ifrit(scene: PackedScene) -> Resource:
+	# 밸런스 튜닝: ATK ALL 230→180 (#7 ≥ #8 역전 해결, 단발이 아니라 ALL이라 영향 큼)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.sand_ifrit"; e.max_hp = 450; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"; i1.condition = "준비"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 230; i2.target = IntentRes.TargetType.ALL; i2.damage_type = "fire"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 180; i2.target = IntentRes.TargetType.ALL; i2.damage_type = "fire"
 	e.intent_pattern = [i1, i2]
 	return e
 
@@ -280,20 +281,23 @@ static func ammit_cub(scene: PackedScene) -> Resource:
 	return e
 
 static func sphinx_adult(scene: PackedScene) -> Resource:
+	# 밸런스 튜닝: ATK 120→140, finisher 150→180, T1-BERSERK 추가 (#9 = #8 역전 해결)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.sphinx_adult"; e.max_hp = 720; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 120; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 140; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 120; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.SPECIAL; i4.value = 1
+	i4.action_type = IntentRes.ActionType.SPECIAL; i4.value = 1; i4.status_type = "remove_card"
 	var i5 := IntentRes.new()
-	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 150; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "slash"
+	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 180; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "slash"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
+	e.phase_thresholds = [0.5]
+	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
 static func pyramid_golem(scene: PackedScene) -> Resource:
