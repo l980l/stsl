@@ -181,6 +181,9 @@ func _choice_effect_name(t: int) -> String:
 		ChoiceRes.EffectType.ADD_RELIC:     return "렐릭추가"
 		ChoiceRes.EffectType.ADD_HERO:      return "영웅추가"
 		ChoiceRes.EffectType.ADD_RELIC_GAMBLE: return "랜덤렐릭"
+		ChoiceRes.EffectType.TRIGGER_BATTLE: return "전투"
+		ChoiceRes.EffectType.ADD_CARD:      return "카드추가"
+		ChoiceRes.EffectType.MULTI:         return "다중효과"
 	return "?"
 
 # ─────────────────────────────────────────
@@ -474,14 +477,18 @@ func _generate_relics() -> void:
 	md += "| 이름 | 트리거 | 효과 | 값 | 전용 영웅 | 저주 |\n"
 	md += "|------|--------|------|-----|-----------|------|\n"
 
-	var csv_rows: Array = [["이름", "설명", "트리거", "효과", "값", "bonus_value", "전용_영웅", "저주", "penalty_트리거", "penalty_효과", "penalty_값"]]
+	var csv_rows: Array = [["이름", "설명", "트리거", "효과", "값", "조건값", "bonus_value", "전용_영웅", "저주", "penalty_트리거", "penalty_효과", "penalty_값"]]
 
 	for relic in pool:
 		var hero_str: String = relic.owner_hero_id if relic.owner_hero_id != "" else "—"
 		var cursed_str: String = "✓" if relic.is_cursed else "—"
-		md += "| %s | %s | %s | %d | %s | %s |\n" % [
+		# ON_HERO_DAMAGED 등 condition_value 사용 시 "값 (피해 ≥N)" 형태로 표시
+		var val_str: String = "%d" % relic.value
+		if relic.condition_value > 0:
+			val_str = "%d (피해 ≥%d)" % [relic.value, relic.condition_value]
+		md += "| %s | %s | %s | %s | %s | %s |\n" % [
 			relic.relic_name, _trigger_name(relic.trigger),
-			_relic_effect_name(relic.effect_type), relic.value,
+			_relic_effect_name(relic.effect_type), val_str,
 			hero_str, cursed_str
 		]
 		if relic.is_cursed:
@@ -493,7 +500,7 @@ func _generate_relics() -> void:
 		csv_rows.append([
 			relic.relic_name, relic.description,
 			_trigger_name(relic.trigger), _relic_effect_name(relic.effect_type),
-			relic.value, relic.bonus_value, relic.owner_hero_id,
+			relic.value, relic.condition_value, relic.bonus_value, relic.owner_hero_id,
 			"true" if relic.is_cursed else "",
 			_trigger_name(relic.penalty_trigger) if relic.is_cursed else "",
 			_relic_effect_name(relic.penalty_effect_type) if relic.is_cursed else "",
@@ -511,7 +518,10 @@ func _generate_events() -> void:
 	var md: String = "# 이벤트 도감 (자동 생성)\n\n"
 	md += "> 이 파일은 `tools/generate_catalog.gd`로 자동 생성됩니다. 직접 수정 금지.\n\n"
 
-	var csv_rows: Array = [["Act", "이벤트명", "설명", "선택지번호", "선택지이름", "효과타입", "값", "골드비용", "HP비용"]]
+	var csv_rows: Array = [["Act", "이벤트명", "설명", "선택지번호", "선택지이름",
+		"효과타입", "값", "골드비용", "HP비용",
+		"보조효과", "보조값", "확률%", "실패효과", "실패값",
+		"전투티어", "보상효과", "보상값", "카드ID", "필요영웅"]]
 
 	var event_sets: Array = [
 		{ "label": "Act 1 (공용)", "act": 1, "pool": EventsAct1.build_pool() },
@@ -531,23 +541,76 @@ func _generate_events() -> void:
 				md += "> %s\n\n" % event.description
 			for ci in range(event.choices.size()):
 				var choice: Resource = event.choices[ci]
-				var cost_str: String = ""
-				if choice.cost_gold > 0:
-					cost_str += " (골드 -%d)" % choice.cost_gold
-				if choice.cost_hp > 0:
-					cost_str += " (HP -%d)" % choice.cost_hp
-				var val_str: String = ""
-				if choice.value > 0:
-					val_str = " → %s %d" % [_choice_effect_name(choice.effect_type), choice.value]
-				elif choice.effect_type != ChoiceRes.EffectType.NONE:
-					val_str = " → %s" % _choice_effect_name(choice.effect_type)
-				md += "- **%s**%s%s\n" % [choice.label, cost_str, val_str]
+				md += "- **%s**%s\n" % [choice.label, _choice_summary(choice)]
 				csv_rows.append([act_num, event.event_name, event.description, ci + 1, choice.label,
-					_choice_effect_name(choice.effect_type), choice.value, choice.cost_gold, choice.cost_hp])
+					_choice_effect_name(choice.effect_type), choice.value, choice.cost_gold, choice.cost_hp,
+					_choice_effect_name(choice.secondary_effect_type), choice.secondary_value,
+					choice.success_chance, _choice_effect_name(choice.alt_effect_type), choice.alt_value,
+					choice.encounter_tier,
+					_choice_effect_name(choice.reward_effect_type), choice.reward_value,
+					choice.card_id, choice.required_hero_id])
 			md += "\n"
 
 	_write_text("events.md", md)
 	_write_csv("events.csv", csv_rows)
+
+# 선택지 한 줄 요약 — 비용/주효과/보조/확률/전투/조건 모두 표시
+func _choice_summary(choice: Resource) -> String:
+	var parts: PackedStringArray = []
+
+	# 비용
+	if choice.cost_gold > 0:
+		parts.append("[골드 -%d]" % choice.cost_gold)
+	if choice.cost_hp > 0:
+		parts.append("[HP -%d]" % choice.cost_hp)
+
+	# 조건부
+	if choice.required_hero_id != "":
+		parts.append("[%s 전용]" % choice.required_hero_id)
+
+	# 주효과
+	match choice.effect_type:
+		ChoiceRes.EffectType.NONE:
+			pass
+		ChoiceRes.EffectType.TRIGGER_BATTLE:
+			var tier_str: String = "엘리트 전투" if choice.encounter_tier >= 1 else "전투"
+			var reward_str: String = ""
+			if choice.reward_effect_type != ChoiceRes.EffectType.NONE:
+				var rname: String = _choice_effect_name(choice.reward_effect_type)
+				reward_str = " → 보상: %s%s" % [rname, (" %d" % choice.reward_value) if choice.reward_value > 0 else ""]
+			parts.append("→ %s%s" % [tier_str, reward_str])
+		ChoiceRes.EffectType.ADD_CARD:
+			var card_label: String = ("(%s)" % choice.card_id) if choice.card_id != "" else ""
+			parts.append("→ 카드추가 %s" % card_label)
+		_:
+			var name1: String = _choice_effect_name(choice.effect_type)
+			if choice.value > 0:
+				parts.append("→ %s %d" % [name1, choice.value])
+			else:
+				parts.append("→ %s" % name1)
+
+	# 보조 효과 (MULTI)
+	if choice.secondary_effect_type != ChoiceRes.EffectType.NONE:
+		var s_name: String = _choice_effect_name(choice.secondary_effect_type)
+		if choice.secondary_value > 0:
+			parts.append("+ %s %d" % [s_name, choice.secondary_value])
+		else:
+			parts.append("+ %s" % s_name)
+
+	# 확률 (성공/실패)
+	if choice.success_chance > 0 and choice.success_chance < 100:
+		var alt_str: String = ""
+		if choice.alt_effect_type != ChoiceRes.EffectType.NONE:
+			var aname: String = _choice_effect_name(choice.alt_effect_type)
+			if choice.alt_value > 0:
+				alt_str = " / 실패: %s %d" % [aname, choice.alt_value]
+			else:
+				alt_str = " / 실패: %s" % aname
+		parts.append("[%d%% 성공%s]" % [choice.success_chance, alt_str])
+
+	if parts.is_empty():
+		return ""
+	return " " + " ".join(parts)
 
 # ─────────────────────────────────────────
 # README
