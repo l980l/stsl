@@ -84,7 +84,15 @@ signal run_started()
 signal node_entered(node_id: int)
 signal run_ended(won: bool)
 
+# 테스트 주입용 (production은 항상 null) — RefCounted 테스트에서 SceneTree에
+# 매니저 등록 없이 의존성 제공하기 위한 hook.
+var _test_tm_override: Object = null
+var _test_dm_override: Object = null
+var _test_bm_override: Object = null
+
 func _get_tm() -> Object:
+	if _test_tm_override:
+		return _test_tm_override
 	if Engine.has_singleton("TeamManager"):
 		return Engine.get_singleton("TeamManager")
 	var ml := Engine.get_main_loop()
@@ -93,6 +101,8 @@ func _get_tm() -> Object:
 	return null
 
 func _get_dm() -> Object:
+	if _test_dm_override:
+		return _test_dm_override
 	if Engine.has_singleton("DeckManager"):
 		return Engine.get_singleton("DeckManager")
 	var ml := Engine.get_main_loop()
@@ -101,6 +111,8 @@ func _get_dm() -> Object:
 	return null
 
 func _get_bm() -> Object:
+	if _test_bm_override:
+		return _test_bm_override
 	if Engine.has_singleton("BattleManager"):
 		return Engine.get_singleton("BattleManager")
 	var ml := Engine.get_main_loop()
@@ -126,6 +138,11 @@ func spend_gold(amount: int) -> bool:
 func add_relic(relic: Resource) -> void:
 	relics.append(relic)
 	relic_added.emit(relic)
+	# PASSIVE 렐릭은 즉시 1회 적용 (영구 효과). trigger_relics(PASSIVE) 호출은
+	# 기존 보유 PASSIVE 렐릭까지 재적용하므로 방금 추가한 relic만 직접 호출.
+	var _RR = load("res://resources/relic_resource.gd")
+	if relic.trigger == _RR.TriggerType.PASSIVE:
+		_apply_relic_effect(relic, relic.value, {})
 
 func has_relic(relic_name: String) -> bool:
 	for r in relics:
@@ -960,27 +977,29 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 		var dmg_in: int = context.get("amount", 0)
 		if dmg_in < relic.condition_value:
 			return
+	# is_inside_tree() 가드는 over-defensive. add_relic/trigger_relics는 항상 게임 진행
+	# 중에 호출되며 그 시점에 GameManager는 tree에 있음. null 체크만으로 충분.
 	match relic.effect_type:
 		RelicRes.EffectType.HEAL:
-			if is_inside_tree() and tm:
+			if tm:
 				for hero in tm.heroes:
 					tm.heal(hero.hero_id, value)
 		RelicRes.EffectType.ENERGY:
-			if is_inside_tree() and dm:
+			if dm:
 				dm.current_energy += value
 				dm.energy_changed.emit(dm.current_energy)
 		RelicRes.EffectType.DRAW:
-			if is_inside_tree() and dm:
+			if dm:
 				dm.draw_cards(value)
 		RelicRes.EffectType.BLOCK:
 			var bm_block := _get_bm()
-			if is_inside_tree() and bm_block and tm:
+			if bm_block and tm:
 				for hero in tm.heroes:
 					bm_block._hero_block[hero.hero_id] = \
 						bm_block._hero_block.get(hero.hero_id, 0) + value
 		RelicRes.EffectType.APPLY_STATUS_ENEMY:
 			var bm_ase := _get_bm()
-			if is_inside_tree() and bm_ase and bm_ase.is_battle_active:
+			if bm_ase and bm_ase.is_battle_active:
 				# relic.status_type 사용. 빈 문자열이면 fallback으로 poison (기존 동작)
 				var stype: String = relic.status_type if relic.status_type != "" else "poison"
 				for i in range(bm_ase._enemies.size()):
@@ -988,16 +1007,16 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 						bm_ase._apply_status_to_enemy(i, stype, value)
 		RelicRes.EffectType.GAIN_MORALE:
 			var bm_gm := _get_bm()
-			if is_inside_tree() and bm_gm:
+			if bm_gm:
 				bm_gm._apply_status_to_hero(relic.owner_hero_id, "morale", value)
 		RelicRes.EffectType.MAX_HP:
-			if is_inside_tree() and tm:
+			if tm:
 				for hero in tm.heroes:
 					tm.increase_max_hp(hero.hero_id, value)
 		RelicRes.EffectType.COST_REDUCTION:
 			pass  # PASSIVE 릴릭에서 별도 처리
 		RelicRes.EffectType.DAMAGE_HERO:
-			if is_inside_tree() and tm:
+			if tm:
 				var living: Array = tm.get_living_heroes()
 				if not living.is_empty():
 					var target = living[randi() % living.size()]
