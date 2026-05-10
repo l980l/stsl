@@ -31,6 +31,9 @@ battle.signature.kekkai.toast,🛡 결계!,🛡 Kekkai!,🛡 Kekkai !,🛡 Kekka
 battle.signature.egyptian_curse.toast,👁 영원의 저주!,👁 Eternal Curse!,👁 Malédiction !,👁 Maledizione!,👁 ¡Maldición!,👁 永遠の呪い！,👁 Αιώνια Κατάρα!,👁 永恒诅咒！,👁 永恆詛咒！
 battle.signature.yin_yang.toast,☯ 음양 순환!,☯ Yin-Yang!,☯ Yin-Yang !,☯ Yin-Yang!,☯ ¡Yin-Yang!,☯ 陰陽！,☯ Γιν-Γιανγκ!,☯ 阴阳！,☯ 陰陽！
 battle.target.ally,아군,Ally,Allié,Alleato,Aliado,味方,Σύμμαχος,队友,队友
+battle.target.hero,영웅,Hero,Héros,Eroe,Héroe,英雄,Ήρωας,英雄,英雄
+battle.target.all_hero,모든 영웅,All Heroes,Tous les héros,Tutti gli Eroi,Todos los Héroes,全英雄,Όλοι οι Ήρωες,全英雄,全英雄
+battle.damage,피해,damage,dégâts,danni,daño,ダメージ,ζημιά,伤害,傷害
 battle.target.all_ally,아군 전체,All Allies,Tous les alliés,Tutti gli Alleati,Todos los Aliados,全味方,Όλοι οι Σύμμαχοι,全队友,全队友
 battle.target.lowest_hp_ally,최저 HP 아군,Lowest HP Ally,Allié HP le plus bas,Alleato HP più basso,Aliado con HP más bajo,最低HP味方,Σύμμαχος με Χαμηλότερο HP,最低HP队友,最低HP队友
 battle.target.random_ally,랜덤 아군,Random Ally,Allié aléatoire,Alleato Casuale,Aliado Aleatorio,ランダム味方,Τυχαίος Σύμμαχος,随机队友,随机队友

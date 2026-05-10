@@ -92,7 +92,10 @@ const STATUS_EMOJI := {
 	"poison_dmg": "☠", "weak": "↓", "vulnerable": "⚡",
 	"morale": "★", "charm": "♥", "strength": "↑",
 	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜",
-	"invuln": "🛡", "counter_pool": "🔄", "marked_by": "🎯"
+	"invuln": "🛡", "counter_pool": "🔄", "marked_by": "🎯",
+	"death_rattle": "💀",
+	"sig_greek": "⚔", "sig_norse": "🌪", "sig_egyptian": "👁",
+	"sig_buddhist": "☸", "sig_daoist": "☯", "sig_japanese": "🌸",
 }
 
 # 내부 시그니처/메커니즘 추적 키 — 의도/상태 UI에 노출 안 함
@@ -1921,6 +1924,33 @@ func _go_to_main_menu() -> void:
 # 카드 효과 텍스트 헬퍼
 # ─────────────────────────────────────────────
 
+func _signature_still_active(myth: String, enemy_status: Dictionary) -> bool:
+	# 1회성 시그니처는 발동 후 숨김 (norse 라그나로크). 나머지는 alive 동안 항상 활성.
+	match myth:
+		"norse":
+			return not enemy_status.get("norse_ragnarok_fired", false)
+		_:
+			return true
+
+func _format_death_rattle_tooltip(dt: Resource) -> String:
+	# 동적 툴팁: death_trigger IntentResource 효과 설명
+	var prefix: String = tr("status.death_rattle.prefix")
+	var v: int = dt.value
+	var target_all: bool = dt.target == IntentRes.TargetType.ALL
+	match dt.action_type:
+		IntentRes.ActionType.DEBUFF:
+			var sname: String = tr("status.%s.name" % dt.status_type)
+			var tgt: String = tr("battle.target.all_hero") if target_all else tr("battle.target.hero")
+			return "%s %s %s +%d" % [prefix, tgt, sname, v]
+		IntentRes.ActionType.ATTACK:
+			var tgt2: String = tr("battle.target.all_hero") if target_all else tr("battle.target.hero")
+			return "%s %s %d %s" % [prefix, tgt2, v, tr("battle.damage")]
+		IntentRes.ActionType.BUFF_ALLY:
+			var sname2: String = tr("status.%s.name" % dt.status_type)
+			return "%s %s %s +%d" % [prefix, tr("battle.target.ally"), sname2, v]
+		_:
+			return tr("status.death_rattle.desc")
+
 func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	var tex: Texture2D = IconUtils.get_status_icon(key)
 	var tooltip: String = _trf("status.%s.desc" % key, val)
@@ -2027,6 +2057,20 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		hbox.add_child(lbl)
 		box.add_child(hbox)
 	var status: Dictionary = BattleManager.get_enemy_status(index)
+	# DEATH-RATTLE 보유 + 신화 시그니처 활성 표시 (살아있을 때만)
+	var enemy_res: Resource = BattleManager.get_enemy(index)
+	if enemy_res != null and BattleManager.is_enemy_alive(index):
+		# DEATH-RATTLE: 사망 시 1회 발동 (사망하면 enemy 자체가 dim 처리됨)
+		if enemy_res.get("death_trigger") != null:
+			var dr_lbl: Control = _make_status_label("death_rattle", 1, {})
+			dr_lbl.tooltip_text = _format_death_rattle_tooltip(enemy_res.death_trigger)
+			box.add_child(dr_lbl)
+		# 신화 시그니처: signatures_enabled + 1회성 시그니처는 발동 후 숨김
+		if enemy_res.get("signatures_enabled") and enemy_res.mythology != "" and _signature_still_active(enemy_res.mythology, status):
+			var sig_key: String = "sig_" + enemy_res.mythology
+			var sig_lbl: Control = _make_status_label(sig_key, 1, {})
+			sig_lbl.tooltip_text = _trf("signature.%s.desc" % enemy_res.mythology, 0)
+			box.add_child(sig_lbl)
 	for key in status:
 		if key in STATUS_INTERNAL_KEYS:
 			continue
