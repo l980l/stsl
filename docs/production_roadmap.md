@@ -1,7 +1,7 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-09 v13)
-> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) 기준
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-10 v14)
+> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
 ---
@@ -37,6 +37,7 @@
 **이벤트 씬 i18n·격자 패턴** (PR #92): 이벤트 선택지 하드코딩 한국어 → tr() 교체(10개 번역 키 신설, 8언어), 8개 씬 격자 배경 오버레이 셰이더 적용.
 **오디오 시스템 V2** (PR #94): `AudioManager` autoload (SFX 풀 16ch·BGM 크로스페이드·버스 볼륨 저장), `UISound` autoload (전역 버튼 호버·클릭 SFX, no_ui_sound 메타 opt-out), SFX 24종(-14 LUFS) + BGM 70종(-18 LUFS) 생성·정규화, 신화별 전투 BGM·보스 페이즈별 BGM 동적 선택, BGM 트랙 종료 자동 반복, 설정창 사운드 탭(볼륨 슬라이더 4개), `assets/audio/` .gitignore 처리. BurstParticleGroup2D weakref 람다 크래시 수정. 맵 룸 아이콘 툴팁 0.4s 지연 구현. `has_debuffs_N` 카드 조건 설명 동적 파싱.
 **인카운터 v2** (PR #95): 6 신화 일반 몬스터 풀 전면 재설계. 신화당 20종 × 10 인카운터 (난이도 1~10 오름차순), **각 몬스터 종이 정확히 1개 인카운터에만 등장**(중복 0). 84종 신규 몬스터 + 한국어/영어 번역. **Floor 가중치 선택 알고리즘**(`_pick_weighted_encounter`): 진행도 기반 ±3 윈도우 삼각 분포로 floor 진행에 따라 평균 난이도 상승, 같은 floor 내 변동성 보존. `test_encounter_weighting.gd` + `test_enemies.gd` 검증 3종.
+**이벤트·렐릭 v2** (PR #104~#107): `EventChoiceResource`에 신규 EffectType 3종(TRIGGER_BATTLE/MULTI/ADD_CARD) + 신규 필드(secondary/alt/reward/required_hero_id/encounter_tier/card_id), 22개 중복 이벤트를 새 메커니즘(전투-보상/확률/MULTI/조건부)으로 다양화, 5개 렐릭 차별화(scarab→APPLY_STATUS_ENEMY, ankh→ON_HERO_DAMAGED+condition_value, idun→PLAYER_TURN_END, dharma→PASSIVE MAX_HP, tengu→BATTLE_WIN), 5개 신규 이벤트 추가(sphinx_gate/ymir_blood/bodhi_tree/eight_immortals/kitsune_kit). **PASSIVE 트리거 적용 버그 수정**(_ancient_artifact/_dharma_seal/_cursed_crown MAX_HP 보너스 회복 — `add_relic` 시 즉시 적용). `condition_value` 처리를 HEAL/BLOCK까지 확장. `relic.status_type` 무시 버그 수정(_orochi_scale weak 회복). 카탈로그 스크립트 새 EffectType 인식, 사전 fail 37개 정리(i18n 키 마이그레이션·맵 노드·카드 풀 카운트), 통합 테스트 +14. **1365 테스트 통과 / 0 fail**.
 
 ---
 
@@ -90,6 +91,7 @@
 - ✅ 클레오파트라 전용 렐릭 2종 (독사의 팔찌, 파라오의 인장)
 - ✅ 저주 렐릭 3종 (악마의 계약, 저주받은 왕관, 피의 서약)
 - ✅ 캐릭터 생존 조건부 강화 효과 구현 (owner_hero_id + is_alive 체크)
+- ✅ 5개 렐릭 차별화 (M6.6, PR #104·#107) — scarab/ankh/idun/dharma/tengu 각각 trigger·effect_type·condition_value로 정체성 부여
 
 ### 1-4. 이벤트 확장
 - ✅ 기본 이벤트 5종 (황금 상자, 상처 입은 전사, 고대 도서관, 저주받은 제단, 동료 만남)
@@ -97,6 +99,7 @@
   - 프로메테우스의 불 (DRAW_UP +1, HP -20), 헤라클레스의 시련 (GOLD +60, HP -25)
   - 키르케의 마법 (HEAL +25, GOLD -50), 하데스의 계약 (ADD_RELIC, HP -30)
   - 헤르메스의 도박 (GOLD +50 OR 카드 1장 제거 — 플레이어가 선택)
+- ✅ **이벤트 메커니즘 v2** (M6.6, PR #104) — 22개 중복 다양화 (TRIGGER_BATTLE/MULTI/확률/조건부) + 신규 5개 (sphinx_gate/ymir_blood/bodhi_tree/eight_immortals/kitsune_kit). 신규 EffectType: TRIGGER_BATTLE / MULTI / ADD_CARD
 
 ### 1-5. 상점 보완
 - ✅ 상점 카드 목록을 현재 영웅 덱 기반 풀에서 추출
@@ -466,6 +469,68 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ---
 
+## Milestone 6.6 — 이벤트·렐릭 다양화 v2 ✅ (PR #104~#107)
+
+### 6.6-1. 신규 EffectType 인프라 ✅ (PR #104)
+- ✅ `EventChoiceResource` 신규 enum 3종: `TRIGGER_BATTLE`, `MULTI`, `ADD_CARD`
+- ✅ 신규 필드: `secondary_effect_type/value` (MULTI), `success_chance` + `alt_effect_type/value` (확률), `reward_effect_type/value` + `encounter_tier` (TRIGGER_BATTLE), `card_id` (ADD_CARD), `required_hero_id` (조건부)
+- ✅ `event_scene.gd` 핸들러 확장: 다중 효과·확률·조건부 비활성화 처리
+- ✅ `game_manager.gd:start_event_battle()` + `_apply_event_battle_reward()` — 이벤트→전투→보상 흐름
+- ✅ i18n 키 7종 추가 (battle / battle_elite / chance / add_card / add_card_named / requires_hero)
+
+### 6.6-2. 22개 중복 이벤트 다양화 ✅ (PR #104)
+단순 양자택일 → TRIGGER_BATTLE / MULTI / 확률 / 조건부:
+- act1(2): prometheus_fire(확률), circe_magic(MULTI)
+- act2(4): book_of_the_dead(TRIGGER_BATTLE), anubis_judgment(MULTI), nile_flood(MULTI), mummy_curse(엘리트 전투)
+- act3(5): odin_ravens(확률), ragnarok_prophecy(MULTI), mimirs_well(MULTI), dragon_gold(엘리트 전투), frost_giant_corpse(확률)
+- buddhist(4): mara_illusion(확률), monk_blessing(MULTI), temple_trial(전투), nirvana_gate(MULTI)
+- daoist(4): immortal_duel(전투), dao_purification(MULTI), cosmic_remnant(MULTI), vermilion_rebirth(확률)
+- japanese(3): oni_shogi(전투), kappa_river_crossing(MULTI), tengu_training(musashi 조건부)
+
+### 6.6-3. 신규 이벤트 5종 ✅ (PR #104)
+- act2: `sphinx_gate` (확률+MULTI: 70% 카드 제거 + 골드)
+- act3: `ymir_blood` (TRIGGER_BATTLE 엘리트 → 렐릭)
+- buddhist: `bodhi_tree` (HEAL +40 + 영구 드로우 +1 MULTI)
+- daoist: `eight_immortals` (50% 렐릭+골드, 50% HEAL)
+- japanese: `kitsune_kit` (60% 렐릭, 40% HEAL — 다중 분기)
+
+### 6.6-4. 5개 렐릭 차별화 + condition_value 확장 ✅ (PR #104)
+중복 패턴(BATTLE_START→BLOCK/ENERGY/DRAW, BATTLE_WIN→HEAL) 차별화:
+- `_scarab_talisman` BLOCK 8 → APPLY_STATUS_ENEMY poison 4
+- `_ankh_of_life` BATTLE_WIN HEAL → ON_HERO_DAMAGED + condition_value 10 (10+ 피해 시 HEAL 5)
+- `_idun_apple` BATTLE_WIN HEAL → PLAYER_TURN_END HEAL 3 (지속)
+- `_dharma_seal` BATTLE_START ENERGY (iron_will과 동일) → PASSIVE MAX_HP +20
+- `_tengu_feather` BATTLE_START DRAW (tacticians_map과 동일) → BATTLE_WIN DRAW +2
+- ✅ `condition_value` 처리를 HEAL/BLOCK까지 확장 (game_manager._apply_relic_effect)
+
+### 6.6-5. 카탈로그 스크립트 확장 ✅ (PR #105)
+- ✅ `_choice_effect_name`에 TRIGGER_BATTLE/ADD_CARD/MULTI 추가
+- ✅ `_choice_summary` 신규: 비용·주효과·보조·확률·전투·조건 통합 표시
+- ✅ events.csv 9 → 19 컬럼 확장 (보조효과/확률/실패/전투티어/보상/카드ID/필요영웅)
+- ✅ relics.csv: condition_value > 0 시 "값 (피해 ≥N)" inline 표시 (ankh_of_life, blood_stone)
+
+### 6.6-6. 사전 작업 fail 37개 정리 ✅ (PR #106)
+- ✅ `relic.status_type` 무시 버그 수정 (`_orochi_scale` weak 부여 회복; fallback poison 유지로 기존 5종 무회귀)
+- ✅ 영웅 weak/vulnerable 감소 테스트 수정 (영웅 status는 `end_player_turn` 시 감소 — 적과 대칭)
+- ✅ FLOORS=15 확장 반영 (test_map_generator/test_game_manager 노드 카운트·보스 ID·floor 검증을 가변 범위로)
+- ✅ i18n 키 마이그레이션 (적 7개·이벤트 4개·렐릭 7개 한국어 → i18n 키)
+- ✅ 카드 풀 카운트 동기화 (나폴레옹 5/9, 잔다르크 부활 4) + LOCALES 8 → 9 (zh_TW)
+
+### 6.6-7. PASSIVE 트리거 버그 수정 + 통합 테스트 ✅ (PR #107)
+- ✅ **PASSIVE 트리거 미적용 버그 수정**: `add_relic`에서 PASSIVE 렐릭 즉시 `_apply_relic_effect` 호출 (방금 추가한 relic만 — `trigger_relics` 전체 호출은 중복 부여 위험). `_dharma_seal` / `_ancient_artifact` / `_cursed_crown` MAX_HP 보너스 실효 회복.
+- ✅ 테스트 인프라: GM에 `_test_tm/dm/bm_override` 의존성 주입 hook (production 영향 0). `_apply_relic_effect`의 over-defensive `is_inside_tree()` 가드 제거.
+- ✅ `tests/test_event_integration.gd` 신규 +8: TRIGGER_BATTLE 보상 흐름, pending_event_battle_reward 수명주기, required_hero_id + cost_gold 조건부
+- ✅ `tests/test_relics.gd` +6: 신규 렐릭 5종 동작 + PASSIVE 적용 검증
+
+**최종 상태**: **1365 테스트 통과 / 0 fail** (이전 1312 passed, 37 failed → 누적 +53 PASS / -37 fail)
+
+**수동 검증 필요** (헤드리스 불가):
+- 이벤트 → 전투 진입 시 씬 전환 + BGM 변경
+- 조건부 선택지 회색 비활성화 시각 표시
+- 새 태그(전투/카드추가/확률) 표시
+
+---
+
 ## Milestone 7 — 비주얼 / 오디오
 
 ### 7-1. 캐릭터 아트
@@ -728,7 +793,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-05-09 v13. PR #97 반영 — 몬스터 메커니즘 레이어 v1 완료 (6 신화 시그니처 자동 적용, IntentRes ActionType 7종 신규, ~115/120 monsters tier 적용, 25 테스트 함수).
+> 최종 갱신: 2026-05-10 v14. PR #104~#107 반영 — 이벤트·렐릭 v2 완료 (신규 EffectType 3종, 22개 다양화, 5개 차별화, 5개 신규 이벤트, PASSIVE 트리거 버그 수정, 1365 테스트 통과 / 0 fail).
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -753,6 +818,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 오디오 시스템 V2 (M7-6) | PR #94. AudioManager·UISound·SFX 24종·BGM 70종·동적 선택·루프·정규화 |
 | ✅ 완료 | 인카운터 v2 (M6.5-1) | PR #95. 6 신화 × 20 몬스터 × 10 인카운터 (중복 0), floor 가중치 선택, 검증 3종 |
 | ✅ 완료 | 몬스터 메커니즘 레이어 (M6.5-2) | PR #97. 6 신화 시그니처 자동 + IntentRes ActionType 7종 신규 + ~115/120 monsters tier 적용. 25 테스트 함수, 1269 통과 |
+| ✅ 완료 | 이벤트·렐릭 v2 (M6.6) | PR #104~#107. 신규 EffectType 3종(TRIGGER_BATTLE/MULTI/ADD_CARD) + 22개 다양화 + 5개 렐릭 차별화 + 5개 신규 이벤트 + PASSIVE/status_type 버그 수정 + 통합 테스트 +14. **1365 통과 / 0 fail** |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
 | 🟡 중기 | 이벤트 BGM 나머지 생성 (M7-6) | dark×3·encounter×2·fortune×2 미생성분 |
 | 🟢 장기 | 비주얼 (M7-1~7-5) 캐릭터·카드 아트, 이펙트 | 몰입감 |
