@@ -63,6 +63,9 @@ var current_node_id: int = -1
 var pending_enemies: Array = []     # 다음 배틀 적 데이터
 var card_rewards: Array = []        # 다음 카드 보상 목록
 var pending_event: Resource = null  # 현재 이벤트 데이터 (EventResource)
+# 이벤트가 트리거한 전투 — 승리 시 자동 적용할 추가 보상 (Dictionary 또는 빈 값)
+# {effect_type: int, value: int, card_id: String}
+var pending_event_battle_reward: Dictionary = {}
 var card_rewards_pick_count: int = 1  # 카드픽 화면에서 선택 가능한 카드 수
 var pending_boss_upgrade: bool = false  # 보스 후 카드 강화 대기 여부
 var pending_boss_recruit: bool = false  # 보스 후 영웅 영입 대기 여부
@@ -142,6 +145,7 @@ func reset() -> void:
 	pending_enemies.clear()
 	card_rewards.clear()
 	pending_event = null
+	pending_event_battle_reward = {}
 	run_won = false
 	card_rewards_pick_count = 1
 	pending_boss_upgrade = false
@@ -246,6 +250,8 @@ func complete_battle(won: bool) -> void:
 		last_battle_gold = 0
 		var RelicRes = load("res://resources/relic_resource.gd")
 		trigger_relics(RelicRes.TriggerType.BATTLE_WIN)
+		# 이벤트 트리거 전투의 추가 보상 (있다면) — 카드 보상 전에 즉시 적용
+		_apply_event_battle_reward()
 		card_rewards = _generate_card_rewards()
 		# 룸 타입별 카드 보상 수량 및 보스 릴릭 처리
 		if current_node_id >= 0 and current_node_id < run_map.size():
@@ -325,6 +331,50 @@ func complete_event() -> void:
 	_advance_nodes_from(current_node_id)
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
+
+# 이벤트 선택지 → 전투 트리거. tier 0=일반, 1=엘리트.
+# pending_event는 null로 정리 (이벤트 화면은 이미 닫혔음). 보상은 complete_battle 후 적용.
+func start_event_battle(tier: int, reward: Dictionary) -> void:
+	pending_event = null
+	pending_event_battle_reward = reward
+	if tier >= 1:
+		pending_enemies = _make_elite_enemies()
+	else:
+		pending_enemies = _make_normal_enemies()
+	_apply_act_difficulty(pending_enemies, current_act)
+	_last_elite_solo = (pending_enemies.size() == 1)
+	_last_boss_enemy_id = ""
+	change_state(GameState.BATTLE)
+	_request_scene("res://scenes/battle/battle_scene.tscn")
+
+func _apply_event_battle_reward() -> void:
+	if pending_event_battle_reward.is_empty():
+		return
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var etype: int = int(pending_event_battle_reward.get("effect_type", ChoiceRes.EffectType.NONE))
+	var value: int = int(pending_event_battle_reward.get("value", 0))
+	var card_id: String = String(pending_event_battle_reward.get("card_id", ""))
+	pending_event_battle_reward = {}
+	match etype:
+		ChoiceRes.EffectType.GOLD:
+			add_gold(value)
+		ChoiceRes.EffectType.HEAL:
+			var tm: Object = _get_tm()
+			if tm:
+				for hero in tm.heroes:
+					tm.heal(hero.hero_id, value)
+		ChoiceRes.EffectType.ADD_RELIC:
+			var relic := get_random_relic()
+			if relic:
+				add_relic(relic)
+		ChoiceRes.EffectType.ADD_CARD:
+			if card_id != "" and ResourceLoader.exists(card_id):
+				var card_res: Resource = load(card_id)
+				var dm: Object = _get_dm()
+				if card_res and dm:
+					dm.add_card_to_deck(card_res)
+		_:
+			pass
 
 func complete_rest() -> void:
 	_advance_nodes_from(current_node_id)
@@ -905,6 +955,11 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 	var RelicRes = load("res://resources/relic_resource.gd")
 	var tm := _get_tm()
 	var dm := _get_dm()
+	# ON_HERO_DAMAGED 트리거에서 condition_value > 0이면 받은 피해가 그 이상일 때만 발동
+	if relic.condition_value > 0:
+		var dmg_in: int = context.get("amount", 0)
+		if dmg_in < relic.condition_value:
+			return
 	match relic.effect_type:
 		RelicRes.EffectType.HEAL:
 			if is_inside_tree() and tm:
@@ -912,10 +967,8 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 					tm.heal(hero.hero_id, value)
 		RelicRes.EffectType.ENERGY:
 			if is_inside_tree() and dm:
-				var dmg_amount: int = context.get("amount", 0)
-				if relic.condition_value == 0 or dmg_amount >= relic.condition_value:
-					dm.current_energy += value
-					dm.energy_changed.emit(dm.current_energy)
+				dm.current_energy += value
+				dm.energy_changed.emit(dm.current_energy)
 		RelicRes.EffectType.DRAW:
 			if is_inside_tree() and dm:
 				dm.draw_cards(value)

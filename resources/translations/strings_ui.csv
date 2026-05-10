@@ -136,3 +136,9 @@ ui.event.tag.remove_card,카드 제거,Remove Card,Retirer Carte,Rimuovi Carta,E
 ui.event.tag.add_relic,렐릭 획득,Gain Relic,Obtenir Relique,Ottieni Reliquia,Obtener Reliquia,遺物獲得,Απόκτηση Λειψάνου,获得遗物,获得遗物
 ui.event.tag.relic_gamble,렐릭 도박,Relic Gamble,Pari Relique,Scommessa Reliquia,Apostar Reliquia,遺物ギャンブル,Τζόγος Λειψάνου,遗物赌注,遗物赌注
 ui.event.tag.add_hero,영웅 합류,Hero Joins,Héros Rejoint,Eroe Si Unisce,Héroe Se Une,英雄加入,Ήρωας Εντάσσεται,英雄加入,英雄加入
+ui.event.tag.add_card,카드 추가,Add Card,Ajouter Carte,Aggiungi Carta,Añadir Carta,カード追加,Προσθήκη Κάρτας,加入卡牌,加入卡牌
+ui.event.tag.add_card_named,%s 추가,Add %s,Ajouter %s,Aggiungi %s,Añadir %s,%s 追加,Προσθήκη %s,加入 %s,加入 %s
+ui.event.tag.battle,전투 발생,Battle,Combat,Battaglia,Batalla,戦闘,Μάχη,战斗,戰鬥
+ui.event.tag.battle_elite,엘리트 전투,Elite Battle,Combat Élite,Battaglia Élite,Batalla Élite,エリート戦闘,Μάχη Επίλεκτου,精英战斗,精英戰鬥
+ui.event.tag.chance,%d%% 확률,%d%% Chance,%d%% Chance,%d%% Probabilità,%d%% Probabilidad,%d%% 確率,%d%% Πιθανότητα,%d%% 概率,%d%% 機率
+ui.event.requires_hero,%s 필요,Requires %s,Nécessite %s,Richiede %s,Requiere %s,%s が必要,Απαιτείται %s,需要 %s,需要 %s

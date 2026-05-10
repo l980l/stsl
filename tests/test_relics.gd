@@ -260,10 +260,11 @@ func test_buddhist_relics_exist() -> void:
 	_assert("relic.dharma_drum.name" in names, "법고 존재")
 	_assert("relic.prayer_beads.name" in names, "염주 존재")
 	var RelicRes = load("res://resources/relic_resource.gd")
+	# 차별화: BATTLE_START → ENERGY +1 (iron_will과 100% 동일) → PASSIVE → MAX_HP +20
 	var seal = pool.filter(func(r): return r.relic_name == "relic.dharma_seal.name")[0]
-	_assert(seal.trigger == RelicRes.TriggerType.BATTLE_START, "법인 트리거=BATTLE_START")
-	_assert(seal.effect_type == RelicRes.EffectType.ENERGY, "법인 효과=ENERGY")
-	_assert(seal.value == 1, "법인 value=1")
+	_assert(seal.trigger == RelicRes.TriggerType.PASSIVE, "법인 트리거=PASSIVE")
+	_assert(seal.effect_type == RelicRes.EffectType.MAX_HP, "법인 효과=MAX_HP")
+	_assert(seal.value == 20, "법인 value=20")
 
 func test_daoist_relics_exist() -> void:
 	print("[TestRelics] test_daoist_relics_exist")

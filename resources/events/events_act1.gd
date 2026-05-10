@@ -62,12 +62,15 @@ static func _companion_encounter() -> Resource:
 	e.choices = [ca, cb]; return e
 
 static func _prometheus_fire() -> Resource:
+	# 다양화: 단순 DRAW_UP+cost_hp → 확률 효과 (70% 드로우 영구, 30% 카드 1장 소실)
 	var e: Resource = EventRes.new()
 	e.event_name = "event.act1.prometheus_fire.name"
 	e.description = "event.act1.prometheus_fire.desc"
 	e.bgm_type = "mysterious"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.act1.prometheus_fire.choice_1"
-	ca.effect_type = ChoiceRes.EffectType.DRAW_UP; ca.value = 1; ca.cost_hp = 20
+	ca.effect_type = ChoiceRes.EffectType.DRAW_UP; ca.value = 1; ca.cost_hp = 15
+	ca.success_chance = 70
+	ca.alt_effect_type = ChoiceRes.EffectType.REMOVE_CARD
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.act1.prometheus_fire.choice_2"
 	cb.effect_type = ChoiceRes.EffectType.NONE
 	e.choices = [ca, cb]; return e
@@ -83,11 +86,13 @@ static func _heracles_trial() -> Resource:
 	e.choices = [ca, cb]; return e
 
 static func _circe_magic() -> Resource:
+	# 다양화: HEAL gold 비용 → MULTI (HEAL + REMOVE_CARD), 마법으로 카드 정화
 	var e: Resource = EventRes.new()
 	e.event_name = "event.act1.circe_magic.name"; e.description = "event.act1.circe_magic.desc"
 	e.bgm_type = "mysterious"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.act1.circe_magic.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.HEAL; ca.value = 25; ca.cost_gold = 50
+	ca.secondary_effect_type = ChoiceRes.EffectType.REMOVE_CARD
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.act1.circe_magic.choice_2"
 	cb.effect_type = ChoiceRes.EffectType.NONE
 	e.choices = [ca, cb]; return e
