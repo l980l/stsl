@@ -38,21 +38,21 @@ relic.iron_will.desc,전투 시작 시 에너지 +1,Energy +1 at start,Énergie 
 relic.ancient_shield.name,고대의 방패,Ancient Shield,Bouclier antique,Antico Scudo,Escudo Antiguo,古代の盾,Αρχαία Ασπίδα,古代之盾,古代之盾
 relic.ancient_shield.desc,전투 시작 시 팀 전체 방어도 +4,Team Block +4 at start,Blocage +4 au début,Difesa +4 all'inizio,Defensa +4 al inicio,戦闘開始時、チーム全体の防御+4,+4 Άμυνα στην ομάδα στην αρχή,战斗开始时全队护甲 +4,战斗开始时全队护甲 +4
 relic.ankh_of_life.name,앙크의 생명,Ankh of Life,Ankh de vie,Ankh della Vita,Ankh de Vida,アンクの命,Άνκχ της Ζωής,安卡生命之符,安卡生命之符
-relic.ankh_of_life.desc,전투 승리 시 팀 전체 HP +12,Team HP +12 on victory,PV +12 après une victoire,PV +12 alla vittoria,PV +12 al ganar,勝利時、チーム全体のHP+12,+12 HP στην ομάδα μετά τη νίκη,战斗胜利时全队HP +12,战斗胜利时全队HP +12
+relic.ankh_of_life.desc,피해 10 이상 받으면 즉시 HP +5,Heal +5 when taking 10+ damage,PV +5 si vous subissez 10+ dégâts,PV +5 quando subisci 10+ danni,Cura +5 al recibir 10+ daño,10以上の被ダメ時にHP+5,+5 HP όταν δέχεστε 10+ ζημιά,受到10+伤害时 HP +5,受到10+傷害時 HP +5
 relic.eye_of_horus.name,호루스의 눈,Eye of Horus,Œil d'Horus,Occhio di Horus,Ojo de Horus,ホルスの目,Μάτι του Ώρου,荷鲁斯之眼,荷鲁斯之眼
 relic.eye_of_horus.desc,플레이어 턴 시작 시 카드 1장 드로우. 클레오파트라 생존 시 +2장,Draw 1 or 2 cards if Cleo lives,Pioche 1 ou 2 si Cléo vit,Pesca 1 o 2 se Cleo vive,Roba 1 o 2 si Cleo vive,ターン開始時カード1枚引く（クレオ生存時2）,+1 ή +2 κάρτες αν ζει η Κλεοπάτρα,回合开始抽 1 张牌（克利奥帕特拉存活时 +2）,回合开始抽 1 张牌（克利奥帕特拉存活时 +2）
 relic.scarab_talisman.name,스카라베 부적,Scarab Talisman,Talisman du scarabée,Talismano dello Scarabeo,Talismán de Escarabajo,スカラベの守護札,Φυλαχτό Σκαραβαίος,圣甲虫护身符,圣甲虫护身符
-relic.scarab_talisman.desc,전투 시작 시 팀 전체 방어도 +8,Team Block +8 at start,Blocage +8 au début,Difesa +8 all'inizio,Defensa +8 al inicio,戦闘開始時、チーム全体の防御+8,+8 Άμυνα στην ομάδα στην αρχή,战斗开始时全队护甲 +8,战斗开始时全队护甲 +8
+relic.scarab_talisman.desc,전투 시작 시 모든 적에게 독 4,Apply Poison 4 to all enemies at start,Applique Poison 4 à tous au début,Applica Veleno 4 a inizio,Aplica Veneno 4 al inicio,戦闘開始時、全敵に毒4を付与,+4 Δηλητήριο σε όλους τους εχθρούς στην αρχή,战斗开始时所有敌方中毒 4,戰鬥開始時所有敵方中毒 4
 relic.rune_of_fate.name,운명의 룬,Rune of Fate,Rune du destin,Runa del Destino,Runa del Destino,運命のルーン,Ρούνος του Πεπρωμένου,命运卢恩,命运卢恩
 relic.rune_of_fate.desc,전투 시작 시 카드 2장 추가 드로우,Draw 2 extra cards at start,Pioche 2 bonus au début,Pesca 2 extra all'inizio,Roba 2 extra al inicio,戦闘開始時、カードを2枚追加で引く,+2 κάρτες στην αρχή της μάχης,战斗开始时额外抽 2 张牌,战斗开始时额外抽 2 张牌
 relic.mjolnir_shard.name,묠니르의 파편,Mjolnir Shard,Éclat de Mjölnir,Frammento di Mjolnir,Fragmento de Mjölnir,ミョルニルの破片,Θραύσμα του Μγιόλνιρ,雷神之锤碎片,雷神之锤碎片
 relic.mjolnir_shard.desc,전투 시작 시 팀 전체 방어도 +10,Team Block +10 at start,Blocage +10 au début,Difesa +10 all'inizio,Defensa +10 al inicio,戦闘開始時、チーム全体の防御+10,+10 Άμυνα στην ομάδα στην αρχή,战斗开始时全队护甲 +10,战斗开始时全队护甲 +10
 relic.idun_apple.name,이둔의 사과,Idun's Apple,Pomme d'Idunn,Mela di Idun,Manzana de Idun,イズンのリンゴ,Μήλο της Ιντούν,伊登苹果,伊登苹果
-relic.idun_apple.desc,전투 승리 시 팀 전체 HP +15,Team HP +15 on victory,PV +15 après une victoire,PV +15 alla vittoria,PV +15 al ganar,勝利時、チーム全体のHP+15,+15 HP στην ομάδα μετά τη νίκη,战斗胜利时全队HP +15,战斗胜利时全队HP +15
+relic.idun_apple.desc,플레이어 턴 종료 시 팀 전체 HP +3,Team HP +3 at turn end,PV +3 à la fin du tour,PV +3 a fine turno,PV +3 al final del turno,プレイヤーターン終了時HP+3,+3 HP στο τέλος του γύρου,玩家回合结束时全队 HP +3,玩家回合結束時全隊 HP +3
 relic.ghost_talisman.name,귀신 부적,Ghost Talisman,Talisman spectral,Talismano Spettrale,Talismán Espectral,幽霊の護符,Φυλαχτό Φάντασμα,鬼神护符,鬼神护符
 relic.ghost_talisman.desc,플레이어 턴 종료 시 무작위 적에게 독 2 부여,Apply Poison 2 at turn end,Applique Poison 2 à la fin,Applica Veleno 2 a fine turno,Aplica Veneno 2 al final,ターン終了時、ランダムな敵に毒2を付与,2 Δηλητήριο σε τυχαίο εχθρό στο τέλος,玩家回合结束时随机敌方中毒 2,玩家回合结束时随机敌方中毒 2
 relic.tengu_feather.name,텐구의 깃털,Tengu Feather,Plume de Tengu,Piuma di Tengu,Pluma de Tengu,天狗の羽,Φτερό Τένγκου,天狗之羽,天狗之羽
-relic.tengu_feather.desc,전투 시작 시 카드 1장 추가 드로우,Draw 1 extra card at start,Pioche 1 bonus au début,Pesca 1 extra all'inizio,Roba 1 extra al inicio,戦闘開始時、カードを1枚追加で引く,+1 κάρτα στην αρχή της μάχης,战斗开始时额外抽 1 张牌,战斗开始时额外抽 1 张牌
+relic.tengu_feather.desc,전투 승리 시 카드 2장 드로우,Draw 2 cards on victory,Pioche 2 cartes après une victoire,Pesca 2 carte alla vittoria,Roba 2 cartas al ganar,勝利時カード2枚を引く,+2 κάρτες στη νίκη,战斗胜利时抽 2 张牌,戰鬥勝利時抽 2 張牌
 relic.orochi_scale.name,오로치의 비늘,Orochi Scale,Écaille d'Orochi,Scaglia di Orochi,Escama de Orochi,オロチの鱗,Λέπι του Ορότσι,八岐大蛇之鳞,八岐大蛇之鳞
 relic.orochi_scale.desc,영웅이 피해를 받을 때 무작위 적에게 약화 1 부여,Apply Weak 1 on taking DMG,Applique Faiblesse 1 si dégâts,Applica Debolezza 1 se colpito,Aplica Debilidad 1 al recibir daño,ダメージを受けた時、ランダムな敵に弱体1,1 Αδυναμία σε τυχαίο εχθρό αν δεχτείς ζημιά,英雄受到伤害时随机敌方虚弱 1,英雄受到伤害时随机敌方虚弱 1
 relic.flag_of_orleans.name,오를레앙 깃발,Flag of Orleans,Drapeau d'Orléans,Bandiera di Orléans,Bandera de Orleans,オルレアンの旗,Σημαία της Ορλεάνης,奥尔良旗帜,奥尔良旗帜
@@ -68,7 +68,7 @@ relic.niten_ichi_ryu.desc,전투 시작 시 에너지 +1 (무사시 전용),Ener
 relic.gorin_sho_relic.name,오륜서,Gorin-no-sho (Book of Five Rings),Gorin-no-sho (Traité des cinq roues),Gorin-no-sho (Libro dei Cinque Anelli),Gorin-no-sho (El libro de los cinco anillos),五輪書,Γκορίν-νο-σο (Το Βιβλίο των Πέντε Δαχτυλιδιών),五轮书,五轮书
 relic.gorin_sho_relic.desc,플레이어 턴 시작 시 카드 1장 추가 드로우 (무사시 전용),Draw extra card (Musashi only),Pioche bonus (Musashi),Pesca extra (Musashi),Roba extra (Musashi),ターン開始時カード1枚追加（武蔵専用）,+1 κάρτα (Μόνο Μουσάσι),回合开始额外抽牌（武藏专用）,回合开始额外抽牌（武藏专用）
 relic.dharma_seal.name,법인,Dharma Seal,Sceau du Dharma,Sigillo del Dharma,Sello del Dharma,法印,Σφραγίδα Ντάρμα,法印,法印
-relic.dharma_seal.desc,전투 시작 시 에너지 +1,Energy +1 at battle start,Énergie +1 au début du combat,Energia +1 all'inizio del combattimento,Energía +1 al inicio del combate,戦闘開始時エネルギー+1,+1 Ενέργεια στην αρχή,战斗开始时能量+1,戰鬥開始時能量+1
+relic.dharma_seal.desc,팀 전체 최대 HP +20,Team Max HP +20,PV max +20 à l'équipe,PV Max +20 alla squadra,PV Máx +20 al equipo,チーム全体の最大HP+20,+20 Μέγιστο HP στην ομάδα,全队最大 HP +20,全隊最大 HP +20
 relic.dharma_drum.name,법고,Dharma Drum,Tambour du Dharma,Tamburo del Dharma,Tambor del Dharma,法鼓,Τύμπανο Ντάρμα,法鼓,法鼓
 relic.dharma_drum.desc,전투 승리 시 사기 +3,Morale +3 on victory,Moral +3 à la victoire,Morale +3 alla vittoria,Moral +3 en victoria,戦闘勝利時士気+3,+3 Ηθικό στη νίκη,战斗胜利时士气+3,戰鬥勝利時士氣+3
 relic.prayer_beads.name,염주,Prayer Beads,Chapelet,Rosario,Rosario,念珠,Χάντρες Προσευχής,念珠,念珠

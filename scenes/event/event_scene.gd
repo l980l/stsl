@@ -235,6 +235,8 @@ func _build_choices(frame: Panel, event: Resource) -> void:
 		_build_choice_card(row, i, event.choices[i])
 
 func _build_choice_card(row: HBoxContainer, idx: int, choice: Resource) -> void:
+	var enabled: bool = _is_choice_available(choice)
+
 	var base_style := StyleBoxFlat.new()
 	base_style.bg_color = Color(0.027, 0.020, 0.012, 0.55)
 	base_style.border_color = SacredPalette.BRASS_700
@@ -247,6 +249,8 @@ func _build_choice_card(row: HBoxContainer, idx: int, choice: Resource) -> void:
 
 	var card := Panel.new()
 	card.add_theme_stylebox_override("panel", base_style)
+	if not enabled:
+		card.modulate = Color(0.55, 0.55, 0.55, 1.0)
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	card.custom_minimum_size = Vector2(0.0, 100.0)
@@ -320,6 +324,14 @@ func _build_choice_card(row: HBoxContainer, idx: int, choice: Resource) -> void:
 	content.add_child(verb_lbl)
 	LabelUtils.fit_text(verb_lbl, 20, 13)
 
+	# 조건 미충족 hint
+	if not enabled and choice.required_hero_id != "":
+		var hint_lbl := Label.new()
+		hint_lbl.text = tr("ui.event.requires_hero") % tr("hero." + choice.required_hero_id + ".name")
+		hint_lbl.add_theme_color_override("font_color", SacredPalette.BLOOD_400)
+		hint_lbl.add_theme_font_size_override("font_size", 12)
+		content.add_child(hint_lbl)
+
 	# 비용 태그
 	var tags := _cost_tags(choice)
 	if not tags.is_empty():
@@ -349,31 +361,47 @@ func _build_choice_card(row: HBoxContainer, idx: int, choice: Resource) -> void:
 	sp_bot.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_child(sp_bot)
 
-	# 투명 버튼 오버레이 (호버 + 클릭)
+	# 투명 버튼 오버레이 (호버 + 클릭) — 조건 미충족 시 비활성
 	var btn := Button.new()
 	btn.flat = true
 	btn.focus_mode = Control.FOCUS_NONE
+	btn.disabled = not enabled
 	var empty := StyleBoxEmpty.new()
 	btn.add_theme_stylebox_override("normal", empty)
 	btn.add_theme_stylebox_override("hover", empty)
 	btn.add_theme_stylebox_override("pressed", empty)
 	btn.add_theme_stylebox_override("focus", empty)
+	btn.add_theme_stylebox_override("disabled", empty)
 	btn.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	card.add_child(btn)
 
-	var cap_card  := card
-	var cap_accent := accent
-	btn.mouse_entered.connect(func():
-		cap_card.add_theme_stylebox_override("panel", hover_style)
-		var tw := cap_card.create_tween()
-		tw.tween_property(cap_accent, "modulate:a", 1.0, 0.18)
-	)
-	btn.mouse_exited.connect(func():
-		cap_card.add_theme_stylebox_override("panel", base_style)
-		var tw := cap_card.create_tween()
-		tw.tween_property(cap_accent, "modulate:a", 0.0, 0.18)
-	)
-	btn.pressed.connect(_on_choice_selected.bind(choice))
+	if enabled:
+		var cap_card  := card
+		var cap_accent := accent
+		btn.mouse_entered.connect(func():
+			cap_card.add_theme_stylebox_override("panel", hover_style)
+			var tw := cap_card.create_tween()
+			tw.tween_property(cap_accent, "modulate:a", 1.0, 0.18)
+		)
+		btn.mouse_exited.connect(func():
+			cap_card.add_theme_stylebox_override("panel", base_style)
+			var tw := cap_card.create_tween()
+			tw.tween_property(cap_accent, "modulate:a", 0.0, 0.18)
+		)
+		btn.pressed.connect(_on_choice_selected.bind(choice))
+
+func _is_choice_available(choice: Resource) -> bool:
+	if choice.required_hero_id != "":
+		var found: bool = false
+		for h in TeamManager.heroes:
+			if h.hero_id == choice.required_hero_id:
+				found = true
+				break
+		if not found:
+			return false
+	if choice.cost_gold > 0 and GameManager.gold < choice.cost_gold:
+		return false
+	return true
 
 func _cost_tags(choice: Resource) -> Array:
 	var tags: Array = []
@@ -381,13 +409,26 @@ func _cost_tags(choice: Resource) -> Array:
 		tags.append({"text": tr("ui.event.tag.cost_gold") % choice.cost_gold, "color": SacredPalette.BONE_300})
 	if choice.cost_hp > 0:
 		tags.append({"text": tr("ui.event.tag.cost_hp") % choice.cost_hp, "color": SacredPalette.BLOOD_400})
-	match choice.effect_type:
+	_append_effect_tag(tags, choice.effect_type, choice.value, choice.card_id)
+	if choice.secondary_effect_type != EventChoiceResource.EffectType.NONE:
+		_append_effect_tag(tags, choice.secondary_effect_type, choice.secondary_value, "")
+	if choice.success_chance > 0 and choice.success_chance < 100:
+		tags.append({"text": tr("ui.event.tag.chance") % choice.success_chance, "color": SacredPalette.BRASS_400})
+	if choice.effect_type == EventChoiceResource.EffectType.TRIGGER_BATTLE:
+		var battle_key := "ui.event.tag.battle_elite" if choice.encounter_tier >= 1 else "ui.event.tag.battle"
+		tags.append({"text": tr(battle_key), "color": SacredPalette.BLOOD_400})
+		if choice.reward_effect_type != EventChoiceResource.EffectType.NONE:
+			_append_effect_tag(tags, choice.reward_effect_type, choice.reward_value, "")
+	return tags
+
+func _append_effect_tag(tags: Array, etype: int, value: int, card_id: String) -> void:
+	match etype:
 		EventChoiceResource.EffectType.GOLD:
-			tags.append({"text": tr("ui.event.tag.gain_gold") % choice.value, "color": SacredPalette.BRASS_300})
+			tags.append({"text": tr("ui.event.tag.gain_gold") % value, "color": SacredPalette.BRASS_300})
 		EventChoiceResource.EffectType.HEAL:
-			tags.append({"text": tr("ui.event.tag.gain_hp") % choice.value, "color": SacredPalette.BRASS_300})
+			tags.append({"text": tr("ui.event.tag.gain_hp") % value, "color": SacredPalette.BRASS_300})
 		EventChoiceResource.EffectType.DRAW_UP:
-			tags.append({"text": tr("ui.event.tag.draw_up") % choice.value, "color": SacredPalette.BRASS_300})
+			tags.append({"text": tr("ui.event.tag.draw_up") % value, "color": SacredPalette.BRASS_300})
 		EventChoiceResource.EffectType.REMOVE_CARD:
 			tags.append({"text": tr("ui.event.tag.remove_card"), "color": SacredPalette.BONE_300})
 		EventChoiceResource.EffectType.ADD_RELIC:
@@ -396,7 +437,15 @@ func _cost_tags(choice: Resource) -> Array:
 			tags.append({"text": tr("ui.event.tag.relic_gamble"), "color": SacredPalette.BONE_300})
 		EventChoiceResource.EffectType.ADD_HERO:
 			tags.append({"text": tr("ui.event.tag.add_hero"), "color": SacredPalette.BRASS_300})
-	return tags
+		EventChoiceResource.EffectType.ADD_CARD:
+			if card_id != "" and ResourceLoader.exists(card_id):
+				var card_res: Resource = load(card_id)
+				var name_str: String = ""
+				if card_res and "card_name" in card_res:
+					name_str = tr(card_res.card_name)
+				tags.append({"text": tr("ui.event.tag.add_card_named") % name_str, "color": SacredPalette.BRASS_300})
+			else:
+				tags.append({"text": tr("ui.event.tag.add_card"), "color": SacredPalette.BRASS_300})
 
 func _play_open() -> void:
 	if _popup_tween:
@@ -417,45 +466,72 @@ func _play_close(callback: Callable) -> void:
 func _on_choice_selected(choice: Resource) -> void:
 	_play_close(func():
 		_apply_choice(choice)
-		GameManager.complete_event()
+		# TRIGGER_BATTLE은 GameManager.start_event_battle()이 씬 전환을 직접 처리
+		if choice.effect_type != EventChoiceResource.EffectType.TRIGGER_BATTLE:
+			GameManager.complete_event()
 	)
 
 func _apply_choice(choice: Resource) -> void:
-	match choice.effect_type:
+	# 1) 비용 선처리 — gold 부족 시 효과 자체가 무효
+	if choice.cost_gold > 0 and not GameManager.spend_gold(choice.cost_gold):
+		return
+	if choice.cost_hp > 0:
+		for hero in TeamManager.heroes:
+			TeamManager.take_damage(hero.hero_id, choice.cost_hp)
+
+	# 2) TRIGGER_BATTLE은 별도 — pending_event를 유지한 채 전투 진입
+	if choice.effect_type == EventChoiceResource.EffectType.TRIGGER_BATTLE:
+		var reward: Dictionary = {
+			"effect_type": choice.reward_effect_type,
+			"value": choice.reward_value,
+			"card_id": choice.card_id,
+		}
+		GameManager.start_event_battle(choice.encounter_tier, reward)
+		return
+
+	# 3) 확률 효과 — success_chance 0/100 외에는 dice 굴림
+	if choice.success_chance > 0 and choice.success_chance < 100:
+		if randi() % 100 < choice.success_chance:
+			_apply_single_effect(choice.effect_type, choice.value, choice.card_id)
+		else:
+			_apply_single_effect(choice.alt_effect_type, choice.alt_value, "")
+		return
+
+	# 4) 일반 + MULTI
+	_apply_single_effect(choice.effect_type, choice.value, choice.card_id)
+	if choice.secondary_effect_type != EventChoiceResource.EffectType.NONE:
+		_apply_single_effect(choice.secondary_effect_type, choice.secondary_value, "")
+
+func _apply_single_effect(etype: int, value: int, card_id: String) -> void:
+	match etype:
 		EventChoiceResource.EffectType.GOLD:
-			if choice.cost_hp > 0:
-				for hero in TeamManager.heroes:
-					TeamManager.take_damage(hero.hero_id, choice.cost_hp)
-			GameManager.add_gold(choice.value)
+			GameManager.add_gold(value)
 		EventChoiceResource.EffectType.HEAL:
-			if GameManager.spend_gold(choice.cost_gold):
-				for hero in TeamManager.heroes:
-					TeamManager.heal(hero.hero_id, choice.value)
+			for hero in TeamManager.heroes:
+				TeamManager.heal(hero.hero_id, value)
 		EventChoiceResource.EffectType.DRAW_UP:
-			if choice.cost_hp > 0:
-				for hero in TeamManager.heroes:
-					TeamManager.take_damage(hero.hero_id, choice.cost_hp)
-			DeckManager.base_draw_count += choice.value
+			DeckManager.base_draw_count += value
 		EventChoiceResource.EffectType.REMOVE_CARD:
 			if not DeckManager.draw_pile.is_empty():
-				DeckManager.draw_pile.remove_at(
-					randi() % DeckManager.draw_pile.size())
+				DeckManager.draw_pile.remove_at(randi() % DeckManager.draw_pile.size())
 		EventChoiceResource.EffectType.ADD_RELIC:
-			if choice.cost_hp > 0:
-				for hero in TeamManager.heroes:
-					TeamManager.take_damage(hero.hero_id, choice.cost_hp)
 			var relic: Resource = GameManager.get_random_relic()
 			if relic:
 				GameManager.add_relic(relic)
 		EventChoiceResource.EffectType.ADD_RELIC_GAMBLE:
-			var relic: Resource
+			var rg: Resource
 			if randf() < 0.5:
-				relic = GameManager.get_random_relic()
+				rg = GameManager.get_random_relic()
 			else:
-				relic = GameManager.get_random_cursed_relic()
-			if relic:
-				GameManager.add_relic(relic)
+				rg = GameManager.get_random_cursed_relic()
+			if rg:
+				GameManager.add_relic(rg)
 		EventChoiceResource.EffectType.ADD_HERO:
 			GameManager.recruit_random_hero()
+		EventChoiceResource.EffectType.ADD_CARD:
+			if card_id != "" and ResourceLoader.exists(card_id):
+				var card_res: Resource = load(card_id)
+				if card_res:
+					DeckManager.add_card_to_deck(card_res)
 		EventChoiceResource.EffectType.NONE:
 			pass

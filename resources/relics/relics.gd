@@ -156,10 +156,14 @@ static func _ancient_shield() -> Resource:
 # ──── Act 2 렐릭 (이집트 신화) ────
 
 static func _ankh_of_life() -> Resource:
+	# 차별화: BATTLE_WIN → HEAL 12 (다른 BATTLE_WIN HEAL과 중복) → ON_HERO_DAMAGED + condition
+	# 큰 피해(10+)를 받으면 즉시 5 회복. 생명의 표식 — 위기에 살아남는 의미.
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.ankh_of_life.name"
 	r.description = "relic.ankh_of_life.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r.effect_type = RelicRes.EffectType.HEAL; r.value = 12; return r
+	r.trigger = RelicRes.TriggerType.ON_HERO_DAMAGED
+	r.effect_type = RelicRes.EffectType.HEAL
+	r.value = 5; r.condition_value = 10
+	return r
 
 static func _eye_of_horus() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.eye_of_horus.name"
@@ -169,10 +173,13 @@ static func _eye_of_horus() -> Resource:
 	r.value = 1; r.bonus_value = 2; r.owner_hero_id = "cleopatra"; return r
 
 static func _scarab_talisman() -> Resource:
+	# 차별화: BATTLE_START → BLOCK 8 (다른 BLOCK 렐릭과 중복) → APPLY_STATUS_ENEMY (poison 4)
+	# 이집트 풍뎅이 = 부활/독의 상징
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.scarab_talisman.name"
 	r.description = "relic.scarab_talisman.desc"
 	r.trigger = RelicRes.TriggerType.BATTLE_START
-	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 8; return r
+	r.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
+	r.status_type = "poison"; r.value = 4; return r
 
 # ──── Act 3 렐릭 (북유럽 신화) ────
 
@@ -189,18 +196,22 @@ static func _mjolnir_shard() -> Resource:
 	r.effect_type = RelicRes.EffectType.BLOCK; r.value = 10; return r
 
 static func _idun_apple() -> Resource:
+	# 차별화: BATTLE_WIN → HEAL 15 (중복) → PLAYER_TURN_END + HEAL 3 (지속 회복)
+	# 이둔의 사과 = 영원한 젊음 → 매 턴 끝 회복
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.idun_apple.name"
 	r.description = "relic.idun_apple.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r.effect_type = RelicRes.EffectType.HEAL; r.value = 15; return r
+	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
+	r.effect_type = RelicRes.EffectType.HEAL; r.value = 3; return r
 
 # ──── 챕터 2 렐릭 (불교 신화) ────
 
 static func _dharma_seal() -> Resource:
+	# 차별화: BATTLE_START → ENERGY +1 (iron_will과 100% 동일) → PASSIVE → MAX_HP +20
+	# 불교의 가르침 = 영구적 인내·지구력
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.dharma_seal.name"
 	r.description = "relic.dharma_seal.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_START
-	r.effect_type = RelicRes.EffectType.ENERGY; r.value = 1; return r
+	r.trigger = RelicRes.TriggerType.PASSIVE
+	r.effect_type = RelicRes.EffectType.MAX_HP; r.value = 20; return r
 
 static func _dharma_drum() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.dharma_drum.name"
@@ -244,10 +255,12 @@ static func _ghost_talisman() -> Resource:
 	r.status_type = "poison"; r.value = 2; return r
 
 static func _tengu_feather() -> Resource:
+	# 차별화: BATTLE_START → DRAW 1 (tacticians_map과 동일) → BATTLE_WIN → DRAW 2
+	# 텐구의 깃털 = 승리 후 영적 통찰 → 다음 전투 첫 패 풍부
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.tengu_feather.name"
 	r.description = "relic.tengu_feather.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_START
-	r.effect_type = RelicRes.EffectType.DRAW; r.value = 1; return r
+	r.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r.effect_type = RelicRes.EffectType.DRAW; r.value = 2; return r
 
 static func _orochi_scale() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.orochi_scale.name"

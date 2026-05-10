@@ -32,6 +32,13 @@ func run_all() -> Dictionary:
 	test_daoist_peach_of_immortality_event()
 	test_japanese_event_pool_size()
 	test_japanese_ise_shrine_event()
+	test_new_effect_types_exist()
+	test_trigger_battle_choice_structure()
+	test_multi_effect_choice_structure()
+	test_probabilistic_choice_structure()
+	test_add_card_choice_structure()
+	test_required_hero_field()
+	test_phase4_new_events_exist()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -272,7 +279,7 @@ func test_hermes_event_has_two_choices() -> void:
 func test_act2_pool_size_ten() -> void:
 	print("[TestEvent] test_act2_pool_size_ten")
 	var pool := EventsAct2.build_pool()
-	_assert(pool.size() == 10, "Act2 이벤트 풀 10종")
+	_assert(pool.size() == 11, "Act2 이벤트 풀 11종")  # Phase 4: +sphinx_gate
 
 func test_act2_book_of_the_dead() -> void:
 	print("[TestEvent] test_act2_book_of_the_dead")
@@ -280,10 +287,11 @@ func test_act2_book_of_the_dead() -> void:
 	var pool := EventsAct2.build_pool()
 	var found := false
 	for e in pool:
-		if e.event_name == "사자의 서":
+		if e.event_name == "event.act2.book_of_the_dead.name":
 			found = true
-			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.DRAW_UP, "선택 A: DRAW_UP")
-			_assert(e.choices[0].cost_hp == 15, "cost_hp == 15")
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.TRIGGER_BATTLE, "선택 A: TRIGGER_BATTLE")
+			_assert(e.choices[0].reward_effect_type == ChoiceRes.EffectType.DRAW_UP, "보상: DRAW_UP")
+			_assert(e.choices[0].reward_value == 1, "보상 +1")
 	_assert(found, "사자의 서 이벤트 존재")
 
 func test_act2_pharaoh_tomb_relic() -> void:
@@ -315,9 +323,12 @@ func test_act2_mummy_curse_gamble() -> void:
 	var pool := EventsAct2.build_pool()
 	var found := false
 	for e in pool:
-		if e.event_name == "미라의 저주":
+		if e.event_name == "event.act2.mummy_curse.name":
 			found = true
-			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.ADD_RELIC_GAMBLE, "선택 A: ADD_RELIC_GAMBLE")
+			# 다양화: GAMBLE → TRIGGER_BATTLE (엘리트, 승리 시 렐릭)
+			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.TRIGGER_BATTLE, "선택 A: TRIGGER_BATTLE")
+			_assert(e.choices[0].encounter_tier == 1, "엘리트 tier")
+			_assert(e.choices[0].reward_effect_type == ChoiceRes.EffectType.ADD_RELIC, "보상: ADD_RELIC")
 	_assert(found, "미라의 저주 이벤트 존재")
 
 func test_act2_oasis_three_choices() -> void:
@@ -345,7 +356,7 @@ func test_buddhist_event_pool_size() -> void:
 	print("[TestEvent] test_buddhist_event_pool_size")
 	var BuddhistEvents = load("res://resources/events/events_buddhist.gd")
 	var pool: Array = BuddhistEvents.build_pool()
-	_assert(pool.size() == 10, "불교 이벤트 풀 10종")
+	_assert(pool.size() == 11, "불교 이벤트 풀 11종")  # Phase 4: +bodhi_tree
 
 func test_buddhist_yama_toll_event() -> void:
 	print("[TestEvent] test_buddhist_yama_toll_event")
@@ -378,7 +389,7 @@ func test_daoist_event_pool_size() -> void:
 	print("[TestEvent] test_daoist_event_pool_size")
 	var DaoistEvents = load("res://resources/events/events_daoist.gd")
 	var pool: Array = DaoistEvents.build_pool()
-	_assert(pool.size() == 10, "도교 이벤트 풀 10종")
+	_assert(pool.size() == 11, "도교 이벤트 풀 11종")  # Phase 4: +eight_immortals
 
 func test_daoist_peach_of_immortality_event() -> void:
 	print("[TestEvent] test_daoist_peach_of_immortality_event")
@@ -398,7 +409,7 @@ func test_japanese_event_pool_size() -> void:
 	print("[TestEvent] test_japanese_event_pool_size")
 	var JapaneseEvents = load("res://resources/events/events_japanese.gd")
 	var pool: Array = JapaneseEvents.build_pool()
-	_assert(pool.size() == 10, "일본 이벤트 풀 10종")
+	_assert(pool.size() == 11, "일본 이벤트 풀 11종")  # Phase 4: +kitsune_kit
 
 func test_japanese_ise_shrine_event() -> void:
 	print("[TestEvent] test_japanese_ise_shrine_event")
@@ -413,3 +424,84 @@ func test_japanese_ise_shrine_event() -> void:
 			_assert(e.choices[0].value == 50, "HEAL +50")
 			_assert(e.choices[0].cost_gold == 30, "골드 -30")
 	_assert(found, "이세 신궁의 축복 이벤트 존재")
+
+# ──────────────────────────────────────────────
+# Phase 1 인프라 — 신규 EffectType 및 필드
+# ──────────────────────────────────────────────
+
+func test_new_effect_types_exist() -> void:
+	print("[TestEvent] test_new_effect_types_exist")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	_assert(ChoiceRes.EffectType.has("TRIGGER_BATTLE"), "TRIGGER_BATTLE enum 존재")
+	_assert(ChoiceRes.EffectType.has("ADD_CARD"), "ADD_CARD enum 존재")
+	_assert(ChoiceRes.EffectType.has("MULTI"), "MULTI enum 존재")
+
+func test_trigger_battle_choice_structure() -> void:
+	print("[TestEvent] test_trigger_battle_choice_structure")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var c: Resource = ChoiceRes.new()
+	c.effect_type = ChoiceRes.EffectType.TRIGGER_BATTLE
+	c.encounter_tier = 1
+	c.reward_effect_type = ChoiceRes.EffectType.ADD_RELIC
+	c.reward_value = 0
+	_assert(c.effect_type == ChoiceRes.EffectType.TRIGGER_BATTLE, "TRIGGER_BATTLE 설정")
+	_assert(c.encounter_tier == 1, "엘리트 tier 설정")
+	_assert(c.reward_effect_type == ChoiceRes.EffectType.ADD_RELIC, "보상 effect_type")
+
+func test_multi_effect_choice_structure() -> void:
+	print("[TestEvent] test_multi_effect_choice_structure")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var c: Resource = ChoiceRes.new()
+	c.effect_type = ChoiceRes.EffectType.GOLD
+	c.value = 50
+	c.secondary_effect_type = ChoiceRes.EffectType.HEAL
+	c.secondary_value = 10
+	_assert(c.secondary_effect_type == ChoiceRes.EffectType.HEAL, "보조 effect_type 설정")
+	_assert(c.secondary_value == 10, "보조 value 설정")
+
+func test_probabilistic_choice_structure() -> void:
+	print("[TestEvent] test_probabilistic_choice_structure")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var c: Resource = ChoiceRes.new()
+	c.effect_type = ChoiceRes.EffectType.ADD_RELIC
+	c.success_chance = 60
+	c.alt_effect_type = ChoiceRes.EffectType.HEAL
+	c.alt_value = -20  # 실패 시 페널티 (음수 HEAL = 데미지 의도라면 별도 처리 필요)
+	_assert(c.success_chance == 60, "success_chance 60")
+	_assert(c.alt_effect_type == ChoiceRes.EffectType.HEAL, "alt_effect_type 설정")
+
+func test_add_card_choice_structure() -> void:
+	print("[TestEvent] test_add_card_choice_structure")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var c: Resource = ChoiceRes.new()
+	c.effect_type = ChoiceRes.EffectType.ADD_CARD
+	c.card_id = "res://resources/cards/strike.tres"
+	_assert(c.effect_type == ChoiceRes.EffectType.ADD_CARD, "ADD_CARD 설정")
+	_assert(c.card_id != "", "card_id 설정")
+
+func test_required_hero_field() -> void:
+	print("[TestEvent] test_required_hero_field")
+	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	var c: Resource = ChoiceRes.new()
+	c.required_hero_id = "achilles"
+	_assert(c.required_hero_id == "achilles", "required_hero_id 필드 설정 가능")
+
+func test_phase4_new_events_exist() -> void:
+	print("[TestEvent] test_phase4_new_events_exist")
+	# 신화별 신규 이벤트 5종 존재 검증
+	var checks: Array = [
+		["res://resources/events/events_act2.gd", "event.act2.sphinx_gate.name"],
+		["res://resources/events/events_act3.gd", "event.act3.ymir_blood.name"],
+		["res://resources/events/events_buddhist.gd", "event.buddhist.bodhi_tree.name"],
+		["res://resources/events/events_daoist.gd", "event.daoist.eight_immortals.name"],
+		["res://resources/events/events_japanese.gd", "event.japanese.kitsune_kit.name"],
+	]
+	for entry in checks:
+		var script = load(entry[0])
+		var pool: Array = script.build_pool()
+		var found := false
+		for ev in pool:
+			if ev.event_name == entry[1]:
+				found = true
+				break
+		_assert(found, "신규 이벤트 존재: " + entry[1])
