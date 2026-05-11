@@ -1,8 +1,9 @@
 keys,ko,en,fr,it,es,ja,el,zh,zh_TW
 event.act1.golden_chest.name,황금 상자,Golden Chest,Coffre d'Or,Scrigno d'Oro,Cofre de Oro,黄金の宝箱,Χρυσό Σεντούκι,黄金宝箱,黄金宝箱
 event.act1.golden_chest.desc,낡은 황금 상자가 놓여 있다.,An ancient chest of gold lies before thee.,Un vieux coffre d'or repose ici.,Un antico scrigno d'oro giace dinanzi a te.,Un viejo cofre de oro yace ante ti.,古びた黄金の宝箱が置かれている。,Ένα παλιό χρυσό σεντούκι βρίσκεται εδώ.,此处陈放着一只陈旧的黄金宝箱。,此处陈放着一只陈旧的黄金宝箱。
-event.act1.golden_chest.choice_1,열기,Open,Ouvrir,Apri,Abrir,開ける,Άνοιγμα,开启,开启
-event.act1.golden_chest.choice_2,무시,Ignore,Ignorer,Ignora,Ignorar,無視する,Αγνόησε,忽略,忽略
+event.act1.golden_chest.choice_1,강제로 연다 (70% 골드+60 / 30% 카드 분실),Force Open (70% Gold+60 / 30% Card Lost),Forcer (70% Or+60 / 30% Carte Perdue),Forza l'Apertura (70% Oro+60 / 30% Carta Persa),Forzar Apertura (70% Oro+60 / 30% Carta Perdida),強引に開ける (70% ゴールド+60 / 30% カード喪失),Άνοιγμα με Βία (70% Χρυσός+60 / 30% Κάρτα Χάνεται),强行打开 (70% 金币+60 / 30% 卡牌丢失),強行打開 (70% 金幣+60 / 30% 卡牌丟失)
+event.act1.golden_chest.choice_2,조심스레 살펴본다 (골드 +15),Examine Carefully (Gold +15),Examiner Prudemment (Or +15),Esamina con Cura (Oro +15),Examinar Cuidadosamente (Oro +15),慎重に調べる (ゴールド+15),Εξετάζω Προσεκτικά (Χρυσός +15),小心查看 (金币+15),小心查看 (金幣+15)
+event.act1.golden_chest.choice_3,미믹과 결투한다 (전투 → 유물),Fight the Mimic (Battle → Relic),Combattre le Mimique (Combat → Relique),Combatti il Mimic (Battaglia → Reliquia),Combatir al Mímico (Batalla → Reliquia),ミミックと戦う (戦闘 → レリック),Πολεμώ τον Μίμο (Μάχη → Κειμήλιο),与拟态怪决斗 (战斗 → 遗物),與擬態怪決鬥 (戰鬥 → 遺物)
 event.act1.wounded_warrior.name,상처 입은 전사,Wounded Warrior,Guerrier Blessé,Guerriero Ferito,Guerrero Herido,手負いの戦士,Πληγωμένος Πολεμιστής,负伤的战士,负伤的战士
 event.act1.wounded_warrior.desc,부상당한 병사가 치료를 요청한다.,A fallen soldier cries out for thy mercy.,Un soldat blessé implore tes soins.,Un soldat ferito implora il tuo aiuto.,Un soldado herido implora tu ayuda.,傷ついた兵士が手当てを求めている。,Ένας τραυματισμένος στρατιώτης ζητά θεραπεία.,一名受伤的士兵正在请求治疗。,一名受伤的士兵正在请求治疗。
 event.act1.wounded_warrior.choice_1,치료 (골드 -20),Heal (Gold -20),Soigner (Or -20),Cura (Oro -20),Curar (Oro -20),手当てする (ゴールド -20),Θεραπεία (Χρυσός -20),治疗 (金币 -20),治疗 (金币 -20)

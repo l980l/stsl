@@ -402,7 +402,8 @@ func test_daoist_peach_of_immortality_event() -> void:
 			found = true
 			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.HEAL, "선택A: HEAL")
 			_assert(e.choices[0].value == 40, "HEAL +40")
-			_assert(e.choices[1].effect_type == ChoiceRes.EffectType.NONE, "선택B: NONE")
+			# 재설계: 2번 NONE → 복숭아 약탈 GOLD + cost_hp
+			_assert(e.choices[1].effect_type == ChoiceRes.EffectType.GOLD, "선택B: GOLD (약탈)")
 	_assert(found, "불로장생의 복숭아 이벤트 존재")
 
 func test_japanese_event_pool_size() -> void:
