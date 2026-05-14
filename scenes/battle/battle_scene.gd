@@ -1517,6 +1517,55 @@ func _play_hit_flash(node: Node2D) -> void:
 	if node.has_method("flash"):
 		node.flash(Color(1.0, 0.2, 0.2, 1.0), 0.18)
 
+# ice 명중 시 타겟이 잠시 푸르게 얼어붙음 (HTML .target.frozen 필터 근사)
+func _apply_frozen_tint(node: Node2D) -> void:
+	if node == null: return
+	var tw := node.create_tween()
+	tw.tween_property(node, "modulate", Color(0.66, 0.82, 1.3), 0.15)
+	tw.tween_interval(1.5)
+	tw.tween_property(node, "modulate", Color(1, 1, 1), 0.45)
+
+# fire 명중 시 타겟이 잠시 그을림 (HTML .target.scorched 근사) — 잔불 시간 동안 유지
+func _apply_scorched_tint(node: Node2D) -> void:
+	if node == null: return
+	var tw := node.create_tween()
+	tw.tween_property(node, "modulate", Color(0.55, 0.4, 0.32), 0.2)
+	tw.tween_interval(3.0)
+	tw.tween_property(node, "modulate", Color(1, 1, 1), 0.8)
+
+# 디버프 적용 시 타겟이 잠시 칙칙하게 약화됨 (HTML .target.weakened 근사)
+func _apply_weakened_tint(node: Node2D) -> void:
+	if node == null: return
+	var tw := node.create_tween()
+	tw.tween_property(node, "modulate", Color(0.62, 0.55, 0.7), 0.25)
+	tw.tween_interval(1.3)
+	tw.tween_property(node, "modulate", Color(1, 1, 1), 0.7)
+
+# weak/vulnerable 디버프 적용 시 hex VFX — 같은 타겟 연속 적용은 0.5초 디바운스
+func _spawn_debuff_hex(target: String) -> void:
+	var now := Time.get_ticks_msec()
+	if now - int(_debuff_hex_cd.get(target, 0)) < 500:
+		return
+	_debuff_hex_cd[target] = now
+	var char_node: Node2D = null
+	if target.begins_with("enemy_"):
+		var idx := target.substr(6).to_int()
+		char_node = _enemy_char_nodes[idx] if idx < _enemy_char_nodes.size() else null
+	else:
+		char_node = _hero_char_nodes.get(target)
+	if char_node == null:
+		return
+	var target_pos: Vector2 = char_node.global_position
+	var fx := _VFX_DEBUFF_HEX.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_shake()
+		AudioManager.play_sfx("debuff")
+	)
+	fx.play(_resolve_caster_pos(BattleManager._vfx_caster, target_pos), target_pos)
+	_apply_weakened_tint(char_node)
+
 func _play_status_flash(node: Node2D, status_color: Color) -> void:
 	if node == null: return
 	if node.has_method("flash"):
@@ -1674,13 +1723,22 @@ const _VFX_SCENES: Dictionary = {
 	"poison":     preload("res://scenes/vfx/poison_particle.tscn"),
 	"divine":     preload("res://scenes/vfx/divine_particle.tscn"),
 	"curse":      preload("res://scenes/vfx/curse_particle.tscn"),
-	"fire":       preload("res://scenes/vfx/fire_particle.tscn"),
-	"ice":        preload("res://scenes/vfx/ice_particle.tscn"),
-	"lightning":  preload("res://scenes/vfx/lightning_particle.tscn"),
 }
 const _VFX_DEFAULT: PackedScene = preload("res://scenes/vfx/default_particle.tscn")
+# lightning/ice/fire는 시전자→타겟 빔 타입 — 별도 경로 (_spawn_caster_beam)
+const _VFX_LIGHTNING_BEAM := preload("res://scenes/vfx/lightning_beam.gd")
+const _VFX_ICE_SHARDS := preload("res://scenes/vfx/ice_shards.gd")
+const _VFX_FIRE_BLAST := preload("res://scenes/vfx/fire_blast.gd")
+const _VFX_DEBUFF_HEX := preload("res://scenes/vfx/debuff_hex.gd")
 const _VFX_HEAL: PackedScene = preload("res://scenes/vfx/heal_particle.tscn")
 const _VFX_BLOCK: PackedScene = preload("res://scenes/vfx/block_particle.tscn")
+
+# lightning으로 죽는 적/영웅 — 사망 연출을 빔 임팩트 시점까지 지연하기 위한 빔 참조
+# key: "enemy_%d" 또는 hero_id → lightning_beam 인스턴스
+var _lit_death_beam: Dictionary = {}
+
+# 디버프 hex VFX — 같은 타겟 연속 적용 시 중복 발동 방지 (target → 마지막 발동 ticks_msec)
+var _debuff_hex_cd: Dictionary = {}
 
 func _spawn_self_particles(pos: Vector2, scene: PackedScene) -> void:
 	var fx: Node2D = scene.instantiate()
@@ -1710,6 +1768,80 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 	fx.burst()
 	AudioManager.play_sfx("impact_" + (dtype if dtype != "" else "default"))
 
+# ── 번개 빔 VFX (시전자→타겟) ──────────────────────────────
+# caster: BattleManager._vfx_caster — int(적 인덱스) / String(hero_id) / null
+func _resolve_caster_pos(caster, target_pos: Vector2) -> Vector2:
+	if caster is int:
+		if caster >= 0 and caster < _enemy_char_nodes.size():
+			var n = _enemy_char_nodes[caster]
+			if is_instance_valid(n):
+				return n.global_position
+	elif caster is String:
+		var n = _hero_char_nodes.get(caster)
+		if is_instance_valid(n):
+			return n.global_position
+	# 공격자 노드 무효 — 타겟 위쪽에서 내리꽂는 fallback
+	return target_pos + Vector2(0.0, -350.0)
+
+# lightning/ice 등 시전자→타겟 빔 VFX 공통 생성기.
+# 빔이 명중을 알리는 screen_effect 시점에 화면 효과·SFX·피격 피드백을 동기화한다.
+func _spawn_caster_beam(beam_script: GDScript, caster_pos: Vector2, target_pos: Vector2,
+		dtype: String, on_impact: Callable) -> Node2D:
+	var fx: Node2D = beam_script.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		_play_screen_shake()
+		AudioManager.play_sfx("impact_" + dtype)
+		on_impact.call()
+	)
+	fx.play(caster_pos, target_pos)
+	return fx
+
+# dtype에 대응하는 시전자→타겟 빔 스크립트 (없으면 null)
+func _caster_beam_script(dtype: String) -> GDScript:
+	match dtype:
+		"lightning":
+			return _VFX_LIGHTNING_BEAM
+		"ice":
+			return _VFX_ICE_SHARDS
+		"fire":
+			return _VFX_FIRE_BLAST
+		_:
+			return null
+
+func _play_screen_flash() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 100
+	add_child(layer)
+	var rect := ColorRect.new()
+	rect.color = Color(0.863, 0.918, 1.0)  # #dceaff
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rect.modulate.a = 0.0
+	layer.add_child(rect)
+	var tw := create_tween()
+	tw.tween_property(rect, "modulate:a", 0.85, 0.03)
+	tw.tween_property(rect, "modulate:a", 0.0, 0.32)
+	tw.tween_callback(layer.queue_free)
+
+func _play_screen_shake() -> void:
+	if has_meta("_lit_shake"):
+		var prev = get_meta("_lit_shake")
+		if prev is Tween and prev.is_valid():
+			prev.kill()
+		position = get_meta("_lit_shake_orig", position)
+	var orig := position
+	set_meta("_lit_shake_orig", orig)
+	var tw := create_tween()
+	for i in range(8):
+		var mag := 6.0 * (1.0 - float(i) / 8.0)
+		tw.tween_property(self, "position",
+			orig + Vector2(randf_range(-mag, mag), randf_range(-mag, mag)), 0.045)
+	tw.tween_property(self, "position", orig, 0.045)
+	set_meta("_lit_shake", tw)
+
 func _on_hero_healed(hero_id: String, amount: int) -> void:
 	_update_hero_ui(hero_id)
 	for entry in _hero_nodes:
@@ -1730,80 +1862,123 @@ func _on_hero_block_gained(hero_id: String, _amount: int) -> void:
 		AudioManager.play_sfx("block")
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
-	_update_hero_ui(hero_id)
-	for entry in _hero_nodes:
-		if entry["hero_id"] == hero_id and entry["panel"].visible:
-			var panel: ColorRect = entry["panel"]
-			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
-			_spawn_damage_popup(popup_pos, amount, amount == 0, hero_id)
-			break
-	# hurt 애니메이션 + hit 이펙트
 	var char_node = _hero_char_nodes.get(hero_id)
-	if char_node:
-		_play_hit_flash(char_node)
-		_play_hit_shake(char_node, amount)
+	# 피격 피드백 한 묶음 — HP UI·데미지 팝업·플래시·흔들림·hurt 애니메이션
+	# lightning은 차지 후 볼트가 꽂히는 순간까지 이 묶음을 지연한다.
+	var feedback := func() -> void:
+		_update_hero_ui(hero_id)
+		for entry in _hero_nodes:
+			if entry["hero_id"] == hero_id and entry["panel"].visible:
+				var panel: ColorRect = entry["panel"]
+				var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
+				_spawn_damage_popup(popup_pos, amount, amount == 0, hero_id)
+				break
+		if char_node:
+			_play_hit_flash(char_node)
+			_play_hit_shake(char_node, amount)
+			if dtype == "ice":
+				_apply_frozen_tint(char_node)
+			elif dtype == "fire":
+				_apply_scorched_tint(char_node)
+			if char_node.has_node("AnimationPlayer"):
+				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+				if ap.has_animation("hurt"):
+					ap.play("hurt")
+	var beam_script := _caster_beam_script(dtype)
+	if beam_script != null and amount > 0 and char_node:
 		var hero_spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
-		if amount > 0:
+		var beam := _spawn_caster_beam(beam_script, _resolve_caster_pos(BattleManager._vfx_caster, hero_spark_pos), hero_spark_pos, dtype, feedback)
+		_register_lit_death_beam(hero_id, beam)
+	else:
+		feedback.call()
+		if char_node and amount > 0:
+			var hero_spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
 			_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
 
-		if char_node.has_node("AnimationPlayer"):
-			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-			if ap.has_animation("hurt"):
-				ap.play("hurt")
-
 func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
-	_update_enemy_ui(index)
-	if index < _enemy_nodes.size() and _enemy_nodes[index]["panel"].visible:
-		var panel: ColorRect = _enemy_nodes[index]["panel"]
-		var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
-		_spawn_damage_popup(popup_pos, amount, amount == 0, "enemy_%d" % index)
 	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
-	if char_node:
-		_play_hit_flash(char_node)
-		_play_hit_shake(char_node, amount)
+	var feedback := func() -> void:
+		_update_enemy_ui(index)
+		if index < _enemy_nodes.size() and _enemy_nodes[index]["panel"].visible:
+			var panel: ColorRect = _enemy_nodes[index]["panel"]
+			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
+			_spawn_damage_popup(popup_pos, amount, amount == 0, "enemy_%d" % index)
+		if char_node:
+			_play_hit_flash(char_node)
+			_play_hit_shake(char_node, amount)
+			if dtype == "ice":
+				_apply_frozen_tint(char_node)
+			elif dtype == "fire":
+				_apply_scorched_tint(char_node)
+			if char_node.has_node("AnimationPlayer"):
+				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+				if ap.has_animation("hurt"):
+					ap.play("hurt")
+	var beam_script := _caster_beam_script(dtype)
+	if beam_script != null and amount > 0 and char_node:
 		var spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
-		_spawn_impact_particles(spark_pos, amount, false, dtype)
+		var beam := _spawn_caster_beam(beam_script, _resolve_caster_pos(BattleManager._vfx_caster, spark_pos), spark_pos, dtype, feedback)
+		_register_lit_death_beam("enemy_%d" % index, beam)
+	else:
+		feedback.call()
+		if char_node and amount > 0:
+			var spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
+			_spawn_impact_particles(spark_pos, amount, false, dtype)
 
-		if char_node.has_node("AnimationPlayer"):
-			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-			if ap.has_animation("hurt"):
-				ap.play("hurt")
+# lightning 빔을 사망 연출 지연용으로 등록 — 빔이 사라지면 자동 정리
+func _register_lit_death_beam(key: String, beam: Node2D) -> void:
+	_lit_death_beam[key] = beam
+	beam.tree_exited.connect(func() -> void:
+		if _lit_death_beam.get(key) == beam:
+			_lit_death_beam.erase(key))
+
+# lightning으로 죽은 경우 사망 연출을 빔 임팩트 시점까지 지연, 아니면 즉시 실행
+func _run_or_defer_death(key: String, death_fx: Callable) -> void:
+	var beam = _lit_death_beam.get(key)
+	if is_instance_valid(beam):
+		beam.screen_effect.connect(death_fx)
+	else:
+		death_fx.call()
 
 func _on_enemy_died(index: int) -> void:
-	AudioManager.play_sfx("enemy_death")
-	_update_enemy_ui(index)
-	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
-	if char_node and char_node.has_node("AnimationPlayer"):
-		var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-		if ap.has_animation("death"):
-			ap.play("death")
-
-func _on_hero_died(hero_id: String) -> void:
-	AudioManager.play_sfx("hero_death")
-	_update_hero_ui(hero_id)
-	var hand: Array = DeckManager.hand
-	for i in range(min(_card_buttons.size(), hand.size())):
-		if hand[i].owner_id == hero_id:
-			_card_buttons[i].set_owner_dead(true)
-	# 패널 흰 섬광 → 회색 페이드
-	for entry in _hero_nodes:
-		if entry["hero_id"] != hero_id:
-			continue
-		var panel: ColorRect = entry["panel"]
-		panel.modulate = Color(1.5, 1.5, 1.5)
-		var tw := panel.create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-		tw.tween_property(panel, "modulate", Color(0.4, 0.4, 0.4), 0.5)
-		break
-	# 스프라이트: death 애니메이션 없으면 코드 페이드아웃
-	var char_node = _hero_char_nodes.get(hero_id)
-	if char_node:
-		if char_node.has_node("AnimationPlayer"):
+	var death_fx := func() -> void:
+		AudioManager.play_sfx("enemy_death")
+		_update_enemy_ui(index)
+		var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
+		if char_node and char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			if ap.has_animation("death"):
 				ap.play("death")
-				return
-		var tw2: Tween = char_node.create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
-		tw2.tween_property(char_node, "modulate:a", 0.0, 0.6)
+	_run_or_defer_death("enemy_%d" % index, death_fx)
+
+func _on_hero_died(hero_id: String) -> void:
+	var death_fx := func() -> void:
+		AudioManager.play_sfx("hero_death")
+		_update_hero_ui(hero_id)
+		var hand: Array = DeckManager.hand
+		for i in range(min(_card_buttons.size(), hand.size())):
+			if hand[i].owner_id == hero_id:
+				_card_buttons[i].set_owner_dead(true)
+		# 패널 흰 섬광 → 회색 페이드
+		for entry in _hero_nodes:
+			if entry["hero_id"] != hero_id:
+				continue
+			var panel: ColorRect = entry["panel"]
+			panel.modulate = Color(1.5, 1.5, 1.5)
+			var tw := panel.create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+			tw.tween_property(panel, "modulate", Color(0.4, 0.4, 0.4), 0.5)
+			break
+		# 스프라이트: death 애니메이션 없으면 코드 페이드아웃
+		var char_node = _hero_char_nodes.get(hero_id)
+		if char_node:
+			if char_node.has_node("AnimationPlayer"):
+				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+				if ap.has_animation("death"):
+					ap.play("death")
+					return
+			var tw2: Tween = char_node.create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+			tw2.tween_property(char_node, "modulate:a", 0.0, 0.6)
+	_run_or_defer_death(hero_id, death_fx)
 
 func _on_hero_revived(hero_id: String) -> void:
 	# 해당 영웅 슬롯을 다시 표시하고 HP/상태 갱신
@@ -2151,6 +2326,8 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 		var char_node: Node2D = _hero_char_nodes.get(target)
 		if flash_color != Color.WHITE:
 			_play_status_flash(char_node, flash_color)
+	if status_type == "weak" or status_type == "vulnerable":
+		_spawn_debuff_hex(target)
 
 func _refresh_debug_badge() -> void:
 	if _debug_badge == null:

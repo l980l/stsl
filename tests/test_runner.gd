@@ -28,6 +28,10 @@ var TestSecretRoom = preload("res://tests/test_secret_room.gd")
 var TestEncounterWeighting = preload("res://tests/test_encounter_weighting.gd")
 var TestEnemyMechanics = preload("res://tests/test_enemy_mechanics.gd")
 var TestEventIntegration = preload("res://tests/test_event_integration.gd")
+var TestLightningBeam = preload("res://tests/test_lightning_beam.gd")
+var TestIceShards = preload("res://tests/test_ice_shards.gd")
+var TestFireBlast = preload("res://tests/test_fire_blast.gd")
+var TestDebuffHex = preload("res://tests/test_debuff_hex.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -60,6 +64,10 @@ func _init() -> void:
 		TestEncounterWeighting.new(),
 		TestEnemyMechanics.new(),
 		TestEventIntegration.new(),
+		TestLightningBeam.new(),
+		TestIceShards.new(),
+		TestFireBlast.new(),
+		TestDebuffHex.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()
