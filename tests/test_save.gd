@@ -153,7 +153,7 @@ func test_relic_serialization_roundtrip() -> void:
 	var RelicRes = load("res://resources/relic_resource.gd")
 	var relic: Resource = RelicRes.new()
 	relic.relic_name = "버닝 블러드"
-	relic.trigger = RelicRes.TriggerType.BATTLE_WIN
+	relic.trigger = RelicRes.TriggerType.PLAYER_TURN_END
 	relic.effect_type = RelicRes.EffectType.HEAL
 	relic.value = 6
 	# 직렬화

@@ -7,14 +7,13 @@ enum TriggerType {
 	BATTLE_START,       # 전투 시작
 	PLAYER_TURN_START,  # 플레이어 턴 시작
 	PLAYER_TURN_END,    # 플레이어 턴 종료
-	BATTLE_WIN,         # 전투 승리
 	ON_HERO_DAMAGED,    # 영웅 피해 시
 }
 
 enum EffectType {
 	HEAL, ENERGY, DRAW, APPLY_STATUS_ENEMY, MAX_HP, RECOVER_CARD,
 	GAIN_MORALE, COST_REDUCTION, BLOCK,
-	DAMAGE_HERO
+	DAMAGE_HERO, RUN_STRENGTH
 }
 
 @export var relic_name: String = ""

@@ -54,6 +54,9 @@ var current_act: int = 1
 var gold: int = 0
 var relics: Array = []
 var run_won: bool = false
+# "점점 강해지는" 렐릭용 런 누적 카운터
+var battles_completed: int = 0
+var enemies_killed_this_run: int = 0
 var act_mythologies: Array[String] = []
 
 # ── Plan 04: 런 스테이트 ──────────────────────────────
@@ -156,6 +159,8 @@ func reset() -> void:
 	current_act = 1
 	gold = 0
 	relics.clear()
+	battles_completed = 0
+	enemies_killed_this_run = 0
 	run_map.clear()
 	available_node_ids.clear()
 	current_node_id = -1
@@ -265,8 +270,12 @@ func complete_battle(won: bool) -> void:
 		last_battle_turns  = int(bm.turn_count)  if bm else 0
 		last_battle_damage = int(bm.damage_taken_this_battle) if bm else 0
 		last_battle_gold = 0
-		var RelicRes = load("res://resources/relic_resource.gd")
-		trigger_relics(RelicRes.TriggerType.BATTLE_WIN)
+		# 런 카운터 누적 — "점점 강해지는" 렐릭용
+		battles_completed += 1
+		if bm:
+			for _alive in bm._enemy_alive:
+				if not _alive:
+					enemies_killed_this_run += 1
 		# 이벤트 트리거 전투의 추가 보상 (있다면) — 카드 보상 전에 즉시 적용
 		_apply_event_battle_reward()
 		card_rewards = _generate_card_rewards()
@@ -876,6 +885,8 @@ func to_dict() -> Dictionary:
 		"current_act": current_act,
 		"current_floor": current_floor,
 		"gold": gold,
+		"battles_completed": battles_completed,
+		"enemies_killed_this_run": enemies_killed_this_run,
 		"current_node_id": current_node_id,
 		"available_node_ids": available_node_ids.duplicate(),
 		"run_map": map_data,
@@ -886,6 +897,8 @@ func from_dict(data: Dictionary) -> void:
 	current_act = data.get("current_act", 1)
 	current_floor = data.get("current_floor", 0)
 	gold = data.get("gold", 0)
+	battles_completed = data.get("battles_completed", 0)
+	enemies_killed_this_run = data.get("enemies_killed_this_run", 0)
 	current_node_id = data.get("current_node_id", -1)
 	available_node_ids = data.get("available_node_ids", [])
 	run_map.clear()
@@ -1043,6 +1056,36 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 					var _bm_re := _get_bm()
 					if _bm_re:
 						_bm_re._check_lose_condition()
+		RelicRes.EffectType.RUN_STRENGTH:
+			# "점점 강해지는" 렐릭 — BATTLE_START 시점에 런 카운터를 BM 파워로 세팅.
+			# status_type으로 메커니즘 구분. _active_powers는 매 전투 초기화되므로 누적처럼 동작.
+			var bm_rs := _get_bm()
+			if bm_rs == null or tm == null:
+				return
+			var amount: int = 0
+			var per_hit: bool = false
+			match relic.status_type:
+				"battles_strength":
+					amount = battles_completed * value
+				"battles_per_hit":
+					amount = battles_completed * value
+					per_hit = true
+				"kills_strength":
+					amount = enemies_killed_this_run * value
+			if amount <= 0:
+				return
+			if per_hit:
+				# 카드 히트당 보너스 — 전용 영웅에게만
+				if relic.owner_hero_id != "":
+					var k_ph: String = "power.bonus_per_hit:" + relic.owner_hero_id
+					var cur_ph: int = bm_rs._active_powers.get(k_ph, {}).get("value", 0)
+					bm_rs._active_powers[k_ph] = {"value": cur_ph + amount}
+			else:
+				# 영웅 전체 데미지 보너스
+				for hero in tm.heroes:
+					var k_sp: String = "power.strength_player:" + hero.hero_id
+					var cur_sp: int = bm_rs._active_powers.get(k_sp, {}).get("value", 0)
+					bm_rs._active_powers[k_sp] = {"value": cur_sp + amount}
 
 func _build_relic_pool() -> Array:
 	return _RelicData.build_pool()

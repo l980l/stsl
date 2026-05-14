@@ -153,7 +153,6 @@ func _trigger_name(t: int) -> String:
 		RelicRes.TriggerType.BATTLE_START:      return "BATTLE_START"
 		RelicRes.TriggerType.PLAYER_TURN_START: return "TURN_START"
 		RelicRes.TriggerType.PLAYER_TURN_END:   return "TURN_END"
-		RelicRes.TriggerType.BATTLE_WIN:        return "BATTLE_WIN"
 		RelicRes.TriggerType.ON_HERO_DAMAGED:   return "ON_DAMAGED"
 	return "?"
 
