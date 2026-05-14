@@ -92,6 +92,17 @@ func _build_ui() -> void:
 	add_child(title)
 	LabelUtils.fit_text(title, 40, 22)
 
+	# 골드 소지량 (좌측 상단 — 상점씬과 동일)
+	var gold_lbl := Label.new()
+	gold_lbl.name = "GoldLabel"
+	gold_lbl.theme_type_variation = "EyebrowLabel"
+	gold_lbl.add_theme_font_size_override("font_size", 21)
+	gold_lbl.text     = "⛬ %dg" % GameManager.gold
+	gold_lbl.position = Vector2(30, 22)
+	gold_lbl.size     = Vector2(200, 32)
+	add_child(gold_lbl)
+	LabelUtils.fit_text(gold_lbl, 21, 13)
+
 	# 릴릭 표시
 	_relic_container = FlowContainer.new()
 	_relic_container.position = Vector2(20, 70)

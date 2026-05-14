@@ -24,6 +24,21 @@ static func build_pool() -> Array:
 		_niten_ichi_ryu(), _gorin_sho_relic(),
 	]
 
+## 이벤트 보상으로만 지급 — 랜덤 풀에 포함하지 않음.
+## 1/2/3번째 턴 두루마리 중 무작위. 해당 턴에만 카드 2장 추가 드로우.
+static func sacred_scroll() -> Resource:
+	return _make_sacred_scroll(randi() % 3 + 1)
+
+static func _make_sacred_scroll(turn: int) -> Resource:
+	var r: Resource = RelicRes.new()
+	r.relic_name = "relic.sacred_scroll_%d.name" % turn
+	r.description = "relic.sacred_scroll_%d.desc" % turn
+	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r.effect_type = RelicRes.EffectType.DRAW
+	r.value = 2
+	r.condition_value = turn  # 발동할 턴 번호
+	return r
+
 static func _burning_blood() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.burning_blood.name"
 	r.description = "relic.burning_blood.desc"

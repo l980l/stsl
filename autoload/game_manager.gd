@@ -316,9 +316,15 @@ func complete_battle(won: bool) -> void:
 		_request_scene("res://scenes/game_over/game_over_scene.tscn")
 
 func complete_card_pick() -> void:
+	card_rewards.clear()
+	# current_node_id 유효성 검증 (디버그 메뉴 진입 등으로 -1인 경우 run_map[-1]이
+	# 마지막 노드=보스를 가리켜 act 종료가 잘못 발동하는 버그 방지)
+	if current_node_id < 0 or current_node_id >= run_map.size():
+		change_state(GameState.MAP)
+		_request_scene("res://scenes/map/map_scene.tscn")
+		return
 	var node: Resource = run_map[current_node_id]
 	_advance_nodes_from(current_node_id)
-	card_rewards.clear()
 	if node.room_type == _MapNodeRes.RoomType.BOSS:
 		# 보스 승리: 카드 강화 1회 후 게임 오버(승)
 		pending_boss_upgrade = true
@@ -345,7 +351,8 @@ func recruit_random_hero() -> void:
 
 func complete_event() -> void:
 	pending_event = null
-	_advance_nodes_from(current_node_id)
+	if current_node_id >= 0 and current_node_id < run_map.size():
+		_advance_nodes_from(current_node_id)
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
 
@@ -390,6 +397,13 @@ func _apply_event_battle_reward() -> void:
 				var dm: Object = _get_dm()
 				if card_res and dm:
 					dm.add_card_to_deck(card_res)
+		ChoiceRes.EffectType.DRAW_UP:
+			for _i in range(value):
+				add_relic(_RelicData.sacred_scroll())
+		ChoiceRes.EffectType.REMOVE_CARD:
+			var dm_rm: Object = _get_dm()
+			if dm_rm:
+				dm_rm.remove_random_card()
 		_:
 			pass
 
@@ -972,11 +986,16 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 	var RelicRes = load("res://resources/relic_resource.gd")
 	var tm := _get_tm()
 	var dm := _get_dm()
-	# ON_HERO_DAMAGED 트리거에서 condition_value > 0이면 받은 피해가 그 이상일 때만 발동
+	# condition_value > 0 — 트리거별 발동 조건
 	if relic.condition_value > 0:
-		var dmg_in: int = context.get("amount", 0)
-		if dmg_in < relic.condition_value:
-			return
+		if relic.trigger == RelicRes.TriggerType.PLAYER_TURN_START:
+			# 성스러운 두루마리 — condition_value번째 턴에만 발동
+			if context.get("turn", 0) != relic.condition_value:
+				return
+		else:
+			# ON_HERO_DAMAGED — 받은 피해가 condition_value 이상일 때만 발동
+			if context.get("amount", 0) < relic.condition_value:
+				return
 	# is_inside_tree() 가드는 over-defensive. add_relic/trigger_relics는 항상 게임 진행
 	# 중에 호출되며 그 시점에 GameManager는 tree에 있음. null 체크만으로 충분.
 	match relic.effect_type:

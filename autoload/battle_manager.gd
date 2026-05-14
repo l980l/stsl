@@ -169,7 +169,7 @@ func _phase_player_main() -> void:
 		deck_mgr.start_turn()
 	var _gm_pts = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
 	if _gm_pts and _gm_pts.is_inside_tree():
-		_gm_pts.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START)
+		_gm_pts.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": turn_count})
 	player_turn_started.emit()
 
 func _phase_player_post() -> bool:

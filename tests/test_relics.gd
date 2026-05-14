@@ -41,6 +41,7 @@ func run_all() -> Dictionary:
 	test_idun_apple_heals_on_turn_end_trigger()
 	test_tengu_feather_draws_on_battle_win_trigger()
 	test_scarab_talisman_uses_status_type_field()
+	test_sacred_scroll_draws_only_on_matching_turn()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -411,3 +412,27 @@ func test_scarab_talisman_uses_status_type_field() -> void:
 	if orochi == null:
 		return
 	_assert(orochi.status_type == "weak", "오로치 status_type=weak (이전 버그로 poison 부여)")
+
+func test_sacred_scroll_draws_only_on_matching_turn() -> void:
+	print("[TestRelics] test_sacred_scroll_draws_only_on_matching_turn")
+	var tm := _make_tm()
+	tm.add_hero(_make_hero("napoleon", 100))
+	var dm := DeckManagerClass.new()
+	_to_free.append(dm)
+	var gm := _make_gm_with_tm(tm)
+	gm._test_dm_override = dm
+	# 2번째 턴 두루마리 — condition_value=2
+	var RelicsGd = load("res://resources/relics/relics.gd")
+	gm.relics.append(RelicsGd._make_sacred_scroll(2))
+	var CardRes = load("res://resources/card_resource.gd")
+	for i in range(5):
+		dm.draw_pile.append(CardRes.new())
+	# 1턴 — condition_value 2 != turn 1 → 미발동
+	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 1})
+	_assert(dm.hand.size() == 0, "1턴엔 2번째 두루마리 미발동 (hand 0, 실제: %d)" % dm.hand.size())
+	# 2턴 — 발동, 카드 2장 드로우
+	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 2})
+	_assert(dm.hand.size() == 2, "2턴에 발동 — 카드 2장 드로우 (실제: %d)" % dm.hand.size())
+	# 3턴 — 다시 미발동
+	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 3})
+	_assert(dm.hand.size() == 2, "3턴엔 미발동 (hand 2 유지, 실제: %d)" % dm.hand.size())

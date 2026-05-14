@@ -128,8 +128,8 @@ static func _mummy_curse() -> Resource:
 	ca.encounter_tier = 1
 	ca.reward_effect_type = ChoiceRes.EffectType.ADD_RELIC
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.act2.mummy_curse.choice_2"
-	# 봉인 강화 — 저주가 영혼 갉아먹지만 의식으로 회복 (HEAL, cost_hp 유지)
-	cb.effect_type = ChoiceRes.EffectType.HEAL; cb.value = 20; cb.cost_hp = 20
+	# 저주받은 카드를 석관에 봉인 — 덱 압축
+	cb.effect_type = ChoiceRes.EffectType.REMOVE_CARD; cb.value = 1
 	e.choices = [ca, cb]; return e
 
 static func _ra_sunboat() -> Resource:

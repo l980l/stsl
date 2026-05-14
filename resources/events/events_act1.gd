@@ -11,26 +11,20 @@ static func build_pool() -> Array:
 	]
 
 static func _golden_chest() -> Resource:
-	# 재설계: "열기 vs 무시" → 미믹 위험 vs 안전 소량
-	# 1번 강제로 연다 → 70% +60 골드 / 30% 미믹 전투 (TRIGGER_BATTLE 보통, 승리 시 +80 골드)
-	# 2번 조심스레 살펴본다 → +15 골드 (함정 발견, 떨어진 동전만 회수)
+	# 재설계: 1번 상자 연다 → 70% +60 골드 / 30% 경비병에게 들킴 (TRIGGER_BATTLE 보통)
+	#          2번 그냥 지나간다 → 효과 없음
 	var e: Resource = EventRes.new()
 	e.event_name = "event.act1.golden_chest.name"; e.description = "event.act1.golden_chest.desc"
 	e.bgm_type = "fortune"
 	var ca: Resource = ChoiceRes.new(); ca.label = "event.act1.golden_chest.choice_1"
 	ca.effect_type = ChoiceRes.EffectType.GOLD; ca.value = 60
 	ca.success_chance = 70
-	# 실패: TRIGGER_BATTLE은 success_chance와 결합할 수 없음 → alt를 REMOVE_CARD로
-	# (미믹이 가장 약한 카드 한 장 먹음 — 실은 정화 효과지만 random은 페널티 가능)
-	ca.alt_effect_type = ChoiceRes.EffectType.REMOVE_CARD
+	# 실패 30%: 경비병과 전투 (event_scene._apply_choice가 alt=TRIGGER_BATTLE 처리)
+	ca.alt_effect_type = ChoiceRes.EffectType.TRIGGER_BATTLE
+	ca.encounter_tier = 0
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.act1.golden_chest.choice_2"
-	cb.effect_type = ChoiceRes.EffectType.GOLD; cb.value = 15
-	# 미믹과 직접 싸우는 옵션 — TRIGGER_BATTLE, 승리 시 +80 + 렐릭 — 추가 옵션
-	var cc: Resource = ChoiceRes.new(); cc.label = "event.act1.golden_chest.choice_3"
-	cc.effect_type = ChoiceRes.EffectType.TRIGGER_BATTLE
-	cc.encounter_tier = 0
-	cc.reward_effect_type = ChoiceRes.EffectType.ADD_RELIC
-	e.choices = [ca, cb, cc]; return e
+	cb.effect_type = ChoiceRes.EffectType.NONE
+	e.choices = [ca, cb]; return e
 
 static func _wounded_warrior() -> Resource:
 	# 재설계: 무시 → 죽어가는 전사가 마지막 동전을 줌 (양심의 짐)

@@ -2,6 +2,7 @@
 extends Node2D
 
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const CARD_REMOVAL_OVERLAY := preload("res://scenes/components/card_removal_overlay.gd")
 const CARD_W  := 140
 const CARD_H  := 200
 const CARD_GAP := 20
@@ -15,27 +16,17 @@ const SVC_PANEL_H   := 110
 const SVC_PANEL_GAP := 20
 
 var _inventory:           Dictionary  = {}
-var _remove_layer:        CanvasLayer     = null
 var _upgrade_layer:       CanvasLayer     = null
-var _remove_group:        Control         = null
 var _upgrade_group:       Control         = null
-var _remove_overlay:      Control         = null
 var _upgrade_overlay:     Control         = null
-var _remove_scroll:       ScrollContainer = null
 var _upgrade_scroll:      ScrollContainer = null
-var _remove_card_parents: Dictionary      = {}
 var _upgrade_card_parents:Dictionary      = {}
 var _active_scroll:       ScrollContainer = null
 var _card_tweens:         Dictionary  = {}
-var _remove_card_tweens:  Dictionary  = {}
 var _upgrade_card_tweens: Dictionary  = {}
 var _card_removed:          bool      = false
 var _upgrade_btn_ref:       Button    = null
 var _upgrade_price:         int       = 0
-var _remove_price:          int       = 0
-var _selected_remove_card:  Resource  = null
-var _selected_remove_node:  CardScene = null
-var _confirm_remove_btn:    Button    = null
 var _selected_upgrade_card: Resource  = null
 var _selected_upgrade_node: CardScene = null
 var _confirm_upgrade_btn:   Button    = null
@@ -60,9 +51,6 @@ func _unhandled_input(ev: InputEvent) -> void:
 	if ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
 		if _upgrade_layer:
 			_hide_upgrade_panel()
-			get_viewport().set_input_as_handled()
-		elif _remove_layer:
-			_hide_remove_panel()
 			get_viewport().set_input_as_handled()
 
 func _build_ui() -> void:
@@ -384,7 +372,7 @@ func _build_service_section() -> void:
 			"desc":     tr("ui.shop.svc_remove_desc"),
 			"price":    remove_price,
 			"accent":   P.BLOOD_400,
-			"callback": func(): _show_remove_panel(remove_price),
+			"callback": func(): _open_removal(remove_price),
 			"enabled":  not _card_removed and not DeckManager.get_full_deck().is_empty(),
 		},
 		{
@@ -539,239 +527,25 @@ func _on_upgrade_card(price: int) -> void:
 	_show_upgrade_panel(price)
 
 # ── 카드 제거 패널 ────────────────────────────────────────
-func _show_remove_panel(price: int) -> void:
-	if _remove_layer:
-		_hide_remove_panel()
+func _open_removal(price: int) -> void:
+	var deck: Array = DeckManager.get_full_deck()
+	if deck.is_empty():
 		return
-	var full_deck: Array = DeckManager.get_full_deck()
-	if full_deck.is_empty():
-		return
-
-	_remove_price = price
-	_remove_layer = CanvasLayer.new()
-	_remove_layer.layer = 10
-	add_child(_remove_layer)
-
-	var overlay := Control.new()
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_remove_layer.add_child(overlay)
-	_remove_overlay = overlay
-
-	var dim := ColorRect.new()
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.color = Color(0.0, 0.0, 0.0, 0.72)
-	dim.gui_input.connect(func(ev: InputEvent) -> void:
-		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			_hide_remove_panel()
-	)
-	overlay.add_child(dim)
-
-	var group := Control.new()
-	group.set_anchors_preset(Control.PRESET_FULL_RECT)
-	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	group.pivot_offset = Vector2(960, 540)
-	group.scale = Vector2(0.9, 0.9)
-	group.modulate.a = 0.0
-	overlay.add_child(group)
-	_remove_group = group
-
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(1300, 600)
-	panel.position = Vector2((1920 - 1300) / 2.0, (1080 - 600) / 2.0)
-	group.add_child(panel)
-
-	var hl := TextureRect.new()
-	hl.texture = SacredTheme.make_top_fade_tex()
-	hl.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	hl.stretch_mode = TextureRect.STRETCH_SCALE
-	hl.position = panel.position
-	hl.size = Vector2(1300, 80)
-	hl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	group.add_child(hl)
-
-	var hdiv := TextureRect.new()
-	hdiv.texture = SacredTheme.make_center_bright_h_tex()
-	hdiv.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	hdiv.stretch_mode = TextureRect.STRETCH_SCALE
-	hdiv.position = Vector2(panel.position.x + 20, panel.position.y + 60)
-	hdiv.size = Vector2(1260, 2)
-	hdiv.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	group.add_child(hdiv)
-
-	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left",   20)
-	margin.add_theme_constant_override("margin_right",  20)
-	margin.add_theme_constant_override("margin_top",    14)
-	margin.add_theme_constant_override("margin_bottom", 14)
-	margin.clip_children = Control.CLIP_CHILDREN_ONLY
-	panel.add_child(margin)
-
-	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 10)
-	margin.add_child(vbox)
-
-	var title_lbl := Label.new()
-	title_lbl.theme_type_variation = "TitleLabel"
-	title_lbl.text                 = tr("ui.shop.remove_prompt") % price
-	title_lbl.add_theme_font_size_override("font_size", 20)
-	vbox.add_child(title_lbl)
-	LabelUtils.fit_text(title_lbl, 20, 14)
-
-	var close_btn := Button.new()
-	close_btn.theme_type_variation = "IconButton"
-	close_btn.text = "✕"
-	close_btn.add_theme_font_size_override("font_size", 20)
-	close_btn.custom_minimum_size = Vector2(40, 40)
-	close_btn.pressed.connect(_hide_remove_panel)
-	group.add_child(close_btn)
-	close_btn.position = Vector2((1920.0 - 1300) / 2.0 + 1300 - 56, (1080.0 - 600) / 2.0 + 12)
-	close_btn.size     = Vector2(40, 40)
-	SacredTheme.animate_button(close_btn)
-
-	var clip_box := Control.new()
-	clip_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vbox.add_child(clip_box)
-
-	var scroll := ScrollContainer.new()
-	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	scroll.clip_contents = true
-	clip_box.add_child(scroll)
-	_remove_scroll = scroll
-	SacredTheme.style_sacred_scrollbar(scroll)
-
-	var margin_c := MarginContainer.new()
-	margin_c.add_theme_constant_override("margin_left", 12)
-	margin_c.add_theme_constant_override("margin_top", 12)
-	margin_c.add_theme_constant_override("margin_right", 12)
-	margin_c.add_theme_constant_override("margin_bottom", 12)
-	scroll.add_child(margin_c)
-
-	var grid := GridContainer.new()
-	grid.columns = 8
-	grid.add_theme_constant_override("h_separation", 10)
-	grid.add_theme_constant_override("v_separation", 10)
-	margin_c.add_child(grid)
-
-	for card in full_deck:
-		var captured_card: Resource = card
-
-		var wrapper := Control.new()
-		wrapper.custom_minimum_size = Vector2(137, 195)
-		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
-		grid.add_child(wrapper)
-
-		var card_node: CardScene = CARD_SCENE.instantiate()
-		card_node.position     = Vector2(-1.75, -5.0)
-		card_node.pivot_offset = Vector2(70.0, 200.0)
-		card_node.scale        = Vector2(0.975, 0.975)
-		card_node.setup(card, CardScene.Mode.REWARD)
-		wrapper.add_child(card_node)
-
-		var captured_node: CardScene = card_node
-		card_node.card_hovered.connect(func(_c): _show_remove_card_hover(captured_node))
-		card_node.card_unhovered.connect(func(_c): _clear_remove_card_hover(captured_node))
-		card_node.gui_input.connect(func(ev: InputEvent):
-			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-				_on_select_remove_card(captured_card, captured_node)
-		)
-
-	var confirm_row := HBoxContainer.new()
-	vbox.add_child(confirm_row)
-	var spc_l := Control.new()
-	spc_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	confirm_row.add_child(spc_l)
-	var confirm_btn := Button.new()
-	confirm_btn.text = tr("ui.shop.btn_confirm_remove")
-	confirm_btn.custom_minimum_size = Vector2(200, 44)
-	confirm_btn.add_theme_font_size_override("font_size", 16)
-	confirm_btn.disabled = true
-	confirm_btn.pressed.connect(_on_confirm_remove)
-	confirm_row.add_child(confirm_btn)
-	_confirm_remove_btn = confirm_btn
-	SacredTheme.animate_button(confirm_btn)
-	var spc_r := Control.new()
-	spc_r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	confirm_row.add_child(spc_r)
-
-	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(group, "scale", Vector2.ONE, 0.15)
-	tw.parallel().tween_property(group, "modulate:a", 1.0, 0.15)
-
-func _show_remove_card_hover(node: CardScene) -> void:
-	if node in _remove_card_tweens:
-		_remove_card_tweens[node].kill()
-	_active_scroll = _remove_scroll
-	if _remove_overlay and node.get_parent() != _remove_overlay:
-		_remove_card_parents[node] = node.get_parent()
-		node.reparent(_remove_overlay, true)
-	node.z_index = 50
-	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
-	_remove_card_tweens[node] = tw
-
-func _clear_remove_card_hover(node: CardScene) -> void:
-	if node in _remove_card_tweens:
-		_remove_card_tweens[node].kill()
-	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
-	tw.tween_callback(func():
-		if not is_instance_valid(node):
+	var overlay = CARD_REMOVAL_OVERLAY.new()
+	add_child(overlay)
+	overlay.confirmed.connect(func(card: Resource) -> void:
+		if not GameManager.spend_gold(price):
 			return
-		node.z_index = 0
-		if node in _remove_card_parents:
-			var orig: Node = _remove_card_parents[node]
-			_remove_card_parents.erase(node)
-			if is_instance_valid(orig):
-				node.reparent(orig, false)
-				node.position = Vector2(-1.75, -5.0)
-				node.scale    = Vector2(0.975, 0.975)
+		_card_removed = true
+		DeckManager.remove_from_deck(card)
+		_refresh_gold_label()
+		_refresh_upgrade_btn()
 	)
-	_remove_card_tweens[node] = tw
-
-func _hide_remove_panel() -> void:
-	if _remove_layer:
-		for tw in _remove_card_tweens.values():
-			if tw.is_valid():
-				tw.kill()
-		_remove_card_tweens.clear()
-		_remove_card_parents.clear()
-		_remove_overlay = null
-		_remove_scroll  = null
-		_active_scroll  = null
-		_selected_remove_card = null
-		_selected_remove_node = null
-		_confirm_remove_btn   = null
-		var layer := _remove_layer
-		var group := _remove_group
-		_remove_layer = null
-		_remove_group = null
-		if is_instance_valid(group):
-			var tw := create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
-			tw.tween_property(group, "scale", Vector2(0.9, 0.9), 0.12)
-			tw.parallel().tween_property(group, "modulate:a", 0.0, 0.12)
-			tw.tween_callback(func(): if is_instance_valid(layer): layer.queue_free())
-		else:
-			if is_instance_valid(layer): layer.queue_free()
-
-func _on_select_remove_card(card: Resource, node: CardScene) -> void:
-	if is_instance_valid(_selected_remove_node):
-		_selected_remove_node.tween_glow(0.0, 0.12)
-	_selected_remove_card = card
-	_selected_remove_node = node
-	node.tween_glow(1.0, 0.15)
-	if is_instance_valid(_confirm_remove_btn):
-		_confirm_remove_btn.disabled = false
-
-func _on_confirm_remove() -> void:
-	if _selected_remove_card == null:
-		return
-	if not GameManager.spend_gold(_remove_price):
-		return
-	_card_removed = true
-	DeckManager.remove_from_deck(_selected_remove_card)
-	_hide_remove_panel()
-	_refresh_gold_label()
-	_refresh_upgrade_btn()
+	overlay.open(deck, {
+		"cancelable":   true,
+		"title_text":   tr("ui.shop.remove_prompt") % price,
+		"confirm_text": tr("ui.shop.btn_confirm_remove"),
+	})
 
 func _refresh_gold_label() -> void:
 	var lbl := get_node_or_null("GoldLabel")

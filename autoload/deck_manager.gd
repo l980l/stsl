@@ -177,6 +177,17 @@ func remove_from_deck(card: Resource) -> bool:
 		return true
 	return false
 
+# 무작위 카드 1장 영구 제거 — 이벤트 등 전투 밖에서 호출.
+# 전투 후엔 카드가 draw/hand/discard/exhaust로 흩어져 있으므로 모든 더미를 대상으로 한다.
+func remove_random_card() -> bool:
+	var pools: Array = [draw_pile, hand, discard_pile, exhaust_pile]
+	var non_empty: Array = pools.filter(func(p: Array) -> bool: return not p.is_empty())
+	if non_empty.is_empty():
+		return false
+	var pool: Array = non_empty[randi() % non_empty.size()]
+	pool.remove_at(randi() % pool.size())
+	return true
+
 func consolidate_for_battle() -> void:
 	draw_pile.append_array(hand)
 	draw_pile.append_array(discard_pile)

@@ -131,8 +131,11 @@ ui.event.tag.cost_gold,−%d 코인,−%d Coin,−%d Pièce,−%d Moneta,−%d M
 ui.event.tag.cost_hp,−%d HP,−%d HP,−%d PV,−%d PF,−%d PS,−%d HP,−%d ΖΩΗ,−%d 血量,−%d 血量
 ui.event.tag.gain_gold,+%d 코인,+%d Coin,+%d Pièce,+%d Moneta,+%d Moneda,+%d コイン,+%d Νόμισμα,+%d 金币,+%d 金币
 ui.event.tag.gain_hp,+%d HP,+%d HP,+%d PV,+%d PF,+%d PS,+%d HP,+%d ΖΩΗ,+%d 血量,+%d 血量
-ui.event.tag.draw_up,드로우 +%d,Draw +%d,Piocher +%d,Pescare +%d,Robar +%d,ドロー +%d,Ανάληψη +%d,抽牌 +%d,抽牌 +%d
+ui.event.tag.draw_up,성스러운 두루마리,Sacred Scroll,Parchemin Sacré,Pergamena Sacra,Pergamino Sagrado,聖なる巻物,Ιερός Κύλινδρος,神圣卷轴,神聖捲軸
+ui.buff.permanent_draw.name,영구 드로우 증가,Permanent Draw Bonus,Bonus de Pioche Permanent,Bonus Pesca Permanente,Bono de Robo Permanente,永続ドロー増加,Μόνιμη Αύξηση Ανάληψης,永久抽牌强化,永久抽牌強化
+ui.buff.permanent_draw.desc,매 턴 시작 시 카드를 +%d장 더 뽑습니다,Draw +%d additional cards at the start of each turn,Piochez %d cartes supplémentaires au début de chaque tour,Pesca %d carte aggiuntive all'inizio di ogni turno,Roba %d cartas adicionales al inicio de cada turno,毎ターン開始時にカードを%d枚追加でドローします,Τραβήξτε %d επιπλέον κάρτες στην αρχή κάθε γύρου,每回合开始时额外抽 %d 张牌,每回合開始時額外抽 %d 張牌
 ui.event.tag.remove_card,카드 제거,Remove Card,Retirer Carte,Rimuovi Carta,Eliminar Carta,カード除去,Αφαίρεση Κάρτας,移除卡牌,移除卡牌
+ui.event.tag.remove_card_random,무작위 카드 1장 제거,Remove Random Card,Retirer Carte Aléatoire,Rimuovi Carta Casuale,Eliminar Carta Aleatoria,ランダムにカード1枚除去,Αφαίρεση Τυχαίας Κάρτας,随机移除1张卡牌,隨機移除1張卡牌
 ui.event.tag.add_relic,렐릭 획득,Gain Relic,Obtenir Relique,Ottieni Reliquia,Obtener Reliquia,遺物獲得,Απόκτηση Λειψάνου,获得遗物,获得遗物
 ui.event.tag.relic_gamble,렐릭 도박,Relic Gamble,Pari Relique,Scommessa Reliquia,Apostar Reliquia,遺物ギャンブル,Τζόγος Λειψάνου,遗物赌注,遗物赌注
 ui.event.tag.add_hero,영웅 합류,Hero Joins,Héros Rejoint,Eroe Si Unisce,Héroe Se Une,英雄加入,Ήρωας Εντάσσεται,英雄加入,英雄加入
@@ -140,5 +143,6 @@ ui.event.tag.add_card,카드 추가,Add Card,Ajouter Carte,Aggiungi Carta,Añadi
 ui.event.tag.add_card_named,%s 추가,Add %s,Ajouter %s,Aggiungi %s,Añadir %s,%s 追加,Προσθήκη %s,加入 %s,加入 %s
 ui.event.tag.battle,전투 발생,Battle,Combat,Battaglia,Batalla,戦闘,Μάχη,战斗,戰鬥
 ui.event.tag.battle_elite,엘리트 전투,Elite Battle,Combat Élite,Battaglia Élite,Batalla Élite,エリート戦闘,Μάχη Επίλεκτου,精英战斗,精英戰鬥
-ui.event.tag.chance,%d%% 확률,%d%% Chance,%d%% Chance,%d%% Probabilità,%d%% Probabilidad,%d%% 確率,%d%% Πιθανότητα,%d%% 概率,%d%% 機率
+ui.event.tag.none,효과 없음,No Effect,Aucun Effet,Nessun Effetto,Sin Efecto,効果なし,Καμία Επίδραση,无效果,無效果
 ui.event.requires_hero,%s 필요,Requires %s,Nécessite %s,Richiede %s,Requiere %s,%s が必要,Απαιτείται %s,需要 %s,需要 %s
+ui.event.remove_prompt,제거할 카드를 선택하세요,Select a card to remove,Choisir une carte à retirer,Seleziona una carta da rimuovere,Elige una carta a eliminar,除去するカードを選択,Επίλεξε κάρτα για αφαίρεση,选择要移除的卡牌,選擇要移除的卡牌
