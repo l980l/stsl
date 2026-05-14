@@ -52,7 +52,14 @@ func get_relic_icon(name_key: String) -> Texture2D:
 	var svg_path := RELIC_DIR + fname + ".svg"
 	if ResourceLoader.exists(svg_path):
 		return _load(svg_path)
-	return _load(RELIC_DIR + fname + ".png")
+	var png_path := RELIC_DIR + fname + ".png"
+	if ResourceLoader.exists(png_path):
+		return _load(png_path)
+	# 변형 렐릭(sacred_scroll_1 등)은 끝의 _숫자를 떼고 base 아이콘을 공유
+	var us := fname.rfind("_")
+	if us > 0 and fname.substr(us + 1).is_valid_int():
+		return _load(RELIC_DIR + fname.substr(0, us) + ".svg")
+	return _load(png_path)
 
 const _INTENT_ICON_FILES := {
 	0: "attack",

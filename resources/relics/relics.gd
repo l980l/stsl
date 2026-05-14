@@ -24,11 +24,26 @@ static func build_pool() -> Array:
 		_niten_ichi_ryu(), _gorin_sho_relic(),
 	]
 
+## 이벤트 보상으로만 지급 — 랜덤 풀에 포함하지 않음.
+## 1/2/3번째 턴 두루마리 중 무작위. 해당 턴에만 카드 2장 추가 드로우.
+static func sacred_scroll() -> Resource:
+	return _make_sacred_scroll(randi() % 3 + 1)
+
+static func _make_sacred_scroll(turn: int) -> Resource:
+	var r: Resource = RelicRes.new()
+	r.relic_name = "relic.sacred_scroll_%d.name" % turn
+	r.description = "relic.sacred_scroll_%d.desc" % turn
+	r.trigger = RelicRes.TriggerType.PLAYER_TURN_START
+	r.effect_type = RelicRes.EffectType.DRAW
+	r.value = 2
+	r.condition_value = turn  # 발동할 턴 번호
+	return r
+
 static func _burning_blood() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.burning_blood.name"
 	r.description = "relic.burning_blood.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r.effect_type = RelicRes.EffectType.HEAL; r.value = 6; return r
+	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
+	r.effect_type = RelicRes.EffectType.HEAL; r.value = 2; return r
 
 static func _phoenix_feather() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.phoenix_feather.name"
@@ -97,9 +112,9 @@ static func _artillery_horn() -> Resource:
 static func _nanjung_ilgi() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.nanjung_ilgi.name"
 	r.description = "relic.nanjung_ilgi.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_WIN
+	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
 	r.effect_type = RelicRes.EffectType.HEAL
-	r.owner_hero_id = "yi_sun_sin"; r.value = 0; r.bonus_value = 8; return r
+	r.owner_hero_id = "yi_sun_sin"; r.value = 0; r.bonus_value = 3; return r
 
 static func _pharaoh_seal() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.pharaoh_seal.name"
@@ -111,8 +126,8 @@ static func _pharaoh_seal() -> Resource:
 static func _devils_contract() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.devils_contract.name"
 	r.description = "relic.devils_contract.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r.effect_type = RelicRes.EffectType.HEAL; r.value = 20
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.HEAL; r.value = 12
 	r.is_cursed = true
 	r.penalty_trigger = RelicRes.TriggerType.PLAYER_TURN_START
 	r.penalty_effect_type = RelicRes.EffectType.DAMAGE_HERO; r.penalty_value = 3; return r
@@ -184,10 +199,12 @@ static func _scarab_talisman() -> Resource:
 # ──── Act 3 렐릭 (북유럽 신화) ────
 
 static func _rune_of_fate() -> Resource:
+	# 점점 강해지는 (C): 전투 시작 시 이번 런 처치한 적 수 × value 만큼 영웅 전체 데미지
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.rune_of_fate.name"
 	r.description = "relic.rune_of_fate.desc"
 	r.trigger = RelicRes.TriggerType.BATTLE_START
-	r.effect_type = RelicRes.EffectType.DRAW; r.value = 2; return r
+	r.effect_type = RelicRes.EffectType.RUN_STRENGTH
+	r.status_type = "kills_strength"; r.value = 1; return r
 
 static func _mjolnir_shard() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.mjolnir_shard.name"
@@ -216,8 +233,8 @@ static func _dharma_seal() -> Resource:
 static func _dharma_drum() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.dharma_drum.name"
 	r.description = "relic.dharma_drum.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r.effect_type = RelicRes.EffectType.GAIN_MORALE; r.value = 3; return r
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.GAIN_MORALE; r.value = 2; return r
 
 static func _prayer_beads() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.prayer_beads.name"
@@ -242,8 +259,8 @@ static func _five_elements_jade() -> Resource:
 static func _immortal_crane_feather() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.immortal_crane_feather.name"
 	r.description = "relic.immortal_crane_feather.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r.effect_type = RelicRes.EffectType.MAX_HP; r.value = 10; return r
+	r.trigger = RelicRes.TriggerType.PASSIVE
+	r.effect_type = RelicRes.EffectType.MAX_HP; r.value = 30; return r
 
 # ──── 챕터 2 렐릭 (일본 신화) ────
 
@@ -255,12 +272,12 @@ static func _ghost_talisman() -> Resource:
 	r.status_type = "poison"; r.value = 2; return r
 
 static func _tengu_feather() -> Resource:
-	# 차별화: BATTLE_START → DRAW 1 (tacticians_map과 동일) → BATTLE_WIN → DRAW 2
-	# 텐구의 깃털 = 승리 후 영적 통찰 → 다음 전투 첫 패 풍부
+	# 점점 강해지는 (A): 전투 시작 시 치른 전투 수 × value 만큼 영웅 전체 데미지 누적
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.tengu_feather.name"
 	r.description = "relic.tengu_feather.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r.effect_type = RelicRes.EffectType.DRAW; r.value = 2; return r
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.RUN_STRENGTH
+	r.status_type = "battles_strength"; r.value = 2; return r
 
 static func _orochi_scale() -> Resource:
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.orochi_scale.name"
@@ -295,11 +312,13 @@ static func _thousand_horses() -> Resource:
 	r.owner_hero_id = "genghis_khan"; r.value = 30; return r
 
 static func _conquerors_whip() -> Resource:
+	# 점점 강해지는 (B): 전투 시작 시 치른 전투 수 × value 만큼 카드 공격 히트당 보너스 (칭기즈칸 전용)
 	var r: Resource = RelicRes.new(); r.relic_name = "relic.conquerors_whip.name"
 	r.description = "relic.conquerors_whip.desc"
-	r.trigger = RelicRes.TriggerType.BATTLE_WIN
-	r.effect_type = RelicRes.EffectType.DRAW
-	r.owner_hero_id = "genghis_khan"; r.value = 1; return r
+	r.trigger = RelicRes.TriggerType.BATTLE_START
+	r.effect_type = RelicRes.EffectType.RUN_STRENGTH
+	r.status_type = "battles_per_hit"
+	r.owner_hero_id = "genghis_khan"; r.value = 3; return r
 
 # ──── 무사시 전용 렐릭 ────
 

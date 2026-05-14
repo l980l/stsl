@@ -9,7 +9,10 @@ func _on_node_added(node: Node) -> void:
 		node.mouse_entered.connect(_on_hover.bind(node))
 		node.pressed.connect(_on_click.bind(node))
 
-func _on_hover(_btn: BaseButton) -> void:
+func _on_hover(btn: BaseButton) -> void:
+	# 비활성화된 버튼은 호버 사운드를 내지 않는다
+	if btn.disabled:
+		return
 	AudioManager.play_ui("ui_hover")
 
 func _on_click(_btn: BaseButton) -> void:

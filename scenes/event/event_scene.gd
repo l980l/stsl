@@ -11,8 +11,11 @@ const ILLO_H     := 680.0
 const NARR_H     := 270.0
 const CHOICE_PAD := 24.0
 
+const CARD_REMOVAL_OVERLAY := preload("res://scenes/components/card_removal_overlay.gd")
+
 var _frame: Panel = null
 var _popup_tween: Tween = null
+var _pending_card_removal: bool = false
 
 func _ready() -> void:
 	var event: Resource = GameManager.pending_event
@@ -401,51 +404,118 @@ func _is_choice_available(choice: Resource) -> bool:
 			return false
 	if choice.cost_gold > 0 and GameManager.gold < choice.cost_gold:
 		return false
+	# 영웅 합류 — 팀이 정원(3명)으로 꽉 찼으면 선택 불가
+	if choice.effect_type == EventChoiceResource.EffectType.ADD_HERO \
+			and TeamManager.heroes.size() >= 3:
+		return false
 	return true
 
+# 번역 키에 %d가 없을 때(번역 미로드 등) % 연산자 크래시를 막는 가드
+func _fmt(key: String, arg) -> String:
+	var t := tr(key)
+	return (t % arg) if "%" in t else t
+
+# 선택지의 효과를 태그 배열로 변환. 모든 선택지가 일관된 태그를 갖는다.
+# - 비용은 확률과 무관하게 항상 표시
+# - 확률 분기는 "N% → 효과" 형태. 같은 분기에서 함께 일어나는 효과는 한 태그로 묶는다
+#   (예: 스핑크스 70% → 카드 제거 / +30코인 — "70%"가 두 번 반복되지 않도록)
+# - 효과·비용이 전혀 없으면 "효과 없음" 태그
 func _cost_tags(choice: Resource) -> Array:
 	var tags: Array = []
+	# 비용 — 확률과 무관하게 항상 발생
 	if choice.cost_gold > 0:
-		tags.append({"text": tr("ui.event.tag.cost_gold") % choice.cost_gold, "color": SacredPalette.BONE_300})
+		tags.append({"text": _fmt("ui.event.tag.cost_gold", choice.cost_gold), "color": SacredPalette.BONE_300})
 	if choice.cost_hp > 0:
-		tags.append({"text": tr("ui.event.tag.cost_hp") % choice.cost_hp, "color": SacredPalette.BLOOD_400})
-	_append_effect_tag(tags, choice.effect_type, choice.value, choice.card_id)
-	if choice.secondary_effect_type != EventChoiceResource.EffectType.NONE:
-		_append_effect_tag(tags, choice.secondary_effect_type, choice.secondary_value, "")
+		tags.append({"text": _fmt("ui.event.tag.cost_hp", choice.cost_hp), "color": SacredPalette.BLOOD_400})
+
 	if choice.success_chance > 0 and choice.success_chance < 100:
-		tags.append({"text": tr("ui.event.tag.chance") % choice.success_chance, "color": SacredPalette.BRASS_400})
-	if choice.effect_type == EventChoiceResource.EffectType.TRIGGER_BATTLE:
-		var battle_key := "ui.event.tag.battle_elite" if choice.encounter_tier >= 1 else "ui.event.tag.battle"
-		tags.append({"text": tr(battle_key), "color": SacredPalette.BLOOD_400})
-		if choice.reward_effect_type != EventChoiceResource.EffectType.NONE:
-			_append_effect_tag(tags, choice.reward_effect_type, choice.reward_value, "")
+		# 확률 분기 — 성공 효과들은 한 태그로 묶고, 실패(alt) 분기는 별도 태그
+		var p_succ: String = "%d%% → " % choice.success_chance
+		var p_fail: String = "%d%% → " % (100 - choice.success_chance)
+		_append_success_tag(tags, choice, p_succ)
+		# 확률 실패(alt) 분기 — 여기서 일어나는 카드 제거는 강제된 손해(페널티)
+		_append_effect_tag(tags, choice.alt_effect_type, choice.alt_value, "", choice, p_fail, true)
+	else:
+		# 확률 없음 — 효과를 그대로
+		_append_effect_tag(tags, choice.effect_type, choice.value, choice.card_id, choice, "")
+		if choice.secondary_effect_type != EventChoiceResource.EffectType.NONE:
+			_append_effect_tag(tags, choice.secondary_effect_type, choice.secondary_value, "", choice, "")
+		# 효과도 비용도 없는 선택지 — "효과 없음"으로 명시
+		if choice.effect_type == EventChoiceResource.EffectType.NONE \
+				and choice.secondary_effect_type == EventChoiceResource.EffectType.NONE \
+				and choice.cost_gold == 0 and choice.cost_hp == 0:
+			tags.append({"text": tr("ui.event.tag.none"), "color": SacredPalette.BONE_300})
 	return tags
 
-func _append_effect_tag(tags: Array, etype: int, value: int, card_id: String) -> void:
+# 확률 성공 분기 — effect (+secondary)를 한 태그로 묶는다.
+# 성공 분기 효과는 모두 보상(플레이어가 선택지로 의도한 결과)이므로 보상색.
+func _append_success_tag(tags: Array, choice: Resource, prefix: String) -> void:
+	var parts: Array = [_effect_text(choice.effect_type, choice.value, choice.card_id, choice)]
+	if choice.secondary_effect_type != EventChoiceResource.EffectType.NONE:
+		parts.append(_effect_text(choice.secondary_effect_type, choice.secondary_value, "", choice))
+	tags.append({"text": prefix + " / ".join(parts), "color": SacredPalette.BRASS_300})
+
+# 효과 1개의 태그 텍스트(번역 적용)만 반환. 색상·prefix는 호출자가 결정.
+# is_penalty: 페널티 맥락이면 REMOVE_CARD를 "무작위 카드 1장 제거"로 표시 (보상은 "카드 제거").
+func _effect_text(etype: int, value: int, card_id: String, choice: Resource, is_penalty: bool = false) -> String:
 	match etype:
+		EventChoiceResource.EffectType.NONE:
+			return tr("ui.event.tag.none")
 		EventChoiceResource.EffectType.GOLD:
-			tags.append({"text": tr("ui.event.tag.gain_gold") % value, "color": SacredPalette.BRASS_300})
+			return _fmt("ui.event.tag.gain_gold", value)
 		EventChoiceResource.EffectType.HEAL:
-			tags.append({"text": tr("ui.event.tag.gain_hp") % value, "color": SacredPalette.BRASS_300})
+			return _fmt("ui.event.tag.gain_hp", value)
 		EventChoiceResource.EffectType.DRAW_UP:
-			tags.append({"text": tr("ui.event.tag.draw_up") % value, "color": SacredPalette.BRASS_300})
+			return tr("ui.event.tag.draw_up")
 		EventChoiceResource.EffectType.REMOVE_CARD:
-			tags.append({"text": tr("ui.event.tag.remove_card"), "color": SacredPalette.BONE_300})
+			return tr("ui.event.tag.remove_card_random") if is_penalty else tr("ui.event.tag.remove_card")
 		EventChoiceResource.EffectType.ADD_RELIC:
-			tags.append({"text": tr("ui.event.tag.add_relic"), "color": SacredPalette.BRASS_300})
+			return tr("ui.event.tag.add_relic")
 		EventChoiceResource.EffectType.ADD_RELIC_GAMBLE:
-			tags.append({"text": tr("ui.event.tag.relic_gamble"), "color": SacredPalette.BONE_300})
+			return tr("ui.event.tag.relic_gamble")
 		EventChoiceResource.EffectType.ADD_HERO:
-			tags.append({"text": tr("ui.event.tag.add_hero"), "color": SacredPalette.BRASS_300})
+			return tr("ui.event.tag.add_hero")
 		EventChoiceResource.EffectType.ADD_CARD:
 			if card_id != "" and ResourceLoader.exists(card_id):
 				var card_res: Resource = load(card_id)
-				var name_str: String = ""
 				if card_res and "card_name" in card_res:
-					name_str = tr(card_res.card_name)
-				tags.append({"text": tr("ui.event.tag.add_card_named") % name_str, "color": SacredPalette.BRASS_300})
-			else:
-				tags.append({"text": tr("ui.event.tag.add_card"), "color": SacredPalette.BRASS_300})
+					return _fmt("ui.event.tag.add_card_named", tr(card_res.card_name))
+			return tr("ui.event.tag.add_card")
+		EventChoiceResource.EffectType.TRIGGER_BATTLE:
+			return tr("ui.event.tag.battle_elite" if choice.encounter_tier >= 1 else "ui.event.tag.battle")
+	return ""
+
+# 효과별 태그 색상. REMOVE_CARD만 맥락(보상/페널티)에 따라 달라진다.
+func _effect_color(etype: int, is_penalty: bool) -> Color:
+	match etype:
+		EventChoiceResource.EffectType.NONE:
+			return SacredPalette.BONE_300
+		EventChoiceResource.EffectType.ADD_RELIC_GAMBLE:
+			return SacredPalette.BONE_300
+		EventChoiceResource.EffectType.TRIGGER_BATTLE:
+			return SacredPalette.BLOOD_400
+		EventChoiceResource.EffectType.REMOVE_CARD:
+			# 의도한 덱 압축이면 보상색, 확률 실패로 강제된 카드 분실이면 페널티색
+			return SacredPalette.BLOOD_400 if is_penalty else SacredPalette.BRASS_300
+		_:
+			return SacredPalette.BRASS_300
+
+# 효과 1개를 태그로 추가. prefix: 확률 "N% → " 또는 보상 화살표 "→ ".
+# is_penalty: 확률 실패(alt) 분기처럼 강제된 손해인지 (REMOVE_CARD 색상에만 영향).
+func _append_effect_tag(tags: Array, etype: int, value: int, card_id: String, choice: Resource, prefix: String, is_penalty: bool = false) -> void:
+	# NONE은 prefix(확률 실패 분기 등)가 있을 때만 "효과 없음"을 표시
+	if etype == EventChoiceResource.EffectType.NONE:
+		if prefix != "":
+			tags.append({"text": prefix + tr("ui.event.tag.none"), "color": SacredPalette.BONE_300})
+		return
+	tags.append({
+		"text": prefix + _effect_text(etype, value, card_id, choice, is_penalty),
+		"color": _effect_color(etype, is_penalty),
+	})
+	# 전투 보상은 "→ 효과"로 이어 붙임
+	if etype == EventChoiceResource.EffectType.TRIGGER_BATTLE \
+			and choice.reward_effect_type != EventChoiceResource.EffectType.NONE:
+		_append_effect_tag(tags, choice.reward_effect_type, choice.reward_value, "", choice, "→ ")
 
 func _play_open() -> void:
 	if _popup_tween:
@@ -463,18 +533,28 @@ func _play_close(callback: Callable) -> void:
 	_popup_tween.tween_property(_frame, "scale", Vector2(0.97, 0.97), 0.20)
 	callback.call()
 
+# _apply_choice 반환: 0=완료(complete_event 호출), 1=전투 진입, 2=카드 제거 패널 대기
+const _CHOICE_DONE := 0
+const _CHOICE_BATTLE := 1
+const _CHOICE_CARD_REMOVAL := 2
+
 func _on_choice_selected(choice: Resource) -> void:
 	_play_close(func():
-		_apply_choice(choice)
-		# TRIGGER_BATTLE은 GameManager.start_event_battle()이 씬 전환을 직접 처리
-		if choice.effect_type != EventChoiceResource.EffectType.TRIGGER_BATTLE:
+		var result := _apply_choice(choice)
+		if result == _CHOICE_BATTLE:
+			pass  # 전투 진입 — complete_event는 전투 종료 후
+		elif result == _CHOICE_CARD_REMOVAL:
+			_open_card_removal()  # 패널 confirmed 콜백이 complete_event 책임
+		else:
 			GameManager.complete_event()
 	)
 
-func _apply_choice(choice: Resource) -> void:
+func _apply_choice(choice: Resource) -> int:
+	_pending_card_removal = false
+
 	# 1) 비용 선처리 — gold 부족 시 효과 자체가 무효
 	if choice.cost_gold > 0 and not GameManager.spend_gold(choice.cost_gold):
-		return
+		return _CHOICE_DONE
 	if choice.cost_hp > 0:
 		for hero in TeamManager.heroes:
 			TeamManager.take_damage(hero.hero_id, choice.cost_hp)
@@ -487,22 +567,57 @@ func _apply_choice(choice: Resource) -> void:
 			"card_id": choice.card_id,
 		}
 		GameManager.start_event_battle(choice.encounter_tier, reward)
-		return
+		return _CHOICE_BATTLE
 
 	# 3) 확률 효과 — success_chance 0/100 외에는 dice 굴림
 	if choice.success_chance > 0 and choice.success_chance < 100:
 		if randi() % 100 < choice.success_chance:
 			_apply_single_effect(choice.effect_type, choice.value, choice.card_id)
+			# 성공 시 보조 효과도 적용 (예: 스핑크스 — REMOVE_CARD + GOLD)
+			if choice.secondary_effect_type != EventChoiceResource.EffectType.NONE:
+				_apply_single_effect(choice.secondary_effect_type, choice.secondary_value, "")
 		else:
-			_apply_single_effect(choice.alt_effect_type, choice.alt_value, "")
-		return
+			# 실패 분기의 alt가 TRIGGER_BATTLE이면 전투 진입
+			if choice.alt_effect_type == EventChoiceResource.EffectType.TRIGGER_BATTLE:
+				var reward_alt: Dictionary = {
+					"effect_type": choice.reward_effect_type,
+					"value": choice.reward_value,
+					"card_id": choice.card_id,
+				}
+				GameManager.start_event_battle(choice.encounter_tier, reward_alt)
+				return _CHOICE_BATTLE
+			# 확률 실패(alt) 분기 — 강제된 페널티
+			_apply_single_effect(choice.alt_effect_type, choice.alt_value, "", true)
+		return _CHOICE_CARD_REMOVAL if _pending_card_removal else _CHOICE_DONE
 
 	# 4) 일반 + MULTI
 	_apply_single_effect(choice.effect_type, choice.value, choice.card_id)
 	if choice.secondary_effect_type != EventChoiceResource.EffectType.NONE:
 		_apply_single_effect(choice.secondary_effect_type, choice.secondary_value, "")
+	return _CHOICE_CARD_REMOVAL if _pending_card_removal else _CHOICE_DONE
 
-func _apply_single_effect(etype: int, value: int, card_id: String) -> void:
+# 카드 제거 패널 — 플레이어가 제거할 카드를 직접 선택 (취소 불가).
+# 패널의 confirmed 콜백이 실제 제거 + complete_event를 책임진다.
+func _open_card_removal() -> void:
+	var deck: Array = DeckManager.get_full_deck()
+	if deck.is_empty():
+		GameManager.complete_event()
+		return
+	var overlay = CARD_REMOVAL_OVERLAY.new()
+	add_child(overlay)
+	overlay.confirmed.connect(func(card: Resource) -> void:
+		DeckManager.remove_from_deck(card)
+		GameManager.complete_event()
+	)
+	overlay.open(deck, {
+		"cancelable":   false,
+		"title_text":   tr("ui.event.remove_prompt"),
+		"confirm_text": tr("ui.shop.btn_confirm_remove"),
+	})
+
+# is_penalty: 확률 실패(alt) 분기처럼 강제된 효과인지.
+#   REMOVE_CARD가 페널티면 무작위 즉시 제거, 보상이면 플레이어가 카드 선택 패널에서 고른다.
+func _apply_single_effect(etype: int, value: int, card_id: String, is_penalty: bool = false) -> void:
 	match etype:
 		EventChoiceResource.EffectType.GOLD:
 			GameManager.add_gold(value)
@@ -510,10 +625,16 @@ func _apply_single_effect(etype: int, value: int, card_id: String) -> void:
 			for hero in TeamManager.heroes:
 				TeamManager.heal(hero.hero_id, value)
 		EventChoiceResource.EffectType.DRAW_UP:
-			DeckManager.base_draw_count += value
+			var _RelicData := load("res://resources/relics/relics.gd")
+			for _i in range(value):
+				GameManager.add_relic(_RelicData.sacred_scroll())
 		EventChoiceResource.EffectType.REMOVE_CARD:
-			if not DeckManager.draw_pile.is_empty():
-				DeckManager.draw_pile.remove_at(randi() % DeckManager.draw_pile.size())
+			if is_penalty:
+				# 페널티 — 무작위 카드 1장 즉시 제거 (플레이어 선택권 없음)
+				DeckManager.remove_random_card()
+			else:
+				# 보상 — _open_card_removal의 카드 선택 패널에서 처리, 여기선 대기 표시만
+				_pending_card_removal = true
 		EventChoiceResource.EffectType.ADD_RELIC:
 			var relic: Resource = GameManager.get_random_relic()
 			if relic:

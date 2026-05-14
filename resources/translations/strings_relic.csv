@@ -1,6 +1,6 @@
 keys,ko,en,fr,it,es,ja,el,zh,zh_TW
 relic.burning_blood.name,버닝 블러드,Burning Blood,Sang brûlant,Sangue Ardente,Sangre Ardiente,バーニングブラッド,Φλεγόμενο Αίμα,燃烧之血,燃烧之血
-relic.burning_blood.desc,전투 승리 시 팀 전체 HP +6,Team HP +6 on victory,PV de l'équipe +6 après une victoire,PV della squadra +6 alla vittoria,PV del equipo +6 al ganar,戦闘勝利時、チーム全体のHP+6,+6 HP στην ομάδα μετά τη νίκη,战斗胜利时全队HP +6,战斗胜利时全队HP +6
+relic.burning_blood.desc,매 턴 종료 시 팀 전체 HP +2,Team HP +2 at end of turn,PV de l'équipe +2 en fin de tour,PV squadra +2 a fine turno,PV del equipo +2 al final del turno,ターン終了時、チーム全体のHP+2,+2 HP στην ομάδα στο τέλος του γύρου,回合结束时全队HP +2,回合結束時全隊HP +2
 relic.phoenix_feather.name,불사조 깃털,Phoenix Feather,Plume de Phénix,Piuma di Fenice,Pluma de Fénix,不死鳥の羽,Φτερό Φοίνικα,不死鸟之羽,不死鸟之羽
 relic.phoenix_feather.desc,플레이어 턴 시작 시 에너지 +1,Energy +1 at turn start,Énergie +1 au début du tour,Energia +1 a inizio turno,Energía +1 al empezar turno,プレイヤーのターン開始時、エネルギー+1,+1 Ενέργεια στην αρχή του γύρου,玩家回合开始时能量 +1,玩家回合开始时能量 +1
 relic.poison_vial.name,독약 병,Poison Vial,Fiole de poison,Fiala di Veleno,Vial de Veneno,毒薬の瓶,Φιαλίδιο Δηλητηρίου,毒药瓶,毒药瓶
@@ -22,11 +22,11 @@ relic.turtle_ship_model.desc,플레이어 턴 시작 시 방어도 +2 (이순신
 relic.artillery_horn.name,포병 나팔,Artillery Horn,Cor de l'artillerie,Corno dell'Artiglieria,Cuerno de Artillería,砲兵のラッパ,Κέρας του Πυροβολικού,炮兵喇叭,炮兵喇叭
 relic.artillery_horn.desc,플레이어 턴 시작 시 사기 +1 (나폴레옹 생존 시 적용),Morale +1 if Napoleon lives,Morale +1 si Napoléon vit,Morale +1 se Napoleone vive,Moral +1 si Napoleón vive,ターン開始時、士気+1（ナポレオン生存時）,+1 Ηθικό αν ζει ο Ναπολέων,玩家回合开始时士气 +1（拿破仑存活时）,玩家回合开始时士气 +1（拿破仑存活时）
 relic.nanjung_ilgi.name,난중일기,Nanjung Ilgi (War Diary),Nanjung Ilgi (Journal de guerre),Nanjung Ilgi (Diario),Nanjung Ilgi (Diario),乱中日記,Ναντζούνγκ Ίλγκι (Ημερολόγιο),乱中日记,乱中日记
-relic.nanjung_ilgi.desc,전투 승리 시 팀 HP +8 (이순신 생존 시 적용),Team HP +8 if Yi lives,PV +8 si Yi vit,PV +8 se Yi vive,PV +8 si Yi vive,勝利時、チームHP+8（イ・スンシン生存時）,+8 HP αν ζει ο Γι στη νίκη,战斗胜利时全队HP +8（李舜臣存活时）,战斗胜利时全队HP +8（李舜臣存活时）
+relic.nanjung_ilgi.desc,매 턴 종료 시 팀 HP +3 (이순신 생존 시 적용),Team HP +3 at turn end if Yi lives,PV équipe +3 en fin de tour si Yi vit,PV squadra +3 a fine turno se Yi vive,PV equipo +3 al final del turno si Yi vive,ターン終了時、チームHP+3（イ・スンシン生存時）,+3 HP στην ομάδα στο τέλος του γύρου αν ζει ο Γι,回合结束时全队HP +3（李舜臣存活时）,回合結束時全隊HP +3（李舜臣存活時）
 relic.pharaoh_seal.name,파라오의 인장,Pharaoh's Seal,Sceau du Pharaon,Sigillo del Faraone,Sello del Faraón,ファラオの印章,Σφραγίδα του Φαραώ,法老印章,法老印章
 relic.pharaoh_seal.desc,플레이어 턴 시작 시 무작위 적 독 +1 (클레오파트라 생존 시 적용),Poison +1 if Cleo lives,Poison +1 si Cléo vit,Veleno +1 se Cleo vive,Veneno +1 si Cleo vive,ターン開始時、毒+1（クレオパトラ生存時）,+1 Δηλητήριο αν ζει η Κλεοπάτρα,玩家回合开始时随机敌方中毒 +1（克利奥帕特拉存活时）,玩家回合开始时随机敌方中毒 +1（克利奥帕特拉存活时）
 relic.devils_contract.name,악마의 계약,Devil's Contract,Contrat du Diable,Contratto del Diavolo,Contrato del Diablo,悪魔の契約,Συμβόλαιο με τον Διάβολο,恶魔契约,恶魔契约
-relic.devils_contract.desc,전투 승리 시 팀 HP +20. 단 매 플레이어 턴 시작 시 무작위 영웅 HP -3,"+20 HP on win, but -3 per turn","+20 PV à la fin, -3 par tour","+20 PV alla vittoria, -3 ogni turno","+20 PV al ganar, -3 cada turno",勝利時HP+20、毎ターン開始時ランダムHP-3,"+20 HP στη νίκη, -3 HP κάθε γύρο",战胜HP +20，但每回合开始随机英雄HP -3,战胜HP +20，但每回合开始随机英雄HP -3
+relic.devils_contract.desc,전투 시작 시 팀 HP +12. 단 매 턴 시작 시 무작위 영웅 HP -3,"+12 HP at battle start, but -3 per turn","+12 PV au début, -3 par tour","+12 PV all'inizio, -3 ogni turno","+12 PV al inicio, -3 cada turno",戦闘開始時HP+12、毎ターン開始時ランダムHP-3,"+12 HP στην αρχή, -3 HP κάθε γύρο",战斗开始时全队HP +12，但每回合开始随机英雄HP -3,戰鬥開始時全隊HP +12，但每回合開始隨機英雄HP -3
 relic.cursed_crown.name,저주받은 왕관,Cursed Crown,Couronne maudite,Corona Maledetta,Corona Maldita,呪われた王冠,Καταραμένο Στέμμα,被诅咒的王冠,被诅咒的王冠
 relic.cursed_crown.desc,최대 HP +25. 단 매 전투 시작 시 무작위 영웅 HP -8,"Max HP +25, but -8 at start","PV Max +25, -8 au début","PV Max +25, -8 all'inizio","PV Máx +25, -8 al inicio",最大HP+25、戦闘開始時ランダムHP-8,"+25 Μέγιστη HP, -8 HP στην αρχή",最大HP +25，但战斗开始时随机英雄HP -8,最大HP +25，但战斗开始时随机英雄HP -8
 relic.blood_oath.name,피의 서약,Blood Oath,Serment de sang,Giuramento di Sangue,Juramento de Sangre,血の誓約,Όρκος Αίματος,血液誓约,血液誓约
@@ -44,7 +44,7 @@ relic.eye_of_horus.desc,플레이어 턴 시작 시 카드 1장 드로우. 클�
 relic.scarab_talisman.name,스카라베 부적,Scarab Talisman,Talisman du scarabée,Talismano dello Scarabeo,Talismán de Escarabajo,スカラベの守護札,Φυλαχτό Σκαραβαίος,圣甲虫护身符,圣甲虫护身符
 relic.scarab_talisman.desc,전투 시작 시 모든 적에게 독 4,Apply Poison 4 to all enemies at start,Applique Poison 4 à tous au début,Applica Veleno 4 a inizio,Aplica Veneno 4 al inicio,戦闘開始時、全敵に毒4を付与,+4 Δηλητήριο σε όλους τους εχθρούς στην αρχή,战斗开始时所有敌方中毒 4,戰鬥開始時所有敵方中毒 4
 relic.rune_of_fate.name,운명의 룬,Rune of Fate,Rune du destin,Runa del Destino,Runa del Destino,運命のルーン,Ρούνος του Πεπρωμένου,命运卢恩,命运卢恩
-relic.rune_of_fate.desc,전투 시작 시 카드 2장 추가 드로우,Draw 2 extra cards at start,Pioche 2 bonus au début,Pesca 2 extra all'inizio,Roba 2 extra al inicio,戦闘開始時、カードを2枚追加で引く,+2 κάρτες στην αρχή της μάχης,战斗开始时额外抽 2 张牌,战斗开始时额外抽 2 张牌
+relic.rune_of_fate.desc,처치한 적이 많을수록 강해진다 (처치한 적당 영웅 전체 공격 +1),Grows with each kill (+1 attack per enemy slain),Se renforce à chaque ennemi tué (+1 attaque par ennemi),Più forte a ogni nemico ucciso (+1 attacco per nemico),Más fuerte por cada enemigo abatido (+1 ataque por enemigo),敵を倒すほど強くなる（撃破した敵ごとに全英雄の攻撃+1）,Δυναμώνει με κάθε εχθρό (+1 επίθεση ανά εχθρό),击杀越多越强（每击杀一个敌人全英雄攻击+1）,擊殺越多越強（每擊殺一個敵人全英雄攻擊+1）
 relic.mjolnir_shard.name,묠니르의 파편,Mjolnir Shard,Éclat de Mjölnir,Frammento di Mjolnir,Fragmento de Mjölnir,ミョルニルの破片,Θραύσμα του Μγιόλνιρ,雷神之锤碎片,雷神之锤碎片
 relic.mjolnir_shard.desc,전투 시작 시 팀 전체 방어도 +10,Team Block +10 at start,Blocage +10 au début,Difesa +10 all'inizio,Defensa +10 al inicio,戦闘開始時、チーム全体の防御+10,+10 Άμυνα στην ομάδα στην αρχή,战斗开始时全队护甲 +10,战斗开始时全队护甲 +10
 relic.idun_apple.name,이둔의 사과,Idun's Apple,Pomme d'Idunn,Mela di Idun,Manzana de Idun,イズンのリンゴ,Μήλο της Ιντούν,伊登苹果,伊登苹果
@@ -52,7 +52,7 @@ relic.idun_apple.desc,플레이어 턴 종료 시 팀 전체 HP +3,Team HP +3 at
 relic.ghost_talisman.name,귀신 부적,Ghost Talisman,Talisman spectral,Talismano Spettrale,Talismán Espectral,幽霊の護符,Φυλαχτό Φάντασμα,鬼神护符,鬼神护符
 relic.ghost_talisman.desc,플레이어 턴 종료 시 무작위 적에게 독 2 부여,Apply Poison 2 at turn end,Applique Poison 2 à la fin,Applica Veleno 2 a fine turno,Aplica Veneno 2 al final,ターン終了時、ランダムな敵に毒2を付与,2 Δηλητήριο σε τυχαίο εχθρό στο τέλος,玩家回合结束时随机敌方中毒 2,玩家回合结束时随机敌方中毒 2
 relic.tengu_feather.name,텐구의 깃털,Tengu Feather,Plume de Tengu,Piuma di Tengu,Pluma de Tengu,天狗の羽,Φτερό Τένγκου,天狗之羽,天狗之羽
-relic.tengu_feather.desc,전투 승리 시 카드 2장 드로우,Draw 2 cards on victory,Pioche 2 cartes après une victoire,Pesca 2 carte alla vittoria,Roba 2 cartas al ganar,勝利時カード2枚を引く,+2 κάρτες στη νίκη,战斗胜利时抽 2 张牌,戰鬥勝利時抽 2 張牌
+relic.tengu_feather.desc,전투를 치를수록 강해진다 (치른 전투당 영웅 전체 공격 +2),Grows stronger each battle (+2 attack per battle),Se renforce à chaque combat (+2 attaque par combat),Più forte a ogni battaglia (+2 attacco per battaglia),Más fuerte cada batalla (+2 ataque por batalla),戦うほど強くなる（戦闘ごとに全英雄の攻撃+2）,Δυναμώνει σε κάθε μάχη (+2 επίθεση ανά μάχη),每场战斗后变强（每场战斗全英雄攻击+2）,每場戰鬥後變強（每場戰鬥全英雄攻擊+2）
 relic.orochi_scale.name,오로치의 비늘,Orochi Scale,Écaille d'Orochi,Scaglia di Orochi,Escama de Orochi,オロチの鱗,Λέπι του Ορότσι,八岐大蛇之鳞,八岐大蛇之鳞
 relic.orochi_scale.desc,영웅이 피해를 받을 때 무작위 적에게 약화 1 부여,Apply Weak 1 on taking DMG,Applique Faiblesse 1 si dégâts,Applica Debolezza 1 se colpito,Aplica Debilidad 1 al recibir daño,ダメージを受けた時、ランダムな敵に弱体1,1 Αδυναμία σε τυχαίο εχθρό αν δεχτείς ζημιά,英雄受到伤害时随机敌方虚弱 1,英雄受到伤害时随机敌方虚弱 1
 relic.flag_of_orleans.name,오를레앙 깃발,Flag of Orleans,Drapeau d'Orléans,Bandiera di Orléans,Bandera de Orleans,オルレアンの旗,Σημαία της Ορλεάνης,奥尔良旗帜,奥尔良旗帜
@@ -62,7 +62,7 @@ relic.saints_tears.desc,영웅이 피해를 받을 때 팀 전체 HP +30 (잔다
 relic.thousand_horses.name,천군만마,Thousand Horses,Mille chevaux,Mille Cavalli,Mil Caballos,千軍万馬,Χίλια Άλογα,千军万马,千军万马
 relic.thousand_horses.desc,전투 시작 시 팀 전체 방어도 +30,Team Block +30 at start,Blocage +30 au début,Difesa +30 all'inizio,Defensa +30 al inicio,戦闘開始時、チーム全体の防御+30,+30 Άμυνα στην ομάδα στην αρχή,战斗开始时全队护甲 +30,战斗开始时全队护甲 +30
 relic.conquerors_whip.name,정복자의 채찍,Conqueror's Whip,Fouet du conquérant,Frusta del Conquistatore,Látigo del Conquistador,征服者の鞭,Μαστίγιο του Κατακτητή,征服者之鞭,征服者之鞭
-relic.conquerors_whip.desc,전투 승리 시 카드 1장 드로우,Draw 1 card on victory,Pioche 1 après une victoire,Pesca 1 alla vittoria,Roba 1 al ganar,勝利時、カードを1枚引く,+1 κάρτα στη νίκη,战斗胜利时抽 1 张牌,战斗胜利时抽 1 张牌
+relic.conquerors_whip.desc,전투를 치를수록 강해진다 (치른 전투당 카드 공격 +3 / 칭기즈칸 전용),Grows stronger each battle (+3 card attack per battle / Genghis Khan),Se renforce à chaque combat (+3 par combat / Gengis Khan),Più forte a ogni battaglia (+3 per battaglia / Gengis Khan),Más fuerte cada batalla (+3 por batalla / Gengis Kan),戦うほど強くなる（戦闘ごとにカード攻撃+3／ジンギスカン専用）,Δυναμώνει σε κάθε μάχη (+3 ανά μάχη / Τζένγκις Χαν),每场战斗后变强（每场战斗卡牌攻击+3／成吉思汗专属）,每場戰鬥後變強（每場戰鬥卡牌攻擊+3／成吉思汗專屬）
 relic.niten_ichi_ryu.name,니텐이치류,Niten Ichi-ryu,Niten Ichi-ryu,Niten Ichi-ryu,Niten Ichi-ryu,二天一流,Νιτενίτσι-ρου,二天一流,二天一流
 relic.niten_ichi_ryu.desc,전투 시작 시 에너지 +1 (무사시 전용),Energy +1 (Musashi only),Énergie +1 (Musashi),Energia +1 (Musashi),Energía +1 (Musashi),戦闘開始時エネルギー+1（武蔵専用）,+1 Ενέργεια (Μόνο Μουσάσι),战斗开始能量 +1（武藏专用）,战斗开始能量 +1（武藏专用）
 relic.gorin_sho_relic.name,오륜서,Gorin-no-sho (Book of Five Rings),Gorin-no-sho (Traité des cinq roues),Gorin-no-sho (Libro dei Cinque Anelli),Gorin-no-sho (El libro de los cinco anillos),五輪書,Γκορίν-νο-σο (Το Βιβλίο των Πέντε Δαχτυλιδιών),五轮书,五轮书
@@ -70,7 +70,7 @@ relic.gorin_sho_relic.desc,플레이어 턴 시작 시 카드 1장 추가 드로
 relic.dharma_seal.name,법인,Dharma Seal,Sceau du Dharma,Sigillo del Dharma,Sello del Dharma,法印,Σφραγίδα Ντάρμα,法印,法印
 relic.dharma_seal.desc,팀 전체 최대 HP +20,Team Max HP +20,PV max +20 à l'équipe,PV Max +20 alla squadra,PV Máx +20 al equipo,チーム全体の最大HP+20,+20 Μέγιστο HP στην ομάδα,全队最大 HP +20,全隊最大 HP +20
 relic.dharma_drum.name,법고,Dharma Drum,Tambour du Dharma,Tamburo del Dharma,Tambor del Dharma,法鼓,Τύμπανο Ντάρμα,法鼓,法鼓
-relic.dharma_drum.desc,전투 승리 시 사기 +3,Morale +3 on victory,Moral +3 à la victoire,Morale +3 alla vittoria,Moral +3 en victoria,戦闘勝利時士気+3,+3 Ηθικό στη νίκη,战斗胜利时士气+3,戰鬥勝利時士氣+3
+relic.dharma_drum.desc,전투 시작 시 사기 +2,Morale +2 at battle start,Moral +2 au début du combat,Morale +2 all'inizio,Moral +2 al inicio,戦闘開始時士気+2,+2 Ηθικό στην αρχή της μάχης,战斗开始时士气+2,戰鬥開始時士氣+2
 relic.prayer_beads.name,염주,Prayer Beads,Chapelet,Rosario,Rosario,念珠,Χάντρες Προσευχής,念珠,念珠
 relic.prayer_beads.desc,영웅이 피해를 받을 때 방어도 +10,Block +10 when a hero takes damage,Blocage +10 quand un héros reçoit des dégâts,Difesa +10 quando un eroe subisce danni,Defensa +10 cuando un héroe recibe daño,英雄がダメージを受けたとき防御+10,+10 Άμυνα όταν ο ήρωας λαμβάνει ζημιά,英雄受伤时护甲+10,英雄受傷時護甲+10
 relic.yin_yang_mirror.name,음양경,Yin Yang Mirror,Miroir Yin Yang,Specchio Yin Yang,Espejo Yin Yang,陰陽鏡,Καθρέπτης Γιν-Γιανγκ,阴阳镜,陰陽鏡
@@ -78,4 +78,10 @@ relic.yin_yang_mirror.desc,전투 시작 시 카드 비용 -1,Reduce card cost b
 relic.five_elements_jade.name,오행 옥,Five Elements Jade,Jade des Cinq Éléments,Giada dei Cinque Elementi,Jade de los Cinco Elementos,五行玉,Νεφρίτης Πέντε Στοιχείων,五行玉,五行玉
 relic.five_elements_jade.desc,플레이어 턴 종료 시 HP +15,HP +15 at end of player turn,PV +15 à la fin du tour,PF +15 alla fine del turno,PV +15 al final del turno,プレイヤーターン終了時HP+15,+15 HP στο τέλος του γύρου,玩家回合结束时HP+15,玩家回合結束時HP+15
 relic.immortal_crane_feather.name,선학 깃털,Immortal Crane Feather,Plume de Grue Immortelle,Piuma di Gru Immortale,Pluma de Grulla Inmortal,仙鶴の羽根,Φτερό Αθάνατου Γερανού,仙鹤羽毛,仙鶴羽毛
-relic.immortal_crane_feather.desc,전투 승리 시 최대 HP +10,Max HP +10 on victory,HP Max +10 à la victoire,HP Max +10 alla vittoria,HP Máx +10 en victoria,戦闘勝利時最大HP+10,+10 Μέγιστο HP στη νίκη,战斗胜利时最大HP+10,戰鬥勝利時最大HP+10
+relic.immortal_crane_feather.desc,최대 HP +30,Max HP +30,PV Max +30,PF Max +30,PV Máx +30,最大HP+30,+30 Μέγιστο HP,最大HP +30,最大HP +30
+relic.sacred_scroll_1.name,첫 번째 성스러운 두루마리,First Sacred Scroll,Premier Parchemin Sacré,Prima Pergamena Sacra,Primer Pergamino Sagrado,一つ目の聖なる巻物,Πρώτος Ιερός Κύλινδρος,第一神圣卷轴,第一神聖捲軸
+relic.sacred_scroll_1.desc,1번째 턴 시작 시 카드를 2장 더 뽑습니다,Draw 2 extra cards at the start of turn 1,Piochez 2 cartes bonus au début du tour 1,Pesca 2 carte extra all'inizio del turno 1,Roba 2 cartas extra al inicio del turno 1,1ターン目開始時にカードを2枚追加で引く,Τραβήξτε 2 επιπλέον κάρτες στην αρχή του γύρου 1,第 1 回合开始时额外抽 2 张牌,第 1 回合開始時額外抽 2 張牌
+relic.sacred_scroll_2.name,두 번째 성스러운 두루마리,Second Sacred Scroll,Deuxième Parchemin Sacré,Seconda Pergamena Sacra,Segundo Pergamino Sagrado,二つ目の聖なる巻物,Δεύτερος Ιερός Κύλινδρος,第二神圣卷轴,第二神聖捲軸
+relic.sacred_scroll_2.desc,2번째 턴 시작 시 카드를 2장 더 뽑습니다,Draw 2 extra cards at the start of turn 2,Piochez 2 cartes bonus au début du tour 2,Pesca 2 carte extra all'inizio del turno 2,Roba 2 cartas extra al inicio del turno 2,2ターン目開始時にカードを2枚追加で引く,Τραβήξτε 2 επιπλέον κάρτες στην αρχή του γύρου 2,第 2 回合开始时额外抽 2 张牌,第 2 回合開始時額外抽 2 張牌
+relic.sacred_scroll_3.name,세 번째 성스러운 두루마리,Third Sacred Scroll,Troisième Parchemin Sacré,Terza Pergamena Sacra,Tercer Pergamino Sagrado,三つ目の聖なる巻物,Τρίτος Ιερός Κύλινδρος,第三神圣卷轴,第三神聖捲軸
+relic.sacred_scroll_3.desc,3번째 턴 시작 시 카드를 2장 더 뽑습니다,Draw 2 extra cards at the start of turn 3,Piochez 2 cartes bonus au début du tour 3,Pesca 2 carte extra all'inizio del turno 3,Roba 2 cartas extra al inicio del turno 3,3ターン目開始時にカードを2枚追加で引く,Τραβήξτε 2 επιπλέον κάρτες στην αρχή του γύρου 3,第 3 回合开始时额外抽 2 张牌,第 3 回合開始時額外抽 2 張牌

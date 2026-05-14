@@ -117,9 +117,17 @@ func setup_battle(enemies: Array) -> void:
 		_enemy_phase.append(0)
 	is_battle_active = true
 	battle_started.emit()
-	var _gm_bs = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
+	var _gm_bs = _get_gm()
 	if _gm_bs and _gm_bs.is_inside_tree():
 		_gm_bs.trigger_relics(RelicRes.TriggerType.BATTLE_START)
+
+# autoload GameManager 참조 — Engine.get_singleton()은 autoload를 못 찾으므로
+# (autoload는 /root 아래 노드일 뿐 엔진 싱글톤이 아님) SceneTree root에서 직접 가져온다.
+func _get_gm() -> Object:
+	var ml := Engine.get_main_loop()
+	if ml and ml.root:
+		return ml.root.get_node_or_null("GameManager")
+	return null
 
 func start_player_turn() -> void:
 	if not is_battle_active:
@@ -167,9 +175,9 @@ func _phase_player_main() -> void:
 	_trigger_active_powers("player_turn_start")
 	if deck_mgr:
 		deck_mgr.start_turn()
-	var _gm_pts = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
+	var _gm_pts = _get_gm()
 	if _gm_pts and _gm_pts.is_inside_tree():
-		_gm_pts.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START)
+		_gm_pts.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": turn_count})
 	player_turn_started.emit()
 
 func _phase_player_post() -> bool:
@@ -207,7 +215,7 @@ func end_player_turn() -> void:
 	if not is_player_turn or not is_battle_active:
 		return
 	is_player_turn = false
-	var _gm_pte = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
+	var _gm_pte = _get_gm()
 	if _gm_pte and _gm_pte.is_inside_tree():
 		_gm_pte.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_END)
 	if deck_mgr:
@@ -901,7 +909,7 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 	if amount > 0:
 		damage_taken_this_battle += amount
 		team_mgr.take_damage(hero_id, amount)
-		var _gm_hd = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
+		var _gm_hd = _get_gm()
 		if _gm_hd and _gm_hd.is_inside_tree():
 			_gm_hd.trigger_relics(RelicRes.TriggerType.ON_HERO_DAMAGED,
 				{"hero_id": hero_id, "amount": amount})

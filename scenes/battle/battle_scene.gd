@@ -1855,7 +1855,7 @@ func _on_battle_lost() -> void:
 	GameManager.pending_enemies.clear()
 	GameManager.run_won = false
 	GameManager.run_ended.emit(false)
-	var sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
+	var sm = get_node_or_null("/root/SaveManager")
 	if sm:
 		sm.clear_save()
 	GameManager.change_state(GameManager.GameState.GAME_OVER)

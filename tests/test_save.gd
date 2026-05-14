@@ -4,6 +4,8 @@ extends RefCounted
 
 const TeamManagerClass = preload("res://autoload/team_manager.gd")
 const DeckManagerClass = preload("res://autoload/deck_manager.gd")
+const GameManagerClass = preload("res://autoload/game_manager.gd")
+const SaveManagerClass = preload("res://autoload/save_manager.gd")
 const HeroRes = preload("res://resources/hero_resource.gd")
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes = preload("res://resources/effect_resource.gd")
@@ -19,6 +21,7 @@ func run_all() -> Dictionary:
 	test_deck_manager_roundtrip()
 	test_has_save_false_when_no_file()
 	test_relic_serialization_roundtrip()
+	test_sacred_scroll_survives_save_load()
 	test_deck_from_dict_preserves_effects()
 	test_upgraded_flag_preserved_in_save()
 	for n in _to_free:
@@ -150,7 +153,7 @@ func test_relic_serialization_roundtrip() -> void:
 	var RelicRes = load("res://resources/relic_resource.gd")
 	var relic: Resource = RelicRes.new()
 	relic.relic_name = "버닝 블러드"
-	relic.trigger = RelicRes.TriggerType.BATTLE_WIN
+	relic.trigger = RelicRes.TriggerType.PLAYER_TURN_END
 	relic.effect_type = RelicRes.EffectType.HEAL
 	relic.value = 6
 	# 직렬화
@@ -213,3 +216,30 @@ func test_upgraded_flag_preserved_in_save() -> void:
 	var restored: Resource = dm2.draw_pile[0]
 	_assert(restored.upgrade_level == 1, "강화된 카드 upgrade_level=1 저장/복원")
 	_assert(restored.effects[0].value == 9, "강화 수치 복원")
+
+# 성스러운 두루마리는 build_pool에 없는 이벤트 전용 렐릭 —
+# save_manager가 relic_name만 저장하므로 _deserialize_relics가 팩토리로 복원해야 한다.
+func test_sacred_scroll_survives_save_load() -> void:
+	print("[TestSave] test_sacred_scroll_survives_save_load")
+	var sm := SaveManagerClass.new()
+	_to_free.append(sm)
+	var gm := GameManagerClass.new()
+	_to_free.append(gm)
+	var RelicData = load("res://resources/relics/relics.gd")
+	gm.relics.append(RelicData._make_sacred_scroll(2))
+	gm.relics.append(RelicData._make_sacred_scroll(3))
+
+	var serialized: Array = sm._serialize_relics(gm)
+	var gm2 := GameManagerClass.new()
+	_to_free.append(gm2)
+	sm._deserialize_relics(gm2, serialized)
+
+	_assert(gm2.relics.size() == 2, "두루마리 2개 세이브/로드 보존 (실제: %d)" % gm2.relics.size())
+	if gm2.relics.size() != 2:
+		return
+	var RelicRes = load("res://resources/relic_resource.gd")
+	_assert(gm2.relics[0].condition_value == 2, "2번째 두루마리 condition_value=2 보존")
+	_assert(gm2.relics[1].condition_value == 3, "3번째 두루마리 condition_value=3 보존")
+	_assert(gm2.relics[0].trigger == RelicRes.TriggerType.PLAYER_TURN_START, "trigger=PLAYER_TURN_START 보존")
+	_assert(gm2.relics[0].effect_type == RelicRes.EffectType.DRAW, "effect_type=DRAW 보존")
+	_assert(gm2.relics[0].value == 2, "value=2 보존")

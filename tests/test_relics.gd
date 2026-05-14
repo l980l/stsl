@@ -22,7 +22,7 @@ func run_all() -> Dictionary:
 	test_relic_owner_hero_id_set()
 	test_relic_no_duplicate_names()
 	test_increase_max_hp()
-	test_battle_win_relic_heal()
+	test_relic_heal_fields()
 	test_is_cursed_field_exists()
 	test_penalty_fields_exist()
 	test_damage_hero_effect_bypasses_block()
@@ -39,8 +39,9 @@ func run_all() -> Dictionary:
 	test_passive_max_hp_applied_to_all_heroes()
 	test_ankh_of_life_condition_value_threshold()
 	test_idun_apple_heals_on_turn_end_trigger()
-	test_tengu_feather_draws_on_battle_win_trigger()
+	test_tengu_feather_run_strength()
 	test_scarab_talisman_uses_status_type_field()
+	test_sacred_scroll_draws_only_on_matching_turn()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -107,7 +108,7 @@ func test_trigger_type_values() -> void:
 	_assert(RelicRes.TriggerType.PASSIVE == 0, "PASSIVE == 0")
 	_assert(RelicRes.TriggerType.BATTLE_START == 1, "BATTLE_START == 1")
 	_assert(RelicRes.TriggerType.PLAYER_TURN_START == 2, "PLAYER_TURN_START == 2")
-	_assert(RelicRes.TriggerType.ON_HERO_DAMAGED == 5, "ON_HERO_DAMAGED == 5")
+	_assert(RelicRes.TriggerType.ON_HERO_DAMAGED == 4, "ON_HERO_DAMAGED == 4 (BATTLE_WIN 폐기)")
 
 func test_effect_type_values() -> void:
 	print("[TestRelics] test_effect_type_values")
@@ -115,6 +116,7 @@ func test_effect_type_values() -> void:
 	_assert(RelicRes.EffectType.APPLY_STATUS_ENEMY == 3, "APPLY_STATUS_ENEMY == 3")
 	_assert(RelicRes.EffectType.BLOCK == 8, "BLOCK == 8")
 	_assert(RelicRes.EffectType.DAMAGE_HERO == 9, "DAMAGE_HERO == 9")
+	_assert(RelicRes.EffectType.RUN_STRENGTH == 10, "RUN_STRENGTH == 10")
 
 func test_relic_battle_start_trigger() -> void:
 	print("[TestRelics] test_relic_battle_start_trigger")
@@ -154,17 +156,17 @@ func test_increase_max_hp() -> void:
 	_assert(tm.get_hero("napoleon").max_hp == old_max + 15, "increase_max_hp +15")
 	_assert(tm.get_current_hp("napoleon") == old_max + 15, "현재 HP도 +15 증가")
 
-func test_battle_win_relic_heal() -> void:
-	print("[TestRelics] test_battle_win_relic_heal")
-	# 버닝 블러드 릴릭 효과: BATTLE_WIN → HEAL
+func test_relic_heal_fields() -> void:
+	print("[TestRelics] test_relic_heal_fields")
+	# 버닝 블러드: 재설계 — PLAYER_TURN_END → HEAL 2 (BATTLE_WIN 폐기)
 	var relic := RelicRes.new()
 	relic.relic_name = "버닝 블러드"
-	relic.trigger = RelicRes.TriggerType.BATTLE_WIN
+	relic.trigger = RelicRes.TriggerType.PLAYER_TURN_END
 	relic.effect_type = RelicRes.EffectType.HEAL
-	relic.value = 6
-	_assert(relic.trigger == RelicRes.TriggerType.BATTLE_WIN, "버닝 블러드 트리거 BATTLE_WIN")
+	relic.value = 2
+	_assert(relic.trigger == RelicRes.TriggerType.PLAYER_TURN_END, "버닝 블러드 트리거 PLAYER_TURN_END")
 	_assert(relic.effect_type == RelicRes.EffectType.HEAL, "버닝 블러드 효과 HEAL")
-	_assert(relic.value == 6, "버닝 블러드 회복량 6")
+	_assert(relic.value == 2, "버닝 블러드 회복량 2")
 
 func test_is_cursed_field_exists() -> void:
 	print("[TestRelics] test_is_cursed_field_exists")
@@ -297,10 +299,11 @@ func test_japanese_relics_exist() -> void:
 	_assert("relic.tengu_feather.name" in names, "텐구의 깃털 존재")
 	_assert("relic.orochi_scale.name" in names, "오로치의 비늘 존재")
 	var RelicRes2 = load("res://resources/relic_resource.gd")
-	# Phase 3 차별화: BATTLE_START → DRAW 1 (tacticians_map과 동일) → BATTLE_WIN → DRAW 2
+	# 재설계: BATTLE_START → RUN_STRENGTH (점점 강해지는 렐릭, BATTLE_WIN 폐기)
 	var feather = pool.filter(func(r): return r.relic_name == "relic.tengu_feather.name")[0]
-	_assert(feather.trigger == RelicRes2.TriggerType.BATTLE_WIN, "텐구의 깃털 트리거=BATTLE_WIN")
-	_assert(feather.effect_type == RelicRes2.EffectType.DRAW, "텐구의 깃털 효과=DRAW")
+	_assert(feather.trigger == RelicRes2.TriggerType.BATTLE_START, "텐구의 깃털 트리거=BATTLE_START")
+	_assert(feather.effect_type == RelicRes2.EffectType.RUN_STRENGTH, "텐구의 깃털 효과=RUN_STRENGTH")
+	_assert(feather.status_type == "battles_strength", "텐구의 깃털 status_type=battles_strength")
 	_assert(feather.value == 2, "텐구의 깃털 value=2")
 
 # ──────────────────────────────────────────────
@@ -380,20 +383,31 @@ func test_idun_apple_heals_on_turn_end_trigger() -> void:
 	_assert(tm.get_current_hp("napoleon") == 73,
 		"이둔 사과 PLAYER_TURN_END HEAL 3 (70→73, 실제: %d)" % tm.get_current_hp("napoleon"))
 
-func test_tengu_feather_draws_on_battle_win_trigger() -> void:
-	print("[TestRelics] test_tengu_feather_draws_on_battle_win_trigger")
+func test_tengu_feather_run_strength() -> void:
+	print("[TestRelics] test_tengu_feather_run_strength")
+	# tengu_feather: BATTLE_START + RUN_STRENGTH(battles_strength) value 2.
+	# battles_completed=3 → BATTLE_START 시 영웅 전체 power.strength_player += 3*2=6
 	var tm := _make_tm()
 	tm.add_hero(_make_hero("napoleon", 100))
-	var dm := DeckManagerClass.new()
-	_to_free.append(dm)
+	var bm := BattleManagerClass.new()
+	_to_free.append(bm)
 	var gm := _make_gm_with_tm(tm)
-	gm._test_dm_override = dm
+	gm._test_bm_override = bm
+	gm.battles_completed = 3
 	gm.relics.append(_find_relic("relic.tengu_feather.name"))
-	# DM에 카드 풀 채우고 draw 호출 검증 (단순히 draw_cards 호출 됐는지 보고 싶음)
-	# DM 내부 상태로 draw_cards가 호출되었음을 검증 — 빈 덱이라 0장 그려도 호출 자체는 OK
-	gm.trigger_relics(RelicRes.TriggerType.BATTLE_WIN)
-	# tengu_feather: BATTLE_WIN → DRAW value 2. 호출 자체는 검증됨 (예외 없이 완료)
-	_assert(true, "tengu_feather BATTLE_WIN 트리거 — DM.draw_cards(2) 호출 (예외 없음)")
+	gm.trigger_relics(RelicRes.TriggerType.BATTLE_START)
+	var sp: int = bm._active_powers.get("power.strength_player:napoleon", {}).get("value", 0)
+	_assert(sp == 6, "battles_completed=3 → 텐구 깃털 strength_player +6 (실제: %d)" % sp)
+	# kills_strength 메커니즘도 검증 (rune_of_fate)
+	var bm2 := BattleManagerClass.new()
+	_to_free.append(bm2)
+	var gm2 := _make_gm_with_tm(tm)
+	gm2._test_bm_override = bm2
+	gm2.enemies_killed_this_run = 7
+	gm2.relics.append(_find_relic("relic.rune_of_fate.name"))
+	gm2.trigger_relics(RelicRes.TriggerType.BATTLE_START)
+	var sp2: int = bm2._active_powers.get("power.strength_player:napoleon", {}).get("value", 0)
+	_assert(sp2 == 7, "enemies_killed=7 → 운명의 룬 strength_player +7 (실제: %d)" % sp2)
 
 func test_scarab_talisman_uses_status_type_field() -> void:
 	print("[TestRelics] test_scarab_talisman_uses_status_type_field")
@@ -411,3 +425,27 @@ func test_scarab_talisman_uses_status_type_field() -> void:
 	if orochi == null:
 		return
 	_assert(orochi.status_type == "weak", "오로치 status_type=weak (이전 버그로 poison 부여)")
+
+func test_sacred_scroll_draws_only_on_matching_turn() -> void:
+	print("[TestRelics] test_sacred_scroll_draws_only_on_matching_turn")
+	var tm := _make_tm()
+	tm.add_hero(_make_hero("napoleon", 100))
+	var dm := DeckManagerClass.new()
+	_to_free.append(dm)
+	var gm := _make_gm_with_tm(tm)
+	gm._test_dm_override = dm
+	# 2번째 턴 두루마리 — condition_value=2
+	var RelicsGd = load("res://resources/relics/relics.gd")
+	gm.relics.append(RelicsGd._make_sacred_scroll(2))
+	var CardRes = load("res://resources/card_resource.gd")
+	for i in range(5):
+		dm.draw_pile.append(CardRes.new())
+	# 1턴 — condition_value 2 != turn 1 → 미발동
+	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 1})
+	_assert(dm.hand.size() == 0, "1턴엔 2번째 두루마리 미발동 (hand 0, 실제: %d)" % dm.hand.size())
+	# 2턴 — 발동, 카드 2장 드로우
+	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 2})
+	_assert(dm.hand.size() == 2, "2턴에 발동 — 카드 2장 드로우 (실제: %d)" % dm.hand.size())
+	# 3턴 — 다시 미발동
+	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 3})
+	_assert(dm.hand.size() == 2, "3턴엔 미발동 (hand 2 유지, 실제: %d)" % dm.hand.size())
