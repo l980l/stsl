@@ -309,7 +309,7 @@ func complete_battle(won: bool) -> void:
 	else:
 		run_won = false
 		run_ended.emit(false)
-		var _sm_fail = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
+		var _sm_fail = get_node_or_null("/root/SaveManager")
 		if _sm_fail:
 			_sm_fail.clear_save()
 		change_state(GameState.GAME_OVER)
@@ -504,7 +504,7 @@ func _start_next_act() -> void:
 func _end_run_won() -> void:
 	run_won = true
 	run_ended.emit(true)
-	var _sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
+	var _sm = get_node_or_null("/root/SaveManager")
 	if _sm:
 		_sm.clear_save()
 	var _pm = get_node_or_null("/root/ProgressManager")
@@ -904,7 +904,7 @@ func _request_scene(path: String) -> void:
 	if is_inside_tree():
 		# 맵으로 돌아갈 때 저장
 		if path == "res://scenes/map/map_scene.tscn" and not run_map.is_empty():
-			var _sm = Engine.get_singleton("SaveManager") if Engine.has_singleton("SaveManager") else null
+			var _sm = get_node_or_null("/root/SaveManager")
 			if _sm:
 				_sm.save()
 		var _st := get_node_or_null("/root/SceneTransition")

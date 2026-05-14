@@ -404,6 +404,10 @@ func _is_choice_available(choice: Resource) -> bool:
 			return false
 	if choice.cost_gold > 0 and GameManager.gold < choice.cost_gold:
 		return false
+	# 영웅 합류 — 팀이 정원(3명)으로 꽉 찼으면 선택 불가
+	if choice.effect_type == EventChoiceResource.EffectType.ADD_HERO \
+			and TeamManager.heroes.size() >= 3:
+		return false
 	return true
 
 # 번역 키에 %d가 없을 때(번역 미로드 등) % 연산자 크래시를 막는 가드

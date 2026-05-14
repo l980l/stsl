@@ -5,9 +5,10 @@ extends Node
 const SAVE_PATH := "user://save.json"
 
 func save() -> void:
-	var _gm = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
-	var _tm = Engine.get_singleton("TeamManager") if Engine.has_singleton("TeamManager") else null
-	var _dm = Engine.get_singleton("DeckManager") if Engine.has_singleton("DeckManager") else null
+	# autoload는 Engine 싱글톤이 아니라 /root 아래 노드 — get_node_or_null로 접근
+	var _gm = get_node_or_null("/root/GameManager")
+	var _tm = get_node_or_null("/root/TeamManager")
+	var _dm = get_node_or_null("/root/DeckManager")
 	if _gm == null or _tm == null or _dm == null:
 		return
 	var data := {
@@ -37,9 +38,9 @@ func load_save() -> bool:
 		push_warning("[SaveManager] 세이브 버전 %s 미지원 — 초기화합니다." % data["version"])
 		clear_save()
 		return false
-	var _gm = Engine.get_singleton("GameManager") if Engine.has_singleton("GameManager") else null
-	var _tm = Engine.get_singleton("TeamManager") if Engine.has_singleton("TeamManager") else null
-	var _dm = Engine.get_singleton("DeckManager") if Engine.has_singleton("DeckManager") else null
+	var _gm = get_node_or_null("/root/GameManager")
+	var _tm = get_node_or_null("/root/TeamManager")
+	var _dm = get_node_or_null("/root/DeckManager")
 	if _gm == null or _tm == null or _dm == null:
 		return false
 	_gm.from_dict(data["game_manager"])
@@ -65,8 +66,16 @@ func _serialize_relics(_gm: Object) -> Array:
 func _deserialize_relics(_gm: Object, data: Array) -> void:
 	_gm.relics.clear()
 	var pool: Array = _gm._build_relic_pool()
+	var RelicData = load("res://resources/relics/relics.gd")
 	for entry in data:
+		var rname: String = entry["relic_name"]
+		# 성스러운 두루마리는 이벤트 전용이라 build_pool에 없음 — 팩토리로 복원
+		if rname.begins_with("relic.sacred_scroll_"):
+			var n: int = rname.trim_prefix("relic.sacred_scroll_").trim_suffix(".name").to_int()
+			if n >= 1 and n <= 3:
+				_gm.relics.append(RelicData._make_sacred_scroll(n))
+			continue
 		for r in pool:
-			if r.relic_name == entry["relic_name"]:
+			if r.relic_name == rname:
 				_gm.relics.append(r)
 				break
