@@ -1,7 +1,7 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-10 v14)
-> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) 기준
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-16 v15)
+> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
 ---
@@ -531,6 +531,104 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ---
 
+## Milestone 6.7 — 이벤트 UX 마무리 ✅ (PR #108~#110)
+
+### 6.7-1. 무의미 NONE 옵션 일괄 재설계 ✅ (PR #108)
+- ✅ 모든 이벤트 선택지에 의미 있는 trade-off 부여 — "효과 없음" NONE 선택지 제거 또는 새 메커니즘으로 대체
+- ✅ 일관된 비용/보상 구조 정립
+
+### 6.7-2. 이벤트 choice 라벨 i18n 갱신 ✅ (PR #109)
+- ✅ 약 45개 이벤트 choice 라벨 다국어 갱신 (새 효과 반영)
+- ✅ 선택지 텍스트가 행동 이름만 명시, 효과는 태그가 전담
+
+### 6.7-3. 시스템 대규모 개선 + 버그 수정 ✅ (PR #110)
+- ✅ **autoload 버그 수정**: `Engine.get_singleton(autoload)` → `get_node("/root/...")` (autoload 는 노드, singleton 아님). 전투 렐릭·세이브 무력화 회복
+- ✅ i18n: 손상된 이벤트 번역키 복구, choice 레이블 정리, 행동 이름↔효과 불일치 7건 수정
+- ✅ 렐릭: 성스러운 두루마리 1/2/3턴 드로우+2 3종으로 재설계 (PERM_DRAW 폐기)
+- ✅ 이벤트 효과 태그 시스템 재작성 — 확률 분기 "N% → 효과" 묶음, 보상/페널티 색상 구분, NONE 에 "효과 없음" 태그
+- ✅ **카드 제거 UI 통합** — `card_removal_overlay` 공용 컴포넌트로 추출 (상점·이벤트 공유)
+- ✅ 미라의 저주 무의미 선택지 → 카드 봉인(제거)
+- ✅ UI: 맵 씬 골드 표시, 비활성 버튼 호버 사운드 제거
+- ✅ 통합 테스트: 두루마리·확률 분기·카드 제거
+
+---
+
+## Milestone 6.8 — VFX 시스템 v1 ✅ (PR #111~#113)
+
+> HTML 데모(`ui_sample/vfx/`) 기반 VFX 20종 GDScript 포팅 + 임팩트 시점 동기화 + 게임 속도 옵션 hook.
+> M7-5 애니메이션/이펙트 의 핵심 항목 완료.
+
+### 6.8-1. 공격·상태·버프 VFX 20종 GDScript 포팅 ✅ (PR #111)
+- ✅ **공격 VFX (12종)**: lightning_beam, ice_shards, fire_blast, poison_splash, arrow_shot, explosion_blast, blunt_smash, bullet_shot, holy_strike, holy_slash, holy_arrow, holy_fire, holy_blunt, charm_kiss, blood_spray
+- ✅ **상태/지원 VFX (4종)**: stun_stars, death_dissolve, revive_blessing, heal_blessing
+- ✅ **버프 VFX (3종)**: holy_buff (Joan POWER 황금), warrior_buff (그 외 영웅 POWER 분노 주황), defense_buff (BLOCK 6각 dome + barrier + 룬링)
+- ✅ **반함 VFX (1종)**: infatuation (charm 임계치 도달 시 charm_kiss 대신 발동, 붉은 계통)
+- ✅ 모든 VFX 가 `signal screen_effect` + 2-layer blend (`_smoke_layer` 일반 + `_glow_layer` 가산) 패턴
+- ✅ Joan damage_type 분리: divine 11장 → holy_strike / holy_blunt / holy_fire / holy_bolt 4가지
+- ✅ Napoleon salvo: projectile → bullet (bullet_shot 별도 VFX)
+- ✅ `vfx_preview.tscn` 디버그 씬 (F6 로 모든 VFX 미리보기)
+- ✅ 단위 테스트 11종 (정적 도형 함수 검증)
+
+### 6.8-2. divine damage_type → holy 계열 일괄 이주 ✅ (PR #112)
+- ✅ Musashi 카드 3장 (void_sword/mushin_blade/clear_wind) → holy_slash
+- ✅ 적 인텐트 108개 — target+신화 기반 자동 매핑:
+  - ALL → holy_fire (30개), LOWEST_HP → holy_arrow (21개)
+  - Buddhist/Egyptian/Greek RANDOM → holy_strike (29개)
+  - Daoist/Japanese RANDOM → holy_slash (24개)
+  - Norse RANDOM → holy_blunt (4개)
+- ✅ 잔여 divine 0건. 신화 5개 모두 (Buddhist 40 + Daoist 35 + Egyptian 17 + Greek 7 + Japanese 2 + Norse 7)
+
+### 6.8-3. 임팩트 시점 동기화 + 게임 속도 옵션 hook ✅ (PR #113)
+**핵심 설계**:
+- ✅ 각 VFX 스크립트에 `const IMPACT_DELAY` 상수 노출 (차지+비행 합 = `screen_effect` emit 시점). 단일 진실
+- ✅ `battle_manager` 신규 시그널: `intent_vfx_charge_start(enemy_index, intent, target_hero_id)`, `card_vfx_charge_start(card, target_enemy_index, target_hero_id)`, `poison_tick_applied(target, amount)`
+- ✅ `_execute_intent` / `_apply_card_effects` async 변환 — 시그널 emit → `await IMPACT_DELAY` → 데미지/상태 적용
+- ✅ `_card_busy` 플래그 + `_start_card_effects` wrapper — 영웅 카드 빠른 입력 시 두 번째 카드 차단 (play_card 동기 유지, test 호환)
+- ✅ battle_scene 신규 핸들러 (`_on_intent_vfx_start` / `_on_card_vfx_start` / `_on_poison_tick`) — VFX 차지 시작 책임 일원화. 기존 데미지 핸들러는 SFX·flash·shake·tint·hurt 애니만
+- ✅ 적 단일 타겟 인텐트 — battle_manager 가 시그널 emit 전에 RANDOM/LOWEST_HP 타겟 미리 결정 → 정확한 영웅에 VFX (셋 중 가운데/둘 중 왼쪽 잘못 표시 버그 수정)
+
+**GameSettings autoload (신규)**:
+- ✅ `vfx_speed_multiplier` (default 1.0=보통)
+- ✅ `monster_interval_multiplier` (default 1.0=빠르게=현재 turn_interval)
+- ✅ `anim_speed_multiplier` (default 1.0=빠르게, `AnimationPlayer.speed_scale`)
+- ✅ `particle_quality` (default 2=상)
+- ✅ save/load + UI(graphics/gameplay 탭)는 별도 PR 예정. battle_manager 가 `get_node_or_null("/root/GameSettings")` 안전 접근 (CLI test 호환)
+
+**시각/SFX 매핑·통일**:
+- ✅ curse damage_type 시각이펙트 → debuff_hex 빔 통일 (impact-only `_VFX_SCENES["curse"]` 제거)
+- ✅ holy_* / debuff / charm SFX 매핑 helper — 자원 없는 키를 기본 계열로 재활용 (holy_slash→impact_slash, holy_blunt→impact_blunt, holy_arrow→impact_projectile, holy_fire→impact_fire, weak/vulnerable→impact_curse, charm/enthrall→impact_divine)
+- ✅ buff/heal/defense SFX — `_spawn_holy_buff`/`_spawn_warrior_buff`/`_spawn_defense_buff`/`_spawn_heal_blessing` 의 `screen_effect` 콜백에 직접 SFX 연결 (이중 호출 방지)
+
+**버그 수정**:
+- ✅ 무심검(CONDITIONAL_DMG holy_slash) 등 DAMAGE 변종 VFX 누락 — `effect.damage_type != ""` 체크로 모든 DAMAGE-like effect 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF, ENERGY_TO_DAMAGE 등)
+- ✅ 사망한 적/영웅에 ALL 효과(BLOCK_ALL/HEAL_ALL/VFX) 적용 차단
+- ✅ 모래폭풍(DAMAGE ALL curse + WEAK ALL) — 적당 debuff_hex 빔 2개씩 표시 → did_attack/did_debuff 플래그로 중복 방지
+- ✅ 매혹 카드 `EffectType.CHARM` 분기 누락 — VFX 안 나오던 버그 수정
+- ✅ 매혹 → enthrall(반함) 임계치 도달 시 infatuation VFX 자동 분기 (`will_enthrall_enemy` helper)
+- ✅ character_placeholder flash shader `COLOR.a = 1.0` 강제 제거 — weak/vulnerable status 적용 시 캐릭터 영역에 불투명 주황 사각형이 표시되던 버그 (vfx_preview 엔 placeholder 가 없어 재현 안 됨)
+- ✅ 신화 시그니처 발동 시 적 panel 위 140→364px ColorRect 사각형(`_burst_signature_at_enemy`) 비활성 — 토스트 라벨이 이미 표시
+- ✅ 화면 플래시(`_play_screen_flash`) 비활성 — 매 스킬마다 전체 화면 번쩍이 너무 강함
+- ✅ 카드 드래그 중(MOUSE_HIDDEN) 전투 종료 시 마우스 잔존 — `_on_battle_won`/`_on_battle_lost` 에서 드래그 정리 + `Input.mouse_mode = VISIBLE`
+
+**차지 시간 절반 (피드백 반영)**:
+- ✅ poison(0.6→0.3), debuff_hex(0.65→0.32), fire/ice/holy_strike/holy_fire(0.65→0.32), holy_arrow(0.30→0.15), holy_slash(0.38→0.19), holy_blunt windup(0.35→0.18), charm_kiss(0.7→0.35)
+
+**poison_tick 신규**:
+- ✅ `scenes/vfx/poison_tick.gd` — poison_splash 의 잔류 가스 + 보글 거품 + 발 아래 초록 웅덩이 추출. 차지/비행 없이 1.2s 즉발. impact_poison SFX
+- ✅ `BattleManager.poison_tick_applied` 시그널 emit (`_tick_hero_poison` / `_tick_enemy_poison` 끝)
+- ✅ poison_splash POISON_TIME 3.0 → 1.5
+
+**vfx_preview 디버그**:
+- ✅ screen_effect 시점에 화면 중앙 "💥 IMPACT" 라벨 (1초 페이드)
+- ✅ info 라벨에 IMPACT_DELAY 자동 표시
+
+**Phase 2 (별도 PR — 미완료)**:
+- 🔲 `settings_overlay` 의 display 탭을 graphics 로 교체 + 파티클 갯수 옵션 (상/중/하)
+- 🔲 신규 gameplay 탭 (vfx_speed/anim_speed/monster_interval 4단계 segment)
+- 🔲 ConfigFile 또는 SacredTheme 패턴으로 GameSettings.save()/load()
+
+---
+
 ## Milestone 7 — 비주얼 / 오디오
 
 ### 7-1. 캐릭터 아트
@@ -573,7 +671,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - 🔲 크리티컬 HP 상태(15% 이하) 전투 연출: hp_lbl 색상 BLOOD_300, 화면 가장자리 비네트
 
 ### 7-5. 애니메이션 / 이펙트
-- 🔲 카드 사용 시 이펙트 (공격 임팩트, 독 스플래시, 방어막)
+- ✅ **카드 사용 시 이펙트 (공격 임팩트·독 스플래시·방어막) — VFX 시스템 v1 (M6.8, PR #111~#113)**: 20종 GDScript 포팅, 임팩트 시점 동기화, GameSettings autoload hook
 - 🔲 히트 스톱 (공격 시 0.1초 정지)
 - ✅ 씬 전환 페이드 인/아웃 (`autoload/scene_transition.gd` + CanvasLayer 검정 오버레이)
 - 🔲 페이즈 전환 연출 (보스 분노 이펙트)
@@ -819,6 +917,9 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 인카운터 v2 (M6.5-1) | PR #95. 6 신화 × 20 몬스터 × 10 인카운터 (중복 0), floor 가중치 선택, 검증 3종 |
 | ✅ 완료 | 몬스터 메커니즘 레이어 (M6.5-2) | PR #97. 6 신화 시그니처 자동 + IntentRes ActionType 7종 신규 + ~115/120 monsters tier 적용. 25 테스트 함수, 1269 통과 |
 | ✅ 완료 | 이벤트·렐릭 v2 (M6.6) | PR #104~#107. 신규 EffectType 3종(TRIGGER_BATTLE/MULTI/ADD_CARD) + 22개 다양화 + 5개 렐릭 차별화 + 5개 신규 이벤트 + PASSIVE/status_type 버그 수정 + 통합 테스트 +14. **1365 통과 / 0 fail** |
+| ✅ 완료 | 이벤트 UX 마무리 (M6.7) | PR #108~#110. 무의미 NONE 옵션 일괄 재설계 + choice 라벨 i18n 갱신 + autoload 버그 수정(전투 렐릭·세이브 회복) + 카드 제거 UI 통합(card_removal_overlay) |
+| ✅ 완료 | VFX 시스템 v1 (M6.8) | PR #111~#113. 공격·상태·버프 VFX 20종 GDScript 포팅 + divine→holy 일괄 이주 + 임팩트 시점 동기화(`IMPACT_DELAY` + async `_execute_intent`) + GameSettings autoload hook + curse→debuff_hex 통일 + SFX 매핑 + 다수 시각 버그 수정(flash shader/시그니처 burst/screen_flash 비활성) + poison_tick 신규 + vfx_preview 디버그. **1470 통과 / 0 fail** |
+| 🟡 중기 | VFX 옵션 UI (M6.8 Phase 2) | settings_overlay 의 graphics/gameplay 탭 신설 (파티클 품질 + vfx/anim/monster 속도 4단계) + GameSettings save/load |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
 | 🟡 중기 | 이벤트 BGM 나머지 생성 (M7-6) | dark×3·encounter×2·fortune×2 미생성분 |
 | 🟢 장기 | 비주얼 (M7-1~7-5) 캐릭터·카드 아트, 이펙트 | 몰입감 |

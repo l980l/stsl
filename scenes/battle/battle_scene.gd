@@ -873,29 +873,10 @@ func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	# 적 위치에 색상 플래시 (시그니처 색상)
 	_burst_signature_at_enemy(enemy_index, color)
 
-# 적 panel 중앙에 확장하는 색상 사각형 (페이드 아웃)
-func _burst_signature_at_enemy(enemy_index: int, color: Color) -> void:
-	if enemy_index < 0 or enemy_index >= _enemy_nodes.size():
-		return
-	var panel: ColorRect = _enemy_nodes[enemy_index]["panel"]
-	if panel == null or not panel.visible:
-		return
-	var center: Vector2 = panel.global_position + panel.size / 2.0
-	var burst := ColorRect.new()
-	var col: Color = color
-	col.a = 0.55
-	burst.color = col
-	burst.size = Vector2(140, 140)
-	burst.position = center - Vector2(70, 70)
-	burst.pivot_offset = Vector2(70, 70)
-	burst.scale = Vector2(0.3, 0.3)
-	burst.z_index = 50
-	burst.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(burst)
-	var tw := create_tween().set_parallel(true)
-	tw.tween_property(burst, "scale", Vector2(2.6, 2.6), 0.55)
-	tw.tween_property(burst, "modulate:a", 0.0, 0.55)
-	tw.chain().tween_callback(burst.queue_free)
+# 적 시그니처 발동 시 시각 강조 — 사용자 피드백으로 비활성 (큰 주황/보라 사각형이 어색).
+# 시그니처 토스트 라벨(_on_signature_fired)이 이미 화면 중앙에 표시되므로 추가 강조 불필요.
+func _burst_signature_at_enemy(_enemy_index: int, _color: Color) -> void:
+	pass
 
 # T3-SUMMON: 런타임에 spawn된 적의 UI 패널 + 캐릭터 노드 추가
 func _on_enemy_spawned(enemy_index: int) -> void:
