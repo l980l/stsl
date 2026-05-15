@@ -837,6 +837,7 @@ func _connect_signals() -> void:
 	BattleManager.card_vfx_charge_start.connect(_on_card_vfx_start)
 	BattleManager.poison_tick_applied.connect(_on_poison_tick)
 	BattleManager.signature_fired.connect(_on_signature_fired)
+	BattleManager.pending_damage_changed.connect(_on_pending_damage_changed)
 
 var _bgm_boss_id: String = ""
 
@@ -857,6 +858,13 @@ func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
 
 # 신화 시그니처 발동 시 화면 중앙에 짧은 토스트 표시 (~1.5초 페이드)
 # Throttle: 같은 시그니처는 1턴에 1회만 (다중 적 동시 발동 시 중복 방지)
+func _on_pending_damage_changed(enemy_index: int) -> void:
+	if enemy_index < 0 or enemy_index >= _enemy_nodes.size():
+		return
+	if _enemy_nodes[enemy_index].is_empty():
+		return
+	_update_enemy_ui(enemy_index)
+
 func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	if _signatures_shown_this_turn.has(signature_name):
 		return
@@ -1199,8 +1207,20 @@ func _update_enemy_ui(index: int) -> void:
 	_apply_hp_state(_bar, _fill, _ratio, is_boss_enemy)
 	_apply_hp_change(_bar, _ratio)
 	_apply_shield(_bar, _ratio, block, enemy.max_hp)
-	entry["hp_lbl"].text = "%d / %d" % [cur_hp, enemy.max_hp]
+	# 차지 중 카드의 예측 데미지 — 사망 예정 표시 + btn 비활성화 + panel dim
+	var pending: int = BattleManager.get_pending_dmg(index)
+	var doomed: bool = BattleManager.is_enemy_doomed(index)
+	if pending > 0:
+		entry["hp_lbl"].text = "%d / %d  (-%d)" % [cur_hp, enemy.max_hp, pending]
+	else:
+		entry["hp_lbl"].text = "%d / %d" % [cur_hp, enemy.max_hp]
 	entry["block_lbl"].text = "🛡%d" % block if block > 0 else ""
+	if doomed:
+		entry["panel"].modulate = Color(0.5, 0.5, 0.5, 1.0)
+		entry["btn"].disabled = true
+	else:
+		entry["panel"].modulate = Color.WHITE
+		# btn 의 enable 상태는 다른 경로(turn 변화 등)가 결정 — 사망 예정 해제 시는 유지
 
 	# 의도 표시
 	var intent: Resource = BattleManager.get_enemy_current_intent(index)
@@ -1639,57 +1659,112 @@ func _play_hit_shake(node: Node2D, amount: int) -> void:
 	node.set_meta("_shake_tween", tw)
 
 
-const _POPUP_FONT := preload("res://assets/fonts/Inter-SemiBold.ttf")
-var _popup_ls: Dictionary = {}  # font_size → LabelSettings 캐시
+const _POPUP_FONT := preload("res://assets/fonts/Cinzel-Bold.ttf")
+var _popup_main_ls: Dictionary = {}  # font_size → 메인 LabelSettings
+# 글로우 halo — outline 크기별 캐시. "{size}_{outline}" → LabelSettings
+var _popup_halo_ls: Dictionary = {}
 
-func _get_popup_ls(font_size: int) -> LabelSettings:
-	if not _popup_ls.has(font_size):
+func _get_popup_main_ls(font_size: int) -> LabelSettings:
+	if not _popup_main_ls.has(font_size):
 		var ls := LabelSettings.new()
 		ls.font = _POPUP_FONT
 		ls.font_size = font_size
-		_popup_ls[font_size] = ls
-	return _popup_ls[font_size]
+		_popup_main_ls[font_size] = ls
+	return _popup_main_ls[font_size]
 
+# halo Label 의 LabelSettings — outline 만으로 글자 윤곽 글로우 (font_color 는 modulate 로 조절)
+func _get_popup_halo_ls(font_size: int, outline_size: int, color: Color) -> LabelSettings:
+	var key := "%d_%d_%08x" % [font_size, outline_size, color.to_rgba32()]
+	if not _popup_halo_ls.has(key):
+		var ls := LabelSettings.new()
+		ls.font = _POPUP_FONT
+		ls.font_size = font_size
+		# font 자체는 거의 안 보이게 (alpha 0) — outline 만 표시
+		ls.font_color = Color(color.r, color.g, color.b, 0.0)
+		ls.outline_color = color
+		ls.outline_size = outline_size
+		_popup_halo_ls[key] = ls
+	return _popup_halo_ls[key]
+
+# 본 글씨는 거의 흰색 — 타입 색 15% 만 섞음
+func _popup_text_color(color: Color) -> Color:
+	return Color.WHITE.lerp(color, 0.15)
+
+# halo 레이어 N장 — 각 outline 점점 작게, alpha 점점 진하게 → 글자 윤곽 부드러운 글로우
+const _POPUP_HALO_LAYERS := [
+	{"outline": 48, "alpha": 0.05},
+	{"outline": 36, "alpha": 0.08},
+	{"outline": 26, "alpha": 0.13},
+	{"outline": 18, "alpha": 0.20},
+	{"outline": 11, "alpha": 0.28},
+	{"outline":  6, "alpha": 0.40},
+]
+
+func _add_popup_halo(container: Node2D, text: String, font_size: int, color: Color) -> void:
+	for layer in _POPUP_HALO_LAYERS:
+		var halo := Label.new()
+		halo.text = text
+		halo.label_settings = _get_popup_halo_ls(font_size, layer["outline"], color)
+		halo.modulate.a = layer["alpha"]
+		container.add_child(halo)
+		halo.reset_size()
+		halo.position = -halo.size / 2.0
+
+# 색은 VFX HTML 톤 — 채도 낮춤 + 밝기 ↑ (촌스러운 원색 회피)
 const _STATUS_POPUP_INFO := {
-	"weak":          ["Weak",          Color(1.00, 0.55, 0.10)],
-	"vulnerable":    ["Vulnerable",    Color(0.80, 0.30, 1.00)],
-	"poison":        ["Poison",        Color(0.40, 1.00, 0.20)],
-	"strength":      ["Strength",      Color(1.00, 0.85, 0.10)],
-	"charm":         ["Charm",         Color(1.00, 0.40, 0.85)],
-	"enthrall":      ["Enthralled",    Color(0.70, 0.20, 1.00)],
-	"taunt":         ["Taunt",         Color(1.00, 0.45, 0.10)],
-	"morale":        ["Morale",        Color(1.00, 0.95, 0.20)],
-	"counter_block": ["Counter Block", Color(0.40, 0.85, 1.00)],
+	"weak":          ["Weak",          Color(1.00, 0.65, 0.30)],   # rgba(255,166,77)  부드러운 오렌지
+	"vulnerable":    ["Vulnerable",    Color(0.75, 0.50, 1.00)],   # rgba(191,128,255) 라벤더 보라
+	"poison":        ["Poison",        Color(0.71, 1.00, 0.35)],   # rgba(180,255,90)  라임
+	"strength":      ["Strength",      Color(1.00, 0.92, 0.62)],   # rgba(255,235,160) 따뜻한 골드
+	"charm":         ["Charm",         Color(1.00, 0.60, 0.85)],   # rgba(255,153,217) 로즈핑크
+	"enthrall":      ["Enthralled",    Color(0.70, 0.55, 1.00)],   # rgba(179,140,255) 라일락
+	"taunt":         ["Taunt",         Color(1.00, 0.62, 0.32)],   # rgba(255,158,82)  코랄
+	"morale":        ["Morale",        Color(1.00, 0.95, 0.65)],   # rgba(255,242,166) 옅은 골드
+	"counter_block": ["Counter Block", Color(0.60, 0.85, 1.00)],   # rgba(153,217,255) 부드러운 하늘
 }
 
 func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int, stack_key: String) -> void:
 	var count: int = _popup_stack.get(stack_key, 0)
 	_popup_stack[stack_key] = count + 1
+	var tint: Color = _popup_text_color(color)
+	var container := Node2D.new()
+	container.z_index = 20
+	add_child(container)
+	# 글로우 halo — N장 outline 겹침 (글자 윤곽 부드럽게 퍼짐)
+	_add_popup_halo(container, text, font_size, color)
+	# 메인 Label — 흰 톤 + 작은 outline
 	var lbl := Label.new()
 	lbl.text = text
-	lbl.modulate = color
-	lbl.label_settings = _get_popup_ls(font_size)
+	lbl.modulate = tint * 1.4
+	lbl.label_settings = _get_popup_main_ls(font_size)
+	container.add_child(lbl)
+	lbl.reset_size()
+	lbl.position = -lbl.size / 2.0
+	# 위치 — base_pos 를 중심으로
 	var spawn_pos := Vector2(base_pos.x + randf_range(-15.0, 15.0), base_pos.y + count * 32.0)
-	lbl.position = spawn_pos
-	lbl.z_index = 20
-	add_child(lbl)
+	container.position = spawn_pos
+	container.scale = Vector2.ZERO
+	# scale punch + 등장 하이라이트 + 부동/페이드 (모두 container 의 property)
 	var tw := create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(lbl, "position:y", spawn_pos.y - 60.0, 0.8)
-	tw.tween_property(lbl, "modulate:a", 0.0, 0.8)
+	tw.tween_property(container, "scale", Vector2(1.3, 1.3), 0.10).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.chain().tween_property(container, "scale", Vector2(1.0, 1.0), 0.08)
+	tw.chain().set_parallel(true)
+	tw.tween_property(lbl, "modulate", tint, 0.12)
+	tw.tween_property(container, "position:y", spawn_pos.y - 60.0, 0.7)
+	tw.tween_property(container, "modulate:a", 0.0, 0.7)
 	tw.chain().tween_callback(func() -> void:
-		lbl.queue_free()
+		container.queue_free()
 		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
 	)
 
 func _spawn_damage_popup(world_pos: Vector2, amount: int, fully_blocked: bool, stack_key: String) -> void:
 	if fully_blocked:
-		_spawn_popup(world_pos, "Block", Color(0.4, 0.8, 1.0), 28, stack_key)
+		_spawn_popup(world_pos, "Block", Color(0.55, 0.78, 1.00), 36, stack_key)   # rgba(140,200,255)
 	else:
-		_spawn_popup(world_pos, str(amount), Color(1.0, 0.2, 0.2), 28, stack_key)
+		_spawn_popup(world_pos, str(amount), Color(1.00, 0.31, 0.31), 36, stack_key)  # rgba(255,80,80)
 
 func _spawn_heal_popup(world_pos: Vector2, amount: int, stack_key: String) -> void:
-	_spawn_popup(world_pos, "+" + str(amount), Color(0.2, 1.0, 0.4), 28, stack_key)
+	_spawn_popup(world_pos, "+" + str(amount), Color(0.71, 1.00, 0.35), 36, stack_key)  # rgba(180,255,90) lime
 
 func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: String) -> void:
 	if not _STATUS_POPUP_INFO.has(status_type):
@@ -1697,24 +1772,31 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 	var info: Array = _STATUS_POPUP_INFO[status_type]
 	var count: int = _popup_stack.get(stack_key, 0)
 	_popup_stack[stack_key] = count + 1
+	var status_color: Color = info[1]
+	var tint: Color = _popup_text_color(status_color)
+	var container := Node2D.new()
+	container.z_index = 20
+	add_child(container)
+	_add_popup_halo(container, info[0], 32, status_color)
 	var lbl := Label.new()
 	lbl.text = info[0]
-	lbl.modulate = info[1]
-	lbl.label_settings = _get_popup_ls(26)
+	lbl.modulate = tint * 1.4
+	lbl.label_settings = _get_popup_main_ls(32)
+	container.add_child(lbl)
+	lbl.reset_size()
+	lbl.position = -lbl.size / 2.0
 	var spawn_pos := Vector2(world_pos.x + randf_range(-15.0, 15.0), world_pos.y + count * 32.0)
-	lbl.position = spawn_pos
-	lbl.pivot_offset = Vector2(30, 13)
-	lbl.scale = Vector2.ZERO
-	lbl.z_index = 20
-	add_child(lbl)
+	container.position = spawn_pos
+	container.scale = Vector2.ZERO
 	var tw := create_tween()
-	tw.tween_property(lbl, "scale", Vector2(1.3, 1.3), 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.tween_property(lbl, "scale", Vector2(1.0, 1.0), 0.08)
-	tw.set_parallel(true)
-	tw.tween_property(lbl, "position:y", spawn_pos.y - 55.0, 0.7).set_delay(0.2)
-	tw.tween_property(lbl, "modulate:a", 0.0, 0.7).set_delay(0.2)
+	tw.tween_property(container, "scale", Vector2(1.3, 1.3), 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.chain().tween_property(container, "scale", Vector2(1.0, 1.0), 0.08)
+	tw.chain().set_parallel(true)
+	tw.tween_property(lbl, "modulate", tint, 0.12)
+	tw.tween_property(container, "position:y", spawn_pos.y - 55.0, 0.7)
+	tw.tween_property(container, "modulate:a", 0.0, 0.7)
 	tw.chain().tween_callback(func() -> void:
-		lbl.queue_free()
+		container.queue_free()
 		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
 	)
 

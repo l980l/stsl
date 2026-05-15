@@ -116,8 +116,8 @@ signal vfx_impact_resolved
 # 독 DoT tick — 데미지 시그널과 별개로 가스 VFX/SFX 트리거 (target = "enemy_X" 또는 hero_id)
 signal poison_tick_applied(target: String, amount: int)
 
-# 영웅 카드 발동 중 — 다음 카드 입력 차단 (await 중첩 방지)
-var _card_busy: bool = false
+# 차지 중 카드의 예측 누적 데미지 — UI 가 사망 예정 적 dim/비활성화 + 추가 ATTACK 카드 거부
+var _pending_dmg_to_enemy: Dictionary = {}  # enemy_index(int) → int
 
 # GameSettings autoload 안전 접근 — CLI test 환경에서 식별자 미인식 회피
 # null(=test 환경) 시 0 반환 → 모든 await 스킵 → 동기 즉시 적용 유지
@@ -195,6 +195,79 @@ func _card_vfx_impact_delay(card: Resource) -> float:
 			EffectRes.EffectType.BLOCK, EffectRes.EffectType.BLOCK_ALL, EffectRes.EffectType.FORMATION_BLOCK, EffectRes.EffectType.COUNTER_BLOCK, EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED, EffectRes.EffectType.MORALE_TO_BLOCK:
 				return _VFX_DEFENSE_BUFF.IMPACT_DELAY * _vfx_speed_mul()
 	return 0.0
+
+# 차지 중 카드의 예측 데미지 — UI 가 사망 예정 적을 즉시 dim/비활성화 + 추가 ATTACK 거부
+signal pending_damage_changed(enemy_index: int)
+
+func _card_has_damage(card: Resource) -> bool:
+	for effect in card.effects:
+		if effect.damage_type != "":
+			return true
+	return false
+
+# 카드의 단일 타겟/ALL 데미지 추정 — weak/strength/vulnerable 만 적용 (정확보다 보수적)
+# 결과: enemy_index → 예측 데미지 합 (hit_count 포함)
+func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionary:
+	var result: Dictionary = {}
+	var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
+	var weak: int = owner_status.get("weak", 0)
+	var strength: int = _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+	for effect in card.effects:
+		if effect.damage_type == "":
+			continue
+		if effect.condition != "" and not _evaluate_condition(effect.condition, card):
+			continue
+		var dmg: int = effect.value
+		if weak > 0:
+			dmg = int(dmg * 0.75)
+		dmg += strength
+		var targets: Array = []
+		if effect.target == "ALL":
+			for i in range(_enemies.size()):
+				if _enemy_alive[i]:
+					targets.append(i)
+		else:
+			if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+				targets.append(target_enemy_index)
+		for ti in targets:
+			var t_dmg := dmg
+			var t_status: Dictionary = _enemy_status[ti] if ti < _enemy_status.size() else {}
+			if t_status.get("vulnerable", 0) > 0:
+				t_dmg = int(t_dmg * 1.5)
+			t_dmg = max(0, t_dmg)
+			var prev: int = int(result[ti]) if result.has(ti) else 0
+			result[ti] = prev + t_dmg * effect.hit_count
+	return result
+
+func _add_pending_dmg(idx: int, amount: int) -> void:
+	if amount <= 0:
+		return
+	var cur: int = _pending_dmg_to_enemy[idx] if _pending_dmg_to_enemy.has(idx) else 0
+	_pending_dmg_to_enemy[idx] = cur + amount
+	pending_damage_changed.emit(idx)
+
+func _clear_pending_dmg(idx: int, amount: int) -> void:
+	if amount <= 0 or not _pending_dmg_to_enemy.has(idx):
+		return
+	var v: int = int(_pending_dmg_to_enemy[idx]) - amount
+	if v <= 0:
+		_pending_dmg_to_enemy.erase(idx)
+	else:
+		_pending_dmg_to_enemy[idx] = v
+	pending_damage_changed.emit(idx)
+
+func get_pending_dmg(idx: int) -> int:
+	return int(_pending_dmg_to_enemy[idx]) if _pending_dmg_to_enemy.has(idx) else 0
+
+func get_enemy_effective_hp(idx: int) -> int:
+	return max(0, get_enemy_hp(idx) - get_pending_dmg(idx))
+
+func is_enemy_doomed(idx: int) -> bool:
+	if idx < 0 or idx >= _enemy_hp.size():
+		return false
+	if not _enemy_alive[idx]:
+		return false
+	return get_enemy_effective_hp(idx) <= 0
 
 # fx 의 screen_effect 시그널(=실제 임팩트 시점) 까지 대기.
 # fx 가 emit 안 하는 경우(예: 비공격 즉발) fallback_timeout 후 진행.
@@ -332,24 +405,21 @@ func _phase_player_post() -> bool:
 	return did_work
 
 func play_card(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> bool:
-	if _card_busy:
-		# 이전 카드 발동 중 — 빠른 입력 시 두 번째 카드 차단 (await 중첩 방지)
-		return false
 	if not is_player_turn or not is_battle_active:
+		return false
+	# ATTACK 카드 단일 타겟 — 사망 예정(앞 카드 누적으로 effective_hp 0) 적 거부
+	if target_enemy_index >= 0 and is_enemy_doomed(target_enemy_index) and _card_has_damage(card):
 		return false
 	if deck_mgr == null or not deck_mgr.play_card(card):
 		return false
 	_cards_played_this_turn += 1
-	_track_card_type_counters(card)   # 카드 타입 카운터 추적
-	_start_card_effects(card, target_enemy_index, target_hero_id)  # fire-and-forget — busy 플래그는 wrapper 가 관리
+	_track_card_type_counters(card)
+	_start_card_effects(card, target_enemy_index, target_hero_id)  # fire-and-forget
 	return true
 
 # play_card 를 동기로 유지하면서 _apply_card_effects 의 await 패턴을 흡수.
-# busy 플래그가 모든 종료 경로(early return 포함)에서 풀리도록 wrapper 가 관리.
 func _start_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String) -> void:
-	_card_busy = true
 	await _apply_card_effects(card, target_enemy_index, target_hero_id)
-	_card_busy = false
 
 func end_player_turn() -> void:
 	if not is_player_turn or not is_battle_active:
@@ -510,15 +580,25 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 		return
 	# VFX 차지 시작 — battle_scene 이 받아 owner→target VFX 재생
 	card_vfx_charge_start.emit(card, target_enemy_index, target_hero_id)
+	# 차지 중 카드의 예측 데미지 즉시 누적 — 다음 카드 입력 시 사망 예정 적 차단/UI 갱신
+	var _pending_estimate := _estimate_card_damage(card, target_enemy_index)
+	for _ei in _pending_estimate:
+		_add_pending_dmg(_ei, _pending_estimate[_ei])
 	var _delay := _card_vfx_impact_delay(card)
 	if _delay > 0.0:
 		# popup·SFX 동기화: fx.screen_effect 시점까지 대기 (fallback timer = _delay + 0.5s)
 		await _await_vfx_impact(_delay + 0.5)
-		# 차지 중 전투 종료 / 시전 영웅 사망 시 효과 적용 스킵
 		if not is_battle_active:
+			for _ei in _pending_estimate:
+				_clear_pending_dmg(_ei, _pending_estimate[_ei])
 			return
 		if team_mgr and not team_mgr.is_alive(card.owner_id):
+			for _ei in _pending_estimate:
+				_clear_pending_dmg(_ei, _pending_estimate[_ei])
 			return
+	# 임팩트 도달 — pending 차감 후 실제 효과 적용 (실제 데미지 시그널이 hp 갱신)
+	for _ei in _pending_estimate:
+		_clear_pending_dmg(_ei, _pending_estimate[_ei])
 	_kills_this_card = 0
 	_enthralls_this_card = 0
 	for effect in card.effects:
