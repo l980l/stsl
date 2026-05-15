@@ -33,8 +33,6 @@ const POISON_TICK := preload("res://scenes/vfx/poison_tick.gd")
 # 현재버전 — 게임에서 실제 사용 중
 const VFX_CURRENT := [
 	{"name": "slash",          "kind": "impact", "path": "res://scenes/vfx/slash_particle.tscn"},
-	{"name": "default",        "kind": "impact", "path": "res://scenes/vfx/default_particle.tscn"},
-	{"name": "block",          "kind": "self",   "path": "res://scenes/vfx/block_particle.tscn"},
 	{"name": "fire",           "kind": "beam",   "path": "res://scenes/vfx/fire_blast.gd"},
 	{"name": "ice",            "kind": "beam",   "path": "res://scenes/vfx/ice_shards.gd"},
 	{"name": "lightning_beam", "kind": "beam",   "path": "res://scenes/vfx/lightning_beam.gd"},
@@ -62,13 +60,14 @@ const VFX_CURRENT := [
 	{"name": "defense_buff",   "kind": "beam",   "path": "res://scenes/vfx/defense_buff.gd"},
 ]
 
-# 구버전 — 더 이상 사용 X (beam 으로 대체됨). 참조용으로 vfx_preview 에 표시.
-# - projectile/explosive/divine/curse: damage_type 매핑이 모두 beam VFX 로 이전
+# 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.
 const VFX_LEGACY := [
 	{"name": "projectile",     "kind": "impact", "path": "res://scenes/vfx/projectile_particle.tscn"},
 	{"name": "explosive",      "kind": "impact", "path": "res://scenes/vfx/explosive_particle.tscn"},
 	{"name": "divine",         "kind": "impact", "path": "res://scenes/vfx/divine_particle.tscn"},
 	{"name": "curse",          "kind": "impact", "path": "res://scenes/vfx/curse_particle.tscn"},
+	{"name": "default",        "kind": "impact", "path": "res://scenes/vfx/default_particle.tscn"},
+	{"name": "block",          "kind": "self",   "path": "res://scenes/vfx/block_particle.tscn"},
 ]
 
 const VFX_LIST := VFX_CURRENT + VFX_LEGACY  # 호환성 유지 (다른 코드가 참조 시)
@@ -353,22 +352,42 @@ func _play(entry: Dictionary) -> void:
 				fx.screen_effect.connect(_show_impact_marker.bind(entry["name"]))
 				fx.play(_caster_pos, _target_pos)
 		"impact":
-			var fx: Node2D = (load(entry["path"]) as PackedScene).instantiate()
-			if "autostart" in fx:
-				fx.autostart = false
-			if "repeat" in fx:
-				fx.repeat = false
-			add_child(fx)
-			fx.global_position = _target_pos
-			if entry["name"] == "slash":
-				var slash_rot := randf_range(0.0, TAU)
-				fx.rotation = slash_rot
-				# battle_scene과 동일하게 slash는 피 분출을 베기 방향으로 추가 발동
-				var blood: Node2D = BLOOD_SPRAY.new()
-				add_child(blood)
-				blood.position = Vector2.ZERO
-				blood.play(_target_pos, _target_pos, slash_rot)
-			fx.burst()
+			var packed := load(entry["path"]) as PackedScene
+			if _compare_3way:
+				# PackedScene (GPUParticles2D) 의 amount 를 인스턴스별로 스케일
+				var x_offsets := [-400.0, 0.0, 400.0]
+				var scales    := [0.25, 0.5, 1.0]
+				for i in 3:
+					var fx_n: Node2D = packed.instantiate()
+					if "autostart" in fx_n:
+						fx_n.autostart = false
+					if "repeat" in fx_n:
+						fx_n.repeat = false
+					add_child(fx_n)
+					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
+					fx_n.global_position = t_pos
+					_scale_packed_amounts(fx_n, scales[i])
+					if entry["name"] == "slash":
+						fx_n.rotation = randf_range(0.0, TAU)
+					fx_n.burst()
+					_spawn_compare_label(t_pos, "x" + str(scales[i]))
+			else:
+				var fx: Node2D = packed.instantiate()
+				if "autostart" in fx:
+					fx.autostart = false
+				if "repeat" in fx:
+					fx.repeat = false
+				add_child(fx)
+				fx.global_position = _target_pos
+				if entry["name"] == "slash":
+					var slash_rot := randf_range(0.0, TAU)
+					fx.rotation = slash_rot
+					# battle_scene과 동일하게 slash는 피 분출을 베기 방향으로 추가 발동
+					var blood: Node2D = BLOOD_SPRAY.new()
+					add_child(blood)
+					blood.position = Vector2.ZERO
+					blood.play(_target_pos, _target_pos, slash_rot)
+				fx.burst()
 		"self":
 			var fx: Node2D = (load(entry["path"]) as PackedScene).instantiate()
 			if "autostart" in fx:
@@ -381,6 +400,16 @@ func _play(entry: Dictionary) -> void:
 			var shield := fx.get_node_or_null("ShieldIcon")
 			if shield:
 				shield.play_shield()
+
+# 3-way 비교 모드 — PackedScene (GPUParticles2D/CPUParticles2D) 의 amount 를 scale 곱셈
+# 재귀적으로 자식 모두 — slash_particle 같은 BurstParticleGroup 의 4개 노드 일괄 적용
+func _scale_packed_amounts(node: Node, scale: float) -> void:
+	if node is GPUParticles2D:
+		(node as GPUParticles2D).amount = maxi(1, int(round((node as GPUParticles2D).amount * scale)))
+	elif node is CPUParticles2D:
+		(node as CPUParticles2D).amount = maxi(1, int(round((node as CPUParticles2D).amount * scale)))
+	for child in node.get_children():
+		_scale_packed_amounts(child, scale)
 
 # 3-way 비교 모드 — 각 타겟 위 라벨 (x0.25/x0.5/x1.0). VFX 지속 시간만큼 페이드아웃.
 func _spawn_compare_label(target_pos: Vector2, text: String) -> void:

@@ -14,6 +14,13 @@ func _pcount(n: int) -> int:
 	var gs := get_node_or_null("/root/GameSettings")
 	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
 
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT    := Color(1.0, 0.949, 0.976)   # #fff2f9 — 흰분홍 코어
 const COL_MID    := Color(1.0, 0.604, 0.831)   # #ff9ad4 — 분홍
 const COL_DEEP   := Color(0.902, 0.310, 0.651) # #e64fa6 — 진분홍
@@ -119,7 +126,7 @@ func _spawn_trail(pos: Vector2) -> void:
 	_particles.append(_mk(pos + _roff(10.0),
 		Vector2(randf_range(-0.4, 0.4), -0.3 - randf() * 0.5),
 		0.7 + randf() * 0.5, 8.0 + randf() * 8.0, "heart", 0.0, randf_range(-0.3, 0.3)))
-	if randf() < 0.5:
+	if randf() < 0.5 * _scale():
 		_particles.append(_mk(pos,
 			Vector2(randf_range(-0.6, 0.6), randf_range(-0.6, 0.6) - 0.2),
 			0.6 + randf() * 0.5, 1.5 + randf() * 1.5, "sparkle", 0.0))
@@ -154,12 +161,12 @@ func _spawn_impact_burst(pos: Vector2) -> void:
 
 # 잔류 — 명중 후 타겟 주위에 떠오르는 하트·반짝임
 func _spawn_ambient() -> void:
-	if randf() < 0.6:
+	if randf() < 0.6 * _scale():
 		var tn := "violet" if randf() < 0.25 else "rose"
 		_particles.append(_mk(_target + Vector2(randf_range(-45.0, 45.0), randf_range(10.0, 30.0)),
 			Vector2(randf_range(-0.3, 0.3), -0.5 - randf() * 0.7),
 			1.6 + randf() * 0.9, 8.0 + randf() * 10.0, "heart", 0.0, randf_range(-0.25, 0.25), 0.0, tn))
-	if randf() < 0.4:
+	if randf() < 0.4 * _scale():
 		_particles.append(_mk(_target + Vector2(randf_range(-50.0, 50.0), randf_range(-15.0, 15.0)),
 			Vector2(randf_range(-0.4, 0.4), -0.4 - randf() * 0.5),
 			1.4 + randf() * 0.9, 1.2 + randf() * 1.2, "sparkle", 0.0))

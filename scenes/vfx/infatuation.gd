@@ -14,6 +14,13 @@ func _pcount(n: int) -> int:
 	var gs := get_node_or_null("/root/GameSettings")
 	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
 
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT     := Color(1.0, 0.945, 0.910)  # 흰 따뜻한 톤
 const COL_RED     := Color(1.0, 0.296, 0.376)  # #ff4b60 — 다이나믹 빨강
 const COL_CRIMSON := Color(0.784, 0.094, 0.176) # #c8182d — 진홍
@@ -220,18 +227,18 @@ func _spawn_trail(pos: Vector2, tint: String) -> void:
 	_particles.append(_mk(pos + Vector2(randf_range(-4, 4), randf_range(-4, 4)),
 		Vector2(randf_range(-0.4, 0.4), -0.3 - randf() * 0.5),
 		0.7 + randf() * 0.5, 5.0 + randf() * 4.0, "heart_small", 0.0, 0.0, 0.0, tint))
-	if randf() < 0.4:
+	if randf() < 0.4 * _scale():
 		_particles.append(_mk(pos, Vector2(randf_range(-1, 1), randf_range(-1, 1) - 0.2),
 			0.6 + randf() * 0.5, 1.2 + randf() * 1.0, "sparkle", 0.0, 0.0, 0.0, tint))
 
 func _spawn_ambient() -> void:
 	var ctr := _target + Vector2(0.0, -30.0)
-	if randf() < 0.5:
+	if randf() < 0.5 * _scale():
 		var tint := "crimson" if randf() < 0.4 else "rose"
 		_particles.append(_mk(ctr + Vector2(randf_range(-50, 50), randf_range(-10, 30)),
 			Vector2(randf_range(-0.3, 0.3), -0.5 - randf() * 0.7),
 			1.4 + randf(), 6.0 + randf() * 5.0, "heart_small", 0.0, 0.0, 0.0, tint))
-	if randf() < 0.3:
+	if randf() < 0.3 * _scale():
 		var tint2 := "crimson" if randf() < 0.5 else "rose"
 		_particles.append(_mk(ctr + Vector2(randf_range(-55, 55), randf_range(-20, 20)),
 			Vector2(randf_range(-0.4, 0.4), -0.3 - randf() * 0.5),

@@ -5,6 +5,15 @@
 # battle_manager 의 _tick_*_poison 시점에 .new() → add_child → play(target, target).
 extends Node2D
 
+# 파티클 갯수 / ambient 확률 — GameSettings.particle_count_scale 적용 (override 우선)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
+
 const COL_GAS     := Color(0.627, 0.863, 0.314)  # rgba(160,220,80) — 독가스
 const COL_DRIP    := Color(0.549, 0.824, 0.196)  # rgba(140,210,50) — 독액 거품 본체
 const COL_DRIP_HL := Color(0.863, 1.0, 0.627)    # rgba(220,255,160) — 거품 외곽
@@ -47,7 +56,7 @@ func play(_caster_pos: Vector2, target_pos: Vector2) -> void:
 
 func _spawn_ambient() -> void:
 	# 가스 — 위로 스멀스멀 솟구침
-	if randf() < 0.7:
+	if randf() < 0.7 * _scale():
 		_particles.append({
 			"pos": _target + Vector2(randf_range(-35.0, 35.0), randf_range(25.0, 55.0)),
 			"vel": Vector2(randf_range(-0.15, 0.15), -0.4 - randf() * 0.5),
@@ -55,7 +64,7 @@ func _spawn_ambient() -> void:
 			"r": 12.0 + randf() * 12.0, "kind": "gas", "grav": -0.005,
 		})
 	# 거품 — 웅덩이에서 보글보글 솟아오름
-	if randf() < 0.4:
+	if randf() < 0.4 * _scale():
 		_particles.append({
 			"pos": _target + Vector2(randf_range(-30.0, 30.0), randf_range(40.0, 70.0)),
 			"vel": Vector2(randf_range(-0.1, 0.1), -0.6 - randf() * 0.7),

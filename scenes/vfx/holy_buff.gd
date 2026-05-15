@@ -14,6 +14,13 @@ func _pcount(n: int) -> int:
 	var gs := get_node_or_null("/root/GameSettings")
 	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
 
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT     := Color(1.0, 0.965, 0.776) # #fff6c6 — 흰금 코어
 const COL_MID     := Color(1.0, 0.831, 0.439) # #ffd470 — 황금
 const COL_DEEP    := Color(0.8, 0.541, 0.102) # #cc8a1a — 진금
@@ -130,7 +137,7 @@ func _spawn_rising() -> void:
 		_particles.append(_mk(ctr + Vector2(randf_range(-60.0, 60.0), 10.0),
 			Vector2(randf_range(-0.3, 0.3), -1.0 - randf() * 1.2),
 			1.4 + randf() * 0.9, 1.4 + randf() * 1.6, "mote"))
-	if randf() < 0.2:
+	if randf() < 0.2 * _scale():
 		_particles.append(_mk(ctr + Vector2(randf_range(-50.0, 50.0), 0.0),
 			Vector2(randf_range(-0.4, 0.4), -0.6 - randf() * 0.7),
 			1.6 + randf() * 0.9, 8.0 + randf() * 8.0, "feather", 0.0,

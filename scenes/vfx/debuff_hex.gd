@@ -14,6 +14,13 @@ func _pcount(n: int) -> int:
 	var gs := get_node_or_null("/root/GameSettings")
 	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
 
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT     := Color(0.847, 0.706, 1.0)   # #d8b4ff — 밝은 보라
 const COL_MID     := Color(0.545, 0.361, 0.965) # #8b5cf6 — 보라
 const COL_DEEP    := Color(0.290, 0.165, 0.549) # #4a2a8c — 진보라
@@ -165,11 +172,11 @@ func _spawn_impact_cloud(pos: Vector2) -> void:
 
 # 잔류 — 명중 후 타겟 주위에 천천히 피어오르는 독무·룬
 func _spawn_ambient() -> void:
-	if randf() < 0.7:
+	if randf() < 0.7 * _scale():
 		_particles.append(_mk(_target + Vector2(randf_range(-50.0, 50.0), randf_range(20.0, 40.0)),
 			Vector2(randf_range(-0.1, 0.1), -0.3 - randf() * 0.5),
 			1.6 + randf() * 0.9, 10.0 + randf() * 14.0, "miasma", -0.004))
-	if randf() < 0.3:
+	if randf() < 0.3 * _scale():
 		_particles.append(_mk(_target + Vector2(randf_range(-45.0, 45.0), randf_range(-5.0, 25.0)),
 			Vector2(randf_range(-0.15, 0.15), -0.4 - randf() * 0.4),
 			1.4 + randf() * 0.8, 1.2 + randf() * 1.2, "rune", 0.0))
