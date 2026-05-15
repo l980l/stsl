@@ -30,12 +30,9 @@ const DEFENSE_BUFF := preload("res://scenes/vfx/defense_buff.gd")
 const POISON_TICK := preload("res://scenes/vfx/poison_tick.gd")
 
 # kind: "impact"=피격 버스트(타겟 위치) / "self"=자기 버프 버스트 / "beam"=시전자→타겟 빔
-const VFX_LIST := [
+# 현재버전 — 게임에서 실제 사용 중
+const VFX_CURRENT := [
 	{"name": "slash",          "kind": "impact", "path": "res://scenes/vfx/slash_particle.tscn"},
-	{"name": "projectile",     "kind": "impact", "path": "res://scenes/vfx/projectile_particle.tscn"},
-	{"name": "explosive",      "kind": "impact", "path": "res://scenes/vfx/explosive_particle.tscn"},
-	{"name": "divine",         "kind": "impact", "path": "res://scenes/vfx/divine_particle.tscn"},
-	{"name": "curse",          "kind": "impact", "path": "res://scenes/vfx/curse_particle.tscn"},
 	{"name": "default",        "kind": "impact", "path": "res://scenes/vfx/default_particle.tscn"},
 	{"name": "block",          "kind": "self",   "path": "res://scenes/vfx/block_particle.tscn"},
 	{"name": "fire",           "kind": "beam",   "path": "res://scenes/vfx/fire_blast.gd"},
@@ -44,16 +41,17 @@ const VFX_LIST := [
 	{"name": "debuff",         "kind": "beam",   "path": "res://scenes/vfx/debuff_hex.gd"},
 	{"name": "charm",          "kind": "beam",   "path": "res://scenes/vfx/charm_kiss.gd"},
 	{"name": "poison",         "kind": "beam",   "path": "res://scenes/vfx/poison_splash.gd"},
+	{"name": "poison_tick",    "kind": "beam",   "path": "res://scenes/vfx/poison_tick.gd"},
 	{"name": "death",          "kind": "beam",   "path": "res://scenes/vfx/death_dissolve.gd"},
 	{"name": "revive",         "kind": "beam",   "path": "res://scenes/vfx/revive_blessing.gd"},
 	{"name": "heal",           "kind": "beam",   "path": "res://scenes/vfx/heal_blessing.gd"},
 	{"name": "blood",          "kind": "beam",   "path": "res://scenes/vfx/blood_spray.gd"},
-	{"name": "holy",           "kind": "beam",   "path": "res://scenes/vfx/holy_strike.gd"},
 	{"name": "arrow",          "kind": "beam",   "path": "res://scenes/vfx/arrow_shot.gd"},
-	{"name": "explosive",      "kind": "beam",   "path": "res://scenes/vfx/explosion_blast.gd"},
+	{"name": "explosion",      "kind": "beam",   "path": "res://scenes/vfx/explosion_blast.gd"},
 	{"name": "blunt",          "kind": "beam",   "path": "res://scenes/vfx/blunt_smash.gd"},
 	{"name": "stun",           "kind": "beam",   "path": "res://scenes/vfx/stun_stars.gd"},
 	{"name": "bullet",         "kind": "beam",   "path": "res://scenes/vfx/bullet_shot.gd"},
+	{"name": "holy_strike",    "kind": "beam",   "path": "res://scenes/vfx/holy_strike.gd"},
 	{"name": "holy_slash",     "kind": "beam",   "path": "res://scenes/vfx/holy_slash.gd"},
 	{"name": "holy_arrow",     "kind": "beam",   "path": "res://scenes/vfx/holy_arrow.gd"},
 	{"name": "holy_fire",      "kind": "beam",   "path": "res://scenes/vfx/holy_fire.gd"},
@@ -62,8 +60,18 @@ const VFX_LIST := [
 	{"name": "warrior_buff",   "kind": "beam",   "path": "res://scenes/vfx/warrior_buff.gd"},
 	{"name": "infatuation",    "kind": "beam",   "path": "res://scenes/vfx/infatuation.gd"},
 	{"name": "defense_buff",   "kind": "beam",   "path": "res://scenes/vfx/defense_buff.gd"},
-	{"name": "poison_tick",    "kind": "beam",   "path": "res://scenes/vfx/poison_tick.gd"},
 ]
+
+# 구버전 — 더 이상 사용 X (beam 으로 대체됨). 참조용으로 vfx_preview 에 표시.
+# - projectile/explosive/divine/curse: damage_type 매핑이 모두 beam VFX 로 이전
+const VFX_LEGACY := [
+	{"name": "projectile",     "kind": "impact", "path": "res://scenes/vfx/projectile_particle.tscn"},
+	{"name": "explosive",      "kind": "impact", "path": "res://scenes/vfx/explosive_particle.tscn"},
+	{"name": "divine",         "kind": "impact", "path": "res://scenes/vfx/divine_particle.tscn"},
+	{"name": "curse",          "kind": "impact", "path": "res://scenes/vfx/curse_particle.tscn"},
+]
+
+const VFX_LIST := VFX_CURRENT + VFX_LEGACY  # 호환성 유지 (다른 코드가 참조 시)
 
 var _caster_pos := Vector2(420, 540)
 var _target_pos := Vector2(1500, 540)
@@ -90,15 +98,36 @@ func _ready() -> void:
 	title.text = "VFX 버튼 선택 → 빈 곳 클릭으로 타겟 이동+재생   /   [Space] 재생"
 	panel.add_child(title)
 
-	var grid := GridContainer.new()
-	grid.columns = 5
-	panel.add_child(grid)
-	for entry in VFX_LIST:
+	# 현재버전 (게임에서 실제 사용 중)
+	var current_lbl := Label.new()
+	current_lbl.text = "── 현재버전 ──"
+	current_lbl.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	panel.add_child(current_lbl)
+	var grid_current := GridContainer.new()
+	grid_current.columns = 5
+	panel.add_child(grid_current)
+	for entry in VFX_CURRENT:
 		var b := Button.new()
 		b.text = entry["name"]
 		b.custom_minimum_size = Vector2(150.0, 0.0)
 		b.pressed.connect(_select_and_play.bind(entry))
-		grid.add_child(b)
+		grid_current.add_child(b)
+
+	# 구버전 (더 이상 사용 X — 참조용)
+	var legacy_lbl := Label.new()
+	legacy_lbl.text = "── 구버전 (사용 X) ──"
+	legacy_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	panel.add_child(legacy_lbl)
+	var grid_legacy := GridContainer.new()
+	grid_legacy.columns = 5
+	panel.add_child(grid_legacy)
+	for entry in VFX_LEGACY:
+		var b := Button.new()
+		b.text = entry["name"]
+		b.custom_minimum_size = Vector2(150.0, 0.0)
+		b.modulate = Color(0.75, 0.75, 0.75)
+		b.pressed.connect(_select_and_play.bind(entry))
+		grid_legacy.add_child(b)
 
 	var auto_btn := CheckBox.new()
 	auto_btn.text = "자동 반복 (1.8s)"
