@@ -213,6 +213,7 @@ func open() -> void:
 		"vfx_speed":        GameSettings.vfx_speed_key,
 		"anim_speed":       GameSettings.anim_speed_key,
 		"monster_interval": GameSettings.monster_interval_key,
+		"kill_cam":         "on" if GameSettings.kill_cam_enabled else "off",
 	}
 	for gid in current_keys:
 		if _seg_groups.has(gid):
@@ -275,6 +276,7 @@ func _on_defaults() -> void:
 		"vfx_speed":        GameSettings.VFX_SPEED_DEFAULT,
 		"anim_speed":       GameSettings.ANIM_SPEED_DEFAULT,
 		"monster_interval": GameSettings.MONSTER_INTERVAL_DEFAULT,
+		"kill_cam":         "on" if GameSettings.KILL_CAM_DEFAULT else "off",
 	}
 	for gid in defaults:
 		if not _seg_groups.has(gid):
@@ -416,6 +418,13 @@ func _build_gameplay_panel() -> void:
 		_build_x_labels(GameSettings.MONSTER_INTERVAL_KEYS, GameSettings.MONSTER_INTERVAL_VALUES),
 		GameSettings.monster_interval_key,
 		func(k: String) -> void: GameSettings.set_monster_interval(k))
+
+	# 킬캠 (처치/사망 시 슬로우 + 카메라 줌인)
+	_build_seg_row(p, mono, 192.0, tr("ui.settings.kill_cam"), "kill_cam",
+		["off", "on"],
+		{"off": tr("ui.settings.off"), "on": tr("ui.settings.on")},
+		"on" if GameSettings.kill_cam_enabled else "off",
+		func(k: String) -> void: GameSettings.set_kill_cam_enabled(k == "on"))
 
 # 일반 segment row 빌더 — 라벨 + N개 버튼. group_id 로 _seg_groups 등록.
 func _build_seg_row(parent: Control, mono: Font, row_y: float, label_text: String,

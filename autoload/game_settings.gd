@@ -20,6 +20,9 @@ const PARTICLE_KEYS    := ["minimal", "low", "medium", "high"]
 const PARTICLE_VALUES  := [0.1, 0.25, 0.5, 1.0]
 const PARTICLE_DEFAULT := "high"  # 상
 
+# 킬캠 — 처치/사망 시 슬로우 + 카메라 줌인 (사용자 옵션, 기본 on)
+const KILL_CAM_DEFAULT := true
+
 const _CONFIG_PATH := "user://game_settings.cfg"
 
 # 현재 multiplier 값 (직접 사용)
@@ -33,6 +36,7 @@ var vfx_speed_key: String = VFX_SPEED_DEFAULT
 var anim_speed_key: String = ANIM_SPEED_DEFAULT
 var monster_interval_key: String = MONSTER_INTERVAL_DEFAULT
 var particle_key: String = PARTICLE_DEFAULT
+var kill_cam_enabled: bool = KILL_CAM_DEFAULT
 
 func _ready() -> void:
 	load_settings()
@@ -66,6 +70,9 @@ func set_particle_quality(key: String) -> void:
 	particle_key = key
 	particle_quality = idx
 
+func set_kill_cam_enabled(enabled: bool) -> void:
+	kill_cam_enabled = enabled
+
 # ── 적용된 값 조회 (battle_manager 등이 사용) ──
 func get_vfx_delay(base: float) -> float:
 	return base * vfx_speed_multiplier
@@ -86,6 +93,7 @@ func save_settings() -> void:
 	cfg.set_value("gameplay", "vfx_speed", vfx_speed_key)
 	cfg.set_value("gameplay", "anim_speed", anim_speed_key)
 	cfg.set_value("gameplay", "monster_interval", monster_interval_key)
+	cfg.set_value("gameplay", "kill_cam_enabled", kill_cam_enabled)
 	cfg.save(_CONFIG_PATH)
 
 func load_settings() -> void:
@@ -96,8 +104,10 @@ func load_settings() -> void:
 		set_vfx_speed(VFX_SPEED_DEFAULT)
 		set_anim_speed(ANIM_SPEED_DEFAULT)
 		set_monster_interval(MONSTER_INTERVAL_DEFAULT)
+		set_kill_cam_enabled(KILL_CAM_DEFAULT)
 		return
 	set_particle_quality(cfg.get_value("graphics", "particle_quality", PARTICLE_DEFAULT))
 	set_vfx_speed(cfg.get_value("gameplay", "vfx_speed", VFX_SPEED_DEFAULT))
 	set_anim_speed(cfg.get_value("gameplay", "anim_speed", ANIM_SPEED_DEFAULT))
 	set_monster_interval(cfg.get_value("gameplay", "monster_interval", MONSTER_INTERVAL_DEFAULT))
+	set_kill_cam_enabled(cfg.get_value("gameplay", "kill_cam_enabled", KILL_CAM_DEFAULT))
