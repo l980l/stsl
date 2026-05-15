@@ -68,29 +68,29 @@ static func osiris(scene: PackedScene) -> Resource:
 	e.phase_thresholds = [0.5]
 	e.phase_heal_ratios = [0.6]
 	var p0_i1 := IntentRes.new()
-	p0_i1.action_type = IntentRes.ActionType.ATTACK; p0_i1.value = 180; p0_i1.target = IntentRes.TargetType.RANDOM; p0_i1.damage_type = "divine"
+	p0_i1.action_type = IntentRes.ActionType.ATTACK; p0_i1.value = 180; p0_i1.target = IntentRes.TargetType.RANDOM; p0_i1.damage_type = "holy_strike"
 	var p0_i2 := IntentRes.new()
-	p0_i2.action_type = IntentRes.ActionType.ATTACK; p0_i2.value = 180; p0_i2.target = IntentRes.TargetType.RANDOM; p0_i2.damage_type = "divine"
+	p0_i2.action_type = IntentRes.ActionType.ATTACK; p0_i2.value = 180; p0_i2.target = IntentRes.TargetType.RANDOM; p0_i2.damage_type = "holy_strike"
 	var p0_i3 := IntentRes.new()
 	p0_i3.action_type = IntentRes.ActionType.BUFF; p0_i3.value = 1; p0_i3.status_type = "strength"
 	var p0_i3b := IntentRes.new()
 	p0_i3b.action_type = IntentRes.ActionType.DEBUFF; p0_i3b.value = 2; p0_i3b.status_type = "vulnerable"; p0_i3b.target = IntentRes.TargetType.ALL
 	var p0_i4 := IntentRes.new()
-	p0_i4.action_type = IntentRes.ActionType.ATTACK; p0_i4.value = 220; p0_i4.target = IntentRes.TargetType.ALL; p0_i4.damage_type = "divine"
+	p0_i4.action_type = IntentRes.ActionType.ATTACK; p0_i4.value = 220; p0_i4.target = IntentRes.TargetType.ALL; p0_i4.damage_type = "holy_fire"
 	var p1_i1 := IntentRes.new()
 	p1_i1.action_type = IntentRes.ActionType.BUFF; p1_i1.value = 2; p1_i1.status_type = "strength"; p1_i1.condition = "부활"
 	var p1_i2 := IntentRes.new()
-	p1_i2.action_type = IntentRes.ActionType.ATTACK; p1_i2.value = 220; p1_i2.target = IntentRes.TargetType.RANDOM; p1_i2.damage_type = "divine"
+	p1_i2.action_type = IntentRes.ActionType.ATTACK; p1_i2.value = 220; p1_i2.target = IntentRes.TargetType.RANDOM; p1_i2.damage_type = "holy_strike"
 	var p1_i2b := IntentRes.new()
 	p1_i2b.action_type = IntentRes.ActionType.DEBUFF; p1_i2b.value = 6; p1_i2b.status_type = "poison"; p1_i2b.target = IntentRes.TargetType.RANDOM
 	var p1_i3 := IntentRes.new()
-	p1_i3.action_type = IntentRes.ActionType.ATTACK; p1_i3.value = 220; p1_i3.target = IntentRes.TargetType.ALL; p1_i3.damage_type = "divine"
+	p1_i3.action_type = IntentRes.ActionType.ATTACK; p1_i3.value = 220; p1_i3.target = IntentRes.TargetType.ALL; p1_i3.damage_type = "holy_fire"
 	var p1_i4 := IntentRes.new()
 	p1_i4.action_type = IntentRes.ActionType.DEBUFF; p1_i4.value = 3; p1_i4.status_type = "weak"; p1_i4.target = IntentRes.TargetType.ALL
 	var p1_i4b := IntentRes.new()
 	p1_i4b.action_type = IntentRes.ActionType.DEBUFF; p1_i4b.value = 3; p1_i4b.status_type = "vulnerable"; p1_i4b.target = IntentRes.TargetType.ALL
 	var p1_i5 := IntentRes.new()
-	p1_i5.action_type = IntentRes.ActionType.ATTACK; p1_i5.value = 300; p1_i5.target = IntentRes.TargetType.LOWEST_HP; p1_i5.damage_type = "divine"
+	p1_i5.action_type = IntentRes.ActionType.ATTACK; p1_i5.value = 300; p1_i5.target = IntentRes.TargetType.LOWEST_HP; p1_i5.damage_type = "holy_arrow"
 	e.intent_pattern = [p0_i1, p0_i2, p0_i3, p0_i3b, p0_i4]
 	e.phase_patterns = [
 		[p0_i1, p0_i2, p0_i3, p0_i3b, p0_i4],

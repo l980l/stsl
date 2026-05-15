@@ -444,7 +444,7 @@ static func _void_sword() -> Resource:
 	e.value = 75; e.base_value = 75
 	e.bonus_value = 150; e.base_bonus_value = 150
 	e.target = "SINGLE"; e.status_type = "hand_size_0"
-	e.damage_type = "divine"
+	e.damage_type = "holy_slash"
 	c.effects = [e]; return c
 
 static func _mushin_power() -> Resource:
@@ -488,7 +488,7 @@ static func _mushin_blade() -> Resource:
 	e.value = 30; e.base_value = 30
 	e.bonus_value = 100; e.base_bonus_value = 100
 	e.target = "SINGLE"; e.status_type = "hand_size_0"
-	e.damage_type = "divine"
+	e.damage_type = "holy_slash"
 	c.effects = [e]; return c
 
 static func _clear_wind() -> Resource:
@@ -503,7 +503,7 @@ static func _clear_wind() -> Resource:
 	ea.value = 120; ea.base_value = 120
 	ea.bonus_value = 250; ea.base_bonus_value = 250
 	ea.target = "SINGLE"; ea.status_type = "hand_size_0"
-	ea.damage_type = "divine"
+	ea.damage_type = "holy_slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"; eb.status_type = "poison"

@@ -14,9 +14,9 @@ static func golden_elixir(scene: PackedScene) -> Resource:
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "vulnerable"
 	i3.target = IntentRes.TargetType.ALL
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 160; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "divine"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 160; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "holy_slash"
 	var i5 := IntentRes.new()
-	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 130; i5.target = IntentRes.TargetType.ALL; i5.damage_type = "divine"
+	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 130; i5.target = IntentRes.TargetType.ALL; i5.damage_type = "holy_fire"
 	var i6 := IntentRes.new()
 	i6.action_type = IntentRes.ActionType.DEBUFF; i6.value = 2; i6.status_type = "vulnerable"
 	i6.target = IntentRes.TargetType.ALL
@@ -34,9 +34,9 @@ static func silver_elixir(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 2; i2.status_type = "strength"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "holy_slash"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 170; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "divine"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 170; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "holy_slash"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
 	return e

@@ -31,7 +31,7 @@ static func norn(scene: PackedScene) -> Resource:
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "vulnerable"
 	i2.target = IntentRes.TargetType.ALL
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 170; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 170; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "holy_blunt"
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 6; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]

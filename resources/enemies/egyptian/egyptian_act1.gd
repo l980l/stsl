@@ -44,11 +44,11 @@ static func obelisk_guardian(scene: PackedScene) -> Resource:
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.BUFF; p0i1.value = 60; p0i1.status_type = "block"
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 150; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "divine"
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 150; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "holy_strike"
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "divine"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "holy_fire"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 220; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "divine"
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 220; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "holy_strike"
 	e.phase_patterns = [[p0i1, p0i2], [p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
 	return e

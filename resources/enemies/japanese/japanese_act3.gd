@@ -10,11 +10,11 @@ static func iwato_guardian(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 70; i1.status_type = "block"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 170; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "divine"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 170; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "holy_slash"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.BUFF; i3.value = 50; i3.status_type = "block"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 190; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "divine"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 190; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "holy_arrow"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
 	return e
