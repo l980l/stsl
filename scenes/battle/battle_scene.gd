@@ -44,6 +44,16 @@ const SIGNATURE_COLORS := {
 	"yin_yang":       Color(0.85, 0.95, 1.0),  # 도교 — 청백
 	"kekkai":         Color(0.3, 0.7, 1.0),    # 일본 — 푸른 결계
 }
+
+# 신화 → 시그니처 아이콘 + 툴팁 desc 키 (적 panel 우측 상단 표시)
+const SIGNATURE_INFO := {
+	"greek":    {"emoji": "⚔",  "desc_key": "battle.signature.hubris.desc"},
+	"norse":    {"emoji": "🌪", "desc_key": "battle.signature.ragnarok.desc"},
+	"egyptian": {"emoji": "👁", "desc_key": "battle.signature.egyptian_curse.desc"},
+	"buddhist": {"emoji": "☸",  "desc_key": "battle.signature.karma.desc"},
+	"daoist":   {"emoji": "☯",  "desc_key": "battle.signature.yin_yang.desc"},
+	"japanese": {"emoji": "🛡", "desc_key": "battle.signature.kekkai.desc"},
+}
 var _card_buttons: Array = []
 var _hero_char_nodes: Dictionary = {}  # hero_id → Node2D
 var _enemy_char_nodes: Array = []      # index → Node2D
@@ -482,17 +492,17 @@ func _refresh_hud() -> void:
 			rect.custom_minimum_size = Vector2(28, 28)
 			rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			rect.tooltip_text = tip
 			rect.mouse_filter = Control.MOUSE_FILTER_STOP
 			_relic_container.add_child(rect)
+			SacredTheme.attach_tooltip(rect, tip)
 		else:
 			var lbl := Label.new()
 			lbl.text = "[%s]" % tr(s["name_key"])
-			lbl.tooltip_text = tip
 			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 			lbl.add_theme_font_size_override("font_size", 13)
 			lbl.modulate = Color(1.0, 0.0, 1.0)
 			_relic_container.add_child(lbl)
+			SacredTheme.attach_tooltip(lbl, tip)
 	if not GameManager or not GameManager.is_inside_tree():
 		return
 	for relic in GameManager.relics:
@@ -504,17 +514,17 @@ func _refresh_hud() -> void:
 			rect.custom_minimum_size = Vector2(28, 28)
 			rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			rect.tooltip_text = tip
 			rect.mouse_filter = Control.MOUSE_FILTER_STOP
 			_relic_container.add_child(rect)
+			SacredTheme.attach_tooltip(rect, tip)
 		else:
 			var lbl := Label.new()
 			lbl.text = "[%s]" % tr(relic.relic_name)
-			lbl.tooltip_text = tip
 			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 			lbl.add_theme_font_size_override("font_size", 13)
 			lbl.modulate = Color(1.0, 0.85, 0.3)
 			_relic_container.add_child(lbl)
+			SacredTheme.attach_tooltip(lbl, tip)
 
 func _refresh_relics() -> void:
 	_refresh_hud()
@@ -731,8 +741,8 @@ func _apply_hp_state(bar: Control, fill: TextureRect, ratio: float, is_boss: boo
 
 	# 펄스 — bloom intensity만 (fill alpha 건드리면 하위 레이어 가로줄이 비침)
 	var dur: float = 0.0
-	var lo_intensity: float = 0.35
-	var hi_intensity: float = 0.35
+	var lo_intensity: float = 0.0
+	var hi_intensity: float = 0.0
 	if ratio <= 0.15:
 		dur = 0.9
 		lo_intensity = 0.35
@@ -742,7 +752,8 @@ func _apply_hp_state(bar: Control, fill: TextureRect, ratio: float, is_boss: boo
 		lo_intensity = 0.30
 		hi_intensity = 0.85
 	else:
-		bloom_mat.set_shader_parameter("intensity", 0.35)
+		# 정상 HP — 블룸 완전히 끔 (임계치 미만에서만 브리딩)
+		bloom_mat.set_shader_parameter("intensity", 0.0)
 		return
 
 	bloom_mat.set_shader_parameter("intensity", lo_intensity)
@@ -827,6 +838,7 @@ func _connect_signals() -> void:
 	BattleManager.card_vfx_charge_start.connect(_on_card_vfx_start)
 	BattleManager.poison_tick_applied.connect(_on_poison_tick)
 	BattleManager.signature_fired.connect(_on_signature_fired)
+	BattleManager.pending_damage_changed.connect(_on_pending_damage_changed)
 
 var _bgm_boss_id: String = ""
 
@@ -847,6 +859,13 @@ func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
 
 # 신화 시그니처 발동 시 화면 중앙에 짧은 토스트 표시 (~1.5초 페이드)
 # Throttle: 같은 시그니처는 1턴에 1회만 (다중 적 동시 발동 시 중복 방지)
+func _on_pending_damage_changed(enemy_index: int) -> void:
+	if enemy_index < 0 or enemy_index >= _enemy_nodes.size():
+		return
+	if _enemy_nodes[enemy_index].is_empty():
+		return
+	_update_enemy_ui(enemy_index)
+
 func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	if _signatures_shown_this_turn.has(signature_name):
 		return
@@ -878,6 +897,30 @@ func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 func _burst_signature_at_enemy(_enemy_index: int, _color: Color) -> void:
 	pass
 
+# 신화 시그니처 아이콘 — 적 panel 우측 상단. 호버 시 툴팁으로 효과 설명.
+# 주의: btn 이 panel 과 같은 사이즈로 self 의 자식이라 — panel 자식 Label 은 가려짐.
+# 해결: Label 을 self(battle_scene) 의 자식 + 매우 늦게 add (btn 위) + z_index 최상위.
+func _attach_signature_icon(panel: ColorRect, mythology) -> void:
+	if panel == null or mythology == null:
+		return
+	var info: Dictionary = SIGNATURE_INFO.get(mythology, {})
+	if info.is_empty():
+		return
+	var existing := get_node_or_null(NodePath("_SigIcon_%s" % str(panel.get_instance_id())))
+	if existing != null:
+		return
+	var lbl := Label.new()
+	lbl.name = "_SigIcon_%s" % str(panel.get_instance_id())
+	lbl.text = info["emoji"]
+	lbl.add_theme_font_size_override("font_size", 22)
+	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+	lbl.z_index = 100
+	var pp: Vector2 = panel.position
+	lbl.position = pp + Vector2(panel.size.x - 34.0, 4.0)
+	lbl.size = Vector2(26, 28)
+	add_child(lbl)
+	SacredTheme.attach_tooltip(lbl, tr(info["desc_key"]))
+
 # T3-SUMMON: 런타임에 spawn된 적의 UI 패널 + 캐릭터 노드 추가
 func _on_enemy_spawned(enemy_index: int) -> void:
 	var enemy: Resource = BattleManager.get_enemy(enemy_index)
@@ -892,6 +935,7 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 	entry["btn"].visible = true
 	entry["btn"].disabled = false
 	entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
+	_attach_signature_icon(entry["panel"], enemy.get("mythology"))
 	var slot_pos: Vector2 = _enemy_slot_pos(enemy_index, total)
 	if enemy.character_scene != null:
 		var char_node = enemy.character_scene.instantiate()
@@ -1063,6 +1107,9 @@ func _setup_enemies() -> void:
 		entry["btn"].disabled = false
 		entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
 
+		# 신화 시그니처 아이콘 + 툴팁 — panel 우측 상단
+		_attach_signature_icon(entry["panel"], enemy.get("mythology"))
+
 		var slot_pos: Vector2 = _enemy_slot_pos(i, total)
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
@@ -1161,8 +1208,20 @@ func _update_enemy_ui(index: int) -> void:
 	_apply_hp_state(_bar, _fill, _ratio, is_boss_enemy)
 	_apply_hp_change(_bar, _ratio)
 	_apply_shield(_bar, _ratio, block, enemy.max_hp)
-	entry["hp_lbl"].text = "%d / %d" % [cur_hp, enemy.max_hp]
+	# 차지 중 카드의 예측 데미지 — 사망 예정 표시 + btn 비활성화 + panel dim
+	var pending: int = BattleManager.get_pending_dmg(index)
+	var doomed: bool = BattleManager.is_enemy_doomed(index)
+	if pending > 0:
+		entry["hp_lbl"].text = "%d / %d  (-%d)" % [cur_hp, enemy.max_hp, pending]
+	else:
+		entry["hp_lbl"].text = "%d / %d" % [cur_hp, enemy.max_hp]
 	entry["block_lbl"].text = "🛡%d" % block if block > 0 else ""
+	if doomed:
+		entry["panel"].modulate = Color(0.5, 0.5, 0.5, 1.0)
+		entry["btn"].disabled = true
+	else:
+		entry["panel"].modulate = Color.WHITE
+		# btn 의 enable 상태는 다른 경로(turn 변화 등)가 결정 — 사망 예정 해제 시는 유지
 
 	# 의도 표시
 	var intent: Resource = BattleManager.get_enemy_current_intent(index)
@@ -1565,6 +1624,7 @@ func _spawn_status_vfx(target: String, kind: String, beam_script: GDScript, sfx:
 	var fx: Node2D = beam_script.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_shake()
 		AudioManager.play_sfx(sfx)
@@ -1600,57 +1660,112 @@ func _play_hit_shake(node: Node2D, amount: int) -> void:
 	node.set_meta("_shake_tween", tw)
 
 
-const _POPUP_FONT := preload("res://assets/fonts/IMFellEnglish-Italic.ttf")
-var _popup_ls: Dictionary = {}  # font_size → LabelSettings 캐시
+const _POPUP_FONT := preload("res://assets/fonts/Cinzel-Bold.ttf")
+var _popup_main_ls: Dictionary = {}  # font_size → 메인 LabelSettings
+# 글로우 halo — outline 크기별 캐시. "{size}_{outline}" → LabelSettings
+var _popup_halo_ls: Dictionary = {}
 
-func _get_popup_ls(font_size: int) -> LabelSettings:
-	if not _popup_ls.has(font_size):
+func _get_popup_main_ls(font_size: int) -> LabelSettings:
+	if not _popup_main_ls.has(font_size):
 		var ls := LabelSettings.new()
 		ls.font = _POPUP_FONT
 		ls.font_size = font_size
-		_popup_ls[font_size] = ls
-	return _popup_ls[font_size]
+		_popup_main_ls[font_size] = ls
+	return _popup_main_ls[font_size]
 
+# halo Label 의 LabelSettings — outline 만으로 글자 윤곽 글로우 (font_color 는 modulate 로 조절)
+func _get_popup_halo_ls(font_size: int, outline_size: int, color: Color) -> LabelSettings:
+	var key := "%d_%d_%08x" % [font_size, outline_size, color.to_rgba32()]
+	if not _popup_halo_ls.has(key):
+		var ls := LabelSettings.new()
+		ls.font = _POPUP_FONT
+		ls.font_size = font_size
+		# font 자체는 거의 안 보이게 (alpha 0) — outline 만 표시
+		ls.font_color = Color(color.r, color.g, color.b, 0.0)
+		ls.outline_color = color
+		ls.outline_size = outline_size
+		_popup_halo_ls[key] = ls
+	return _popup_halo_ls[key]
+
+# 본 글씨는 거의 흰색 — 타입 색 15% 만 섞음
+func _popup_text_color(color: Color) -> Color:
+	return Color.WHITE.lerp(color, 0.15)
+
+# halo 레이어 N장 — 각 outline 점점 작게, alpha 점점 진하게 → 글자 윤곽 부드러운 글로우
+const _POPUP_HALO_LAYERS := [
+	{"outline": 48, "alpha": 0.05},
+	{"outline": 36, "alpha": 0.08},
+	{"outline": 26, "alpha": 0.13},
+	{"outline": 18, "alpha": 0.20},
+	{"outline": 11, "alpha": 0.28},
+	{"outline":  6, "alpha": 0.40},
+]
+
+func _add_popup_halo(container: Node2D, text: String, font_size: int, color: Color) -> void:
+	for layer in _POPUP_HALO_LAYERS:
+		var halo := Label.new()
+		halo.text = text
+		halo.label_settings = _get_popup_halo_ls(font_size, layer["outline"], color)
+		halo.modulate.a = layer["alpha"]
+		container.add_child(halo)
+		halo.reset_size()
+		halo.position = -halo.size / 2.0
+
+# 색은 VFX HTML 톤 — 채도 낮춤 + 밝기 ↑ (촌스러운 원색 회피)
 const _STATUS_POPUP_INFO := {
-	"weak":          ["Weak",          Color(1.00, 0.55, 0.10)],
-	"vulnerable":    ["Vulnerable",    Color(0.80, 0.30, 1.00)],
-	"poison":        ["Poison",        Color(0.40, 1.00, 0.20)],
-	"strength":      ["Strength",      Color(1.00, 0.85, 0.10)],
-	"charm":         ["Charm",         Color(1.00, 0.40, 0.85)],
-	"enthrall":      ["Enthralled",    Color(0.70, 0.20, 1.00)],
-	"taunt":         ["Taunt",         Color(1.00, 0.45, 0.10)],
-	"morale":        ["Morale",        Color(1.00, 0.95, 0.20)],
-	"counter_block": ["Counter Block", Color(0.40, 0.85, 1.00)],
+	"weak":          ["Weak",          Color(1.00, 0.65, 0.30)],   # rgba(255,166,77)  부드러운 오렌지
+	"vulnerable":    ["Vulnerable",    Color(0.75, 0.50, 1.00)],   # rgba(191,128,255) 라벤더 보라
+	"poison":        ["Poison",        Color(0.71, 1.00, 0.35)],   # rgba(180,255,90)  라임
+	"strength":      ["Strength",      Color(1.00, 0.92, 0.62)],   # rgba(255,235,160) 따뜻한 골드
+	"charm":         ["Charm",         Color(1.00, 0.60, 0.85)],   # rgba(255,153,217) 로즈핑크
+	"enthrall":      ["Enthralled",    Color(0.70, 0.55, 1.00)],   # rgba(179,140,255) 라일락
+	"taunt":         ["Taunt",         Color(1.00, 0.62, 0.32)],   # rgba(255,158,82)  코랄
+	"morale":        ["Morale",        Color(1.00, 0.95, 0.65)],   # rgba(255,242,166) 옅은 골드
+	"counter_block": ["Counter Block", Color(0.60, 0.85, 1.00)],   # rgba(153,217,255) 부드러운 하늘
 }
 
 func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int, stack_key: String) -> void:
 	var count: int = _popup_stack.get(stack_key, 0)
 	_popup_stack[stack_key] = count + 1
+	var tint: Color = _popup_text_color(color)
+	var container := Node2D.new()
+	container.z_index = 20
+	add_child(container)
+	# 글로우 halo — N장 outline 겹침 (글자 윤곽 부드럽게 퍼짐)
+	_add_popup_halo(container, text, font_size, color)
+	# 메인 Label — 흰 톤 + 작은 outline
 	var lbl := Label.new()
 	lbl.text = text
-	lbl.modulate = color
-	lbl.label_settings = _get_popup_ls(font_size)
+	lbl.modulate = tint * 1.4
+	lbl.label_settings = _get_popup_main_ls(font_size)
+	container.add_child(lbl)
+	lbl.reset_size()
+	lbl.position = -lbl.size / 2.0
+	# 위치 — base_pos 를 중심으로
 	var spawn_pos := Vector2(base_pos.x + randf_range(-15.0, 15.0), base_pos.y + count * 32.0)
-	lbl.position = spawn_pos
-	lbl.z_index = 20
-	add_child(lbl)
+	container.position = spawn_pos
+	container.scale = Vector2.ZERO
+	# scale punch + 등장 하이라이트 + 부동/페이드 (모두 container 의 property)
 	var tw := create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(lbl, "position:y", spawn_pos.y - 60.0, 0.8)
-	tw.tween_property(lbl, "modulate:a", 0.0, 0.8)
+	tw.tween_property(container, "scale", Vector2(1.3, 1.3), 0.10).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.chain().tween_property(container, "scale", Vector2(1.0, 1.0), 0.08)
+	tw.chain().set_parallel(true)
+	tw.tween_property(lbl, "modulate", tint, 0.12)
+	tw.tween_property(container, "position:y", spawn_pos.y - 60.0, 0.7)
+	tw.tween_property(container, "modulate:a", 0.0, 0.7)
 	tw.chain().tween_callback(func() -> void:
-		lbl.queue_free()
+		container.queue_free()
 		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
 	)
 
 func _spawn_damage_popup(world_pos: Vector2, amount: int, fully_blocked: bool, stack_key: String) -> void:
 	if fully_blocked:
-		_spawn_popup(world_pos, "Block", Color(0.4, 0.8, 1.0), 28, stack_key)
+		_spawn_popup(world_pos, "Block", Color(0.55, 0.78, 1.00), 36, stack_key)   # rgba(140,200,255)
 	else:
-		_spawn_popup(world_pos, str(amount), Color(1.0, 0.2, 0.2), 28, stack_key)
+		_spawn_popup(world_pos, str(amount), Color(1.00, 0.31, 0.31), 36, stack_key)  # rgba(255,80,80)
 
 func _spawn_heal_popup(world_pos: Vector2, amount: int, stack_key: String) -> void:
-	_spawn_popup(world_pos, "+" + str(amount), Color(0.2, 1.0, 0.4), 28, stack_key)
+	_spawn_popup(world_pos, "+" + str(amount), Color(0.71, 1.00, 0.35), 36, stack_key)  # rgba(180,255,90) lime
 
 func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: String) -> void:
 	if not _STATUS_POPUP_INFO.has(status_type):
@@ -1658,24 +1773,31 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 	var info: Array = _STATUS_POPUP_INFO[status_type]
 	var count: int = _popup_stack.get(stack_key, 0)
 	_popup_stack[stack_key] = count + 1
+	var status_color: Color = info[1]
+	var tint: Color = _popup_text_color(status_color)
+	var container := Node2D.new()
+	container.z_index = 20
+	add_child(container)
+	_add_popup_halo(container, info[0], 32, status_color)
 	var lbl := Label.new()
 	lbl.text = info[0]
-	lbl.modulate = info[1]
-	lbl.label_settings = _get_popup_ls(26)
+	lbl.modulate = tint * 1.4
+	lbl.label_settings = _get_popup_main_ls(32)
+	container.add_child(lbl)
+	lbl.reset_size()
+	lbl.position = -lbl.size / 2.0
 	var spawn_pos := Vector2(world_pos.x + randf_range(-15.0, 15.0), world_pos.y + count * 32.0)
-	lbl.position = spawn_pos
-	lbl.pivot_offset = Vector2(30, 13)
-	lbl.scale = Vector2.ZERO
-	lbl.z_index = 20
-	add_child(lbl)
+	container.position = spawn_pos
+	container.scale = Vector2.ZERO
 	var tw := create_tween()
-	tw.tween_property(lbl, "scale", Vector2(1.3, 1.3), 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.tween_property(lbl, "scale", Vector2(1.0, 1.0), 0.08)
-	tw.set_parallel(true)
-	tw.tween_property(lbl, "position:y", spawn_pos.y - 55.0, 0.7).set_delay(0.2)
-	tw.tween_property(lbl, "modulate:a", 0.0, 0.7).set_delay(0.2)
+	tw.tween_property(container, "scale", Vector2(1.3, 1.3), 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.chain().tween_property(container, "scale", Vector2(1.0, 1.0), 0.08)
+	tw.chain().set_parallel(true)
+	tw.tween_property(lbl, "modulate", tint, 0.12)
+	tw.tween_property(container, "position:y", spawn_pos.y - 55.0, 0.7)
+	tw.tween_property(container, "modulate:a", 0.0, 0.7)
 	tw.chain().tween_callback(func() -> void:
-		lbl.queue_free()
+		container.queue_free()
 		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
 	)
 
@@ -1841,6 +1963,7 @@ func _spawn_heal_blessing(pos: Vector2) -> void:
 	var fx := _VFX_HEAL_BLESSING.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		AudioManager.play_sfx("heal")
 	)
@@ -1852,6 +1975,7 @@ func _spawn_holy_buff(pos: Vector2) -> void:
 	var fx := _VFX_HOLY_BUFF.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		AudioManager.play_sfx("impact_divine")
@@ -1864,6 +1988,7 @@ func _spawn_warrior_buff(pos: Vector2) -> void:
 	var fx := _VFX_WARRIOR_BUFF.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		AudioManager.play_sfx("impact_blunt")
@@ -1950,6 +2075,7 @@ func _on_poison_tick(target: String, _amount: int) -> void:
 	var fx := _VFX_POISON_TICK.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		AudioManager.play_sfx("impact_poison")
 	)
@@ -2089,6 +2215,7 @@ func _spawn_attack_beam_simple(dtype: String, caster_pos: Vector2, target_pos: V
 	add_child(fx)
 	fx.position = Vector2.ZERO
 	var sfx_key: String = _sfx_for_dtype(dtype)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		_play_screen_shake()
@@ -2109,6 +2236,7 @@ func _spawn_debuff_beam_simple(beam_script: GDScript, caster_pos: Vector2, targe
 	add_child(fx)
 	fx.position = Vector2.ZERO
 	var sfx_key: String = _sfx_for_status(stype)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_shake()
 		AudioManager.play_sfx(sfx_key)
@@ -2122,6 +2250,7 @@ func _spawn_caster_beam(beam_script: GDScript, caster_pos: Vector2, target_pos: 
 	var fx: Node2D = beam_script.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		_play_screen_shake()
@@ -2205,6 +2334,7 @@ func _spawn_defense_buff(pos: Vector2) -> void:
 	var fx := _VFX_DEFENSE_BUFF.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		AudioManager.play_sfx("block")
 	)
@@ -2366,6 +2496,10 @@ func _on_battle_won() -> void:
 	await get_tree().create_timer(1.5).timeout
 	if not is_inside_tree():
 		return
+	# 1.5s 대기 중 새 드래그 시도로 mouse HIDDEN 됐을 수 있음 — 씬 전환 직전 보험
+	if _drag_card != null:
+		_cleanup_drag()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	GameManager.complete_battle(true)
 
 func _on_battle_lost() -> void:
@@ -2496,7 +2630,7 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 		hbox.custom_minimum_size = Vector2(0, 20)
 		hbox.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		hbox.mouse_filter = Control.MOUSE_FILTER_STOP
-		hbox.tooltip_text = tooltip
+		SacredTheme.attach_tooltip(hbox, tooltip)
 
 		var icon := TextureRect.new()
 		icon.texture = tex
@@ -2529,7 +2663,7 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	else:
 		fallback_lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
 	fallback_lbl.theme_type_variation = "EyebrowLabel"
-	fallback_lbl.tooltip_text = tooltip
+	SacredTheme.attach_tooltip(fallback_lbl, tooltip)
 	fallback_lbl.add_theme_font_size_override("font_size", 12)
 	fallback_lbl.custom_minimum_size = Vector2(0, 18)
 	fallback_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -2571,8 +2705,8 @@ func _refresh_status_icons_enemy(index: int) -> void:
 	if not cinfo.is_empty():
 		var hbox := HBoxContainer.new()
 		hbox.custom_minimum_size = Vector2(0, 18)
-		hbox.tooltip_text = _counter_tooltip_text(cinfo)
 		hbox.mouse_filter = Control.MOUSE_FILTER_STOP
+		SacredTheme.attach_tooltip(hbox, _counter_tooltip_text(cinfo))
 		var icon_tex := IconUtils.get_counter_icon()
 		if icon_tex != null:
 			var icon := TextureRect.new()
@@ -2598,13 +2732,13 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		# DEATH-RATTLE: 사망 시 1회 발동 (사망하면 enemy 자체가 dim 처리됨)
 		if enemy_res.get("death_trigger") != null:
 			var dr_lbl: Control = _make_status_label("death_rattle", 1, {})
-			dr_lbl.tooltip_text = _format_death_rattle_tooltip(enemy_res.death_trigger)
+			SacredTheme.attach_tooltip(dr_lbl, _format_death_rattle_tooltip(enemy_res.death_trigger))
 			box.add_child(dr_lbl)
 		# 신화 시그니처: signatures_enabled + 1회성 시그니처는 발동 후 숨김
 		if enemy_res.get("signatures_enabled") and enemy_res.mythology != "" and _signature_still_active(enemy_res.mythology, status):
 			var sig_key: String = "sig_" + enemy_res.mythology
 			var sig_lbl: Control = _make_status_label(sig_key, 1, {})
-			sig_lbl.tooltip_text = _trf("signature.%s.desc" % enemy_res.mythology, 0)
+			SacredTheme.attach_tooltip(sig_lbl, _trf("signature.%s.desc" % enemy_res.mythology, 0))
 			box.add_child(sig_lbl)
 	for key in status:
 		if key in STATUS_INTERNAL_KEYS:
@@ -2638,7 +2772,7 @@ func _make_power_item(base_key: String, v: int) -> Control:
 	hbox.mouse_filter = Control.MOUSE_FILTER_STOP
 	var desc_fmt: String = tr(base_key + ".desc")
 	if desc_fmt != base_key + ".desc":
-		hbox.tooltip_text = desc_fmt % v if desc_fmt.contains("%d") else desc_fmt
+		SacredTheme.attach_tooltip(hbox, desc_fmt % v if desc_fmt.contains("%d") else desc_fmt)
 
 	var tex: Texture2D = IconUtils.get_power_icon(base_key)
 	if tex != null:
@@ -3184,6 +3318,9 @@ func _card_target_type(card: Resource) -> String:
 
 func _start_drag(card: Resource) -> void:
 	if _card_pick_in_progress:
+		return
+	# 전투 종료 중(승리·패배 연출 1.5s 대기) 새 드래그 차단 — mouse HIDDEN 잔존 방지
+	if not BattleManager.is_battle_active or not BattleManager.is_player_turn:
 		return
 	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	_reset_hand_fan()

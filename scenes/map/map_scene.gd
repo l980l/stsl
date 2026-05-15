@@ -27,11 +27,6 @@ var _deck_card_parents: Dictionary      = {}
 var _active_scroll:     ScrollContainer = null
 var _confirm_popup:     CanvasLayer     = null
 
-var _room_tooltip_panel: Panel = null
-var _room_tooltip_label: Label = null
-var _room_tooltip_timer: Timer = null
-var _room_tooltip_pending: String = ""
-const _ROOM_TOOLTIP_DELAY := 0.4
 
 func _trf(key: String, args) -> String:
 	var s := tr(key)
@@ -135,8 +130,6 @@ func _build_ui() -> void:
 	_map_content.custom_minimum_size = Vector2(1920, content_h)
 	_map_scroll.add_child(_map_content)
 
-	_build_room_tooltip()
-
 	# 연결선 먼저 그리기 (버튼 뒤에)
 	_draw_connections()
 
@@ -173,46 +166,6 @@ func _build_ui() -> void:
 	SacredTheme.animate_button(btn_back)
 
 	_build_party_panel()
-
-func _build_room_tooltip() -> void:
-	var cl := CanvasLayer.new()
-	cl.layer = 20
-	add_child(cl)
-	_room_tooltip_panel = Panel.new()
-	_room_tooltip_panel.visible = false
-	_room_tooltip_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	cl.add_child(_room_tooltip_panel)
-	_room_tooltip_label = Label.new()
-	_room_tooltip_label.position = Vector2(10, 6)
-	_room_tooltip_label.add_theme_font_size_override("font_size", 15)
-	_room_tooltip_panel.add_child(_room_tooltip_label)
-	_room_tooltip_timer = Timer.new()
-	_room_tooltip_timer.one_shot = true
-	_room_tooltip_timer.wait_time = _ROOM_TOOLTIP_DELAY
-	_room_tooltip_timer.timeout.connect(_on_room_tooltip_timer)
-	add_child(_room_tooltip_timer)
-
-func _on_room_hover(text: String) -> void:
-	_room_tooltip_pending = text
-	_room_tooltip_timer.start()
-
-func _on_room_exit() -> void:
-	_room_tooltip_timer.stop()
-	_room_tooltip_pending = ""
-	_room_tooltip_panel.visible = false
-
-func _on_room_tooltip_timer() -> void:
-	if _room_tooltip_pending.is_empty():
-		return
-	_room_tooltip_label.text = _room_tooltip_pending
-	_room_tooltip_label.reset_size()
-	var sz := _room_tooltip_label.get_combined_minimum_size()
-	_room_tooltip_panel.size = sz + Vector2(20, 12)
-	var mpos := get_viewport().get_mouse_position()
-	_room_tooltip_panel.position = mpos + Vector2(16, 24)
-	_room_tooltip_panel.position.x = minf(_room_tooltip_panel.position.x, 1916.0 - _room_tooltip_panel.size.x)
-	_room_tooltip_panel.position.y = minf(_room_tooltip_panel.position.y, 1076.0 - _room_tooltip_panel.size.y)
-	_room_tooltip_panel.visible = true
 
 func _build_party_panel() -> void:
 	var tm := get_node_or_null("/root/TeamManager")
@@ -347,8 +300,7 @@ func _create_node_button(node: Resource) -> void:
 	btn.position = _node_top_left(node)
 	btn.size = Vector2(NODE_SIZE, NODE_SIZE)
 	var tip_text := _room_type_text(node.room_type)
-	btn.mouse_entered.connect(func(): _on_room_hover(tip_text))
-	btn.mouse_exited.connect(_on_room_exit)
+	SacredTheme.attach_tooltip(btn, tip_text)
 	var icon: Texture2D = IconUtils.get_room_icon(node.room_type)
 	if icon != null:
 		btn.icon = icon
@@ -429,17 +381,17 @@ func _refresh_relics() -> void:
 			rect.custom_minimum_size = Vector2(28, 28)
 			rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			rect.tooltip_text = tip
 			rect.mouse_filter = Control.MOUSE_FILTER_STOP
 			_relic_container.add_child(rect)
+			SacredTheme.attach_tooltip(rect, tip)
 		else:
 			var lbl := Label.new()
 			lbl.text = "[%s]" % tr(s["name_key"])
-			lbl.tooltip_text = tip
 			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 			lbl.add_theme_font_size_override("font_size", 13)
 			lbl.modulate = SacredPalette.AMETHYST_300
 			_relic_container.add_child(lbl)
+			SacredTheme.attach_tooltip(lbl, tip)
 	for relic in GameManager.relics:
 		var tip: String = "%s\n%s" % [tr(relic.relic_name), tr(relic.description)]
 		var tex: Texture2D = IconUtils.get_relic_icon(relic.relic_name)
@@ -449,17 +401,17 @@ func _refresh_relics() -> void:
 			rect.custom_minimum_size = Vector2(28, 28)
 			rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			rect.tooltip_text = tip
 			rect.mouse_filter = Control.MOUSE_FILTER_STOP
 			_relic_container.add_child(rect)
+			SacredTheme.attach_tooltip(rect, tip)
 		else:
 			var lbl := Label.new()
 			lbl.text = "[%s]" % tr(relic.relic_name)
-			lbl.tooltip_text = tip
 			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 			lbl.add_theme_font_size_override("font_size", 14)
 			lbl.modulate = SacredPalette.BRASS_300
 			_relic_container.add_child(lbl)
+			SacredTheme.attach_tooltip(lbl, tip)
 
 func _room_type_text(room_type: int) -> String:
 	match room_type:
