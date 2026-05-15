@@ -32,7 +32,7 @@ const POISON_TICK := preload("res://scenes/vfx/poison_tick.gd")
 # kind: "impact"=피격 버스트(타겟 위치) / "self"=자기 버프 버스트 / "beam"=시전자→타겟 빔
 # 현재버전 — 게임에서 실제 사용 중
 const VFX_CURRENT := [
-	{"name": "slash",          "kind": "impact", "path": "res://scenes/vfx/slash_particle.tscn"},
+	{"name": "slash+blood",    "kind": "impact", "path": "res://scenes/vfx/slash_particle.tscn", "with_blood": true},
 	{"name": "fire",           "kind": "beam",   "path": "res://scenes/vfx/fire_blast.gd"},
 	{"name": "ice",            "kind": "beam",   "path": "res://scenes/vfx/ice_shards.gd"},
 	{"name": "lightning_beam", "kind": "beam",   "path": "res://scenes/vfx/lightning_beam.gd"},
@@ -62,6 +62,7 @@ const VFX_CURRENT := [
 
 # 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.
 const VFX_LEGACY := [
+	{"name": "slash",          "kind": "impact", "path": "res://scenes/vfx/slash_particle.tscn"},
 	{"name": "projectile",     "kind": "impact", "path": "res://scenes/vfx/projectile_particle.tscn"},
 	{"name": "explosive",      "kind": "impact", "path": "res://scenes/vfx/explosive_particle.tscn"},
 	{"name": "divine",         "kind": "impact", "path": "res://scenes/vfx/divine_particle.tscn"},
@@ -367,8 +368,15 @@ func _play(entry: Dictionary) -> void:
 					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
 					fx_n.global_position = t_pos
 					_scale_packed_amounts(fx_n, scales[i])
-					if entry["name"] == "slash":
-						fx_n.rotation = randf_range(0.0, TAU)
+					var slash_rot_n := randf_range(0.0, TAU)
+					if entry.get("with_blood", false):
+						fx_n.rotation = slash_rot_n
+						var blood_n: Node2D = BLOOD_SPRAY.new()
+						add_child(blood_n)
+						blood_n.position = Vector2.ZERO
+						blood_n.play(t_pos, t_pos, slash_rot_n)
+					elif entry["name"] == "slash":
+						fx_n.rotation = slash_rot_n
 					fx_n.burst()
 					_spawn_compare_label(t_pos, "x" + str(scales[i]))
 			else:
@@ -379,14 +387,16 @@ func _play(entry: Dictionary) -> void:
 					fx.repeat = false
 				add_child(fx)
 				fx.global_position = _target_pos
-				if entry["name"] == "slash":
-					var slash_rot := randf_range(0.0, TAU)
+				var slash_rot := randf_range(0.0, TAU)
+				if entry.get("with_blood", false):
 					fx.rotation = slash_rot
 					# battle_scene과 동일하게 slash는 피 분출을 베기 방향으로 추가 발동
 					var blood: Node2D = BLOOD_SPRAY.new()
 					add_child(blood)
 					blood.position = Vector2.ZERO
 					blood.play(_target_pos, _target_pos, slash_rot)
+				elif entry["name"] == "slash":
+					fx.rotation = slash_rot
 				fx.burst()
 		"self":
 			var fx: Node2D = (load(entry["path"]) as PackedScene).instantiate()
