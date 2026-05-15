@@ -1,7 +1,7 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-16 v15)
-> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** 기준
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-16 v16)
+> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
 ---
@@ -622,10 +622,54 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - ✅ screen_effect 시점에 화면 중앙 "💥 IMPACT" 라벨 (1초 페이드)
 - ✅ info 라벨에 IMPACT_DELAY 자동 표시
 
-**Phase 2 (별도 PR — 미완료)**:
-- 🔲 `settings_overlay` 의 display 탭을 graphics 로 교체 + 파티클 갯수 옵션 (상/중/하)
-- 🔲 신규 gameplay 탭 (vfx_speed/anim_speed/monster_interval 4단계 segment)
-- 🔲 ConfigFile 또는 SacredTheme 패턴으로 GameSettings.save()/load()
+**Phase 2 ✅ (PR #114)**:
+- ✅ `settings_overlay` graphics 탭 — 파티클 갯수 옵션 (4단계: minimal/low/medium/high — `0.1/0.25/0.5/1.0`. 저사양 대응 minimal 추가는 PR #115 후속)
+- ✅ 신규 gameplay 탭 (vfx_speed/anim_speed/monster_interval 4단계 segment)
+- ✅ ConfigFile 기반 `GameSettings.save_settings() / load_settings()` (`user://game_settings.cfg`)
+
+---
+
+## Milestone 6.9 — 전투 UX 폴리싱 v2 ✅ (PR #115)
+
+> M6.8 후 실전 사용 피드백 기반 — VFX 동기화 정확도, popup 시각효과, 카드 입력 흐름, 툴팁 통일.
+
+### 6.9-1. VFX impact 시점 정확 동기화 v2
+- ✅ `BattleManager.vfx_impact_resolved` 신호 + `_await_vfx_impact(fallback)` helper
+- ✅ battle_scene 의 모든 `fx.screen_effect.connect` 9곳에서 시그널 emit (CONNECT_ONE_SHOT)
+- ✅ 기존 timer 보정값(+0.08s) 이 부정확하던 문제 해결 — popup·SFX·flash 가 **동일 frame** 표시
+- ✅ fallback timer (`_delay + 0.5s`) — fx 가 emit 안 하는 비정상 케이스 방어
+
+### 6.9-2. 글로벌 툴팁 시스템
+- ✅ `SacredTheme.attach_tooltip(ctrl, text)` 글로벌 헬퍼 — 단일 CanvasLayer (layer 100) + Panel + Label
+- ✅ 짙은 검정+보라 `Color(0.04, 0.025, 0.08, 0.8)` + BRASS 테두리. 자연 너비, 360px 초과 시만 wrap
+- ✅ 모든 `tooltip_text = X` 사용처 17곳 일괄 교체 (battle 12 + map 4 + 시그니처 1)
+- ✅ map_scene 의 자체 `_build_room_tooltip` 시스템 제거 → 글로벌 통일
+- ✅ Godot 기본 PopupPanel tooltip 의 viewport alpha 합성 문제 회피
+
+### 6.9-3. 신화 시그니처 아이콘
+- ✅ 적 panel 우측 상단 — 6 신화별 emoji 아이콘 + 호버 툴팁으로 효과 설명
+- ✅ `strings_battle.csv` `signature.{myth}.desc` 키 6종 × 9 언어 등록
+- ✅ btn 가림 회피: Label 을 self(battle_scene) 자식 + late add + z_index 100
+
+### 6.9-4. popup 시각효과 (데미지/힐/Block/상태이상)
+- ✅ Cinzel-Bold 36px (이전 Inter-SemiBold 28) — Sacred 테마와 일관성
+- ✅ 6 레이어 halo outline (alpha 0.05~0.40, outline 6~48px) — 은은한 fuzzy 글로우
+- ✅ 메인 Label 흰 톤 (color × 0.15 + white) + 검정 outline 없음 + 그림자 없음
+- ✅ VFX HTML 기반 톤다운 색상 — 살구/라임/라벤더/코랄/로즈/골드 (촌스러운 원색 회피)
+- ✅ 등장 효과: scale 0→1.3→1.0 punch + modulate 1.4× → 1× 페이드
+
+### 6.9-5. 카드 입력 흐름 + 사망 예측 차단
+- ✅ `_card_busy` 제거 → 카드 사용 즉시 다음 카드 입력 가능 (스무스)
+- ✅ `_pending_dmg_to_enemy` 추적 — 차지 중 카드의 예측 누적 데미지 (DAMAGE effect, weak/strength/vulnerable)
+- ✅ `is_enemy_doomed(idx)`: `effective_hp = current_hp - pending` 0 이하면 사망 예정
+- ✅ `play_card` 거부: 사망 예정 적에 단일 타겟 ATTACK 카드 입력 시 즉시 false
+- ✅ UI: `pending_damage_changed` → `_update_enemy_ui` → panel modulate 0.5 dim, btn disable, HP 라벨 `13/50 (-15)` 표시
+
+### 6.9-6. HP 블룸 임계치 + 파티클 0.1 + vfx_preview 4-way
+- ✅ HP 바 블룸: ratio > 0.40 (정상) intensity 0.0 (이전 0.35 고정 켜짐 버그). 임계치 미만에서만 브리딩
+- ✅ `GameSettings.PARTICLE` 4단계 [minimal=0.1, low=0.25, medium=0.5, high=1.0]
+- ✅ vfx_preview UI 압축 — 시전자(y=540) 안 가리게: panel y 24→8, grid columns 5→9, button 150→105
+- ✅ 비교 모드 3-way → 4-way (x0.1 추가)
 
 ---
 
@@ -691,6 +735,56 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - ✅ 라우드니스 정규화 (SFX -14 LUFS / BGM -18 LUFS, ffmpeg loudnorm)
 - 🔲 이벤트 BGM 나머지 (dark×3·encounter×2·fortune×2 일부 미생성)
 - 🔲 보이스 (캐릭터 전용 보이스 라인 — 선택 사항)
+
+---
+
+## Milestone 7.5 — 배경 시스템 v1 (HD-2D 유사 깊이감)
+
+> 목표: 일러스트 단일 배경 → **2D 다중 레이어 + parallax + DOF 셰이더 + Light2D + SVG 식생/오브젝트** 로
+> 옥토퍼스 트래블러 류 깊이감 흉내. 진짜 3D 카메라(SubViewport+Sprite3D) 까지 가지 않고 작업량 1/5 로 80% 시각 효과.
+> 톤은 픽셀 아트가 아닌 **SVG flat + 라이팅** — Tunic / Hades 스타일에 가까움.
+
+### 7.5-1. parallax 다중 레이어 시스템
+- 🔲 `scenes/components/scene_background.tscn` — `ParallaxBackground` + 5~7 레이어 슬롯
+- 🔲 레이어 motion_scale: sky(0.05) / far(0.15) / mid(0.4) / near(0.7) / fg(1.0)
+- 🔲 카메라 micro-sway (battle_scene 카메라 좌우 ±20px 자동 흔들림 — 고정 화면도 깊이감)
+- 🔲 신화별 팔레트 적용 (greek=청·황금 / norse=회·푸른 / egyptian=황·주황 / buddhist=주황·녹 / daoist=흑·금 / japanese=홍·먹)
+
+### 7.5-2. DOF (depth-of-field) 셰이더
+- 🔲 `assets/shaders/scene_dof.gdshader` — 가우시안 블러, near/far 분리 가능
+- 🔲 배경 레이어(sky/far/mid)는 blur 강함, 캐릭터(near) 선명
+- 🔲 fg 레이어(앞 바위·식생)는 살짝 blur — bokeh 느낌
+- 🔲 GameSettings.particle_quality 와 연동 — minimal 시 DOF off (성능)
+
+### 7.5-3. Light2D 라이팅
+- 🔲 신화별 메인 라이트 (점광원 또는 directional) — 색·위치·세기
+- 🔲 캐릭터 발 아래 ground shadow (어두운 ellipse 텍스처)
+- 🔲 보스/엘리트 spotlight (등장 시 라이트 fade-in + breathing)
+- 🔲 배경 ambient 라이트 — 신화별 색조 (egyptian=warm orange, norse=cool blue 등)
+
+### 7.5-4. SVG 식생/오브젝트 라이브러리
+- 🔲 `assets/art/scenery/` 디렉토리 — 신화별 서브폴더 (greek/, norse/, egyptian/, buddhist/, daoist/, japanese/)
+- 🔲 각 신화당 식생 6~10종 (나무·풀·꽃·바위·기둥·등불·기치 등)
+- 🔲 Inkscape 또는 Figma 로 SVG 제작 (외부 작업 — 일러스트 의존도 낮은 도형 위주)
+- 🔲 Godot SVG import — `scale = 1.0` 기준 + `texture_filter = NEAREST` 선택 (sharp edge)
+- 🔲 BatlleScene 의 _background_for_myth() 가 신화별 SVG 무작위 배치 (각 레이어에 N개 spawn)
+
+### 7.5-5. 통합 + 적용
+- 🔲 battle_scene — 일러스트 ColorRect(`bg_tex`) 제거 → ParallaxBackground 로 교체
+- 🔲 map_scene — 챕터별 배경 (현재 단일 일러스트) → parallax + 식생
+- 🔲 event_scene / shop / rest — 단순 (1~2 레이어) 적용
+- 🔲 main_menu / chapter_select — 강화 (5+ 레이어, 라이팅 강조)
+- 🔲 vfx_preview 에 배경 파티클(먼지/잎사귀) 토글 디버그 옵션
+
+### 7.5-6. 성능 / 옵션
+- 🔲 GameSettings.background_quality (0=off / 1=basic / 2=full DOF + 라이팅)
+- 🔲 minimal 파티클 quality 시 자동 background_quality=1
+- 🔲 ParallaxBackground 의 enabled toggle (모바일 저사양 fallback)
+
+### 7.5-7. 검증
+- 🔲 60fps 유지 (PC 기준 6 레이어 + DOF + 라이트 3개)
+- 🔲 모바일 30fps 이상 (background_quality=1 모드)
+- 🔲 신화별 톤 일관성 — Sacred 팔레트와 충돌 없음
 
 ---
 
@@ -891,7 +985,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-05-10 v14. PR #104~#107 반영 — 이벤트·렐릭 v2 완료 (신규 EffectType 3종, 22개 다양화, 5개 차별화, 5개 신규 이벤트, PASSIVE 트리거 버그 수정, 1365 테스트 통과 / 0 fail).
+> 최종 갱신: 2026-05-16 v16. PR #114·#115 반영 — 설정 graphics/gameplay 탭 + 전투 UX 폴리싱 v2 (VFX impact 정확 동기화·글로벌 툴팁·popup 글로우·카드 흐름·사망 예측·HP 블룸 임계치·파티클 4단계). 1470 테스트 통과 / 0 fail.
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -919,7 +1013,9 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 이벤트·렐릭 v2 (M6.6) | PR #104~#107. 신규 EffectType 3종(TRIGGER_BATTLE/MULTI/ADD_CARD) + 22개 다양화 + 5개 렐릭 차별화 + 5개 신규 이벤트 + PASSIVE/status_type 버그 수정 + 통합 테스트 +14. **1365 통과 / 0 fail** |
 | ✅ 완료 | 이벤트 UX 마무리 (M6.7) | PR #108~#110. 무의미 NONE 옵션 일괄 재설계 + choice 라벨 i18n 갱신 + autoload 버그 수정(전투 렐릭·세이브 회복) + 카드 제거 UI 통합(card_removal_overlay) |
 | ✅ 완료 | VFX 시스템 v1 (M6.8) | PR #111~#113. 공격·상태·버프 VFX 20종 GDScript 포팅 + divine→holy 일괄 이주 + 임팩트 시점 동기화(`IMPACT_DELAY` + async `_execute_intent`) + GameSettings autoload hook + curse→debuff_hex 통일 + SFX 매핑 + 다수 시각 버그 수정(flash shader/시그니처 burst/screen_flash 비활성) + poison_tick 신규 + vfx_preview 디버그. **1470 통과 / 0 fail** |
-| 🟡 중기 | VFX 옵션 UI (M6.8 Phase 2) | settings_overlay 의 graphics/gameplay 탭 신설 (파티클 품질 + vfx/anim/monster 속도 4단계) + GameSettings save/load |
+| ✅ 완료 | VFX 옵션 UI (M6.8 Phase 2) | PR #114. graphics/gameplay 탭 + 4단계 segment + ConfigFile save/load |
+| ✅ 완료 | 전투 UX 폴리싱 v2 (M6.9) | PR #115. fx.screen_effect 직접 await 동기화 + 글로벌 툴팁 시스템 + popup 글로우(Cinzel-Bold/halo)/색상(VFX HTML 톤) + 카드 입력 스무스(_card_busy 제거) + 사망 예측 차단 + HP 블룸 임계치 수정 + 파티클 4단계 + vfx_preview 4-way. **1470 통과 / 0 fail** |
+| 🔴 즉시 | 배경 시스템 v1 (M7.5) | parallax 다중 레이어 + DOF 셰이더 + Light2D + SVG 식생/오브젝트. 옥토퍼스/Tunic/Hades 류 깊이감 (작업량 1/5 로 80% 효과) |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
 | 🟡 중기 | 이벤트 BGM 나머지 생성 (M7-6) | dark×3·encounter×2·fortune×2 미생성분 |
 | 🟢 장기 | 비주얼 (M7-1~7-5) 캐릭터·카드 아트, 이펙트 | 몰입감 |
