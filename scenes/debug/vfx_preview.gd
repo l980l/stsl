@@ -104,6 +104,23 @@ func _ready() -> void:
 	auto_btn.toggled.connect(func(on: bool) -> void: _auto = on)
 	panel.add_child(auto_btn)
 
+	# 파티클 갯수 토글 — 다음 VFX spawn 부터 즉시 반영 (GameSettings.particle_quality)
+	var pq_label := Label.new()
+	pq_label.text = "파티클 갯수 (현재: %s)" % GameSettings.particle_key
+	panel.add_child(pq_label)
+	var pq_box := HBoxContainer.new()
+	panel.add_child(pq_box)
+	for k in GameSettings.PARTICLE_KEYS:
+		var idx_str := str(GameSettings.PARTICLE_VALUES[GameSettings.PARTICLE_KEYS.find(k)])
+		var pq_btn := Button.new()
+		pq_btn.text = "x" + idx_str
+		pq_btn.custom_minimum_size = Vector2(80, 0)
+		pq_btn.pressed.connect(func() -> void:
+			GameSettings.set_particle_quality(k)
+			pq_label.text = "파티클 갯수 (현재: %s)" % GameSettings.particle_key
+			_update_info())
+		pq_box.add_child(pq_btn)
+
 	_info = Label.new()
 	panel.add_child(_info)
 	_update_info()
@@ -252,6 +269,17 @@ func _update_info() -> void:
 		var script: GDScript = load(_selected["path"]) as GDScript
 		if script and "IMPACT_DELAY" in script:
 			s += "\n⏱ 임팩트 시점: %.2fs (이때 데미지/SFX 적용)" % script.IMPACT_DELAY
+		# 파티클 갯수 적용 여부 — 스크립트에 _pcount 메서드 정의돼 있는지
+		if script:
+			var has_pcount: bool = false
+			for m in script.get_script_method_list():
+				if m["name"] == "_pcount":
+					has_pcount = true
+					break
+			if has_pcount:
+				s += "\n🎚 파티클 갯수 적용 ✓ — 현재 %s (x%s)" % [GameSettings.particle_key, str(GameSettings.particle_count_scale())]
+			else:
+				s += "\n🎚 파티클 갯수 미적용 (단일 spawn / 폴리곤 점)"
 	_info.text = s
 
 func _select_and_play(entry: Dictionary) -> void:
