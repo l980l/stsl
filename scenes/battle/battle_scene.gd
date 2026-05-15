@@ -2010,16 +2010,17 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 					elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
 						_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type)
 		elif et == EffectResource.EffectType.CHARM:
-			# Cleopatra 매혹 카드 — charm_kiss 빔 (단일/ALL)
+			# Cleopatra 매혹 카드 — 적별로 enthrall 임계치 도달 여부 판정 → infatuation 또는 charm_kiss
 			if did_debuff:
 				continue
 			did_debuff = true
+			var charm_stacks: int = effect.value
 			if effect.target == "ALL":
 				for i in range(_enemy_char_nodes.size()):
 					if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
-						_spawn_debuff_beam_simple(_VFX_CHARM_KISS, caster_pos, _enemy_char_nodes[i].global_position, "charm")
+						_spawn_charm_or_infatuation(caster_pos, _enemy_char_nodes[i].global_position, i, charm_stacks)
 			elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
-				_spawn_debuff_beam_simple(_VFX_CHARM_KISS, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, "charm")
+				_spawn_charm_or_infatuation(caster_pos, _enemy_char_nodes[target_enemy_index].global_position, target_enemy_index, charm_stacks)
 		elif et == EffectResource.EffectType.HEAL or et == EffectResource.EffectType.HEAL_ALL:
 			if not did_self_aoe:
 				_spawn_heal_blessing(caster_pos)
@@ -2091,6 +2092,13 @@ func _spawn_attack_beam_simple(dtype: String, caster_pos: Vector2, target_pos: V
 	)
 	fx.play(caster_pos, target_pos)
 
+# 매혹 카드용 — 이 적이 charm 누적으로 enthrall 발동할지 판정 후 charm_kiss / infatuation 분기
+func _spawn_charm_or_infatuation(caster_pos: Vector2, target_pos: Vector2, enemy_index: int, charm_stacks: int) -> void:
+	if BattleManager.will_enthrall_enemy(enemy_index, charm_stacks):
+		_spawn_debuff_beam_simple(_VFX_INFATUATION, caster_pos, target_pos, "enthrall")
+	else:
+		_spawn_debuff_beam_simple(_VFX_CHARM_KISS, caster_pos, target_pos, "charm")
+
 # 단순 디버프 spawn — screen_effect 시점에 SFX
 func _spawn_debuff_beam_simple(beam_script: GDScript, caster_pos: Vector2, target_pos: Vector2, stype: String) -> void:
 	var fx: Node2D = beam_script.new()
@@ -2154,19 +2162,8 @@ func _caster_beam_script(dtype: String) -> GDScript:
 			return null
 
 func _play_screen_flash() -> void:
-	var layer := CanvasLayer.new()
-	layer.layer = 100
-	add_child(layer)
-	var rect := ColorRect.new()
-	rect.color = Color(0.863, 0.918, 1.0)  # #dceaff
-	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rect.modulate.a = 0.0
-	layer.add_child(rect)
-	var tw := create_tween()
-	tw.tween_property(rect, "modulate:a", 0.85, 0.03)
-	tw.tween_property(rect, "modulate:a", 0.0, 0.32)
-	tw.tween_callback(layer.queue_free)
+	# 비활성화 — 매 스킬마다 전체 화면 번쩍임이 너무 강함 (사용자 피드백)
+	pass
 
 func _play_screen_shake() -> void:
 	if has_meta("_lit_shake"):
@@ -2355,6 +2352,10 @@ func _on_battle_won() -> void:
 	_message_label.text = tr("battle.msg_victory")
 	_end_turn_btn.disabled = true
 	_selected_card = null
+	# 드래그 중 전투 종료 시 마우스 hidden 잔존 방지 — 드래그 정리
+	if _drag_card != null:
+		_cleanup_drag()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	for entry in _enemy_nodes:
 		entry["btn"].disabled = true
 	GameManager.complete_battle(true)
@@ -2363,6 +2364,10 @@ func _on_battle_lost() -> void:
 	if _lose_played:
 		return
 	_lose_played = true
+	# 드래그 중 전투 종료 시 마우스 hidden 잔존 방지
+	if _drag_card != null:
+		_cleanup_drag()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_end_turn_btn.disabled = true
 	_selected_card = null
 	for entry in _enemy_nodes:

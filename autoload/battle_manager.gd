@@ -1504,6 +1504,22 @@ func is_enemy_alive(index: int) -> bool:
 		return false
 	return _enemy_alive[index]
 
+# VFX 미리 결정용 — 카드의 charm stacks 가 적용되면 enthrall 발동할지 사전 판정
+# (실제 적용은 _apply_status_to_enemy 가 수행. 여기서는 시각이펙트 분기만)
+func will_enthrall_enemy(enemy_index: int, charm_stacks: int) -> bool:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return false
+	if not _enemy_alive[enemy_index]:
+		return false
+	var current: int = _enemy_status[enemy_index].get("charm", 0)
+	var new_charm: int = current + charm_stacks
+	var charm_reduce: int = 0
+	for _cpk in _active_powers:
+		if _cpk.begins_with("power.charm_threshold_minus:"):
+			charm_reduce += _active_powers[_cpk].get("value", 0)
+	var threshold: int = max(1, CHARM_THRESHOLD_BASE + _enemy_status[enemy_index].get("charm_resistance", 0) - charm_reduce)
+	return new_charm >= threshold
+
 func get_enemy_current_intent(index: int) -> Resource:
 	if index < 0 or index >= _enemies.size():
 		return null
