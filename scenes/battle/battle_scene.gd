@@ -1853,31 +1853,37 @@ func _spawn_revive_blessing(pos: Vector2) -> void:
 	fx.play(pos, pos)
 
 # 회복 VFX — 회복 대상 위치에 나뭇잎·반짝임·고리·십자
+# screen_effect 시점(차지 끝)에 heal SFX 발동
 func _spawn_heal_blessing(pos: Vector2) -> void:
 	var fx := _VFX_HEAL_BLESSING.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void:
+		AudioManager.play_sfx("heal")
+	)
 	fx.play(pos, pos)
 
 # 신성 버프 VFX — Joan 의 POWER 카드 발동 시 시전자 위치에 룬링·빛기둥·황금 깃털
+# "buff" SFX 자원 없음 → impact_divine 재활용 (신성·강력 톤)
 func _spawn_holy_buff(pos: Vector2) -> void:
 	var fx := _VFX_HOLY_BUFF.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
-		AudioManager.play_sfx("buff")
+		AudioManager.play_sfx("impact_divine")
 	)
 	fx.play(pos, pos)
 
 # 전사 버프 VFX — Joan 외 영웅의 POWER 카드 발동 시 분노/주황 가시링·오라·잔불
+# "buff" SFX 자원 없음 → impact_blunt 재활용 (분노·강한 충격 톤)
 func _spawn_warrior_buff(pos: Vector2) -> void:
 	var fx := _VFX_WARRIOR_BUFF.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
-		AudioManager.play_sfx("buff")
+		AudioManager.play_sfx("impact_blunt")
 	)
 	fx.play(pos, pos)
 
@@ -1960,13 +1966,20 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 	if owner_node == null:
 		return
 	var caster_pos: Vector2 = owner_node.global_position
-	# 카드의 모든 effect 에 대해 적절한 VFX 시작 (return 안 함 — 여러 effect 동시 표시)
+	# 카드의 모든 effect 에 대해 적절한 VFX 시작 — 단, 같은 효과군은 한 번만 표시.
 	# damage_type 이 명시된 effect 는 모두 ATTACK 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF 등)
 	# 차지 시간 동기화는 첫 effect 기준 (_card_vfx_impact_delay) — 다른 VFX 는 자체 타이밍.
-	var did_buff: bool = false  # POWER 류 버프는 한 번만 (여러 power.* effect 가 있어도 단일 buff VFX)
-	var did_self_aoe: bool = false  # heal/block 도 한 번만
+	var did_attack: bool = false   # ATTACK 빔 한 번만 (모래폭풍 = DMG ALL curse + WEAK ALL → 빔 중복 방지)
+	var did_buff: bool = false     # POWER 버프 한 번만
+	var did_self_aoe: bool = false # heal/block 한 번만
+	var did_debuff: bool = false   # 디버프 빔 한 번만 (ATTACK 이 이미 있으면 status 추가 표시 안 함)
 	for effect in card.effects:
 		if effect.damage_type != "":
+			if did_attack:
+				continue
+			did_attack = true
+			# ATTACK 이 발동되면 같은 카드의 status 빔(weak/vulnerable 등)은 중복으로 안 띄움
+			did_debuff = true
 			var dtype: String = effect.damage_type
 			if effect.target == "ALL":
 				for i in range(_enemy_char_nodes.size()):
@@ -1985,8 +1998,11 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 						_spawn_warrior_buff(caster_pos)
 					did_buff = true
 			else:
+				if did_debuff:
+					continue
 				var fx_script: GDScript = _debuff_script_for_status(effect.status_type)
 				if fx_script:
+					did_debuff = true
 					if effect.target == "ALL":
 						for i in range(_enemy_char_nodes.size()):
 							if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
@@ -2165,20 +2181,21 @@ func _on_hero_healed(hero_id: String, amount: int) -> void:
 			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
 			_spawn_heal_popup(popup_pos, amount, hero_id)
 			break
-	# heal_blessing VFX 는 _on_card_vfx_start 가 차지 시작. 여기서는 SFX 만.
-	if _hero_char_nodes.get(hero_id):
-		AudioManager.play_sfx("heal")
+	# heal_blessing VFX 가 screen_effect 시점에 SFX 직접 발동 (이중 호출 방지)
 
-func _on_hero_block_gained(hero_id: String, _amount: int) -> void:
-	# defense_buff VFX 는 _on_card_vfx_start (또는 _on_intent_vfx_start 의 적 BUFF) 가 차지 시작. 여기서는 SFX 만.
-	if _hero_char_nodes.get(hero_id):
-		AudioManager.play_sfx("block")
+func _on_hero_block_gained(_hero_id: String, _amount: int) -> void:
+	# defense_buff VFX 가 screen_effect 시점에 SFX 직접 발동 (이중 호출 방지)
+	pass
 
 # 방어도 버프 VFX — BLOCK 획득 시 6각 dome + barrier + 룬링
+# screen_effect 시점(차지 끝)에 block SFX 발동
 func _spawn_defense_buff(pos: Vector2) -> void:
 	var fx := _VFX_DEFENSE_BUFF.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void:
+		AudioManager.play_sfx("block")
+	)
 	fx.play(pos, pos)
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
