@@ -17,6 +17,7 @@ const ORB_CHARGE_START := 0.12  # 차지 구체 시작
 const ORB_CHARGE_FULL  := 0.36  # 차지 완료
 const ORB_OFFSET_Y     := -90.0 # 차지 구체 — 타겟 위로(px)
 const CHARGE_TIME      := 0.6   # 차지 시간(s)
+const IMPACT_DELAY     := CHARGE_TIME  # battle_manager 동기화용 (차지 끝 = 회복 발동)
 const HEAL_TIME        := 1.4   # 발동 후 잎·반짝임 분출 지속(s)
 const RING_SQUASH      := 0.34  # 누운 원근 — y축 압축 (rotateX 70°)
 const PSPEED           := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수

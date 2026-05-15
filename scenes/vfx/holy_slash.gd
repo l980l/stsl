@@ -18,6 +18,7 @@ const _VFX_SLASH_PARTICLE: PackedScene = preload("res://scenes/vfx/slash_particl
 const ORB_CHARGE_START := 0.12  # 차지 구체 시작
 const ORB_CHARGE_FULL  := 0.36  # 차지 완료
 const CHANNEL_TIME     := 0.38  # 채널·후광 시간(s)
+const IMPACT_DELAY     := CHANNEL_TIME  # battle_manager 동기화용 (채널 끝 = 베기 명중)
 const HALO_RADIUS      := 56.0  # 시전자 뒤 후광 반경(px)
 const FEATHER_COUNT    := 14    # 베기 명중 시 피 대신 튀는 깃털 개수
 const PSPEED           := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수

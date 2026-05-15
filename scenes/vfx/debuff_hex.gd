@@ -17,6 +17,7 @@ const COL_DRIP_HL := Color(0.784, 0.902, 0.667) # rgba(200,230,170) — 독액 �
 const ORB_CHARGE_START := 0.12  # 차지 구체 시작
 const ORB_CHARGE_FULL  := 0.40  # 차지 완료
 const CHARGE_TIME      := 0.65  # 차지 시간(s)
+const IMPACT_DELAY     := CHARGE_TIME  # battle_manager 동기화용 (차지 끝 = 발톱 할퀴기 시작)
 const CLAW_DUR         := 0.28  # 발톱 할퀴기 1회 지속(s)
 const DEBUFF_TIME      := 2.0   # 명중 후 독무·마법진 지속(s)
 const PSPEED           := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수

@@ -21,6 +21,7 @@ const ORB_CHARGE_START := 0.12  # 차지 구체 시작
 const ORB_CHARGE_FULL  := 0.36  # 차지 완료
 const CHARGE_TIME      := 0.6   # 차지 시간(s)
 const FLASK_FLIGHT     := 0.5   # 플라스크 비행 시간(s)
+const IMPACT_DELAY     := CHARGE_TIME + FLASK_FLIGHT  # battle_manager 동기화용
 const ARC_HEIGHT       := 100.0 # 포물선 최고점 높이(px)
 const POISON_TIME      := 3.0   # 명중 후 잔류 독(DoT) 지속(s) — HTML 6.0초의 절반
 const PSPEED           := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수

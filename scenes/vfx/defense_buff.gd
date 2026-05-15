@@ -11,6 +11,7 @@ const COL_DEEP := Color(0.165, 0.420, 0.690) # #2a6bb0
 const ORB_OFFSET_Y    := -50.0
 const ORB_CHARGE_FULL := 0.32
 const CHARGE_TIME     := 0.3
+const IMPACT_DELAY    := CHARGE_TIME  # battle_manager 동기화용
 const BUFF_TIME       := 1.2
 const RING_SQUASH     := 0.34
 const RING_RADIUS     := 100.0

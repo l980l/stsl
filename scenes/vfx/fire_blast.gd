@@ -15,6 +15,7 @@ const ORB_CHARGE_START := 0.12  # 차지 구체 시작
 const ORB_CHARGE_FULL  := 0.36  # 차지 완료
 const CHARGE_TIME      := 0.65  # 차지 시간(s)
 const PROJ_FLIGHT      := 0.45  # 투사체 비행 시간(s)
+const IMPACT_DELAY     := CHARGE_TIME + PROJ_FLIGHT  # battle_manager 동기화용
 const ARC_HEIGHT       := 120.0 # 포물선 최고점 높이(px)
 const BURN_TIME        := 2.0   # 명중 후 잔불(DoT) 지속(s)
 const PSPEED           := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수

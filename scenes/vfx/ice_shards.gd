@@ -17,6 +17,7 @@ const FROST_FLOOR_SIZE := 1.28  # 바닥 서리 최대 가로 scale
 const CHARGE_TIME      := 0.65  # 차지 시간(s)
 const SHARD_COUNT      := 5     # 파편 개수
 const SHARD_FLIGHT     := 0.32  # 파편 비행 시간(s)
+const IMPACT_DELAY     := CHARGE_TIME + SHARD_FLIGHT  # battle_manager 동기화용
 const FREEZE_TIME      := 2.0   # 명중 후 눈보라·얼음 감옥 지속(s)
 const PSPEED           := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수
 

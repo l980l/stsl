@@ -14,6 +14,7 @@ const COL_SMOKE  := Color(1.0, 0.706, 0.863)   # rgba(255,180,220) — 분홍 �
 # 크기/타이밍 — 이 상수만 만지면 된다.
 const CHARGE_TIME  := 0.7    # 차지 시간(s)
 const PROJ_FLIGHT  := 0.6    # 키스 투사체 비행 시간(s)
+const IMPACT_DELAY := CHARGE_TIME + PROJ_FLIGHT  # battle_manager 동기화용
 const ARC_HEIGHT   := 50.0   # 포물선 최고점 높이(px)
 const WOBBLE_AMP   := 22.0   # 비행 중 흔들림 진폭(px)
 const CHARM_TIME   := 2.5    # 명중 후 매혹 잔류(s) — HTML 5.0초의 절반

@@ -822,6 +822,9 @@ func _connect_signals() -> void:
 	BattleManager.card_pick_requested.connect(_on_card_pick_requested)
 	BattleManager.boss_phase_changed.connect(_on_boss_phase_changed)
 	BattleManager.enemy_spawned.connect(_on_enemy_spawned)
+	# VFX 차지 시작 — 적 인텐트/영웅 카드 출처 모두 임팩트 시점에 데미지·SFX 동기
+	BattleManager.intent_vfx_charge_start.connect(_on_intent_vfx_start)
+	BattleManager.card_vfx_charge_start.connect(_on_card_vfx_start)
 	BattleManager.signature_fired.connect(_on_signature_fired)
 
 var _bgm_boss_id: String = ""
@@ -930,7 +933,7 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 
 func _start_battle() -> void:
 	if not GameManager.pending_enemies.is_empty():
-		BattleManager.turn_interval = 0.4
+		BattleManager.turn_interval = 0.4  # base — GameSettings.monster_interval_multiplier 가 곱셈 적용
 		BattleManager.setup_battle(GameManager.pending_enemies)
 		_setup_heroes()
 		_setup_enemies()
@@ -1496,15 +1499,9 @@ func _on_energy_changed(new_energy: int) -> void:
 
 func _on_card_played(card: Resource) -> void:
 	call_deferred("_refresh_all_hero_ui")
+	# VFX (DAMAGE/BLOCK/HEAL/APPLY_STATUS) 는 BattleManager.card_vfx_charge_start → _on_card_vfx_start 가 처리.
+	# 여기서는 영웅 attack 애니메이션만 (anim_speed_multiplier 적용).
 	var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
-	# 버프 (POWER) — Joan=홀리(황금), 그 외=전사(분노 주황). 캐릭터 노드 위치에 발동.
-	if card.get("card_type") == CardResource.CardType.POWER:
-		var ch_node = _hero_char_nodes.get(owner_id)
-		if ch_node:
-			if owner_id == "joan_of_arc":
-				_spawn_holy_buff(ch_node.global_position)
-			else:
-				_spawn_warrior_buff(ch_node.global_position)
 	var anim_name: String = card.get("play_animation") if card.get("play_animation") != null else ""
 	if anim_name == "":
 		return
@@ -1512,6 +1509,8 @@ func _on_card_played(card: Resource) -> void:
 	if char_node == null or not char_node.has_node("AnimationPlayer"):
 		return
 	var anim_player: AnimationPlayer = char_node.get_node("AnimationPlayer")
+	var gs := get_node_or_null("/root/GameSettings")
+	anim_player.speed_scale = gs.anim_speed_multiplier if gs else 1.0
 	if anim_player.has_animation(anim_name):
 		anim_player.play(anim_name)
 
@@ -1882,7 +1881,153 @@ func _spawn_warrior_buff(pos: Vector2) -> void:
 	)
 	fx.play(pos, pos)
 
-# lightning/ice 등 시전자→타겟 빔 VFX 공통 생성기.
+# 임팩트 위치를 약간 흔들어 두 발 이상의 VFX 가 같은 점에 겹치지 않게
+func _impact_jitter() -> Vector2:
+	return Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
+
+# 첫 살아있는 영웅의 char_node 좌표 — 단일 타겟 적 인텐트의 시각적 대표
+func _first_living_hero_pos() -> Vector2:
+	for entry in _hero_nodes:
+		var hid: String = entry["hero_id"]
+		if hid == "" or not TeamManager.is_alive(hid):
+			continue
+		var hnode: Node2D = _hero_char_nodes.get(hid)
+		if hnode:
+			return hnode.global_position
+	return Vector2.ZERO
+
+# 모든 살아있는 영웅의 char_node 좌표
+func _all_living_hero_positions() -> Array:
+	var out: Array = []
+	for entry in _hero_nodes:
+		var hid: String = entry["hero_id"]
+		if hid == "" or not TeamManager.is_alive(hid):
+			continue
+		var hnode: Node2D = _hero_char_nodes.get(hid)
+		if hnode:
+			out.append(hnode.global_position)
+	return out
+
+# 적 인텐트 차지 시작 — battle_manager 가 차지 끝나기까지 await 후 데미지 적용.
+# VFX 의 screen_effect 시점이 데미지 시그널 emit 시점과 일치 (임팩트 동기화).
+func _on_intent_vfx_start(enemy_index: int, intent: Resource) -> void:
+	if enemy_index < 0 or enemy_index >= _enemy_char_nodes.size():
+		return
+	var caster_node: Node2D = _enemy_char_nodes[enemy_index]
+	if caster_node == null:
+		return
+	var caster_pos: Vector2 = caster_node.global_position
+	var IntentRes = BattleManager.IntentRes
+	match intent.action_type:
+		IntentRes.ActionType.ATTACK:
+			var dtype: String = intent.damage_type
+			if intent.target == IntentRes.TargetType.ALL:
+				for hpos in _all_living_hero_positions():
+					_spawn_attack_beam_simple(dtype, caster_pos, hpos + _impact_jitter())
+			else:
+				var hpos: Vector2 = _first_living_hero_pos()
+				if hpos != Vector2.ZERO:
+					_spawn_attack_beam_simple(dtype, caster_pos, hpos + _impact_jitter())
+		IntentRes.ActionType.BUFF:
+			if intent.status_type == "block":
+				_spawn_defense_buff(caster_pos)
+			else:
+				_spawn_warrior_buff(caster_pos)
+		IntentRes.ActionType.DEBUFF:
+			var stype: String = intent.status_type
+			var fx_script: GDScript = _debuff_script_for_status(stype)
+			if fx_script:
+				if intent.target == IntentRes.TargetType.ALL:
+					for hpos in _all_living_hero_positions():
+						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype)
+				else:
+					var hpos: Vector2 = _first_living_hero_pos()
+					if hpos != Vector2.ZERO:
+						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype)
+
+# 영웅 카드 차지 시작 — battle_manager 가 차지 끝나기까지 await 후 효과 적용.
+func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id: String) -> void:
+	var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
+	var owner_node: Node2D = _hero_char_nodes.get(owner_id)
+	if owner_node == null:
+		return
+	var caster_pos: Vector2 = owner_node.global_position
+	# 첫 의미 있는 effect 만 VFX 트리거 — 이후 effect 들은 데미지/상태 시그널로 SFX/feedback
+	for effect in card.effects:
+		var et = effect.effect_type
+		if et == EffectResource.EffectType.DAMAGE:
+			var dtype: String = effect.damage_type
+			if effect.target == "ALL":
+				for i in range(_enemy_char_nodes.size()):
+					if i < _enemy_alive_visible() and _enemy_char_nodes[i]:
+						_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[i].global_position + _impact_jitter())
+			elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size():
+				_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[target_enemy_index].global_position + _impact_jitter())
+			return
+		elif et == EffectResource.EffectType.APPLY_STATUS:
+			if effect.status_type.begins_with("power."):
+				if owner_id == "joan_of_arc":
+					_spawn_holy_buff(caster_pos)
+				else:
+					_spawn_warrior_buff(caster_pos)
+			else:
+				var fx_script: GDScript = _debuff_script_for_status(effect.status_type)
+				if fx_script and target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size():
+					_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type)
+			return
+		elif et == EffectResource.EffectType.HEAL or et == EffectResource.EffectType.HEAL_ALL:
+			_spawn_heal_blessing(caster_pos)
+			return
+		elif et == EffectResource.EffectType.BLOCK or et == EffectResource.EffectType.BLOCK_ALL:
+			_spawn_defense_buff(caster_pos)
+			return
+
+# 살아있는 적 인덱스 카운트 (target=ALL 영웅 카드의 visible 적 갯수)
+func _enemy_alive_visible() -> int:
+	var n: int = 0
+	for i in range(_enemy_char_nodes.size()):
+		if _enemy_char_nodes[i] != null and BattleManager.is_enemy_alive(i):
+			n += 1
+	return n
+
+# 디버프 status_type → VFX 스크립트
+func _debuff_script_for_status(stype: String) -> GDScript:
+	if stype == "weak" or stype == "vulnerable":
+		return _VFX_DEBUFF_HEX
+	elif stype == "charm":
+		return _VFX_CHARM_KISS
+	elif stype == "enthrall":
+		return _VFX_INFATUATION
+	return null
+
+# 단순 빔 spawn — screen_effect 시점에 SFX/flash/shake 발동
+func _spawn_attack_beam_simple(dtype: String, caster_pos: Vector2, target_pos: Vector2) -> void:
+	var beam_script := _caster_beam_script(dtype)
+	if beam_script == null:
+		return
+	var fx: Node2D = beam_script.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		_play_screen_shake()
+		AudioManager.play_sfx("impact_" + dtype)
+	)
+	fx.play(caster_pos, target_pos)
+
+# 단순 디버프 spawn — screen_effect 시점에 SFX
+func _spawn_debuff_beam_simple(beam_script: GDScript, caster_pos: Vector2, target_pos: Vector2, stype: String) -> void:
+	var fx: Node2D = beam_script.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	var sfx_name: String = "charm" if stype == "charm" or stype == "enthrall" else "debuff"
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_shake()
+		AudioManager.play_sfx(sfx_name)
+	)
+	fx.play(caster_pos, target_pos)
+
+# lightning/ice 등 시전자→타겟 빔 VFX 공통 생성기 (구버전 — beam 동적 사망 지연용으로 일부 코드에서 유지).
 # 빔이 명중을 알리는 screen_effect 시점에 화면 효과·SFX·피격 피드백을 동기화한다.
 func _spawn_caster_beam(beam_script: GDScript, caster_pos: Vector2, target_pos: Vector2,
 		dtype: String, on_impact: Callable) -> Node2D:
@@ -1969,15 +2114,13 @@ func _on_hero_healed(hero_id: String, amount: int) -> void:
 			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
 			_spawn_heal_popup(popup_pos, amount, hero_id)
 			break
-	var char_node = _hero_char_nodes.get(hero_id)
-	if char_node:
-		_spawn_heal_blessing(char_node.global_position)
+	# heal_blessing VFX 는 _on_card_vfx_start 가 차지 시작. 여기서는 SFX 만.
+	if _hero_char_nodes.get(hero_id):
 		AudioManager.play_sfx("heal")
 
 func _on_hero_block_gained(hero_id: String, _amount: int) -> void:
-	var char_node = _hero_char_nodes.get(hero_id)
-	if char_node:
-		_spawn_defense_buff(char_node.global_position)
+	# defense_buff VFX 는 _on_card_vfx_start (또는 _on_intent_vfx_start 의 적 BUFF) 가 차지 시작. 여기서는 SFX 만.
+	if _hero_char_nodes.get(hero_id):
 		AudioManager.play_sfx("block")
 
 # 방어도 버프 VFX — BLOCK 획득 시 6각 dome + barrier + 룬링
@@ -1988,76 +2131,62 @@ func _spawn_defense_buff(pos: Vector2) -> void:
 	fx.play(pos, pos)
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
+	# VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 이미 차지 시작.
+	# 데미지 시그널은 임팩트 시점이므로 — 피격 피드백 즉시 (UI·팝업·플래시·틴트·hurt 애니).
+	# 빔이 없는 dtype (divine 등 impact-only) 은 별도 _spawn_impact_particles.
+	_update_hero_ui(hero_id)
+	for entry in _hero_nodes:
+		if entry["hero_id"] == hero_id and entry["panel"].visible:
+			var panel: ColorRect = entry["panel"]
+			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
+			_spawn_damage_popup(popup_pos, amount, amount == 0, hero_id)
+			break
 	var char_node = _hero_char_nodes.get(hero_id)
-	# 피격 피드백 한 묶음 — HP UI·데미지 팝업·플래시·흔들림·hurt 애니메이션
-	# lightning은 차지 후 볼트가 꽂히는 순간까지 이 묶음을 지연한다.
-	var feedback := func() -> void:
-		_update_hero_ui(hero_id)
-		for entry in _hero_nodes:
-			if entry["hero_id"] == hero_id and entry["panel"].visible:
-				var panel: ColorRect = entry["panel"]
-				var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
-				_spawn_damage_popup(popup_pos, amount, amount == 0, hero_id)
-				break
-		if char_node:
-			_play_hit_flash(char_node)
-			_play_hit_shake(char_node, amount)
-			if dtype == "ice":
-				_apply_frozen_tint(char_node)
-			elif dtype == "fire":
-				_apply_scorched_tint(char_node)
-			elif dtype == "poison":
-				_apply_poisoned_tint(char_node)
-			elif dtype == "explosive":
-				_apply_scorched_tint(char_node)
-			if char_node.has_node("AnimationPlayer"):
-				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-				if ap.has_animation("hurt"):
-					ap.play("hurt")
-	var beam_script := _caster_beam_script(dtype)
-	if beam_script != null and amount > 0 and char_node:
-		var hero_spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
-		var beam := _spawn_caster_beam(beam_script, _resolve_caster_pos(BattleManager._vfx_caster, hero_spark_pos), hero_spark_pos, dtype, feedback)
-		_register_lit_death_beam(hero_id, beam)
-	else:
-		feedback.call()
-		if char_node and amount > 0:
-			var hero_spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
-			_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
+	if char_node:
+		_play_hit_flash(char_node)
+		_play_hit_shake(char_node, amount)
+		if dtype == "ice":
+			_apply_frozen_tint(char_node)
+		elif dtype == "fire":
+			_apply_scorched_tint(char_node)
+		elif dtype == "poison":
+			_apply_poisoned_tint(char_node)
+		elif dtype == "explosive":
+			_apply_scorched_tint(char_node)
+		if char_node.has_node("AnimationPlayer"):
+			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+			if ap.has_animation("hurt"):
+				ap.play("hurt")
+	# 빔 VFX 가 없는 dtype 은 impact-only 파티클로 보강
+	if amount > 0 and char_node and _caster_beam_script(dtype) == null:
+		var hero_spark_pos: Vector2 = char_node.global_position + _impact_jitter()
+		_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
 
 func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
+	_update_enemy_ui(index)
+	if index < _enemy_nodes.size() and _enemy_nodes[index]["panel"].visible:
+		var panel: ColorRect = _enemy_nodes[index]["panel"]
+		var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
+		_spawn_damage_popup(popup_pos, amount, amount == 0, "enemy_%d" % index)
 	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
-	var feedback := func() -> void:
-		_update_enemy_ui(index)
-		if index < _enemy_nodes.size() and _enemy_nodes[index]["panel"].visible:
-			var panel: ColorRect = _enemy_nodes[index]["panel"]
-			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
-			_spawn_damage_popup(popup_pos, amount, amount == 0, "enemy_%d" % index)
-		if char_node:
-			_play_hit_flash(char_node)
-			_play_hit_shake(char_node, amount)
-			if dtype == "ice":
-				_apply_frozen_tint(char_node)
-			elif dtype == "fire":
-				_apply_scorched_tint(char_node)
-			elif dtype == "poison":
-				_apply_poisoned_tint(char_node)
-			elif dtype == "explosive":
-				_apply_scorched_tint(char_node)
-			if char_node.has_node("AnimationPlayer"):
-				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-				if ap.has_animation("hurt"):
-					ap.play("hurt")
-	var beam_script := _caster_beam_script(dtype)
-	if beam_script != null and amount > 0 and char_node:
-		var spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
-		var beam := _spawn_caster_beam(beam_script, _resolve_caster_pos(BattleManager._vfx_caster, spark_pos), spark_pos, dtype, feedback)
-		_register_lit_death_beam("enemy_%d" % index, beam)
-	else:
-		feedback.call()
-		if char_node and amount > 0:
-			var spark_pos: Vector2 = char_node.global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-30.0, 30.0))
-			_spawn_impact_particles(spark_pos, amount, false, dtype)
+	if char_node:
+		_play_hit_flash(char_node)
+		_play_hit_shake(char_node, amount)
+		if dtype == "ice":
+			_apply_frozen_tint(char_node)
+		elif dtype == "fire":
+			_apply_scorched_tint(char_node)
+		elif dtype == "poison":
+			_apply_poisoned_tint(char_node)
+		elif dtype == "explosive":
+			_apply_scorched_tint(char_node)
+		if char_node.has_node("AnimationPlayer"):
+			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+			if ap.has_animation("hurt"):
+				ap.play("hurt")
+	if amount > 0 and char_node and _caster_beam_script(dtype) == null:
+		var spark_pos: Vector2 = char_node.global_position + _impact_jitter()
+		_spawn_impact_particles(spark_pos, amount, false, dtype)
 
 # lightning 빔을 사망 연출 지연용으로 등록 — 빔이 사라지면 자동 정리
 func _register_lit_death_beam(key: String, beam: Node2D) -> void:
@@ -2465,14 +2594,8 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 		var char_node: Node2D = _hero_char_nodes.get(target)
 		if flash_color != Color.WHITE:
 			_play_status_flash(char_node, flash_color)
-	if status_type == "weak" or status_type == "vulnerable":
-		_spawn_status_vfx(target, "hex", _VFX_DEBUFF_HEX, "debuff")
-	elif status_type == "charm":
-		# 매혹 누적 (임계치 미달) — battle_manager 가 enthrall 도달 시 enthrall 만 emit, charm 은 skip
-		_spawn_status_vfx(target, "charm", _VFX_CHARM_KISS, "charm")
-	elif status_type == "enthrall":
-		# 임계치 도달 → 반함 발동 — 더 화려한 VFX
-		_spawn_status_vfx(target, "enthrall", _VFX_INFATUATION, "enthrall")
+	# weak/vulnerable/charm/enthrall VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 차지 시작.
+	# 여기서는 상태 아이콘 갱신·status_popup·tint flash 만 (임팩트 시점 동기).
 
 func _refresh_debug_badge() -> void:
 	if _debug_badge == null:
