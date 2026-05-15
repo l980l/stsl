@@ -13,16 +13,9 @@ const _CURSOR_SIZES:    Dictionary = {"S": 24, "M": 32, "L": 48, "XL": 64}
 const _DEFAULT_KEY   := "M"
 const _TABS          := [["sound", "ui.settings.sound"], ["graphics", "ui.settings.graphics"], ["gameplay", "ui.settings.gameplay"], ["language", "ui.settings.language_tab"]]
 
-# 파티클 라벨 (i18n 키 없이 짧은 문자열)
-const _PARTICLE_LABELS := {
-	"low":    "하",
-	"medium": "중",
-	"high":   "상",
-}
-
-# multiplier 값 → "x1.0" 형식 라벨 (gameplay segment 용)
+# multiplier 값 → "x1.0" 형식 라벨 (GDScript 는 %g 미지원 → str() 사용)
 static func _x_label(value: float) -> String:
-	return "x%g" % value
+	return "x" + str(value)
 
 # values 배열을 {key: "xVAL"} dict 로 변환
 static func _build_x_labels(keys: Array, values: Array) -> Dictionary:
@@ -394,9 +387,11 @@ func _build_graphics_panel() -> void:
 	# Row 1: 커서 크기 (기존 cursor segment)
 	_build_cursor_seg_row(p, mono, 24.0)
 
-	# Row 2: 파티클 갯수 (graphics)
+	# Row 2: 파티클 갯수 (graphics) — 라벨도 "xVAL" 형식 (x0.25/x0.5/x1.0)
 	_build_seg_row(p, mono, 68.0, tr("ui.settings.particle_quality"), "particle",
-		GameSettings.PARTICLE_KEYS, _PARTICLE_LABELS, GameSettings.particle_key,
+		GameSettings.PARTICLE_KEYS,
+		_build_x_labels(GameSettings.PARTICLE_KEYS, GameSettings.PARTICLE_VALUES),
+		GameSettings.particle_key,
 		func(k: String) -> void: GameSettings.set_particle_quality(k))
 
 func _build_gameplay_panel() -> void:
