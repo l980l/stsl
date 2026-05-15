@@ -1953,18 +1953,19 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 		return
 	var caster_pos: Vector2 = owner_node.global_position
 	# 첫 의미 있는 effect 만 VFX 트리거 — 이후 effect 들은 데미지/상태 시그널로 SFX/feedback
+	# damage_type 이 명시된 effect 는 모두 ATTACK 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF 등)
 	for effect in card.effects:
-		var et = effect.effect_type
-		if et == EffectResource.EffectType.DAMAGE:
+		if effect.damage_type != "":
 			var dtype: String = effect.damage_type
 			if effect.target == "ALL":
 				for i in range(_enemy_char_nodes.size()):
-					if i < _enemy_alive_visible() and _enemy_char_nodes[i]:
+					if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
 						_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[i].global_position + _impact_jitter())
-			elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size():
+			elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
 				_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[target_enemy_index].global_position + _impact_jitter())
 			return
-		elif et == EffectResource.EffectType.APPLY_STATUS:
+		var et = effect.effect_type
+		if et == EffectResource.EffectType.APPLY_STATUS:
 			if effect.status_type.begins_with("power."):
 				if owner_id == "joan_of_arc":
 					_spawn_holy_buff(caster_pos)
@@ -1972,7 +1973,7 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 					_spawn_warrior_buff(caster_pos)
 			else:
 				var fx_script: GDScript = _debuff_script_for_status(effect.status_type)
-				if fx_script and target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size():
+				if fx_script and target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
 					_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type)
 			return
 		elif et == EffectResource.EffectType.HEAL or et == EffectResource.EffectType.HEAL_ALL:

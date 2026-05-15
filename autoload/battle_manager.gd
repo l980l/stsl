@@ -169,19 +169,20 @@ func _intent_vfx_impact_delay(intent: Resource) -> float:
 		_:
 			return 0.0
 
-# 영웅 카드 차지 시간 — 첫 effect 기준 (DAMAGE 우선)
+# 영웅 카드 차지 시간 — 첫 effect 기준
+# damage_type 이 명시된 effect 는 모두 ATTACK 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF 등)
 func _card_vfx_impact_delay(card: Resource) -> float:
 	for effect in card.effects:
+		if effect.damage_type != "":
+			return _vfx_impact_delay_for_damage_type(effect.damage_type)
 		match effect.effect_type:
-			EffectRes.EffectType.DAMAGE:
-				return _vfx_impact_delay_for_damage_type(effect.damage_type)
 			EffectRes.EffectType.APPLY_STATUS:
 				var d := _vfx_impact_delay_for_status(effect.status_type)
 				if d > 0.0:
 					return d
-			EffectRes.EffectType.HEAL, EffectRes.EffectType.HEAL_ALL:
+			EffectRes.EffectType.HEAL, EffectRes.EffectType.HEAL_ALL, EffectRes.EffectType.HEAL_PER_DEAD_ALLY:
 				return _VFX_HEAL_BLESSING.IMPACT_DELAY * _vfx_speed_mul()
-			EffectRes.EffectType.BLOCK, EffectRes.EffectType.BLOCK_ALL:
+			EffectRes.EffectType.BLOCK, EffectRes.EffectType.BLOCK_ALL, EffectRes.EffectType.FORMATION_BLOCK, EffectRes.EffectType.COUNTER_BLOCK, EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED, EffectRes.EffectType.MORALE_TO_BLOCK:
 				return _VFX_DEFENSE_BUFF.IMPACT_DELAY * _vfx_speed_mul()
 	return 0.0
 
@@ -655,8 +656,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_deal_damage_to_enemy(target_enemy_index, dmg)
 			EffectRes.EffectType.BLOCK_ALL:
 				if team_mgr:
+					# 사망 영웅 제외 — 살아있는 영웅만 BLOCK
 					for hero in team_mgr.heroes:
-						_hero_block[hero.hero_id] = _hero_block.get(hero.hero_id, 0) + effect.value
+						if team_mgr.is_alive(hero.hero_id):
+							_hero_block[hero.hero_id] = _hero_block.get(hero.hero_id, 0) + effect.value
+							hero_block_gained.emit(hero.hero_id, effect.value)
 			EffectRes.EffectType.HEAL_ALL:
 				if team_mgr:
 					var heal_amt: int = effect.value
@@ -666,8 +670,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							if not team_mgr.is_alive(hero.hero_id):
 								dead_count += 1
 						heal_amt = effect.value * dead_count
+					# 사망 영웅 제외 — 살아있는 영웅만 HEAL (REVIVE 는 별도 effect_type)
 					for hero in team_mgr.heroes:
-						team_mgr.heal(hero.hero_id, heal_amt)
+						if team_mgr.is_alive(hero.hero_id):
+							team_mgr.heal(hero.hero_id, heal_amt)
 			EffectRes.EffectType.FORMATION_BLOCK:
 				if team_mgr:
 					var count: int = team_mgr.get_living_heroes().size()
