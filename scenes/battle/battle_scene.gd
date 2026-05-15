@@ -123,6 +123,7 @@ func _trf(key: String, args) -> String:
 
 func _ready() -> void:
 	_build_ui()
+	_setup_kill_cam()
 	if OS.is_debug_build():
 		_build_debug_tooltip()
 	BattleManager.team_mgr = TeamManager
@@ -2398,6 +2399,44 @@ func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 		var spark_pos: Vector2 = char_node.global_position + _impact_jitter()
 		_spawn_impact_particles(spark_pos, amount, false, dtype)
 
+# ── 킬캠 (slow-mo + 카메라 줌인) ────────────────────────────────────
+# 처치 / 사망 시 짧은 슬로우 모션 + 카메라가 타겟으로 줌인. GameSettings.kill_cam_enabled 옵션.
+var _camera: Camera2D = null
+const _KC_HOME_POS := Vector2(960, 540)  # 화면 중앙 (1920x1080)
+var _kill_cam_active: bool = false
+
+func _setup_kill_cam() -> void:
+	_camera = Camera2D.new()
+	_camera.position = _KC_HOME_POS
+	_camera.zoom = Vector2.ONE
+	_camera.make_current()
+	add_child(_camera)
+
+func _play_kill_cam(target_pos: Vector2) -> void:
+	# autoload 안전 접근 (CLI 테스트 환경 회피)
+	var gs := get_node_or_null("/root/GameSettings")
+	if gs == null or not gs.kill_cam_enabled:
+		return
+	if _kill_cam_active or _camera == null:
+		return
+	_kill_cam_active = true
+	var prev_scale := Engine.time_scale
+	Engine.time_scale = 0.3
+	# 줌인 + 이동 (트윈도 scaled time 영향 — 영화적 느낌)
+	var tw_in := create_tween().set_parallel(true)
+	tw_in.tween_property(_camera, "zoom", Vector2(1.6, 1.6), 0.10).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw_in.tween_property(_camera, "position", target_pos, 0.10).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await tw_in.finished
+	# slowmo 유지 (scaled 0.18s ≈ unscaled 0.6s)
+	await get_tree().create_timer(0.18).timeout
+	# 줌아웃 — 정상 속도로 복귀하면서
+	Engine.time_scale = prev_scale
+	var tw_out := create_tween().set_parallel(true)
+	tw_out.tween_property(_camera, "zoom", Vector2.ONE, 0.20).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tw_out.tween_property(_camera, "position", _KC_HOME_POS, 0.20).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	await tw_out.finished
+	_kill_cam_active = false
+
 # lightning 빔을 사망 연출 지연용으로 등록 — 빔이 사라지면 자동 정리
 func _register_lit_death_beam(key: String, beam: Node2D) -> void:
 	_lit_death_beam[key] = beam
@@ -2414,16 +2453,19 @@ func _run_or_defer_death(key: String, death_fx: Callable) -> void:
 		death_fx.call()
 
 func _on_enemy_died(index: int) -> void:
+	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
 	var death_fx := func() -> void:
 		AudioManager.play_sfx("enemy_death")
 		_update_enemy_ui(index)
-		var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
 		if char_node:
 			_spawn_death_dissolve(char_node.global_position)
 			if char_node.has_node("AnimationPlayer"):
 				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 				if ap.has_animation("death"):
 					ap.play("death")
+		# 처치 순간 킬캠 (옵션 켜져있으면)
+		if char_node:
+			_play_kill_cam(char_node.global_position)
 	_run_or_defer_death("enemy_%d" % index, death_fx)
 
 func _on_hero_died(hero_id: String) -> void:
@@ -2447,6 +2489,8 @@ func _on_hero_died(hero_id: String) -> void:
 		var char_node = _hero_char_nodes.get(hero_id)
 		if char_node:
 			_spawn_death_dissolve(char_node.global_position)
+			# 영웅 사망 순간 킬캠 (옵션 켜져있으면)
+			_play_kill_cam(char_node.global_position)
 			if char_node.has_node("AnimationPlayer"):
 				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 				if ap.has_animation("death"):
