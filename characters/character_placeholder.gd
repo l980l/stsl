@@ -8,8 +8,8 @@ const _FLASH_SHADER := """
 shader_type canvas_item;
 uniform vec4 flash_color : source_color = vec4(0.0);
 void fragment() {
+	// 평소 ColorRect alpha 유지 — alpha=1 강제 시 일러스트 뒤의 placeholder 가 사각형으로 노출됨
 	COLOR.rgb += flash_color.rgb * flash_color.a;
-	COLOR.a = 1.0;
 }
 """
 
