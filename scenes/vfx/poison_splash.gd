@@ -23,7 +23,7 @@ const CHARGE_TIME      := 0.3   # 차지 시간(s)
 const FLASK_FLIGHT     := 0.5   # 플라스크 비행 시간(s)
 const IMPACT_DELAY     := CHARGE_TIME + FLASK_FLIGHT  # battle_manager 동기화용
 const ARC_HEIGHT       := 100.0 # 포물선 최고점 높이(px)
-const POISON_TIME      := 3.0   # 명중 후 잔류 독(DoT) 지속(s) — HTML 6.0초의 절반
+const POISON_TIME      := 1.5   # 명중 후 잔류 독 지속(s)
 const PSPEED           := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수
 
 ## 플라스크 명중 순간 — 화면 흔들림·SFX 요청 (battle_scene이 수신)
