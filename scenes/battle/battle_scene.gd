@@ -1496,10 +1496,18 @@ func _on_energy_changed(new_energy: int) -> void:
 
 func _on_card_played(card: Resource) -> void:
 	call_deferred("_refresh_all_hero_ui")
+	var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
+	# 버프 (POWER) — Joan=홀리(황금), 그 외=전사(분노 주황). 캐릭터 노드 위치에 발동.
+	if card.get("card_type") == CardResource.CardType.POWER:
+		var ch_node = _hero_char_nodes.get(owner_id)
+		if ch_node:
+			if owner_id == "joan_of_arc":
+				_spawn_holy_buff(ch_node.global_position)
+			else:
+				_spawn_warrior_buff(ch_node.global_position)
 	var anim_name: String = card.get("play_animation") if card.get("play_animation") != null else ""
 	if anim_name == "":
 		return
-	var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
 	var char_node = _hero_char_nodes.get(owner_id)
 	if char_node == null or not char_node.has_node("AnimationPlayer"):
 		return
@@ -1530,8 +1538,16 @@ func _apply_scorched_tint(node: Node2D) -> void:
 	if node == null: return
 	var tw := node.create_tween()
 	tw.tween_property(node, "modulate", Color(0.55, 0.4, 0.32), 0.2)
-	tw.tween_interval(3.0)
+	tw.tween_interval(1.5)
 	tw.tween_property(node, "modulate", Color(1, 1, 1), 0.8)
+
+# poison 명중 시 타겟이 잠시 독성 녹색으로 물듦 (HTML .target.poisoned 근사)
+func _apply_poisoned_tint(node: Node2D) -> void:
+	if node == null: return
+	var tw := node.create_tween()
+	tw.tween_property(node, "modulate", Color(0.72, 1.05, 0.55), 0.25)
+	tw.tween_interval(2.0)
+	tw.tween_property(node, "modulate", Color(1, 1, 1), 0.7)
 
 # 디버프 적용 시 타겟이 잠시 칙칙하게 약화됨 (HTML .target.weakened 근사)
 func _apply_weakened_tint(node: Node2D) -> void:
@@ -1541,12 +1557,21 @@ func _apply_weakened_tint(node: Node2D) -> void:
 	tw.tween_interval(1.3)
 	tw.tween_property(node, "modulate", Color(1, 1, 1), 0.7)
 
-# weak/vulnerable 디버프 적용 시 hex VFX — 같은 타겟 연속 적용은 0.5초 디바운스
-func _spawn_debuff_hex(target: String) -> void:
+# 매혹 적용 시 타겟이 잠시 분홍빛으로 물듦 (HTML .target.charmed 근사)
+func _apply_charmed_tint(node: Node2D) -> void:
+	if node == null: return
+	var tw := node.create_tween()
+	tw.tween_property(node, "modulate", Color(1.25, 0.78, 1.05), 0.25)
+	tw.tween_interval(1.5)
+	tw.tween_property(node, "modulate", Color(1, 1, 1), 0.7)
+
+# 상태이상(디버프/매혹) VFX 발동 — 같은 타겟·종류 연속 적용은 0.5초 디바운스
+func _spawn_status_vfx(target: String, kind: String, beam_script: GDScript, sfx: String) -> void:
+	var cd_key := target + "/" + kind
 	var now := Time.get_ticks_msec()
-	if now - int(_debuff_hex_cd.get(target, 0)) < 500:
+	if now - int(_status_vfx_cd.get(cd_key, 0)) < 500:
 		return
-	_debuff_hex_cd[target] = now
+	_status_vfx_cd[cd_key] = now
 	var char_node: Node2D = null
 	if target.begins_with("enemy_"):
 		var idx := target.substr(6).to_int()
@@ -1556,15 +1581,18 @@ func _spawn_debuff_hex(target: String) -> void:
 	if char_node == null:
 		return
 	var target_pos: Vector2 = char_node.global_position
-	var fx := _VFX_DEBUFF_HEX.new()
+	var fx: Node2D = beam_script.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_shake()
-		AudioManager.play_sfx("debuff")
+		AudioManager.play_sfx(sfx)
 	)
 	fx.play(_resolve_caster_pos(BattleManager._vfx_caster, target_pos), target_pos)
-	_apply_weakened_tint(char_node)
+	if kind == "hex":
+		_apply_weakened_tint(char_node)
+	elif kind == "charm":
+		_apply_charmed_tint(char_node)
 
 func _play_status_flash(node: Node2D, status_color: Color) -> void:
 	if node == null: return
@@ -1717,28 +1745,45 @@ func _stop_target_bloom(panel: ColorRect) -> void:
 
 const _VFX_SCENES: Dictionary = {
 	"slash":      preload("res://scenes/vfx/slash_particle.tscn"),
-	"blunt":      preload("res://scenes/vfx/blunt_particle.tscn"),
-	"projectile": preload("res://scenes/vfx/projectile_particle.tscn"),
-	"explosive":  preload("res://scenes/vfx/explosive_particle.tscn"),
-	"poison":     preload("res://scenes/vfx/poison_particle.tscn"),
 	"divine":     preload("res://scenes/vfx/divine_particle.tscn"),
 	"curse":      preload("res://scenes/vfx/curse_particle.tscn"),
 }
 const _VFX_DEFAULT: PackedScene = preload("res://scenes/vfx/default_particle.tscn")
-# lightning/ice/fire는 시전자→타겟 빔 타입 — 별도 경로 (_spawn_caster_beam)
+# lightning/ice/fire/poison/projectile/explosive은 시전자→타겟 빔 타입 — 별도 경로 (_spawn_caster_beam)
 const _VFX_LIGHTNING_BEAM := preload("res://scenes/vfx/lightning_beam.gd")
 const _VFX_ICE_SHARDS := preload("res://scenes/vfx/ice_shards.gd")
 const _VFX_FIRE_BLAST := preload("res://scenes/vfx/fire_blast.gd")
+const _VFX_POISON_SPLASH := preload("res://scenes/vfx/poison_splash.gd")
+const _VFX_ARROW_SHOT := preload("res://scenes/vfx/arrow_shot.gd")
+const _VFX_EXPLOSION_BLAST := preload("res://scenes/vfx/explosion_blast.gd")
+const _VFX_BLUNT_SMASH := preload("res://scenes/vfx/blunt_smash.gd")
+const _VFX_BULLET_SHOT := preload("res://scenes/vfx/bullet_shot.gd")
+const _VFX_HOLY_STRIKE := preload("res://scenes/vfx/holy_strike.gd")
+const _VFX_HOLY_SLASH := preload("res://scenes/vfx/holy_slash.gd")
+const _VFX_HOLY_ARROW := preload("res://scenes/vfx/holy_arrow.gd")
+const _VFX_HOLY_FIRE := preload("res://scenes/vfx/holy_fire.gd")
+const _VFX_HOLY_BLUNT := preload("res://scenes/vfx/holy_blunt.gd")
+# 사망/부활 VFX — 빔이 아니라 대상 위치에서만 발동
+const _VFX_DEATH_DISSOLVE := preload("res://scenes/vfx/death_dissolve.gd")
+const _VFX_REVIVE_BLESSING := preload("res://scenes/vfx/revive_blessing.gd")
+# slash 명중 시 기존 베기 파티클에 더해 발동하는 피 분출
+const _VFX_BLOOD_SPRAY := preload("res://scenes/vfx/blood_spray.gd")
 const _VFX_DEBUFF_HEX := preload("res://scenes/vfx/debuff_hex.gd")
-const _VFX_HEAL: PackedScene = preload("res://scenes/vfx/heal_particle.tscn")
+const _VFX_CHARM_KISS := preload("res://scenes/vfx/charm_kiss.gd")
+const _VFX_INFATUATION := preload("res://scenes/vfx/infatuation.gd")
+const _VFX_HEAL_BLESSING := preload("res://scenes/vfx/heal_blessing.gd")
+const _VFX_HOLY_BUFF := preload("res://scenes/vfx/holy_buff.gd")
+const _VFX_WARRIOR_BUFF := preload("res://scenes/vfx/warrior_buff.gd")
 const _VFX_BLOCK: PackedScene = preload("res://scenes/vfx/block_particle.tscn")
+const _VFX_DEFENSE_BUFF := preload("res://scenes/vfx/defense_buff.gd")
 
 # lightning으로 죽는 적/영웅 — 사망 연출을 빔 임팩트 시점까지 지연하기 위한 빔 참조
 # key: "enemy_%d" 또는 hero_id → lightning_beam 인스턴스
 var _lit_death_beam: Dictionary = {}
 
-# 디버프 hex VFX — 같은 타겟 연속 적용 시 중복 발동 방지 (target → 마지막 발동 ticks_msec)
-var _debuff_hex_cd: Dictionary = {}
+# 상태이상 VFX(디버프/매혹) — 같은 타겟·종류 연속 적용 시 중복 발동 방지
+# key: "target/kind" → 마지막 발동 ticks_msec
+var _status_vfx_cd: Dictionary = {}
 
 func _spawn_self_particles(pos: Vector2, scene: PackedScene) -> void:
 	var fx: Node2D = scene.instantiate()
@@ -1763,10 +1808,21 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 	add_child(fx)
 	fx.global_position = pos
 	fx.scale.x = -1.0 if flipped else 1.0
+	var slash_rot := randf_range(0.0, TAU)
 	if dtype == "slash":
-		fx.rotation = randf_range(0.0, TAU)
+		fx.rotation = slash_rot
 	fx.burst()
 	AudioManager.play_sfx("impact_" + (dtype if dtype != "" else "default"))
+	# slash는 기존 베기 파티클에 더해 피 분출을 추가로 발동 (베기 방향으로 분출)
+	if dtype == "slash":
+		_spawn_blood_spray(pos, slash_rot)
+
+# slash 명중 시 피 분출 — 기존 slash_particle.tscn 과 별개로 추가 발동
+func _spawn_blood_spray(pos: Vector2, dir_angle: float = INF) -> void:
+	var fx := _VFX_BLOOD_SPRAY.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.play(pos, pos, dir_angle)
 
 # ── 번개 빔 VFX (시전자→타겟) ──────────────────────────────
 # caster: BattleManager._vfx_caster — int(적 인덱스) / String(hero_id) / null
@@ -1782,6 +1838,49 @@ func _resolve_caster_pos(caster, target_pos: Vector2) -> Vector2:
 			return n.global_position
 	# 공격자 노드 무효 — 타겟 위쪽에서 내리꽂는 fallback
 	return target_pos + Vector2(0.0, -350.0)
+
+# 사망 VFX — 죽는 대상 위치에 핏물·재·영혼 분출
+func _spawn_death_dissolve(pos: Vector2) -> void:
+	var fx := _VFX_DEATH_DISSOLVE.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.play(pos, pos)
+
+# 부활 VFX — 부활 대상 위치에 빛기둥·고리·빛 입자
+func _spawn_revive_blessing(pos: Vector2) -> void:
+	var fx := _VFX_REVIVE_BLESSING.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.play(pos, pos)
+
+# 회복 VFX — 회복 대상 위치에 나뭇잎·반짝임·고리·십자
+func _spawn_heal_blessing(pos: Vector2) -> void:
+	var fx := _VFX_HEAL_BLESSING.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.play(pos, pos)
+
+# 신성 버프 VFX — Joan 의 POWER 카드 발동 시 시전자 위치에 룬링·빛기둥·황금 깃털
+func _spawn_holy_buff(pos: Vector2) -> void:
+	var fx := _VFX_HOLY_BUFF.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("buff")
+	)
+	fx.play(pos, pos)
+
+# 전사 버프 VFX — Joan 외 영웅의 POWER 카드 발동 시 분노/주황 가시링·오라·잔불
+func _spawn_warrior_buff(pos: Vector2) -> void:
+	var fx := _VFX_WARRIOR_BUFF.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("buff")
+	)
+	fx.play(pos, pos)
 
 # lightning/ice 등 시전자→타겟 빔 VFX 공통 생성기.
 # 빔이 명중을 알리는 screen_effect 시점에 화면 효과·SFX·피격 피드백을 동기화한다.
@@ -1808,6 +1907,26 @@ func _caster_beam_script(dtype: String) -> GDScript:
 			return _VFX_ICE_SHARDS
 		"fire":
 			return _VFX_FIRE_BLAST
+		"poison":
+			return _VFX_POISON_SPLASH
+		"projectile":
+			return _VFX_ARROW_SHOT
+		"explosive":
+			return _VFX_EXPLOSION_BLAST
+		"blunt":
+			return _VFX_BLUNT_SMASH
+		"bullet":
+			return _VFX_BULLET_SHOT
+		"holy_strike":
+			return _VFX_HOLY_STRIKE
+		"holy_slash":
+			return _VFX_HOLY_SLASH
+		"holy_bolt":
+			return _VFX_HOLY_ARROW
+		"holy_fire":
+			return _VFX_HOLY_FIRE
+		"holy_blunt":
+			return _VFX_HOLY_BLUNT
 		_:
 			return null
 
@@ -1852,14 +1971,21 @@ func _on_hero_healed(hero_id: String, amount: int) -> void:
 			break
 	var char_node = _hero_char_nodes.get(hero_id)
 	if char_node:
-		_spawn_self_particles(char_node.global_position + Vector2(0.0, -20.0), _VFX_HEAL)
+		_spawn_heal_blessing(char_node.global_position)
 		AudioManager.play_sfx("heal")
 
 func _on_hero_block_gained(hero_id: String, _amount: int) -> void:
 	var char_node = _hero_char_nodes.get(hero_id)
 	if char_node:
-		_spawn_self_particles(char_node.global_position + Vector2(0.0, -10.0), _VFX_BLOCK)
+		_spawn_defense_buff(char_node.global_position)
 		AudioManager.play_sfx("block")
+
+# 방어도 버프 VFX — BLOCK 획득 시 6각 dome + barrier + 룬링
+func _spawn_defense_buff(pos: Vector2) -> void:
+	var fx := _VFX_DEFENSE_BUFF.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.play(pos, pos)
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	var char_node = _hero_char_nodes.get(hero_id)
@@ -1879,6 +2005,10 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 			if dtype == "ice":
 				_apply_frozen_tint(char_node)
 			elif dtype == "fire":
+				_apply_scorched_tint(char_node)
+			elif dtype == "poison":
+				_apply_poisoned_tint(char_node)
+			elif dtype == "explosive":
 				_apply_scorched_tint(char_node)
 			if char_node.has_node("AnimationPlayer"):
 				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
@@ -1909,6 +2039,10 @@ func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 			if dtype == "ice":
 				_apply_frozen_tint(char_node)
 			elif dtype == "fire":
+				_apply_scorched_tint(char_node)
+			elif dtype == "poison":
+				_apply_poisoned_tint(char_node)
+			elif dtype == "explosive":
 				_apply_scorched_tint(char_node)
 			if char_node.has_node("AnimationPlayer"):
 				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
@@ -1945,10 +2079,12 @@ func _on_enemy_died(index: int) -> void:
 		AudioManager.play_sfx("enemy_death")
 		_update_enemy_ui(index)
 		var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
-		if char_node and char_node.has_node("AnimationPlayer"):
-			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-			if ap.has_animation("death"):
-				ap.play("death")
+		if char_node:
+			_spawn_death_dissolve(char_node.global_position)
+			if char_node.has_node("AnimationPlayer"):
+				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
+				if ap.has_animation("death"):
+					ap.play("death")
 	_run_or_defer_death("enemy_%d" % index, death_fx)
 
 func _on_hero_died(hero_id: String) -> void:
@@ -1971,6 +2107,7 @@ func _on_hero_died(hero_id: String) -> void:
 		# 스프라이트: death 애니메이션 없으면 코드 페이드아웃
 		var char_node = _hero_char_nodes.get(hero_id)
 		if char_node:
+			_spawn_death_dissolve(char_node.global_position)
 			if char_node.has_node("AnimationPlayer"):
 				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 				if ap.has_animation("death"):
@@ -1998,6 +2135,8 @@ func _on_hero_revived(hero_id: String) -> void:
 	var char_node = _hero_char_nodes.get(hero_id)
 	if char_node != null:
 		char_node.visible = true
+		char_node.modulate = Color(1, 1, 1)  # 사망 페이드아웃 복원
+		_spawn_revive_blessing(char_node.global_position)
 		if char_node.has_node("AnimationPlayer"):
 			var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 			ap.stop()
@@ -2327,7 +2466,13 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 		if flash_color != Color.WHITE:
 			_play_status_flash(char_node, flash_color)
 	if status_type == "weak" or status_type == "vulnerable":
-		_spawn_debuff_hex(target)
+		_spawn_status_vfx(target, "hex", _VFX_DEBUFF_HEX, "debuff")
+	elif status_type == "charm":
+		# 매혹 누적 (임계치 미달) — battle_manager 가 enthrall 도달 시 enthrall 만 emit, charm 은 skip
+		_spawn_status_vfx(target, "charm", _VFX_CHARM_KISS, "charm")
+	elif status_type == "enthrall":
+		# 임계치 도달 → 반함 발동 — 더 화려한 VFX
+		_spawn_status_vfx(target, "enthrall", _VFX_INFATUATION, "enthrall")
 
 func _refresh_debug_badge() -> void:
 	if _debug_badge == null:

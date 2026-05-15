@@ -51,7 +51,7 @@ static func _strike() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
-	e.damage_type = "divine"
+	e.damage_type = "blunt"  # strike — 일반 둔기 베기
 	c.effects = [e]; return c
 
 static func _defend() -> Resource:
@@ -75,7 +75,7 @@ static func _holy_smite() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
-	ea.damage_type = "divine"
+	ea.damage_type = "holy_strike"  # holy_smite — 성스러운 일격
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.HEAL
 	eb.value = 20; eb.base_value = 20; eb.target = "SELF"
@@ -110,7 +110,7 @@ static func _holy_bolt() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 70; ea.base_value = 70; ea.target = "SINGLE"
-	ea.damage_type = "divine"
+	ea.damage_type = "holy_bolt"  # 빛의 화살
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "vulnerable"; eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"
@@ -126,7 +126,7 @@ static func _orleans_charge() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 110; e.base_value = 110; e.target = "SINGLE"
-	e.damage_type = "divine"
+	e.damage_type = "holy_blunt"  # orleans_charge — 성스러운 둔기
 	c.effects = [e]; return c
 
 static func _holy_wave() -> Resource:
@@ -139,7 +139,7 @@ static func _holy_wave() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 65; e.base_value = 65; e.target = "ALL"
-	e.damage_type = "divine"
+	e.damage_type = "holy_strike"
 	c.effects = [e]; return c
 
 static func _holy_fury() -> Resource:
@@ -152,7 +152,7 @@ static func _holy_fury() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 140; e.base_value = 140; e.target = "ALL"
-	e.damage_type = "divine"
+	e.damage_type = "holy_blunt"
 	c.effects = [e]; return c
 
 static func _crusaders_faith() -> Resource:
@@ -194,7 +194,7 @@ static func _archangels_wrath() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 120; ea.base_value = 120; ea.target = "ALL"
-	ea.damage_type = "divine"
+	ea.damage_type = "holy_blunt"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.HEAL_ALL
 	eb.value = 15; eb.base_value = 15
@@ -213,7 +213,7 @@ static func _divine_punishment() -> Resource:
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DAMAGE
 	eb.value = 120; eb.base_value = 120; eb.target = "ALL"
-	eb.damage_type = "divine"
+	eb.damage_type = "holy_strike"  # divine_punishment — 성스러운 일격
 	var ec := EffRes.new()
 	ec.effect_type = EffRes.EffectType.APPLY_STATUS
 	ec.status_type = "weak"; ec.value = 2; ec.base_value = 2; ec.target = "ALL"
@@ -229,7 +229,7 @@ static func _crusade() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 82; ea.base_value = 82; ea.target = "ALL"
-	ea.damage_type = "divine"
+	ea.damage_type = "holy_strike"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "vulnerable"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
@@ -245,7 +245,7 @@ static func _holy_judge() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
-	ea.damage_type = "divine"
+	ea.damage_type = "holy_strike"  # holy_judge — 성스러운 일격
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
 	eb.status_type = "weak"; eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"
@@ -495,7 +495,7 @@ static func _saints_revelation() -> Resource:
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.SACRIFICE_PAYOFF
 	e.value = 20; e.base_value = 20; e.target = "ALL"
-	e.damage_type = "divine"
+	e.damage_type = "holy_strike"
 	c.effects = [e]; return c
 
 static func _martyrs_light() -> Resource:
@@ -540,5 +540,5 @@ static func _saints_flame() -> Resource:
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DAMAGE
 	eb.value = 220; eb.base_value = 220; eb.target = "ALL"
-	eb.damage_type = "divine"
+	eb.damage_type = "holy_fire"  # saints_flame — 성스러운 화염
 	c.effects = [ea, eb]; return c

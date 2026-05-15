@@ -32,6 +32,17 @@ var TestLightningBeam = preload("res://tests/test_lightning_beam.gd")
 var TestIceShards = preload("res://tests/test_ice_shards.gd")
 var TestFireBlast = preload("res://tests/test_fire_blast.gd")
 var TestDebuffHex = preload("res://tests/test_debuff_hex.gd")
+var TestCharmKiss = preload("res://tests/test_charm_kiss.gd")
+var TestPoisonSplash = preload("res://tests/test_poison_splash.gd")
+var TestDeathDissolve = preload("res://tests/test_death_dissolve.gd")
+var TestReviveBlessing = preload("res://tests/test_revive_blessing.gd")
+var TestHealBlessing = preload("res://tests/test_heal_blessing.gd")
+var TestBloodSpray = preload("res://tests/test_blood_spray.gd")
+var TestHolyStrike = preload("res://tests/test_holy_strike.gd")
+var TestArrowShot = preload("res://tests/test_arrow_shot.gd")
+var TestExplosionBlast = preload("res://tests/test_explosion_blast.gd")
+var TestBluntSmash = preload("res://tests/test_blunt_smash.gd")
+var TestBulletShot = preload("res://tests/test_bullet_shot.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -68,6 +79,17 @@ func _init() -> void:
 		TestIceShards.new(),
 		TestFireBlast.new(),
 		TestDebuffHex.new(),
+		TestCharmKiss.new(),
+		TestPoisonSplash.new(),
+		TestDeathDissolve.new(),
+		TestReviveBlessing.new(),
+		TestHealBlessing.new(),
+		TestBloodSpray.new(),
+		TestHolyStrike.new(),
+		TestArrowShot.new(),
+		TestExplosionBlast.new(),
+		TestBluntSmash.new(),
+		TestBulletShot.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()

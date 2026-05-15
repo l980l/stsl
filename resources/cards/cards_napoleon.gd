@@ -173,7 +173,7 @@ static func _salvo() -> Resource:
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 40; ea.base_value = 40; ea.target = "SINGLE"
-	ea.damage_type = "projectile"
+	ea.damage_type = "bullet"  # 총알 — 화살(projectile)과 별도 VFX 예정
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.ENERGY
 	eb.value = 1; eb.base_value = 1

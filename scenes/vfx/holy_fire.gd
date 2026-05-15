@@ -1,14 +1,14 @@
-# scenes/vfx/fire_blast.gd
-# 시전자→타겟 화염 공격 VFX — ui_sample/vfx/Fire Attack VFX.html 재현 (데미지 숫자 제외).
-# battle_scene이 fire damage_type 공격 시 .new() → add_child → play(caster, target).
+# scenes/vfx/holy_fire.gd
+# 시전자→타겟 성스러운 화염 VFX — fire_blast 의 황금/홀리 색감 변종.
+# Joan of Arc 의 saints_flame 등 — battle_scene 이 holy_fire damage_type 공격 시 .new() → add_child → play.
 # 노드는 position (0,0)으로 add_child해야 한다 (좌표를 global로 받아 그대로 그림).
 # 어두운 연기는 가산 블렌드로 안 보이므로 연기(일반)·불꽃(가산) 2개 레이어로 분리해 그린다.
 extends Node2D
 
-const COL_HOT   := Color(1.0, 0.949, 0.753)   # #fff2c0 — 흰노랑 코어
-const COL_MID   := Color(1.0, 0.706, 0.329)   # #ffb454 — 주황
-const COL_DEEP  := Color(1.0, 0.353, 0.122)   # #ff5a1f — 진홍
-const COL_SMOKE := Color(0.156, 0.110, 0.086) # rgba(40,28,22) — 어두운 연기
+const COL_HOT   := Color(1.0, 0.965, 0.85)    # 거의 흰 코어
+const COL_MID   := Color(1.0, 0.820, 0.4)     # #ffd166 — 황금
+const COL_DEEP  := Color(0.784, 0.573, 0.196) # #c89232 — 진금빛
+const COL_SMOKE := Color(0.165, 0.137, 0.078) # 어두운 황갈색 — 그을음
 
 # 크기/타이밍 — 이 상수만 만지면 된다.
 const ORB_CHARGE_START := 0.12  # 차지 구체 시작
@@ -25,21 +25,18 @@ signal screen_effect
 var _caster := Vector2.ZERO
 var _target := Vector2.ZERO
 var _charge_orb: Sprite2D
-var _smoke_layer: Node2D  # 일반 블렌드 — 어두운 연기
-var _fire_layer: Node2D   # 가산 블렌드 — 불꽃·불씨·투사체·shock·heat
-var _particles: Array = []  # [{pos, vel, life, max_life, r, kind, grav}]
-var _proj_t := -1.0       # <0 = 비활성, 0~1 = 투사체 비행 진행
+var _smoke_layer: Node2D
+var _fire_layer: Node2D
+var _particles: Array = []
+var _proj_t := -1.0
 var _impacted := false
-var _shock_life := -1.0   # <0 = 비활성, 0~1 = 충격파 링 진행
-var _heat_life := -1.0    # <0 = 비활성, 0~1 = 열기 펄스 진행
-var _burn_timer := 0.0    # 잔불 남은 시간
+var _shock_life := -1.0
+var _heat_life := -1.0
+var _burn_timer := 0.0
 
-# ── 포물선 투사체 위치 (autoload 비의존 static — 단위 테스트 가능) ──
-# t=0 → a, t=1 → b, 중간은 sin 곡선으로 arc_h 만큼 위로 솟음.
 static func proj_pos(a: Vector2, b: Vector2, t: float, arc_h: float) -> Vector2:
 	return a.lerp(b, t) + Vector2(0.0, -sin(t * PI) * arc_h)
 
-# 라디얼 그라데이션 구체 텍스처 — orb.png는 배경이 불투명해 검은 박스로 보이므로 코드 생성.
 static func _make_orb_tex(c_core: Color, c_mid: Color, c_edge: Color) -> GradientTexture2D:
 	var grad := Gradient.new()
 	grad.offsets = PackedFloat32Array([0.0, 0.42, 0.72, 1.0])
@@ -56,24 +53,18 @@ static func _make_orb_tex(c_core: Color, c_mid: Color, c_edge: Color) -> Gradien
 func _ready() -> void:
 	set_process(false)
 	var orb_tex := _make_orb_tex(COL_HOT, COL_MID, COL_DEEP)
-
-	# 연기 레이어 — 일반 블렌드, 가장 아래
 	_smoke_layer = _DrawLayer.new()
 	_smoke_layer.setup(self, false)
 	add_child(_smoke_layer)
-
 	_charge_orb = Sprite2D.new()
 	_charge_orb.texture = orb_tex
-	_charge_orb.modulate = Color(1, 1, 1, 0.0)  # 알파만 제어 — 색은 텍스처가 가짐
+	_charge_orb.modulate = Color(1, 1, 1, 0.0)
 	_charge_orb.scale = Vector2(ORB_CHARGE_START, ORB_CHARGE_START)
 	add_child(_charge_orb)
-
-	# 불꽃 레이어 — 가산 블렌드, 가장 위
 	_fire_layer = _DrawLayer.new()
 	_fire_layer.setup(self, true)
 	add_child(_fire_layer)
 
-# caster_pos / target_pos 는 global 좌표 (노드가 (0,0)에 있다는 전제)
 func play(caster_pos: Vector2, target_pos: Vector2) -> void:
 	_caster = caster_pos
 	_target = target_pos
@@ -81,7 +72,6 @@ func play(caster_pos: Vector2, target_pos: Vector2) -> void:
 	_run()
 
 func _run() -> void:
-	# 1) 차지 — 시전자 손의 불꽃 구체 (0.65s)
 	var tw := create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tw.tween_property(_charge_orb, "modulate:a", 1.0, 0.2)
 	tw.parallel().tween_property(_charge_orb, "scale", Vector2(ORB_CHARGE_FULL, ORB_CHARGE_FULL), CHARGE_TIME)
@@ -89,16 +79,13 @@ func _run() -> void:
 	await get_tree().create_timer(CHARGE_TIME).timeout
 	if not is_inside_tree():
 		return
-	# 2) 발사 — 구체 사라짐 + 포물선 투사체
 	var tw2 := create_tween()
 	tw2.tween_property(_charge_orb, "modulate:a", 0.0, 0.12)
 	_proj_t = 0.0
-	# 3) 비행·명중·잔불은 _process에서. 정리.
 	await get_tree().create_timer(PROJ_FLIGHT + BURN_TIME + 1.5).timeout
 	if is_inside_tree():
 		queue_free()
 
-# 투사체 꽁무니 — 연기 + 불꽃 + 불씨
 func _spawn_trail(pos: Vector2) -> void:
 	for _i in range(8):
 		_particles.append(_mk(pos + _rand_off(8.0),
@@ -113,7 +100,6 @@ func _spawn_trail(pos: Vector2) -> void:
 			Vector2(randf_range(-1.75, 1.75), randf_range(-1.75, 1.75) - 0.4),
 			0.5 + randf() * 0.5, 1.4 + randf() * 1.2, "ember", 0.02))
 
-# 명중 폭발 — 큰 불덩이 + 사방으로 튀는 불씨 + 피어오르는 연기
 func _spawn_explosion(pos: Vector2) -> void:
 	for _i in range(70):
 		var a := randf() * TAU
@@ -134,7 +120,6 @@ func _spawn_explosion(pos: Vector2) -> void:
 			Vector2(cos(a) * sp, sin(a) * sp),
 			1.4 + randf() * 0.9, 26.0 + randf() * 30.0, "smoke", -0.01))
 
-# 잔불(DoT) — 명중 후 타겟에서 천천히 피어오르는 불꽃·불씨
 func _spawn_burn() -> void:
 	if randf() < 0.7:
 		_particles.append(_mk(_target + Vector2(randf_range(-20.0, 20.0), randf_range(-5.0, 5.0)),
@@ -152,14 +137,12 @@ func _rand_off(m: float) -> Vector2:
 	return Vector2(randf_range(-m, m), randf_range(-m, m))
 
 func _process(delta: float) -> void:
-	# 투사체 비행 — 비행 중 꽁무니 trail 방출
 	if _proj_t >= 0.0:
 		_proj_t += delta / PROJ_FLIGHT
 		_spawn_trail(proj_pos(_caster, _target, clampf(_proj_t, 0.0, 1.0), ARC_HEIGHT))
 		if _proj_t >= 1.0 and not _impacted:
 			_on_impact()
 
-	# 파티클 물리 (HTML frame() 포팅) — 수명 만료 시 제거
 	var damp: float = pow(0.992, delta * 60.0)
 	var alive: Array = []
 	for p in _particles:
@@ -172,12 +155,10 @@ func _process(delta: float) -> void:
 		alive.append(p)
 	_particles = alive
 
-	# 잔불 — 명중 후 BURN_TIME 동안 지속 생성
 	if _burn_timer > 0.0:
 		_burn_timer -= delta
 		_spawn_burn()
 
-	# 충격파 링 / 열기 펄스 진행
 	if _shock_life >= 0.0:
 		_shock_life += delta / 0.6
 	if _heat_life >= 0.0:
@@ -195,21 +176,20 @@ func _on_impact() -> void:
 	_burn_timer = BURN_TIME
 	screen_effect.emit()
 
-# flame/fireball 의 수명별 색 (alpha 포함) — 흰노랑 → 주황 → 진홍
+# 황금 톤 색 변환 — 흰노랑 → 황금 → 진금빛 (fire 의 주황·진홍을 황금 계열로)
 func _fire_color(kind: String, k: float) -> Color:
 	if kind == "fireball":
 		if k < 0.25:
 			return Color(1.0, 0.961, 0.824, 0.9)
 		elif k < 0.55:
-			return Color(1.0, 0.667, 0.275, 0.75)
-		return Color(0.863, 0.235, 0.078, 0.55)
+			return Color(1.0, 0.820, 0.4, 0.75)
+		return Color(0.784, 0.573, 0.196, 0.55)
 	if k < 0.3:
-		return Color(1.0, 0.922, 0.706, 0.9)
+		return Color(1.0, 0.949, 0.753, 0.9)
 	elif k < 0.6:
-		return Color(1.0, 0.549, 0.196, 0.7)
-	return Color(0.706, 0.157, 0.059, 0.45)
+		return Color(1.0, 0.820, 0.4, 0.7)
+	return Color(0.6, 0.4, 0.15, 0.45)
 
-# ── 그리기 패스 — _DrawLayer 가 블렌드 모드별로 호출 ──
 func _draw_smoke_pass(canvas: CanvasItem) -> void:
 	for p in _particles:
 		if p["kind"] != "smoke":
@@ -220,7 +200,6 @@ func _draw_smoke_pass(canvas: CanvasItem) -> void:
 		canvas.draw_circle(p["pos"], r, Color(COL_SMOKE, a))
 
 func _draw_fire_pass(canvas: CanvasItem) -> void:
-	# 불꽃·불덩이
 	for p in _particles:
 		var kind: String = p["kind"]
 		if kind != "flame" and kind != "fireball":
@@ -229,14 +208,13 @@ func _draw_fire_pass(canvas: CanvasItem) -> void:
 		var c := _fire_color(kind, k)
 		var r: float = p["r"] * (1.0 + k * 0.8)
 		canvas.draw_circle(p["pos"], r, Color(c.r, c.g, c.b, c.a * (1.0 - k)))
-	# 불씨 (밝은 점)
+	# 불씨 — 황금 톤 (fire 의 빨강 → 황금)
 	for p in _particles:
 		if p["kind"] != "ember":
 			continue
 		var k: float = p["life"] / p["max_life"]
 		var a: float = 1.0 - k
-		canvas.draw_circle(p["pos"], p["r"], Color(1.0, 0.784 - 0.471 * k, 0.392 - 0.314 * k, a))
-	# 열기 펄스 (큰 반투명 원: scale 0.4→1→1.6, 알파 0→1→0)
+		canvas.draw_circle(p["pos"], p["r"], Color(1.0, 0.961 - 0.157 * k, 0.745 - 0.235 * k, a))
 	if _heat_life >= 0.0 and _heat_life <= 1.0:
 		var hscale: float
 		var hop: float
@@ -249,12 +227,10 @@ func _draw_fire_pass(canvas: CanvasItem) -> void:
 			hscale = lerpf(1.0, 1.6, u)
 			hop = 1.0 - u
 		canvas.draw_circle(_target, 130.0 * hscale, Color(COL_MID, 0.13 * hop))
-	# 충격파 링
 	if _shock_life >= 0.0 and _shock_life <= 1.0:
 		var rad: float = 14.0 + _shock_life * 340.0
 		var sa: float = (1.0 - _shock_life) * 0.85
 		canvas.draw_arc(_target, rad, 0.0, TAU, 48, Color(COL_MID, sa), 1.0 + 4.0 * (1.0 - _shock_life), true)
-	# 투사체 머리 — 밝은 코어 글로우
 	if _proj_t >= 0.0:
 		var pp := proj_pos(_caster, _target, clampf(_proj_t, 0.0, 1.0), ARC_HEIGHT)
 		canvas.draw_circle(pp, 38.0, Color(COL_DEEP, 0.22))
@@ -262,8 +238,6 @@ func _draw_fire_pass(canvas: CanvasItem) -> void:
 		canvas.draw_circle(pp, 10.0, Color(COL_HOT, 0.9))
 		canvas.draw_circle(pp, 5.0, Color(1, 1, 1, 1))
 
-# ── 블렌드 모드가 다른 두 그리기 레이어 ──
-# 어두운 연기는 가산이면 안 보이므로 일반 블렌드, 불꽃은 글로우용 가산 블렌드.
 class _DrawLayer:
 	extends Node2D
 	var _fx: Node2D
