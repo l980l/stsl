@@ -15,6 +15,13 @@ func _pcount(n: int) -> int:
 	var gs := get_node_or_null("/root/GameSettings")
 	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
 
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
+
 const COL_HOT     := Color(1, 1, 1)             # 흰 코어
 const COL_MID     := Color(1.0, 0.914, 0.659)   # #ffe9a8 — 황금
 const COL_DEEP    := Color(0.8, 0.588, 0.282)   # #cc9648 — 진황금
@@ -125,7 +132,7 @@ func _process(delta: float) -> void:
 
 	# 빛기둥 활성 동안 빛 입자 강하
 	if _pillar_age >= 0.0 and _pillar_age < REVIVE_TIME:
-		if randf() < 0.6:
+		if randf() < 0.6 * _scale():
 			_spawn_pillar_mote()
 
 	# 파티클 물리 (HTML frame() 포팅) — 수명 만료 시 제거

@@ -13,6 +13,13 @@ func _pcount(n: int) -> int:
 	var gs := get_node_or_null("/root/GameSettings")
 	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
 
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
+
 const COL_HOT  := Color(1, 1, 1)              # 흰 코어
 const COL_MID  := Color(0.749, 0.902, 1.0)    # #bfe6ff
 const COL_DEEP := Color(0.353, 0.659, 0.902)  # #5aa8e6
@@ -262,7 +269,7 @@ func _process(delta: float) -> void:
 	# 눈보라 — 명중 후 FREEZE_TIME 동안 지속 생성
 	if _freeze_timer > 0.0:
 		_freeze_timer -= delta
-		if randf() < 0.7:
+		if randf() < 0.7 * _scale():
 			_spawn_snow()
 
 	# 충격파 링 / 바닥 서리 / 얼음 감옥 진행

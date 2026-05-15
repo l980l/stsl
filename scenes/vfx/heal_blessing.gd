@@ -15,6 +15,13 @@ func _pcount(n: int) -> int:
 	var gs := get_node_or_null("/root/GameSettings")
 	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
 
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
+
 const COL_HOT      := Color(0.902, 1.0, 0.878)  # #e6ffe0 — 흰연두 코어
 const COL_MID      := Color(0.525, 1.0, 0.682)  # #86ffae — 회복 녹색
 const COL_DEEP     := Color(0.180, 0.604, 0.353) # #2e9a5a — 진녹색
@@ -174,9 +181,9 @@ func _process(delta: float) -> void:
 	# 잎·반짝임 지속 분출 — HEAL_TIME 동안
 	if _heal_timer > 0.0:
 		_heal_timer -= delta
-		if randf() < 0.4:
+		if randf() < 0.4 * _scale():
 			_spawn_leaf(false)
-		if randf() < 0.9:
+		if randf() < 0.9 * _scale():
 			_spawn_sparkle(false)
 
 	# 파티클 물리 (HTML frame() 포팅) — 수명 만료 시 제거

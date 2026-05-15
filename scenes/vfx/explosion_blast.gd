@@ -161,7 +161,7 @@ func _process(delta: float) -> void:
 	# 잔류 연기
 	if _smoke_timer > 0.0:
 		_smoke_timer -= delta
-		if randf() < 0.6:
+		if randf() < 0.6 * _scale():
 			_spawn_ambient_smoke()
 
 	# 파티클 물리 (HTML frame() 포팅) — 수명 만료 시 제거

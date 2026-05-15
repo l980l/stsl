@@ -6,6 +6,15 @@
 # 회색 재는 가산 블렌드로 안 보이므로 핏물·재(일반)·영혼(가산) 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 / ambient 확률 — GameSettings.particle_count_scale 적용 (override 우선)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
+
 const COL_SOUL      := Color(0.549, 0.561, 0.596) # 잿빛 영혼 — 외곽 글로우
 const COL_SOUL_HOT  := Color(0.784, 0.792, 0.820) # 잿빛 영혼 — 중심 글로우
 const COL_BLOOD     := Color(0.431, 0.078, 0.078) # rgba(110,20,20) — 핏물
@@ -83,9 +92,9 @@ func _process(delta: float) -> void:
 	# 재·영혼 분출 — DISSOLVE_TIME 동안
 	if _emit_timer > 0.0:
 		_emit_timer -= delta
-		if randf() < 0.7:
+		if randf() < 0.7 * _scale():
 			_spawn_ash()
-		if randf() < 0.5:
+		if randf() < 0.5 * _scale():
 			_spawn_soul()
 
 	# 파티클 물리 (HTML frame() 포팅) — 수명 만료 시 제거
