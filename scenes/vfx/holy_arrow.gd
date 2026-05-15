@@ -5,6 +5,22 @@
 # 어두운 안개·깃털은 일반 블렌드, 후광·트레이서·빛입자·빛상처·십자잔상은 가산 — 2레이어.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT     := Color(1, 1, 1)             # 흰 코어
 const COL_MID     := Color(1.0, 0.949, 0.753)   # #fff2c0 — 성광
 const COL_GOLD    := Color(1.0, 0.820, 0.4)     # #ffd166 — 황금
@@ -92,7 +108,7 @@ func _spawn_channel_mote() -> void:
 # 발사 — 황금 머즐 스파크 (탄피 없음 — 마법 화살)
 func _spawn_muzzle() -> void:
 	var dir := (_target - _caster).normalized()
-	for _i in range(14):
+	for _i in range(_pcount(14)):
 		var ang := dir.angle() + randf_range(-0.25, 0.25)
 		var sp := 4.0 + randf() * 7.0
 		_particles.append(_mk(_caster, Vector2(cos(ang) * sp, sin(ang) * sp),
@@ -100,12 +116,12 @@ func _spawn_muzzle() -> void:
 
 # 명중 — 튕기는 스파크 + 안개만 (별가루·깃털·빛 상처는 사용하지 않음)
 func _spawn_impact(pos: Vector2, ang: float) -> void:
-	for _i in range(20):
+	for _i in range(_pcount(20)):
 		var a := ang + PI + randf_range(-0.7, 0.7)
 		var sp := 2.0 + randf() * 6.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 1.0),
 			0.4 + randf() * 0.4, 1.0 + randf() * 1.3, "spark", 0.18))
-	for _i in range(14):
+	for _i in range(_pcount(14)):
 		var a := randf() * TAU
 		var sp := 0.5 + randf() * 1.6
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.6 - 0.4),

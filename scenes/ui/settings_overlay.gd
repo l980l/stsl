@@ -11,7 +11,18 @@ extends CanvasLayer
 
 const _CURSOR_SIZES:    Dictionary = {"S": 24, "M": 32, "L": 48, "XL": 64}
 const _DEFAULT_KEY   := "M"
-const _TABS          := [["sound", "ui.settings.sound"], ["display", "ui.settings.display"], ["language", "ui.settings.language_tab"]]
+const _TABS          := [["sound", "ui.settings.sound"], ["graphics", "ui.settings.graphics"], ["gameplay", "ui.settings.gameplay"], ["language", "ui.settings.language_tab"]]
+
+# multiplier 값 → "x1.0" 형식 라벨 (GDScript 는 %g 미지원 → str() 사용)
+static func _x_label(value: float) -> String:
+	return "x" + str(value)
+
+# values 배열을 {key: "xVAL"} dict 로 변환
+static func _build_x_labels(keys: Array, values: Array) -> Dictionary:
+	var out: Dictionary = {}
+	for i in keys.size():
+		out[keys[i]] = _x_label(values[i])
+	return out
 const _AUDIO_BUSES   := [["master", "ui.settings.vol_master"], ["music", "ui.settings.vol_music"], ["sfx", "ui.settings.vol_sfx"], ["ui", "ui.settings.vol_ui"]]
 const _AUDIO_DEFAULTS := {"master": 1.0, "music": 0.8, "sfx": 1.0, "ui": 1.0}
 const _PANEL_W       := 600.0
@@ -31,6 +42,9 @@ var _applying:           bool = false
 var _initial_volumes: Dictionary = {}
 var _volume_sliders:  Dictionary = {}
 var _volume_labels:   Dictionary = {}
+
+# graphics/gameplay segment 상태 (key: 옵션 그룹 이름, value: { initial, pending, buttons:Dict[key→Button] })
+var _seg_groups: Dictionary = {}
 
 var _active_tab:  String     = "sound"
 var _tab_btns:    Dictionary = {}
@@ -106,7 +120,8 @@ func _ready() -> void:
 		_tab_panels[key] = cp
 
 	_build_sound_panel()
-	_build_display_panel()
+	_build_graphics_panel()
+	_build_gameplay_panel()
 	_build_language_panel()
 
 	_switch_tab("sound")
@@ -192,6 +207,19 @@ func open() -> void:
 		if _volume_sliders.has(bkey):
 			(_volume_sliders[bkey] as HSlider).value = vol
 
+	# graphics/gameplay segment — 현재 GameSettings 값을 initial/pending 으로 동기화
+	var current_keys := {
+		"particle":         GameSettings.particle_key,
+		"vfx_speed":        GameSettings.vfx_speed_key,
+		"anim_speed":       GameSettings.anim_speed_key,
+		"monster_interval": GameSettings.monster_interval_key,
+	}
+	for gid in current_keys:
+		if _seg_groups.has(gid):
+			_seg_groups[gid]["initial"] = current_keys[gid]
+			_seg_groups[gid]["pending"] = current_keys[gid]
+			_refresh_seg_group(gid)
+
 	if _popup_tween:
 		_popup_tween.kill()
 	var p := $Panel as Panel
@@ -218,6 +246,10 @@ func close() -> void:
 func _on_apply() -> void:
 	_applying = true
 	SacredTheme.save_cursor_size(_pending_cursor_px)
+	GameSettings.save_settings()  # graphics/gameplay segment 저장 (set 은 클릭 시 즉시)
+	# 적용된 pending 을 새 initial 로 갱신 — close 시 revert 안 되도록
+	for gid in _seg_groups:
+		_seg_groups[gid]["initial"] = _seg_groups[gid]["pending"]
 	var locale_changed := _pending_locale_idx != _initial_locale_idx
 	if locale_changed:
 		LocaleManager.set_locale(LocaleManager.LOCALES[_pending_locale_idx])
@@ -237,6 +269,21 @@ func _on_defaults() -> void:
 		AudioManager.set_bus_volume(bkey, dv)
 		if _volume_sliders.has(bkey):
 			(_volume_sliders[bkey] as HSlider).value = dv
+	# graphics/gameplay segment — 각 그룹의 default 키로 복원
+	var defaults := {
+		"particle":         GameSettings.PARTICLE_DEFAULT,
+		"vfx_speed":        GameSettings.VFX_SPEED_DEFAULT,
+		"anim_speed":       GameSettings.ANIM_SPEED_DEFAULT,
+		"monster_interval": GameSettings.MONSTER_INTERVAL_DEFAULT,
+	}
+	for gid in defaults:
+		if not _seg_groups.has(gid):
+			continue
+		var grp: Dictionary = _seg_groups[gid]
+		var key: String = defaults[gid]
+		grp["pending"] = key
+		(grp["on_select"] as Callable).call(key)
+		_refresh_seg_group(gid)
 
 func _set_pending_cursor(px: int) -> void:
 	_pending_cursor_px = px
@@ -247,6 +294,12 @@ func _revert_pending() -> void:
 	SacredTheme.apply_cursor_size(_initial_cursor_px)
 	for bkey in _initial_volumes:
 		AudioManager.set_bus_volume(bkey, _initial_volumes[bkey])
+	# graphics/gameplay segment — initial 키로 GameSettings 복원
+	for gid in _seg_groups:
+		var grp: Dictionary = _seg_groups[gid]
+		var initial_key: String = grp["initial"]
+		grp["pending"] = initial_key
+		(grp["on_select"] as Callable).call(initial_key)
 
 func _on_locale_selected(idx: int) -> void:
 	_pending_locale_idx = idx
@@ -327,34 +380,144 @@ func _build_sound_panel() -> void:
 		p.add_child(val_lbl)
 		_volume_labels[bkey] = val_lbl
 
-func _build_display_panel() -> void:
-	var p := _tab_panels["display"] as Control
+func _build_graphics_panel() -> void:
+	var p := _tab_panels["graphics"] as Control
 	var mono := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
 
+	# Row 1: 커서 크기 (기존 cursor segment)
+	_build_cursor_seg_row(p, mono, 24.0)
+
+	# Row 2: 파티클 갯수 (graphics) — 라벨도 "xVAL" 형식 (x0.25/x0.5/x1.0)
+	_build_seg_row(p, mono, 80.0, tr("ui.settings.particle_quality"), "particle",
+		GameSettings.PARTICLE_KEYS,
+		_build_x_labels(GameSettings.PARTICLE_KEYS, GameSettings.PARTICLE_VALUES),
+		GameSettings.particle_key,
+		func(k: String) -> void: GameSettings.set_particle_quality(k))
+
+func _build_gameplay_panel() -> void:
+	var p := _tab_panels["gameplay"] as Control
+	var mono := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
+
+	# 각 segment 라벨은 multiplier 값 기반 ("x1.0" 형식)
+	_build_seg_row(p, mono, 24.0, tr("ui.settings.vfx_speed"), "vfx_speed",
+		GameSettings.VFX_SPEED_KEYS,
+		_build_x_labels(GameSettings.VFX_SPEED_KEYS, GameSettings.VFX_SPEED_VALUES),
+		GameSettings.vfx_speed_key,
+		func(k: String) -> void: GameSettings.set_vfx_speed(k))
+
+	_build_seg_row(p, mono, 80.0, tr("ui.settings.anim_speed"), "anim_speed",
+		GameSettings.ANIM_SPEED_KEYS,
+		_build_x_labels(GameSettings.ANIM_SPEED_KEYS, GameSettings.ANIM_SPEED_VALUES),
+		GameSettings.anim_speed_key,
+		func(k: String) -> void: GameSettings.set_anim_speed(k))
+
+	_build_seg_row(p, mono, 136.0, tr("ui.settings.monster_interval"), "monster_interval",
+		GameSettings.MONSTER_INTERVAL_KEYS,
+		_build_x_labels(GameSettings.MONSTER_INTERVAL_KEYS, GameSettings.MONSTER_INTERVAL_VALUES),
+		GameSettings.monster_interval_key,
+		func(k: String) -> void: GameSettings.set_monster_interval(k))
+
+# 일반 segment row 빌더 — 라벨 + N개 버튼. group_id 로 _seg_groups 등록.
+func _build_seg_row(parent: Control, mono: Font, row_y: float, label_text: String,
+		group_id: String, keys: Array, label_map: Dictionary, current_key: String,
+		on_select: Callable) -> void:
+	var lbl := Label.new()
+	lbl.text = label_text
+	lbl.theme_type_variation = "SubLabel"
+	lbl.offset_left   = 32.0
+	lbl.offset_top    = row_y
+	lbl.offset_right  = 170.0
+	lbl.offset_bottom = row_y + 36.0
+	parent.add_child(lbl)
+	LabelUtils.fit_text(lbl, 16, 11)
+
+	var seg_box := HBoxContainer.new()
+	seg_box.offset_left   = 180.0
+	seg_box.offset_top    = row_y
+	seg_box.offset_right  = 520.0
+	seg_box.offset_bottom = row_y + 30.0
+	seg_box.add_theme_constant_override("separation", 0)
+	parent.add_child(seg_box)
+
+	var buttons: Dictionary = {}
+	for i in keys.size():
+		var key: String = keys[i]
+		var btn := Button.new()
+		btn.text = label_map.get(key, key)
+		btn.custom_minimum_size = Vector2(0, 30)
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		btn.focus_mode = Control.FOCUS_NONE
+		btn.add_theme_font_override("font", mono)
+		btn.add_theme_font_size_override("font_size", 11)
+		btn.pressed.connect(_on_seg_pressed.bind(group_id, key, on_select))
+
+		var base_style := StyleBoxFlat.new()
+		base_style.bg_color     = Color(SacredPalette.INK_900.r, SacredPalette.INK_900.g, SacredPalette.INK_900.b, 0.8)
+		base_style.border_color = SacredPalette.BRASS_700
+		base_style.border_width_top    = 1
+		base_style.border_width_bottom = 1
+		base_style.border_width_left   = 1 if i == 0 else 0
+		base_style.border_width_right  = 1
+		btn.add_theme_stylebox_override("normal", base_style)
+		btn.add_theme_stylebox_override("focus",  base_style)
+		_seg_base_styles[btn] = base_style
+
+		seg_box.add_child(btn)
+		buttons[key] = btn
+
+		var hl := TextureRect.new()
+		hl.name = "_hl"
+		hl.texture = SacredTheme.make_top_fade_tex(SacredPalette.BRASS_300, 0.30)
+		hl.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		hl.stretch_mode = TextureRect.STRETCH_SCALE
+		hl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		hl.visible = false
+		btn.add_child(hl)
+		hl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	_seg_groups[group_id] = {"initial": current_key, "pending": current_key, "buttons": buttons, "on_select": on_select}
+	_refresh_seg_group(group_id)
+
+func _on_seg_pressed(group_id: String, key: String, on_select: Callable) -> void:
+	if not _seg_groups.has(group_id):
+		return
+	_seg_groups[group_id]["pending"] = key
+	on_select.call(key)  # 즉시 적용 (cancel 시 revert)
+	_refresh_seg_group(group_id)
+
+func _refresh_seg_group(group_id: String) -> void:
+	var grp: Dictionary = _seg_groups[group_id]
+	var pending: String = grp["pending"]
+	var buttons: Dictionary = grp["buttons"]
+	for k in buttons:
+		_apply_seg_style(buttons[k] as Button, k == pending)
+
+# 기존 커서 크기 segment (cursor 만 별도 — _CURSOR_SIZES 의 px 값 직접 사용)
+func _build_cursor_seg_row(parent: Control, mono: Font, row_y: float) -> void:
 	var lbl := Label.new()
 	lbl.text = tr("ui.settings.cursor_size")
 	lbl.theme_type_variation = "SubLabel"
 	lbl.offset_left   = 32.0
-	lbl.offset_top    = 24.0
+	lbl.offset_top    = row_y
 	lbl.offset_right  = 170.0
-	lbl.offset_bottom = 60.0
-	p.add_child(lbl)
-	LabelUtils.fit_text(lbl, 18, 12)
+	lbl.offset_bottom = row_y + 36.0
+	parent.add_child(lbl)
+	LabelUtils.fit_text(lbl, 16, 11)
 
 	var seg_box := HBoxContainer.new()
 	seg_box.offset_left   = 180.0
-	seg_box.offset_top    = 24.0
+	seg_box.offset_top    = row_y
 	seg_box.offset_right  = 520.0
-	seg_box.offset_bottom = 67.0
+	seg_box.offset_bottom = row_y + 30.0
 	seg_box.add_theme_constant_override("separation", 0)
-	p.add_child(seg_box)
+	parent.add_child(seg_box)
 
 	var keys: Array = _CURSOR_SIZES.keys()
 	for i in keys.size():
 		var key: String = keys[i]
 		var btn := Button.new()
 		btn.text = key
-		btn.custom_minimum_size = Vector2(0, 43)
+		btn.custom_minimum_size = Vector2(0, 30)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.add_theme_font_override("font", mono)
@@ -398,7 +561,7 @@ func _build_language_panel() -> void:
 	lbl.offset_right  = 170.0
 	lbl.offset_bottom = 60.0
 	p.add_child(lbl)
-	LabelUtils.fit_text(lbl, 18, 12)
+	LabelUtils.fit_text(lbl, 16, 11)
 
 	var opt := OptionButton.new()
 	opt.offset_left   = 180.0

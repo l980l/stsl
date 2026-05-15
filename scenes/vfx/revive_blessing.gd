@@ -6,6 +6,22 @@
 # 어두운 황금 안개는 가산 블렌드로 흐려지므로 기둥·고리·안개·깃털(일반)·빛입자(가산) 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
+
 const COL_HOT     := Color(1, 1, 1)             # 흰 코어
 const COL_MID     := Color(1.0, 0.914, 0.659)   # #ffe9a8 — 황금
 const COL_DEEP    := Color(0.8, 0.588, 0.282)   # #cc9648 — 진황금
@@ -90,18 +106,18 @@ func _spawn_pillar_mote() -> void:
 # 폭발 — 빛 입자 + 깃털 + 황금 안개
 func _spawn_burst() -> void:
 	var origin := _target + Vector2(0.0, -60.0)
-	for _i in range(80):
+	for _i in range(_pcount(80)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 6.0
 		_particles.append(_mk(origin, Vector2(cos(a) * sp, sin(a) * sp - 1.5),
 			1.5 + randf() * 0.9, 1.6 + randf() * 1.6, "mote", 0.018))
-	for _i in range(40):
+	for _i in range(_pcount(40)):
 		var a := randf() * TAU
 		var sp := 1.5 + randf() * 4.0
 		_particles.append(_mk(origin, Vector2(cos(a) * sp, sin(a) * sp - 1.2),
 			1.8 + randf() * 0.9, 12.0 + randf() * 12.0, "feather", 0.012,
 			randf_range(-0.8, 0.8), randf_range(-0.18, 0.18)))
-	for _i in range(24):
+	for _i in range(_pcount(24)):
 		var a := randf() * TAU
 		var sp := 0.6 + randf() * 1.8
 		_particles.append(_mk(origin, Vector2(cos(a) * sp, sin(a) * sp * 0.6 - 0.5),
@@ -116,7 +132,7 @@ func _process(delta: float) -> void:
 
 	# 빛기둥 활성 동안 빛 입자 강하
 	if _pillar_age >= 0.0 and _pillar_age < REVIVE_TIME:
-		if randf() < 0.6:
+		if randf() < 0.6 * _scale():
 			_spawn_pillar_mote()
 
 	# 파티클 물리 (HTML frame() 포팅) — 수명 만료 시 제거

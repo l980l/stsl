@@ -5,6 +5,15 @@
 # 피는 어두운 빨강 — 가산이면 안 보이므로 일반 블렌드(노드 기본)로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_BLOOD      := Color(0.757, 0.102, 0.102) # #c11a1a — 갓 튄 피
 const COL_BLOOD_DARK := Color(0.522, 0.043, 0.043) # 마르며 어두워진 피
 
@@ -35,7 +44,7 @@ func _ready() -> void:
 func play(_caster_pos: Vector2, target_pos: Vector2, dir_angle: float = INF) -> void:
 	var base_ang: float = dir_angle if is_finite(dir_angle) else -PI / 2.0
 	# 작은 핏방울
-	for _i in range(BLOOD_COUNT):
+	for _i in range(_pcount(BLOOD_COUNT)):
 		var a := base_ang + randf_range(-1.0, 1.0)
 		var sp := 3.0 + randf() * 8.0
 		_particles.append({
@@ -44,7 +53,7 @@ func play(_caster_pos: Vector2, target_pos: Vector2, dir_angle: float = INF) -> 
 			"r": 1.6 + randf() * 2.2, "grav": 0.18,
 		})
 	# 큰 핏방울
-	for _i in range(BLOOD_BIG_COUNT):
+	for _i in range(_pcount(BLOOD_BIG_COUNT)):
 		var a := base_ang + randf_range(-0.9, 0.9)
 		var sp := 4.0 + randf() * 5.0
 		_particles.append({

@@ -5,6 +5,15 @@
 # 어두운 연기·먼지·파편·탄피·탄흔은 일반 블렌드, 트레이서·스파크·머즐플래시·총알머리는 가산 — 2레이어.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_HOT     := Color(1, 1, 1)             # 흰 코어
 const COL_STEEL   := Color(0.812, 0.831, 0.867) # #cfd4dd
 const COL_AIM     := Color(1.0, 0.251, 0.251)   # #ff4040 — 조준 레이저
@@ -83,13 +92,13 @@ func _mk(pos: Vector2, vel: Vector2, max_life: float, r: float, kind: String,
 func _spawn_muzzle() -> void:
 	var dir := (_target - _caster).normalized()
 	# 스파크 — 총구 앞쪽 부채꼴
-	for _i in range(14):
+	for _i in range(_pcount(14)):
 		var ang := dir.angle() + randf_range(-0.25, 0.25)
 		var sp := 4.0 + randf() * 7.0
 		_particles.append(_mk(_caster, Vector2(cos(ang) * sp, sin(ang) * sp),
 			0.26 + randf() * 0.22, 1.2 + randf() * 1.4, "spark", 0.04))
 	# 머즐 연기
-	for _i in range(14):
+	for _i in range(_pcount(14)):
 		var ang := dir.angle() + randf_range(-0.8, 0.8)
 		var sp := 0.6 + randf() * 1.6
 		_particles.append(_mk(_caster, Vector2(cos(ang) * sp, sin(ang) * sp * 0.7 - 0.3 - randf() * 0.5),
@@ -102,17 +111,17 @@ func _spawn_muzzle() -> void:
 
 # 명중 — 튕기는 스파크 + 먼지 + 파편
 func _spawn_impact(pos: Vector2, ang: float) -> void:
-	for _i in range(28):
+	for _i in range(_pcount(28)):
 		var a := ang + PI + randf_range(-0.7, 0.7)
 		var sp := 2.0 + randf() * 7.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 1.0),
 			0.38 + randf() * 0.4, 1.0 + randf() * 1.3, "spark", 0.18))
-	for _i in range(18):
+	for _i in range(_pcount(18)):
 		var a := ang + PI + randf_range(-0.5, 0.5)
 		var sp := 0.4 + randf() * 2.2
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.5 - 0.6),
 			0.7 + randf() * 0.5, 9.0 + randf() * 10.0, "dust", -0.008))
-	for _i in range(8):
+	for _i in range(_pcount(8)):
 		var a := ang + PI + randf_range(-0.45, 0.45)
 		var sp := 3.0 + randf() * 5.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 2.0),

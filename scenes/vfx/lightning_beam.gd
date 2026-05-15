@@ -4,6 +4,15 @@
 # 노드는 position (0,0)으로 add_child해야 한다 (좌표를 global로 받아 그대로 그림).
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_GLOW   := Color(0.486, 0.769, 1.0)  # #7cc4ff — 외곽 글로우
 const COL_MID    := Color(0.812, 0.902, 1.0)  # #cfe6ff — 중간
 const COL_CORE   := Color(1, 1, 1)            # 흰 코어
@@ -43,6 +52,7 @@ static func make_bolt(a: Vector2, b: Vector2, segs: int, offset: float, branches
 		pts.append(base + perp * k)
 	pts.append(b)
 	var branch_list: Array = []
+	# branches 는 make_bolt 호출자가 결정 (static 함수라 _pcount 호출 불가) — 호출처에서 _pcount 적용
 	for _i in range(branches):
 		var idx: int = 3 + randi() % maxi(1, pts.size() - 6)
 		var start: Vector2 = pts[idx]
@@ -149,7 +159,7 @@ func _run() -> void:
 		queue_free()
 
 func _spawn_bolts(n: int) -> void:
-	for _i in range(n):
+	for _i in range(_pcount(n)):
 		_active_bolts.append({
 			"bolt": make_bolt(_caster, _target, 20, 46.0, 3),
 			"life": 1.0,

@@ -2362,6 +2362,10 @@ func _on_battle_won() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	for entry in _enemy_nodes:
 		entry["btn"].disabled = true
+	# 마지막 적 사망 연출(death_dissolve)·VFX 임팩트·SFX 보여주고 종료 화면 전환
+	await get_tree().create_timer(1.5).timeout
+	if not is_inside_tree():
+		return
 	GameManager.complete_battle(true)
 
 func _on_battle_lost() -> void:

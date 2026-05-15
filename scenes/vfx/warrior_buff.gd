@@ -5,6 +5,22 @@
 # dust/chunk 는 일반 블렌드, ember/flame/룬링/오라/충격파는 가산 블렌드 — 2레이어.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT   := Color(1.0, 0.941, 0.753) # #fff0c0 — 흰주황 코어
 const COL_MID   := Color(1.0, 0.478, 0.165) # #ff7a2a — 분노 주황
 const COL_DEEP  := Color(0.784, 0.188, 0.078) # #c83014 — 진홍
@@ -103,22 +119,22 @@ func _mk(pos: Vector2, vel: Vector2, max_life: float, r: float, kind: String,
 func _spawn_burst() -> void:
 	var ctr := _target + Vector2(0.0, -30.0)
 	var floor_y := _target + Vector2(0.0, 30.0)
-	for _i in range(30):
+	for _i in range(_pcount(30)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 6.0
 		_particles.append(_mk(ctr, Vector2(cos(a) * sp, sin(a) * sp * 0.9 - 2.0),
 			1.1 + randf() * 0.8, 1.5 + randf() * 1.6, "ember", 0.04))
-	for _i in range(14):
+	for _i in range(_pcount(14)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 4.0
 		_particles.append(_mk(floor_y, Vector2(cos(a) * sp, sin(a) * sp * 0.3 - 0.8 - randf()),
 			1.5 + randf() * 0.9, 22.0 + randf() * 18.0, "dust", -0.005))
-	for _i in range(10):
+	for _i in range(_pcount(10)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 4.0
 		_particles.append(_mk(ctr, Vector2(cos(a) * sp, sin(a) * sp - 2.0),
 			0.6 + randf() * 0.5, 14.0 + randf() * 14.0, "flame", -0.02))
-	for _i in range(8):
+	for _i in range(_pcount(8)):
 		var a := randf() * TAU
 		var sp := 3.0 + randf() * 5.0
 		_particles.append(_mk(floor_y, Vector2(cos(a) * sp, sin(a) * sp * 0.4 - 3.0 - randf() * 1.5),
@@ -128,11 +144,11 @@ func _spawn_burst() -> void:
 # BUFF_TIME 동안 매 프레임 — 잔불 솟구침
 func _spawn_rising() -> void:
 	var floor_y := _target.y + 30.0
-	for _i in range(2):
+	for _i in range(_pcount(2)):
 		_particles.append(_mk(Vector2(_target.x + randf_range(-75.0, 75.0), floor_y + randf_range(-5.0, 5.0)),
 			Vector2(randf_range(-0.6, 0.6), -1.2 - randf() * 1.5),
 			1.2 + randf() * 0.9, 1.6 + randf() * 1.6, "ember", 0.02))
-	if randf() < 0.4:
+	if randf() < 0.4 * _scale():
 		_particles.append(_mk(Vector2(_target.x + randf_range(-50.0, 50.0), floor_y - 5.0),
 			Vector2(randf_range(-0.3, 0.3), -1.5 - randf()),
 			0.7 + randf() * 0.5, 8.0 + randf() * 10.0, "flame", -0.02))

@@ -5,6 +5,22 @@
 # 어두운 연기·먼지는 일반 블렌드, 불꽃·불씨·충격파는 가산 블렌드 — 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT   := Color(1.0, 0.965, 0.8)     # #fff6cc — 흰노랑 코어
 const COL_MID   := Color(1.0, 0.604, 0.227)   # #ff9a3a — 주황
 const COL_DEEP  := Color(0.847, 0.227, 0.094) # #d83a18 — 진홍
@@ -82,39 +98,39 @@ func _mk(pos: Vector2, vel: Vector2, max_life: float, r: float, kind: String,
 # 대폭발 — 흰 코어 + 화염구 + 불꽃 + 불씨 + 흙먼지 + 버섯구름 연기 + 파편
 func _spawn_fireball(pos: Vector2) -> void:
 	var bs := BLAST_SCALE
-	for _i in range(10):
+	for _i in range(_pcount(10)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 3.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 1.0) * bs,
 			0.2 + randf() * 0.2, (18.0 + randf() * 16.0) * bs, "core", -0.01))
-	for _i in range(50):
+	for _i in range(_pcount(50)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 7.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.85 - 2.0) * bs,
 			0.7 + randf() * 0.7, (18.0 + randf() * 30.0) * bs, "fireball", -0.025))
-	for _i in range(30):
+	for _i in range(_pcount(30)):
 		var a := randf() * TAU
 		var sp := 4.0 + randf() * 8.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.7 - 3.0) * bs,
 			0.4 + randf() * 0.5, (8.0 + randf() * 14.0) * bs, "flame", -0.015))
-	for _i in range(70):
+	for _i in range(_pcount(70)):
 		var a := randf() * TAU
 		var sp := 3.0 + randf() * 11.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 2.0) * bs,
 			1.0 + randf() * 1.1, (1.4 + randf() * 1.8) * bs, "ember", 0.06))
-	for _i in range(35):
+	for _i in range(_pcount(35)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 5.0
 		_particles.append(_mk(pos + Vector2(randf_range(-15.0, 15.0), 20.0 + randf_range(-4.0, 4.0)) * bs,
 			Vector2(cos(a) * sp, sin(a) * sp * 0.3 - 0.5 - randf() * 1.2) * bs,
 			1.6 + randf() * 1.2, (24.0 + randf() * 22.0) * bs, "dust", -0.005))
-	for _i in range(25):
+	for _i in range(_pcount(25)):
 		var a := -PI / 2.0 + randf_range(-0.45, 0.45)
 		var sp := 1.2 + randf() * 2.4
 		_particles.append(_mk(pos + Vector2(randf_range(-20.0, 20.0), -10.0) * bs,
 			Vector2(cos(a) * sp, sin(a) * sp) * bs,
 			2.2 + randf() * 1.5, (34.0 + randf() * 30.0) * bs, "smoke", -0.018))
-	for _i in range(15):
+	for _i in range(_pcount(15)):
 		var a := -PI / 2.0 + randf_range(-PI / 2.0, PI / 2.0)
 		var sp := 4.0 + randf() * 8.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 2.0) * bs,
@@ -145,7 +161,7 @@ func _process(delta: float) -> void:
 	# 잔류 연기
 	if _smoke_timer > 0.0:
 		_smoke_timer -= delta
-		if randf() < 0.6:
+		if randf() < 0.6 * _scale():
 			_spawn_ambient_smoke()
 
 	# 파티클 물리 (HTML frame() 포팅) — 수명 만료 시 제거

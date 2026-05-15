@@ -5,6 +5,22 @@
 # 어두운 독가스는 가산 블렌드로 안 보이므로 가스·물방울·거품(일반)·불씨·헤일로(가산) 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT     := Color(0.910, 1.0, 0.690)   # #e8ffb0 — 연두 코어
 const COL_MID     := Color(0.722, 1.0, 0.361)   # #b8ff5c — 독성 녹색
 const COL_DEEP    := Color(0.227, 0.541, 0.110) # #3a8a1c — 진녹색
@@ -134,24 +150,24 @@ func _spawn_trail(pos: Vector2) -> void:
 	_particles.append(_mk(pos + Vector2(randf_range(-3.0, 3.0), randf_range(-3.0, 3.0)),
 		Vector2(randf_range(-0.2, 0.2), 0.2 + randf() * 0.4),
 		0.7 + randf() * 0.5, 4.0 + randf() * 5.0, "drip", 0.04))
-	if randf() < 0.7:
+	if randf() < 0.7 * _scale():
 		_particles.append(_mk(pos + Vector2(randf_range(-2.0, 2.0), randf_range(-2.0, 2.0)),
 			Vector2(randf_range(-0.15, 0.15), -0.2 - randf() * 0.3),
 			0.9 + randf() * 0.5, 8.0 + randf() * 8.0, "gas", -0.005))
 
 # 명중 폭발 — 독액 + 독가스 + 불씨
 func _spawn_splash(pos: Vector2) -> void:
-	for _i in range(40):
+	for _i in range(_pcount(40)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 4.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.6 - 1.2),
 			0.8 + randf() * 0.6, 3.0 + randf() * 5.0, "drip", 0.06))
-	for _i in range(50):
+	for _i in range(_pcount(50)):
 		var a := randf() * TAU
 		var sp := 0.6 + randf() * 2.5
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.6 - 0.4),
 			1.4 + randf() * 0.9, 18.0 + randf() * 20.0, "gas", -0.008))
-	for _i in range(24):
+	for _i in range(_pcount(24)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 3.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 0.6),
@@ -159,15 +175,15 @@ func _spawn_splash(pos: Vector2) -> void:
 
 # 잔류 — 명중 후 타겟 주위의 독가스·거품·떨어지는 독액
 func _spawn_ambient() -> void:
-	if randf() < 0.7:
+	if randf() < 0.7 * _scale():
 		_particles.append(_mk(_target + Vector2(randf_range(-35.0, 35.0), randf_range(25.0, 55.0)),
 			Vector2(randf_range(-0.15, 0.15), -0.4 - randf() * 0.5),
 			1.6 + randf() * 0.8, 12.0 + randf() * 12.0, "gas", -0.005))
-	if randf() < 0.3:
+	if randf() < 0.3 * _scale():
 		_particles.append(_mk(_target + Vector2(randf_range(-30.0, 30.0), randf_range(40.0, 70.0)),
 			Vector2(randf_range(-0.1, 0.1), -0.6 - randf() * 0.7),
 			0.9 + randf() * 0.5, 3.0 + randf() * 4.0, "bubble", 0.0))
-	if randf() < 0.2:
+	if randf() < 0.2 * _scale():
 		_particles.append(_mk(_target + Vector2(randf_range(-30.0, 30.0), randf_range(-15.0, 15.0)),
 			Vector2(randf_range(-0.1, 0.1), 0.5 + randf() * 0.4),
 			0.9 + randf() * 0.4, 2.4 + randf() * 1.8, "drip", 0.05))

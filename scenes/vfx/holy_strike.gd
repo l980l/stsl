@@ -5,6 +5,22 @@
 # 어두운 황금 안개는 가산 블렌드로 흐려지므로 기둥·글리프·안개·깃털(일반)·빛입자/칼(가산) 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT     := Color(1, 1, 1)             # 흰 코어
 const COL_MID     := Color(1.0, 0.949, 0.753)   # #fff2c0 — 성광
 const COL_GOLD    := Color(1.0, 0.820, 0.4)     # #ffd166 — 금빛
@@ -132,24 +148,24 @@ func _spawn_channel_mote() -> void:
 
 # 명중 폭발 — 빛 입자 + 깃털 + 황금 안개 + 바닥에서 솟는 안개
 func _spawn_impact() -> void:
-	for _i in range(40):
+	for _i in range(_pcount(40)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 6.0
 		_particles.append(_mk(_target, Vector2(cos(a) * sp, sin(a) * sp - 1.5),
 			1.4 + randf() * 0.9, 1.6 + randf() * 1.6, "mote", 0.018))
-	for _i in range(35):
+	for _i in range(_pcount(35)):
 		var a := randf() * TAU
 		var sp := 1.4 + randf() * 4.0
 		_particles.append(_mk(_target, Vector2(cos(a) * sp, sin(a) * sp * 0.8 - 1.2),
 			1.8 + randf() * 1.1, 11.0 + randf() * 12.0, "feather", 0.01,
 			randf_range(-0.6, 0.6), randf_range(-0.18, 0.18)))
-	for _i in range(26):
+	for _i in range(_pcount(26)):
 		var a := randf() * TAU
 		var sp := 0.6 + randf() * 1.8
 		_particles.append(_mk(_target, Vector2(cos(a) * sp, sin(a) * sp * 0.6 - 0.5),
 			1.6 + randf() * 0.9, 28.0 + randf() * 22.0, "haze", -0.008))
 	# 바닥에서 솟는 안개
-	for _i in range(24):
+	for _i in range(_pcount(24)):
 		var a := -PI / 2.0 + randf_range(-0.7, 0.7)
 		var sp := 1.0 + randf() * 2.0
 		_particles.append(_mk(_target + Vector2(0.0, 70.0),

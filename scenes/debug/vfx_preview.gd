@@ -30,30 +30,26 @@ const DEFENSE_BUFF := preload("res://scenes/vfx/defense_buff.gd")
 const POISON_TICK := preload("res://scenes/vfx/poison_tick.gd")
 
 # kind: "impact"=피격 버스트(타겟 위치) / "self"=자기 버프 버스트 / "beam"=시전자→타겟 빔
-const VFX_LIST := [
-	{"name": "slash",          "kind": "impact", "path": "res://scenes/vfx/slash_particle.tscn"},
-	{"name": "projectile",     "kind": "impact", "path": "res://scenes/vfx/projectile_particle.tscn"},
-	{"name": "explosive",      "kind": "impact", "path": "res://scenes/vfx/explosive_particle.tscn"},
-	{"name": "divine",         "kind": "impact", "path": "res://scenes/vfx/divine_particle.tscn"},
-	{"name": "curse",          "kind": "impact", "path": "res://scenes/vfx/curse_particle.tscn"},
-	{"name": "default",        "kind": "impact", "path": "res://scenes/vfx/default_particle.tscn"},
-	{"name": "block",          "kind": "self",   "path": "res://scenes/vfx/block_particle.tscn"},
+# 현재버전 — 게임에서 실제 사용 중
+const VFX_CURRENT := [
+	{"name": "slash+blood",    "kind": "impact", "path": "res://scenes/vfx/slash_particle.tscn", "with_blood": true},
 	{"name": "fire",           "kind": "beam",   "path": "res://scenes/vfx/fire_blast.gd"},
 	{"name": "ice",            "kind": "beam",   "path": "res://scenes/vfx/ice_shards.gd"},
 	{"name": "lightning_beam", "kind": "beam",   "path": "res://scenes/vfx/lightning_beam.gd"},
 	{"name": "debuff",         "kind": "beam",   "path": "res://scenes/vfx/debuff_hex.gd"},
 	{"name": "charm",          "kind": "beam",   "path": "res://scenes/vfx/charm_kiss.gd"},
 	{"name": "poison",         "kind": "beam",   "path": "res://scenes/vfx/poison_splash.gd"},
+	{"name": "poison_tick",    "kind": "beam",   "path": "res://scenes/vfx/poison_tick.gd"},
 	{"name": "death",          "kind": "beam",   "path": "res://scenes/vfx/death_dissolve.gd"},
 	{"name": "revive",         "kind": "beam",   "path": "res://scenes/vfx/revive_blessing.gd"},
 	{"name": "heal",           "kind": "beam",   "path": "res://scenes/vfx/heal_blessing.gd"},
 	{"name": "blood",          "kind": "beam",   "path": "res://scenes/vfx/blood_spray.gd"},
-	{"name": "holy",           "kind": "beam",   "path": "res://scenes/vfx/holy_strike.gd"},
 	{"name": "arrow",          "kind": "beam",   "path": "res://scenes/vfx/arrow_shot.gd"},
-	{"name": "explosive",      "kind": "beam",   "path": "res://scenes/vfx/explosion_blast.gd"},
+	{"name": "explosion",      "kind": "beam",   "path": "res://scenes/vfx/explosion_blast.gd"},
 	{"name": "blunt",          "kind": "beam",   "path": "res://scenes/vfx/blunt_smash.gd"},
 	{"name": "stun",           "kind": "beam",   "path": "res://scenes/vfx/stun_stars.gd"},
 	{"name": "bullet",         "kind": "beam",   "path": "res://scenes/vfx/bullet_shot.gd"},
+	{"name": "holy_strike",    "kind": "beam",   "path": "res://scenes/vfx/holy_strike.gd"},
 	{"name": "holy_slash",     "kind": "beam",   "path": "res://scenes/vfx/holy_slash.gd"},
 	{"name": "holy_arrow",     "kind": "beam",   "path": "res://scenes/vfx/holy_arrow.gd"},
 	{"name": "holy_fire",      "kind": "beam",   "path": "res://scenes/vfx/holy_fire.gd"},
@@ -62,8 +58,20 @@ const VFX_LIST := [
 	{"name": "warrior_buff",   "kind": "beam",   "path": "res://scenes/vfx/warrior_buff.gd"},
 	{"name": "infatuation",    "kind": "beam",   "path": "res://scenes/vfx/infatuation.gd"},
 	{"name": "defense_buff",   "kind": "beam",   "path": "res://scenes/vfx/defense_buff.gd"},
-	{"name": "poison_tick",    "kind": "beam",   "path": "res://scenes/vfx/poison_tick.gd"},
 ]
+
+# 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.
+const VFX_LEGACY := [
+	{"name": "slash",          "kind": "impact", "path": "res://scenes/vfx/slash_particle.tscn"},
+	{"name": "projectile",     "kind": "impact", "path": "res://scenes/vfx/projectile_particle.tscn"},
+	{"name": "explosive",      "kind": "impact", "path": "res://scenes/vfx/explosive_particle.tscn"},
+	{"name": "divine",         "kind": "impact", "path": "res://scenes/vfx/divine_particle.tscn"},
+	{"name": "curse",          "kind": "impact", "path": "res://scenes/vfx/curse_particle.tscn"},
+	{"name": "default",        "kind": "impact", "path": "res://scenes/vfx/default_particle.tscn"},
+	{"name": "block",          "kind": "self",   "path": "res://scenes/vfx/block_particle.tscn"},
+]
+
+const VFX_LIST := VFX_CURRENT + VFX_LEGACY  # 호환성 유지 (다른 코드가 참조 시)
 
 var _caster_pos := Vector2(420, 540)
 var _target_pos := Vector2(1500, 540)
@@ -72,6 +80,7 @@ var _auto := false
 var _selected: Dictionary = VFX_LIST[VFX_LIST.size() - 1]  # 기본 lightning_beam
 var _info: Label
 var _impact_label: Label  # 임팩트 시점 시각 마커 — VFX 의 screen_effect 콜백
+var _compare_3way: bool = false  # 3-way 비교 모드 — 한 번에 x0.25/x0.5/x1.0 동시 spawn
 
 func _ready() -> void:
 	# 어두운 배경 — 가산 블렌드 글로우 확인용
@@ -89,20 +98,64 @@ func _ready() -> void:
 	title.text = "VFX 버튼 선택 → 빈 곳 클릭으로 타겟 이동+재생   /   [Space] 재생"
 	panel.add_child(title)
 
-	var grid := GridContainer.new()
-	grid.columns = 5
-	panel.add_child(grid)
-	for entry in VFX_LIST:
+	# 현재버전 (게임에서 실제 사용 중)
+	var current_lbl := Label.new()
+	current_lbl.text = "── 현재버전 ──"
+	current_lbl.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	panel.add_child(current_lbl)
+	var grid_current := GridContainer.new()
+	grid_current.columns = 5
+	panel.add_child(grid_current)
+	for entry in VFX_CURRENT:
 		var b := Button.new()
 		b.text = entry["name"]
 		b.custom_minimum_size = Vector2(150.0, 0.0)
 		b.pressed.connect(_select_and_play.bind(entry))
-		grid.add_child(b)
+		grid_current.add_child(b)
+
+	# 구버전 (더 이상 사용 X — 참조용)
+	var legacy_lbl := Label.new()
+	legacy_lbl.text = "── 구버전 (사용 X) ──"
+	legacy_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	panel.add_child(legacy_lbl)
+	var grid_legacy := GridContainer.new()
+	grid_legacy.columns = 5
+	panel.add_child(grid_legacy)
+	for entry in VFX_LEGACY:
+		var b := Button.new()
+		b.text = entry["name"]
+		b.custom_minimum_size = Vector2(150.0, 0.0)
+		b.modulate = Color(0.75, 0.75, 0.75)
+		b.pressed.connect(_select_and_play.bind(entry))
+		grid_legacy.add_child(b)
 
 	var auto_btn := CheckBox.new()
 	auto_btn.text = "자동 반복 (1.8s)"
 	auto_btn.toggled.connect(func(on: bool) -> void: _auto = on)
 	panel.add_child(auto_btn)
+
+	# 파티클 갯수 토글 — 다음 VFX spawn 부터 즉시 반영 (GameSettings.particle_quality)
+	var pq_label := Label.new()
+	pq_label.text = "파티클 갯수 (현재: %s)" % GameSettings.particle_key
+	panel.add_child(pq_label)
+	var pq_box := HBoxContainer.new()
+	panel.add_child(pq_box)
+	for k in GameSettings.PARTICLE_KEYS:
+		var idx_str := str(GameSettings.PARTICLE_VALUES[GameSettings.PARTICLE_KEYS.find(k)])
+		var pq_btn := Button.new()
+		pq_btn.text = "x" + idx_str
+		pq_btn.custom_minimum_size = Vector2(80, 0)
+		pq_btn.pressed.connect(func() -> void:
+			GameSettings.set_particle_quality(k)
+			pq_label.text = "파티클 갯수 (현재: %s)" % GameSettings.particle_key
+			_update_info())
+		pq_box.add_child(pq_btn)
+
+	# 3-way 비교 — 한 번 클릭에 3개 인스턴스 (x0.25 / x0.5 / x1.0) 동시 spawn (좌/중/우)
+	var cmp_btn := CheckBox.new()
+	cmp_btn.text = "3-way 비교 (x0.25 | x0.5 | x1.0 동시 spawn)"
+	cmp_btn.toggled.connect(func(on: bool) -> void: _compare_3way = on)
+	panel.add_child(cmp_btn)
 
 	_info = Label.new()
 	panel.add_child(_info)
@@ -252,6 +305,17 @@ func _update_info() -> void:
 		var script: GDScript = load(_selected["path"]) as GDScript
 		if script and "IMPACT_DELAY" in script:
 			s += "\n⏱ 임팩트 시점: %.2fs (이때 데미지/SFX 적용)" % script.IMPACT_DELAY
+		# 파티클 갯수 적용 여부 — 스크립트에 _pcount 메서드 정의돼 있는지
+		if script:
+			var has_pcount: bool = false
+			for m in script.get_script_method_list():
+				if m["name"] == "_pcount":
+					has_pcount = true
+					break
+			if has_pcount:
+				s += "\n🎚 파티클 갯수 적용 ✓ — 현재 %s (x%s)" % [GameSettings.particle_key, str(GameSettings.particle_count_scale())]
+			else:
+				s += "\n🎚 파티클 갯수 미적용 (단일 spawn / 폴리곤 점)"
 	_info.text = s
 
 func _select_and_play(entry: Dictionary) -> void:
@@ -263,29 +327,77 @@ func _play(entry: Dictionary) -> void:
 	match entry["kind"]:
 		"beam":
 			var script: GDScript = load(entry["path"]) as GDScript
-			var fx: Node2D = script.new()
-			add_child(fx)
-			fx.position = Vector2.ZERO
-			fx.screen_effect.connect(_preview_flash)
-			fx.screen_effect.connect(_show_impact_marker.bind(entry["name"]))
-			fx.play(_caster_pos, _target_pos)
+			if _compare_3way:
+				# 3개 인스턴스 동시 spawn — 각 다른 _particle_scale_override + 좌/중/우 위치
+				var x_offsets := [-400.0, 0.0, 400.0]
+				var scales    := [0.25, 0.5, 1.0]
+				for i in 3:
+					var fx_n: Node2D = script.new()
+					add_child(fx_n)
+					fx_n.position = Vector2.ZERO
+					if "_particle_scale_override" in fx_n:
+						fx_n.set("_particle_scale_override", scales[i])
+					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
+					var c_pos: Vector2 = _caster_pos + Vector2(x_offsets[i], 0.0)
+					if i == 1:
+						# 가운데 인스턴스만 임팩트 마커 (3개가 거의 동시 발동 — 라벨은 1개)
+						fx_n.screen_effect.connect(_preview_flash)
+						fx_n.screen_effect.connect(_show_impact_marker.bind("%s — 3way" % entry["name"]))
+					fx_n.play(c_pos, t_pos)
+					_spawn_compare_label(t_pos, "x" + str(scales[i]))
+			else:
+				var fx: Node2D = script.new()
+				add_child(fx)
+				fx.position = Vector2.ZERO
+				fx.screen_effect.connect(_preview_flash)
+				fx.screen_effect.connect(_show_impact_marker.bind(entry["name"]))
+				fx.play(_caster_pos, _target_pos)
 		"impact":
-			var fx: Node2D = (load(entry["path"]) as PackedScene).instantiate()
-			if "autostart" in fx:
-				fx.autostart = false
-			if "repeat" in fx:
-				fx.repeat = false
-			add_child(fx)
-			fx.global_position = _target_pos
-			if entry["name"] == "slash":
+			var packed := load(entry["path"]) as PackedScene
+			if _compare_3way:
+				# PackedScene (GPUParticles2D) 의 amount 를 인스턴스별로 스케일
+				var x_offsets := [-400.0, 0.0, 400.0]
+				var scales    := [0.25, 0.5, 1.0]
+				for i in 3:
+					var fx_n: Node2D = packed.instantiate()
+					if "autostart" in fx_n:
+						fx_n.autostart = false
+					if "repeat" in fx_n:
+						fx_n.repeat = false
+					add_child(fx_n)
+					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
+					fx_n.global_position = t_pos
+					_scale_packed_amounts(fx_n, scales[i])
+					var slash_rot_n := randf_range(0.0, TAU)
+					if entry.get("with_blood", false):
+						fx_n.rotation = slash_rot_n
+						var blood_n: Node2D = BLOOD_SPRAY.new()
+						add_child(blood_n)
+						blood_n.position = Vector2.ZERO
+						blood_n.play(t_pos, t_pos, slash_rot_n)
+					elif entry["name"] == "slash":
+						fx_n.rotation = slash_rot_n
+					fx_n.burst()
+					_spawn_compare_label(t_pos, "x" + str(scales[i]))
+			else:
+				var fx: Node2D = packed.instantiate()
+				if "autostart" in fx:
+					fx.autostart = false
+				if "repeat" in fx:
+					fx.repeat = false
+				add_child(fx)
+				fx.global_position = _target_pos
 				var slash_rot := randf_range(0.0, TAU)
-				fx.rotation = slash_rot
-				# battle_scene과 동일하게 slash는 피 분출을 베기 방향으로 추가 발동
-				var blood: Node2D = BLOOD_SPRAY.new()
-				add_child(blood)
-				blood.position = Vector2.ZERO
-				blood.play(_target_pos, _target_pos, slash_rot)
-			fx.burst()
+				if entry.get("with_blood", false):
+					fx.rotation = slash_rot
+					# battle_scene과 동일하게 slash는 피 분출을 베기 방향으로 추가 발동
+					var blood: Node2D = BLOOD_SPRAY.new()
+					add_child(blood)
+					blood.position = Vector2.ZERO
+					blood.play(_target_pos, _target_pos, slash_rot)
+				elif entry["name"] == "slash":
+					fx.rotation = slash_rot
+				fx.burst()
 		"self":
 			var fx: Node2D = (load(entry["path"]) as PackedScene).instantiate()
 			if "autostart" in fx:
@@ -298,6 +410,33 @@ func _play(entry: Dictionary) -> void:
 			var shield := fx.get_node_or_null("ShieldIcon")
 			if shield:
 				shield.play_shield()
+
+# 3-way 비교 모드 — PackedScene (GPUParticles2D/CPUParticles2D) 의 amount 를 scale 곱셈
+# 재귀적으로 자식 모두 — slash_particle 같은 BurstParticleGroup 의 4개 노드 일괄 적용
+func _scale_packed_amounts(node: Node, scale: float) -> void:
+	if node is GPUParticles2D:
+		(node as GPUParticles2D).amount = maxi(1, int(round((node as GPUParticles2D).amount * scale)))
+	elif node is CPUParticles2D:
+		(node as CPUParticles2D).amount = maxi(1, int(round((node as CPUParticles2D).amount * scale)))
+	for child in node.get_children():
+		_scale_packed_amounts(child, scale)
+
+# 3-way 비교 모드 — 각 타겟 위 라벨 (x0.25/x0.5/x1.0). VFX 지속 시간만큼 페이드아웃.
+func _spawn_compare_label(target_pos: Vector2, text: String) -> void:
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.add_theme_font_size_override("font_size", 28)
+	lbl.add_theme_color_override("font_color", Color(0.85, 1.0, 0.85))
+	lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	lbl.add_theme_constant_override("outline_size", 4)
+	lbl.position = target_pos + Vector2(-40.0, -180.0)
+	lbl.size = Vector2(80, 40)
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(lbl)
+	var tw := create_tween()
+	tw.tween_interval(2.5)
+	tw.tween_property(lbl, "modulate:a", 0.0, 0.5)
+	tw.tween_callback(lbl.queue_free)
 
 func _show_impact_marker(vfx_name: String) -> void:
 	_impact_label.text = "💥 IMPACT — %s\n(데미지/SFX 적용 시점)" % vfx_name

@@ -5,6 +5,22 @@
 # 어두운 독무는 가산 블렌드로 안 보이므로 독무·물방울(일반)·룬·발톱(가산) 2개 레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT     := Color(0.847, 0.706, 1.0)   # #d8b4ff — 밝은 보라
 const COL_MID     := Color(0.545, 0.361, 0.965) # #8b5cf6 — 보라
 const COL_DEEP    := Color(0.290, 0.165, 0.549) # #4a2a8c — 진보라
@@ -89,7 +105,7 @@ func _run() -> void:
 	tw.tween_property(_charge_orb, "modulate:a", 1.0, 0.2)
 	tw.parallel().tween_property(_charge_orb, "scale", Vector2(ORB_CHARGE_FULL, ORB_CHARGE_FULL), CHARGE_TIME)
 	set_process(true)
-	for _i in range(3):
+	for _i in range(_pcount(3)):
 		_spawn_tendrils()
 		await get_tree().create_timer(0.15).timeout
 		if not is_inside_tree():
@@ -120,7 +136,7 @@ func _run() -> void:
 
 # 차지 중 시전자→타겟 경로를 따라 기어가는 어두운 덩굴 (포물선 경로)
 func _spawn_tendrils() -> void:
-	for _i in range(10):
+	for _i in range(_pcount(10)):
 		var t := randf()
 		var base := _caster.lerp(_target, t)
 		base += Vector2(randf_range(-15.0, 15.0), randf_range(-20.0, 20.0) - sin(t * PI) * 40.0)
@@ -138,17 +154,17 @@ func _spawn_claw(ang_off: float, y_off: float) -> void:
 
 # 명중 폭발 — 독무 + 룬 파편 + 독액 방울
 func _spawn_impact_cloud(pos: Vector2) -> void:
-	for _i in range(55):
+	for _i in range(_pcount(55)):
 		var a := randf() * TAU
 		var sp := 0.8 + randf() * 3.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.7 - 0.5),
 			1.2 + randf() * 0.9, 18.0 + randf() * 22.0, "miasma", -0.008))
-	for _i in range(32):
+	for _i in range(_pcount(32)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 4.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 0.5),
 			1.0 + randf() * 0.7, 1.5 + randf() * 1.4, "rune", 0.0))
-	for _i in range(18):
+	for _i in range(_pcount(18)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 3.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 0.4),
@@ -156,11 +172,11 @@ func _spawn_impact_cloud(pos: Vector2) -> void:
 
 # 잔류 — 명중 후 타겟 주위에 천천히 피어오르는 독무·룬
 func _spawn_ambient() -> void:
-	if randf() < 0.7:
+	if randf() < 0.7 * _scale():
 		_particles.append(_mk(_target + Vector2(randf_range(-50.0, 50.0), randf_range(20.0, 40.0)),
 			Vector2(randf_range(-0.1, 0.1), -0.3 - randf() * 0.5),
 			1.6 + randf() * 0.9, 10.0 + randf() * 14.0, "miasma", -0.004))
-	if randf() < 0.3:
+	if randf() < 0.3 * _scale():
 		_particles.append(_mk(_target + Vector2(randf_range(-45.0, 45.0), randf_range(-5.0, 25.0)),
 			Vector2(randf_range(-0.15, 0.15), -0.4 - randf() * 0.4),
 			1.4 + randf() * 0.8, 1.2 + randf() * 1.2, "rune", 0.0))

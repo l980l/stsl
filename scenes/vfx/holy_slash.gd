@@ -5,6 +5,22 @@
 # 깃털은 일반 블렌드, 후광·채널 빛입자·차지 오브는 가산 — 2레이어.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+var _particle_scale_override: float = -1.0  # vfx_preview 3-way 비교용 (음수=GameSettings)
+
+func _pcount(n: int) -> int:
+	if _particle_scale_override > 0.0:
+		return maxi(1, int(round(n * _particle_scale_override)))
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
+
+# ambient/trail 의 확률 spawn 에 사용 — _pcount 와 동일 스케일
+func _scale() -> float:
+	if _particle_scale_override > 0.0:
+		return _particle_scale_override
+	var gs := get_node_or_null("/root/GameSettings")
+	return 1.0 if gs == null else gs.particle_count_scale()
 const COL_HOT     := Color(1, 1, 1)             # 흰 코어
 const COL_MID     := Color(1.0, 0.949, 0.753)   # #fff2c0 — 성광
 const COL_GOLD    := Color(1.0, 0.820, 0.4)     # #ffd166 — 황금
@@ -106,7 +122,7 @@ func _spawn_basic_slash_and_feathers() -> void:
 	fx.global_position = _target
 	fx.rotation = slash_rot
 	fx.burst()
-	for _i in range(FEATHER_COUNT):
+	for _i in range(_pcount(FEATHER_COUNT)):
 		var a := slash_rot + randf_range(-0.7, 0.7)
 		var sp := 1.5 + randf() * 4.0
 		_particles.append({
