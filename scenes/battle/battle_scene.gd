@@ -1745,7 +1745,7 @@ func _stop_target_bloom(panel: ColorRect) -> void:
 const _VFX_SCENES: Dictionary = {
 	"slash":      preload("res://scenes/vfx/slash_particle.tscn"),
 	"divine":     preload("res://scenes/vfx/divine_particle.tscn"),
-	"curse":      preload("res://scenes/vfx/curse_particle.tscn"),
+	# curse 는 _caster_beam_script 에서 debuff_hex 빔으로 처리
 }
 const _VFX_DEFAULT: PackedScene = preload("res://scenes/vfx/default_particle.tscn")
 # lightning/ice/fire/poison/projectile/explosive은 시전자→타겟 빔 타입 — 별도 경로 (_spawn_caster_beam)
@@ -2072,6 +2072,8 @@ func _caster_beam_script(dtype: String) -> GDScript:
 			return _VFX_HOLY_FIRE
 		"holy_blunt":
 			return _VFX_HOLY_BLUNT
+		"curse":
+			return _VFX_DEBUFF_HEX  # curse 공격 = debuff hex 빔 (시각만 통일, 실제 데미지는 그대로)
 		_:
 			return null
 

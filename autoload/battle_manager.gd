@@ -139,7 +139,8 @@ func _vfx_impact_delay_for_damage_type(dtype: String) -> float:
 		"holy_bolt":   base = _VFX_HOLY_ARROW.IMPACT_DELAY
 		"holy_fire":   base = _VFX_HOLY_FIRE.IMPACT_DELAY
 		"holy_blunt":  base = _VFX_HOLY_BLUNT.IMPACT_DELAY
-		_:             base = 0.0  # divine/slash/curse 등 impact-only — 즉발
+		"curse":       base = _VFX_DEBUFF_HEX.IMPACT_DELAY  # curse 공격 = debuff hex 빔
+		_:             base = 0.0  # divine/slash 등 impact-only — 즉발
 	return base * _vfx_speed_mul()
 
 func _vfx_impact_delay_for_status(stype: String) -> float:
