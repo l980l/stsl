@@ -8,9 +8,9 @@ const VFX_SPEED_KEYS    := ["fastest", "fast", "normal", "slow"]
 const VFX_SPEED_VALUES  := [0.5, 0.75, 1.0, 1.5]
 const VFX_SPEED_DEFAULT := "normal"  # 보통
 
-const ANIM_SPEED_KEYS    := ["fastest", "fast", "normal", "slow"]
-const ANIM_SPEED_VALUES  := [1.5, 1.0, 0.7, 0.5]  # AnimationPlayer.speed_scale
-const ANIM_SPEED_DEFAULT := "fast"  # 빠르게 = 현재 상태
+const ANIM_SPEED_KEYS    := ["slow", "normal", "fast", "fastest"]
+const ANIM_SPEED_VALUES  := [0.5, 0.7, 1.0, 1.5]  # AnimationPlayer.speed_scale (오름차순)
+const ANIM_SPEED_DEFAULT := "fast"  # = 1.0 = 현재 상태
 
 const MONSTER_INTERVAL_KEYS    := ["fastest", "fast", "normal", "slow"]
 const MONSTER_INTERVAL_VALUES  := [0.5, 1.0, 1.5, 2.0]
