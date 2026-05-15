@@ -16,6 +16,7 @@ const COL_CHUNK     := Color(0.431, 0.353, 0.235) # rgba(110,90,60) — 파편
 # 크기/타이밍 — 이 상수만 만지면 된다.
 const WINDUP_TIME := 0.35  # 휘두르기 준비 (캐릭터 애니메이션 — VFX는 대기만)
 const SLAM_TIME   := 0.25  # 슬램 동작 — 시전자 머리 위 호로 휘두르기 표시
+const IMPACT_DELAY := WINDUP_TIME + SLAM_TIME  # battle_manager 동기화용
 const ARC_RADIUS  := 90.0  # 휘두르기 호 반경(px) — 검 궤적 크기
 const ARC_OFFSET  := -30.0 # 호 중심 — 시전자 어깨 높이로(px)
 const STUN_TIME   := 2.0   # 명중 후 균열·분화구 유지(s)

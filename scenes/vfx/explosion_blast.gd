@@ -15,6 +15,7 @@ const COL_CHUNK := Color(0.392, 0.275, 0.157) # rgba(100,70,40) — 파편
 
 # 크기/타이밍 — 이 상수만 만지면 된다.
 const BOMB_FLIGHT   := 0.55  # 폭탄 포물선 비행 시간(s)
+const IMPACT_DELAY  := BOMB_FLIGHT  # battle_manager 동기화용 (차지 없음, 던지자마자 비행)
 const ARC_HEIGHT    := 180.0 # 포물선 최고점 높이(px)
 const SMOKE_TIME    := 0.8   # 폭발 후 잔류 연기 지속(s)
 const BLAST_SCALE   := 0.4   # 폭발 파티클·충격파·분화구 크기 배율

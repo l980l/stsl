@@ -27,6 +27,7 @@ const HOLY_BUFF := preload("res://scenes/vfx/holy_buff.gd")
 const WARRIOR_BUFF := preload("res://scenes/vfx/warrior_buff.gd")
 const INFATUATION := preload("res://scenes/vfx/infatuation.gd")
 const DEFENSE_BUFF := preload("res://scenes/vfx/defense_buff.gd")
+const POISON_TICK := preload("res://scenes/vfx/poison_tick.gd")
 
 # kind: "impact"=피격 버스트(타겟 위치) / "self"=자기 버프 버스트 / "beam"=시전자→타겟 빔
 const VFX_LIST := [
@@ -61,6 +62,7 @@ const VFX_LIST := [
 	{"name": "warrior_buff",   "kind": "beam",   "path": "res://scenes/vfx/warrior_buff.gd"},
 	{"name": "infatuation",    "kind": "beam",   "path": "res://scenes/vfx/infatuation.gd"},
 	{"name": "defense_buff",   "kind": "beam",   "path": "res://scenes/vfx/defense_buff.gd"},
+	{"name": "poison_tick",    "kind": "beam",   "path": "res://scenes/vfx/poison_tick.gd"},
 ]
 
 var _caster_pos := Vector2(420, 540)
@@ -69,6 +71,7 @@ var _dragging: int = -1  # 0=시전자, 1=타겟, -1=없음
 var _auto := false
 var _selected: Dictionary = VFX_LIST[VFX_LIST.size() - 1]  # 기본 lightning_beam
 var _info: Label
+var _impact_label: Label  # 임팩트 시점 시각 마커 — VFX 의 screen_effect 콜백
 
 func _ready() -> void:
 	# 어두운 배경 — 가산 블렌드 글로우 확인용
@@ -104,6 +107,17 @@ func _ready() -> void:
 	_info = Label.new()
 	panel.add_child(_info)
 	_update_info()
+
+	# 임팩트 시점 마커 — 화면 중앙. VFX screen_effect 시점에 표시.
+	_impact_label = Label.new()
+	_impact_label.text = ""
+	_impact_label.add_theme_font_size_override("font_size", 36)
+	_impact_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+	_impact_label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	_impact_label.add_theme_constant_override("outline_size", 6)
+	_impact_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_impact_label.modulate.a = 0.0
+	add_child(_impact_label)
 
 	var t := Timer.new()
 	t.wait_time = 1.8
@@ -228,8 +242,16 @@ func _update_info() -> void:
 				DEFENSE_BUFF.PANEL_DIST, DEFENSE_BUFF.RING_RADIUS]
 			s += "차지 %.2fs · 버프 지속 %.1fs (시전자 마커 무시)" % [
 				DEFENSE_BUFF.CHARGE_TIME, DEFENSE_BUFF.BUFF_TIME]
+		"poison_tick":
+			s += "독 DoT tick — 잔류 가스만 (poison_splash 의 ambient 추출)\n"
+			s += "지속 %.1fs · sfx=impact_poison · 시전자 마커 무시" % POISON_TICK.TICK_TIME
 		_:
 			s += "시전자 마커는 beam 전용 — impact/self는 타겟 위치에서 재생"
+	# IMPACT_DELAY 한 줄 자동 추가 — VFX 스크립트에 노출돼 있으면 표시 (battle_manager 가 동기화에 사용)
+	if _selected.get("kind", "") == "beam":
+		var script: GDScript = load(_selected["path"]) as GDScript
+		if script and "IMPACT_DELAY" in script:
+			s += "\n⏱ 임팩트 시점: %.2fs (이때 데미지/SFX 적용)" % script.IMPACT_DELAY
 	_info.text = s
 
 func _select_and_play(entry: Dictionary) -> void:
@@ -240,10 +262,12 @@ func _select_and_play(entry: Dictionary) -> void:
 func _play(entry: Dictionary) -> void:
 	match entry["kind"]:
 		"beam":
-			var fx: Node2D = (load(entry["path"]) as GDScript).new()
+			var script: GDScript = load(entry["path"]) as GDScript
+			var fx: Node2D = script.new()
 			add_child(fx)
 			fx.position = Vector2.ZERO
 			fx.screen_effect.connect(_preview_flash)
+			fx.screen_effect.connect(_show_impact_marker.bind(entry["name"]))
 			fx.play(_caster_pos, _target_pos)
 		"impact":
 			var fx: Node2D = (load(entry["path"]) as PackedScene).instantiate()
@@ -274,6 +298,14 @@ func _play(entry: Dictionary) -> void:
 			var shield := fx.get_node_or_null("ShieldIcon")
 			if shield:
 				shield.play_shield()
+
+func _show_impact_marker(vfx_name: String) -> void:
+	_impact_label.text = "💥 IMPACT — %s\n(데미지/SFX 적용 시점)" % vfx_name
+	_impact_label.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_property(_impact_label, "modulate:a", 1.0, 0.05)
+	tw.tween_interval(0.7)
+	tw.tween_property(_impact_label, "modulate:a", 0.0, 0.3)
 
 func _preview_flash() -> void:
 	var r := ColorRect.new()

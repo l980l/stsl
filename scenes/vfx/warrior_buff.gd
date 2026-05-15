@@ -16,6 +16,7 @@ const ORB_CHARGE_START := 0.10  # 차지 구체 시작 스케일
 const ORB_CHARGE_FULL  := 0.45  # 차지 완료 스케일
 const ORB_OFFSET_Y     := -80.0
 const CHARGE_TIME      := 0.3
+const IMPACT_DELAY     := CHARGE_TIME  # battle_manager 동기화용
 const BUFF_TIME        := 1.5
 const RING_SQUASH      := 0.34
 const RING_RADIUS      := 130.0

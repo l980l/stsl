@@ -16,6 +16,7 @@ const ORB_FIRE         := 0.72  # 발사 폭발
 const IMPACT_START     := 0.20  # 임팩트 팝 시작
 const IMPACT_MID       := 0.80  # 임팩트 중간
 const IMPACT_END       := 1.60  # 임팩트 잔광 끝
+const IMPACT_DELAY     := 0.55  # 차지 종료 = 첫 볼트 명중 시점 (battle_manager 동기화용)
 
 ## 발사 순간 화면 플래시·흔들림 요청 (battle_scene이 수신)
 signal screen_effect

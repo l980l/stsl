@@ -13,8 +13,9 @@ const COL_FEATHER_RIB := Color(0.627, 0.486, 0.196) # 깃털 중심선 — 어�
 const COL_HIT_RING    := Color(1.0, 0.816, 0.416)   # #ffd06a — 황금 충격
 const COL_CRACK       := Color(0.451, 0.314, 0.118) # 어두운 황금 균열
 
-const WINDUP_TIME := 0.35
+const WINDUP_TIME := 0.18
 const SLAM_TIME   := 0.25
+const IMPACT_DELAY := WINDUP_TIME + SLAM_TIME  # battle_manager 동기화용
 const ARC_RADIUS  := 90.0
 const ARC_OFFSET  := -30.0
 const STUN_TIME   := 2.0

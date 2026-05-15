@@ -15,6 +15,7 @@ const ORB_CHARGE_START := 0.10  # 차지 구체 시작 스케일
 const ORB_CHARGE_FULL  := 0.45  # 차지 완료 스케일
 const ORB_OFFSET_Y     := -90.0 # 차지 구체 — 타겟 위로(px)
 const CHARGE_TIME      := 0.3   # 차지 시간(s)
+const IMPACT_DELAY     := CHARGE_TIME  # battle_manager 동기화용 (차지 끝 = 버프 발동)
 const BUFF_TIME        := 1.5   # 빛기둥·룬링 지속 + mote/feather 분출(s)
 const RING_SQUASH      := 0.34  # 누운 원근 — y축 압축 (HTML rotateX 70°)
 const PILLAR_HEIGHT    := 240.0 # 빛기둥 높이(px)

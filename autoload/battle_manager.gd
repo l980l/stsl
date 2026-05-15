@@ -9,6 +9,28 @@ const RelicRes = preload("res://resources/relic_resource.gd")
 const InteractionSys = preload("res://autoload/enemy_interaction_system.gd")
 const SignatureSys = preload("res://autoload/enemy_signature_system.gd")
 
+# VFX 임팩트 지연 조회 — 각 VFX 스크립트의 IMPACT_DELAY 상수 참조 (단일 진실)
+const _VFX_LIGHTNING_BEAM = preload("res://scenes/vfx/lightning_beam.gd")
+const _VFX_ICE_SHARDS     = preload("res://scenes/vfx/ice_shards.gd")
+const _VFX_FIRE_BLAST     = preload("res://scenes/vfx/fire_blast.gd")
+const _VFX_POISON_SPLASH  = preload("res://scenes/vfx/poison_splash.gd")
+const _VFX_ARROW_SHOT     = preload("res://scenes/vfx/arrow_shot.gd")
+const _VFX_EXPLOSION_BLAST = preload("res://scenes/vfx/explosion_blast.gd")
+const _VFX_BLUNT_SMASH    = preload("res://scenes/vfx/blunt_smash.gd")
+const _VFX_BULLET_SHOT    = preload("res://scenes/vfx/bullet_shot.gd")
+const _VFX_HOLY_STRIKE    = preload("res://scenes/vfx/holy_strike.gd")
+const _VFX_HOLY_SLASH     = preload("res://scenes/vfx/holy_slash.gd")
+const _VFX_HOLY_ARROW     = preload("res://scenes/vfx/holy_arrow.gd")
+const _VFX_HOLY_FIRE      = preload("res://scenes/vfx/holy_fire.gd")
+const _VFX_HOLY_BLUNT     = preload("res://scenes/vfx/holy_blunt.gd")
+const _VFX_DEBUFF_HEX     = preload("res://scenes/vfx/debuff_hex.gd")
+const _VFX_CHARM_KISS     = preload("res://scenes/vfx/charm_kiss.gd")
+const _VFX_INFATUATION    = preload("res://scenes/vfx/infatuation.gd")
+const _VFX_HOLY_BUFF      = preload("res://scenes/vfx/holy_buff.gd")
+const _VFX_WARRIOR_BUFF   = preload("res://scenes/vfx/warrior_buff.gd")
+const _VFX_DEFENSE_BUFF   = preload("res://scenes/vfx/defense_buff.gd")
+const _VFX_HEAL_BLESSING  = preload("res://scenes/vfx/heal_blessing.gd")
+
 const POISON_DMG_PER_STACK: int = 10
 const TOKEN_DMG_PER_STACK: int = 25
 const TOKEN_MAX_STACK: int = 6
@@ -81,6 +103,95 @@ signal card_pick_requested(action: String, draw_count: int)
 signal boss_phase_changed(enemy_index: int, new_phase: int)
 signal enemy_spawned(enemy_index: int)  # T3-SUMMON: 런타임 적 추가 알림 (UI 갱신용)
 signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시그니처 발동 알림 (UI 토스트용)
+
+# VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생.
+# 차지(IMPACT_DELAY) 이후 데미지/상태 적용 + 기존 시그널 (hero_damaged 등) emit.
+# target_hero_id: 단일 타겟의 영웅 id ("" 이면 ALL 또는 미지정)
+signal intent_vfx_charge_start(enemy_index: int, intent: Resource, target_hero_id: String)
+signal card_vfx_charge_start(card: Resource, target_enemy_index: int, target_hero_id: String)
+
+# 독 DoT tick — 데미지 시그널과 별개로 가스 VFX/SFX 트리거 (target = "enemy_X" 또는 hero_id)
+signal poison_tick_applied(target: String, amount: int)
+
+# 영웅 카드 발동 중 — 다음 카드 입력 차단 (await 중첩 방지)
+var _card_busy: bool = false
+
+# GameSettings autoload 안전 접근 — CLI test 환경에서 식별자 미인식 회피
+# null(=test 환경) 시 0 반환 → 모든 await 스킵 → 동기 즉시 적용 유지
+func _vfx_speed_mul() -> float:
+	var gs := get_node_or_null("/root/GameSettings")
+	return gs.vfx_speed_multiplier if gs else 0.0
+
+func _monster_interval_mul() -> float:
+	var gs := get_node_or_null("/root/GameSettings")
+	return gs.monster_interval_multiplier if gs else 0.0
+
+# ── VFX 임팩트 지연 (초) — vfx_speed_multiplier 적용된 값 ──
+func _vfx_impact_delay_for_damage_type(dtype: String) -> float:
+	var base: float = 0.0
+	match dtype:
+		"lightning":   base = _VFX_LIGHTNING_BEAM.IMPACT_DELAY
+		"ice":         base = _VFX_ICE_SHARDS.IMPACT_DELAY
+		"fire":        base = _VFX_FIRE_BLAST.IMPACT_DELAY
+		"poison":      base = _VFX_POISON_SPLASH.IMPACT_DELAY
+		"projectile":  base = _VFX_ARROW_SHOT.IMPACT_DELAY
+		"explosive":   base = _VFX_EXPLOSION_BLAST.IMPACT_DELAY
+		"blunt":       base = _VFX_BLUNT_SMASH.IMPACT_DELAY
+		"bullet":      base = _VFX_BULLET_SHOT.IMPACT_DELAY
+		"holy_strike": base = _VFX_HOLY_STRIKE.IMPACT_DELAY
+		"holy_slash":  base = _VFX_HOLY_SLASH.IMPACT_DELAY
+		"holy_bolt":   base = _VFX_HOLY_ARROW.IMPACT_DELAY
+		"holy_fire":   base = _VFX_HOLY_FIRE.IMPACT_DELAY
+		"holy_blunt":  base = _VFX_HOLY_BLUNT.IMPACT_DELAY
+		"curse":       base = _VFX_DEBUFF_HEX.IMPACT_DELAY  # curse 공격 = debuff hex 빔
+		_:             base = 0.0  # divine/slash 등 impact-only — 즉발
+	return base * _vfx_speed_mul()
+
+func _vfx_impact_delay_for_status(stype: String) -> float:
+	var base: float = 0.0
+	if stype == "weak" or stype == "vulnerable":
+		base = _VFX_DEBUFF_HEX.IMPACT_DELAY
+	elif stype == "charm":
+		base = _VFX_CHARM_KISS.IMPACT_DELAY
+	elif stype == "enthrall":
+		base = _VFX_INFATUATION.IMPACT_DELAY
+	elif stype.begins_with("power."):
+		base = _VFX_HOLY_BUFF.IMPACT_DELAY  # holy_buff / warrior_buff 동일 차지
+	return base * _vfx_speed_mul()
+
+# 적 인텐트 차지 시간
+func _intent_vfx_impact_delay(intent: Resource) -> float:
+	match intent.action_type:
+		IntentRes.ActionType.ATTACK:
+			return _vfx_impact_delay_for_damage_type(intent.damage_type)
+		IntentRes.ActionType.BUFF:
+			# 적 자기 강화 — block(defense_buff) / power.*(warrior_buff)
+			var base: float = _VFX_DEFENSE_BUFF.IMPACT_DELAY if intent.status_type == "block" else _VFX_WARRIOR_BUFF.IMPACT_DELAY
+			return base * _vfx_speed_mul()
+		IntentRes.ActionType.DEBUFF:
+			return _vfx_impact_delay_for_status(intent.status_type)
+		_:
+			return 0.0
+
+# 영웅 카드 차지 시간 — 첫 effect 기준
+# damage_type 이 명시된 effect 는 모두 ATTACK 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF 등)
+func _card_vfx_impact_delay(card: Resource) -> float:
+	for effect in card.effects:
+		if effect.damage_type != "":
+			return _vfx_impact_delay_for_damage_type(effect.damage_type)
+		match effect.effect_type:
+			EffectRes.EffectType.APPLY_STATUS:
+				var d := _vfx_impact_delay_for_status(effect.status_type)
+				if d > 0.0:
+					return d
+			EffectRes.EffectType.CHARM:
+				# CHARM effect_type — Cleopatra 매혹 카드 (charm_kiss 빔)
+				return _VFX_CHARM_KISS.IMPACT_DELAY * _vfx_speed_mul()
+			EffectRes.EffectType.HEAL, EffectRes.EffectType.HEAL_ALL, EffectRes.EffectType.HEAL_PER_DEAD_ALLY:
+				return _VFX_HEAL_BLESSING.IMPACT_DELAY * _vfx_speed_mul()
+			EffectRes.EffectType.BLOCK, EffectRes.EffectType.BLOCK_ALL, EffectRes.EffectType.FORMATION_BLOCK, EffectRes.EffectType.COUNTER_BLOCK, EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED, EffectRes.EffectType.MORALE_TO_BLOCK:
+				return _VFX_DEFENSE_BUFF.IMPACT_DELAY * _vfx_speed_mul()
+	return 0.0
 
 func setup_battle(enemies: Array) -> void:
 	if deck_mgr != null:
@@ -205,14 +316,24 @@ func _phase_player_post() -> bool:
 	return did_work
 
 func play_card(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> bool:
+	if _card_busy:
+		# 이전 카드 발동 중 — 빠른 입력 시 두 번째 카드 차단 (await 중첩 방지)
+		return false
 	if not is_player_turn or not is_battle_active:
 		return false
 	if deck_mgr == null or not deck_mgr.play_card(card):
 		return false
 	_cards_played_this_turn += 1
 	_track_card_type_counters(card)   # 카드 타입 카운터 추적
-	_apply_card_effects(card, target_enemy_index, target_hero_id)
+	_start_card_effects(card, target_enemy_index, target_hero_id)  # fire-and-forget — busy 플래그는 wrapper 가 관리
 	return true
+
+# play_card 를 동기로 유지하면서 _apply_card_effects 의 await 패턴을 흡수.
+# busy 플래그가 모든 종료 경로(early return 포함)에서 풀리도록 wrapper 가 관리.
+func _start_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String) -> void:
+	_card_busy = true
+	await _apply_card_effects(card, target_enemy_index, target_hero_id)
+	_card_busy = false
 
 func end_player_turn() -> void:
 	if not is_player_turn or not is_battle_active:
@@ -371,6 +492,16 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 	# 카드 소유 영웅이 사망 상태면 효과 없음
 	if team_mgr and not team_mgr.is_alive(card.owner_id):
 		return
+	# VFX 차지 시작 — battle_scene 이 받아 owner→target VFX 재생
+	card_vfx_charge_start.emit(card, target_enemy_index, target_hero_id)
+	var _delay := _card_vfx_impact_delay(card)
+	if _delay > 0.0:
+		await get_tree().create_timer(_delay).timeout
+		# 차지 중 전투 종료 / 시전 영웅 사망 시 효과 적용 스킵
+		if not is_battle_active:
+			return
+		if team_mgr and not team_mgr.is_alive(card.owner_id):
+			return
 	_kills_this_card = 0
 	_enthralls_this_card = 0
 	for effect in card.effects:
@@ -532,8 +663,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_deal_damage_to_enemy(target_enemy_index, dmg)
 			EffectRes.EffectType.BLOCK_ALL:
 				if team_mgr:
+					# 사망 영웅 제외 — 살아있는 영웅만 BLOCK
 					for hero in team_mgr.heroes:
-						_hero_block[hero.hero_id] = _hero_block.get(hero.hero_id, 0) + effect.value
+						if team_mgr.is_alive(hero.hero_id):
+							_hero_block[hero.hero_id] = _hero_block.get(hero.hero_id, 0) + effect.value
+							hero_block_gained.emit(hero.hero_id, effect.value)
 			EffectRes.EffectType.HEAL_ALL:
 				if team_mgr:
 					var heal_amt: int = effect.value
@@ -543,8 +677,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							if not team_mgr.is_alive(hero.hero_id):
 								dead_count += 1
 						heal_amt = effect.value * dead_count
+					# 사망 영웅 제외 — 살아있는 영웅만 HEAL (REVIVE 는 별도 effect_type)
 					for hero in team_mgr.heroes:
-						team_mgr.heal(hero.hero_id, heal_amt)
+						if team_mgr.is_alive(hero.hero_id):
+							team_mgr.heal(hero.hero_id, heal_amt)
 			EffectRes.EffectType.FORMATION_BLOCK:
 				if team_mgr:
 					var count: int = team_mgr.get_living_heroes().size()
@@ -966,7 +1102,9 @@ func _tick_hero_poison(hero_id: String) -> void:
 	var dur: int = status.get("poison_dur", 0)
 	if dmg <= 0 or dur <= 0:
 		return
-	team_mgr.take_damage(hero_id, dmg * POISON_DMG_PER_STACK)
+	var tick_amt: int = dmg * POISON_DMG_PER_STACK
+	team_mgr.take_damage(hero_id, tick_amt)
+	poison_tick_applied.emit(hero_id, tick_amt)
 	dur -= 1
 	if dur <= 0:
 		_hero_status[hero_id]["poison_dmg"] = 0
@@ -982,6 +1120,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 	var tick_dmg: int = _consume_double_next_damage(dmg * POISON_DMG_PER_STACK)
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - tick_dmg)
 	enemy_damaged.emit(enemy_index, tick_dmg, "poison")
+	poison_tick_applied.emit("enemy_%d" % enemy_index, tick_dmg)
 	dur -= 1
 	if dur <= 0:
 		_enemy_status[enemy_index]["poison_dmg"] = 0
@@ -1025,7 +1164,7 @@ func _phase_enemy_main() -> void:
 		if not _enemy_alive[i]:
 			continue
 		if not first and turn_interval > 0.0:
-			await get_tree().create_timer(turn_interval).timeout
+			await get_tree().create_timer(turn_interval * _monster_interval_mul()).timeout
 		first = false
 		_enemy_block[i] = 0
 		# 시그니처 hook: 턴 시작 (휴브리스 pending 처리, 도교 음양, 일본 결계)
@@ -1068,7 +1207,7 @@ func _phase_enemy_main() -> void:
 			continue
 		var intent: Resource = pattern[_enemy_intent_index[i]]
 		_vfx_caster = i  # 이 적이 공격자 — lightning 등 빔 VFX 시전자 좌표용
-		_execute_intent(i, intent)
+		await _execute_intent(i, intent)  # 차지 + 임팩트 + 데미지 적용까지 대기
 		_vfx_caster = null
 		_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
 	_check_win_condition()
@@ -1090,6 +1229,24 @@ func _phase_enemy_post() -> bool:
 	return did_work
 
 func _execute_intent(enemy_index: int, intent: Resource) -> void:
+	# 단일 타겟 인텐트는 시그널 emit 전에 영웅 타겟 미리 결정 — battle_scene 이 정확한 영웅 위치에 VFX 표시
+	var pre_target_id: String = ""
+	if intent.target != IntentRes.TargetType.ALL:
+		match intent.action_type:
+			IntentRes.ActionType.ATTACK:
+				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
+			IntentRes.ActionType.DEBUFF:
+				pre_target_id = _pick_hero_target(intent.target, enemy_index)
+	# VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생
+	intent_vfx_charge_start.emit(enemy_index, intent, pre_target_id)
+	var _delay := _intent_vfx_impact_delay(intent)
+	if _delay > 0.0:
+		await get_tree().create_timer(_delay).timeout
+		# 차지 중 전투 종료 / 적 사망 시 데미지 적용 스킵
+		if not is_battle_active:
+			return
+		if enemy_index >= 0 and enemy_index < _enemy_alive.size() and not _enemy_alive[enemy_index]:
+			return
 	match intent.action_type:
 		IntentRes.ActionType.ATTACK:
 			var dmg: int = intent.value
@@ -1110,7 +1267,10 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 						_deal_damage_to_hero(hero.hero_id, dmg, intent.damage_type)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
-				var target_id: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
+				# 미리 결정된 타겟 사용 (사망 시 fallback 으로 재결정)
+				var target_id: String = pre_target_id
+				if target_id == "" or (team_mgr and not team_mgr.is_alive(target_id)):
+					target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 				if target_id != "":
 					# T3-MARK: 마킹한 영웅 공격 시 데미지 +50%
 					var marked_by: Array = _hero_status.get(target_id, {}).get("marked_by", [])
@@ -1132,7 +1292,9 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 					for hero in team_mgr.get_living_heroes():
 						_apply_status_to_hero(hero.hero_id, stype, intent.value)
 			else:
-				var target_id: String = _pick_hero_target(intent.target, enemy_index)
+				var target_id: String = pre_target_id
+				if target_id == "" or (team_mgr and not team_mgr.is_alive(target_id)):
+					target_id = _pick_hero_target(intent.target, enemy_index)
 				if target_id != "":
 					_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
@@ -1347,6 +1509,22 @@ func is_enemy_alive(index: int) -> bool:
 	if index < 0 or index >= _enemy_alive.size():
 		return false
 	return _enemy_alive[index]
+
+# VFX 미리 결정용 — 카드의 charm stacks 가 적용되면 enthrall 발동할지 사전 판정
+# (실제 적용은 _apply_status_to_enemy 가 수행. 여기서는 시각이펙트 분기만)
+func will_enthrall_enemy(enemy_index: int, charm_stacks: int) -> bool:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return false
+	if not _enemy_alive[enemy_index]:
+		return false
+	var current: int = _enemy_status[enemy_index].get("charm", 0)
+	var new_charm: int = current + charm_stacks
+	var charm_reduce: int = 0
+	for _cpk in _active_powers:
+		if _cpk.begins_with("power.charm_threshold_minus:"):
+			charm_reduce += _active_powers[_cpk].get("value", 0)
+	var threshold: int = max(1, CHARM_THRESHOLD_BASE + _enemy_status[enemy_index].get("charm_resistance", 0) - charm_reduce)
+	return new_charm >= threshold
 
 func get_enemy_current_intent(index: int) -> Resource:
 	if index < 0 or index >= _enemies.size():

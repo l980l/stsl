@@ -13,6 +13,9 @@ func _on_hover(btn: BaseButton) -> void:
 	# 비활성화된 버튼은 호버 사운드를 내지 않는다
 	if btn.disabled:
 		return
+	# PrimaryButton 테마 변형만 호버 사운드 — 다른 버튼(Standard/Vow/Chapter/Icon 등)은 너무 시끄러움
+	if btn.theme_type_variation != "PrimaryButton":
+		return
 	AudioManager.play_ui("ui_hover")
 
 func _on_click(_btn: BaseButton) -> void:

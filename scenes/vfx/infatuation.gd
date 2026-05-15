@@ -15,6 +15,7 @@ const ORB_OFFSET_Y    := -50.0  # 시전자 가슴 위
 const ORB_CHARGE_FULL := 0.40
 const CHARGE_TIME     := 0.55  # 차지(s)
 const FLIGHT_TIME     := 0.55  # 하트 투사체 비행(s)
+const IMPACT_DELAY    := CHARGE_TIME + FLIGHT_TIME  # battle_manager 동기화용 (큰 키스 명중)
 const BUFF_TIME       := 3.0   # 반함 지속 — 만다라/체인/오라 표시(s)
 const FAN_COUNT       := 4     # fan 하트 갯수 (큰 키스 1개 추가, 총 5개)
 const RING_SQUASH     := 0.34

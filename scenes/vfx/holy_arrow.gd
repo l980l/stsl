@@ -14,8 +14,9 @@ const COL_HAZE    := Color(1.0, 0.941, 0.784)   # rgba(255,240,200) — 안개
 const COL_FEATHER := Color(1.0, 0.980, 0.863)   # rgba(255,250,220) — 깃털
 
 # 크기/타이밍 — 이 상수만 만지면 된다.
-const DRAW_TIME    := 0.30  # 조준 시간(s)
+const DRAW_TIME    := 0.15  # 조준 시간(s)
 const FLIGHT_TIME  := 0.11  # 빛의 화살 비행 시간(s) — 매우 빠름
+const IMPACT_DELAY := DRAW_TIME + FLIGHT_TIME  # battle_manager 동기화용
 const STUCK_TIME   := 1.5   # 명중 후 십자가 박힌 채 유지 시간(s)
 const HALO_RADIUS  := 56.0  # 시전자 뒤 후광 반경(px)
 const PSPEED       := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수

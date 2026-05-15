@@ -18,6 +18,7 @@ const COL_SMOKE   := Color(0.706, 0.706, 0.745) # rgba(180,180,190) — 머즐 �
 # 크기/타이밍 — 이 상수만 만지면 된다.
 const DRAW_TIME   := 0.30  # 조준 시간(s)
 const FLIGHT_TIME := 0.11  # 총알 비행 시간(s) — 매우 빠름
+const IMPACT_DELAY := DRAW_TIME + FLIGHT_TIME  # battle_manager 동기화용
 const HOLE_TIME   := 1.5   # 탄흔 유지 시간(s)
 const PSPEED      := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수
 
