@@ -13,18 +13,23 @@ const _CURSOR_SIZES:    Dictionary = {"S": 24, "M": 32, "L": 48, "XL": 64}
 const _DEFAULT_KEY   := "M"
 const _TABS          := [["sound", "ui.settings.sound"], ["graphics", "ui.settings.graphics"], ["gameplay", "ui.settings.gameplay"], ["language", "ui.settings.language_tab"]]
 
-# 4단계 segment 라벨 (한국어 직접 — i18n 키 없을 시 fallback)
-const _SPEED_LABELS := {
-	"fastest": "아주 빠르게",
-	"fast":    "빠르게",
-	"normal":  "보통",
-	"slow":    "느리게",
-}
+# 파티클 라벨 (i18n 키 없이 짧은 문자열)
 const _PARTICLE_LABELS := {
 	"low":    "하",
 	"medium": "중",
 	"high":   "상",
 }
+
+# multiplier 값 → "x1.0" 형식 라벨 (gameplay segment 용)
+static func _x_label(value: float) -> String:
+	return "x%g" % value
+
+# values 배열을 {key: "xVAL"} dict 로 변환
+static func _build_x_labels(keys: Array, values: Array) -> Dictionary:
+	var out: Dictionary = {}
+	for i in keys.size():
+		out[keys[i]] = _x_label(values[i])
+	return out
 const _AUDIO_BUSES   := [["master", "ui.settings.vol_master"], ["music", "ui.settings.vol_music"], ["sfx", "ui.settings.vol_sfx"], ["ui", "ui.settings.vol_ui"]]
 const _AUDIO_DEFAULTS := {"master": 1.0, "music": 0.8, "sfx": 1.0, "ui": 1.0}
 const _PANEL_W       := 600.0
@@ -390,7 +395,7 @@ func _build_graphics_panel() -> void:
 	_build_cursor_seg_row(p, mono, 24.0)
 
 	# Row 2: 파티클 갯수 (graphics)
-	_build_seg_row(p, mono, 80.0, "파티클 갯수", "particle",
+	_build_seg_row(p, mono, 68.0, tr("ui.settings.particle_quality"), "particle",
 		GameSettings.PARTICLE_KEYS, _PARTICLE_LABELS, GameSettings.particle_key,
 		func(k: String) -> void: GameSettings.set_particle_quality(k))
 
@@ -398,16 +403,23 @@ func _build_gameplay_panel() -> void:
 	var p := _tab_panels["gameplay"] as Control
 	var mono := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
 
-	_build_seg_row(p, mono, 24.0, "VFX 재생 속도", "vfx_speed",
-		GameSettings.VFX_SPEED_KEYS, _SPEED_LABELS, GameSettings.vfx_speed_key,
+	# 각 segment 라벨은 multiplier 값 기반 ("x1.0" 형식)
+	_build_seg_row(p, mono, 24.0, tr("ui.settings.vfx_speed"), "vfx_speed",
+		GameSettings.VFX_SPEED_KEYS,
+		_build_x_labels(GameSettings.VFX_SPEED_KEYS, GameSettings.VFX_SPEED_VALUES),
+		GameSettings.vfx_speed_key,
 		func(k: String) -> void: GameSettings.set_vfx_speed(k))
 
-	_build_seg_row(p, mono, 80.0, "애니메이션 재생 속도", "anim_speed",
-		GameSettings.ANIM_SPEED_KEYS, _SPEED_LABELS, GameSettings.anim_speed_key,
+	_build_seg_row(p, mono, 68.0, tr("ui.settings.anim_speed"), "anim_speed",
+		GameSettings.ANIM_SPEED_KEYS,
+		_build_x_labels(GameSettings.ANIM_SPEED_KEYS, GameSettings.ANIM_SPEED_VALUES),
+		GameSettings.anim_speed_key,
 		func(k: String) -> void: GameSettings.set_anim_speed(k))
 
-	_build_seg_row(p, mono, 136.0, "몬스터 행동 간 인터벌", "monster_interval",
-		GameSettings.MONSTER_INTERVAL_KEYS, _SPEED_LABELS, GameSettings.monster_interval_key,
+	_build_seg_row(p, mono, 112.0, tr("ui.settings.monster_interval"), "monster_interval",
+		GameSettings.MONSTER_INTERVAL_KEYS,
+		_build_x_labels(GameSettings.MONSTER_INTERVAL_KEYS, GameSettings.MONSTER_INTERVAL_VALUES),
+		GameSettings.monster_interval_key,
 		func(k: String) -> void: GameSettings.set_monster_interval(k))
 
 # 일반 segment row 빌더 — 라벨 + N개 버튼. group_id 로 _seg_groups 등록.
@@ -422,7 +434,7 @@ func _build_seg_row(parent: Control, mono: Font, row_y: float, label_text: Strin
 	lbl.offset_right  = 170.0
 	lbl.offset_bottom = row_y + 36.0
 	parent.add_child(lbl)
-	LabelUtils.fit_text(lbl, 18, 12)
+	LabelUtils.fit_text(lbl, 16, 11)
 
 	var seg_box := HBoxContainer.new()
 	seg_box.offset_left   = 180.0
@@ -495,7 +507,7 @@ func _build_cursor_seg_row(parent: Control, mono: Font, row_y: float) -> void:
 	lbl.offset_right  = 170.0
 	lbl.offset_bottom = row_y + 36.0
 	parent.add_child(lbl)
-	LabelUtils.fit_text(lbl, 18, 12)
+	LabelUtils.fit_text(lbl, 16, 11)
 
 	var seg_box := HBoxContainer.new()
 	seg_box.offset_left   = 180.0
@@ -554,7 +566,7 @@ func _build_language_panel() -> void:
 	lbl.offset_right  = 170.0
 	lbl.offset_bottom = 60.0
 	p.add_child(lbl)
-	LabelUtils.fit_text(lbl, 18, 12)
+	LabelUtils.fit_text(lbl, 16, 11)
 
 	var opt := OptionButton.new()
 	opt.offset_left   = 180.0

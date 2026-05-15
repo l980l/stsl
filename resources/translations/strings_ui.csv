@@ -71,6 +71,10 @@ ui.settings.sound,사운드,Sound,Son,Suono,Sonido,サウンド,Ήχος,音效,
 ui.settings.display,화면,Display,Affichage,Schermo,Pantalla,画面,Οθόνη,画面,画面
 ui.settings.graphics,그래픽,Graphics,Graphismes,Grafica,Gráficos,グラフィック,Γραφικά,图形,圖形
 ui.settings.gameplay,게임플레이,Gameplay,Jouabilité,Gameplay,Jugabilidad,ゲームプレイ,Παιχνίδι,游戏玩法,遊戲玩法
+ui.settings.vfx_speed,VFX 속도,VFX Speed,Vitesse VFX,Velocità VFX,Velocidad VFX,VFX速度,Ταχύτητα VFX,VFX速度,VFX速度
+ui.settings.anim_speed,애니메이션 속도,Animation Speed,Vitesse animation,Velocità animazione,Velocidad animación,アニメ速度,Ταχύτητα κίνησης,动画速度,動畫速度
+ui.settings.monster_interval,몬스터 행동 인터벌,Monster Interval,Intervalle monstre,Intervallo mostro,Intervalo monstruo,モンスター間隔,Διάστημα τέρατος,怪物间隔,怪物間隔
+ui.settings.particle_quality,파티클 갯수,Particle Count,Nombre particules,Numero particelle,Cantidad partículas,パーティクル数,Αριθμός σωματιδίων,粒子数量,粒子數量
 ui.settings.language_tab,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言,语言
 ui.settings.vol_master,마스터,Master,Master,Master,Master,マスター,Master,主音量,主音量
 ui.settings.vol_music,음악,Music,Musique,Musica,Música,音楽,Μουσική,音乐,音樂
