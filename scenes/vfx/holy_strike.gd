@@ -15,7 +15,7 @@ const COL_FEATHER := Color(1.0, 0.980, 0.863)   # rgba(255,250,220) — 깃털
 # 크기/타이밍 — 이 상수만 만지면 된다.
 const ORB_CHARGE_START := 0.12  # 채널 구체 시작
 const ORB_CHARGE_FULL  := 0.36  # 채널 완료
-const CHANNEL_TIME     := 0.65  # 채널(차지) 시간(s)
+const CHANNEL_TIME     := 0.32  # 채널(차지) 시간(s)
 const DESCENT_TIME     := 0.3   # 빛기둥·빛의 칼 강하 시간(s)
 const IMPACT_DELAY     := CHANNEL_TIME + DESCENT_TIME  # battle_manager 동기화용
 const PILLAR_WIDTH     := 180.0 # 빛기둥 너비(px)

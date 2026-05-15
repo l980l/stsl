@@ -1952,8 +1952,11 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 	if owner_node == null:
 		return
 	var caster_pos: Vector2 = owner_node.global_position
-	# 첫 의미 있는 effect 만 VFX 트리거 — 이후 effect 들은 데미지/상태 시그널로 SFX/feedback
+	# 카드의 모든 effect 에 대해 적절한 VFX 시작 (return 안 함 — 여러 effect 동시 표시)
 	# damage_type 이 명시된 effect 는 모두 ATTACK 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF 등)
+	# 차지 시간 동기화는 첫 effect 기준 (_card_vfx_impact_delay) — 다른 VFX 는 자체 타이밍.
+	var did_buff: bool = false  # POWER 류 버프는 한 번만 (여러 power.* effect 가 있어도 단일 buff VFX)
+	var did_self_aoe: bool = false  # heal/block 도 한 번만
 	for effect in card.effects:
 		if effect.damage_type != "":
 			var dtype: String = effect.damage_type
@@ -1963,25 +1966,33 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 						_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[i].global_position + _impact_jitter())
 			elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
 				_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[target_enemy_index].global_position + _impact_jitter())
-			return
+			continue
 		var et = effect.effect_type
 		if et == EffectResource.EffectType.APPLY_STATUS:
 			if effect.status_type.begins_with("power."):
-				if owner_id == "joan_of_arc":
-					_spawn_holy_buff(caster_pos)
-				else:
-					_spawn_warrior_buff(caster_pos)
+				if not did_buff:
+					if owner_id == "joan_of_arc":
+						_spawn_holy_buff(caster_pos)
+					else:
+						_spawn_warrior_buff(caster_pos)
+					did_buff = true
 			else:
 				var fx_script: GDScript = _debuff_script_for_status(effect.status_type)
-				if fx_script and target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
-					_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type)
-			return
+				if fx_script:
+					if effect.target == "ALL":
+						for i in range(_enemy_char_nodes.size()):
+							if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
+								_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[i].global_position, effect.status_type)
+					elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
+						_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type)
 		elif et == EffectResource.EffectType.HEAL or et == EffectResource.EffectType.HEAL_ALL:
-			_spawn_heal_blessing(caster_pos)
-			return
+			if not did_self_aoe:
+				_spawn_heal_blessing(caster_pos)
+				did_self_aoe = true
 		elif et == EffectResource.EffectType.BLOCK or et == EffectResource.EffectType.BLOCK_ALL:
-			_spawn_defense_buff(caster_pos)
-			return
+			if not did_self_aoe:
+				_spawn_defense_buff(caster_pos)
+				did_self_aoe = true
 
 # 살아있는 적 인덱스 카운트 (target=ALL 영웅 카드의 visible 적 갯수)
 func _enemy_alive_visible() -> int:

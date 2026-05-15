@@ -12,7 +12,7 @@ const COL_VIOLET := Color(0.769, 0.486, 1.0)   # #c47cff — 보라
 const COL_SMOKE  := Color(1.0, 0.706, 0.863)   # rgba(255,180,220) — 분홍 연기
 
 # 크기/타이밍 — 이 상수만 만지면 된다.
-const CHARGE_TIME  := 0.7    # 차지 시간(s)
+const CHARGE_TIME  := 0.35   # 차지 시간(s)
 const PROJ_FLIGHT  := 0.6    # 키스 투사체 비행 시간(s)
 const IMPACT_DELAY := CHARGE_TIME + PROJ_FLIGHT  # battle_manager 동기화용
 const ARC_HEIGHT   := 50.0   # 포물선 최고점 높이(px)

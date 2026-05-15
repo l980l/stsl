@@ -13,7 +13,7 @@ const COL_SMOKE := Color(0.156, 0.110, 0.086) # rgba(40,28,22) — 어두운 연
 # 크기/타이밍 — 이 상수만 만지면 된다.
 const ORB_CHARGE_START := 0.12  # 차지 구체 시작
 const ORB_CHARGE_FULL  := 0.36  # 차지 완료
-const CHARGE_TIME      := 0.65  # 차지 시간(s)
+const CHARGE_TIME      := 0.32  # 차지 시간(s)
 const PROJ_FLIGHT      := 0.45  # 투사체 비행 시간(s)
 const IMPACT_DELAY     := CHARGE_TIME + PROJ_FLIGHT  # battle_manager 동기화용
 const ARC_HEIGHT       := 120.0 # 포물선 최고점 높이(px)
