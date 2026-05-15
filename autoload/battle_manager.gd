@@ -32,6 +32,9 @@ var _enemy_status: Array = []
 var _enemy_intent_index: Array = []
 var _enemy_phase: Array = []
 var _last_attacker: Dictionary = {}
+# VFX용 — 현재 행동 중인 공격자 (int=적 인덱스 / String=hero_id / null).
+# _execute_intent 동안만 유효. battle_scene이 lightning 등 빔 VFX 시전자 좌표 결정에 사용.
+var _vfx_caster = null
 
 var debug_hero_invincible: bool = false
 
@@ -1064,7 +1067,9 @@ func _phase_enemy_main() -> void:
 		if pattern.is_empty():
 			continue
 		var intent: Resource = pattern[_enemy_intent_index[i]]
+		_vfx_caster = i  # 이 적이 공격자 — lightning 등 빔 VFX 시전자 좌표용
 		_execute_intent(i, intent)
+		_vfx_caster = null
 		_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
 	_check_win_condition()
 	_check_lose_condition()
