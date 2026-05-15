@@ -1908,9 +1908,9 @@ func _all_living_hero_positions() -> Array:
 			out.append(hnode.global_position)
 	return out
 
-# 적 인텐트 차지 시작 — battle_manager 가 차지 끝나기까지 await 후 데미지 적용.
+# 적 인텐트 차지 시작 — battle_manager 가 미리 결정한 target_hero_id 사용.
 # VFX 의 screen_effect 시점이 데미지 시그널 emit 시점과 일치 (임팩트 동기화).
-func _on_intent_vfx_start(enemy_index: int, intent: Resource) -> void:
+func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: String) -> void:
 	if enemy_index < 0 or enemy_index >= _enemy_char_nodes.size():
 		return
 	var caster_node: Node2D = _enemy_char_nodes[enemy_index]
@@ -1925,7 +1925,7 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource) -> void:
 				for hpos in _all_living_hero_positions():
 					_spawn_attack_beam_simple(dtype, caster_pos, hpos + _impact_jitter())
 			else:
-				var hpos: Vector2 = _first_living_hero_pos()
+				var hpos: Vector2 = _hero_pos_or_first(target_hero_id)
 				if hpos != Vector2.ZERO:
 					_spawn_attack_beam_simple(dtype, caster_pos, hpos + _impact_jitter())
 		IntentRes.ActionType.BUFF:
@@ -1941,9 +1941,17 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource) -> void:
 					for hpos in _all_living_hero_positions():
 						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype)
 				else:
-					var hpos: Vector2 = _first_living_hero_pos()
+					var hpos: Vector2 = _hero_pos_or_first(target_hero_id)
 					if hpos != Vector2.ZERO:
 						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype)
+
+# target_hero_id 의 영웅 좌표 — 사망/미지정 시 첫 살아있는 영웅 fallback
+func _hero_pos_or_first(hero_id: String) -> Vector2:
+	if hero_id != "":
+		var node: Node2D = _hero_char_nodes.get(hero_id)
+		if node and TeamManager.is_alive(hero_id):
+			return node.global_position
+	return _first_living_hero_pos()
 
 # 영웅 카드 차지 시작 — battle_manager 가 차지 끝나기까지 await 후 효과 적용.
 func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id: String) -> void:
@@ -2012,6 +2020,34 @@ func _debuff_script_for_status(stype: String) -> GDScript:
 		return _VFX_INFATUATION
 	return null
 
+# dtype → 적절한 SFX 키. 등록되지 않은 holy_* 는 기본 계열 SFX 재활용.
+func _sfx_for_dtype(dtype: String) -> String:
+	match dtype:
+		"lightning":   return "impact_lightning"
+		"ice":         return "impact_ice"
+		"fire":        return "impact_fire"
+		"holy_fire":   return "impact_fire"
+		"poison":      return "impact_poison"
+		"projectile":  return "impact_projectile"
+		"holy_bolt":   return "impact_projectile"
+		"explosive":   return "impact_explosive"
+		"blunt":       return "impact_blunt"
+		"holy_blunt":  return "impact_blunt"
+		"holy_strike": return "impact_blunt"
+		"bullet":      return "impact_projectile"
+		"slash":       return "impact_slash"
+		"holy_slash":  return "impact_slash"
+		"curse":       return "impact_curse"
+		"divine":      return "impact_divine"
+		_:             return "impact_default"
+
+# status_type → SFX 키. 디버프/매혹 전용 SFX 가 없으면 curse/divine 재활용.
+func _sfx_for_status(stype: String) -> String:
+	match stype:
+		"weak", "vulnerable":   return "impact_curse"
+		"charm", "enthrall":    return "impact_divine"
+		_:                       return "impact_curse"
+
 # 단순 빔 spawn — screen_effect 시점에 SFX/flash/shake 발동
 func _spawn_attack_beam_simple(dtype: String, caster_pos: Vector2, target_pos: Vector2) -> void:
 	var beam_script := _caster_beam_script(dtype)
@@ -2020,10 +2056,11 @@ func _spawn_attack_beam_simple(dtype: String, caster_pos: Vector2, target_pos: V
 	var fx: Node2D = beam_script.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
+	var sfx_key: String = _sfx_for_dtype(dtype)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		_play_screen_shake()
-		AudioManager.play_sfx("impact_" + dtype)
+		AudioManager.play_sfx(sfx_key)
 	)
 	fx.play(caster_pos, target_pos)
 
@@ -2032,10 +2069,10 @@ func _spawn_debuff_beam_simple(beam_script: GDScript, caster_pos: Vector2, targe
 	var fx: Node2D = beam_script.new()
 	add_child(fx)
 	fx.position = Vector2.ZERO
-	var sfx_name: String = "charm" if stype == "charm" or stype == "enthrall" else "debuff"
+	var sfx_key: String = _sfx_for_status(stype)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_shake()
-		AudioManager.play_sfx(sfx_name)
+		AudioManager.play_sfx(sfx_key)
 	)
 	fx.play(caster_pos, target_pos)
 

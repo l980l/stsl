@@ -106,7 +106,8 @@ signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시�
 
 # VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생.
 # 차지(IMPACT_DELAY) 이후 데미지/상태 적용 + 기존 시그널 (hero_damaged 등) emit.
-signal intent_vfx_charge_start(enemy_index: int, intent: Resource)
+# target_hero_id: 단일 타겟의 영웅 id ("" 이면 ALL 또는 미지정)
+signal intent_vfx_charge_start(enemy_index: int, intent: Resource, target_hero_id: String)
 signal card_vfx_charge_start(card: Resource, target_enemy_index: int, target_hero_id: String)
 
 # 영웅 카드 발동 중 — 다음 카드 입력 차단 (await 중첩 방지)
@@ -1219,8 +1220,16 @@ func _phase_enemy_post() -> bool:
 	return did_work
 
 func _execute_intent(enemy_index: int, intent: Resource) -> void:
+	# 단일 타겟 인텐트는 시그널 emit 전에 영웅 타겟 미리 결정 — battle_scene 이 정확한 영웅 위치에 VFX 표시
+	var pre_target_id: String = ""
+	if intent.target != IntentRes.TargetType.ALL:
+		match intent.action_type:
+			IntentRes.ActionType.ATTACK:
+				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
+			IntentRes.ActionType.DEBUFF:
+				pre_target_id = _pick_hero_target(intent.target, enemy_index)
 	# VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생
-	intent_vfx_charge_start.emit(enemy_index, intent)
+	intent_vfx_charge_start.emit(enemy_index, intent, pre_target_id)
 	var _delay := _intent_vfx_impact_delay(intent)
 	if _delay > 0.0:
 		await get_tree().create_timer(_delay).timeout
@@ -1249,7 +1258,10 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 						_deal_damage_to_hero(hero.hero_id, dmg, intent.damage_type)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
-				var target_id: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
+				# 미리 결정된 타겟 사용 (사망 시 fallback 으로 재결정)
+				var target_id: String = pre_target_id
+				if target_id == "" or (team_mgr and not team_mgr.is_alive(target_id)):
+					target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 				if target_id != "":
 					# T3-MARK: 마킹한 영웅 공격 시 데미지 +50%
 					var marked_by: Array = _hero_status.get(target_id, {}).get("marked_by", [])
@@ -1271,7 +1283,9 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 					for hero in team_mgr.get_living_heroes():
 						_apply_status_to_hero(hero.hero_id, stype, intent.value)
 			else:
-				var target_id: String = _pick_hero_target(intent.target, enemy_index)
+				var target_id: String = pre_target_id
+				if target_id == "" or (team_mgr and not team_mgr.is_alive(target_id)):
+					target_id = _pick_hero_target(intent.target, enemy_index)
 				if target_id != "":
 					_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
