@@ -72,6 +72,7 @@ var _auto := false
 var _selected: Dictionary = VFX_LIST[VFX_LIST.size() - 1]  # 기본 lightning_beam
 var _info: Label
 var _impact_label: Label  # 임팩트 시점 시각 마커 — VFX 의 screen_effect 콜백
+var _compare_3way: bool = false  # 3-way 비교 모드 — 한 번에 x0.25/x0.5/x1.0 동시 spawn
 
 func _ready() -> void:
 	# 어두운 배경 — 가산 블렌드 글로우 확인용
@@ -120,6 +121,12 @@ func _ready() -> void:
 			pq_label.text = "파티클 갯수 (현재: %s)" % GameSettings.particle_key
 			_update_info())
 		pq_box.add_child(pq_btn)
+
+	# 3-way 비교 — 한 번 클릭에 3개 인스턴스 (x0.25 / x0.5 / x1.0) 동시 spawn (좌/중/우)
+	var cmp_btn := CheckBox.new()
+	cmp_btn.text = "3-way 비교 (x0.25 | x0.5 | x1.0 동시 spawn)"
+	cmp_btn.toggled.connect(func(on: bool) -> void: _compare_3way = on)
+	panel.add_child(cmp_btn)
 
 	_info = Label.new()
 	panel.add_child(_info)
@@ -291,12 +298,31 @@ func _play(entry: Dictionary) -> void:
 	match entry["kind"]:
 		"beam":
 			var script: GDScript = load(entry["path"]) as GDScript
-			var fx: Node2D = script.new()
-			add_child(fx)
-			fx.position = Vector2.ZERO
-			fx.screen_effect.connect(_preview_flash)
-			fx.screen_effect.connect(_show_impact_marker.bind(entry["name"]))
-			fx.play(_caster_pos, _target_pos)
+			if _compare_3way:
+				# 3개 인스턴스 동시 spawn — 각 다른 _particle_scale_override + 좌/중/우 위치
+				var x_offsets := [-400.0, 0.0, 400.0]
+				var scales    := [0.25, 0.5, 1.0]
+				for i in 3:
+					var fx_n: Node2D = script.new()
+					add_child(fx_n)
+					fx_n.position = Vector2.ZERO
+					if "_particle_scale_override" in fx_n:
+						fx_n.set("_particle_scale_override", scales[i])
+					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
+					var c_pos: Vector2 = _caster_pos + Vector2(x_offsets[i], 0.0)
+					if i == 1:
+						# 가운데 인스턴스만 임팩트 마커 (3개가 거의 동시 발동 — 라벨은 1개)
+						fx_n.screen_effect.connect(_preview_flash)
+						fx_n.screen_effect.connect(_show_impact_marker.bind("%s — 3way" % entry["name"]))
+					fx_n.play(c_pos, t_pos)
+					_spawn_compare_label(t_pos, "x" + str(scales[i]))
+			else:
+				var fx: Node2D = script.new()
+				add_child(fx)
+				fx.position = Vector2.ZERO
+				fx.screen_effect.connect(_preview_flash)
+				fx.screen_effect.connect(_show_impact_marker.bind(entry["name"]))
+				fx.play(_caster_pos, _target_pos)
 		"impact":
 			var fx: Node2D = (load(entry["path"]) as PackedScene).instantiate()
 			if "autostart" in fx:
@@ -326,6 +352,23 @@ func _play(entry: Dictionary) -> void:
 			var shield := fx.get_node_or_null("ShieldIcon")
 			if shield:
 				shield.play_shield()
+
+# 3-way 비교 모드 — 각 타겟 위 라벨 (x0.25/x0.5/x1.0). VFX 지속 시간만큼 페이드아웃.
+func _spawn_compare_label(target_pos: Vector2, text: String) -> void:
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.add_theme_font_size_override("font_size", 28)
+	lbl.add_theme_color_override("font_color", Color(0.85, 1.0, 0.85))
+	lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	lbl.add_theme_constant_override("outline_size", 4)
+	lbl.position = target_pos + Vector2(-40.0, -180.0)
+	lbl.size = Vector2(80, 40)
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	add_child(lbl)
+	var tw := create_tween()
+	tw.tween_interval(2.5)
+	tw.tween_property(lbl, "modulate:a", 0.0, 0.5)
+	tw.tween_callback(lbl.queue_free)
 
 func _show_impact_marker(vfx_name: String) -> void:
 	_impact_label.text = "💥 IMPACT — %s\n(데미지/SFX 적용 시점)" % vfx_name
