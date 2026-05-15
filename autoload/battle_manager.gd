@@ -110,6 +110,9 @@ signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시�
 signal intent_vfx_charge_start(enemy_index: int, intent: Resource, target_hero_id: String)
 signal card_vfx_charge_start(card: Resource, target_enemy_index: int, target_hero_id: String)
 
+# 독 DoT tick — 데미지 시그널과 별개로 가스 VFX/SFX 트리거 (target = "enemy_X" 또는 hero_id)
+signal poison_tick_applied(target: String, amount: int)
+
 # 영웅 카드 발동 중 — 다음 카드 입력 차단 (await 중첩 방지)
 var _card_busy: bool = false
 
@@ -1099,7 +1102,9 @@ func _tick_hero_poison(hero_id: String) -> void:
 	var dur: int = status.get("poison_dur", 0)
 	if dmg <= 0 or dur <= 0:
 		return
-	team_mgr.take_damage(hero_id, dmg * POISON_DMG_PER_STACK)
+	var tick_amt: int = dmg * POISON_DMG_PER_STACK
+	team_mgr.take_damage(hero_id, tick_amt)
+	poison_tick_applied.emit(hero_id, tick_amt)
 	dur -= 1
 	if dur <= 0:
 		_hero_status[hero_id]["poison_dmg"] = 0
@@ -1115,6 +1120,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 	var tick_dmg: int = _consume_double_next_damage(dmg * POISON_DMG_PER_STACK)
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - tick_dmg)
 	enemy_damaged.emit(enemy_index, tick_dmg, "poison")
+	poison_tick_applied.emit("enemy_%d" % enemy_index, tick_dmg)
 	dur -= 1
 	if dur <= 0:
 		_enemy_status[enemy_index]["poison_dmg"] = 0

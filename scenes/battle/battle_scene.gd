@@ -825,6 +825,7 @@ func _connect_signals() -> void:
 	# VFX 차지 시작 — 적 인텐트/영웅 카드 출처 모두 임팩트 시점에 데미지·SFX 동기
 	BattleManager.intent_vfx_charge_start.connect(_on_intent_vfx_start)
 	BattleManager.card_vfx_charge_start.connect(_on_card_vfx_start)
+	BattleManager.poison_tick_applied.connect(_on_poison_tick)
 	BattleManager.signature_fired.connect(_on_signature_fired)
 
 var _bgm_boss_id: String = ""
@@ -1770,6 +1771,7 @@ const _VFX_BLOOD_SPRAY := preload("res://scenes/vfx/blood_spray.gd")
 const _VFX_DEBUFF_HEX := preload("res://scenes/vfx/debuff_hex.gd")
 const _VFX_CHARM_KISS := preload("res://scenes/vfx/charm_kiss.gd")
 const _VFX_INFATUATION := preload("res://scenes/vfx/infatuation.gd")
+const _VFX_POISON_TICK := preload("res://scenes/vfx/poison_tick.gd")
 const _VFX_HEAL_BLESSING := preload("res://scenes/vfx/heal_blessing.gd")
 const _VFX_HOLY_BUFF := preload("res://scenes/vfx/holy_buff.gd")
 const _VFX_WARRIOR_BUFF := preload("res://scenes/vfx/warrior_buff.gd")
@@ -1950,6 +1952,27 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: St
 					var hpos: Vector2 = _hero_pos_or_first(target_hero_id)
 					if hpos != Vector2.ZERO:
 						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype)
+
+# 독 DoT tick — 가스 VFX + impact_poison SFX
+func _on_poison_tick(target: String, _amount: int) -> void:
+	var pos: Vector2 = Vector2.ZERO
+	if target.begins_with("enemy_"):
+		var idx: int = target.substr(6).to_int()
+		if idx >= 0 and idx < _enemy_char_nodes.size() and _enemy_char_nodes[idx]:
+			pos = _enemy_char_nodes[idx].global_position
+	else:
+		var hnode: Node2D = _hero_char_nodes.get(target)
+		if hnode:
+			pos = hnode.global_position
+	if pos == Vector2.ZERO:
+		return
+	var fx := _VFX_POISON_TICK.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void:
+		AudioManager.play_sfx("impact_poison")
+	)
+	fx.play(pos, pos)
 
 # target_hero_id 의 영웅 좌표 — 사망/미지정 시 첫 살아있는 영웅 fallback
 func _hero_pos_or_first(hero_id: String) -> Vector2:

@@ -27,6 +27,7 @@ const HOLY_BUFF := preload("res://scenes/vfx/holy_buff.gd")
 const WARRIOR_BUFF := preload("res://scenes/vfx/warrior_buff.gd")
 const INFATUATION := preload("res://scenes/vfx/infatuation.gd")
 const DEFENSE_BUFF := preload("res://scenes/vfx/defense_buff.gd")
+const POISON_TICK := preload("res://scenes/vfx/poison_tick.gd")
 
 # kind: "impact"=피격 버스트(타겟 위치) / "self"=자기 버프 버스트 / "beam"=시전자→타겟 빔
 const VFX_LIST := [
@@ -61,6 +62,7 @@ const VFX_LIST := [
 	{"name": "warrior_buff",   "kind": "beam",   "path": "res://scenes/vfx/warrior_buff.gd"},
 	{"name": "infatuation",    "kind": "beam",   "path": "res://scenes/vfx/infatuation.gd"},
 	{"name": "defense_buff",   "kind": "beam",   "path": "res://scenes/vfx/defense_buff.gd"},
+	{"name": "poison_tick",    "kind": "beam",   "path": "res://scenes/vfx/poison_tick.gd"},
 ]
 
 var _caster_pos := Vector2(420, 540)
@@ -240,6 +242,9 @@ func _update_info() -> void:
 				DEFENSE_BUFF.PANEL_DIST, DEFENSE_BUFF.RING_RADIUS]
 			s += "차지 %.2fs · 버프 지속 %.1fs (시전자 마커 무시)" % [
 				DEFENSE_BUFF.CHARGE_TIME, DEFENSE_BUFF.BUFF_TIME]
+		"poison_tick":
+			s += "독 DoT tick — 잔류 가스만 (poison_splash 의 ambient 추출)\n"
+			s += "지속 %.1fs · sfx=impact_poison · 시전자 마커 무시" % POISON_TICK.TICK_TIME
 		_:
 			s += "시전자 마커는 beam 전용 — impact/self는 타겟 위치에서 재생"
 	# IMPACT_DELAY 한 줄 자동 추가 — VFX 스크립트에 노출돼 있으면 표시 (battle_manager 가 동기화에 사용)
