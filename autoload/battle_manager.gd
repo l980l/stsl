@@ -181,6 +181,9 @@ func _card_vfx_impact_delay(card: Resource) -> float:
 				var d := _vfx_impact_delay_for_status(effect.status_type)
 				if d > 0.0:
 					return d
+			EffectRes.EffectType.CHARM:
+				# CHARM effect_type — Cleopatra 매혹 카드 (charm_kiss 빔)
+				return _VFX_CHARM_KISS.IMPACT_DELAY * _vfx_speed_mul()
 			EffectRes.EffectType.HEAL, EffectRes.EffectType.HEAL_ALL, EffectRes.EffectType.HEAL_PER_DEAD_ALLY:
 				return _VFX_HEAL_BLESSING.IMPACT_DELAY * _vfx_speed_mul()
 			EffectRes.EffectType.BLOCK, EffectRes.EffectType.BLOCK_ALL, EffectRes.EffectType.FORMATION_BLOCK, EffectRes.EffectType.COUNTER_BLOCK, EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED, EffectRes.EffectType.MORALE_TO_BLOCK:

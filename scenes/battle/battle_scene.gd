@@ -2009,6 +2009,17 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 								_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[i].global_position, effect.status_type)
 					elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
 						_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type)
+		elif et == EffectResource.EffectType.CHARM:
+			# Cleopatra 매혹 카드 — charm_kiss 빔 (단일/ALL)
+			if did_debuff:
+				continue
+			did_debuff = true
+			if effect.target == "ALL":
+				for i in range(_enemy_char_nodes.size()):
+					if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
+						_spawn_debuff_beam_simple(_VFX_CHARM_KISS, caster_pos, _enemy_char_nodes[i].global_position, "charm")
+			elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
+				_spawn_debuff_beam_simple(_VFX_CHARM_KISS, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, "charm")
 		elif et == EffectResource.EffectType.HEAL or et == EffectResource.EffectType.HEAL_ALL:
 			if not did_self_aoe:
 				_spawn_heal_blessing(caster_pos)
