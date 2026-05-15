@@ -388,7 +388,7 @@ func _build_graphics_panel() -> void:
 	_build_cursor_seg_row(p, mono, 24.0)
 
 	# Row 2: 파티클 갯수 (graphics) — 라벨도 "xVAL" 형식 (x0.25/x0.5/x1.0)
-	_build_seg_row(p, mono, 68.0, tr("ui.settings.particle_quality"), "particle",
+	_build_seg_row(p, mono, 80.0, tr("ui.settings.particle_quality"), "particle",
 		GameSettings.PARTICLE_KEYS,
 		_build_x_labels(GameSettings.PARTICLE_KEYS, GameSettings.PARTICLE_VALUES),
 		GameSettings.particle_key,
@@ -405,13 +405,13 @@ func _build_gameplay_panel() -> void:
 		GameSettings.vfx_speed_key,
 		func(k: String) -> void: GameSettings.set_vfx_speed(k))
 
-	_build_seg_row(p, mono, 68.0, tr("ui.settings.anim_speed"), "anim_speed",
+	_build_seg_row(p, mono, 80.0, tr("ui.settings.anim_speed"), "anim_speed",
 		GameSettings.ANIM_SPEED_KEYS,
 		_build_x_labels(GameSettings.ANIM_SPEED_KEYS, GameSettings.ANIM_SPEED_VALUES),
 		GameSettings.anim_speed_key,
 		func(k: String) -> void: GameSettings.set_anim_speed(k))
 
-	_build_seg_row(p, mono, 112.0, tr("ui.settings.monster_interval"), "monster_interval",
+	_build_seg_row(p, mono, 136.0, tr("ui.settings.monster_interval"), "monster_interval",
 		GameSettings.MONSTER_INTERVAL_KEYS,
 		_build_x_labels(GameSettings.MONSTER_INTERVAL_KEYS, GameSettings.MONSTER_INTERVAL_VALUES),
 		GameSettings.monster_interval_key,
@@ -435,7 +435,7 @@ func _build_seg_row(parent: Control, mono: Font, row_y: float, label_text: Strin
 	seg_box.offset_left   = 180.0
 	seg_box.offset_top    = row_y
 	seg_box.offset_right  = 520.0
-	seg_box.offset_bottom = row_y + 43.0
+	seg_box.offset_bottom = row_y + 30.0
 	seg_box.add_theme_constant_override("separation", 0)
 	parent.add_child(seg_box)
 
@@ -444,7 +444,7 @@ func _build_seg_row(parent: Control, mono: Font, row_y: float, label_text: Strin
 		var key: String = keys[i]
 		var btn := Button.new()
 		btn.text = label_map.get(key, key)
-		btn.custom_minimum_size = Vector2(0, 43)
+		btn.custom_minimum_size = Vector2(0, 30)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.add_theme_font_override("font", mono)
@@ -508,7 +508,7 @@ func _build_cursor_seg_row(parent: Control, mono: Font, row_y: float) -> void:
 	seg_box.offset_left   = 180.0
 	seg_box.offset_top    = row_y
 	seg_box.offset_right  = 520.0
-	seg_box.offset_bottom = row_y + 43.0
+	seg_box.offset_bottom = row_y + 30.0
 	seg_box.add_theme_constant_override("separation", 0)
 	parent.add_child(seg_box)
 
@@ -517,7 +517,7 @@ func _build_cursor_seg_row(parent: Control, mono: Font, row_y: float) -> void:
 		var key: String = keys[i]
 		var btn := Button.new()
 		btn.text = key
-		btn.custom_minimum_size = Vector2(0, 43)
+		btn.custom_minimum_size = Vector2(0, 30)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.add_theme_font_override("font", mono)
