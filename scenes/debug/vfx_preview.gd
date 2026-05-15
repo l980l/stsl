@@ -80,7 +80,7 @@ var _auto := false
 var _selected: Dictionary = VFX_LIST[VFX_LIST.size() - 1]  # 기본 lightning_beam
 var _info: Label
 var _impact_label: Label  # 임팩트 시점 시각 마커 — VFX 의 screen_effect 콜백
-var _compare_3way: bool = false  # 3-way 비교 모드 — 한 번에 x0.25/x0.5/x1.0 동시 spawn
+var _compare_4way: bool = false  # 4-way 비교 모드 — 한 번에 x0.1/x0.25/x0.5/x1.0 동시 spawn
 
 func _ready() -> void:
 	# 어두운 배경 — 가산 블렌드 글로우 확인용
@@ -91,7 +91,7 @@ func _ready() -> void:
 	add_child(bg)
 
 	var panel := VBoxContainer.new()
-	panel.position = Vector2(24, 24)
+	panel.position = Vector2(24, 8)
 	add_child(panel)
 
 	var title := Label.new()
@@ -104,12 +104,12 @@ func _ready() -> void:
 	current_lbl.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
 	panel.add_child(current_lbl)
 	var grid_current := GridContainer.new()
-	grid_current.columns = 5
+	grid_current.columns = 9
 	panel.add_child(grid_current)
 	for entry in VFX_CURRENT:
 		var b := Button.new()
 		b.text = entry["name"]
-		b.custom_minimum_size = Vector2(150.0, 0.0)
+		b.custom_minimum_size = Vector2(105.0, 0.0)
 		b.pressed.connect(_select_and_play.bind(entry))
 		grid_current.add_child(b)
 
@@ -119,12 +119,12 @@ func _ready() -> void:
 	legacy_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	panel.add_child(legacy_lbl)
 	var grid_legacy := GridContainer.new()
-	grid_legacy.columns = 5
+	grid_legacy.columns = 9
 	panel.add_child(grid_legacy)
 	for entry in VFX_LEGACY:
 		var b := Button.new()
 		b.text = entry["name"]
-		b.custom_minimum_size = Vector2(150.0, 0.0)
+		b.custom_minimum_size = Vector2(105.0, 0.0)
 		b.modulate = Color(0.75, 0.75, 0.75)
 		b.pressed.connect(_select_and_play.bind(entry))
 		grid_legacy.add_child(b)
@@ -151,10 +151,10 @@ func _ready() -> void:
 			_update_info())
 		pq_box.add_child(pq_btn)
 
-	# 3-way 비교 — 한 번 클릭에 3개 인스턴스 (x0.25 / x0.5 / x1.0) 동시 spawn (좌/중/우)
+	# 4-way 비교 — 한 번 클릭에 4개 인스턴스 (x0.1 / x0.25 / x0.5 / x1.0) 동시 spawn
 	var cmp_btn := CheckBox.new()
-	cmp_btn.text = "3-way 비교 (x0.25 | x0.5 | x1.0 동시 spawn)"
-	cmp_btn.toggled.connect(func(on: bool) -> void: _compare_3way = on)
+	cmp_btn.text = "4-way 비교 (x0.1 | x0.25 | x0.5 | x1.0 동시 spawn)"
+	cmp_btn.toggled.connect(func(on: bool) -> void: _compare_4way = on)
 	panel.add_child(cmp_btn)
 
 	_info = Label.new()
@@ -327,11 +327,11 @@ func _play(entry: Dictionary) -> void:
 	match entry["kind"]:
 		"beam":
 			var script: GDScript = load(entry["path"]) as GDScript
-			if _compare_3way:
-				# 3개 인스턴스 동시 spawn — 각 다른 _particle_scale_override + 좌/중/우 위치
-				var x_offsets := [-400.0, 0.0, 400.0]
-				var scales    := [0.25, 0.5, 1.0]
-				for i in 3:
+			if _compare_4way:
+				# 4개 인스턴스 동시 spawn — 각 다른 _particle_scale_override + 화면 가로 4분할
+				var x_offsets := [-540.0, -180.0, 180.0, 540.0]
+				var scales    := [0.1, 0.25, 0.5, 1.0]
+				for i in 4:
 					var fx_n: Node2D = script.new()
 					add_child(fx_n)
 					fx_n.position = Vector2.ZERO
@@ -339,10 +339,10 @@ func _play(entry: Dictionary) -> void:
 						fx_n.set("_particle_scale_override", scales[i])
 					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
 					var c_pos: Vector2 = _caster_pos + Vector2(x_offsets[i], 0.0)
-					if i == 1:
-						# 가운데 인스턴스만 임팩트 마커 (3개가 거의 동시 발동 — 라벨은 1개)
+					if i == 2:
+						# x0.5 인스턴스만 임팩트 마커 (4개가 거의 동시 발동 — 라벨은 1개)
 						fx_n.screen_effect.connect(_preview_flash)
-						fx_n.screen_effect.connect(_show_impact_marker.bind("%s — 3way" % entry["name"]))
+						fx_n.screen_effect.connect(_show_impact_marker.bind("%s — 4way" % entry["name"]))
 					fx_n.play(c_pos, t_pos)
 					_spawn_compare_label(t_pos, "x" + str(scales[i]))
 			else:
@@ -354,11 +354,11 @@ func _play(entry: Dictionary) -> void:
 				fx.play(_caster_pos, _target_pos)
 		"impact":
 			var packed := load(entry["path"]) as PackedScene
-			if _compare_3way:
+			if _compare_4way:
 				# PackedScene (GPUParticles2D) 의 amount 를 인스턴스별로 스케일
-				var x_offsets := [-400.0, 0.0, 400.0]
-				var scales    := [0.25, 0.5, 1.0]
-				for i in 3:
+				var x_offsets := [-540.0, -180.0, 180.0, 540.0]
+				var scales    := [0.1, 0.25, 0.5, 1.0]
+				for i in 4:
 					var fx_n: Node2D = packed.instantiate()
 					if "autostart" in fx_n:
 						fx_n.autostart = false
@@ -411,7 +411,7 @@ func _play(entry: Dictionary) -> void:
 			if shield:
 				shield.play_shield()
 
-# 3-way 비교 모드 — PackedScene (GPUParticles2D/CPUParticles2D) 의 amount 를 scale 곱셈
+# 4-way 비교 모드 — PackedScene (GPUParticles2D/CPUParticles2D) 의 amount 를 scale 곱셈
 # 재귀적으로 자식 모두 — slash_particle 같은 BurstParticleGroup 의 4개 노드 일괄 적용
 func _scale_packed_amounts(node: Node, scale: float) -> void:
 	if node is GPUParticles2D:
@@ -421,7 +421,7 @@ func _scale_packed_amounts(node: Node, scale: float) -> void:
 	for child in node.get_children():
 		_scale_packed_amounts(child, scale)
 
-# 3-way 비교 모드 — 각 타겟 위 라벨 (x0.25/x0.5/x1.0). VFX 지속 시간만큼 페이드아웃.
+# 4-way 비교 모드 — 각 타겟 위 라벨 (x0.1/x0.25/x0.5/x1.0). VFX 지속 시간만큼 페이드아웃.
 func _spawn_compare_label(target_pos: Vector2, text: String) -> void:
 	var lbl := Label.new()
 	lbl.text = text

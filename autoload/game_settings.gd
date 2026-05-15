@@ -16,8 +16,8 @@ const MONSTER_INTERVAL_KEYS    := ["fastest", "fast", "normal", "slow"]
 const MONSTER_INTERVAL_VALUES  := [0.5, 1.0, 1.5, 2.0]
 const MONSTER_INTERVAL_DEFAULT := "fast"  # 빠르게 = 현재 turn_interval 0.4 그대로
 
-const PARTICLE_KEYS    := ["low", "medium", "high"]
-const PARTICLE_VALUES  := [0.25, 0.5, 1.0]
+const PARTICLE_KEYS    := ["minimal", "low", "medium", "high"]
+const PARTICLE_VALUES  := [0.1, 0.25, 0.5, 1.0]
 const PARTICLE_DEFAULT := "high"  # 상
 
 const _CONFIG_PATH := "user://game_settings.cfg"

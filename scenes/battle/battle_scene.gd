@@ -741,8 +741,8 @@ func _apply_hp_state(bar: Control, fill: TextureRect, ratio: float, is_boss: boo
 
 	# 펄스 — bloom intensity만 (fill alpha 건드리면 하위 레이어 가로줄이 비침)
 	var dur: float = 0.0
-	var lo_intensity: float = 0.35
-	var hi_intensity: float = 0.35
+	var lo_intensity: float = 0.0
+	var hi_intensity: float = 0.0
 	if ratio <= 0.15:
 		dur = 0.9
 		lo_intensity = 0.35
@@ -752,7 +752,8 @@ func _apply_hp_state(bar: Control, fill: TextureRect, ratio: float, is_boss: boo
 		lo_intensity = 0.30
 		hi_intensity = 0.85
 	else:
-		bloom_mat.set_shader_parameter("intensity", 0.35)
+		# 정상 HP — 블룸 완전히 끔 (임계치 미만에서만 브리딩)
+		bloom_mat.set_shader_parameter("intensity", 0.0)
 		return
 
 	bloom_mat.set_shader_parameter("intensity", lo_intensity)
