@@ -64,36 +64,36 @@ static func jade_emperor(scene: PackedScene) -> Resource:
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.BUFF; p0i2.value = 1; p0i2.status_type = "strength"
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 190; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "divine"
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 190; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "holy_slash"
 	var p0i4 := IntentRes.new()
-	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 160; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "divine"
+	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 160; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "holy_fire"
 	var p0i5 := IntentRes.new()
 	p0i5.action_type = IntentRes.ActionType.DEBUFF; p0i5.value = 2; p0i5.status_type = "vulnerable"
 	p0i5.target = IntentRes.TargetType.RANDOM
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 220; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "divine"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 220; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "holy_slash"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 2; p1i2.status_type = "vulnerable"
 	p1i2.target = IntentRes.TargetType.ALL
 	var p1i3 := IntentRes.new()
-	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 190; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "divine"
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 190; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "holy_fire"
 	var p1i4 := IntentRes.new()
-	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 200; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "divine"
+	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 200; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "holy_arrow"
 	var p1i5 := IntentRes.new()
 	p1i5.action_type = IntentRes.ActionType.DEBUFF; p1i5.value = 3; p1i5.status_type = "weak"
 	p1i5.target = IntentRes.TargetType.ALL
 	var p1i6 := IntentRes.new()
 	p1i6.action_type = IntentRes.ActionType.BUFF; p1i6.value = 2; p1i6.status_type = "strength"
 	var p2i1 := IntentRes.new()
-	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 160; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "divine"
+	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 160; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "holy_slash"
 	var p2i2 := IntentRes.new()
-	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 160; p2i2.target = IntentRes.TargetType.RANDOM; p2i2.damage_type = "divine"
+	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 160; p2i2.target = IntentRes.TargetType.RANDOM; p2i2.damage_type = "holy_slash"
 	var p2i3 := IntentRes.new()
-	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 160; p2i3.target = IntentRes.TargetType.RANDOM; p2i3.damage_type = "divine"
+	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 160; p2i3.target = IntentRes.TargetType.RANDOM; p2i3.damage_type = "holy_slash"
 	var p2i4 := IntentRes.new()
-	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 160; p2i4.target = IntentRes.TargetType.RANDOM; p2i4.damage_type = "divine"
+	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 160; p2i4.target = IntentRes.TargetType.RANDOM; p2i4.damage_type = "holy_slash"
 	var p2i5 := IntentRes.new()
-	p2i5.action_type = IntentRes.ActionType.ATTACK; p2i5.value = 220; p2i5.target = IntentRes.TargetType.ALL; p2i5.damage_type = "divine"
+	p2i5.action_type = IntentRes.ActionType.ATTACK; p2i5.value = 220; p2i5.target = IntentRes.TargetType.ALL; p2i5.damage_type = "holy_fire"
 	var p2i6 := IntentRes.new()
 	p2i6.action_type = IntentRes.ActionType.DEBUFF; p2i6.value = 3; p2i6.status_type = "vulnerable"
 	p2i6.target = IntentRes.TargetType.ALL

@@ -52,15 +52,15 @@ static func isis_phantom(scene: PackedScene) -> Resource:
 	p0i2.action_type = IntentRes.ActionType.DEBUFF; p0i2.status_type = "vulnerable"; p0i2.value = 2
 	p0i2.target = IntentRes.TargetType.ALL
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 150; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "divine"
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 150; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "holy_strike"
 	# 페이즈1: ATK ALL / DEBUFF vulnerable ALL / ATK LOWEST_HP
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "divine"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "holy_fire"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "vulnerable"; p1i2.value = 3
 	p1i2.target = IntentRes.TargetType.ALL
 	var p1i3 := IntentRes.new()
-	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 240; p1i3.target = IntentRes.TargetType.LOWEST_HP; p1i3.damage_type = "divine"
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 240; p1i3.target = IntentRes.TargetType.LOWEST_HP; p1i3.damage_type = "holy_arrow"
 	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i2, p1i3]]
 	e.intent_pattern = e.phase_patterns[0]
 	return e
@@ -75,24 +75,24 @@ static func ra_horakhty(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	# 페이즈0: ATK RANDOM / DEBUFF weak ALL / ATK RANDOM / ATK ALL
 	var p0i1 := IntentRes.new()
-	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 150; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "divine"
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 150; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "holy_strike"
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.DEBUFF; p0i2.status_type = "weak"; p0i2.value = 2
 	p0i2.target = IntentRes.TargetType.ALL
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 150; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "divine"
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 150; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "holy_strike"
 	var p0i4 := IntentRes.new()
 	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 130; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "fire"
 	# 페이즈1 (65% HP 전환): ATK RANDOM / DEBUFF poison ALL / ATK ALL / ATK LOWEST_HP
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "divine"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "holy_strike"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "poison"; p1i2.value = 6
 	p1i2.target = IntentRes.TargetType.ALL
 	var p1i3 := IntentRes.new()
 	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 200; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "fire"
 	var p1i4 := IntentRes.new()
-	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 220; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "divine"
+	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 220; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "holy_arrow"
 	# 페이즈2 (30% HP 전환): BUFF strength / ATK ALL / DEBUFF vulnerable ALL / ATK LOWEST_HP
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.BUFF; p2i1.status_type = "strength"; p2i1.value = 15
@@ -102,7 +102,7 @@ static func ra_horakhty(scene: PackedScene) -> Resource:
 	p2i3.action_type = IntentRes.ActionType.DEBUFF; p2i3.status_type = "vulnerable"; p2i3.value = 3
 	p2i3.target = IntentRes.TargetType.ALL
 	var p2i4 := IntentRes.new()
-	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 300; p2i4.target = IntentRes.TargetType.LOWEST_HP; p2i4.damage_type = "divine"
+	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 300; p2i4.target = IntentRes.TargetType.LOWEST_HP; p2i4.damage_type = "holy_arrow"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4],
 		[p1i1, p1i2, p1i3, p1i4],

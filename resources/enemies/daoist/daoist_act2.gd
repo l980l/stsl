@@ -25,11 +25,11 @@ static func nine_dragon(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 30; i2.status_type = "block"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 160; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "divine"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 160; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "holy_slash"
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 2; i4.status_type = "strength"
 	var i5 := IntentRes.new()
-	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 220; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "divine"
+	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 220; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "holy_slash"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
 	return e
@@ -67,26 +67,26 @@ static func xuanwu(scene: PackedScene) -> Resource:
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.BUFF; p0i2.value = 40; p0i2.status_type = "block"
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 170; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "divine"
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 170; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "holy_slash"
 	var p0i4 := IntentRes.new()
-	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 140; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "divine"
+	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 140; p0i4.target = IntentRes.TargetType.ALL; p0i4.damage_type = "holy_fire"
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "divine"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "holy_slash"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 160; p1i2.target = IntentRes.TargetType.ALL; p1i2.damage_type = "divine"
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 160; p1i2.target = IntentRes.TargetType.ALL; p1i2.damage_type = "holy_fire"
 	var p1i3 := IntentRes.new()
 	p1i3.action_type = IntentRes.ActionType.DEBUFF; p1i3.value = 2; p1i3.status_type = "vulnerable"
 	p1i3.target = IntentRes.TargetType.RANDOM
 	var p1i4 := IntentRes.new()
-	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 180; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "divine"
+	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 180; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "holy_arrow"
 	var p1i5 := IntentRes.new()
 	p1i5.action_type = IntentRes.ActionType.BUFF; p1i5.value = 2; p1i5.status_type = "strength"
 	var p2i1 := IntentRes.new()
-	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 180; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "divine"
+	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 180; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "holy_slash"
 	var p2i2 := IntentRes.new()
-	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 180; p2i2.target = IntentRes.TargetType.RANDOM; p2i2.damage_type = "divine"
+	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 180; p2i2.target = IntentRes.TargetType.RANDOM; p2i2.damage_type = "holy_slash"
 	var p2i3 := IntentRes.new()
-	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 220; p2i3.target = IntentRes.TargetType.ALL; p2i3.damage_type = "divine"
+	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 220; p2i3.target = IntentRes.TargetType.ALL; p2i3.damage_type = "holy_fire"
 	var p2i4 := IntentRes.new()
 	p2i4.action_type = IntentRes.ActionType.DEBUFF; p2i4.value = 2; p2i4.status_type = "vulnerable"
 	p2i4.target = IntentRes.TargetType.ALL
