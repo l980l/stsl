@@ -5,6 +5,11 @@
 # smoke/petal 은 일반 블렌드, heart/sparkle/만다라/체인/오라/shockwave 는 가산 블렌드.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+func _pcount(n: int) -> int:
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_HOT     := Color(1.0, 0.945, 0.910)  # 흰 따뜻한 톤
 const COL_RED     := Color(1.0, 0.296, 0.376)  # #ff4b60 — 다이나믹 빨강
 const COL_CRIMSON := Color(0.784, 0.094, 0.176) # #c8182d — 진홍
@@ -231,7 +236,7 @@ func _spawn_ambient() -> void:
 func _spawn_impact_burst() -> void:
 	var b := _target + Vector2(0.0, -40.0)
 	# 임팩트 하트 26개 — 더 크고 빠르게
-	for _i in range(26):
+	for _i in range(_pcount(26)):
 		var a := randf() * TAU
 		var sp := 2.5 + randf() * 6.5  # 더 빠르게
 		var tint := "crimson" if randf() < 0.45 else "rose"
@@ -239,14 +244,14 @@ func _spawn_impact_burst() -> void:
 			1.4 + randf() * 0.8, 14.0 + randf() * 16.0, "heart_small", -0.012,
 			randf_range(-0.6, 0.6), 0.0, tint))
 	# 꽃잎 40개 — 더 화려하게
-	for _i in range(40):
+	for _i in range(_pcount(40)):
 		var a := randf() * TAU
 		var sp := 1.5 + randf() * 4.0  # 속도 ↑
 		_particles.append(_mk(b, Vector2(cos(a) * sp, sin(a) * sp * 0.7 - 0.8),
 			1.6 + randf(), 6.0 + randf() * 7.0, "petal", 0.02,
 			randf_range(-0.4, 0.4), randf_range(-0.08, 0.08)))
 	# 별가루 60개 — 더 풍성하게
-	for _i in range(60):
+	for _i in range(_pcount(60)):
 		var a := randf() * TAU
 		var sp := 1.5 + randf() * 6.0
 		var tint := "crimson" if randf() < 0.5 else "rose"
@@ -254,7 +259,7 @@ func _spawn_impact_burst() -> void:
 			1.0 + randf() * 0.7, 1.0 + randf() * 1.4, "sparkle", 0.01,
 			0.0, 0.0, tint))
 	# 빨강 smoke 22개
-	for _i in range(22):
+	for _i in range(_pcount(22)):
 		var a := randf() * TAU
 		var sp := 0.8 + randf() * 1.8
 		_particles.append(_mk(b, Vector2(cos(a) * sp, sin(a) * sp * 0.6 - 0.4),

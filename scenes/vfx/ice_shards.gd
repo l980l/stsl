@@ -4,6 +4,11 @@
 # 노드는 position (0,0)으로 add_child해야 한다 (좌표를 global로 받아 그대로 그림).
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+func _pcount(n: int) -> int:
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_HOT  := Color(1, 1, 1)              # 흰 코어
 const COL_MID  := Color(0.749, 0.902, 1.0)    # #bfe6ff
 const COL_DEEP := Color(0.353, 0.659, 0.902)  # #5aa8e6
@@ -161,7 +166,7 @@ func _spawn_frost_mist(pos: Vector2, intensity: float) -> void:
 
 # 명중 순간 — 회전 파편(chunk) + 큰 서리 안개(mist) + 십자 반짝임(sparkle)
 func _spawn_impact_shatter(pos: Vector2) -> void:
-	for _i in range(28):
+	for _i in range(_pcount(28)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 5.0
 		_particles.append({
@@ -171,7 +176,7 @@ func _spawn_impact_shatter(pos: Vector2) -> void:
 			"r": 3.0 + randf() * 5.0, "kind": "chunk", "grav": 0.06,
 			"ang": a, "spin": randf_range(-0.3, 0.3),
 		})
-	for _i in range(60):
+	for _i in range(_pcount(60)):
 		var a := randf() * TAU
 		var sp := 0.8 + randf() * 3.0
 		_particles.append({
@@ -181,7 +186,7 @@ func _spawn_impact_shatter(pos: Vector2) -> void:
 			"r": 16.0 + randf() * 22.0, "kind": "mist", "grav": -0.01,
 			"ang": 0.0, "spin": 0.0,
 		})
-	for _i in range(50):
+	for _i in range(_pcount(50)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 4.0
 		_particles.append({

@@ -5,6 +5,11 @@
 # 화살·먼지·파편은 또렷한 일반 블렌드, 트레일·스파크·조준선·발사섬광은 가산 블렌드 — 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+func _pcount(n: int) -> int:
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_HOT     := Color(1, 1, 1)             # 흰 코어
 const COL_STEEL   := Color(0.812, 0.831, 0.867) # #cfd4dd — 화살촉
 const COL_AIM     := Color(1.0, 0.251, 0.251)   # #ff4040 — 조준 레이저
@@ -81,17 +86,17 @@ func _mk(pos: Vector2, vel: Vector2, max_life: float, r: float, kind: String,
 
 # 명중 — 튕겨나가는 스파크 + 먼지 구름 + 작은 파편
 func _spawn_impact(pos: Vector2, ang: float) -> void:
-	for _i in range(22):
+	for _i in range(_pcount(22)):
 		var a := ang + PI + randf_range(-0.7, 0.7)
 		var sp := 2.0 + randf() * 6.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 0.8),
 			0.4 + randf() * 0.4, 1.0 + randf() * 1.3, "spark", 0.12))
-	for _i in range(14):
+	for _i in range(_pcount(14)):
 		var a := ang + PI + randf_range(-0.5, 0.5)
 		var sp := 0.5 + randf() * 1.8
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.6 - 0.4),
 			0.6 + randf() * 0.5, 8.0 + randf() * 8.0, "dust", -0.008))
-	for _i in range(6):
+	for _i in range(_pcount(6)):
 		var a := ang + PI + randf_range(-0.4, 0.4)
 		var sp := 3.0 + randf() * 4.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 1.5),

@@ -5,6 +5,11 @@
 # 어두운 연기는 가산 블렌드로 안 보이므로 연기(일반)·불꽃(가산) 2개 레이어로 분리해 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+func _pcount(n: int) -> int:
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_HOT   := Color(1.0, 0.965, 0.85)    # 거의 흰 코어
 const COL_MID   := Color(1.0, 0.820, 0.4)     # #ffd166 — 황금
 const COL_DEEP  := Color(0.784, 0.573, 0.196) # #c89232 — 진금빛
@@ -88,33 +93,33 @@ func _run() -> void:
 		queue_free()
 
 func _spawn_trail(pos: Vector2) -> void:
-	for _i in range(8):
+	for _i in range(_pcount(8)):
 		_particles.append(_mk(pos + _rand_off(8.0),
 			Vector2(randf_range(-0.3, 0.3), -0.3 - randf() * 0.6),
 			0.38 + randf() * 0.42, 8.0 + randf() * 16.0, "smoke", -0.005))
-	for _i in range(6):
+	for _i in range(_pcount(6)):
 		_particles.append(_mk(pos + _rand_off(6.0),
 			Vector2(randf_range(-0.75, 0.75), randf_range(-0.6, 0.6)),
 			0.22 + randf() * 0.22, 3.0 + randf() * 5.0, "flame", -0.02))
-	for _i in range(3):
+	for _i in range(_pcount(3)):
 		_particles.append(_mk(pos,
 			Vector2(randf_range(-1.75, 1.75), randf_range(-1.75, 1.75) - 0.4),
 			0.5 + randf() * 0.5, 1.4 + randf() * 1.2, "ember", 0.02))
 
 func _spawn_explosion(pos: Vector2) -> void:
-	for _i in range(70):
+	for _i in range(_pcount(70)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 5.0
 		_particles.append(_mk(pos,
 			Vector2(cos(a) * sp, sin(a) * sp * 0.85 - 1.2),
 			0.5 + randf() * 0.5, 14.0 + randf() * 22.0, "fireball", -0.015))
-	for _i in range(80):
+	for _i in range(_pcount(80)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 7.0
 		_particles.append(_mk(pos,
 			Vector2(cos(a) * sp, sin(a) * sp - 0.6),
 			0.7 + randf() * 0.7, 1.6 + randf() * 1.6, "ember", 0.045))
-	for _i in range(40):
+	for _i in range(_pcount(40)):
 		var a := -PI / 2.0 + randf_range(-0.8, 0.8)
 		var sp := 0.6 + randf() * 1.6
 		_particles.append(_mk(pos + Vector2(randf_range(-30.0, 30.0), randf_range(-20.0, 20.0)),

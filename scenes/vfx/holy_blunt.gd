@@ -6,6 +6,11 @@
 # 깃털·균열은 일반 블렌드, 스트라이크·스파크·충격파·십자가 폭발은 가산 블렌드 — 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+func _pcount(n: int) -> int:
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_HOT         := Color(1, 1, 1)             # 흰 코어
 const COL_FEATHER_HI  := Color(1.0, 0.980, 0.902)   # 깃털 본체 — 흰빛
 const COL_FEATHER_MID := Color(1.0, 0.882, 0.612)   # 깃털 음영 — 황금 톤
@@ -110,27 +115,27 @@ func _mk(pos: Vector2, vel: Vector2, max_life: float, r: float, kind: String,
 func _spawn_impact_feathers() -> void:
 	var gy := _target + Vector2(0.0, 80.0)
 	# 큰 깃털 — 옆으로 튀는 메인 (blunt 의 chunk 대체)
-	for _i in range(20):
+	for _i in range(_pcount(20)):
 		var a := randf() * TAU
 		var sp := 3.0 + randf() * 6.0
 		_particles.append(_mk(gy, Vector2(cos(a) * sp, sin(a) * sp * 0.45 - 2.5 - randf() * 2.0),
 			1.4 + randf() * 0.7, 9.0 + randf() * 5.0, "feather", 0.06,
 			randf() * TAU, randf_range(-0.6, 0.6)))
 	# 작은 깃털 — 흩어지는 잔깃털 (blunt 의 dust 80개 대체)
-	for _i in range(28):
+	for _i in range(_pcount(28)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 5.0
 		_particles.append(_mk(gy, Vector2(cos(a) * sp, sin(a) * sp * 0.25 - 0.8 - randf() * 1.2) * DUST_SCALE,
 			1.6 + randf() * 0.7, 5.0 + randf() * 3.0, "feather_small", 0.03,
 			randf() * TAU, randf_range(-0.4, 0.4)))
 	# 위로 솟는 작은 깃털 기둥 (blunt 의 위쪽 dust 대체)
-	for _i in range(14):
+	for _i in range(_pcount(14)):
 		_particles.append(_mk(gy + Vector2(randf_range(-20.0, 20.0) * DUST_SCALE, 0.0),
 			Vector2(randf_range(-0.4, 0.4), -3.5 - randf() * 3.0),
 			1.4 + randf() * 0.7, 5.0 + randf() * 3.0, "feather_small", 0.02,
 			randf() * TAU, randf_range(-0.5, 0.5)))
 	# 스파크 — 그대로 유지
-	for _i in range(30):
+	for _i in range(_pcount(30)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 6.0
 		_particles.append(_mk(gy + Vector2(0.0, -10.0), Vector2(cos(a) * sp, sin(a) * sp - 2.0),

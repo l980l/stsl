@@ -5,6 +5,11 @@
 # 어두운 먼지·파편·균열은 일반 블렌드, 스트라이크·스파크·충격파·별폭발은 가산 블렌드 — 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+func _pcount(n: int) -> int:
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_HOT       := Color(1, 1, 1)             # 흰 코어
 const COL_DUST_HOT  := Color(1.0, 0.965, 0.863)   # #fff6dc — 밝은 먼지
 const COL_DUST_MID  := Color(0.831, 0.769, 0.627) # #d4c4a0 — 먼지
@@ -93,23 +98,23 @@ func _mk(pos: Vector2, vel: Vector2, max_life: float, r: float, kind: String,
 # 흙먼지(dust) 만 DUST_SCALE 적용 — 파편/스파크는 영향 없음.
 func _spawn_impact_dust() -> void:
 	var gy := _target + Vector2(0.0, 80.0)
-	for _i in range(80):
+	for _i in range(_pcount(80)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 5.0
 		_particles.append(_mk(gy, Vector2(cos(a) * sp, sin(a) * sp * 0.25 - 0.6 - randf() * 1.2) * DUST_SCALE,
 			1.4 + randf() * 0.9, (20.0 + randf() * 22.0) * DUST_SCALE, "dust", -0.005))
-	for _i in range(24):
+	for _i in range(_pcount(24)):
 		var a := randf() * TAU
 		var sp := 3.0 + randf() * 7.0
 		_particles.append(_mk(gy, Vector2(cos(a) * sp, sin(a) * sp * 0.5 - 3.0 - randf() * 2.0),
 			1.0 + randf() * 0.7, 3.0 + randf() * 4.0, "chunk", 0.3,
 			randf() * TAU, randf_range(-0.4, 0.4)))
-	for _i in range(30):
+	for _i in range(_pcount(30)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 6.0
 		_particles.append(_mk(gy + Vector2(0.0, -10.0), Vector2(cos(a) * sp, sin(a) * sp - 2.0),
 			0.5 + randf() * 0.5, 1.0 + randf() * 1.4, "spark", 0.15))
-	for _i in range(24):
+	for _i in range(_pcount(24)):
 		_particles.append(_mk(gy + Vector2(randf_range(-20.0, 20.0) * DUST_SCALE, 0.0),
 			Vector2(randf_range(-0.25, 0.25), -3.0 - randf() * 3.0) * DUST_SCALE,
 			1.2 + randf() * 0.7, (16.0 + randf() * 16.0) * DUST_SCALE, "dust", -0.005))

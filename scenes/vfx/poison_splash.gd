@@ -5,6 +5,11 @@
 # 어두운 독가스는 가산 블렌드로 안 보이므로 가스·물방울·거품(일반)·불씨·헤일로(가산) 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+func _pcount(n: int) -> int:
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_HOT     := Color(0.910, 1.0, 0.690)   # #e8ffb0 — 연두 코어
 const COL_MID     := Color(0.722, 1.0, 0.361)   # #b8ff5c — 독성 녹색
 const COL_DEEP    := Color(0.227, 0.541, 0.110) # #3a8a1c — 진녹색
@@ -141,17 +146,17 @@ func _spawn_trail(pos: Vector2) -> void:
 
 # 명중 폭발 — 독액 + 독가스 + 불씨
 func _spawn_splash(pos: Vector2) -> void:
-	for _i in range(40):
+	for _i in range(_pcount(40)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 4.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.6 - 1.2),
 			0.8 + randf() * 0.6, 3.0 + randf() * 5.0, "drip", 0.06))
-	for _i in range(50):
+	for _i in range(_pcount(50)):
 		var a := randf() * TAU
 		var sp := 0.6 + randf() * 2.5
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.6 - 0.4),
 			1.4 + randf() * 0.9, 18.0 + randf() * 20.0, "gas", -0.008))
-	for _i in range(24):
+	for _i in range(_pcount(24)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 3.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 0.6),

@@ -6,6 +6,11 @@
 # 나뭇잎은 가산 블렌드로 흐려지므로 잎·고리·십자(일반)·반짝임(가산) 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+func _pcount(n: int) -> int:
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_HOT      := Color(0.902, 1.0, 0.878)  # #e6ffe0 — 흰연두 코어
 const COL_MID      := Color(0.525, 1.0, 0.682)  # #86ffae — 회복 녹색
 const COL_DEEP     := Color(0.180, 0.604, 0.353) # #2e9a5a — 진녹색
@@ -150,9 +155,9 @@ func _spawn_sparkle(from_pop: bool) -> void:
 
 # 발동 순간 폭발 — 반짝임 + 나뭇잎
 func _pop() -> void:
-	for _i in range(24):
+	for _i in range(_pcount(24)):
 		_spawn_sparkle(true)
-	for _i in range(5):
+	for _i in range(_pcount(5)):
 		_spawn_leaf(true)
 
 func _process(delta: float) -> void:

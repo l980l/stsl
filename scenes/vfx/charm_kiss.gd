@@ -5,6 +5,11 @@
 # 분홍 연기는 가산 블렌드로 안 보이므로 연기·하트솔리드(일반)·헤일로/꽃잎/반짝임(가산) 2레이어로 그린다.
 extends Node2D
 
+# 파티클 갯수 — GameSettings.particle_count_scale 적용 (하/중/상 = 0.25/0.5/1.0배)
+func _pcount(n: int) -> int:
+	var gs := get_node_or_null("/root/GameSettings")
+	return n if gs == null else maxi(1, int(round(n * gs.particle_count_scale())))
+
 const COL_HOT    := Color(1.0, 0.949, 0.976)   # #fff2f9 — 흰분홍 코어
 const COL_MID    := Color(1.0, 0.604, 0.831)   # #ff9ad4 — 분홍
 const COL_DEEP   := Color(0.902, 0.310, 0.651) # #e64fa6 — 진분홍
@@ -120,24 +125,24 @@ func _spawn_trail(pos: Vector2) -> void:
 
 # 명중 폭발 — 하트 + 꽃잎 + 반짝임 + 분홍 연기
 func _spawn_impact_burst(pos: Vector2) -> void:
-	for _i in range(26):
+	for _i in range(_pcount(26)):
 		var a := randf() * TAU
 		var sp := 1.5 + randf() * 4.5
 		var tn := "violet" if randf() < 0.3 else "rose"
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.85 - 1.0),
 			1.4 + randf() * 0.8, 14.0 + randf() * 16.0, "heart", -0.012, randf_range(-0.4, 0.4), 0.0, tn))
-	for _i in range(40):
+	for _i in range(_pcount(40)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 3.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.7 - 0.6),
 			1.6 + randf() * 0.9, 6.0 + randf() * 7.0, "petal", 0.02,
 			randf_range(-0.4, 0.4), randf_range(-3.0, 3.0)))
-	for _i in range(60):
+	for _i in range(_pcount(60)):
 		var a := randf() * TAU
 		var sp := 1.0 + randf() * 5.0
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp - 0.5),
 			1.0 + randf() * 0.7, 1.0 + randf() * 1.4, "sparkle", 0.01))
-	for _i in range(22):
+	for _i in range(_pcount(22)):
 		var a := randf() * TAU
 		var sp := 0.6 + randf() * 1.6
 		_particles.append(_mk(pos, Vector2(cos(a) * sp, sin(a) * sp * 0.6 - 0.4),
