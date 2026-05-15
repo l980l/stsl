@@ -351,6 +351,89 @@ func _setup_panels() -> void:
 func _setup_labels() -> void:
 	theme.set_color("font_color", "Label", SacredPalette.BONE_100)
 
+# ── 글로벌 툴팁 시스템 ───────────────────────────────────────────────
+# Godot 기본 PopupPanel 툴팁의 시각적 반투명(viewport 알파 합성/페이드) 회피.
+# 모든 툴팁이 동일한 짙은 불투명 패널 + BONE 라벨로 통일.
+var _gt_layer: CanvasLayer = null
+var _gt_panel: Panel = null
+var _gt_label: Label = null
+
+func _ensure_global_tooltip() -> void:
+	if _gt_panel != null and is_instance_valid(_gt_panel):
+		return
+	var root: Window = Engine.get_main_loop().root
+	_gt_layer = CanvasLayer.new()
+	_gt_layer.layer = 100
+	root.add_child(_gt_layer)
+	_gt_panel = Panel.new()
+	_gt_panel.visible = false
+	_gt_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.04, 0.025, 0.08, 0.8)
+	sb.border_color = Color(SacredPalette.BRASS_700, 0.8)
+	sb.set_border_width_all(1)
+	_gt_panel.add_theme_stylebox_override("panel", sb)
+	_gt_layer.add_child(_gt_panel)
+	_gt_label = Label.new()
+	_gt_label.position = Vector2(12, 8)
+	_gt_label.add_theme_font_size_override("font_size", 15)
+	_gt_label.add_theme_color_override("font_color", SacredPalette.BONE_100)
+	_gt_panel.add_child(_gt_label)
+
+# Control 에 글로벌 툴팁 부착. 같은 컨트롤에 다시 호출 시 텍스트만 갱신.
+func attach_tooltip(ctrl: Control, text: String) -> void:
+	if ctrl == null:
+		return
+	if text.is_empty():
+		if ctrl.has_meta("_sacred_tip"):
+			ctrl.remove_meta("_sacred_tip")
+		return
+	ctrl.set_meta("_sacred_tip", text)
+	if ctrl.has_meta("_sacred_tip_bound"):
+		return
+	ctrl.set_meta("_sacred_tip_bound", true)
+	ctrl.mouse_entered.connect(_on_tip_enter.bind(ctrl))
+	ctrl.mouse_exited.connect(_on_tip_exit)
+	ctrl.tree_exited.connect(_on_tip_exit)
+
+func _on_tip_enter(ctrl: Control) -> void:
+	if not is_instance_valid(ctrl):
+		return
+	var text: String = ctrl.get_meta("_sacred_tip", "")
+	if text.is_empty():
+		return
+	_ensure_global_tooltip()
+	# 자연 너비 측정 — 짧은 텍스트는 그대로, 긴 텍스트만 max_w wrap
+	const MAX_W := 360.0
+	_gt_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_gt_label.custom_minimum_size = Vector2.ZERO
+	_gt_label.text = text
+	_gt_label.reset_size()
+	var w: float = _gt_label.size.x
+	var h: float = _gt_label.size.y
+	if w > MAX_W:
+		_gt_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_gt_label.custom_minimum_size = Vector2(MAX_W, 0)
+		_gt_label.size = Vector2(MAX_W, 0)
+		w = MAX_W
+		# autowrap 적용 후 wrap 된 높이 — 줄 수 × line_height
+		var line_h: float = _gt_label.get_theme_default_font().get_height(_gt_label.get_theme_default_font_size())
+		var line_count: int = _gt_label.get_line_count()
+		if line_count <= 0:
+			line_count = max(1, ceili(_gt_label.get_total_character_count() / 30.0))
+		h = line_h * line_count + 4.0
+	_gt_panel.size = Vector2(w + 24.0, h + 16.0)
+	var mp := _gt_panel.get_viewport().get_mouse_position()
+	var pos := mp + Vector2(16, 24)
+	pos.x = clampf(pos.x, 8.0, 1916.0 - _gt_panel.size.x)
+	pos.y = clampf(pos.y, 8.0, 1076.0 - _gt_panel.size.y)
+	_gt_panel.position = pos
+	_gt_panel.visible = true
+
+func _on_tip_exit() -> void:
+	if _gt_panel != null and is_instance_valid(_gt_panel):
+		_gt_panel.visible = false
+
 # ── 모서리 L자 브라켓 장식 ───────────────────────────────────────────
 # CSS .sacred-window__corner / .sacred-popup__corner 대응
 # node 의 4모서리에 L자 ColorRect 8개를 자식으로 추가한다.

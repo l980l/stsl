@@ -109,6 +109,9 @@ signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시�
 # target_hero_id: 단일 타겟의 영웅 id ("" 이면 ALL 또는 미지정)
 signal intent_vfx_charge_start(enemy_index: int, intent: Resource, target_hero_id: String)
 signal card_vfx_charge_start(card: Resource, target_enemy_index: int, target_hero_id: String)
+# fx 임팩트 도달(screen_effect) 시점 중계 — battle_scene 의 fx.screen_effect 가 emit.
+# popup·SFX 동기화: timer 보정 대신 fx 의 실제 임팩트 시점에 데미지 적용.
+signal vfx_impact_resolved
 
 # 독 DoT tick — 데미지 시그널과 별개로 가스 VFX/SFX 트리거 (target = "enemy_X" 또는 hero_id)
 signal poison_tick_applied(target: String, amount: int)
@@ -192,6 +195,19 @@ func _card_vfx_impact_delay(card: Resource) -> float:
 			EffectRes.EffectType.BLOCK, EffectRes.EffectType.BLOCK_ALL, EffectRes.EffectType.FORMATION_BLOCK, EffectRes.EffectType.COUNTER_BLOCK, EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED, EffectRes.EffectType.MORALE_TO_BLOCK:
 				return _VFX_DEFENSE_BUFF.IMPACT_DELAY * _vfx_speed_mul()
 	return 0.0
+
+# fx 의 screen_effect 시그널(=실제 임팩트 시점) 까지 대기.
+# fx 가 emit 안 하는 경우(예: 비공격 즉발) fallback_timeout 후 진행.
+func _await_vfx_impact(fallback_timeout: float) -> void:
+	var done := [false]
+	var on_resolve := func() -> void:
+		if not done[0]:
+			done[0] = true
+	vfx_impact_resolved.connect(on_resolve, CONNECT_ONE_SHOT)
+	get_tree().create_timer(fallback_timeout).timeout.connect(on_resolve)
+	while not done[0]:
+		await get_tree().process_frame
+	# 시그널 한 번 더 오면 무시 — connect 가 ONE_SHOT 이라 자동 disconnect
 
 func setup_battle(enemies: Array) -> void:
 	if deck_mgr != null:
@@ -496,7 +512,8 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 	card_vfx_charge_start.emit(card, target_enemy_index, target_hero_id)
 	var _delay := _card_vfx_impact_delay(card)
 	if _delay > 0.0:
-		await get_tree().create_timer(_delay).timeout
+		# popup·SFX 동기화: fx.screen_effect 시점까지 대기 (fallback timer = _delay + 0.5s)
+		await _await_vfx_impact(_delay + 0.5)
 		# 차지 중 전투 종료 / 시전 영웅 사망 시 효과 적용 스킵
 		if not is_battle_active:
 			return
@@ -1241,7 +1258,8 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 	intent_vfx_charge_start.emit(enemy_index, intent, pre_target_id)
 	var _delay := _intent_vfx_impact_delay(intent)
 	if _delay > 0.0:
-		await get_tree().create_timer(_delay).timeout
+		# popup·SFX 동기화: fx.screen_effect 시점까지 대기 (fallback timer = _delay + 0.5s)
+		await _await_vfx_impact(_delay + 0.5)
 		# 차지 중 전투 종료 / 적 사망 시 데미지 적용 스킵
 		if not is_battle_active:
 			return

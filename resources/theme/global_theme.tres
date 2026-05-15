@@ -1,7 +1,21 @@
-[gd_resource type="Theme" format=3 uid="uid://n1qdv8ssy45q"]
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://n1qdv8ssy45q"]
 
 [ext_resource type="FontFile" uid="uid://8h22gnnemk40" path="res://resources/theme/fonts/NotoSans-Regular.ttf" id="1_cmhjg"]
+
+[sub_resource type="StyleBoxFlat" id="TooltipPanel_StyleBox"]
+bg_color = Color(0.04, 0.025, 0.08, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.478, 0.361, 0.118, 1)
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
 
 [resource]
 default_font = ExtResource("1_cmhjg")
 default_font_size = 16
+TooltipPanel/styles/panel = SubResource("TooltipPanel_StyleBox")
+TooltipLabel/colors/font_color = Color(0.961, 0.941, 0.910, 1)
