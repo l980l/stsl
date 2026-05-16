@@ -878,7 +878,9 @@ func _connect_signals() -> void:
 	BattleManager.enemy_turn_started.connect(_on_enemy_turn_started)
 	# Turn queue UI 갱신 — 차례 전환·큐 변경 시점 (사망/소환/부활 포함)
 	BattleManager.turn_queue_changed.connect(_on_turn_queue_changed)
-	BattleManager.vfx_impact_resolved.connect(_cam_on_vfx_ended)
+	# VFX 노드 종료 추적 — 임팩트 시점이 아니라 노드가 완전히 free 되는 시점 기준
+	self.child_entered_tree.connect(_on_child_entered_vfx_track)
+	self.child_exiting_tree.connect(_on_child_exited_vfx_track)
 	BattleManager.turn_ended.connect(func(_aid: String): _refresh_turn_queue_widget())
 	BattleManager.enemy_died.connect(func(_idx: int): _refresh_turn_queue_widget())
 	BattleManager.enemy_spawned.connect(func(_idx: int): _refresh_turn_queue_widget())
@@ -2722,8 +2724,26 @@ var _cam_state: int = CamState.IDLE_FAR
 const CAM_ZOOM_HERO := Vector2(1.5, 1.5)
 const CAM_ZOOM_FAR := Vector2.ONE
 const CAM_TWEEN_TIME := 0.3
-const CAM_VFX_TIMEOUT := 1.0  # VFX 종료 후 영웅 복귀 timer (fallback — vfx_impact_resolved 못 받을 때 대비)
+const CAM_VFX_TIMEOUT := 3.0  # VFX 카운터 fallback (모든 VFX 가 가장 오래 가도 3s 안에 끝남)
 var _cam_tween: Tween = null
+var _active_vfx_count: int = 0
+
+func _is_vfx_node(node: Node) -> bool:
+	var script = node.get_script()
+	return script != null and script.resource_path.contains("scenes/vfx/")
+
+func _on_child_entered_vfx_track(node: Node) -> void:
+	if _is_vfx_node(node):
+		_active_vfx_count += 1
+
+func _on_child_exited_vfx_track(node: Node) -> void:
+	if not _is_vfx_node(node):
+		return
+	_active_vfx_count -= 1
+	if _active_vfx_count <= 0:
+		_active_vfx_count = 0
+		# 모든 VFX 노드 종료 — 카메라 복귀 시도 (DRAGGING 으로 전환됐으면 _cam_on_vfx_ended 안에서 skip)
+		_cam_on_vfx_ended()
 
 func _cam_zoom_to_hero(hid: String) -> void:
 	if _kill_cam_active or _camera == null:
@@ -2776,16 +2796,24 @@ func _cam_on_drag_canceled() -> void:
 func _cam_on_card_played() -> void:
 	# 카드 사용 직후 — VFX 재생 상태로 전환 (이미 줌아웃 유지)
 	_cam_state = CamState.VFX_PLAYING
-	# fallback timer — vfx_impact_resolved 못 받아도 일정 시간 후 복귀
-	get_tree().create_timer(CAM_VFX_TIMEOUT).timeout.connect(_cam_try_return_to_hero, CONNECT_ONE_SHOT)
+	# 짧은 fallback — VFX 가 아예 생성 안 되는 카드 (POWER 등) 대비. 0.5s 후 카운터 0 이면 복귀.
+	get_tree().create_timer(0.5).timeout.connect(_cam_check_vfx_complete, CONNECT_ONE_SHOT)
+
+func _cam_check_vfx_complete() -> void:
+	# VFX 카운터가 0 이고 아직 VFX_PLAYING 이면 즉시 복귀 (비-VFX 카드 사용 후)
+	if _active_vfx_count == 0 and _cam_state == CamState.VFX_PLAYING:
+		_cam_try_return_to_hero()
 
 func _cam_on_vfx_ended() -> void:
-	# vfx_impact_resolved 시그널 — VFX_PLAYING 상태일 때만 복귀 (DRAGGING 우선)
+	# 모든 VFX 노드 종료 — VFX_PLAYING 상태일 때만 복귀 (DRAGGING 우선)
 	if _cam_state == CamState.VFX_PLAYING:
 		_cam_try_return_to_hero()
 
 func _cam_try_return_to_hero() -> void:
-	# VFX 끝 또는 timer fallback — DRAGGING 으로 전환됐으면 skip
+	# 아직 VFX 진행 중이면 skip (child_exited 가 종료 시 다시 호출)
+	if _active_vfx_count > 0:
+		return
+	# DRAGGING 으로 전환됐으면 skip — 새 드래그 우선
 	if _cam_state != CamState.VFX_PLAYING:
 		return
 	var hid: String = BattleManager.get_current_hero_id()
