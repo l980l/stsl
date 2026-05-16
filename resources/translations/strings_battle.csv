@@ -2,6 +2,7 @@ keys,ko,en,fr,it,es,ja,el,zh,zh_TW
 battle.btn_end_turn,턴 종료,End Turn,Fin du tour,Fine Turno,Finalizar Turno,ターン終了,Τέλος Γύρου,结束回合,结束回合
 battle.token_tooltip,다음 턴 시작 시 상대를 공격합니다,Attacks opponent at start of next turn.,Attaque l'adversaire au début du prochain tour.,Attacca l'avversario all'inizio del prossimo turno.,Ataca al oponente al inicio del próximo turno.,次のターンの開始時に相手を攻撃します。,Επιτίθεται στον αντίπαλο στην αρχή του επόμενου γύρου.,在下一回合开始时攻击对手。,在下一回合开始时攻击对手。
 battle.token_soldier,병사,Soldier,Soldat,Soldato,Soldado,兵士,Στρατιώτης,士兵,士兵
+battle.msg_intro,전투!,Battle!,Combat !,Battaglia!,¡Batalla!,戦闘！,Μάχη!,战斗！,戰鬥！
 battle.msg_player_turn,플레이어 턴,Player Turn,Tour du Joueur,Turno Giocatore,Turno del Jugador,プレイヤーターン,Γύρος Παίκτη,玩家回合,玩家回合
 battle.msg_enemy_turn,적 턴...,Enemy Turn...,Tour de l'Ennemi...,Turno Nemico...,Turno del Enemigo...,敵ターン...,Γύρος Εχθρού...,敌人回合...,敌人回合...
 battle.msg_victory,🏆 승리!,🏆 Victory!,🏆 Victoire !,🏆 Vittoria!,🏆 ¡Victoria!,🏆 勝利！,🏆 Νίκη!,🏆 胜利！,🏆 胜利！
