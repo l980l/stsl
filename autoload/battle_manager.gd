@@ -86,11 +86,22 @@ var _kills_this_card: int = 0
 var _enthralls_this_card: int = 0
 var _in_echo_replay: bool = false
 
+# 개체별 턴 큐 (ATB) — actor_id → 다음 차례 카운터 (작을수록 먼저)
+var _turn_queue_at: Dictionary = {}
+var _current_actor_id: String = ""
+
 signal battle_started()
 signal battle_won()
 signal battle_lost()
 signal player_turn_started()
 signal enemy_turn_started()
+# 개체별 턴 시스템 (33옵스퀴르 식 ATB) — actor_id 는 "hero:<id>" 또는 "enemy:<idx>"
+@warning_ignore("unused_signal")
+signal turn_started(actor_id: String)
+@warning_ignore("unused_signal")
+signal turn_ended(actor_id: String)
+@warning_ignore("unused_signal")
+signal turn_queue_changed(preview: Array)  # 다음 N차례 미리보기 (UI 갱신)
 signal enemy_died(enemy_index: int)
 signal enemy_damaged(enemy_index: int, amount: int, damage_type: String)
 signal hero_damaged(hero_id: String, amount: int, damage_type: String)
@@ -341,6 +352,8 @@ func setup_battle(enemies: Array) -> void:
 	if team_mgr != null:
 		if not team_mgr.hero_revived.is_connected(_on_hero_revived_clear_state):
 			team_mgr.hero_revived.connect(_on_hero_revived_clear_state)
+		if not team_mgr.hero_died.is_connected(_on_hero_died_queue):
+			team_mgr.hero_died.connect(_on_hero_died_queue)
 	for ei in range(_enemies.size()):
 		var trig = _enemies[ei].get("card_count_trigger")
 		if trig != null and trig is Dictionary and trig.size() > 0:
@@ -358,6 +371,7 @@ func setup_battle(enemies: Array) -> void:
 	for _e in _enemies:
 		_enemy_phase.append(0)
 	is_battle_active = true
+	_initialize_turn_counters()
 	battle_started.emit()
 	var _gm_bs = _get_gm()
 	if _gm_bs and _gm_bs.is_inside_tree():
@@ -370,6 +384,121 @@ func _get_gm() -> Object:
 	if ml and ml.root:
 		return ml.root.get_node_or_null("GameManager")
 	return null
+
+# ── 개체별 턴 큐 (ATB) 헬퍼 ──
+# actor_id 포맷: "hero:<hero_id>" / "enemy:<index>"
+func _actor_id_for_hero(hid: String) -> String:
+	return "hero:" + hid
+
+func _actor_id_for_enemy(idx: int) -> String:
+	return "enemy:" + str(idx)
+
+func _parse_actor_id(actor_id: String) -> Dictionary:
+	var parts := actor_id.split(":", false, 1)
+	if parts.size() < 2:
+		return {}
+	return {"kind": parts[0], "key": parts[1]}
+
+# 적 유효 speed — EnemyResource.speed (없으면 grade 기반 기본값)
+func _enemy_effective_speed(enemy_index: int) -> int:
+	if enemy_index < 0 or enemy_index >= _enemies.size():
+		return 40
+	var enemy = _enemies[enemy_index]
+	var s: int = int(enemy.get("speed"))
+	if s > 0:
+		return s
+	# grade 기본값 — NORMAL 40 / ELITE 50 / BOSS 60
+	var grade: int = int(enemy.get("grade"))
+	match grade:
+		1: return 50  # ELITE
+		2: return 60  # BOSS
+		_: return 40  # NORMAL
+
+func _hero_effective_speed(hid: String) -> int:
+	if team_mgr == null:
+		return 50
+	for hero in team_mgr.heroes:
+		if hero.hero_id == hid:
+			return max(1, int(hero.speed))
+	return 50
+
+func _actor_speed(actor_id: String) -> int:
+	var p := _parse_actor_id(actor_id)
+	if p.is_empty():
+		return 50
+	if p["kind"] == "hero":
+		return _hero_effective_speed(p["key"])
+	elif p["kind"] == "enemy":
+		return _enemy_effective_speed(int(p["key"]))
+	return 50
+
+# 초기 큐 — 모든 생존 액터의 next_at = 1000 / speed
+func _initialize_turn_counters() -> void:
+	_turn_queue_at.clear()
+	_current_actor_id = ""
+	if team_mgr != null:
+		for hero in team_mgr.heroes:
+			if team_mgr.is_alive(hero.hero_id):
+				var aid := _actor_id_for_hero(hero.hero_id)
+				_turn_queue_at[aid] = 1000.0 / max(1, int(hero.speed))
+	for i in range(_enemies.size()):
+		if _enemy_alive[i]:
+			var aid := _actor_id_for_enemy(i)
+			_turn_queue_at[aid] = 1000.0 / max(1, _enemy_effective_speed(i))
+
+# 다음 차례 액터 (가장 작은 _next_turn_at). 동률은 영웅 우선.
+func _peek_next_actor() -> String:
+	if _turn_queue_at.is_empty():
+		return ""
+	var best_aid: String = ""
+	var best_val: float = INF
+	for aid in _turn_queue_at:
+		var v: float = _turn_queue_at[aid]
+		if v < best_val:
+			best_val = v
+			best_aid = aid
+		elif v == best_val and best_aid != "" and aid.begins_with("hero:") and not best_aid.begins_with("hero:"):
+			best_aid = aid
+	return best_aid
+
+# 차례 종료 후 카운터 진행 — 모든 액터에서 best_val 만큼 빼고 본인은 +cost 추가
+func _advance_turn_counter(actor_id: String) -> void:
+	if not _turn_queue_at.has(actor_id):
+		return
+	var base: float = _turn_queue_at[actor_id]
+	for aid in _turn_queue_at.keys():
+		_turn_queue_at[aid] = _turn_queue_at[aid] - base
+	_turn_queue_at[actor_id] = 1000.0 / max(1, _actor_speed(actor_id))
+
+func _remove_from_queue(actor_id: String) -> void:
+	if _turn_queue_at.has(actor_id):
+		_turn_queue_at.erase(actor_id)
+
+# UI 미리보기 — 다음 count 차례 시뮬레이션 (실제 큐는 건드리지 않음)
+func get_turn_queue_preview(count: int = 5) -> Array:
+	var sim: Dictionary = _turn_queue_at.duplicate()
+	var result: Array = []
+	for _i in range(count):
+		if sim.is_empty():
+			break
+		var best_aid: String = ""
+		var best_val: float = INF
+		for aid in sim:
+			var v: float = sim[aid]
+			if v < best_val:
+				best_val = v
+				best_aid = aid
+			elif v == best_val and best_aid != "" and aid.begins_with("hero:") and not best_aid.begins_with("hero:"):
+				best_aid = aid
+		if best_aid == "":
+			break
+		result.append(best_aid)
+		var cost: float = 1000.0 / max(1, _actor_speed(best_aid))
+		var base: float = sim[best_aid]
+		for aid in sim.keys():
+			sim[aid] = sim[aid] - base
+		sim[best_aid] = cost
+	return result
 
 func start_player_turn() -> void:
 	if not is_battle_active:
@@ -1157,6 +1286,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 		SignatureSys.on_enemy_damaged(self, enemy_index, amount)
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
+		_remove_from_queue(_actor_id_for_enemy(enemy_index))
 		_kills_this_card += 1
 		_fire_death_trigger(enemy_index)
 		# 시그니처 hook: 사망 (불교 인과응보)
@@ -1266,6 +1396,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 		_enemy_status[enemy_index]["poison_dur"] = dur
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
+		_remove_from_queue(_actor_id_for_enemy(enemy_index))
 		_fire_death_trigger(enemy_index)
 		enemy_died.emit(enemy_index)
 		_check_win_condition()
@@ -1515,7 +1646,17 @@ func _add_enemy_to_battle(enemy: Resource) -> void:
 	_enemy_status.append({})
 	_enemy_phase.append(0)
 	_enemy_intent_index.append(0)
-	enemy_spawned.emit(_enemies.size() - 1)
+	var new_idx: int = _enemies.size() - 1
+	# 큐 등재 — 평균 카운터 + 1턴 비용 (소환 즉시 행동 방지)
+	var aid := _actor_id_for_enemy(new_idx)
+	var avg: float = 0.0
+	var n: int = _turn_queue_at.size()
+	if n > 0:
+		for v in _turn_queue_at.values():
+			avg += v
+		avg /= float(n)
+	_turn_queue_at[aid] = avg + 1000.0 / max(1, _enemy_effective_speed(new_idx))
+	enemy_spawned.emit(new_idx)
 
 # DEATH-RATTLE: 사망 직후 1회 실행. 자기 자신은 이미 _enemy_alive=false 상태이므로
 # BUFF_ALLY 등 동료 효과는 자신을 제외한 살아있는 동료에게만 적용됨.
@@ -1730,6 +1871,19 @@ func _on_hero_revived_clear_state(hero_id: String) -> void:
 	# 부활 시 블록·상태 초기화 (사망 전 독/출혈/블록 제거)
 	_hero_block[hero_id] = 0
 	_hero_status[hero_id] = {}
+	# 부활 영웅 큐 재진입 — 평균 카운터 + 1턴 비용 (즉시 행동 방지)
+	var aid := _actor_id_for_hero(hero_id)
+	if not _turn_queue_at.has(aid):
+		var avg: float = 0.0
+		var n: int = _turn_queue_at.size()
+		if n > 0:
+			for v in _turn_queue_at.values():
+				avg += v
+			avg /= float(n)
+		_turn_queue_at[aid] = avg + 1000.0 / max(1, _hero_effective_speed(hero_id))
+
+func _on_hero_died_queue(hero_id: String) -> void:
+	_remove_from_queue(_actor_id_for_hero(hero_id))
 
 func _evaluate_condition(cond: String, _card: Resource) -> bool:
 	match cond:
@@ -1965,6 +2119,7 @@ func debug_set_enemy_hp(index: int, hp: int) -> void:
 	_enemy_hp[index] = hp
 	if hp == 0 and _enemy_alive[index]:
 		_enemy_alive[index] = false
+		_remove_from_queue(_actor_id_for_enemy(index))
 		enemy_died.emit(index)
 		_check_win_condition()
 	elif hp > 0 and not _enemy_alive[index]:
