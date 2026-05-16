@@ -85,13 +85,18 @@ const OBJECT_SIZE := {
 	"edelweiss_a":      Vector2(120, 140), "edelweiss_b":      Vector2(130, 130),
 }
 
-# 바람/펄럭임 sway — grass/flower 는 통째, cypress/olive_tree/altar 는 split (위 부분만).
-# 구조물 X (temple/statue/column).
+# 바람/펄럭임 sway — 풀/꽃 (통째 sway) + split 식생/altar (위쪽만 sway).
+# 신화 추가 시 풀/꽃 prefix 추가. 구조물 X (temple/statue/column).
+const _WIND_SMALL_PREFIXES := [
+	"grass", "flower",                # greek
+	"tundra_grass", "edelweiss",      # norse
+]
+
 static func _wind_eligible(svg_id: String) -> bool:
-	return (
-		svg_id.begins_with("grass") or svg_id.begins_with("flower")
-		or _split_suffixes(svg_id).size() > 0
-	)
+	for prefix in _WIND_SMALL_PREFIXES:
+		if svg_id.begins_with(prefix):
+			return true
+	return _split_suffixes(svg_id).size() > 0
 
 # 정지/sway 두 sprite 로 spawn — base + sway 부분. 빈 배열이면 split 아님.
 # 나무: trunk(정지) + leaves(sway). altar: base(정지) + flame(sway).
