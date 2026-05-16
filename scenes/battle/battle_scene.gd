@@ -3670,21 +3670,37 @@ func _show_deck_viewer_in_battle() -> void:
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
-	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", 8)
-	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vbox.add_child(columns)
+	# 영웅별 탭 — 각 탭 = 그 영웅의 draw / discard / exhaust 3 컬럼
+	var tabs := TabContainer.new()
+	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vbox.add_child(tabs)
 
-	var draw_cards := DeckManager.draw_pile.duplicate()
-	draw_cards.shuffle()
-	var discard_cards  := DeckManager.discard_pile.duplicate()
-	var exhaust_cards  := DeckManager.exhaust_pile.duplicate()
+	for hid in DeckManager._heroes.keys():
+		var hero_name: String = hid
+		if TeamManager != null:
+			var hero_res = TeamManager.get_hero(hid)
+			if hero_res != null:
+				hero_name = tr(hero_res.hero_name)
+		var page := Control.new()
+		page.name = hero_name
+		tabs.add_child(page)
 
-	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw")    + " (%d)" % draw_cards.size(),    draw_cards)
-	_add_v_divider(columns)
-	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
-	_add_v_divider(columns)
-	_add_deck_column(columns, tr("ui.battle.deck_viewer.exhaust") + " (%d)" % exhaust_cards.size(), exhaust_cards)
+		var page_columns := HBoxContainer.new()
+		page_columns.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		page_columns.add_theme_constant_override("separation", 8)
+		page.add_child(page_columns)
+
+		var draw_h: Array = (DeckManager._heroes[hid]["draw"] as Array).duplicate()
+		draw_h.shuffle()
+		var discard_h: Array = (DeckManager._heroes[hid]["discard"] as Array).duplicate()
+		var exhaust_h: Array = (DeckManager._heroes[hid]["exhaust"] as Array).duplicate()
+
+		_add_deck_column(page_columns, tr("ui.battle.deck_viewer.draw")    + " (%d)" % draw_h.size(),    draw_h)
+		_add_v_divider(page_columns)
+		_add_deck_column(page_columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_h.size(), discard_h)
+		_add_v_divider(page_columns)
+		_add_deck_column(page_columns, tr("ui.battle.deck_viewer.exhaust") + " (%d)" % exhaust_h.size(), exhaust_h)
 
 	_deck_group  = group
 	_deck_viewer = canvas
