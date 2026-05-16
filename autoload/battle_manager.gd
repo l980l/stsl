@@ -452,6 +452,14 @@ func _initialize_turn_counters() -> void:
 			var aid := _actor_id_for_enemy(i)
 			_turn_queue_at[aid] = 1000.0 / max(1, _enemy_effective_speed(i))
 
+func get_current_actor_id() -> String:
+	return _current_actor_id
+
+func get_current_hero_id() -> String:
+	if _current_actor_id.begins_with("hero:"):
+		return _current_actor_id.substr(5)
+	return ""
+
 # 다음 차례 액터 (가장 작은 _next_turn_at). 동률은 영웅 우선.
 func _peek_next_actor() -> String:
 	if _turn_queue_at.is_empty():
