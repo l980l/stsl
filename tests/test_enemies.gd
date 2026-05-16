@@ -244,6 +244,7 @@ func test_discard_random() -> void:
 	print("[TestEnemies] test_discard_random")
 	var DM = preload("res://autoload/deck_manager.gd")
 	var dm := DM.new()
+	dm.setup_for_battle(["napoleon"])  # 영웅별 entry 생성
 	var CardRes = preload("res://resources/card_resource.gd")
 	var EffRes = preload("res://resources/effect_resource.gd")
 	# 손패에 카드 3장 추가

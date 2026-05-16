@@ -22,32 +22,55 @@ signal card_played(card: Resource)
 signal hand_changed()
 signal energy_changed(new_energy: int)
 
-# ── Legacy properties (read-only 합) — 외부 호출자 점진 마이그레이션용 ──
+# ── Legacy properties — 외부 호출자 점진 마이그레이션 + 테스트 호환 ──
+# Array property 는 첫 영웅 ref 반환 (in-place .append() / .erase() 호환).
+# scalar property 는 setter 도 제공 — 첫 영웅에만 적용.
 var draw_pile: Array:
-	get: return _all_pile("draw")
+	get: return _first_hero_pile("draw")
 var hand: Array:
-	get: return _all_pile("hand")
+	get: return _first_hero_pile("hand")
 var discard_pile: Array:
-	get: return _all_pile("discard")
+	get: return _first_hero_pile("discard")
 var exhaust_pile: Array:
-	get: return _all_pile("exhaust")
+	get: return _first_hero_pile("exhaust")
 var current_energy: int:
 	get:
-		# 첫 영웅의 에너지 (legacy 호환 — 현재 차례 영웅 의미)
 		for hid in _heroes.keys():
 			return _heroes[hid]["energy"]
 		return 0
+	set(value):
+		for hid in _heroes.keys():
+			_heroes[hid]["energy"] = value
+			energy_changed.emit(value)
+			return
 var pending_cost_reduction: int:
 	get:
 		for hid in _heroes.keys():
 			return _heroes[hid]["pending_cost_reduction"]
 		return 0
+	set(value):
+		for hid in _heroes.keys():
+			_heroes[hid]["pending_cost_reduction"] = value
+			return
 var pending_all_cost_zero: bool:
 	get:
 		for hid in _heroes.keys():
 			return _heroes[hid]["pending_all_cost_zero"]
 		return false
+	set(value):
+		for hid in _heroes.keys():
+			_heroes[hid]["pending_all_cost_zero"] = value
+			return
 
+# 첫 영웅의 pile 직접 ref (in-place 수정 호환). _heroes 비어있으면 fallback.
+func _first_hero_pile(pile_name: String) -> Array:
+	if _heroes.is_empty():
+		return _meta_deck if pile_name == "draw" else []
+	for hid in _heroes.keys():
+		return _heroes[hid][pile_name]
+	return []
+
+# 모든 영웅 pile 합산 (read-only) — 외부 합산 API 가 여전히 필요한 경우.
 func _all_pile(pile_name: String) -> Array:
 	if _heroes.is_empty():
 		return _meta_deck.duplicate() if pile_name == "draw" else []

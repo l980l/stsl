@@ -670,7 +670,7 @@ func _dnd_key(hid: String) -> String:
 	return "power.double_next_damage:" + hid
 
 func _consume_double_next_damage(amount: int) -> int:
-	# 현재 hero actor 의 DND 우선, 없으면 legacy global 키
+	# 현재 hero actor 의 DND 우선, 없으면 글로벌 키. 한 번 ×2 적용 후 둘 다 erase.
 	var consumed: bool = false
 	if _current_actor_id.begins_with("hero:"):
 		var hid: String = _current_actor_id.substr(5)
@@ -679,8 +679,9 @@ func _consume_double_next_damage(amount: int) -> int:
 			amount *= 2
 			_active_powers.erase(key)
 			consumed = true
-	if not consumed and _active_powers.has(DND_KEY):
-		amount *= 2
+	if _active_powers.has(DND_KEY):
+		if not consumed:
+			amount *= 2
 		_active_powers.erase(DND_KEY)
 		consumed = true
 	if consumed:
@@ -752,6 +753,7 @@ func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
 				if phase == "player_turn_start" and deck_mgr:
 					# 본인 영웅에게 추가 드로우
 					deck_mgr.draw_cards_h(owner_id, v)
+					_cards_drawn_this_turn += v  # legacy 호환 카운터
 			"power.counter_per_attack":
 				if phase == "enemy_attack":
 					var enemy_idx: int = ctx.get("enemy_index", -1)
@@ -1179,8 +1181,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if dead_count > 0:
 						_deal_damage_to_enemy(target_enemy_index, dead_count * effect.value, effect.damage_type)
 			EffectRes.EffectType.DOUBLE_NEXT_DAMAGE:
-				# 본인 영웅의 다음 데미지 한 번만 ×2
+				# 본인 영웅 다음 데미지 ×2 + 글로벌 슬롯도 등록 (cross-hero / poison tick 호환)
 				_active_powers[_dnd_key(card.owner_id)] = {"value": 1, "owner_id": card.owner_id, "params": {}}
+				_active_powers[DND_KEY] = {"value": 1, "owner_id": "__global__", "params": {}}
 				active_powers_changed.emit()
 			EffectRes.EffectType.DISCARD_PICK_DRAW:
 				_trigger_discard_pick(effect.value, 1)

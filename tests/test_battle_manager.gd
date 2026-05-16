@@ -307,8 +307,7 @@ func test_enemy_all_attack_hits_all_heroes() -> void:
 	intent.target = IntentRes.TargetType.ALL
 	var enemy := _make_enemy(30, [intent])
 	bm.setup_battle([enemy])
-	bm.start_player_turn()
-	bm.end_player_turn()  # 적 턴 실행
+	bm._execute_enemy_turn()  # 적 차례 직접 실행 (영구 큐 의존 제거)
 	_assert(bm.team_mgr.get_current_hp("napoleon") == 60, "ALL 공격 → napoleon HP 70→60")
 	_assert(bm.team_mgr.get_current_hp("cleopatra") == 50, "ALL 공격 → cleopatra HP 60→50")
 

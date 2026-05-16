@@ -157,7 +157,7 @@ func test_block_per_cards_played_scales() -> void:
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
 	bm.setup_battle([_make_enemy(1000)])
-	bm._cards_played_this_turn = 3
+	bm.deck_mgr._heroes["genghis_khan"]["cards_played_this_turn"] = 3
 	var eff := EffectRes.new()
 	eff.effect_type = EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED
 	eff.value = 30; eff.base_value = 30
