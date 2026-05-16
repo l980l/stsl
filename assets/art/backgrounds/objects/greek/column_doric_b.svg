@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 600" width="200" height="600">
+  <defs>
+    <linearGradient id="cdb_shaft" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f0e8cc"/>
+      <stop offset="0.45" stop-color="#c0a878"/>
+      <stop offset="1" stop-color="#604c30"/>
+    </linearGradient>
+    <linearGradient id="cdb_cap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff8d8"/>
+      <stop offset="1" stop-color="#a89270"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="100" cy="588" rx="92" ry="11" fill="#000" opacity="0.42"/>
+  <rect x="20" y="548" width="160" height="34" fill="url(#cdb_cap)"/>
+  <rect x="30" y="528" width="140" height="22" fill="#d8c498"/>
+  <rect x="48" y="120" width="104" height="420" fill="url(#cdb_shaft)"/>
+  <rect x="54" y="128" width="3" height="405" fill="#000" opacity="0.14"/>
+  <rect x="66" y="128" width="3" height="405" fill="#000" opacity="0.14"/>
+  <rect x="78" y="128" width="3" height="405" fill="#000" opacity="0.14"/>
+  <rect x="90" y="128" width="3" height="405" fill="#000" opacity="0.14"/>
+  <rect x="102" y="128" width="3" height="405" fill="#000" opacity="0.14"/>
+  <rect x="114" y="128" width="3" height="405" fill="#000" opacity="0.14"/>
+  <rect x="126" y="128" width="3" height="405" fill="#000" opacity="0.14"/>
+  <rect x="138" y="128" width="3" height="405" fill="#000" opacity="0.14"/>
+  <!-- 깨진 윗부분 (잘림) -->
+  <path d="M 40 120 L 42 100 L 60 110 L 80 90 L 100 100 L 120 85 L 140 95 L 158 105 L 160 120 Z" fill="url(#cdb_cap)"/>
+  <path d="M 48 110 L 152 115" stroke="#000" opacity="0.2" stroke-width="2"/>
+</svg>

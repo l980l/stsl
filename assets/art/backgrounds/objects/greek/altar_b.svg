@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" width="240" height="280">
+  <defs>
+    <linearGradient id="alb_stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8c498"/>
+      <stop offset="1" stop-color="#705c3e"/>
+    </linearGradient>
+    <radialGradient id="alb_fire" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#fff8d8" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffa030" stop-opacity="0.9"/>
+      <stop offset="0.8" stop-color="#c83010" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#801008" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="120" cy="270" rx="92" ry="8" fill="#000" opacity="0.45"/>
+  <rect x="34" y="218" width="172" height="52" fill="url(#alb_stone)"/>
+  <rect x="34" y="218" width="172" height="5" fill="#fff" opacity="0.28"/>
+  <rect x="46" y="200" width="148" height="20" fill="#b89a68"/>
+  <rect x="46" y="216" width="148" height="5" fill="#000" opacity="0.22"/>
+  <rect x="56" y="130" width="128" height="70" fill="url(#alb_stone)"/>
+  <line x1="76" y1="140" x2="76" y2="193" stroke="#000" opacity="0.18" stroke-width="2"/>
+  <line x1="116" y1="140" x2="116" y2="193" stroke="#000" opacity="0.18" stroke-width="2"/>
+  <line x1="156" y1="140" x2="156" y2="193" stroke="#000" opacity="0.18" stroke-width="2"/>
+  <rect x="48" y="118" width="144" height="14" fill="#d4be88"/>
+  <ellipse cx="120" cy="128" rx="58" ry="6" fill="#3a2818" opacity="0.7"/>
+  <ellipse cx="120" cy="108" rx="48" ry="36" fill="url(#alb_fire)"/>
+  <path d="M 102 110 Q 96 80 108 60 Q 116 80 112 100 Q 122 70 128 80 Q 136 100 132 110 Q 142 90 146 102 Z" fill="#ffc850" opacity="0.85"/>
+  <path d="M 114 100 Q 112 70 120 60 Q 128 75 126 100 Z" fill="#fff8d8" opacity="0.9"/>
+</svg>

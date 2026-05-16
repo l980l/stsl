@@ -28,21 +28,29 @@ const PALETTES := {
 # 신화별 SVG 오브젝트 풀 + spawn 가중치 (1차 PR = greek 만)
 const OBJECTS := {
 	"greek": {
-		"large":  ["temple_small"],
-		"medium": ["statue_warrior", "altar"],
-		"small":  ["cypress", "olive_tree"],
-		"pillars":["column_doric"],
+		"large":  ["temple_small_a", "temple_small_b", "temple_small_c", "temple_small_d"],
+		"medium": ["statue_warrior_a", "statue_warrior_b", "statue_warrior_c", "statue_warrior_d",
+				   "altar_a", "altar_b", "altar_c", "altar_d"],
+		"small":  ["cypress_a", "cypress_b", "cypress_c", "cypress_d",
+				   "olive_tree_a", "olive_tree_b", "olive_tree_c", "olive_tree_d"],
+		"pillars":["column_doric_a", "column_doric_b", "column_doric_c", "column_doric_d"],
 	},
 }
 
-# SVG viewBox 크기 (충돌 검사용)
+# SVG viewBox 크기 (충돌 검사용). 같은 base 의 a/b/c/d 는 동일 viewBox.
 const OBJECT_SIZE := {
-	"temple_small":   Vector2(600, 460),
-	"statue_warrior": Vector2(220, 580),
-	"altar":          Vector2(240, 280),
-	"cypress":        Vector2(160, 480),
-	"olive_tree":     Vector2(280, 360),
-	"column_doric":   Vector2(200, 600),
+	"temple_small_a":   Vector2(600, 460), "temple_small_b": Vector2(600, 460),
+	"temple_small_c":   Vector2(600, 460), "temple_small_d": Vector2(600, 460),
+	"statue_warrior_a": Vector2(220, 580), "statue_warrior_b": Vector2(220, 580),
+	"statue_warrior_c": Vector2(220, 580), "statue_warrior_d": Vector2(220, 580),
+	"altar_a":          Vector2(240, 280), "altar_b": Vector2(240, 280),
+	"altar_c":          Vector2(240, 280), "altar_d": Vector2(240, 280),
+	"cypress_a":        Vector2(160, 480), "cypress_b": Vector2(160, 480),
+	"cypress_c":        Vector2(160, 480), "cypress_d": Vector2(160, 480),
+	"olive_tree_a":     Vector2(280, 360), "olive_tree_b": Vector2(280, 360),
+	"olive_tree_c":     Vector2(280, 360), "olive_tree_d": Vector2(280, 360),
+	"column_doric_a":   Vector2(200, 600), "column_doric_b": Vector2(200, 600),
+	"column_doric_c":   Vector2(200, 600), "column_doric_d": Vector2(200, 600),
 }
 
 # Sprite 의 발 anchor 기준 박스 (centered → x ± w*sc/2, y - h*sc ~ y)
@@ -50,7 +58,7 @@ static func _sprite_rect(svg_id: String, anchor: Vector2, sc: float) -> Rect2:
 	var sz: Vector2 = OBJECT_SIZE.get(svg_id, Vector2(120, 240)) * sc
 	return Rect2(anchor.x - sz.x * 0.5, anchor.y - sz.y, sz.x, sz.y)
 
-# anchor_y < rect 발 y 면 — sprite 가 캐릭터 뒤(z 작음) → 통과.
+# 캐릭터 영역 회피 — anchor_y < rect 발 y 면 sprite 가 뒤(z 작음) → 통과.
 static func _overlaps_any(rect: Rect2, anchor_y: float, occupied: Array) -> bool:
 	for r_v in occupied:
 		var r: Rect2 = r_v
@@ -59,6 +67,26 @@ static func _overlaps_any(rect: Rect2, anchor_y: float, occupied: Array) -> bool
 		if anchor_y < r.end.y:
 			continue
 		return true
+	return false
+
+# fg sprite 끼리 — 겹치는 면적 비율이 80% 이상이면 reject (한 쪽이 다른 쪽을 거의 가리는 경우).
+# 부분 겹침(끝쪽/절반)은 OK.
+static func _overlaps_fg(rect: Rect2, fg_rects: Array) -> bool:
+	const MAX_OVERLAP_RATIO := 0.80
+	var area_a: float = rect.size.x * rect.size.y
+	if area_a <= 0.0:
+		return false
+	for r_v in fg_rects:
+		var r: Rect2 = r_v
+		var inter: Rect2 = rect.intersection(r)
+		if inter.size.x <= 0 or inter.size.y <= 0:
+			continue
+		var inter_area: float = inter.size.x * inter.size.y
+		var area_b: float = r.size.x * r.size.y
+		# 큰 쪽이 작은 쪽을 가리는 비율 vs 작은 쪽이 큰 쪽에 가린 비율 — 큰 쪽 사용
+		var ratio: float = max(inter_area / area_a, inter_area / max(area_b, 1.0))
+		if ratio >= MAX_OVERLAP_RATIO:
+			return true
 	return false
 
 # 시각/날씨 호환성 (신화별)
@@ -150,24 +178,25 @@ func _setup_internal(myth: String, variant: int, seed_val: int, time_force: Stri
 	# sc_lo/sc_hi 둘 다 y 비례 lerp. ±10% jitter 로 다양성.
 	var pool: Dictionary = OBJECTS.get(myth, {})
 	var occupied_local: Array = occupied.duplicate()
+	var fg_local: Array = []  # 이번 setup 에서 배치된 fg sprite rect 누적
 	if pool.has("large") and pool["large"].size() > 0:
 		var large_id: String = pool["large"][rng.randi() % pool["large"].size()]
 		var y_rand: float = rng.randf_range(HORIZON_Y + 10.0, 700.0)
 		var t: float = (y_rand - HORIZON_Y) / 430.0
 		var sc_base: float = lerp(0.18, 0.55, t)
-		_try_place(large_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand)
+		_try_place(large_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand, fg_local)
 	if pool.has("medium") and rng.randf() < 0.7:
 		var med_id: String = pool["medium"][rng.randi() % pool["medium"].size()]
 		var y_rand: float = rng.randf_range(HORIZON_Y + 50.0, 1000.0)
 		var t: float = (y_rand - HORIZON_Y) / 730.0
 		var sc_base: float = lerp(0.25, 0.85, t)
-		_try_place(med_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand)
+		_try_place(med_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand, fg_local)
 	if pool.has("pillars") and rng.randf() < 0.50:
-		var pillar_id: String = pool["pillars"][0]
+		var pillar_id: String = pool["pillars"][rng.randi() % pool["pillars"].size()]
 		var y_rand: float = rng.randf_range(500.0, 1050.0)
 		var t: float = (y_rand - 500.0) / 550.0
 		var sc_base: float = lerp(0.35, 0.95, t)
-		_try_place(pillar_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand)
+		_try_place(pillar_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand, fg_local)
 	if pool.has("small"):
 		var fg_count: int = rng.randi_range(8, 14)
 		for i in fg_count:
@@ -175,7 +204,7 @@ func _setup_internal(myth: String, variant: int, seed_val: int, time_force: Stri
 			var y_rand: float = rng.randf_range(HORIZON_Y + 30.0, 1050.0)
 			var t: float = (y_rand - HORIZON_Y) / 780.0
 			var sc_base: float = lerp(0.18, 0.90, t)
-			_try_place(small_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand)
+			_try_place(small_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand, fg_local)
 
 	# 시각 modulate — _back 의 ParallaxLayer 자식 CanvasItem 에 일괄 적용
 	current_env["tint"] = TIME_TINT.get(time_of_day, Color.WHITE)
@@ -188,21 +217,25 @@ func _setup_internal(myth: String, variant: int, seed_val: int, time_force: Stri
 
 # 후보 위치 무작위 → 충돌 검사 → 안 겹치면 spec 추가, 겹치면 재시도.
 # anchor_y 가 z_index 기준 (큰 값 = 앞). large 600 / medium 720 / fg 770 등 차등.
-func _try_place(svg_id: String, myth: String, rng: RandomNumberGenerator, sc_lo: float, sc_hi: float, occupied_local: Array, anchor_y: float = 770.0) -> void:
+func _try_place(svg_id: String, myth: String, rng: RandomNumberGenerator, sc_lo: float, sc_hi: float, occupied_local: Array, anchor_y: float = 770.0, fg_local: Array = []) -> void:
 	const MAX_TRIES := 30
 	for _try in MAX_TRIES:
 		var sc: float = rng.randf_range(sc_lo, sc_hi)
-		# x 화면 전체 (-50~1970) — 충돌 검사가 anchor.y 비교로 캐릭터 가림 여부 결정
 		var x: float = rng.randf_range(-50.0, 1970.0)
 		var anchor := Vector2(x, anchor_y)
 		var rect := _sprite_rect(svg_id, anchor, sc)
-		if not _overlaps_any(rect, anchor.y, occupied_local):
-			front_specs.append({
-				"path": "res://assets/art/backgrounds/objects/%s/%s.svg" % [myth, svg_id],
-				"pos": anchor, "scale": sc,
-			})
-			occupied_local.append(rect.grow(40.0))
-			return
+		# 1) 캐릭터 회피: anchor_y < rect.end.y 면 통과 (z 작아 안 가림)
+		if _overlaps_any(rect, anchor.y, occupied_local):
+			continue
+		# 2) fg 끼리 — 80% 이상 가림 reject (부분 겹침 OK)
+		if _overlaps_fg(rect, fg_local):
+			continue
+		front_specs.append({
+			"path": "res://assets/art/backgrounds/objects/%s/%s.svg" % [myth, svg_id],
+			"pos": anchor, "scale": sc,
+		})
+		fg_local.append(rect)
+		return
 
 # 외부에서 sway 동기화 — _back 만 (fg 는 battle_scene 자체 자식, sway 영향 X)
 func set_scroll_offset(o: Vector2) -> void:
