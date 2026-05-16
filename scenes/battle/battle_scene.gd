@@ -4117,7 +4117,7 @@ func _create_drag_arrow(start_pos: Vector2) -> void:
 			chev.scale = Vector2(0.15 if i % 2 == 0 else -0.15, 0.15)
 			chev.modulate = Color(1.0, 1.0, 1.0, 0.0)
 			chev.z_index = 1550  # 카드 드래그 arrow chevron
-			add_child(chev)
+			_ui_add(chev)  # CanvasLayer — 카메라 zoom 영향 없음
 			_drag_chevrons.append(chev)
 
 	_drag_arrow_head = Sprite2D.new()
@@ -4126,7 +4126,7 @@ func _create_drag_arrow(start_pos: Vector2) -> void:
 	_drag_arrow_head.scale = Vector2(0.5, 0.5)
 	_drag_arrow_head.modulate = Color.WHITE
 	_drag_arrow_head.z_index = 1551  # 화살표 머리 — chevron 위
-	add_child(_drag_arrow_head)
+	_ui_add(_drag_arrow_head)  # CanvasLayer — 카메라 zoom 영향 없음
 
 	_update_drag_arrow(start_pos)
 
