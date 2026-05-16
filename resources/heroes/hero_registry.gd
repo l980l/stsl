@@ -16,6 +16,7 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.hero_name = "hero.napoleon.name"
 			hero.historical_figure = "hero.napoleon.figure"
 			hero.max_hp = 1000
+			hero.speed = 55  # 공격형 지휘관 — 평균
 			hero.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
 			hero.unlock_condition = "default"
 			hero.unlock_description = ""
@@ -23,6 +24,7 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.hero_name = "hero.cleopatra.name"
 			hero.historical_figure = "hero.cleopatra.figure"
 			hero.max_hp = 1000
+			hero.speed = 60  # 디버프/조종형 — 약간 빠름
 			hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
 			hero.unlock_condition = "default"
 			hero.unlock_description = ""
@@ -30,6 +32,7 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.hero_name = "hero.yi_sun_sin.name"
 			hero.historical_figure = "hero.yi_sun_sin.figure"
 			hero.max_hp = 1000
+			hero.speed = 45  # 방어형 역공 — 느림
 			hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
 			hero.unlock_condition = "default"
 			hero.unlock_description = ""
@@ -37,6 +40,7 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.hero_name = "hero.joan_of_arc.name"
 			hero.historical_figure = "hero.joan_of_arc.figure"
 			hero.max_hp = 1000
+			hero.speed = 55  # 서포트/생존형 — 평균
 			hero.character_scene = load("res://characters/heroes/joan_of_arc/joan_of_arc.tscn")
 			hero.unlock_condition = "clear_chapter_1"
 			hero.unlock_description = "hero.joan_of_arc.unlock_desc"
@@ -44,6 +48,7 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.hero_name = "hero.genghis_khan.name"
 			hero.historical_figure = "hero.genghis_khan.figure"
 			hero.max_hp = 1000
+			hero.speed = 65  # 기동형 정복자 — 빠름
 			hero.character_scene = load("res://characters/heroes/genghis_khan/genghis_khan.tscn")
 			hero.unlock_condition = "flag:kill_boss:oshiris"
 			hero.unlock_description = "hero.genghis_khan.unlock_desc"
@@ -51,6 +56,7 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.hero_name = "hero.musashi.name"
 			hero.historical_figure = "hero.musashi.figure"
 			hero.max_hp = 1000
+			hero.speed = 70  # 결투형 검사 — 매우 빠름
 			hero.character_scene = load("res://characters/heroes/musashi/musashi.tscn")
 			hero.unlock_condition = "elite_solo_kills>=5"
 			hero.unlock_description = "hero.musashi.unlock_desc"
