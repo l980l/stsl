@@ -12,9 +12,9 @@ const ANIM_SPEED_KEYS    := ["slow", "normal", "fast", "fastest"]
 const ANIM_SPEED_VALUES  := [0.5, 0.7, 1.0, 1.5]  # AnimationPlayer.speed_scale (오름차순)
 const ANIM_SPEED_DEFAULT := "fast"  # = 1.0 = 현재 상태
 
-const MONSTER_INTERVAL_KEYS    := ["fastest", "fast", "normal", "slow"]
-const MONSTER_INTERVAL_VALUES  := [0.5, 1.0, 1.5, 2.0]
-const MONSTER_INTERVAL_DEFAULT := "fast"  # 빠르게 = 현재 turn_interval 0.4 그대로
+const TURN_INTERVAL_KEYS    := ["fastest", "fast", "normal", "slow"]
+const TURN_INTERVAL_VALUES  := [0.5, 1.0, 1.5, 2.0]
+const TURN_INTERVAL_DEFAULT := "fast"  # 빠르게 = base turn_interval 0.4 그대로
 
 const PARTICLE_KEYS    := ["minimal", "low", "medium", "high"]
 const PARTICLE_VALUES  := [0.1, 0.25, 0.5, 1.0]
@@ -30,14 +30,14 @@ const _CONFIG_PATH := "user://game_settings.cfg"
 
 # 현재 multiplier 값 (직접 사용)
 var vfx_speed_multiplier: float = 1.0
-var monster_interval_multiplier: float = 1.0
+var turn_interval_multiplier: float = 1.0  # 차례 전환 인터벌 (영웅↔영웅, 영웅↔적, 적↔적 등 모든 전환)
 var anim_speed_multiplier: float = 1.0
 var particle_quality: int = 2  # 0=하, 1=중, 2=상
 
 # 현재 segment 키 (UI 가 읽음)
 var vfx_speed_key: String = VFX_SPEED_DEFAULT
 var anim_speed_key: String = ANIM_SPEED_DEFAULT
-var monster_interval_key: String = MONSTER_INTERVAL_DEFAULT
+var turn_interval_key: String = TURN_INTERVAL_DEFAULT
 var particle_key: String = PARTICLE_DEFAULT
 var kill_cam_enabled: bool = KILL_CAM_DEFAULT
 var background_enabled: bool = BACKGROUND_DEFAULT
@@ -60,12 +60,12 @@ func set_anim_speed(key: String) -> void:
 	anim_speed_key = key
 	anim_speed_multiplier = ANIM_SPEED_VALUES[idx]
 
-func set_monster_interval(key: String) -> void:
-	var idx := MONSTER_INTERVAL_KEYS.find(key)
+func set_turn_interval(key: String) -> void:
+	var idx := TURN_INTERVAL_KEYS.find(key)
 	if idx < 0:
 		return
-	monster_interval_key = key
-	monster_interval_multiplier = MONSTER_INTERVAL_VALUES[idx]
+	turn_interval_key = key
+	turn_interval_multiplier = TURN_INTERVAL_VALUES[idx]
 
 func set_particle_quality(key: String) -> void:
 	var idx := PARTICLE_KEYS.find(key)
@@ -84,8 +84,8 @@ func set_background_enabled(enabled: bool) -> void:
 func get_vfx_delay(base: float) -> float:
 	return base * vfx_speed_multiplier
 
-func get_monster_interval(base: float) -> float:
-	return base * monster_interval_multiplier
+func get_turn_interval(base: float) -> float:
+	return base * turn_interval_multiplier
 
 func get_anim_scale() -> float:
 	return anim_speed_multiplier
@@ -99,7 +99,7 @@ func save_settings() -> void:
 	cfg.set_value("graphics", "particle_quality", particle_key)
 	cfg.set_value("gameplay", "vfx_speed", vfx_speed_key)
 	cfg.set_value("gameplay", "anim_speed", anim_speed_key)
-	cfg.set_value("gameplay", "monster_interval", monster_interval_key)
+	cfg.set_value("gameplay", "turn_interval", turn_interval_key)
 	cfg.set_value("gameplay", "kill_cam_enabled", kill_cam_enabled)
 	cfg.set_value("graphics", "background_enabled", background_enabled)
 	cfg.save(_CONFIG_PATH)
@@ -111,13 +111,15 @@ func load_settings() -> void:
 		set_particle_quality(PARTICLE_DEFAULT)
 		set_vfx_speed(VFX_SPEED_DEFAULT)
 		set_anim_speed(ANIM_SPEED_DEFAULT)
-		set_monster_interval(MONSTER_INTERVAL_DEFAULT)
+		set_turn_interval(TURN_INTERVAL_DEFAULT)
 		set_kill_cam_enabled(KILL_CAM_DEFAULT)
 		set_background_enabled(BACKGROUND_DEFAULT)
 		return
 	set_particle_quality(cfg.get_value("graphics", "particle_quality", PARTICLE_DEFAULT))
 	set_vfx_speed(cfg.get_value("gameplay", "vfx_speed", VFX_SPEED_DEFAULT))
 	set_anim_speed(cfg.get_value("gameplay", "anim_speed", ANIM_SPEED_DEFAULT))
-	set_monster_interval(cfg.get_value("gameplay", "monster_interval", MONSTER_INTERVAL_DEFAULT))
+	# 옛 키 "monster_interval" 하위 호환 — 없으면 default
+	var ti_key: String = cfg.get_value("gameplay", "turn_interval", cfg.get_value("gameplay", "monster_interval", TURN_INTERVAL_DEFAULT))
+	set_turn_interval(ti_key)
 	set_kill_cam_enabled(cfg.get_value("gameplay", "kill_cam_enabled", KILL_CAM_DEFAULT))
 	set_background_enabled(cfg.get_value("graphics", "background_enabled", BACKGROUND_DEFAULT))
