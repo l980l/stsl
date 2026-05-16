@@ -74,7 +74,7 @@ var _ui_layer: CanvasLayer = null
 
 func _setup_ui_layer() -> void:
 	_ui_layer = CanvasLayer.new()
-	_ui_layer.layer = 10  # 캐릭터/배경 위
+	_ui_layer.layer = 5  # 캐릭터/배경 위, SettingsOverlay(10) 아래
 	add_child(_ui_layer)
 
 # UI 노드 add_child 헬퍼 — _ui_layer 가 있으면 거기에, 없으면 self 에
