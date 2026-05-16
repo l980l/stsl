@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 15 200 256" width="200" height="256">
+  <defs>
+    <radialGradient id="abua_fire" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#fff8d8" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffb850" stop-opacity="0.9"/>
+      <stop offset="0.8" stop-color="#e85020" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#a02010" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="abua_smoke" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#d0c8b0" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#888070" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 향연 (불꽃 위 솟구침) -->
+  <ellipse cx="120" cy="60" rx="40" ry="25" fill="url(#abua_smoke)"/>
+  <ellipse cx="125" cy="35" rx="50" ry="20" fill="url(#abua_smoke)"/>
+  <!-- 작은 향 불꽃 -->
+  <ellipse cx="120" cy="115" rx="35" ry="22" fill="url(#abua_fire)"/>
+  <path d="M 108 115 Q 102 90 112 75 Q 118 90 116 110 Q 124 80 130 90 Q 138 105 132 115 Z" fill="#ffd860" opacity="0.88"/>
+  <path d="M 116 105 Q 114 78 122 70 Q 128 82 126 105 Z" fill="#fff8d8" opacity="0.9"/>
+  <!-- 향 가지 (세로 막대 3개) -->
+  <rect x="100" y="120" width="2" height="80" fill="#4a2818"/>
+  <rect x="120" y="115" width="2" height="85" fill="#4a2818"/>
+  <rect x="140" y="118" width="2" height="82" fill="#4a2818"/>
+  <!-- 향 끝 불씨 (빨간 점) -->
+  <circle cx="101" cy="120" r="2" fill="#ff8030"/>
+  <circle cx="121" cy="115" r="2" fill="#ff8030"/>
+  <circle cx="141" cy="118" r="2" fill="#ff8030"/>
+</svg>

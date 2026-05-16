@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="35 22 170 248" width="170" height="248">
+  <defs>
+    <linearGradient id="abub_wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#702818"/>
+      <stop offset="1" stop-color="#2a0808"/>
+    </linearGradient>
+  </defs>
+  <!-- 더 단순한 받침 (낮은 향로) -->
+  <rect x="35" y="220" width="170" height="50" fill="url(#abub_wood)"/>
+  <rect x="35" y="220" width="170" height="5" fill="#883818"/>
+  <!-- 작은 향로 (둥근) -->
+  <ellipse cx="120" cy="218" rx="50" ry="14" fill="#7a5018"/>
+  <path d="M 75 218 Q 70 175 80 165 L 160 165 Q 170 175 165 218 Z" fill="#a07020"/>
+  <ellipse cx="120" cy="165" rx="42" ry="6" fill="#3a2418"/>
+  <!-- 손잡이 (양쪽 둥근 고리) -->
+  <circle cx="75" cy="185" r="6" fill="none" stroke="#785020" stroke-width="3"/>
+  <circle cx="165" cy="185" r="6" fill="none" stroke="#785020" stroke-width="3"/>
+</svg>

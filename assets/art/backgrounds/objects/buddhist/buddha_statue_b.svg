@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 192 140 378" width="140" height="378">
+  <defs>
+    <linearGradient id="bsb_stone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a09078"/>
+      <stop offset="0.5" stop-color="#705c44"/>
+      <stop offset="1" stop-color="#382820"/>
+    </linearGradient>
+  </defs>
+  <!-- 석불 (회색 돌, 풍화 흔적) -->
+  <rect x="40" y="510" width="140" height="60" fill="#605040"/>
+  <!-- 좌상 본체 -->
+  <path d="M 55 510 Q 45 420 65 360 Q 85 330 110 330 Q 135 330 155 360 Q 175 420 165 510 Z" fill="url(#bsb_stone)"/>
+  <!-- 몸통 -->
+  <path d="M 80 360 Q 75 290 110 270 Q 145 290 140 360 Z" fill="url(#bsb_stone)"/>
+  <!-- 머리 -->
+  <ellipse cx="110" cy="240" rx="30" ry="34" fill="url(#bsb_stone)"/>
+  <!-- 곱슬 머리 -->
+  <ellipse cx="110" cy="220" rx="32" ry="12" fill="#403428"/>
+  <circle cx="100" cy="215" r="3" fill="#302418"/>
+  <circle cx="120" cy="215" r="3" fill="#302418"/>
+  <!-- 우슈니샤 -->
+  <ellipse cx="110" cy="205" rx="9" ry="13" fill="#403428"/>
+  <!-- 균열 (풍화) -->
+  <path d="M 105 270 L 100 380 L 105 480" stroke="#000" opacity="0.35" stroke-width="2" fill="none"/>
+  <path d="M 130 290 L 132 360" stroke="#000" opacity="0.3" stroke-width="1.5" fill="none"/>
+  <!-- 이끼 -->
+  <ellipse cx="65" cy="420" rx="12" ry="22" fill="#3a5028" opacity="0.55"/>
+  <ellipse cx="160" cy="450" rx="10" ry="20" fill="#3a5028" opacity="0.55"/>
+  <!-- 선정인 -->
+  <ellipse cx="110" cy="400" rx="30" ry="12" fill="url(#bsb_stone)"/>
+</svg>

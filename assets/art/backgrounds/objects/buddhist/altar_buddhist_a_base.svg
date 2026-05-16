@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 15 200 256" width="200" height="256">
+  <defs>
+    <linearGradient id="abua_wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#883818"/>
+      <stop offset="1" stop-color="#3a1408"/>
+    </linearGradient>
+    <linearGradient id="abua_brass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8a040"/>
+      <stop offset="1" stop-color="#785020"/>
+    </linearGradient>
+  </defs>
+  <!-- 목조 받침 (단청) -->
+  <rect x="20" y="220" width="200" height="50" fill="url(#abua_wood)"/>
+  <rect x="20" y="220" width="200" height="6" fill="#a04820"/>
+  <line x1="60" y1="220" x2="60" y2="270" stroke="#1a0808" stroke-width="2" opacity="0.5"/>
+  <line x1="180" y1="220" x2="180" y2="270" stroke="#1a0808" stroke-width="2" opacity="0.5"/>
+  <!-- 연꽃 새김 -->
+  <ellipse cx="120" cy="248" rx="20" ry="10" fill="#d8a040" opacity="0.7"/>
+  <ellipse cx="120" cy="248" rx="10" ry="6" fill="#a07020"/>
+  <!-- 중간 단 (좁음) -->
+  <rect x="40" y="200" width="160" height="22" fill="#a04820"/>
+  <rect x="40" y="216" width="160" height="6" fill="#000" opacity="0.25"/>
+  <!-- 향로 받침 (놋쇠) -->
+  <path d="M 70 130 L 170 130 L 160 200 L 80 200 Z" fill="url(#abua_brass)"/>
+  <ellipse cx="120" cy="130" rx="50" ry="6" fill="#a07020"/>
+  <!-- 향로 손잡이 -->
+  <path d="M 70 145 Q 60 130 75 120" stroke="#785020" stroke-width="3" fill="none"/>
+  <path d="M 170 145 Q 180 130 165 120" stroke="#785020" stroke-width="3" fill="none"/>
+  <!-- 향로 내부 (재) -->
+  <ellipse cx="120" cy="128" rx="42" ry="4" fill="#3a2418"/>
+</svg>

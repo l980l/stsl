@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="5 30 275 311.5" width="275" height="311.5">
+  <defs>
+    <linearGradient id="bya_trunk" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#705038"/>
+      <stop offset="0.5" stop-color="#503820"/>
+      <stop offset="1" stop-color="#2a1810"/>
+    </linearGradient>
+  </defs>
+  <!-- 굵은 줄기 (보리수 — 여러 갈래 + 공중 뿌리) -->
+  <path d="M 120 340 Q 110 250 122 200 Q 130 170 145 170 Q 158 200 162 250 Q 158 300 158 340 Z" fill="url(#bya_trunk)"/>
+  <!-- 공중 뿌리 (여러 가는 줄) -->
+  <line x1="108" y1="250" x2="100" y2="340" stroke="#503820" stroke-width="3"/>
+  <line x1="115" y1="270" x2="110" y2="340" stroke="#503820" stroke-width="2"/>
+  <line x1="170" y1="260" x2="178" y2="340" stroke="#503820" stroke-width="3"/>
+  <line x1="165" y1="280" x2="170" y2="340" stroke="#503820" stroke-width="2"/>
+  <!-- 큰 가지 (양쪽) -->
+  <path d="M 125 190 Q 80 165 40 140" stroke="#503820" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M 145 180 Q 195 150 235 130" stroke="#503820" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M 130 150 Q 95 110 75 80" stroke="#503820" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 148 130 Q 175 100 195 80" stroke="#503820" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>

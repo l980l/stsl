@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 7 295 334.5" width="295" height="334.5">
+  <defs>
+    <radialGradient id="byc_canopy" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#98a868"/>
+      <stop offset="0.55" stop-color="#5a6c30"/>
+      <stop offset="1" stop-color="#2c3818"/>
+    </radialGradient>
+  </defs>
+  <!-- 거대한 캐노피 (성스러운 보리수) -->
+  <ellipse cx="140" cy="115" rx="140" ry="100" fill="url(#byc_canopy)" opacity="0.95"/>
+  <ellipse cx="50" cy="155" rx="55" ry="48" fill="url(#byc_canopy)" opacity="0.85"/>
+  <ellipse cx="230" cy="150" rx="60" ry="50" fill="url(#byc_canopy)" opacity="0.85"/>
+  <ellipse cx="140" cy="55" rx="108" ry="48" fill="url(#byc_canopy)" opacity="0.7"/>
+  <ellipse cx="110" cy="130" rx="14" ry="20" fill="#a8b878" opacity="0.5"/>
+  <ellipse cx="170" cy="125" rx="14" ry="20" fill="#a8b878" opacity="0.5"/>
+  <ellipse cx="140" cy="95" rx="16" ry="22" fill="#a8b878" opacity="0.5"/>
+  <ellipse cx="90" cy="155" rx="12" ry="18" fill="#a8b878" opacity="0.45"/>
+  <ellipse cx="200" cy="160" rx="12" ry="18" fill="#a8b878" opacity="0.45"/>
+  <circle cx="100" cy="180" r="3" fill="#a04030"/>
+  <circle cx="180" cy="175" r="3" fill="#a04030"/>
+  <circle cx="155" cy="200" r="3" fill="#a04030"/>
+  <circle cx="125" cy="175" r="2" fill="#a04030"/>
+</svg>

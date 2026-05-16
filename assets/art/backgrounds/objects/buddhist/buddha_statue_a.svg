@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 181 140 389" width="140" height="389">
+  <defs>
+    <linearGradient id="bsa_robe" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d8a060"/>
+      <stop offset="0.5" stop-color="#a07040"/>
+      <stop offset="1" stop-color="#603818"/>
+    </linearGradient>
+    <linearGradient id="bsa_skin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0d8a8"/>
+      <stop offset="1" stop-color="#a08858"/>
+    </linearGradient>
+  </defs>
+  <!-- 좌대 (연꽃 모양) -->
+  <rect x="40" y="500" width="140" height="70" fill="#806040"/>
+  <rect x="40" y="500" width="140" height="6" fill="#a08868"/>
+  <!-- 연꽃 잎 (좌대 위) -->
+  <path d="M 50 500 Q 70 480 90 500 Z" fill="#9a5040"/>
+  <path d="M 90 500 Q 110 478 130 500 Z" fill="#b86848"/>
+  <path d="M 130 500 Q 150 480 170 500 Z" fill="#9a5040"/>
+  <!-- 결가부좌 (앉은 자세 — 큰 옷자락) -->
+  <path d="M 50 490 Q 40 400 60 350 Q 80 320 110 320 Q 140 320 160 350 Q 180 400 170 490 Z" fill="url(#bsa_robe)"/>
+  <!-- 무릎 라인 -->
+  <ellipse cx="80" cy="450" rx="22" ry="12" fill="#704018" opacity="0.5"/>
+  <ellipse cx="140" cy="450" rx="22" ry="12" fill="#704018" opacity="0.5"/>
+  <!-- 몸통/가슴 (옷 안쪽) -->
+  <path d="M 75 350 Q 70 280 110 260 Q 150 280 145 350 Z" fill="#c89058"/>
+  <!-- 머리 -->
+  <ellipse cx="110" cy="230" rx="32" ry="36" fill="url(#bsa_skin)"/>
+  <!-- 머리카락 (곱슬 패턴) -->
+  <ellipse cx="110" cy="210" rx="34" ry="14" fill="#3a2418"/>
+  <circle cx="100" cy="205" r="3" fill="#2a1810"/>
+  <circle cx="120" cy="205" r="3" fill="#2a1810"/>
+  <!-- 우슈니샤 (정수리 혹) -->
+  <ellipse cx="110" cy="195" rx="10" ry="14" fill="#3a2418"/>
+  <circle cx="110" cy="185" r="3" fill="#d8a040"/>
+  <!-- 눈/입 (단순) -->
+  <line x1="100" y1="232" x2="106" y2="232" stroke="#3a2418" stroke-width="2"/>
+  <line x1="114" y1="232" x2="120" y2="232" stroke="#3a2418" stroke-width="2"/>
+  <path d="M 105 248 Q 110 252 115 248" stroke="#3a2418" stroke-width="1.5" fill="none"/>
+  <!-- 양손 결인 (선정인) -->
+  <ellipse cx="110" cy="395" rx="32" ry="14" fill="url(#bsa_skin)"/>
+  <line x1="90" y1="395" x2="130" y2="395" stroke="#785030" stroke-width="1"/>
+</svg>

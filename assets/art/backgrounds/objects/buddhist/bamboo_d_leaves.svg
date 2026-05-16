@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 70 92 400" width="92" height="400">
+  <defs>
+    <linearGradient id="bmd_leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a8c060"/>
+      <stop offset="1" stop-color="#586830"/>
+    </linearGradient>
+  </defs>
+  <!-- 흩날리는 잎 (바람 -> 한쪽으로) -->
+  <path d="M 72 110 Q 56 100 36 88 Q 56 105 72 110 Z" fill="url(#bmd_leaf)"/>
+  <path d="M 88 90 Q 105 75 122 70 Q 105 85 88 90 Z" fill="url(#bmd_leaf)"/>
+  <path d="M 72 210 Q 54 205 38 210 Q 54 215 72 210 Z" fill="url(#bmd_leaf)"/>
+  <path d="M 90 190 Q 108 185 125 190 Q 108 195 90 190 Z" fill="url(#bmd_leaf)"/>
+  <path d="M 75 310 Q 56 305 40 310 Q 56 315 75 310 Z" fill="url(#bmd_leaf)"/>
+  <path d="M 92 290 Q 110 285 128 290 Q 110 295 92 290 Z" fill="url(#bmd_leaf)"/>
+  <path d="M 78 410 Q 60 405 44 410 Q 60 415 78 410 Z" fill="url(#bmd_leaf)"/>
+</svg>

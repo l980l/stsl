@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="44 18 193 323" width="193" height="323">
+  <defs>
+    <linearGradient id="byd_trunk" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#705038"/>
+      <stop offset="0.5" stop-color="#503820"/>
+      <stop offset="1" stop-color="#2a1808"/>
+    </linearGradient>
+  </defs>
+  <path d="M 138 340 Q 132 240 122 200 Q 115 170 130 110 Q 145 170 148 200 Q 145 270 148 340 Z" fill="url(#byd_trunk)"/>
+  <line x1="125" y1="280" x2="118" y2="340" stroke="#503820" stroke-width="2"/>
+  <line x1="155" y1="275" x2="160" y2="340" stroke="#503820" stroke-width="2"/>
+  <path d="M 130 160 Q 110 130 92 100" stroke="#503820" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 138 140 Q 158 110 170 80" stroke="#503820" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>

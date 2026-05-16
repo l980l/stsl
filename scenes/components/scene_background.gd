@@ -35,6 +35,12 @@ const PALETTES := {
 		{"sky": Color("#b06840"), "horizon": Color("#f0a050"), "silhouette": Color("#5a2818"), "scenery": Color("#8a4828")},
 		{"sky": Color("#2a1830"), "horizon": Color("#503040"), "silhouette": Color("#100808"), "scenery": Color("#281828")},
 	],
+	# 불교 — 짙은 녹+주황. Act 1 평화 산골, Act 2 노을 사찰, Act 3 어두운 명부.
+	"buddhist": [
+		{"sky": Color("#7090a0"), "horizon": Color("#c8a868"), "silhouette": Color("#2a3a28"), "scenery": Color("#3a5028")},
+		{"sky": Color("#a06038"), "horizon": Color("#e09040"), "silhouette": Color("#3a1808"), "scenery": Color("#6a3818")},
+		{"sky": Color("#180810"), "horizon": Color("#403018"), "silhouette": Color("#060000"), "scenery": Color("#180a10")},
+	],
 }
 
 # 신화별 SVG 오브젝트 풀 + spawn 가중치
@@ -68,6 +74,16 @@ const OBJECTS := {
 				   "desert_grass_a", "desert_grass_b",
 				   "egypt_lotus_a", "egypt_lotus_b"],
 		"pillars":["column_lotus_a", "column_lotus_b"],
+	},
+	"buddhist": {
+		"large":  ["pagoda_a", "pagoda_b"],
+		"medium": ["buddha_statue_a", "buddha_statue_b",
+				   "altar_buddhist_a", "altar_buddhist_b"],
+		"small":  ["bamboo_a", "bamboo_b", "bamboo_c", "bamboo_d",
+				   "banyan_a", "banyan_b", "banyan_c", "banyan_d",
+				   "bamboo_grass_a", "bamboo_grass_b",
+				   "buddhist_lotus_a", "buddhist_lotus_b"],
+		"pillars":["column_buddhist_a", "column_buddhist_b"],
 	},
 }
 
@@ -143,6 +159,27 @@ const OBJECT_SIZE := {
 	"desert_grass_b":           Vector2(117, 98),
 	"egypt_lotus_a":            Vector2(120, 140),
 	"egypt_lotus_b":            Vector2(130, 130),
+	# buddhist
+	"pagoda_a":                 Vector2(306, 424),
+	"pagoda_b":                 Vector2(408, 290),
+	"buddha_statue_a":          Vector2(140, 389),
+	"buddha_statue_b":          Vector2(140, 378),
+	"altar_buddhist_a":         Vector2(200, 256),
+	"altar_buddhist_b":         Vector2(170, 248),
+	"bamboo_a":                 Vector2(100, 415),
+	"bamboo_b":                 Vector2(88, 386),
+	"bamboo_c":                 Vector2(138, 430),
+	"bamboo_d":                 Vector2(92, 400),
+	"banyan_a":                 Vector2(275, 311.5),
+	"banyan_b":                 Vector2(240, 285),
+	"banyan_c":                 Vector2(295, 334.5),
+	"banyan_d":                 Vector2(193, 323),
+	"column_buddhist_a":        Vector2(120, 512),
+	"column_buddhist_b":        Vector2(156, 423),
+	"bamboo_grass_a":           Vector2(72, 77),
+	"bamboo_grass_b":           Vector2(117, 100),
+	"buddhist_lotus_a":         Vector2(120, 140),
+	"buddhist_lotus_b":         Vector2(130, 130),
 }
 
 # 바람/펄럭임 sway — 풀/꽃 (통째 sway) + split 식생/altar (위쪽만 sway).
@@ -151,6 +188,7 @@ const _WIND_SMALL_PREFIXES := [
 	"grass", "flower",                # greek
 	"tundra_grass", "edelweiss",      # norse
 	"desert_grass", "egypt_lotus",    # egyptian
+	"bamboo_grass", "buddhist_lotus", # buddhist
 ]
 
 static func _wind_eligible(svg_id: String) -> bool:
@@ -163,9 +201,13 @@ static func _wind_eligible(svg_id: String) -> bool:
 # 나무: trunk(정지) + leaves(sway). altar: base(정지) + flame(sway).
 # 신화 추가 시 식생 prefix 만 늘리면 됨. altar 는 prefix "altar" 자동 매칭 (altar_norse 등).
 static func _split_suffixes(svg_id: String) -> Array:
+	# bamboo_grass 는 풀(통째) — split 제외. bamboo_a/b/c/d 식생만 split.
+	if svg_id.begins_with("bamboo_") and not svg_id.begins_with("bamboo_grass"):
+		return ["_trunk", "_leaves"]
 	if (svg_id.begins_with("cypress") or svg_id.begins_with("olive_tree")
 			or svg_id.begins_with("birch") or svg_id.begins_with("spruce")
-			or svg_id.begins_with("palm") or svg_id.begins_with("acacia")):
+			or svg_id.begins_with("palm") or svg_id.begins_with("acacia")
+			or svg_id.begins_with("banyan")):
 		return ["_trunk", "_leaves"]
 	if svg_id.begins_with("altar"):
 		return ["_base", "_flame"]
