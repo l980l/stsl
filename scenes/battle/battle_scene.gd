@@ -65,6 +65,9 @@ var _energy_label: Label
 var _end_turn_btn: Button
 var _message_label: Label
 var _relic_container: FlowContainer
+var _turn_queue_box: HBoxContainer
+var _turn_queue_slots: Array = []  # 각 슬롯: {root: PanelContainer, swatch: ColorRect, label: Label}
+const TURN_QUEUE_PREVIEW_COUNT: int = 5
 var _selected_card: Resource = null
 var _lose_played: bool = false
 var _defeat_layer: CanvasLayer = null
@@ -340,6 +343,8 @@ func _build_ui() -> void:
 	add_child(_relic_container)
 	_synergy_box = _relic_container
 	_refresh_hud()
+
+	_build_turn_queue_widget()
 
 	_active_powers_box = VBoxContainer.new()
 	_active_powers_box.position = Vector2(16, 858)
@@ -847,6 +852,11 @@ func _connect_signals() -> void:
 	DeckManager.card_played.connect(_on_card_played)
 	BattleManager.player_turn_started.connect(_on_player_turn_started)
 	BattleManager.enemy_turn_started.connect(_on_enemy_turn_started)
+	# Turn queue UI 갱신 — 차례 전환·큐 변경 시점 (사망/소환/부활 포함)
+	BattleManager.turn_queue_changed.connect(_on_turn_queue_changed)
+	BattleManager.turn_ended.connect(func(_aid: String): _refresh_turn_queue_widget())
+	BattleManager.enemy_died.connect(func(_idx: int): _refresh_turn_queue_widget())
+	BattleManager.enemy_spawned.connect(func(_idx: int): _refresh_turn_queue_widget())
 	BattleManager.hero_damaged.connect(_on_hero_damaged)
 	BattleManager.hero_block_gained.connect(_on_hero_block_gained)
 	BattleManager.enemy_damaged.connect(_on_enemy_damaged)
@@ -1373,6 +1383,87 @@ func _apply_card_state(node: CardScene, card_res: Resource) -> void:
 		node.set_owner_dead(false)
 		node.set_disabled(not DeckManager.can_play(card_res))
 
+## ── 좌상단 Turn Queue 미리보기 (ATB 큐) ──
+func _build_turn_queue_widget() -> void:
+	_turn_queue_box = HBoxContainer.new()
+	_turn_queue_box.position = Vector2(20, 18)
+	_turn_queue_box.size = Vector2(WINDOW_W - 40, 48)
+	_turn_queue_box.add_theme_constant_override("separation", 6)
+	add_child(_turn_queue_box)
+	for i in range(TURN_QUEUE_PREVIEW_COUNT):
+		var slot := PanelContainer.new()
+		slot.custom_minimum_size = Vector2(80, 44)
+		var sbx := StyleBoxFlat.new()
+		sbx.bg_color = Color(0.08, 0.07, 0.05, 0.85)
+		sbx.border_color = SacredPalette.BRASS_300
+		sbx.set_border_width_all(1)
+		sbx.set_corner_radius_all(4)
+		sbx.set_content_margin_all(4)
+		slot.add_theme_stylebox_override("panel", sbx)
+		var vb := VBoxContainer.new()
+		vb.add_theme_constant_override("separation", 2)
+		slot.add_child(vb)
+		var swatch := ColorRect.new()
+		swatch.custom_minimum_size = Vector2(0, 4)
+		swatch.color = SacredPalette.BRASS_500
+		vb.add_child(swatch)
+		var lbl := Label.new()
+		lbl.text = ""
+		lbl.add_theme_font_size_override("font_size", 11)
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.clip_text = true
+		vb.add_child(lbl)
+		_turn_queue_box.add_child(slot)
+		_turn_queue_slots.append({"root": slot, "swatch": swatch, "label": lbl})
+	_refresh_turn_queue_widget()
+
+func _on_turn_queue_changed(_preview: Array) -> void:
+	_refresh_turn_queue_widget()
+
+func _refresh_turn_queue_widget() -> void:
+	if _turn_queue_slots.is_empty():
+		return
+	# 현재 차례 액터 + 다음 N-1 차례 미리보기
+	var preview: Array = []
+	var current_aid: String = BattleManager.get_current_actor_id()
+	if current_aid != "":
+		preview.append(current_aid)
+	var next_preview: Array = BattleManager.get_turn_queue_preview(TURN_QUEUE_PREVIEW_COUNT)
+	for aid in next_preview:
+		if preview.size() >= TURN_QUEUE_PREVIEW_COUNT:
+			break
+		preview.append(aid)
+	for i in range(_turn_queue_slots.size()):
+		var slot: Dictionary = _turn_queue_slots[i]
+		if i >= preview.size():
+			slot["root"].visible = false
+			continue
+		slot["root"].visible = true
+		var aid: String = preview[i]
+		var info: Dictionary = _resolve_actor_info(aid)
+		slot["label"].text = info["name"]
+		slot["swatch"].color = info["color"]
+		# 현재 차례 = 첫 슬롯 강조 (밝게)
+		slot["root"].modulate = Color(1.0, 1.0, 1.0, 1.0) if i == 0 else Color(1.0, 1.0, 1.0, 0.7)
+
+func _resolve_actor_info(actor_id: String) -> Dictionary:
+	if actor_id.begins_with("hero:"):
+		var hid: String = actor_id.substr(5)
+		var nm: String = hid
+		if TeamManager != null:
+			var hero_res = TeamManager.get_hero(hid)
+			if hero_res != null:
+				nm = tr(hero_res.hero_name)
+		return {"name": nm, "color": SacredPalette.BRASS_500}
+	if actor_id.begins_with("enemy:"):
+		var idx: int = int(actor_id.substr(6))
+		var nm2: String = "enemy"
+		var enemy_res: Resource = BattleManager.get_enemy(idx)
+		if enemy_res != null:
+			nm2 = tr(enemy_res.enemy_name)
+		return {"name": nm2, "color": Color(0.7, 0.25, 0.25)}
+	return {"name": actor_id, "color": Color(0.5, 0.5, 0.5)}
+
 func _refresh_hand() -> void:
 	for n in _card_buttons:
 		if is_instance_valid(n):
@@ -1616,6 +1707,7 @@ func _on_player_turn_started() -> void:
 	_energy_label.text = "%d/%d" % [DeckManager.get_energy(cur_hid), DeckManager.MAX_ENERGY]
 	# 본인 영웅 핸드 표시 (start_hero_turn 가 드로우 완료)
 	_refresh_hand()
+	_refresh_turn_queue_widget()
 	# 영웅 블록 UI 갱신
 	for entry in _hero_nodes:
 		var hid: String = entry["hero_id"]
@@ -1647,6 +1739,7 @@ func _on_enemy_turn_started() -> void:
 	_signatures_shown_this_turn.clear()  # 시그니처 토스트 throttle 리셋 (1회/턴)
 	# 적 차례 — 본인 영웅 핸드 숨김
 	_refresh_hand()
+	_refresh_turn_queue_widget()
 	# 적 클릭 버튼 비활성
 	for entry in _enemy_nodes:
 		if entry["panel"].visible and not entry["btn"].disabled:
