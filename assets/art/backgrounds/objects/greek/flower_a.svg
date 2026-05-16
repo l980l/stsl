@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" width="120" height="140">
+  <defs>
+    <radialGradient id="fa_petal" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ff7878"/>
+      <stop offset="0.7" stop-color="#c83838"/>
+      <stop offset="1" stop-color="#7a1a1a"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="60" cy="134" rx="34" ry="3" fill="#000" opacity="0.35"/>
+  <!-- 양귀비 — 줄기 3대 -->
+  <path d="M 36 134 Q 36 100 30 50" stroke="#506830" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 60 134 Q 60 90 58 30" stroke="#506830" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 84 134 Q 84 100 90 60" stroke="#506830" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- 잎 -->
+  <path d="M 60 90 Q 50 84 46 92 Q 54 96 60 92 Z" fill="#789848"/>
+  <path d="M 36 100 Q 28 96 24 104 Q 32 108 38 104 Z" fill="#789848"/>
+  <!-- 꽃 — 양귀비 (큰 빨강 4꽃잎) -->
+  <ellipse cx="30" cy="50" rx="12" ry="14" fill="url(#fa_petal)"/>
+  <ellipse cx="30" cy="50" rx="3" ry="3" fill="#1a1208"/>
+  <ellipse cx="58" cy="30" rx="14" ry="16" fill="url(#fa_petal)"/>
+  <ellipse cx="58" cy="30" rx="4" ry="4" fill="#1a1208"/>
+  <ellipse cx="90" cy="60" rx="11" ry="13" fill="url(#fa_petal)"/>
+  <ellipse cx="90" cy="60" rx="3" ry="3" fill="#1a1208"/>
+</svg>

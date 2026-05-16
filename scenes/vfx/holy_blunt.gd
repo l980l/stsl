@@ -35,6 +35,14 @@ signal screen_effect
 
 var _caster := Vector2.ZERO
 var _target := Vector2.ZERO
+# 바닥 먼지/균열/분화구/충격파 anchor — set_ground_anchor() 로 타겟 발 위치 지정.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+
 var _smoke_layer: Node2D
 var _glow_layer: Node2D
 var _particles: Array = []
@@ -117,7 +125,7 @@ func _mk(pos: Vector2, vel: Vector2, max_life: float, r: float, kind: String,
 		"kind": kind, "grav": grav, "rot": rot, "spin": spin}
 
 func _spawn_impact_feathers() -> void:
-	var gy := _target + Vector2(0.0, 80.0)
+	var gy: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 80.0)
 	# 큰 깃털 — 옆으로 튀는 메인 (blunt 의 chunk 대체)
 	for _i in range(_pcount(20)):
 		var a := randf() * TAU
@@ -146,7 +154,7 @@ func _spawn_impact_feathers() -> void:
 			0.5 + randf() * 0.5, 1.0 + randf() * 1.4, "spark", 0.15))
 
 func _spawn_cracks() -> void:
-	var gy := _target + Vector2(0.0, 80.0)
+	var gy: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 80.0)
 	for i in range(8):
 		var ang := PI + float(i) / 8.0 * PI + randf_range(-0.1, 0.1)
 		var ln: float = 60.0 + randf() * 80.0
@@ -199,18 +207,7 @@ func _on_impact() -> void:
 	screen_effect.emit()
 
 func _draw_smoke_pass(canvas: CanvasItem) -> void:
-	if _crater_age >= 0.0:
-		var grow: float = clampf(_crater_age / 0.35, 0.0, 1.0)
-		var fade := 1.0
-		if _crater_age > STUN_TIME:
-			fade = clampf(1.0 - (_crater_age - STUN_TIME) / 0.6, 0.0, 1.0)
-		if fade > 0.0:
-			var cc := _target + Vector2(0.0, 80.0)
-			var crater := PackedVector2Array()
-			for i in range(28):
-				var ang := TAU * float(i) / 28.0
-				crater.append(cc + Vector2(cos(ang) * 100.0 * grow, sin(ang) * 14.0 * grow))
-			canvas.draw_colored_polygon(crater, Color(0.0, 0.0, 0.0, 0.6 * fade))
+	# 분화구 비활성화 — 바닥 그림자/타원과 어색해서 제거. 균열만 유지 (사용자 피드백)
 
 	if _crack_age >= 0.0:
 		var grow_c: float = minf(1.0, _crack_age / 1.5 * 4.0)
@@ -284,7 +281,7 @@ func _draw_glow_pass(canvas: CanvasItem) -> void:
 			oa = _ring_life / 0.25
 		else:
 			oa = 1.0 - (_ring_life - 0.25) / 0.75
-		var rc := _target + Vector2(0.0, 30.0)
+		var rc: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 30.0)
 		canvas.draw_arc(rc, 60.0 * sc, 0.0, TAU, 48, Color(COL_HIT_RING, 0.95 * oa), 6.0, true)
 		canvas.draw_arc(rc, 40.0 * sc, 0.0, TAU, 36, Color(COL_HOT, 0.8 * oa), 2.0, true)
 

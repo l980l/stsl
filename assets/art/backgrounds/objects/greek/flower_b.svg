@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 130" width="130" height="130">
+  <defs>
+    <radialGradient id="fb_petal" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d8d0b8"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="65" cy="124" rx="38" ry="3" fill="#000" opacity="0.35"/>
+  <!-- 데이지 — 줄기 3대 -->
+  <path d="M 32 124 Q 32 90 28 56" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 64 124 Q 64 78 62 32" stroke="#587030" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 98 124 Q 98 92 102 64" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- 잎 -->
+  <path d="M 64 88 Q 54 82 50 90 Q 58 94 64 90 Z" fill="#789848"/>
+  <path d="M 32 96 Q 24 92 22 100 Q 28 104 34 100 Z" fill="#789848"/>
+  <!-- 꽃 — 데이지 (8꽃잎 흰색 + 노란 중심) -->
+  <g transform="translate(28 56)">
+    <ellipse cx="0" cy="-8" rx="4" ry="6" fill="url(#fb_petal)"/>
+    <ellipse cx="6" cy="-6" rx="4" ry="6" transform="rotate(45)" fill="url(#fb_petal)"/>
+    <ellipse cx="8" cy="0" rx="6" ry="4" fill="url(#fb_petal)"/>
+    <ellipse cx="6" cy="6" rx="4" ry="6" transform="rotate(135)" fill="url(#fb_petal)"/>
+    <ellipse cx="0" cy="8" rx="4" ry="6" fill="url(#fb_petal)"/>
+    <ellipse cx="-6" cy="6" rx="4" ry="6" transform="rotate(45)" fill="url(#fb_petal)"/>
+    <ellipse cx="-8" cy="0" rx="6" ry="4" fill="url(#fb_petal)"/>
+    <ellipse cx="-6" cy="-6" rx="4" ry="6" transform="rotate(135)" fill="url(#fb_petal)"/>
+    <ellipse cx="0" cy="0" rx="4" ry="4" fill="#e8c440"/>
+  </g>
+  <g transform="translate(62 32)">
+    <ellipse cx="0" cy="-10" rx="5" ry="8" fill="url(#fb_petal)"/>
+    <ellipse cx="7" cy="-7" rx="5" ry="8" transform="rotate(45)" fill="url(#fb_petal)"/>
+    <ellipse cx="10" cy="0" rx="8" ry="5" fill="url(#fb_petal)"/>
+    <ellipse cx="7" cy="7" rx="5" ry="8" transform="rotate(135)" fill="url(#fb_petal)"/>
+    <ellipse cx="0" cy="10" rx="5" ry="8" fill="url(#fb_petal)"/>
+    <ellipse cx="-7" cy="7" rx="5" ry="8" transform="rotate(45)" fill="url(#fb_petal)"/>
+    <ellipse cx="-10" cy="0" rx="8" ry="5" fill="url(#fb_petal)"/>
+    <ellipse cx="-7" cy="-7" rx="5" ry="8" transform="rotate(135)" fill="url(#fb_petal)"/>
+    <ellipse cx="0" cy="0" rx="5" ry="5" fill="#e8c440"/>
+  </g>
+  <g transform="translate(102 64)">
+    <ellipse cx="0" cy="-7" rx="3.5" ry="5" fill="url(#fb_petal)"/>
+    <ellipse cx="5" cy="-5" rx="3.5" ry="5" transform="rotate(45)" fill="url(#fb_petal)"/>
+    <ellipse cx="7" cy="0" rx="5" ry="3.5" fill="url(#fb_petal)"/>
+    <ellipse cx="5" cy="5" rx="3.5" ry="5" transform="rotate(135)" fill="url(#fb_petal)"/>
+    <ellipse cx="0" cy="7" rx="3.5" ry="5" fill="url(#fb_petal)"/>
+    <ellipse cx="-5" cy="5" rx="3.5" ry="5" transform="rotate(45)" fill="url(#fb_petal)"/>
+    <ellipse cx="-7" cy="0" rx="5" ry="3.5" fill="url(#fb_petal)"/>
+    <ellipse cx="-5" cy="-5" rx="3.5" ry="5" transform="rotate(135)" fill="url(#fb_petal)"/>
+    <ellipse cx="0" cy="0" rx="3.5" ry="3.5" fill="#e8c440"/>
+  </g>
+</svg>

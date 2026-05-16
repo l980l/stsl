@@ -42,6 +42,17 @@ signal screen_effect
 
 var _caster := Vector2.ZERO
 var _target := Vector2.ZERO
+# 바닥 서리/얼음 감옥 anchor — set_ground_anchor() 로 타겟 발 위치 지정.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+	# frost_floor sprite 자체를 캐릭터 뒤로 — 절대 z, 부모(=1300) 무시
+	if _frost_floor != null:
+		_frost_floor.z_as_relative = false
+		_frost_floor.z_index = int(pos.y) - 1
 var _charge_orb: Sprite2D
 var _orbits: Node2D
 var _frost_floor: Sprite2D
@@ -121,7 +132,7 @@ func play(caster_pos: Vector2, target_pos: Vector2) -> void:
 	_target = target_pos
 	_charge_orb.position = caster_pos
 	_orbits.position = caster_pos
-	_frost_floor.position = target_pos + Vector2(0.0, 64.0)
+	_frost_floor.position = _ground_pos if _has_ground else target_pos + Vector2(0.0, 64.0)
 	_run()
 
 func _run() -> void:
@@ -365,7 +376,7 @@ func _draw_ice_shell() -> void:
 		return
 	var sc: float = lerpf(0.7, 1.0, appear)
 	# 바닥 고드름 5개 — [중심 x오프셋, 높이]
-	var base_y: float = _target.y + 58.0
+	var base_y: float = _ground_pos.y if _has_ground else _target.y + 58.0
 	var spikes := [
 		Vector2(-54.0, 64.0), Vector2(-27.0, 96.0), Vector2(0.0, 120.0),
 		Vector2(29.0, 90.0), Vector2(52.0, 70.0),

@@ -43,9 +43,20 @@ const PSPEED           := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계�
 signal screen_effect
 
 var _target := Vector2.ZERO
+# 바닥 룬링 anchor — set_ground_anchor() 로 캐릭터 발 위치 지정.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+	if _ground_layer != null:
+		_ground_layer.z_as_relative = false
+		_ground_layer.z_index = int(pos.y) - 1
 var _charge_orb: Sprite2D
 var _smoke_layer: Node2D  # 일반 블렌드 — 깃털
-var _glow_layer: Node2D   # 가산 블렌드 — mote/룬링/빛기둥
+var _glow_layer: Node2D   # 가산 블렌드 — mote/빛기둥
+var _ground_layer: Node2D # 룬링 (캐릭터 뒤로 z set)
 var _particles: Array = []
 var _ring_age := -1.0     # <0=비활성, 경과 초
 var _pillar_age := -1.0
@@ -68,6 +79,10 @@ static func _make_orb_tex(c_core: Color, c_mid: Color, c_edge: Color) -> Gradien
 
 func _ready() -> void:
 	set_process(false)
+	# 바닥 룬링 — 캐릭터 뒤로 z set, 가산 블렌드. 가장 먼저 add
+	_ground_layer = _GroundLayer.new()
+	_ground_layer.setup(self)
+	add_child(_ground_layer)
 	_smoke_layer = _DrawLayer.new()
 	_smoke_layer.setup(self, false)
 	add_child(_smoke_layer)
@@ -170,6 +185,8 @@ func _process(delta: float) -> void:
 
 	_smoke_layer.queue_redraw()
 	_glow_layer.queue_redraw()
+	if _ground_layer:
+		_ground_layer.queue_redraw()
 
 # ── 일반 블렌드 — 깃털 (가산이면 묻혀버림) ──
 func _draw_smoke_pass(canvas: CanvasItem) -> void:
@@ -194,12 +211,10 @@ func _draw_smoke_pass(canvas: CanvasItem) -> void:
 			inner.append(p["pos"] + v.rotated(p["rot"]))
 		canvas.draw_colored_polygon(inner, Color(COL_HOT, 0.7 * a))
 
-# ── 가산 블렌드 — 빛기둥, 룬 링, mote ──
+# ── 가산 블렌드 — 빛기둥, mote (룬링은 ground_layer 로 분리) ──
 func _draw_glow_pass(canvas: CanvasItem) -> void:
 	if _pillar_age >= 0.0:
 		_draw_pillar(canvas)
-	if _ring_age >= 0.0:
-		_draw_ring(canvas)
 	for p in _particles:
 		if p["kind"] != "mote":
 			continue
@@ -251,7 +266,7 @@ func _draw_ring(canvas: CanvasItem) -> void:
 		return
 	var sc: float = lerpf(0.4, 1.0, grow)
 	var a: float = grow * fade * 0.9
-	var rc := _target + Vector2(0.0, 30.0)
+	var rc: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 30.0)
 	# 외곽 두 동심원 (HTML r=115 + r=100)
 	for radius in [RING_RADIUS, RING_RADIUS * 0.87]:
 		var rad := float(radius) * sc
@@ -283,6 +298,11 @@ func _draw_ring(canvas: CanvasItem) -> void:
 		tri.append(tri[0])
 		canvas.draw_polyline(tri, Color(COL_MID, a * 0.8), 1.5)
 
+# ── 바닥 룬링 (캐릭터 뒤) — _ground_layer 가 z 캐릭터 아래로 set ──
+func _draw_ground_pass(canvas: CanvasItem) -> void:
+	if _ring_age >= 0.0:
+		_draw_ring(canvas)
+
 # ── 블렌드 모드가 다른 두 그리기 레이어 ──
 class _DrawLayer:
 	extends Node2D
@@ -302,3 +322,17 @@ class _DrawLayer:
 			_fx._draw_glow_pass(self)
 		else:
 			_fx._draw_smoke_pass(self)
+
+# 바닥 룬링 전용 레이어 — 가산 블렌드. z_index 캐릭터 아래로.
+class _GroundLayer:
+	extends Node2D
+	var _fx: Node2D
+
+	func setup(owner_fx: Node2D) -> void:
+		_fx = owner_fx
+		var m := CanvasItemMaterial.new()
+		m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		material = m
+
+	func _draw() -> void:
+		_fx._draw_ground_pass(self)

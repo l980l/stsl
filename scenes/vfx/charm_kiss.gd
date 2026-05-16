@@ -42,8 +42,20 @@ signal screen_effect
 
 var _caster := Vector2.ZERO
 var _target := Vector2.ZERO
+# 매혹 오라 anchor — set_ground_anchor() 로 타겟 발 위치 지정.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+	if _ground_layer != null:
+		_ground_layer.z_as_relative = false
+		_ground_layer.z_index = int(pos.y) - 1
+
 var _smoke_layer: Node2D  # 일반 블렌드 — 분홍 연기·하트 솔리드
-var _glow_layer: Node2D   # 가산 블렌드 — 차지오브·헤일로·꽃잎·반짝임·투사체·나선·오라
+var _glow_layer: Node2D   # 가산 블렌드 — 차지오브·헤일로·꽃잎·반짝임·투사체·나선
+var _ground_layer: Node2D # 매혹 오라 (캐릭터 뒤로 z set)
 var _heart_pts: PackedVector2Array  # 단위 하트 윤곽 (32점)
 var _particles: Array = []  # [{pos, vel, life, max_life, size, rot, kind, grav, spin, tint}]
 var _proj_t := -1.0       # <0 = 비활성, 0~1 = 투사체 비행
@@ -85,6 +97,10 @@ func _ready() -> void:
 	set_process(false)
 	_heart_pts = heart_unit()
 
+	# 매혹 오라 — 캐릭터 뒤로 z set, 가산 블렌드. 가장 먼저 add
+	_ground_layer = _GroundLayer.new()
+	_ground_layer.setup(self)
+	add_child(_ground_layer)
 	# 연기·하트 솔리드 레이어 — 일반 블렌드, 아래
 	_smoke_layer = _DrawLayer.new()
 	_smoke_layer.setup(self, false)
@@ -218,6 +234,8 @@ func _process(delta: float) -> void:
 
 	_smoke_layer.queue_redraw()
 	_glow_layer.queue_redraw()
+	if _ground_layer:
+		_ground_layer.queue_redraw()
 
 func _on_impact() -> void:
 	_proj_t = -1.0
@@ -292,15 +310,7 @@ func _draw_glow_pass(canvas: CanvasItem) -> void:
 		canvas.draw_rect(Rect2(pos.x - pr * 2.5, pos.y - 0.3, pr * 5.0, 0.6), Color(COL_HOT, a))
 		canvas.draw_rect(Rect2(pos.x - 0.3, pos.y - pr * 2.5, 0.6, pr * 5.0), Color(COL_HOT, a))
 
-	# 매혹 오라 (타겟 발 아래 분홍 링 — 잔류 동안 펄스)
-	if _ambient_timer > 0.0:
-		var pulse := 0.5 + 0.3 * sin(_elapsed * 4.0)
-		var ac := _target + Vector2(0.0, 70.0)
-		var aura := PackedVector2Array()
-		for i in range(20):
-			var ang := TAU * float(i) / 20.0
-			aura.append(ac + Vector2(cos(ang) * 76.0, sin(ang) * 15.0))
-		canvas.draw_colored_polygon(aura, Color(COL_MID, 0.28 * pulse))
+	# 매혹 오라는 _ground_layer 로 분리됨 (캐릭터 뒤)
 
 	# 하트 충격파 링
 	if _shock_life >= 0.0 and _shock_life <= 1.0:
@@ -359,6 +369,17 @@ func _draw_spiral(canvas: CanvasItem) -> void:
 		pts.append(c + Vector2(cos(ang), sin(ang)) * r)
 	canvas.draw_polyline(pts, Color(COL_HOT, a), 2.0, true)
 
+# ── 매혹 오라 (캐릭터 뒤) — _ground_layer 가 z 캐릭터 아래로 set ──
+func _draw_ground_pass(canvas: CanvasItem) -> void:
+	if _ambient_timer > 0.0:
+		var pulse := 0.5 + 0.3 * sin(_elapsed * 4.0)
+		var ac: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 70.0)
+		var aura := PackedVector2Array()
+		for i in range(20):
+			var ang := TAU * float(i) / 20.0
+			aura.append(ac + Vector2(cos(ang) * 76.0, sin(ang) * 15.0))
+		canvas.draw_colored_polygon(aura, Color(COL_MID, 0.28 * pulse))
+
 # ── 블렌드 모드가 다른 두 그리기 레이어 ──
 # 어두운 분홍 연기는 가산이면 안 보이므로 일반 블렌드, 헤일로·반짝임은 글로우용 가산 블렌드.
 class _DrawLayer:
@@ -379,3 +400,17 @@ class _DrawLayer:
 			_fx._draw_glow_pass(self)
 		else:
 			_fx._draw_smoke_pass(self)
+
+# 매혹 오라 전용 레이어 — 가산 블렌드 (분홍 글로우). z_index 캐릭터 아래로.
+class _GroundLayer:
+	extends Node2D
+	var _fx: Node2D
+
+	func setup(owner_fx: Node2D) -> void:
+		_fx = owner_fx
+		var m := CanvasItemMaterial.new()
+		m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		material = m
+
+	func _draw() -> void:
+		_fx._draw_ground_pass(self)

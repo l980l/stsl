@@ -295,6 +295,18 @@ func _spawn_char_placeholder(slot_pos: Vector2, color: Color, label: String) -> 
 	# battle_scene: char_node.position = (slot.x + 120, slot.y + 184), scale (1.44, 2.4)
 	# 발 위치 = position.y + sprite_h*scale.y*0.5. 단순화: 발 = slot.y + SLOT_H
 	var foot_y: float = slot_pos.y + SLOT_H
+	# 발 그림자 — sprite 보다 z 작게
+	var shadow := Polygon2D.new()
+	shadow.color = Color(0, 0, 0, 0.45)
+	var shadow_pts := PackedVector2Array()
+	var sx: float = slot_pos.x + SLOT_W * 0.5
+	for i in 24:
+		var a: float = TAU * float(i) / 24.0
+		shadow_pts.append(Vector2(sx + cos(a) * 90.0, foot_y - 4.0 + sin(a) * 16.0))
+	shadow.polygon = shadow_pts
+	shadow.z_index = -1
+	add_child(shadow)
+	_char_nodes.append(shadow)
 	var spr := Sprite2D.new()
 	var pl_w := 110
 	var pl_h := 200

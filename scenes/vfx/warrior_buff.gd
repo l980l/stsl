@@ -45,9 +45,20 @@ const PSPEED           := 60.0
 signal screen_effect
 
 var _target := Vector2.ZERO
+# 바닥 ring/잔불 anchor — set_ground_anchor() 로 캐릭터 발 위치 지정.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+	if _ground_layer != null:
+		_ground_layer.z_as_relative = false
+		_ground_layer.z_index = int(pos.y) - 1
 var _charge_orb: Sprite2D
 var _smoke_layer: Node2D  # 일반 블렌드 — dust, chunk
-var _glow_layer: Node2D   # 가산 블렌드 — ember, flame, 룬링, 오라, 충격파
+var _glow_layer: Node2D   # 가산 블렌드 — ember, flame, 오라, 충격파
+var _ground_layer: Node2D # 룬링 (캐릭터 뒤로 z set)
 var _particles: Array = []
 var _ring_age := -1.0
 var _aura_age := -1.0
@@ -70,6 +81,10 @@ static func _make_orb_tex(c_core: Color, c_mid: Color, c_edge: Color) -> Gradien
 
 func _ready() -> void:
 	set_process(false)
+	# 바닥 룬링 — 캐릭터 뒤로 z set, 가산 블렌드. 가장 먼저 add
+	_ground_layer = _GroundLayer.new()
+	_ground_layer.setup(self)
+	add_child(_ground_layer)
 	_smoke_layer = _DrawLayer.new()
 	_smoke_layer.setup(self, false)
 	add_child(_smoke_layer)
@@ -118,7 +133,7 @@ func _mk(pos: Vector2, vel: Vector2, max_life: float, r: float, kind: String,
 # 발동 순간 — ember 30 + dust 14 + flame 10 + chunk 8 (HTML 의 1/3 정도)
 func _spawn_burst() -> void:
 	var ctr := _target + Vector2(0.0, -30.0)
-	var floor_y := _target + Vector2(0.0, 30.0)
+	var floor_y: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 30.0)
 	for _i in range(_pcount(30)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 6.0
@@ -143,7 +158,7 @@ func _spawn_burst() -> void:
 
 # BUFF_TIME 동안 매 프레임 — 잔불 솟구침
 func _spawn_rising() -> void:
-	var floor_y := _target.y + 30.0
+	var floor_y: float = _ground_pos.y if _has_ground else _target.y + 30.0
 	for _i in range(_pcount(2)):
 		_particles.append(_mk(Vector2(_target.x + randf_range(-75.0, 75.0), floor_y + randf_range(-5.0, 5.0)),
 			Vector2(randf_range(-0.6, 0.6), -1.2 - randf() * 1.5),
@@ -181,6 +196,8 @@ func _process(delta: float) -> void:
 
 	_smoke_layer.queue_redraw()
 	_glow_layer.queue_redraw()
+	if _ground_layer:
+		_ground_layer.queue_redraw()
 
 # ── 일반 블렌드 — dust, chunk ──
 func _draw_smoke_pass(canvas: CanvasItem) -> void:
@@ -203,12 +220,10 @@ func _draw_smoke_pass(canvas: CanvasItem) -> void:
 			p["pos"] + fwd * r + side * (r * 0.7), p["pos"] + fwd * -r + side * (r * 0.7),
 		]), Color(COL_CHUNK, a))
 
-# ── 가산 블렌드 — flame, ember, 룬링, 오라, 충격파 ──
+# ── 가산 블렌드 — flame, ember, 오라, 충격파 (룬링은 ground_layer 로 분리) ──
 func _draw_glow_pass(canvas: CanvasItem) -> void:
 	if _aura_age >= 0.0:
 		_draw_aura(canvas)
-	if _ring_age >= 0.0:
-		_draw_ring(canvas)
 	if _shock_age >= 0.0:
 		_draw_shock(canvas)
 	# flame — 시간에 따라 흰주황→주황→진홍
@@ -275,7 +290,7 @@ func _draw_ring(canvas: CanvasItem) -> void:
 		return
 	var sc: float = lerpf(0.3, 1.0, grow)
 	var a: float = grow * fade * 0.95
-	var rc := _target + Vector2(0.0, 30.0)
+	var rc: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 30.0)
 	for radius in [RING_RADIUS, RING_RADIUS * 0.91]:
 		var rad := float(radius) * sc
 		var pts := PackedVector2Array()
@@ -323,6 +338,11 @@ func _draw_shock(canvas: CanvasItem) -> void:
 	canvas.draw_arc(rc, rad, 0.0, TAU, 48, Color(COL_MID, oa), thick, true)
 	canvas.draw_arc(rc, rad * 0.85, 0.0, TAU, 36, Color(COL_HOT, oa * 0.7), thick * 0.5, true)
 
+# ── 바닥 룬링 (캐릭터 뒤) — _ground_layer 가 z 캐릭터 아래로 set ──
+func _draw_ground_pass(canvas: CanvasItem) -> void:
+	if _ring_age >= 0.0:
+		_draw_ring(canvas)
+
 # ── 블렌드 모드가 다른 두 그리기 레이어 ──
 class _DrawLayer:
 	extends Node2D
@@ -342,3 +362,17 @@ class _DrawLayer:
 			_fx._draw_glow_pass(self)
 		else:
 			_fx._draw_smoke_pass(self)
+
+# 바닥 룬링 전용 레이어 — 가산 블렌드. z_index 캐릭터 아래로.
+class _GroundLayer:
+	extends Node2D
+	var _fx: Node2D
+
+	func setup(owner_fx: Node2D) -> void:
+		_fx = owner_fx
+		var m := CanvasItemMaterial.new()
+		m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		material = m
+
+	func _draw() -> void:
+		_fx._draw_ground_pass(self)

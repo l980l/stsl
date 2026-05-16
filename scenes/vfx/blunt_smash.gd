@@ -37,6 +37,13 @@ signal screen_effect
 
 var _caster := Vector2.ZERO
 var _target := Vector2.ZERO
+# 바닥 먼지/균열/분화구/충격파 anchor — set_ground_anchor() 로 타겟 발 위치 지정.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
 var _smoke_layer: Node2D  # 일반 블렌드 — 먼지·파편·균열·분화구
 var _glow_layer: Node2D   # 가산 블렌드 — 스트라이크·스파크·충격파·별폭발·머리 위 별
 var _particles: Array = []  # [{pos, vel, life, max_life, r, kind, grav, rot, spin}]
@@ -101,7 +108,7 @@ func _mk(pos: Vector2, vel: Vector2, max_life: float, r: float, kind: String,
 # 명중 — 바닥 먼지 + 디버리스 + 스파크 + 위로 솟는 먼지 기둥
 # 흙먼지(dust) 만 DUST_SCALE 적용 — 파편/스파크는 영향 없음.
 func _spawn_impact_dust() -> void:
-	var gy := _target + Vector2(0.0, 80.0)
+	var gy: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 80.0)
 	for _i in range(_pcount(80)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 5.0
@@ -125,7 +132,7 @@ func _spawn_impact_dust() -> void:
 
 # 명중 — 8개 방사형 균열 생성
 func _spawn_cracks() -> void:
-	var gy := _target + Vector2(0.0, 80.0)
+	var gy: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 80.0)
 	for i in range(8):
 		var ang := PI + float(i) / 8.0 * PI + randf_range(-0.1, 0.1)
 		var ln: float = 60.0 + randf() * 80.0
@@ -181,19 +188,7 @@ func _on_impact() -> void:
 
 # ── 그리기 패스 — _DrawLayer 가 블렌드 모드별로 호출 ──
 func _draw_smoke_pass(canvas: CanvasItem) -> void:
-	# 분화구 (타겟 발 아래)
-	if _crater_age >= 0.0:
-		var grow: float = clampf(_crater_age / 0.35, 0.0, 1.0)
-		var fade := 1.0
-		if _crater_age > STUN_TIME:
-			fade = clampf(1.0 - (_crater_age - STUN_TIME) / 0.6, 0.0, 1.0)
-		if fade > 0.0:
-			var cc := _target + Vector2(0.0, 80.0)
-			var crater := PackedVector2Array()
-			for i in range(28):
-				var ang := TAU * float(i) / 28.0
-				crater.append(cc + Vector2(cos(ang) * 100.0 * grow, sin(ang) * 14.0 * grow))
-			canvas.draw_colored_polygon(crater, Color(0.0, 0.0, 0.0, 0.6 * fade))
+	# 분화구 비활성화 — 바닥 그림자/타원과 어색해서 제거. 균열만 유지 (사용자 피드백)
 
 	# 바닥 균열 8개 (시간에 따라 자라남)
 	if _crack_age >= 0.0:
@@ -257,7 +252,7 @@ func _draw_glow_pass(canvas: CanvasItem) -> void:
 			oa = _ring_life / 0.25
 		else:
 			oa = 1.0 - (_ring_life - 0.25) / 0.75
-		var rc := _target + Vector2(0.0, 30.0)
+		var rc: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 30.0)
 		canvas.draw_arc(rc, 60.0 * sc, 0.0, TAU, 48, Color(COL_HIT_RING, 0.95 * oa), 6.0, true)
 		canvas.draw_arc(rc, 40.0 * sc, 0.0, TAU, 36, Color(COL_HOT, 0.8 * oa), 2.0, true)
 

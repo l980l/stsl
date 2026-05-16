@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" width="240" height="280">
+  <defs>
+    <radialGradient id="ald_fire" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#fff8d8" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffb850" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#a02010" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="120" cy="130" rx="58" ry="42" fill="url(#ald_fire)"/>
+  <path d="M 96 130 Q 88 90 102 70 Q 112 90 108 116 Q 120 78 128 88 Q 138 108 132 130 Q 144 100 150 116 Z" fill="#ffd860" opacity="0.85"/>
+  <circle cx="92" cy="100" r="3" fill="#ffe890" opacity="0.6"/>
+  <circle cx="142" cy="80" r="2" fill="#ffe890" opacity="0.5"/>
+</svg>

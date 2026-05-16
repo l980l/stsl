@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" width="240" height="280">
+  <defs>
+    <linearGradient id="ald_stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8d8ac"/>
+      <stop offset="1" stop-color="#8a7448"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="120" cy="270" rx="92" ry="9" fill="#000" opacity="0.45"/>
+  <rect x="28" y="232" width="184" height="38" fill="url(#ald_stone)"/>
+  <rect x="38" y="220" width="164" height="14" fill="#c2a874"/>
+  <rect x="50" y="160" width="140" height="62" fill="url(#ald_stone)"/>
+  <rect x="50" y="160" width="140" height="6" fill="#fff" opacity="0.25"/>
+  <line x1="80" y1="170" x2="80" y2="215" stroke="#000" opacity="0.18" stroke-width="2"/>
+  <line x1="120" y1="170" x2="120" y2="215" stroke="#000" opacity="0.18" stroke-width="2"/>
+  <line x1="160" y1="170" x2="160" y2="215" stroke="#000" opacity="0.18" stroke-width="2"/>
+  <rect x="40" y="148" width="160" height="14" fill="#d4be88"/>
+  <rect x="36" y="138" width="168" height="12" fill="#dccaa0"/>
+  <ellipse cx="120" cy="156" rx="68" ry="6" fill="#3a2818" opacity="0.7"/>
+</svg>

@@ -28,11 +28,13 @@ const PALETTES := {
 # 신화별 SVG 오브젝트 풀 + spawn 가중치 (1차 PR = greek 만)
 const OBJECTS := {
 	"greek": {
-		"large":  ["temple_small_a", "temple_small_b", "temple_small_c", "temple_small_d"],
-		"medium": ["statue_warrior_a", "statue_warrior_b", "statue_warrior_c", "statue_warrior_d",
+		"large":  ["temple_small_a", "temple_small_b", "temple_small_d"],
+		"medium": ["statue_warrior_a", "statue_warrior_b", "statue_warrior_d",
 				   "altar_a", "altar_b", "altar_c", "altar_d"],
 		"small":  ["cypress_a", "cypress_b", "cypress_c", "cypress_d",
-				   "olive_tree_a", "olive_tree_b", "olive_tree_c", "olive_tree_d"],
+				   "olive_tree_a", "olive_tree_b", "olive_tree_c", "olive_tree_d",
+				   "grass_a", "grass_b",
+				   "flower_a", "flower_b", "flower_c"],
 		"pillars":["column_doric_a", "column_doric_b", "column_doric_c", "column_doric_d"],
 	},
 }
@@ -40,9 +42,9 @@ const OBJECTS := {
 # SVG viewBox 크기 (충돌 검사용). 같은 base 의 a/b/c/d 는 동일 viewBox.
 const OBJECT_SIZE := {
 	"temple_small_a":   Vector2(600, 460), "temple_small_b": Vector2(600, 460),
-	"temple_small_c":   Vector2(600, 460), "temple_small_d": Vector2(600, 460),
+	"temple_small_d":   Vector2(600, 460),
 	"statue_warrior_a": Vector2(220, 580), "statue_warrior_b": Vector2(220, 580),
-	"statue_warrior_c": Vector2(220, 580), "statue_warrior_d": Vector2(220, 580),
+	"statue_warrior_d": Vector2(220, 480),
 	"altar_a":          Vector2(240, 280), "altar_b": Vector2(240, 280),
 	"altar_c":          Vector2(240, 280), "altar_d": Vector2(240, 280),
 	"cypress_a":        Vector2(160, 480), "cypress_b": Vector2(160, 480),
@@ -51,7 +53,27 @@ const OBJECT_SIZE := {
 	"olive_tree_c":     Vector2(280, 360), "olive_tree_d": Vector2(280, 360),
 	"column_doric_a":   Vector2(200, 600), "column_doric_b": Vector2(200, 600),
 	"column_doric_c":   Vector2(200, 600), "column_doric_d": Vector2(200, 600),
+	"grass_a":          Vector2(100, 80),  "grass_b":         Vector2(140, 100),
+	"flower_a":         Vector2(120, 140), "flower_b":        Vector2(130, 130),
+	"flower_c":         Vector2(110, 110),
 }
+
+# 바람/펄럭임 sway — grass/flower 는 통째, cypress/olive_tree/altar 는 split (위 부분만).
+# 구조물 X (temple/statue/column).
+static func _wind_eligible(svg_id: String) -> bool:
+	return (
+		svg_id.begins_with("grass") or svg_id.begins_with("flower")
+		or _split_suffixes(svg_id).size() > 0
+	)
+
+# 정지/sway 두 sprite 로 spawn — base + sway 부분. 빈 배열이면 split 아님.
+# 나무: trunk(정지) + leaves(sway). altar: base(정지) + flame(sway).
+static func _split_suffixes(svg_id: String) -> Array:
+	if svg_id.begins_with("cypress") or svg_id.begins_with("olive_tree"):
+		return ["_trunk", "_leaves"]
+	if svg_id.begins_with("altar"):
+		return ["_base", "_flame"]
+	return []
 
 # Sprite 의 발 anchor 기준 박스 (centered → x ± w*sc/2, y - h*sc ~ y)
 static func _sprite_rect(svg_id: String, anchor: Vector2, sc: float) -> Rect2:
@@ -173,6 +195,9 @@ func _setup_internal(myth: String, variant: int, seed_val: int, time_force: Stri
 	# 2. 원경 산 실루엣 (도형 — _back 안, parallax 시차)
 	_add_silhouette_layer(palette["silhouette"], 0.15, HORIZON_Y, 10, 95.0)
 
+	# 2.5 땅 원근감 — 지평선~화면 하단 그라데이션 + 작은 디테일 점
+	_add_ground_layer(palette, rng)
+
 	# 3~5. 모든 SVG 오브젝트 — front_specs.
 	# 엄격한 perspective — y 작음(멀리) → scale 작음 / y 큼(가까이) → scale 큼.
 	# sc_lo/sc_hi 둘 다 y 비례 lerp. ±10% jitter 로 다양성.
@@ -230,10 +255,28 @@ func _try_place(svg_id: String, myth: String, rng: RandomNumberGenerator, sc_lo:
 		# 2) fg 끼리 — 80% 이상 가림 reject (부분 겹침 OK)
 		if _overlaps_fg(rect, fg_local):
 			continue
-		front_specs.append({
+		var spec: Dictionary = {
 			"path": "res://assets/art/backgrounds/objects/%s/%s.svg" % [myth, svg_id],
 			"pos": anchor, "scale": sc,
-		})
+			"svg_id": svg_id,
+		}
+		# sway 메타 — shader (1-UV.y) 가중치로 위쪽만 흔들림.
+		# grass/flower/altar(flame): 동일 amp/speed. cypress/olive_tree(leaves): 좀 더 느리고 작게.
+		if _wind_eligible(svg_id):
+			spec["wind"] = true
+			var suffixes: Array = _split_suffixes(svg_id)
+			var is_tree: bool = svg_id.begins_with("cypress") or svg_id.begins_with("olive_tree")
+			spec["wind_phase"] = rng.randf_range(0.0, TAU)
+			if is_tree:
+				spec["wind_amp"] = rng.randf_range(4.0, 8.0)
+				spec["wind_speed"] = rng.randf_range(0.7, 1.3)
+			else:
+				spec["wind_amp"] = rng.randf_range(5.0, 9.0)
+				spec["wind_speed"] = rng.randf_range(0.8, 1.6)
+			if suffixes.size() > 0:
+				spec["split"] = true
+				spec["split_suffixes"] = suffixes
+		front_specs.append(spec)
 		fg_local.append(rect)
 		return
 
@@ -415,3 +458,49 @@ func _add_horizon_glow(color: Color, alpha: float) -> void:
 	glow.size = Vector2(W * 1.2, 130)
 	glow.position = Vector2(-W * 0.1, HORIZON_Y - 65)
 	pl.add_child(glow)
+
+# 땅 원근감 — 지평선 ~ 화면 하단 그라데이션 + 가까이 디테일 점들.
+# silhouette(0.15) 보다 약간 빠른 0.30 motion 으로 ParallaxBackground 안에 추가.
+# z 무관 — _back layer=-100 이라 캐릭터 뒤.
+func _add_ground_layer(palette: Dictionary, rng: RandomNumberGenerator) -> void:
+	var pl := ParallaxLayer.new()
+	pl.motion_scale = Vector2(0.30, 0.30)
+	_back.add_child(pl)
+	# 그라데이션 — 4 stop. 지평선 부근 transparent → 안개 → 중경 → 진한 근경
+	var horizon: Color = palette.get("horizon", Color("#c9a064"))
+	var scenery: Color = palette.get("scenery", Color("#3a4a3a"))
+	var fog: Color = Color(horizon.r * 0.5, horizon.g * 0.5, horizon.b * 0.5, 0.6)
+	var grad := Gradient.new()
+	grad.colors = PackedColorArray([
+		Color(scenery.r, scenery.g, scenery.b, 0.0),
+		fog,
+		Color(scenery.r, scenery.g, scenery.b, 0.85),
+		scenery.darkened(0.30),
+	])
+	grad.offsets = PackedFloat32Array([0.0, 0.15, 0.55, 1.0])
+	var tex := GradientTexture2D.new()
+	tex.gradient = grad
+	tex.fill_to = Vector2(0, 1)
+	tex.width = 64
+	tex.height = int(H - HORIZON_Y)
+	var ground := TextureRect.new()
+	ground.texture = tex
+	ground.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ground.stretch_mode = TextureRect.STRETCH_SCALE
+	ground.size = Vector2(W * 1.2, H - HORIZON_Y)
+	ground.position = Vector2(-W * 0.1, HORIZON_Y)
+	pl.add_child(ground)
+	# 디테일 — 가까이(y > 700) 작은 사각 점들 (풀잎/돌 흉내). 시드 기반 결정적
+	var detail_color: Color = scenery.darkened(0.45)
+	for _i in 60:
+		var px: float = rng.randf_range(-60, W + 60)
+		var py: float = rng.randf_range(700, H - 8)
+		var pw: float = rng.randf_range(2.0, 5.0)
+		var ph: float = rng.randf_range(1.5, 3.5)
+		var dot := Polygon2D.new()
+		dot.color = Color(detail_color.r, detail_color.g, detail_color.b, 0.45)
+		dot.polygon = PackedVector2Array([
+			Vector2(px, py), Vector2(px + pw, py),
+			Vector2(px + pw, py + ph), Vector2(px, py + ph),
+		])
+		pl.add_child(dot)
