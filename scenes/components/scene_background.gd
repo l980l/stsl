@@ -217,7 +217,7 @@ const OBJECT_SIZE := {
 	"temple_taoist_b":          Vector2(324, 330),
 	"crane_statue_a":           Vector2(111, 370),
 	"crane_statue_b":           Vector2(104, 213),
-	"altar_taoist_a":           Vector2(240, 280),
+	"altar_taoist_a":           Vector2(180, 222),
 	"altar_taoist_b":           Vector2(224, 271),
 	"pine_a":                   Vector2(153, 394),
 	"pine_b":                   Vector2(133, 300),

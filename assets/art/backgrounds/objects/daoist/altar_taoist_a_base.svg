@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" width="240" height="280">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 48 180 222" width="180" height="222">
   <defs>
     <linearGradient id="atoa_stone" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#3a2820"/>
@@ -10,17 +10,15 @@
   <rect x="30" y="220" width="180" height="6" fill="#503830"/>
   <!-- 중간 단 -->
   <path d="M 50 220 L 60 200 L 180 200 L 190 220 Z" fill="#2a1a10"/>
-  <!-- 8괘 새김 (가운데 — 작은 8 막대 ring) -->
-  <g transform="translate(120 240)" stroke="#d8a040" stroke-width="1.5" fill="none">
-    <line x1="-22" y1="0" x2="-16" y2="0"/>
-    <line x1="-18" y1="-12" x2="-12" y2="-8"/>
-    <line x1="-8" y1="-20" x2="-4" y2="-15"/>
-    <line x1="4" y1="-20" x2="8" y2="-15"/>
-    <line x1="14" y1="-12" x2="20" y2="-8"/>
-    <line x1="16" y1="0" x2="22" y2="0"/>
-    <line x1="14" y1="12" x2="20" y2="8"/>
-    <line x1="-14" y1="12" x2="-20" y2="8"/>
-  </g>
+  <!-- 8괘 새김 (가운데 — 작은 8 막대 ring). g transform 제거 (trim 스크립트가 BBox 계산하도록). -->
+  <line x1="98" y1="240" x2="104" y2="240" stroke="#d8a040" stroke-width="1.5"/>
+  <line x1="102" y1="228" x2="108" y2="232" stroke="#d8a040" stroke-width="1.5"/>
+  <line x1="112" y1="220" x2="116" y2="225" stroke="#d8a040" stroke-width="1.5"/>
+  <line x1="124" y1="220" x2="128" y2="225" stroke="#d8a040" stroke-width="1.5"/>
+  <line x1="134" y1="228" x2="140" y2="232" stroke="#d8a040" stroke-width="1.5"/>
+  <line x1="136" y1="240" x2="142" y2="240" stroke="#d8a040" stroke-width="1.5"/>
+  <line x1="134" y1="252" x2="140" y2="248" stroke="#d8a040" stroke-width="1.5"/>
+  <line x1="106" y1="252" x2="100" y2="248" stroke="#d8a040" stroke-width="1.5"/>
   <!-- 위쪽 단 (불꽃 받침 — 8각) -->
   <path d="M 65 200 L 75 175 L 165 175 L 175 200 Z" fill="url(#atoa_stone)"/>
   <rect x="80" y="135" width="80" height="42" fill="#3a2820"/>
