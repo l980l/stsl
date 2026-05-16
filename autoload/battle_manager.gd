@@ -710,11 +710,16 @@ func _register_power(key: String, owner_id: String, value: int, params: Dictiona
 	active_powers_changed.emit()
 
 func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
+	# 본인 영웅 차례 한정 — owner_id 영웅 power 만 발동 (owner 없는 글로벌 power 는 모든 영웅 차례에 발동, 3× 효과)
+	var target_hero: String = ctx.get("hero_id", "")
 	for power_key in _active_powers:
 		var power: Dictionary = _active_powers[power_key]
 		var key: String = power_key.split(":")[0] if ":" in power_key else power_key
 		var owner_id: String = power.get("owner_id", "")
 		var v: int = power.get("value", 0)
+		# player_turn_start 시 본인 영웅 power 만 발동 (다른 영웅 차례에는 skip)
+		if phase == "player_turn_start" and target_hero != "" and owner_id != "" and owner_id != target_hero:
+			continue
 		match key:
 			"power.poison_per_turn":
 				if phase == "player_turn_start":
@@ -730,8 +735,8 @@ func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
 						team_mgr.heal(hero.hero_id, v)
 			"power.draw_per_turn":
 				if phase == "player_turn_start" and deck_mgr:
-					deck_mgr.draw_cards(v)
-					_cards_drawn_this_turn += v
+					# 본인 영웅에게 추가 드로우
+					deck_mgr.draw_cards_h(owner_id, v)
 			"power.counter_per_attack":
 				if phase == "enemy_attack":
 					var enemy_idx: int = ctx.get("enemy_index", -1)
