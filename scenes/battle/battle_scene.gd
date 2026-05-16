@@ -3686,8 +3686,12 @@ func _show_deck_viewer_in_battle() -> void:
 	tabs.add_theme_color_override("font_selected_color", SacredPalette.BRASS_400)
 	tabs.add_theme_color_override("font_unselected_color", SacredPalette.BRASS_700)
 	tabs.add_theme_color_override("font_hovered_color", SacredPalette.BRASS_300)
-	# 선택 탭 위쪽 흰 라인 제거 — 기본 stylebox → empty
-	tabs.add_theme_stylebox_override("tab_selected", StyleBoxEmpty.new())
+	# 선택 탭 위쪽 라인 색 — 기본 흰색 → BRASS_400 (다른 UI 와 통일)
+	var _tab_sel_sbx := SacredTheme.theme.get_stylebox("tab_selected", "TabContainer") if SacredTheme.theme else null
+	if _tab_sel_sbx is StyleBoxFlat:
+		var _new_sbx: StyleBoxFlat = (_tab_sel_sbx as StyleBoxFlat).duplicate()
+		_new_sbx.border_color = SacredPalette.BRASS_400
+		tabs.add_theme_stylebox_override("tab_selected", _new_sbx)
 	vbox.add_child(tabs)
 
 	# 기본 활성 탭 — 현재 영웅 / 없으면 마지막 차례 영웅 / 둘 다 없으면 첫 영웅
