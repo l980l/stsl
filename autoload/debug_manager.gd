@@ -157,8 +157,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_sort_card_opts(opts)
 			_make_checkbox_dialog("덱 편집 — 제거할 카드", opts, "제거", func(picked: Array):
 				for card in picked:
-					if not DeckManager.remove_from_deck(card):
-						DeckManager.hand.erase(card)
+					DeckManager.remove_from_deck(card)
 				if not picked.is_empty():
 					DeckManager.hand_changed.emit()
 			)
