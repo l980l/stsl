@@ -881,7 +881,11 @@ func _play_battle_bgm() -> void:
 		_bgm_boss_id = first.enemy_name.split(".")[-1]
 		AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, 0)
 	else:
-		var myth: String = GameManager.act_mythologies[GameManager.current_act - 1]
+		# F6 단독 실행 폴백 — GameManager 미초기화 시 act_mythologies 비어있음
+		var act_idx: int = GameManager.current_act - 1
+		if act_idx < 0 or act_idx >= GameManager.act_mythologies.size():
+			return
+		var myth: String = GameManager.act_mythologies[act_idx]
 		AudioManager.play_bgm_dynamic("battle", myth)
 
 func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
