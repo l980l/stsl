@@ -413,12 +413,12 @@ func _enemy_effective_speed(enemy_index: int) -> int:
 	var s: int = int(enemy.get("speed"))
 	if s > 0:
 		return s
-	# grade 기본값 — NORMAL 40 / ELITE 50 / BOSS 60
+	# grade 기본값 — NORMAL 45 (영웅 평균 55 보다 약간 느림) / ELITE 53 (영웅 평균과 동급) / BOSS 65 (가장 빠른 영웅 60 보다 빠름)
 	var grade: int = int(enemy.get("grade"))
 	match grade:
-		1: return 50  # ELITE
-		2: return 60  # BOSS
-		_: return 40  # NORMAL
+		1: return 53  # ELITE
+		2: return 65  # BOSS
+		_: return 45  # NORMAL
 
 func _hero_effective_speed(hid: String) -> int:
 	if team_mgr == null:
