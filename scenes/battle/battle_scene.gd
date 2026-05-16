@@ -1064,6 +1064,7 @@ func _start_battle() -> void:
 		BattleManager.setup_battle(GameManager.pending_enemies)
 		_setup_heroes()
 		_setup_enemies()
+		await _play_battle_intro()
 		BattleManager.start_player_turn()
 	else:
 		_start_test_battle()  # GameManager 없이 단독 실행 시 폴백
@@ -1125,6 +1126,7 @@ func _start_test_battle() -> void:
 	BattleManager.setup_battle([satyr])
 	_setup_heroes()
 	_setup_enemies()
+	await _play_battle_intro()
 	BattleManager.start_player_turn()
 
 # ─────────────────────────────────────────────
@@ -2830,6 +2832,26 @@ func _setup_kill_cam() -> void:
 	_camera.zoom = Vector2.ONE
 	add_child(_camera)
 	_camera.make_current()  # tree 에 attach 후 호출
+
+# 배틀 인트로 — 1초 줌아웃 유지 + 화면 중앙 ⚔️ 이모지 fade in/out
+func _play_battle_intro() -> void:
+	var lbl := Label.new()
+	lbl.text = "⚔️"
+	lbl.add_theme_font_size_override("font_size", 140)
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.size = Vector2(WINDOW_W, 200)
+	lbl.position = Vector2(0, WINDOW_H / 2.0 - 100)
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lbl.modulate = Color(1, 1, 1, 0)
+	lbl.z_index = 3000
+	_ui_add(lbl)
+	var tw := create_tween()
+	tw.tween_property(lbl, "modulate:a", 1.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_interval(0.6)
+	tw.tween_property(lbl, "modulate:a", 0.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await tw.finished
+	lbl.queue_free()
 
 # Shift+Y 디버그 — 모든 fg sprite + 캐릭터 노드 박스 + (x,y,z) 라벨 표시/숨김
 var _bg_debug_overlay: Node2D = null
