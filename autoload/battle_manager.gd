@@ -651,10 +651,24 @@ func end_player_turn() -> void:
 
 const DND_KEY := "power.double_next_damage:__global__"
 
+func _dnd_key(hid: String) -> String:
+	return "power.double_next_damage:" + hid
+
 func _consume_double_next_damage(amount: int) -> int:
-	if _active_powers.has(DND_KEY):
+	# 현재 hero actor 의 DND 우선, 없으면 legacy global 키
+	var consumed: bool = false
+	if _current_actor_id.begins_with("hero:"):
+		var hid: String = _current_actor_id.substr(5)
+		var key: String = _dnd_key(hid)
+		if _active_powers.has(key):
+			amount *= 2
+			_active_powers.erase(key)
+			consumed = true
+	if not consumed and _active_powers.has(DND_KEY):
 		amount *= 2
 		_active_powers.erase(DND_KEY)
+		consumed = true
+	if consumed:
 		active_powers_changed.emit()
 	return amount
 
@@ -996,7 +1010,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + count * effect.value
 			EffectRes.EffectType.COST_NEXT:
 				if deck_mgr:
-					deck_mgr.pending_cost_reduction += effect.value
+					deck_mgr.add_pending_cost_reduction(card.owner_id, effect.value)
 			EffectRes.EffectType.CONDITIONAL_DMG:
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					if effect.status_type == "dead_ally_count":
@@ -1081,22 +1095,22 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_check_lose_condition()
 			EffectRes.EffectType.COST_ZERO_TURN:
 				if deck_mgr:
-					deck_mgr.pending_all_cost_zero = true
+					deck_mgr.set_pending_all_cost_zero(card.owner_id, true)
 			EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED:
-				var block_amount: int = _cards_played_this_turn * effect.value
+				# 본인 영웅 차례 내 카드 사용 횟수 (DeckManager 영웅별)
+				var played: int = deck_mgr.get_cards_played_this_turn(card.owner_id) if deck_mgr else 0
+				var block_amount: int = played * effect.value
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + block_amount
 			EffectRes.EffectType.ON_KILL_DRAW:
-				# 이번 카드로 처치된 적 수만큼 드로우
+				# 이번 카드로 처치된 적 수만큼 본인 영웅 드로우
 				if deck_mgr:
 					for _i in range(_kills_this_card):
-						deck_mgr.draw_cards(effect.value)
-						_cards_drawn_this_turn += effect.value
+						deck_mgr.draw_cards_h(card.owner_id, effect.value)
 			EffectRes.EffectType.DRAW_PER_ENTHRALL:
-				# 이번 카드로 반함 발동 횟수 × value 드로우
+				# 이번 카드로 반함 발동 횟수 × value, 본인 영웅 드로우
 				if deck_mgr and _enthralls_this_card > 0:
 					var _draw_amt: int = _enthralls_this_card * effect.value
-					deck_mgr.draw_cards(_draw_amt)
-					_cards_drawn_this_turn += _draw_amt
+					deck_mgr.draw_cards_h(card.owner_id, _draw_amt)
 			EffectRes.EffectType.DAMAGE_PER_CHARMED_ENEMY:
 				# charm 스택 보유 적 수 × value 피해
 				var _charmed_count: int = 0
@@ -1126,8 +1140,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						for debuff in ["weak", "vulnerable", "poison_dmg", "charm"]:
 							_hero_status[h.hero_id].erase(debuff)
 			EffectRes.EffectType.PER_DRAW_DMG:
-				if target_enemy_index >= 0 and _cards_drawn_this_turn > 0:
-					var dmg: int = _cards_drawn_this_turn * effect.value
+				# 본인 영웅의 이번 차례 드로우 수 × value
+				var drawn: int = deck_mgr.get_draws_this_turn(card.owner_id) if deck_mgr else 0
+				if target_enemy_index >= 0 and drawn > 0:
+					var dmg: int = drawn * effect.value
 					_deal_damage_to_enemy(target_enemy_index, dmg)
 			EffectRes.EffectType.DAMAGE_PER_BLOCK:
 				var block: int = _hero_block.get(card.owner_id, 0)
@@ -1143,7 +1159,8 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if dead_count > 0:
 						_deal_damage_to_enemy(target_enemy_index, dead_count * effect.value, effect.damage_type)
 			EffectRes.EffectType.DOUBLE_NEXT_DAMAGE:
-				_active_powers[DND_KEY] = {"value": 1, "owner_id": "__global__", "params": {}}
+				# 본인 영웅의 다음 데미지 한 번만 ×2
+				_active_powers[_dnd_key(card.owner_id)] = {"value": 1, "owner_id": card.owner_id, "params": {}}
 				active_powers_changed.emit()
 			EffectRes.EffectType.DISCARD_PICK_DRAW:
 				_trigger_discard_pick(effect.value, 1)
@@ -1152,8 +1169,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				if morale > 0:
 					_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + morale * effect.value
 			EffectRes.EffectType.DAMAGE_PER_HAND_SIZE:
+				# 본인 영웅의 현재 핸드 크기 × value
 				if target_enemy_index >= 0 and deck_mgr:
-					var hand_size: int = deck_mgr.hand.size()
+					var hand_size: int = deck_mgr.get_hand(card.owner_id).size()
 					if hand_size > 0:
 						_deal_damage_to_enemy(target_enemy_index, hand_size * effect.value, effect.damage_type)
 			EffectRes.EffectType.DAMAGE_PER_TOKEN:
@@ -1181,12 +1199,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						else:
 							team_mgr.heal(card.owner_id, heal_amt)
 			EffectRes.EffectType.ENERGY_TO_DAMAGE:
+				# 본인 영웅의 현재 에너지 × value (모두 소비)
 				if target_enemy_index >= 0 and deck_mgr:
-					var energy: int = deck_mgr.current_energy
+					var energy: int = deck_mgr.get_energy(card.owner_id)
 					if energy > 0:
 						_deal_damage_to_enemy(target_enemy_index, energy * effect.value, effect.damage_type)
-						deck_mgr.current_energy = 0
-						deck_mgr.energy_changed.emit(0)
+						deck_mgr.set_energy_h(card.owner_id, 0)
 			EffectRes.EffectType.STATUS_DOUBLE:
 				var sd_targets: Array = []
 				if effect.target == "ALL":

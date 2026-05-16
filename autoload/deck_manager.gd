@@ -223,9 +223,23 @@ func set_pending_cost_reduction(hero_id: String, val: int) -> void:
 	if _heroes.has(hero_id):
 		_heroes[hero_id]["pending_cost_reduction"] = val
 
+func add_pending_cost_reduction(hero_id: String, delta: int) -> void:
+	if _heroes.has(hero_id):
+		_heroes[hero_id]["pending_cost_reduction"] += delta
+
 func set_pending_all_cost_zero(hero_id: String, val: bool) -> void:
 	if _heroes.has(hero_id):
 		_heroes[hero_id]["pending_all_cost_zero"] = val
+
+func add_energy_h(hero_id: String, delta: int) -> void:
+	if _heroes.has(hero_id):
+		_heroes[hero_id]["energy"] += delta
+		energy_changed.emit(_heroes[hero_id]["energy"])
+
+func set_energy_h(hero_id: String, val: int) -> void:
+	if _heroes.has(hero_id):
+		_heroes[hero_id]["energy"] = val
+		energy_changed.emit(val)
 
 func get_cards_played_this_turn(hero_id: String) -> int:
 	return _heroes[hero_id]["cards_played_this_turn"] if _heroes.has(hero_id) else 0
