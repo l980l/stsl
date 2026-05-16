@@ -241,13 +241,6 @@ func _build_ui() -> void:
 	banner_rule.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	banner.add_child(banner_rule)
 
-	var banner_cutout := ColorRect.new()
-	banner_cutout.color = SacredPalette.INK_1000
-	banner_cutout.size = Vector2(20, 14)
-	banner_cutout.position = Vector2(290, 56)
-	banner_cutout.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	banner.add_child(banner_cutout)
-
 	var banner_diamond := Label.new()
 	banner_diamond.text = "✦"
 	banner_diamond.add_theme_color_override("font_color", SacredPalette.BRASS_300)
