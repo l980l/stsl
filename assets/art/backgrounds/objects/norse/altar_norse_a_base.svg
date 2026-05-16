@@ -5,7 +5,6 @@
       <stop offset="1" stop-color="#403c38"/>
     </linearGradient>
   </defs>
-  <ellipse cx="120" cy="270" rx="100" ry="9" fill="#000" opacity="0.5"/>
   <!-- 받침 (큰 돌 더미) -->
   <rect x="30" y="210" width="180" height="60" fill="url(#ana_stone)"/>
   <rect x="30" y="210" width="180" height="6" fill="#a8a4a0" opacity="0.4"/>

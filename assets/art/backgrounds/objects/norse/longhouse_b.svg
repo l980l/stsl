@@ -9,7 +9,6 @@
       <stop offset="1" stop-color="#2a1808"/>
     </linearGradient>
   </defs>
-  <ellipse cx="300" cy="450" rx="280" ry="13" fill="#000" opacity="0.5"/>
   <!-- 더 작은 longhouse — 단순 사각형 -->
   <rect x="80" y="260" width="440" height="160" fill="url(#lhb_wall)"/>
   <line x1="80" y1="290" x2="520" y2="290" stroke="#1a0e08" stroke-width="2" opacity="0.6"/>

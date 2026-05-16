@@ -11,7 +11,6 @@
       <stop offset="1" stop-color="#a02010" stop-opacity="0"/>
     </radialGradient>
   </defs>
-  <ellipse cx="120" cy="270" rx="100" ry="9" fill="#000" opacity="0.5"/>
   <rect x="20" y="220" width="200" height="50" fill="url(#al_stone)"/>
   <rect x="20" y="220" width="200" height="6" fill="#fff" opacity="0.3"/>
   <rect x="34" y="200" width="172" height="22" fill="#bfa978"/>

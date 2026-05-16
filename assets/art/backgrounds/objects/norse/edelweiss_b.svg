@@ -5,7 +5,6 @@
       <stop offset="1" stop-color="#d0ccb8"/>
     </radialGradient>
   </defs>
-  <ellipse cx="65" cy="124" rx="38" ry="3" fill="#000" opacity="0.35"/>
   <!-- 더 작은 군락 -->
   <path d="M 35 124 Q 35 95 30 65" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
   <path d="M 65 124 Q 65 85 62 50" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>

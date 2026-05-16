@@ -6,7 +6,6 @@
       <stop offset="1" stop-color="#2c2824"/>
     </linearGradient>
   </defs>
-  <ellipse cx="110" cy="568" rx="92" ry="10" fill="#000" opacity="0.5"/>
   <!-- 룬스톤 — 위쪽 둥근 거대한 돌 -->
   <path d="M 60 560 Q 50 540 50 480 Q 50 350 50 200 Q 50 120 80 60 Q 100 30 120 30 Q 145 30 165 80 Q 175 130 175 200 Q 175 350 175 480 Q 175 540 160 560 Z" fill="url(#rsa_stone)"/>
   <!-- 받침 -->

@@ -6,7 +6,6 @@
       <stop offset="1" stop-color="#2a1c10"/>
     </linearGradient>
   </defs>
-  <ellipse cx="140" cy="350" rx="92" ry="11" fill="#000" opacity="0.45"/>
   <path d="M 132 340 Q 124 240 130 180 Q 135 140 145 140 Q 148 200 150 340 Z" fill="url(#olb_trunk)"/>
   <path d="M 138 200 Q 96 180 78 140" stroke="#3a2418" stroke-width="6" fill="none" stroke-linecap="round"/>
   <path d="M 142 180 Q 178 155 208 130" stroke="#3a2418" stroke-width="6" fill="none" stroke-linecap="round"/>

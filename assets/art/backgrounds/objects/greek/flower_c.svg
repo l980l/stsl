@@ -5,7 +5,6 @@
       <stop offset="1" stop-color="#d8a040"/>
     </radialGradient>
   </defs>
-  <ellipse cx="55" cy="106" rx="32" ry="3" fill="#000" opacity="0.35"/>
   <!-- 작은 노란꽃 — 줄기 4대 -->
   <path d="M 24 106 Q 22 84 18 60" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
   <path d="M 42 106 Q 42 78 38 44" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>

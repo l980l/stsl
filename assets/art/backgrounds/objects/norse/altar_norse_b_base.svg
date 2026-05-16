@@ -5,7 +5,6 @@
       <stop offset="1" stop-color="#383430"/>
     </linearGradient>
   </defs>
-  <ellipse cx="120" cy="270" rx="92" ry="8" fill="#000" opacity="0.45"/>
   <!-- 거친 돌탑 (스택 형식) -->
   <rect x="40" y="220" width="160" height="50" fill="url(#anb_stone)"/>
   <rect x="55" y="190" width="130" height="30" fill="#605c58"/>

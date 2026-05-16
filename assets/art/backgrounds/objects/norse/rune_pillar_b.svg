@@ -6,7 +6,6 @@
       <stop offset="1" stop-color="#1c1814"/>
     </linearGradient>
   </defs>
-  <ellipse cx="100" cy="588" rx="78" ry="10" fill="#000" opacity="0.5"/>
   <!-- 부서진 기둥 (꼭대기 잘림) -->
   <path d="M 62 580 L 58 200 L 75 90 L 110 75 L 125 95 L 142 200 L 138 580 Z" fill="url(#rpb_stone)"/>
   <ellipse cx="100" cy="580" rx="55" ry="12" fill="#383430"/>

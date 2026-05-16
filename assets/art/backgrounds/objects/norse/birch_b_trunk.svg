@@ -1,5 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 480" width="160" height="480">
-  <ellipse cx="80" cy="468" rx="40" ry="8" fill="#000" opacity="0.45"/>
   <!-- 약간 휘어진 줄기 -->
   <path d="M 70 95 Q 65 220 75 470 L 88 470 Q 95 220 85 95 Z" fill="#d8d4c8"/>
   <path d="M 70 95 Q 65 220 75 470 L 78 470 Q 73 220 78 95 Z" fill="#a8a4a0" opacity="0.45"/>

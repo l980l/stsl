@@ -10,7 +10,6 @@
       <stop offset="1" stop-color="#2a3e22" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <ellipse cx="80" cy="468" rx="42" ry="9" fill="#000" opacity="0.45"/>
   <rect x="74" y="380" width="12" height="90" fill="#3a2a1a"/>
   <rect x="76" y="380" width="3" height="90" fill="#000" opacity="0.3"/>
   <path d="M 80 18 L 28 460 L 132 460 Z" fill="url(#cy_body)"/>

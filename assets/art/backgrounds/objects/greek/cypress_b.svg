@@ -6,7 +6,6 @@
       <stop offset="1" stop-color="#0f2010"/>
     </linearGradient>
   </defs>
-  <ellipse cx="80" cy="468" rx="38" ry="8" fill="#000" opacity="0.42"/>
   <rect x="74" y="388" width="12" height="82" fill="#3a2a1a"/>
   <rect x="76" y="388" width="3" height="82" fill="#000" opacity="0.3"/>
   <path d="M 80 40 L 40 470 L 120 470 Z" fill="url(#cyb_body)"/>

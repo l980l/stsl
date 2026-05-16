@@ -6,7 +6,6 @@
       <stop offset="1" stop-color="#1c1814"/>
     </linearGradient>
   </defs>
-  <ellipse cx="110" cy="568" rx="88" ry="10" fill="#000" opacity="0.5"/>
   <!-- 부서진 룬스톤 — 꼭대기 잘림 -->
   <path d="M 65 560 Q 55 530 55 460 Q 55 320 60 220 L 55 180 L 75 160 L 105 180 L 115 150 L 145 170 L 160 220 Q 165 320 165 460 Q 165 530 155 560 Z" fill="url(#rsb_stone)"/>
   <ellipse cx="110" cy="555" rx="58" ry="13" fill="#383430"/>

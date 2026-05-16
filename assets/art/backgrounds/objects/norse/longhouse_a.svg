@@ -9,7 +9,6 @@
       <stop offset="1" stop-color="#3a2818"/>
     </linearGradient>
   </defs>
-  <ellipse cx="300" cy="450" rx="290" ry="14" fill="#000" opacity="0.5"/>
   <!-- 통나무 벽 (가로 줄) -->
   <rect x="50" y="240" width="500" height="180" fill="url(#lha_wall)"/>
   <line x1="50" y1="270" x2="550" y2="270" stroke="#1a0e08" stroke-width="2" opacity="0.6"/>

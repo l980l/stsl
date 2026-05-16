@@ -14,7 +14,6 @@
       <stop offset="1" stop-color="#604e30"/>
     </linearGradient>
   </defs>
-  <ellipse cx="300" cy="450" rx="280" ry="13" fill="#000" opacity="0.5"/>
   <rect x="20" y="400" width="560" height="50" fill="url(#tmb_floor)"/>
   <rect x="40" y="378" width="520" height="24" fill="#a89074"/>
   <!-- 6기둥 -->

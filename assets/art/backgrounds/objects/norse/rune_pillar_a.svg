@@ -6,7 +6,6 @@
       <stop offset="1" stop-color="#2a2622"/>
     </linearGradient>
   </defs>
-  <ellipse cx="100" cy="588" rx="80" ry="10" fill="#000" opacity="0.5"/>
   <!-- 거친 돌기둥 (다듬어지지 않은 자연석 형태) -->
   <path d="M 60 580 Q 55 540 50 400 L 55 200 L 70 80 L 130 60 L 145 200 L 150 400 Q 145 540 140 580 Z" fill="url(#rpa_stone)"/>
   <!-- 받침 -->

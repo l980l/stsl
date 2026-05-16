@@ -6,7 +6,6 @@
       <stop offset="1" stop-color="#7a1a1a"/>
     </radialGradient>
   </defs>
-  <ellipse cx="60" cy="134" rx="34" ry="3" fill="#000" opacity="0.35"/>
   <!-- 양귀비 — 줄기 3대 -->
   <path d="M 36 134 Q 36 100 30 50" stroke="#506830" stroke-width="3" fill="none" stroke-linecap="round"/>
   <path d="M 60 134 Q 60 90 58 30" stroke="#506830" stroke-width="3" fill="none" stroke-linecap="round"/>

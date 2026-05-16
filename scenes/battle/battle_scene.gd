@@ -2641,7 +2641,16 @@ func _spawn_fg_specs(specs: Array, tint: Color) -> void:
 		var anchor: Vector2 = spec["pos"]
 		var sc: float = spec["scale"]
 		var z_main: int = int(anchor.y)
-		# 발 그림자 — SVG 자체에 ellipse shadow 포함되어 있어 중복 추가 안 함 (사용자 피드백)
+		# 발 그림자 — 코드에서 동적 생성 (SVG 의 그림자 ellipse 는 모두 제거됨, 일관성 + 신화 통일)
+		# 식생(풀/꽃/식생 leaves)은 부드럽게, 구조물(temple/statue/column/altar) 은 짙고 작게
+		var is_soft: bool = SceneBackground._wind_eligible(svg_id) if svg_id != "" else false
+		var is_altar: bool = svg_id.begins_with("altar")
+		var size_w: float = SceneBackground.OBJECT_SIZE.get(svg_id, Vector2(120, 240)).x
+		var soft_shadow: bool = is_soft and not is_altar
+		var shadow_w: float = size_w * sc * (0.50 if soft_shadow else 0.85)
+		var shadow_h: float = max(4.0, size_w * sc * (0.05 if soft_shadow else 0.07))
+		var shadow_alpha: float = 0.30 if soft_shadow else 0.45
+		_add_ground_shadow(self, anchor, shadow_w, shadow_h, shadow_alpha, z_main - 1)
 		# split spawn — base(정지) + sway 부분(shader). 나무: trunk/leaves. altar: base/flame.
 		if spec.get("split", false):
 			var suffixes: Array = spec.get("split_suffixes", ["_trunk", "_leaves"])

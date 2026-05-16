@@ -10,7 +10,6 @@
       <stop offset="1" stop-color="#604830"/>
     </linearGradient>
   </defs>
-  <ellipse cx="110" cy="568" rx="92" ry="10" fill="#000" opacity="0.5"/>
   <rect x="20" y="500" width="180" height="60" fill="url(#swb_base)"/>
   <rect x="20" y="500" width="180" height="6" fill="#fff" opacity="0.25"/>
   <rect x="32" y="480" width="156" height="22" fill="#a08868"/>

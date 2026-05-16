@@ -10,7 +10,6 @@
       <stop offset="1" stop-color="#a08c68"/>
     </linearGradient>
   </defs>
-  <ellipse cx="100" cy="588" rx="88" ry="10" fill="#000" opacity="0.42"/>
   <rect x="22" y="558" width="156" height="24" fill="url(#cdc_cap)"/>
   <rect x="32" y="540" width="136" height="20" fill="#dccaa0"/>
   <rect x="42" y="100" width="116" height="438" fill="url(#cdc_shaft)"/>
