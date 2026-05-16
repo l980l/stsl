@@ -1477,6 +1477,8 @@ func _refresh_turn_queue_widget() -> void:
 		var info: Dictionary = _resolve_actor_info(aid)
 		slot["label"].text = info["name"]
 		slot["swatch"].color = info["color"]
+		# 폰트 크기 자동 조절 — 슬롯 너비 72px (80 - 좌우 4px padding) 안에 맞춤
+		LabelUtils.fit_text(slot["label"], 11, 7, 72.0)
 		# 현재 차례 = 첫 슬롯 강조 (밝게)
 		slot["root"].modulate = Color(1.0, 1.0, 1.0, 1.0) if i == 0 else Color(1.0, 1.0, 1.0, 0.7)
 
