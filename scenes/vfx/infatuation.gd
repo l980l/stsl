@@ -397,15 +397,15 @@ func _draw_mandala(canvas: CanvasItem) -> void:
 	for i in range(8):
 		var ang: float = TAU * float(i) / 8.0 + rot
 		var hpos := rc + Vector2(cos(ang) * 60.0 * sc, sin(ang) * 60.0 * sc)
-		var poly := PackedVector2Array()
+		var small_poly := PackedVector2Array()
 		for v in _heart_pts:
-			poly.append(hpos + v * 8.0 * sc)
-		canvas.draw_colored_polygon(poly, Color(COL_RED, 0.85 * a))
+			small_poly.append(hpos + v * 8.0 * sc)
+		canvas.draw_colored_polygon(small_poly, Color(COL_RED, 0.85 * a))
 	# 중앙 큰 하트
-	var poly := PackedVector2Array()
+	var center_poly := PackedVector2Array()
 	for v in _heart_pts:
-		poly.append(rc + v * 14.0 * sc)
-	canvas.draw_colored_polygon(poly, Color(COL_HOT, a * 0.95))
+		center_poly.append(rc + v * 14.0 * sc)
+	canvas.draw_colored_polygon(center_poly, Color(COL_HOT, a * 0.95))
 
 # 체인 — target 허리 회전 (5s/회전, 점선 외곽 원+8개 하트, 누운 원근)
 func _draw_chains(canvas: CanvasItem) -> void:

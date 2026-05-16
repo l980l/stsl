@@ -102,6 +102,7 @@ signal enemy_counter_changed(enemy_index: int)
 signal card_pick_requested(action: String, draw_count: int)
 signal boss_phase_changed(enemy_index: int, new_phase: int)
 signal enemy_spawned(enemy_index: int)  # T3-SUMMON: 런타임 적 추가 알림 (UI 갱신용)
+@warning_ignore("unused_signal")
 signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시그니처 발동 알림 (UI 토스트용)
 
 # VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생.
@@ -1013,6 +1014,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				var _sbank_key: String = "power.sacrifice_bank:" + card.owner_id
 				var _banked: int = _active_powers.get(_sbank_key, {}).get("value", 0)
 				if _banked > 0:
+					@warning_ignore("integer_division")
 					var _payout: int = (_banked / 100) * effect.value
 					if _payout > 0:
 						if effect.status_type == "block":
