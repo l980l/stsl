@@ -328,13 +328,6 @@ func _build_ui() -> void:
 	hand_rule.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(hand_rule)
 
-	var hand_cutout := ColorRect.new()
-	hand_cutout.color = SacredPalette.INK_1000
-	hand_cutout.size = Vector2(20, 14)
-	hand_cutout.position = Vector2(WINDOW_W / 2.0 - 10, BOTTOM_Y - 17)
-	hand_cutout.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(hand_cutout)
-
 	var hand_diamond := Label.new()
 	hand_diamond.text = "✦"
 	hand_diamond.add_theme_color_override("font_color", SacredPalette.BRASS_300)
