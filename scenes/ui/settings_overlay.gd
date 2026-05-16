@@ -212,7 +212,7 @@ func open() -> void:
 		"particle":         GameSettings.particle_key,
 		"vfx_speed":        GameSettings.vfx_speed_key,
 		"anim_speed":       GameSettings.anim_speed_key,
-		"monster_interval": GameSettings.monster_interval_key,
+		"turn_interval":    GameSettings.turn_interval_key,
 		"kill_cam":         "on" if GameSettings.kill_cam_enabled else "off",
 		"background":       "on" if GameSettings.background_enabled else "off",
 	}
@@ -276,7 +276,7 @@ func _on_defaults() -> void:
 		"particle":         GameSettings.PARTICLE_DEFAULT,
 		"vfx_speed":        GameSettings.VFX_SPEED_DEFAULT,
 		"anim_speed":       GameSettings.ANIM_SPEED_DEFAULT,
-		"monster_interval": GameSettings.MONSTER_INTERVAL_DEFAULT,
+		"turn_interval":    GameSettings.TURN_INTERVAL_DEFAULT,
 		"kill_cam":         "on" if GameSettings.KILL_CAM_DEFAULT else "off",
 		"background":       "on" if GameSettings.BACKGROUND_DEFAULT else "off",
 	}
@@ -422,11 +422,11 @@ func _build_gameplay_panel() -> void:
 		GameSettings.anim_speed_key,
 		func(k: String) -> void: GameSettings.set_anim_speed(k))
 
-	_build_seg_row(p, mono, 136.0, tr("ui.settings.monster_interval"), "monster_interval",
-		GameSettings.MONSTER_INTERVAL_KEYS,
-		_build_x_labels(GameSettings.MONSTER_INTERVAL_KEYS, GameSettings.MONSTER_INTERVAL_VALUES),
-		GameSettings.monster_interval_key,
-		func(k: String) -> void: GameSettings.set_monster_interval(k))
+	_build_seg_row(p, mono, 136.0, tr("ui.settings.turn_interval"), "turn_interval",
+		GameSettings.TURN_INTERVAL_KEYS,
+		_build_x_labels(GameSettings.TURN_INTERVAL_KEYS, GameSettings.TURN_INTERVAL_VALUES),
+		GameSettings.turn_interval_key,
+		func(k: String) -> void: GameSettings.set_turn_interval(k))
 
 	# 킬캠 (처치/사망 시 슬로우 + 카메라 줌인)
 	_build_seg_row(p, mono, 192.0, tr("ui.settings.kill_cam"), "kill_cam",

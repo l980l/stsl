@@ -1033,7 +1033,7 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 
 func _start_battle() -> void:
 	if not GameManager.pending_enemies.is_empty():
-		BattleManager.turn_interval = 0.4  # base — GameSettings.monster_interval_multiplier 가 곱셈 적용
+		BattleManager.turn_interval = 0.4  # base — GameSettings.turn_interval_multiplier 가 곱셈 적용
 		BattleManager.setup_battle(GameManager.pending_enemies)
 		_setup_heroes()
 		_setup_enemies()

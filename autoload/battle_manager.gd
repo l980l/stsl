@@ -141,9 +141,9 @@ func _vfx_speed_mul() -> float:
 	var gs := get_node_or_null("/root/GameSettings")
 	return gs.vfx_speed_multiplier if gs else 0.0
 
-func _monster_interval_mul() -> float:
+func _turn_interval_mul() -> float:
 	var gs := get_node_or_null("/root/GameSettings")
-	return gs.monster_interval_multiplier if gs else 0.0
+	return gs.turn_interval_multiplier if gs else 0.0
 
 # ── VFX 임팩트 지연 (초) — vfx_speed_multiplier 적용된 값 ──
 func _vfx_impact_delay_for_damage_type(dtype: String) -> float:
@@ -542,9 +542,12 @@ func _run_next_actor_turn() -> void:
 	elif next_id.begins_with("enemy:"):
 		var idx: int = int(next_id.substr(6))
 		await _run_one_enemy_turn(idx)
-		# 적 차례 후 다음 actor 자동 진행
+		# 적 차례 후 다음 actor 자동 진행 — 차례 전환 인터벌 대기
 		if is_battle_active:
-			await _run_next_actor_turn()
+			if turn_interval > 0.0:
+				await get_tree().create_timer(turn_interval * _turn_interval_mul()).timeout
+			if is_battle_active:
+				await _run_next_actor_turn()
 
 # 단일 영웅 차례 시작 — 본인 영웅만 phase 처리, 입력 대기
 func _start_hero_turn(hid: String) -> void:
@@ -655,7 +658,11 @@ func end_player_turn() -> void:
 	_advance_turn_counter(_current_actor_id)
 	turn_ended.emit(_current_actor_id)
 	_current_actor_id = ""
-	await _run_next_actor_turn()
+	# 차례 전환 인터벌 — 영웅→다음 actor (영웅이든 적이든)
+	if is_battle_active and turn_interval > 0.0:
+		await get_tree().create_timer(turn_interval * _turn_interval_mul()).timeout
+	if is_battle_active:
+		await _run_next_actor_turn()
 
 const DND_KEY := "power.double_next_damage:__global__"
 
@@ -1486,7 +1493,7 @@ func _execute_enemy_turn() -> void:
 		if not _enemy_alive[i]:
 			continue
 		if not first and turn_interval > 0.0:
-			await get_tree().create_timer(turn_interval * _monster_interval_mul()).timeout
+			await get_tree().create_timer(turn_interval * _turn_interval_mul()).timeout
 		first = false
 		await _run_one_enemy_turn(i, true)  # legacy 모드: 큐 카운터 진행 스킵
 	_check_win_condition()
