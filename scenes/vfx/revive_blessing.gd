@@ -41,8 +41,19 @@ const PSPEED        := 60.0   # HTML(dt*0.06) → Godot(delta*60) 환산 계수
 signal screen_effect
 
 var _target := Vector2.ZERO
-var _smoke_layer: Node2D  # 일반 블렌드 — 기둥·고리·안개·깃털
+# 바닥 고리 anchor — set_ground_anchor() 로 캐릭터 발 위치 지정.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+	if _ground_layer != null:
+		_ground_layer.z_as_relative = false
+		_ground_layer.z_index = int(pos.y) - 1
+var _smoke_layer: Node2D  # 일반 블렌드 — 기둥·안개·깃털
 var _glow_layer: Node2D   # 가산 블렌드 — 빛 입자
+var _ground_layer: Node2D # 바닥 고리 (캐릭터 뒤로 z set)
 var _particles: Array = []  # [{pos, vel, life, max_life, r, kind, grav, rot, spin}]
 var _pillar_age := -1.0   # <0 = 비활성, 경과 초 (빛기둥)
 var _ring_age := -1.0     # <0 = 비활성, 경과 초 (바닥 고리)
@@ -61,7 +72,11 @@ static func pillar_quad(target: Vector2, width: float, height: float, grow: floa
 
 func _ready() -> void:
 	set_process(false)
-	# 기둥·고리·안개·깃털 레이어 — 일반 블렌드, 아래
+	# 바닥 고리 — 캐릭터 뒤로 z set, 일반 블렌드. 가장 먼저 add
+	_ground_layer = _GroundLayer.new()
+	_ground_layer.setup(self)
+	add_child(_ground_layer)
+	# 기둥·안개·깃털 레이어 — 일반 블렌드
 	_smoke_layer = _DrawLayer.new()
 	_smoke_layer.setup(self, false)
 	add_child(_smoke_layer)
@@ -152,6 +167,8 @@ func _process(delta: float) -> void:
 
 	_smoke_layer.queue_redraw()
 	_glow_layer.queue_redraw()
+	if _ground_layer:
+		_ground_layer.queue_redraw()
 
 # ── 그리기 패스 — _DrawLayer 가 블렌드 모드별로 호출 ──
 func _draw_smoke_pass(canvas: CanvasItem) -> void:
@@ -168,9 +185,7 @@ func _draw_smoke_pass(canvas: CanvasItem) -> void:
 				Color(COL_DEEP, 0.0), Color(COL_DEEP, 0.0)])
 			canvas.draw_polygon(quad, cols)
 
-	# 바닥 고리 (누운 원근)
-	if _ring_age >= 0.0:
-		_draw_ring(canvas)
+	# 바닥 고리는 _ground_layer 로 분리됨 (캐릭터 뒤)
 
 	# 황금 안개
 	for p in _particles:
@@ -233,7 +248,7 @@ func _draw_ring(canvas: CanvasItem) -> void:
 	var a: float = appear * fade * 0.9
 	if a <= 0.0:
 		return
-	var rc := _target + Vector2(0.0, 36.0)
+	var rc: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 36.0)
 	# 동심원 3개 (누운 타원)
 	var radii := [125.0, 108.0, 86.0]
 	var ring_cols := [Color(COL_MID, 0.9 * a), Color(COL_HOT, 0.65 * a), Color(COL_DEEP, 0.5 * a)]
@@ -255,6 +270,11 @@ func _draw_ring(canvas: CanvasItem) -> void:
 		var pr := rc + Vector2(cos(rr), sin(rr) * RING_SQUASH) * 86.0 * sc
 		canvas.draw_polyline(PackedVector2Array([pl, tip, pr]), Color(COL_MID, 0.8 * a), 1.2, true)
 
+# ── 바닥 고리 (캐릭터 뒤) — _ground_layer 가 z 캐릭터 아래로 set ──
+func _draw_ground_pass(canvas: CanvasItem) -> void:
+	if _ring_age >= 0.0:
+		_draw_ring(canvas)
+
 # ── 블렌드 모드가 다른 두 그리기 레이어 ──
 # 어두운 황금 안개는 가산이면 흐려지므로 일반 블렌드, 빛 입자는 글로우용 가산 블렌드.
 class _DrawLayer:
@@ -275,3 +295,14 @@ class _DrawLayer:
 			_fx._draw_glow_pass(self)
 		else:
 			_fx._draw_smoke_pass(self)
+
+# 바닥 고리 전용 레이어 — 일반 블렌드. z_index 캐릭터 아래로.
+class _GroundLayer:
+	extends Node2D
+	var _fx: Node2D
+
+	func setup(owner_fx: Node2D) -> void:
+		_fx = owner_fx
+
+	func _draw() -> void:
+		_fx._draw_ground_pass(self)

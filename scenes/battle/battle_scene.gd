@@ -13,6 +13,9 @@ const WINDOW_W := 1920
 const WINDOW_H := 1080
 const SLOT_W := 240
 const SLOT_H := 280
+# 캐릭터 노드의 position.y(slot.y + 184) 에서 발(slot.y + SLOT_H)까지 offset.
+# 바닥 VFX(룬링/글리프)를 발밑에 정렬할 때 사용.
+const _CHAR_FOOT_Y_OFFSET := float(SLOT_H - 184)
 const BOTTOM_Y := 840
 const CARD_W := 110
 const CARD_H := 160
@@ -122,6 +125,8 @@ func _trf(key: String, args) -> String:
 	return s
 
 func _ready() -> void:
+	# y-sort: 캐릭터·전경 SVG 모두 같은 좌표계 — y 큰(아래) 노드가 위로 자동 정렬
+	y_sort_enabled = true
 	_build_ui()
 	_setup_kill_cam()
 	if OS.is_debug_build():
@@ -140,6 +145,7 @@ func _ready() -> void:
 		add_child(_debug_badge)
 
 func _process(delta: float) -> void:
+	_update_camera_sway(delta)
 	if _drag_card != null and not _drag_chevrons.is_empty():
 		_drag_t_offset = fmod(_drag_t_offset + delta * 0.165, 1.0)
 		_update_drag_chevrons()
@@ -152,27 +158,32 @@ func _build_debug_tooltip() -> void:
 # ─────────────────────────────────────────────
 
 func _build_ui() -> void:
-	# 배경
-	var bg := ColorRect.new()
-	bg.color = SacredPalette.INK_1000
-	bg.position = Vector2.ZERO
-	bg.size = Vector2(WINDOW_W, WINDOW_H)
-	add_child(bg)
-
-	const _BG_MAP := {1: "mediterranean", 2: "eastasia"}
-	var bg_id: String = _BG_MAP.get(GameManager.current_chapter, "")
-	if bg_id != "":
-		var bg_path := "res://assets/art/backgrounds/%s.png" % bg_id
-		if ResourceLoader.exists(bg_path):
-			var bg_tex := TextureRect.new()
-			bg_tex.texture = load(bg_path)
-			bg_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			bg_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-			bg_tex.position = Vector2.ZERO
-			bg_tex.size = Vector2(WINDOW_W, WINDOW_H)
-			bg_tex.modulate = Color(1, 1, 1, 0.55)
-			bg_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			add_child(bg_tex)
+	# 배경 — M7.5 v2 SVG 컴포지션 + 무작위 환경(시각/날씨) + critters + weather 입자
+	var gs := get_node_or_null("/root/GameSettings")
+	if gs == null or gs.background_enabled:
+		var SBG := preload("res://scenes/components/scene_background.gd")
+		_scene_bg = SBG.new()
+		var act_v: int = GameManager.current_act if GameManager else 1
+		_scene_bg.setup(_current_mythology(), act_v, randi(), _build_bg_occupied_rects())
+		add_child(_scene_bg)
+		# fg specs → self 자식으로 spawn (y_sort_enabled 가 캐릭터와 자동 정렬)
+		_spawn_fg_specs(_scene_bg.front_specs, _scene_bg.current_env.get("tint", Color.WHITE))
+		# critters (새/별똥별) + weather (비/눈) — env 공유
+		var env: Dictionary = _scene_bg.current_env
+		var critters_script := preload("res://scenes/components/scene_critters.gd")
+		var critters = critters_script.new()
+		add_child(critters)
+		critters.setup(env)
+		var weather_script := preload("res://scenes/components/weather_particles.gd")
+		var weather = weather_script.new()
+		add_child(weather)
+		weather.setup(env.get("weather", "clear"))  # z_index=950 자체 set
+	else:
+		var bg := ColorRect.new()
+		bg.color = SacredPalette.INK_1000
+		bg.position = Vector2.ZERO
+		bg.size = Vector2(WINDOW_W, WINDOW_H)
+		add_child(bg)
 
 	# 상단 배너 (eyebrow + 메시지 + gradient 구분선)
 	var banner := Control.new()
@@ -354,6 +365,38 @@ func _build_ui() -> void:
 	for i in range(3):
 		_hero_nodes.append(_make_hero_slot(i))
 	# 적 슬롯은 _setup_enemies()에서 동적 생성
+
+	# 모든 UI Control 의 z_index = 1000 — fg/캐릭터(z_index 0~1080) 보다 항상 위
+	# 카드(z 1000+), 호버 카드(1200), 디버그 overlay(5000) 와 호환
+	_apply_ui_z_index_recursive(self, 1500)
+
+# battle_scene 의 직접 자식 Control z_index set (재귀 X — 캐릭터 안 Body 영향 회피).
+# 캐릭터 UI(panel/hp/intent/btn/status) 는 별도로 800 (VFX 900 보다 뒤).
+# 화면 UI(end_turn/덱보기/렐릭/배너 등) 는 z (default 1000) — VFX 위.
+func _apply_ui_z_index_recursive(_node: Node, z: int) -> void:
+	for child in get_children():
+		if child is Sprite2D or child is ParallaxBackground or child is CanvasLayer:
+			continue
+		if child is Control:
+			child.z_index = z
+	# 캐릭터 UI 차등 z — panel(배경) < hp_bar < 라벨(hp/block/intent/name/status)
+	# fg(0~1080) 위, VFX(1300) 아래. 라벨이 hp_bar 자식 bloom 위로 올라오게.
+	for entry in _hero_nodes:
+		_set_char_entry_z(entry)
+	for entry in _enemy_nodes:
+		_set_char_entry_z(entry)
+
+func _set_char_entry_z(entry: Dictionary) -> void:
+	const Z_PANEL := 1200   # 배경 panel + bracket
+	const Z_BAR := 1210     # hp_bar wrapper + bg/fill/bloom/ghost (z_as_relative)
+	const Z_LBL := 1220     # 모든 라벨 — bar 위
+	if entry.has("panel") and is_instance_valid(entry["panel"]):
+		entry["panel"].z_index = Z_PANEL
+	if entry.has("hp_bar") and is_instance_valid(entry["hp_bar"]):
+		entry["hp_bar"].z_index = Z_BAR
+	for k in ["name_lbl", "hp_lbl", "block_lbl", "intent_lbl", "btn", "status_box"]:
+		if entry.has(k) and is_instance_valid(entry[k]):
+			entry[k].z_index = Z_LBL
 
 func _hero_slot_pos(index: int) -> Vector2:
 	return (get_node("HeroSlot%d" % (index + 1)) as Marker2D).position
@@ -839,6 +882,7 @@ func _connect_signals() -> void:
 	BattleManager.card_vfx_charge_start.connect(_on_card_vfx_start)
 	BattleManager.poison_tick_applied.connect(_on_poison_tick)
 	BattleManager.signature_fired.connect(_on_signature_fired)
+	BattleManager.cards_exhausted_by_enemy.connect(_on_cards_exhausted_by_enemy)
 	BattleManager.pending_damage_changed.connect(_on_pending_damage_changed)
 
 var _bgm_boss_id: String = ""
@@ -878,7 +922,7 @@ func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	toast.theme_type_variation = "TitleLabel"
 	toast.add_theme_font_size_override("font_size", 32)
 	toast.modulate = color
-	toast.z_index = 100
+	toast.z_index = 2000  # 시그니처 토스트 — popup 위, debug 아래
 	toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	toast.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -892,6 +936,28 @@ func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	tw.tween_callback(toast.queue_free)
 	# 적 위치에 색상 플래시 (시그니처 색상)
 	_burst_signature_at_enemy(enemy_index, color)
+
+# 적 SPECIAL 인텐트가 카드를 이번 전투 동안 exhaust 시켰을 때 — 토스트 알림
+func _on_cards_exhausted_by_enemy(card_names: Array) -> void:
+	var msg: String = "%s\n%s" % [tr("battle.notify.cards_exhausted"), ", ".join(card_names)]
+	var toast := Label.new()
+	toast.text = msg
+	toast.theme_type_variation = "TitleLabel"
+	toast.add_theme_font_size_override("font_size", 26)
+	toast.modulate = Color(1.0, 0.6, 0.4)  # 코랄 — 경고
+	toast.z_index = 2000
+	toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	toast.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	toast.position = Vector2(WINDOW_W / 2.0 - 300, 320)
+	toast.size = Vector2(600, 80)
+	toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	add_child(toast)
+	var tw := create_tween()
+	tw.tween_property(toast, "modulate:a", 1.0, 0.15)
+	tw.tween_interval(2.0)
+	tw.tween_property(toast, "modulate:a", 0.0, 0.4)
+	tw.tween_callback(toast.queue_free)
 
 # 적 시그니처 발동 시 시각 강조 — 사용자 피드백으로 비활성 (큰 주황/보라 사각형이 어색).
 # 시그니처 토스트 라벨(_on_signature_fired)이 이미 화면 중앙에 표시되므로 추가 강조 불필요.
@@ -915,7 +981,7 @@ func _attach_signature_icon(panel: ColorRect, mythology) -> void:
 	lbl.text = info["emoji"]
 	lbl.add_theme_font_size_override("font_size", 22)
 	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-	lbl.z_index = 100
+	lbl.z_index = 1500  # 시그니처 아이콘 — UI 표준
 	var pp: Vector2 = panel.position
 	lbl.position = pp + Vector2(panel.size.x - 34.0, 4.0)
 	lbl.size = Vector2(26, 28)
@@ -942,6 +1008,10 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 		var char_node = enemy.character_scene.instantiate()
 		char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
 		char_node.scale = Vector2(-1.44, 2.4)
+		char_node.z_index = int(slot_pos.y + SLOT_H)
+		# 발 그림자
+		var foot_pos := Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + SLOT_H - 4)
+		_add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
 		add_child(char_node)
 		_enemy_char_nodes[enemy_index] = char_node
 	else:
@@ -949,8 +1019,11 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 		placeholder.color = Color(0.45, 0.45, 0.5, 0.6)
 		placeholder.size = Vector2(60, 120)
 		placeholder.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 30, slot_pos.y + 40)
+		placeholder.z_index = int(slot_pos.y + SLOT_H)
 		add_child(placeholder)
 		_enemy_char_nodes[enemy_index] = placeholder
+	# 새로 만든 적 panel 의 UI Control z_index 갱신
+	_apply_ui_z_index_recursive(self, 1500)
 	_update_enemy_ui(enemy_index)
 	_refresh_enemy_counter(enemy_index)
 
@@ -1068,11 +1141,18 @@ func _setup_heroes() -> void:
 			var slot_pos := _hero_slot_pos(i)
 			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
 			char_node.scale = Vector2(1.44, 2.4)
+			# 발 위치(=panel 발) 기준 z_index — fg sprite 와 동일 규칙
+			char_node.z_index = int(slot_pos.y + SLOT_H)
+			# 발 그림자 — 캐릭터 z 보다 1 작음 (캐릭터 아래, fg/bg 위)
+			var foot_pos := Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + SLOT_H - 4)
+			_add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
 			add_child(char_node)
 			_hero_char_nodes[hero.hero_id] = char_node
 
 		_hero_status_containers[hero.hero_id] = entry["status_box"]
 		_update_hero_ui(hero.hero_id)
+	# 적/영웅 panel 의 hp_bar/이름라벨/intent_lbl 등 UI Control z_index 일괄 갱신
+	_apply_ui_z_index_recursive(self, 1500)
 
 func _setup_enemies() -> void:
 	# 기존 노드 전부 파괴
@@ -1116,6 +1196,10 @@ func _setup_enemies() -> void:
 			var char_node = enemy.character_scene.instantiate()
 			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
 			char_node.scale = Vector2(-1.44, 2.4)
+			char_node.z_index = int(slot_pos.y + SLOT_H)
+			# 발 그림자
+			var foot_pos := Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + SLOT_H - 4)
+			_add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
 			add_child(char_node)
 			_enemy_char_nodes[i] = char_node
 		else:
@@ -1123,11 +1207,14 @@ func _setup_enemies() -> void:
 			placeholder.color = Color(0.45, 0.45, 0.5, 0.6)
 			placeholder.size = Vector2(60, 120)
 			placeholder.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 30, slot_pos.y + 40)
+			placeholder.z_index = int(slot_pos.y + SLOT_H)
 			add_child(placeholder)
 			_enemy_char_nodes[i] = placeholder
 
 		_update_enemy_ui(i)
 		_refresh_enemy_counter(i)
+	# 적 panel 의 hp_bar/이름라벨/intent_lbl 등 UI Control z_index 1000 갱신
+	_apply_ui_z_index_recursive(self, 1500)
 
 func _update_hero_ui(hero_id: String) -> void:
 	for entry in _hero_nodes:
@@ -1230,7 +1317,8 @@ func _update_enemy_ui(index: int) -> void:
 		entry["intent_lbl"].modulate = _intent_color(intent.action_type)
 		match intent.action_type:
 			IntentRes.ActionType.ATTACK:
-				entry["intent_lbl"].text = _trf("battle.intent.attack", intent.value)
+				# 강화/약화/counter_pool 적용된 표시값
+				entry["intent_lbl"].text = _trf("battle.intent.attack", BattleManager.get_intent_display_damage(index, intent))
 			IntentRes.ActionType.BUFF:
 				match intent.status_type:
 					"strength": entry["intent_lbl"].text = _trf("battle.intent.buff.strength", intent.value)
@@ -1320,7 +1408,7 @@ func _refresh_hand() -> void:
 		node.rotation = angle
 		node.pivot_offset = Vector2(70, 100)
 		node.scale = Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE)
-		node.z_index = 10 + i
+		node.z_index = 1500 + i  # 카드 — UI 와 같은 영역
 		node.set_meta("_fan_pos", node.position)
 		node.set_meta("_fan_rot", node.rotation)
 		node.set_meta("_fan_idx", i)
@@ -1376,6 +1464,9 @@ func _on_card_drag_started(card: Resource, screen_pos: Vector2) -> void:
 	_create_drag_arrow(screen_pos)
 
 func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
+	# 우클릭 등으로 이미 cleanup 됐으면 — 라벨 덮어쓰지 않음
+	if _drag_card == null:
+		return
 	_drag_end_pos = screen_pos
 	_update_drag_arrow(screen_pos)
 	_message_label.text = tr("battle.cancel_use") if _drag_cancel_ready and screen_pos.y >= BOTTOM_Y else _drag_hint_text()
@@ -1406,7 +1497,7 @@ func _on_card_hovered(_card: Resource, card_node: CardScene) -> void:
 			tw.tween_property(btn, "scale", Vector2(hover_scale, hover_scale), 0.12)
 			tw.tween_property(btn, "position", base_pos + Vector2(0, -lift), 0.12)
 			tw.tween_property(btn, "rotation", 0.0, 0.12)
-			btn.z_index = 200
+			btn.z_index = 1700  # 호버 카드 — 다른 카드 위
 		else:
 			var dist: int = idx - hover_idx
 			var sign_x: float = 1.0 if dist > 0 else -1.0
@@ -1414,7 +1505,7 @@ func _on_card_hovered(_card: Resource, card_node: CardScene) -> void:
 			tw.tween_property(btn, "position", base_pos + Vector2(sign_x * 35.0 * falloff, 0), 0.12)
 			tw.tween_property(btn, "rotation", base_rot, 0.12)
 			tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE), 0.12)
-			btn.z_index = 10 + idx
+			btn.z_index = 1500 + idx
 
 func _on_card_unhovered(_card: Resource) -> void:
 	_reset_hand_fan()
@@ -1428,7 +1519,7 @@ func _reset_hand_fan() -> void:
 		tw.tween_property(btn, "position", btn.get_meta("_fan_pos"), 0.12)
 		tw.tween_property(btn, "rotation", btn.get_meta("_fan_rot"), 0.12)
 		tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE), 0.12)
-		btn.z_index = idx
+		btn.z_index = 1500 + idx
 
 func _on_enemy_pressed(index: int) -> void:
 	if _debug_hp_target_mode and OS.is_debug_build():
@@ -1624,6 +1715,7 @@ func _spawn_status_vfx(target: String, kind: String, beam_script: GDScript, sfx:
 	var target_pos: Vector2 = char_node.global_position
 	var fx: Node2D = beam_script.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
@@ -1730,7 +1822,7 @@ func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int,
 	_popup_stack[stack_key] = count + 1
 	var tint: Color = _popup_text_color(color)
 	var container := Node2D.new()
-	container.z_index = 20
+	container.z_index = 1800  # popup — 호버 카드(1700) 위, 토스트(2000) 아래
 	add_child(container)
 	# 글로우 halo — N장 outline 겹침 (글자 윤곽 부드럽게 퍼짐)
 	_add_popup_halo(container, text, font_size, color)
@@ -1777,7 +1869,7 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 	var status_color: Color = info[1]
 	var tint: Color = _popup_text_color(status_color)
 	var container := Node2D.new()
-	container.z_index = 20
+	container.z_index = 1800  # popup — 호버 카드(1700) 위, 토스트(2000) 아래
 	add_child(container)
 	_add_popup_halo(container, info[0], 32, status_color)
 	var lbl := Label.new()
@@ -1895,6 +1987,7 @@ func _spawn_self_particles(pos: Vector2, scene: PackedScene) -> void:
 	fx.autostart = false
 	fx.repeat = false
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.global_position = pos
 	fx.burst()
 	var shield := fx.get_node_or_null("ShieldIcon")
@@ -1911,6 +2004,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 	if "repeat" in fx:
 		fx.repeat = false
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.global_position = pos
 	fx.scale.x = -1.0 if flipped else 1.0
 	var slash_rot := randf_range(0.0, TAU)
@@ -1926,6 +2020,7 @@ func _spawn_impact_particles(pos: Vector2, amount: int, flipped: bool = false, d
 func _spawn_blood_spray(pos: Vector2, dir_angle: float = INF) -> void:
 	var fx := _VFX_BLOOD_SPRAY.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
 	fx.play(pos, pos, dir_angle)
 
@@ -1948,22 +2043,29 @@ func _resolve_caster_pos(caster, target_pos: Vector2) -> Vector2:
 func _spawn_death_dissolve(pos: Vector2) -> void:
 	var fx := _VFX_DEATH_DISSOLVE.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
+	fx.set_ground_anchor(pos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
 	fx.play(pos, pos)
 
 # 부활 VFX — 부활 대상 위치에 빛기둥·고리·빛 입자
 func _spawn_revive_blessing(pos: Vector2) -> void:
 	var fx := _VFX_REVIVE_BLESSING.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
+	fx.set_ground_anchor(pos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
 	fx.play(pos, pos)
 
 # 회복 VFX — 회복 대상 위치에 나뭇잎·반짝임·고리·십자
 # screen_effect 시점(차지 끝)에 heal SFX 발동
-func _spawn_heal_blessing(pos: Vector2) -> void:
+func _spawn_heal_blessing(pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
 	var fx := _VFX_HEAL_BLESSING.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		AudioManager.play_sfx("heal")
@@ -1972,10 +2074,13 @@ func _spawn_heal_blessing(pos: Vector2) -> void:
 
 # 신성 버프 VFX — Joan 의 POWER 카드 발동 시 시전자 위치에 룬링·빛기둥·황금 깃털
 # "buff" SFX 자원 없음 → impact_divine 재활용 (신성·강력 톤)
-func _spawn_holy_buff(pos: Vector2) -> void:
+func _spawn_holy_buff(pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
 	var fx := _VFX_HOLY_BUFF.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
@@ -1985,10 +2090,13 @@ func _spawn_holy_buff(pos: Vector2) -> void:
 
 # 전사 버프 VFX — Joan 외 영웅의 POWER 카드 발동 시 분노/주황 가시링·오라·잔불
 # "buff" SFX 자원 없음 → impact_blunt 재활용 (분노·강한 충격 톤)
-func _spawn_warrior_buff(pos: Vector2) -> void:
+func _spawn_warrior_buff(pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
 	var fx := _VFX_WARRIOR_BUFF.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
@@ -2032,33 +2140,34 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: St
 	if caster_node == null:
 		return
 	var caster_pos: Vector2 = caster_node.global_position
-	var IntentRes = BattleManager.IntentRes
+	var caster_foot: Vector2 = _foot_pos(caster_node)
+	var ir = BattleManager.IntentRes
 	match intent.action_type:
-		IntentRes.ActionType.ATTACK:
+		ir.ActionType.ATTACK:
 			var dtype: String = intent.damage_type
-			if intent.target == IntentRes.TargetType.ALL:
+			if intent.target == ir.TargetType.ALL:
 				for hpos in _all_living_hero_positions():
-					_spawn_attack_beam_simple(dtype, caster_pos, hpos + _impact_jitter())
+					_spawn_attack_beam_simple(dtype, caster_pos, hpos + _impact_jitter(), hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
 			else:
 				var hpos: Vector2 = _hero_pos_or_first(target_hero_id)
 				if hpos != Vector2.ZERO:
-					_spawn_attack_beam_simple(dtype, caster_pos, hpos + _impact_jitter())
-		IntentRes.ActionType.BUFF:
+					_spawn_attack_beam_simple(dtype, caster_pos, hpos + _impact_jitter(), hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+		ir.ActionType.BUFF:
 			if intent.status_type == "block":
-				_spawn_defense_buff(caster_pos)
+				_spawn_defense_buff(caster_pos, caster_foot)
 			else:
-				_spawn_warrior_buff(caster_pos)
-		IntentRes.ActionType.DEBUFF:
+				_spawn_warrior_buff(caster_pos, caster_foot)
+		ir.ActionType.DEBUFF:
 			var stype: String = intent.status_type
 			var fx_script: GDScript = _debuff_script_for_status(stype)
 			if fx_script:
-				if intent.target == IntentRes.TargetType.ALL:
+				if intent.target == ir.TargetType.ALL:
 					for hpos in _all_living_hero_positions():
-						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype)
+						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype, hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
 				else:
 					var hpos: Vector2 = _hero_pos_or_first(target_hero_id)
 					if hpos != Vector2.ZERO:
-						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype)
+						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype, hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
 
 # 독 DoT tick — 가스 VFX + impact_poison SFX
 func _on_poison_tick(target: String, _amount: int) -> void:
@@ -2075,7 +2184,9 @@ func _on_poison_tick(target: String, _amount: int) -> void:
 		return
 	var fx := _VFX_POISON_TICK.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
+	fx.set_ground_anchor(pos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		AudioManager.play_sfx("impact_poison")
@@ -2097,6 +2208,7 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 	if owner_node == null:
 		return
 	var caster_pos: Vector2 = owner_node.global_position
+	var caster_foot: Vector2 = _foot_pos(owner_node)
 	# 카드의 모든 effect 에 대해 적절한 VFX 시작 — 단, 같은 효과군은 한 번만 표시.
 	# damage_type 이 명시된 effect 는 모두 ATTACK 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF 등)
 	# 차지 시간 동기화는 첫 effect 기준 (_card_vfx_impact_delay) — 다른 VFX 는 자체 타이밍.
@@ -2115,18 +2227,18 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 			if effect.target == "ALL":
 				for i in range(_enemy_char_nodes.size()):
 					if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
-						_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[i].global_position + _impact_jitter())
+						_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[i].global_position + _impact_jitter(), _foot_pos(_enemy_char_nodes[i]))
 			elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
-				_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[target_enemy_index].global_position + _impact_jitter())
+				_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[target_enemy_index].global_position + _impact_jitter(), _foot_pos(_enemy_char_nodes[target_enemy_index]))
 			continue
 		var et = effect.effect_type
 		if et == EffectResource.EffectType.APPLY_STATUS:
 			if effect.status_type.begins_with("power."):
 				if not did_buff:
 					if owner_id == "joan_of_arc":
-						_spawn_holy_buff(caster_pos)
+						_spawn_holy_buff(caster_pos, caster_foot)
 					else:
-						_spawn_warrior_buff(caster_pos)
+						_spawn_warrior_buff(caster_pos, caster_foot)
 					did_buff = true
 			else:
 				if did_debuff:
@@ -2137,9 +2249,9 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 					if effect.target == "ALL":
 						for i in range(_enemy_char_nodes.size()):
 							if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
-								_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[i].global_position, effect.status_type)
+								_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[i].global_position, effect.status_type, _foot_pos(_enemy_char_nodes[i]))
 					elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
-						_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type)
+						_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type, _foot_pos(_enemy_char_nodes[target_enemy_index]))
 		elif et == EffectResource.EffectType.CHARM:
 			# Cleopatra 매혹 카드 — 적별로 enthrall 임계치 도달 여부 판정 → infatuation 또는 charm_kiss
 			if did_debuff:
@@ -2149,16 +2261,16 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 			if effect.target == "ALL":
 				for i in range(_enemy_char_nodes.size()):
 					if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
-						_spawn_charm_or_infatuation(caster_pos, _enemy_char_nodes[i].global_position, i, charm_stacks)
+						_spawn_charm_or_infatuation(caster_pos, _enemy_char_nodes[i].global_position, i, charm_stacks, _foot_pos(_enemy_char_nodes[i]))
 			elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
-				_spawn_charm_or_infatuation(caster_pos, _enemy_char_nodes[target_enemy_index].global_position, target_enemy_index, charm_stacks)
+				_spawn_charm_or_infatuation(caster_pos, _enemy_char_nodes[target_enemy_index].global_position, target_enemy_index, charm_stacks, _foot_pos(_enemy_char_nodes[target_enemy_index]))
 		elif et == EffectResource.EffectType.HEAL or et == EffectResource.EffectType.HEAL_ALL:
 			if not did_self_aoe:
-				_spawn_heal_blessing(caster_pos)
+				_spawn_heal_blessing(caster_pos, caster_foot)
 				did_self_aoe = true
 		elif et == EffectResource.EffectType.BLOCK or et == EffectResource.EffectType.BLOCK_ALL:
 			if not did_self_aoe:
-				_spawn_defense_buff(caster_pos)
+				_spawn_defense_buff(caster_pos, caster_foot)
 				did_self_aoe = true
 
 # 살아있는 적 인덱스 카운트 (target=ALL 영웅 카드의 visible 적 갯수)
@@ -2208,13 +2320,23 @@ func _sfx_for_status(stype: String) -> String:
 		_:                       return "impact_curse"
 
 # 단순 빔 spawn — screen_effect 시점에 SFX/flash/shake 발동
-func _spawn_attack_beam_simple(dtype: String, caster_pos: Vector2, target_pos: Vector2) -> void:
+# 캐릭터 노드의 발 좌표 (바닥 VFX anchor 용).
+func _foot_pos(char_node: Node2D) -> Vector2:
+	if char_node == null:
+		return Vector2.ZERO
+	return char_node.global_position + Vector2(0.0, _CHAR_FOOT_Y_OFFSET)
+
+func _spawn_attack_beam_simple(dtype: String, caster_pos: Vector2, target_pos: Vector2, target_foot: Vector2 = Vector2.ZERO) -> void:
 	var beam_script := _caster_beam_script(dtype)
 	if beam_script == null:
 		return
 	var fx: Node2D = beam_script.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
+	# 바닥 글리프 가진 vfx (holy_strike 등) 만 발 위치로 anchor
+	if target_foot != Vector2.ZERO and fx.has_method("set_ground_anchor"):
+		fx.set_ground_anchor(target_foot)
 	var sfx_key: String = _sfx_for_dtype(dtype)
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
@@ -2225,17 +2347,20 @@ func _spawn_attack_beam_simple(dtype: String, caster_pos: Vector2, target_pos: V
 	fx.play(caster_pos, target_pos)
 
 # 매혹 카드용 — 이 적이 charm 누적으로 enthrall 발동할지 판정 후 charm_kiss / infatuation 분기
-func _spawn_charm_or_infatuation(caster_pos: Vector2, target_pos: Vector2, enemy_index: int, charm_stacks: int) -> void:
+func _spawn_charm_or_infatuation(caster_pos: Vector2, target_pos: Vector2, enemy_index: int, charm_stacks: int, target_foot: Vector2 = Vector2.ZERO) -> void:
 	if BattleManager.will_enthrall_enemy(enemy_index, charm_stacks):
-		_spawn_debuff_beam_simple(_VFX_INFATUATION, caster_pos, target_pos, "enthrall")
+		_spawn_debuff_beam_simple(_VFX_INFATUATION, caster_pos, target_pos, "enthrall", target_foot)
 	else:
-		_spawn_debuff_beam_simple(_VFX_CHARM_KISS, caster_pos, target_pos, "charm")
+		_spawn_debuff_beam_simple(_VFX_CHARM_KISS, caster_pos, target_pos, "charm", target_foot)
 
 # 단순 디버프 spawn — screen_effect 시점에 SFX
-func _spawn_debuff_beam_simple(beam_script: GDScript, caster_pos: Vector2, target_pos: Vector2, stype: String) -> void:
+func _spawn_debuff_beam_simple(beam_script: GDScript, caster_pos: Vector2, target_pos: Vector2, stype: String, target_foot: Vector2 = Vector2.ZERO) -> void:
 	var fx: Node2D = beam_script.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
+	if target_foot != Vector2.ZERO and fx.has_method("set_ground_anchor"):
+		fx.set_ground_anchor(target_foot)
 	var sfx_key: String = _sfx_for_status(stype)
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
@@ -2250,6 +2375,7 @@ func _spawn_caster_beam(beam_script: GDScript, caster_pos: Vector2, target_pos: 
 		dtype: String, on_impact: Callable) -> Node2D:
 	var fx: Node2D = beam_script.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
@@ -2325,16 +2451,20 @@ func _on_hero_healed(hero_id: String, amount: int) -> void:
 			break
 	# heal_blessing VFX 가 screen_effect 시점에 SFX 직접 발동 (이중 호출 방지)
 
-func _on_hero_block_gained(_hero_id: String, _amount: int) -> void:
+func _on_hero_block_gained(hero_id: String, _amount: int) -> void:
 	# defense_buff VFX 가 screen_effect 시점에 SFX 직접 발동 (이중 호출 방지)
-	pass
+	# 단 UI 는 갱신해야 block_lbl 텍스트가 표시됨
+	_update_hero_ui(hero_id)
 
 # 방어도 버프 VFX — BLOCK 획득 시 6각 dome + barrier + 룬링
 # screen_effect 시점(차지 끝)에 block SFX 발동
-func _spawn_defense_buff(pos: Vector2) -> void:
+func _spawn_defense_buff(pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
 	var fx := _VFX_DEFENSE_BUFF.new()
 	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		AudioManager.play_sfx("block")
@@ -2399,18 +2529,195 @@ func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 		var spark_pos: Vector2 = char_node.global_position + _impact_jitter()
 		_spawn_impact_particles(spark_pos, amount, false, dtype)
 
-# ── 킬캠 (slow-mo + 카메라 줌인) ────────────────────────────────────
-# 처치 / 사망 시 짧은 슬로우 모션 + 카메라가 타겟으로 줌인. GameSettings.kill_cam_enabled 옵션.
+# ── 킬캠 + parallax sway (M7.5 깊이감) ──────────────────────────────
+# 킬캠: 처치/사망 시 슬로우 + 카메라 줌인. GameSettings.kill_cam_enabled 옵션.
+# parallax sway: ParallaxBackground.scroll_offset 직접 변경 — 카메라 미사용 → UI/캐릭터 안 흔들림
 var _camera: Camera2D = null
-const _KC_HOME_POS := Vector2(960, 540)  # 화면 중앙 (1920x1080)
+const _KC_HOME_POS := Vector2(960, 540)
 var _kill_cam_active: bool = false
+var _scene_bg: Node2D = null  # SceneBackground (Node2D, _back/_front 두 ParallaxBackground 보유)
+const WIND_SHADER := preload("res://assets/shaders/wind_sway.gdshader")
 
 func _setup_kill_cam() -> void:
 	_camera = Camera2D.new()
 	_camera.position = _KC_HOME_POS
 	_camera.zoom = Vector2.ONE
-	_camera.make_current()
 	add_child(_camera)
+	_camera.make_current()  # tree 에 attach 후 호출
+
+# Shift+Y 디버그 — 모든 fg sprite + 캐릭터 노드 박스 + (x,y,z) 라벨 표시/숨김
+var _bg_debug_overlay: Node2D = null
+
+func toggle_bg_debug() -> void:
+	if _bg_debug_overlay and is_instance_valid(_bg_debug_overlay):
+		_bg_debug_overlay.queue_free()
+		_bg_debug_overlay = null
+		return
+	_bg_debug_overlay = Node2D.new()
+	_bg_debug_overlay.z_index = 5000
+	add_child(_bg_debug_overlay)
+	# 재귀로 모든 Sprite2D 잡기 — fg(직접 자식) + _back ParallaxLayer 안 SVG(large/medium) 도 포함
+	# critter(bird) 는 제외 — Sprite2D 지만 _critters Node2D 자식 (재귀로 잡지만 라벨 구분)
+	_collect_bg_sprites(self)
+	# 캐릭터 노드들
+	for hero_id in _hero_char_nodes:
+		var n: Node2D = _hero_char_nodes[hero_id]
+		if is_instance_valid(n):
+			_draw_bg_debug_box(n, "HERO_%s" % hero_id, Color(0.4, 0.85, 1.0))
+	for i in _enemy_char_nodes.size():
+		var en: Node2D = _enemy_char_nodes[i]
+		if is_instance_valid(en):
+			_draw_bg_debug_box(en, "ENEMY_%d" % i, Color(1.0, 0.4, 0.4))
+
+# 재귀로 모든 Sprite2D 수집 — debug overlay/critter sprite 자체는 제외
+func _collect_bg_sprites(node: Node) -> void:
+	for child in node.get_children():
+		if child == _bg_debug_overlay:
+			continue
+		if child is Sprite2D:
+			# SVG 오브젝트만 표시 (texture path 가 backgrounds/objects/ 이거나 직접 자식 fg)
+			var spr := child as Sprite2D
+			var tex_path := ""
+			if spr.texture and spr.texture.resource_path:
+				tex_path = spr.texture.resource_path
+			if tex_path.contains("backgrounds/objects"):
+				var tag := "BG"
+				if child.get_parent() == self:
+					tag = "FG"
+				_draw_bg_debug_box(child, tag, Color(1.0, 0.85, 0.2))
+		# 재귀 (CanvasLayer, Node2D, ParallaxBackground/Layer 등)
+		if child.get_child_count() > 0:
+			_collect_bg_sprites(child)
+
+# 노드의 시각 박스 그리기 — Sprite2D 는 get_rect()(centered/offset 자동 보정) 사용,
+# 그 외 Node2D 는 추정 박스 (panel 영역).
+func _draw_bg_debug_box(node: Node2D, label: String, color: Color) -> void:
+	var r: Rect2
+	if node is Sprite2D:
+		var lr: Rect2 = (node as Sprite2D).get_rect()  # local (centered/offset 적용)
+		r = Rect2(node.global_position + lr.position * node.scale, lr.size * node.scale)
+	else:
+		# Node2D — 예상 박스 (영웅/적 panel 240×280 가정, 발 = position.y + 96)
+		r = Rect2(node.global_position - Vector2(60, 96), Vector2(120, 192))
+	# 외곽선 Line2D
+	var line := Line2D.new()
+	line.points = PackedVector2Array([
+		r.position, Vector2(r.end.x, r.position.y),
+		r.end, Vector2(r.position.x, r.end.y), r.position,
+	])
+	line.default_color = color
+	line.width = 2.0
+	_bg_debug_overlay.add_child(line)
+	# 라벨 — 상단에 (x, y, z, foot)
+	var foot_y := int(r.end.y)
+	var lbl := Label.new()
+	lbl.text = "%s\nx=%d  pos.y=%d  z=%d  foot=%d" % [
+		label, int(node.global_position.x), int(node.global_position.y), node.z_index, foot_y,
+	]
+	lbl.position = Vector2(r.position.x, r.position.y - 50)
+	lbl.add_theme_color_override("font_color", color)
+	lbl.add_theme_font_size_override("font_size", 14)
+	_bg_debug_overlay.add_child(lbl)
+
+# 캐릭터 영역 Rect2 array — fg 충돌 검사용 (UI 는 z_index 1000 이라 fg 가 가릴 수 없음 → 제외).
+# anchor_y < rect.end.y 인 sprite 는 캐릭터 뒤(z 작음)라 어차피 안 가려서 통과됨.
+func _build_bg_occupied_rects() -> Array:
+	var rects: Array = []
+	for i in 3:
+		var p: Vector2 = (get_node("HeroSlot%d" % (i + 1)) as Marker2D).position
+		rects.append(Rect2(p.x, p.y, SLOT_W, SLOT_H))
+	for i in 6:
+		var p: Vector2 = (get_node("EnemySlot%d" % (i + 1)) as Marker2D).position
+		rects.append(Rect2(p.x, p.y, SLOT_W, SLOT_H))
+	return rects
+
+# 전경 SVG 오브젝트 — battle_scene 자체 자식으로 spawn.
+# y_sort 가 reliable 하지 않아 z_index = int(position.y) 로 강제 (큰 y → 위로).
+# UI Control 들은 z_index 1000+ 라 fg 보다 항상 위.
+func _spawn_fg_specs(specs: Array, tint: Color) -> void:
+	for spec_v in specs:
+		var spec: Dictionary = spec_v
+		var svg_id: String = spec.get("svg_id", "")
+		var anchor: Vector2 = spec["pos"]
+		var sc: float = spec["scale"]
+		var z_main: int = int(anchor.y)
+		# 발 그림자 — SVG 자체에 ellipse shadow 포함되어 있어 중복 추가 안 함 (사용자 피드백)
+		# split spawn — base(정지) + sway 부분(shader). 나무: trunk/leaves. altar: base/flame.
+		if spec.get("split", false):
+			var suffixes: Array = spec.get("split_suffixes", ["_trunk", "_leaves"])
+			var base_path: String = "res://assets/art/backgrounds/objects/greek/%s%s.svg" % [svg_id, suffixes[0]]
+			var sway_path: String = "res://assets/art/backgrounds/objects/greek/%s%s.svg" % [svg_id, suffixes[1]]
+			_spawn_tree_part(base_path, anchor, sc, tint, z_main, null)
+			var sway_mat := ShaderMaterial.new()
+			sway_mat.shader = WIND_SHADER
+			sway_mat.set_shader_parameter("amplitude", float(spec.get("wind_amp", 4.0)))
+			sway_mat.set_shader_parameter("speed", float(spec.get("wind_speed", 1.0)))
+			sway_mat.set_shader_parameter("phase", float(spec.get("wind_phase", 0.0)))
+			_spawn_tree_part(sway_path, anchor, sc, tint, z_main + 1, sway_mat)
+			continue
+		# 일반 fg sprite (구조물 또는 grass/flower 통째)
+		var path: String = spec["path"]
+		if not ResourceLoader.exists(path):
+			continue
+		var spr := Sprite2D.new()
+		spr.texture = load(path)
+		spr.scale = Vector2(sc, sc)
+		spr.position = anchor
+		spr.offset = Vector2(0, -spr.texture.get_height() * 0.5)
+		spr.modulate = tint
+		spr.z_index = z_main
+		if spec.get("wind", false):
+			var mat := ShaderMaterial.new()
+			mat.shader = WIND_SHADER
+			mat.set_shader_parameter("amplitude", float(spec.get("wind_amp", 4.0)))
+			mat.set_shader_parameter("speed", float(spec.get("wind_speed", 1.0)))
+			mat.set_shader_parameter("phase", float(spec.get("wind_phase", 0.0)))
+			spr.material = mat
+		add_child(spr)
+
+# split tree 의 trunk/leaves 한 조각 spawn. mat 가 null 이 아니면 ShaderMaterial 적용.
+func _spawn_tree_part(path: String, anchor: Vector2, sc: float, tint: Color, z_idx: int, mat: ShaderMaterial) -> void:
+	if not ResourceLoader.exists(path):
+		return
+	var spr := Sprite2D.new()
+	spr.texture = load(path)
+	spr.scale = Vector2(sc, sc)
+	spr.position = anchor
+	spr.offset = Vector2(0, -spr.texture.get_height() * 0.5)
+	spr.modulate = tint
+	spr.z_index = z_idx
+	if mat != null:
+		spr.material = mat
+	add_child(spr)
+
+# 타원 그림자 (Polygon2D 24각형). target 의 자식으로 추가.
+func _add_ground_shadow(target: Node, pos: Vector2, rx: float, ry: float, alpha: float, z_idx: int) -> void:
+	var shadow := Polygon2D.new()
+	shadow.color = Color(0, 0, 0, alpha)
+	var pts := PackedVector2Array()
+	for i in 24:
+		var a: float = TAU * float(i) / 24.0
+		pts.append(pos + Vector2(cos(a) * rx, sin(a) * ry))
+	shadow.polygon = pts
+	shadow.z_index = z_idx
+	target.add_child(shadow)
+
+
+# 현재 act 의 신화 키 (parallax 배경 팔레트용)
+func _current_mythology() -> String:
+	var gm := get_node_or_null("/root/GameManager")
+	if gm == null:
+		return "greek"
+	var act_idx: int = gm.current_act - 1
+	var pool: Array = gm.act_mythologies
+	if act_idx >= 0 and act_idx < pool.size():
+		return pool[act_idx]
+	return "greek"
+
+func _update_camera_sway(_delta: float) -> void:
+	# parallax 보정 비활성화 — 캐릭터/바닥은 안 움직이는데 fg/bg 만 움직이면 어색.
+	# 평상시 sway X, shake 시 모든 자식 같이 이동 (battle_scene.position 변경 효과).
+	pass
 
 func _play_kill_cam(target_pos: Vector2) -> void:
 	# autoload 안전 접근 (CLI 테스트 환경 회피)
@@ -2848,6 +3155,8 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 	if target.begins_with("enemy_"):
 		var idx := target.substr(6).to_int()
 		_refresh_status_icons_enemy(idx)
+		# strength/weak/counter_pool 등 변경 시 intent 표시값 갱신
+		_update_enemy_ui(idx)
 		if idx < _enemy_nodes.size() and _enemy_nodes[idx]["panel"].visible:
 			var panel: ColorRect = _enemy_nodes[idx]["panel"]
 			_spawn_status_popup(panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0), status_type, target)
@@ -2888,6 +3197,12 @@ func _refresh_synergy_hud() -> void:
 	_refresh_hud()
 
 func _input(event: InputEvent) -> void:
+	# 카드 드래그 중 우클릭 → 사용 취소 (핸드 드랍과 동일 처리)
+	if _drag_card != null and event is InputEventMouseButton \
+			and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		_cleanup_drag()
+		get_viewport().set_input_as_handled()
+		return
 	# 패배 화면 입력 대기 → 메인메뉴
 	if _defeat_awaiting_input:
 		var accepted := false
@@ -3471,7 +3786,7 @@ func _create_drag_arrow(start_pos: Vector2) -> void:
 			chev.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 			chev.scale = Vector2(0.15 if i % 2 == 0 else -0.15, 0.15)
 			chev.modulate = Color(1.0, 1.0, 1.0, 0.0)
-			chev.z_index = 5
+			chev.z_index = 1550  # 카드 드래그 arrow chevron
 			add_child(chev)
 			_drag_chevrons.append(chev)
 
@@ -3480,7 +3795,7 @@ func _create_drag_arrow(start_pos: Vector2) -> void:
 	_drag_arrow_head.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_drag_arrow_head.scale = Vector2(0.5, 0.5)
 	_drag_arrow_head.modulate = Color.WHITE
-	_drag_arrow_head.z_index = 6
+	_drag_arrow_head.z_index = 1551  # 화살표 머리 — chevron 위
 	add_child(_drag_arrow_head)
 
 	_update_drag_arrow(start_pos)

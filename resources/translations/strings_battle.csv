@@ -24,6 +24,7 @@ battle.intent.ward,🛡 결계 %d턴,🛡 Ward %dT,🛡 Bouclier %dT,🛡 Scherm
 battle.intent.summon,🐾 소환 ×%d,🐾 Summon ×%d,🐾 Invocation ×%d,🐾 Evoca ×%d,🐾 Invocar ×%d,🐾 召喚 ×%d,🐾 Επίκληση ×%d,🐾 召唤 ×%d,🐾 召喚 ×%d
 battle.intent.mimic,🪞 메아리 %d%%,🪞 Mimic %d%%,🪞 Mimétisme %d%%,🪞 Mimica %d%%,🪞 Imitar %d%%,🪞 模倣 %d%%,🪞 Μίμηση %d%%,🪞 模仿 %d%%,🪞 模仿 %d%%
 battle.intent.special,❓ 특수,❓ Special,❓ Spécial,❓ Speciale,❓ Especial,❓ 特殊,❓ Ειδικό,❓ 特殊,❓ 特殊
+battle.notify.cards_exhausted,❌ 카드를 빼앗겼다!,❌ Cards stolen!,❌ Cartes volées!,❌ Carte rubate!,❌ ¡Cartas robadas!,❌ カード奪取！,❌ Κάρτες κλάπηκαν!,❌ 卡牌被夺！,❌ 卡牌被奪！
 battle.signature.hubris.toast,⚔ 휴브리스!,⚔ Hubris!,⚔ Hybris !,⚔ Hubris!,⚔ ¡Hibris!,⚔ ヒュブリス！,⚔ Ύβρις!,⚔ 傲慢！,⚔ 傲慢！
 battle.signature.ragnarok.toast,🌪 라그나로크!,🌪 Ragnarok!,🌪 Ragnarök !,🌪 Ragnarök!,🌪 ¡Ragnarök!,🌪 ラグナロク！,🌪 Ραγκναρόκ!,🌪 诸神黄昏！,🌪 諸神黃昏！
 battle.signature.karma.toast,☸ 인과응보!,☸ Karma!,☸ Karma !,☸ Karma!,☸ ¡Karma!,☸ 因果応報！,☸ Κάρμα!,☸ 因果报应！,☸ 因果報應！

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" width="240" height="280">
+  <defs>
+    <linearGradient id="alc_stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c8b890"/>
+      <stop offset="1" stop-color="#604c30"/>
+    </linearGradient>
+    <radialGradient id="alc_fire" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#fffae0" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffc060" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#a02010" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="120" cy="270" rx="105" ry="10" fill="#000" opacity="0.5"/>
+  <path d="M 18 270 L 222 270 L 196 220 L 44 220 Z" fill="url(#alc_stone)"/>
+  <rect x="44" y="208" width="152" height="14" fill="#a89270"/>
+  <path d="M 60 208 L 180 208 L 162 130 L 78 130 Z" fill="url(#alc_stone)"/>
+  <line x1="86" y1="140" x2="92" y2="200" stroke="#000" opacity="0.2" stroke-width="2"/>
+  <line x1="120" y1="140" x2="120" y2="200" stroke="#000" opacity="0.2" stroke-width="2"/>
+  <line x1="154" y1="140" x2="148" y2="200" stroke="#000" opacity="0.2" stroke-width="2"/>
+  <rect x="72" y="118" width="96" height="14" fill="#d4be88"/>
+  <ellipse cx="120" cy="125" rx="40" ry="5" fill="#3a2818" opacity="0.7"/>
+  <ellipse cx="120" cy="100" rx="42" ry="32" fill="url(#alc_fire)"/>
+  <path d="M 108 100 Q 102 76 112 60 Q 118 76 116 95 Q 124 70 130 80 Q 132 95 132 100 Z" fill="#ffd060" opacity="0.85"/>
+</svg>

@@ -23,8 +23,13 @@ const SNAP_DUR        := 0.30   # 패널 snap 애니메이션 시간
 signal screen_effect
 
 var _target := Vector2.ZERO
+# 바닥 룬링 anchor — 호출자가 set_ground_anchor() 로 캐릭터 발 위치 지정.
+# 미설정이면 _target 기반 기존 위치(중심+offset) 사용.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
 var _charge_orb: Sprite2D
 var _glow_layer: Node2D
+var _ground_layer: Node2D  # ring(바닥 룬링) 전용 — z_index 캐릭터 뒤로
 var _ring_age := -1.0
 var _dome_age := -1.0
 var _barrier_age := -1.0
@@ -66,6 +71,16 @@ func _ready() -> void:
 	_glow_layer = _DrawLayer.new()
 	_glow_layer.setup(self)
 	add_child(_glow_layer)
+	_ground_layer = _GroundLayer.new()
+	_ground_layer.setup(self)
+	add_child(_ground_layer)
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+	# 룬링이 캐릭터 발 뒤(z 작음)에 보이도록 — 절대 z 로 부모(=1300) 무시
+	_ground_layer.z_as_relative = false
+	_ground_layer.z_index = int(pos.y) - 1
 
 # 첫 인자(caster) 무시
 func play(_caster_pos: Vector2, target_pos: Vector2) -> void:
@@ -100,15 +115,19 @@ func _process(delta: float) -> void:
 	if _barrier_age >= 0.0:
 		_barrier_age += delta
 	_glow_layer.queue_redraw()
+	_ground_layer.queue_redraw()
 
-# ── 가산 블렌드 — dome 패널, barrier, 룬링 ──
+# ── 가산 블렌드 — dome 패널, barrier (캐릭터 앞) ──
 func _draw_glow_pass(canvas: CanvasItem) -> void:
 	if _barrier_age >= 0.0:
 		_draw_barrier(canvas)
-	if _ring_age >= 0.0:
-		_draw_ring(canvas)
 	if _dome_age >= 0.0:
 		_draw_dome(canvas)
+
+# ── 바닥 룬링 (캐릭터 뒤) — _ground_layer 가 z 캐릭터 아래로 set ──
+func _draw_ground_pass(canvas: CanvasItem) -> void:
+	if _ring_age >= 0.0:
+		_draw_ring(canvas)
 
 # 6각 패널 dome — 6개 패널이 사방에서 안쪽으로 snap (각각 다른 delay)
 func _draw_dome(canvas: CanvasItem) -> void:
@@ -174,7 +193,7 @@ func _draw_ring(canvas: CanvasItem) -> void:
 		return
 	var sc: float = lerpf(0.3, 1.0, grow)
 	var a: float = grow * fade * 0.9
-	var rc := _target + Vector2(0.0, 30.0)
+	var rc: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 30.0)
 	for radius in [RING_RADIUS, RING_RADIUS * 0.87]:
 		var rad: float = float(radius) * sc
 		var pts := PackedVector2Array()
@@ -203,3 +222,18 @@ class _DrawLayer:
 
 	func _draw() -> void:
 		_fx._draw_glow_pass(self)
+
+# 바닥 룬링 전용 레이어 — z_index 캐릭터 아래로 set (set_ground_anchor 시).
+# 가산 블렌드 유지.
+class _GroundLayer:
+	extends Node2D
+	var _fx: Node2D
+
+	func setup(owner_fx: Node2D) -> void:
+		_fx = owner_fx
+		var m := CanvasItemMaterial.new()
+		m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		material = m
+
+	func _draw() -> void:
+		_fx._draw_ground_pass(self)

@@ -76,6 +76,7 @@ ui.settings.anim_speed,애니메이션 속도,Animation Speed,Vitesse animation,
 ui.settings.monster_interval,몬스터 행동 인터벌,Monster Interval,Intervalle monstre,Intervallo mostro,Intervalo monstruo,モンスター間隔,Διάστημα τέρατος,怪物间隔,怪物間隔
 ui.settings.particle_quality,파티클 갯수,Particle Count,Nombre particules,Numero particelle,Cantidad partículas,パーティクル数,Αριθμός σωματιδίων,粒子数量,粒子數量
 ui.settings.kill_cam,킬캠 (슬로우+줌),Kill Cam (Slow+Zoom),Caméra kill,Kill cam,Cámara final,キルカム,Κάμερα φόνου,击杀镜头,擊殺鏡頭
+ui.settings.background,배경 (시차+팔레트),Background (Parallax),Arrière-plan,Sfondo,Fondo,背景,Φόντο,背景,背景
 ui.settings.on,켜짐,On,On,On,On,オン,Ναι,开,開
 ui.settings.off,꺼짐,Off,Off,Off,Off,オフ,Όχι,关,關
 ui.settings.language_tab,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言,语言

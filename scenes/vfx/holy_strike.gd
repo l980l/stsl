@@ -46,9 +46,20 @@ signal screen_effect
 
 var _caster := Vector2.ZERO
 var _target := Vector2.ZERO
+# 바닥 글리프 anchor — set_ground_anchor() 로 타겟 발 위치 지정.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+	if _ground_layer != null:
+		_ground_layer.z_as_relative = false
+		_ground_layer.z_index = int(pos.y) - 1
 var _charge_orb: Sprite2D
-var _smoke_layer: Node2D  # 일반 블렌드 — 기둥·글리프·안개·깃털
+var _smoke_layer: Node2D  # 일반 블렌드 — 기둥·안개·깃털
 var _glow_layer: Node2D   # 가산 블렌드 — 빛 입자·빛의 칼·십자 섬광·충격파
+var _ground_layer: Node2D # 글리프 (캐릭터 뒤로 z set)
 var _particles: Array = []  # [{pos, vel, life, max_life, r, kind, grav, rot, spin}]
 var _channeling := false  # 채널 중 — 시전자 손에서 빛 입자 상승
 var _blade_t := -1.0      # <0 = 비활성, 0~1 = 빛의 칼 강하
@@ -85,7 +96,11 @@ static func _make_orb_tex(c_core: Color, c_mid: Color, c_edge: Color) -> Gradien
 func _ready() -> void:
 	set_process(false)
 
-	# 기둥·글리프·안개·깃털 레이어 — 일반 블렌드, 아래
+	# 바닥 글리프 — 캐릭터 뒤로 z set. 가산 블렌드(글리프는 빛). 가장 먼저 add
+	_ground_layer = _GroundLayer.new()
+	_ground_layer.setup(self)
+	add_child(_ground_layer)
+	# 기둥·안개·깃털 레이어 — 일반 블렌드
 	_smoke_layer = _DrawLayer.new()
 	_smoke_layer.setup(self, false)
 	add_child(_smoke_layer)
@@ -220,6 +235,8 @@ func _process(delta: float) -> void:
 
 	_smoke_layer.queue_redraw()
 	_glow_layer.queue_redraw()
+	if _ground_layer:
+		_ground_layer.queue_redraw()
 
 func _on_impact() -> void:
 	_spawn_impact()
@@ -243,9 +260,7 @@ func _draw_smoke_pass(canvas: CanvasItem) -> void:
 				Color(COL_GOLD, 0.0), Color(COL_GOLD, 0.0)])
 			canvas.draw_polygon(quad, cols)
 
-	# 바닥 글리프 (누운 원근)
-	if _glyph_age >= 0.0:
-		_draw_glyph(canvas)
+	# 바닥 글리프는 _ground_layer 로 분리됨 (캐릭터 뒤)
 
 	# 황금 안개
 	for p in _particles:
@@ -362,7 +377,7 @@ func _draw_glyph(canvas: CanvasItem) -> void:
 	var a: float = appear * fade * 0.92
 	if a <= 0.0:
 		return
-	var gc := _target + Vector2(0.0, 40.0)
+	var gc: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 40.0)
 	# 동심원 3개 (누운 타원)
 	var radii := [135.0, 118.0, 92.0]
 	var ring_cols := [Color(COL_MID, 0.9 * a), Color(COL_HOT, 0.6 * a), Color(COL_GOLD, 0.5 * a)]
@@ -389,6 +404,11 @@ func _draw_glyph(canvas: CanvasItem) -> void:
 		sq.append(gc + Vector2(cos(ang) * qr, sin(ang) * qr * GLYPH_SQUASH))
 	canvas.draw_polyline(sq + PackedVector2Array([sq[0]]), Color(COL_GOLD, 0.75 * a), 1.2, true)
 
+# ── 바닥 글리프 (캐릭터 뒤) — _ground_layer 가 z 캐릭터 아래로 set ──
+func _draw_ground_pass(canvas: CanvasItem) -> void:
+	if _glyph_age >= 0.0:
+		_draw_glyph(canvas)
+
 # ── 블렌드 모드가 다른 두 그리기 레이어 ──
 # 어두운 황금 안개는 가산이면 흐려지므로 일반 블렌드, 빛 입자·칼은 글로우용 가산 블렌드.
 class _DrawLayer:
@@ -409,3 +429,14 @@ class _DrawLayer:
 			_fx._draw_glow_pass(self)
 		else:
 			_fx._draw_smoke_pass(self)
+
+# 바닥 글리프 전용 레이어 — 일반 블렌드 (글리프 디테일 보존). z_index 캐릭터 아래로.
+class _GroundLayer:
+	extends Node2D
+	var _fx: Node2D
+
+	func setup(owner_fx: Node2D) -> void:
+		_fx = owner_fx
+
+	func _draw() -> void:
+		_fx._draw_ground_pass(self)

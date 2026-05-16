@@ -42,6 +42,14 @@ signal screen_effect
 
 var _caster := Vector2.ZERO
 var _target := Vector2.ZERO
+# 바닥 분화구/충격파 anchor — set_ground_anchor() 로 타겟 발 위치 지정.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+
 var _smoke_layer: Node2D  # 일반 블렌드 — 연기·먼지·파편·분화구·폭탄·레티클
 var _fire_layer: Node2D   # 가산 블렌드 — 불꽃·불씨·충격파
 var _particles: Array = []  # [{pos, vel, life, max_life, r, kind, grav, rot, spin}]
@@ -209,15 +217,7 @@ func _fire_color(kind: String, k: float) -> Color:
 
 # ── 그리기 패스 — _DrawLayer 가 블렌드 모드별로 호출 ──
 func _draw_smoke_pass(canvas: CanvasItem) -> void:
-	# 분화구 (타겟 발 아래)
-	if _crater_age >= 0.0:
-		var grow: float = clampf(_crater_age / 0.4, 0.0, 1.0)
-		var cc := _target + Vector2(0.0, 44.0)
-		var crater := PackedVector2Array()
-		for i in range(28):
-			var ang := TAU * float(i) / 28.0
-			crater.append(cc + Vector2(cos(ang) * 140.0 * grow * BLAST_SCALE, sin(ang) * 22.0 * grow * BLAST_SCALE))
-		canvas.draw_colored_polygon(crater, Color(0.063, 0.039, 0.020, 0.85))
+	# 분화구 비활성화 — 바닥 그림자/타원과 어색해서 제거 (사용자 피드백)
 
 	# 폭연 + 흙먼지
 	for p in _particles:

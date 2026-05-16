@@ -112,12 +112,16 @@ signal card_vfx_charge_start(card: Resource, target_enemy_index: int, target_her
 # fx 임팩트 도달(screen_effect) 시점 중계 — battle_scene 의 fx.screen_effect 가 emit.
 # popup·SFX 동기화: timer 보정 대신 fx 의 실제 임팩트 시점에 데미지 적용.
 signal vfx_impact_resolved
+# 적 SPECIAL 인텐트가 카드 N장을 이번 전투 동안 exhaust 시켰을 때 (battle_scene 토스트용)
+signal cards_exhausted_by_enemy(card_names: Array)
 
 # 독 DoT tick — 데미지 시그널과 별개로 가스 VFX/SFX 트리거 (target = "enemy_X" 또는 hero_id)
 signal poison_tick_applied(target: String, amount: int)
 
 # 차지 중 카드의 예측 누적 데미지 — UI 가 사망 예정 적 dim/비활성화 + 추가 ATTACK 카드 거부
 var _pending_dmg_to_enemy: Dictionary = {}  # enemy_index(int) → int
+# 적 SPECIAL remove_card 로 이번 전투 동안 빼앗긴 카드 (전투 종료 시 draw_pile 복원)
+var _enemy_stolen_cards: Array = []
 
 # GameSettings autoload 안전 접근 — CLI test 환경에서 식별자 미인식 회피
 # null(=test 환경) 시 0 반환 → 모든 await 스킵 → 동기 즉시 적용 유지
@@ -198,6 +202,22 @@ func _card_vfx_impact_delay(card: Resource) -> float:
 
 # 차지 중 카드의 예측 데미지 — UI 가 사망 예정 적을 즉시 dim/비활성화 + 추가 ATTACK 거부
 signal pending_damage_changed(enemy_index: int)
+
+# 적 인텐트 표시용 — 강화/약화/counter_pool 적용된 실제 데미지 추정 (mark/타겟별 vulnerable 제외)
+func get_intent_display_damage(enemy_index: int, intent: Resource) -> int:
+	var dmg: int = intent.value
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return dmg
+	var status: Dictionary = _enemy_status[enemy_index]
+	var strength: int = status.get("strength", 0)
+	if strength > 0:
+		dmg = int(dmg * (1.0 + 0.1 * strength))
+	if status.get("weak", 0) > 0:
+		dmg = int(dmg * 0.75)
+	var counter_pool: int = status.get("counter_pool", 0)
+	if counter_pool > 0:
+		dmg += counter_pool
+	return dmg
 
 func _card_has_damage(card: Resource) -> bool:
 	for effect in card.effects:
@@ -1493,15 +1513,23 @@ func _execute_special(_enemy_index: int, intent: Resource) -> void:
 		variant = "remove_card"
 	match variant:
 		"remove_card":
-			# 플레이어 덱에서 카드 영구 제거 (손패가 아닌 전체 덱 기준)
+			# 카드 이번 전투 동안 빼앗김 — _enemy_stolen_cards 에 보관, 전투 종료 시 draw_pile 복원
 			if deck_mgr:
-				var full: Array = deck_mgr.get_full_deck()
+				var pools: Array = [deck_mgr.draw_pile, deck_mgr.hand, deck_mgr.discard_pile]
+				var removed_names: Array = []
 				for _i in range(intent.value):
-					if full.is_empty():
+					var avail: Array = pools.filter(func(p: Array) -> bool: return not p.is_empty())
+					if avail.is_empty():
 						break
-					var idx: int = randi() % full.size()
-					deck_mgr.remove_from_deck(full[idx])
-					full.remove_at(idx)
+					var pool: Array = avail[randi() % avail.size()]
+					var pick_idx: int = randi() % pool.size()
+					var card: Resource = pool[pick_idx]
+					pool.remove_at(pick_idx)
+					_enemy_stolen_cards.append(card)
+					removed_names.append(tr(card.card_name))
+				if not removed_names.is_empty():
+					cards_exhausted_by_enemy.emit(removed_names)
+					deck_mgr.hand_changed.emit()
 		_:
 			push_warning("[battle_manager] 알 수 없는 SPECIAL variant: %s" % variant)
 
@@ -1563,6 +1591,7 @@ func debug_instant_win() -> void:
 			_enemy_alive[i] = false
 			enemy_died.emit(i)
 	is_battle_active = false
+	_restore_stolen_cards()
 	battle_won.emit()
 
 func _check_win_condition() -> void:
@@ -1572,6 +1601,7 @@ func _check_win_condition() -> void:
 		if alive:
 			return
 	is_battle_active = false
+	_restore_stolen_cards()
 	battle_won.emit()
 
 func _check_lose_condition() -> void:
@@ -1581,7 +1611,16 @@ func _check_lose_condition() -> void:
 		return
 	if team_mgr.get_living_heroes().is_empty():
 		is_battle_active = false
+		_restore_stolen_cards()
 		battle_lost.emit()
+
+# 적 SPECIAL 로 빼앗긴 카드 — 전투 종료 시 draw_pile 으로 복원
+func _restore_stolen_cards() -> void:
+	if deck_mgr == null or _enemy_stolen_cards.is_empty():
+		return
+	for card in _enemy_stolen_cards:
+		deck_mgr.draw_pile.append(card)
+	_enemy_stolen_cards.clear()
 
 func _get_living_enemy_count() -> int:
 	var count: int = 0

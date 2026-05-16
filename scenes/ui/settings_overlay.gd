@@ -214,6 +214,7 @@ func open() -> void:
 		"anim_speed":       GameSettings.anim_speed_key,
 		"monster_interval": GameSettings.monster_interval_key,
 		"kill_cam":         "on" if GameSettings.kill_cam_enabled else "off",
+		"background":       "on" if GameSettings.background_enabled else "off",
 	}
 	for gid in current_keys:
 		if _seg_groups.has(gid):
@@ -277,6 +278,7 @@ func _on_defaults() -> void:
 		"anim_speed":       GameSettings.ANIM_SPEED_DEFAULT,
 		"monster_interval": GameSettings.MONSTER_INTERVAL_DEFAULT,
 		"kill_cam":         "on" if GameSettings.KILL_CAM_DEFAULT else "off",
+		"background":       "on" if GameSettings.BACKGROUND_DEFAULT else "off",
 	}
 	for gid in defaults:
 		if not _seg_groups.has(gid):
@@ -395,6 +397,13 @@ func _build_graphics_panel() -> void:
 		_build_x_labels(GameSettings.PARTICLE_KEYS, GameSettings.PARTICLE_VALUES),
 		GameSettings.particle_key,
 		func(k: String) -> void: GameSettings.set_particle_quality(k))
+
+	# Row 3: 배경 시스템 (parallax + 신화 팔레트, M7.5)
+	_build_seg_row(p, mono, 136.0, tr("ui.settings.background"), "background",
+		["off", "on"],
+		{"off": tr("ui.settings.off"), "on": tr("ui.settings.on")},
+		"on" if GameSettings.background_enabled else "off",
+		func(k: String) -> void: GameSettings.set_background_enabled(k == "on"))
 
 func _build_gameplay_panel() -> void:
 	var p := _tab_panels["gameplay"] as Control

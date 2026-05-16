@@ -29,8 +29,20 @@ const PSPEED        := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수
 signal screen_effect
 
 var _target := Vector2.ZERO
-var _smoke_layer: Node2D  # 일반 블렌드 — 핏물·회색 재
+# 핏물 웅덩이 anchor — set_ground_anchor() 로 캐릭터 발 위치 지정.
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+	if _ground_layer != null:
+		_ground_layer.z_as_relative = false
+		_ground_layer.z_index = int(pos.y) - 1
+
+var _smoke_layer: Node2D  # 일반 블렌드 — 회색 재
 var _glow_layer: Node2D   # 가산 블렌드 — 푸른 영혼
+var _ground_layer: Node2D # 핏물 웅덩이 (캐릭터 뒤로 z set)
 var _particles: Array = []  # [{pos, vel, life, max_life, r, kind, grav, rot, spin, sway}]
 var _pool_age := -1.0     # <0 = 비활성, 경과 초 (핏물 웅덩이)
 var _emit_timer := 0.0    # 재·영혼 분출 남은 시간
@@ -48,7 +60,11 @@ static func ash_quad(center: Vector2, half_w: float, half_h: float, rot: float) 
 
 func _ready() -> void:
 	set_process(false)
-	# 핏물·재 레이어 — 일반 블렌드, 아래
+	# 핏물 — 캐릭터 뒤로 z set, 일반 블렌드. 가장 먼저 add
+	_ground_layer = _GroundLayer.new()
+	_ground_layer.setup(self)
+	add_child(_ground_layer)
+	# 회색 재 레이어 — 일반 블렌드
 	_smoke_layer = _DrawLayer.new()
 	_smoke_layer.setup(self, false)
 	add_child(_smoke_layer)
@@ -120,19 +136,22 @@ func _process(delta: float) -> void:
 
 	_smoke_layer.queue_redraw()
 	_glow_layer.queue_redraw()
+	if _ground_layer:
+		_ground_layer.queue_redraw()
 
-# ── 그리기 패스 — _DrawLayer 가 블렌드 모드별로 호출 ──
-func _draw_smoke_pass(canvas: CanvasItem) -> void:
-	# 핏물 웅덩이 (발 아래, 가로로 퍼짐)
+# ── 핏물 웅덩이 (캐릭터 뒤) — _ground_layer 가 z 캐릭터 아래로 set ──
+func _draw_ground_pass(canvas: CanvasItem) -> void:
 	if _pool_age >= 0.0:
 		var grow: float = 1.0 - pow(1.0 - clampf(_pool_age / POOL_GROW, 0.0, 1.0), 2.0)
-		var pc := _target + Vector2(0.0, 80.0)
+		var pc: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 80.0)
 		var pool := PackedVector2Array()
 		for i in range(24):
 			var ang := TAU * float(i) / 24.0
 			pool.append(pc + Vector2(cos(ang) * POOL_RADIUS * grow, sin(ang) * 16.0))
 		canvas.draw_colored_polygon(pool, Color(COL_BLOOD, 0.82))
 
+# ── 그리기 패스 — _DrawLayer 가 블렌드 모드별로 호출 (웅덩이는 ground_layer 분리) ──
+func _draw_smoke_pass(canvas: CanvasItem) -> void:
 	# 회색 재 조각 (회전 사각형, 수명에 따라 어두워짐)
 	for p in _particles:
 		if p["kind"] != "ash":
@@ -174,3 +193,14 @@ class _DrawLayer:
 			_fx._draw_glow_pass(self)
 		else:
 			_fx._draw_smoke_pass(self)
+
+# 핏물 웅덩이 전용 레이어 — 일반 블렌드. z_index 캐릭터 아래로.
+class _GroundLayer:
+	extends Node2D
+	var _fx: Node2D
+
+	func setup(owner_fx: Node2D) -> void:
+		_fx = owner_fx
+
+	func _draw() -> void:
+		_fx._draw_ground_pass(self)

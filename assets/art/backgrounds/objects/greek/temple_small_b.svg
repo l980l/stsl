@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 460" width="600" height="460">
+  <defs>
+    <linearGradient id="tmb_roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0d098"/>
+      <stop offset="1" stop-color="#988068"/>
+    </linearGradient>
+    <linearGradient id="tmb_col" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ecdcb4"/>
+      <stop offset="0.5" stop-color="#c0b088"/>
+      <stop offset="1" stop-color="#705c40"/>
+    </linearGradient>
+    <linearGradient id="tmb_floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d0bc90"/>
+      <stop offset="1" stop-color="#604e30"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="300" cy="450" rx="280" ry="13" fill="#000" opacity="0.5"/>
+  <rect x="20" y="400" width="560" height="50" fill="url(#tmb_floor)"/>
+  <rect x="40" y="378" width="520" height="24" fill="#a89074"/>
+  <!-- 6기둥 -->
+  <g>
+    <rect x="50" y="160" width="40" height="220" fill="url(#tmb_col)"/>
+    <rect x="44" y="148" width="52" height="14" fill="#d8c298"/>
+    <rect x="40" y="136" width="60" height="14" fill="#e8d5a0"/>
+  </g>
+  <g>
+    <rect x="135" y="160" width="40" height="220" fill="url(#tmb_col)"/>
+    <rect x="129" y="148" width="52" height="14" fill="#d8c298"/>
+    <rect x="125" y="136" width="60" height="14" fill="#e8d5a0"/>
+  </g>
+  <g>
+    <rect x="220" y="160" width="40" height="220" fill="url(#tmb_col)"/>
+    <rect x="214" y="148" width="52" height="14" fill="#d8c298"/>
+    <rect x="210" y="136" width="60" height="14" fill="#e8d5a0"/>
+  </g>
+  <g>
+    <rect x="340" y="160" width="40" height="220" fill="url(#tmb_col)"/>
+    <rect x="334" y="148" width="52" height="14" fill="#d8c298"/>
+    <rect x="330" y="136" width="60" height="14" fill="#e8d5a0"/>
+  </g>
+  <g>
+    <rect x="425" y="160" width="40" height="220" fill="url(#tmb_col)"/>
+    <rect x="419" y="148" width="52" height="14" fill="#d8c298"/>
+    <rect x="415" y="136" width="60" height="14" fill="#e8d5a0"/>
+  </g>
+  <g>
+    <rect x="510" y="160" width="40" height="220" fill="url(#tmb_col)"/>
+    <rect x="504" y="148" width="52" height="14" fill="#d8c298"/>
+    <rect x="500" y="136" width="60" height="14" fill="#e8d5a0"/>
+  </g>
+  <rect x="20" y="116" width="560" height="22" fill="url(#tmb_roof)"/>
+  <rect x="20" y="134" width="560" height="5" fill="#000" opacity="0.25"/>
+  <path d="M 20 116 L 300 36 L 580 116 Z" fill="url(#tmb_roof)"/>
+  <!-- 페디먼트 디테일 -->
+  <ellipse cx="300" cy="88" rx="24" ry="14" fill="#a8906c"/>
+</svg>
