@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="45 75 110 517" width="110" height="517">
+  <defs>
+    <linearGradient id="rpb_stone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6e6a66"/>
+      <stop offset="0.5" stop-color="#48443e"/>
+      <stop offset="1" stop-color="#1c1814"/>
+    </linearGradient>
+  </defs>
+  <!-- 부서진 기둥 (꼭대기 잘림) -->
+  <path d="M 62 580 L 58 200 L 75 90 L 110 75 L 125 95 L 142 200 L 138 580 Z" fill="url(#rpb_stone)"/>
+  <ellipse cx="100" cy="580" rx="55" ry="12" fill="#383430"/>
+  <!-- 룬 -->
+  <line x1="85" y1="180" x2="115" y2="180" stroke="#1a1814" stroke-width="3"/>
+  <line x1="100" y1="180" x2="100" y2="220" stroke="#1a1814" stroke-width="3"/>
+  <line x1="85" y1="280" x2="100" y2="320" stroke="#1a1814" stroke-width="3"/>
+  <line x1="115" y1="280" x2="100" y2="320" stroke="#1a1814" stroke-with="3"/>
+  <line x1="100" y1="320" x2="100" y2="360" stroke="#1a1814" stroke-width="3"/>
+  <line x1="85" y1="420" x2="115" y2="460" stroke="#1a1814" stroke-width="3"/>
+  <line x1="115" y1="420" x2="85" y2="460" stroke="#1a1814" stroke-width="3"/>
+  <!-- 균열 -->
+  <path d="M 100 110 L 90 280 L 105 450" stroke="#000" opacity="0.45" stroke-width="2" fill="none"/>
+</svg>

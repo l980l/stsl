@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 95 182 255" width="182" height="255">
+  <defs>
+    <linearGradient id="mdt_bark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#685040"/>
+      <stop offset="1" stop-color="#302018"/>
+    </linearGradient>
+  </defs>
+  <!-- 작은 단풍 (균형) -->
+  <path d="M 140 350 Q 132 280 142 230 L 152 230 Q 148 280 148 350 Z" fill="url(#mdt_bark)"/>
+  <path d="M 145 230 Q 120 210 100 195" stroke="#503020" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 148 230 Q 170 215 190 200" stroke="#503020" stroke-width="5" fill="none" stroke-linecap="round"/>
+</svg>

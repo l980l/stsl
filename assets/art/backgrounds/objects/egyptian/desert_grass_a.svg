@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 8 72 71" width="72" height="71">
+  <defs>
+    <linearGradient id="dga_blade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c8a868"/>
+      <stop offset="1" stop-color="#705830"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="76" rx="36" ry="3" fill="#000" opacity="0.35"/>
+  <!-- 마른 사막 풀 -->
+  <path d="M 28 76 Q 26 50 22 22" stroke="url(#dga_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 38 76 Q 38 48 36 14" stroke="url(#dga_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 50 76 Q 52 44 50 10" stroke="url(#dga_blade)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M 62 76 Q 60 46 66 16" stroke="url(#dga_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 72 76 Q 74 54 78 26" stroke="url(#dga_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 44 76 Q 44 62 42 44" stroke="#a08850" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 56 76 Q 56 62 58 42" stroke="#a08850" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

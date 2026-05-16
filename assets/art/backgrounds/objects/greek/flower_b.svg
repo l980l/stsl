@@ -5,7 +5,6 @@
       <stop offset="1" stop-color="#d8d0b8"/>
     </radialGradient>
   </defs>
-  <ellipse cx="65" cy="124" rx="38" ry="3" fill="#000" opacity="0.35"/>
   <!-- 데이지 — 줄기 3대 -->
   <path d="M 32 124 Q 32 90 28 56" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
   <path d="M 64 124 Q 64 78 62 32" stroke="#587030" stroke-width="3" fill="none" stroke-linecap="round"/>

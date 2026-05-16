@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 84 88 386" width="88" height="386">
+  <defs>
+    <linearGradient id="bmb_leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8d068"/>
+      <stop offset="1" stop-color="#607038"/>
+    </linearGradient>
+  </defs>
+  <!-- 적은 잎 -->
+  <path d="M 71 120 Q 56 110 36 105 Q 56 116 71 120 Z" fill="url(#bmb_leaf)"/>
+  <path d="M 89 100 Q 105 88 122 84 Q 104 98 89 100 Z" fill="url(#bmb_leaf)"/>
+  <path d="M 71 220 Q 55 215 38 220 Q 55 225 71 220 Z" fill="url(#bmb_leaf)"/>
+  <path d="M 89 200 Q 108 195 124 200 Q 108 205 89 200 Z" fill="url(#bmb_leaf)"/>
+  <path d="M 71 320 Q 55 315 38 320 Q 55 325 71 320 Z" fill="url(#bmb_leaf)"/>
+  <path d="M 89 300 Q 108 295 124 300 Q 108 305 89 300 Z" fill="url(#bmb_leaf)"/>
+</svg>

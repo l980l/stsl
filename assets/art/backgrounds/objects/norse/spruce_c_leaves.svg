@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="45 10 190 340" width="190" height="340">
+  <defs>
+    <linearGradient id="spc_body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#385838"/>
+      <stop offset="0.5" stop-color="#1c3220"/>
+      <stop offset="1" stop-color="#0a1808"/>
+    </linearGradient>
+  </defs>
+  <!-- 넓은 풍성한 가문비 -->
+  <path d="M 140 10 L 90 100 L 190 100 Z" fill="url(#spc_body)"/>
+  <path d="M 140 70 L 70 170 L 210 170 Z" fill="url(#spc_body)"/>
+  <path d="M 140 140 L 55 240 L 225 240 Z" fill="url(#spc_body)"/>
+  <path d="M 140 210 L 45 305 L 235 305 Z" fill="url(#spc_body)"/>
+  <path d="M 140 10 L 115 70 L 125 100 Z" fill="#506840" opacity="0.5"/>
+  <path d="M 140 70 L 100 150 L 115 170 Z" fill="#506840" opacity="0.45"/>
+  <path d="M 140 140 L 85 220 L 105 240 Z" fill="#506840" opacity="0.4"/>
+  <path d="M 140 10 L 165 70 L 155 100 Z" fill="#0a1408" opacity="0.5"/>
+  <path d="M 140 70 L 180 150 L 165 170 Z" fill="#0a1408" opacity="0.5"/>
+</svg>

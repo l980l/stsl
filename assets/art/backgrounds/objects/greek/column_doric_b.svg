@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 600" width="200" height="600">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 85 160 497" width="160" height="497">
   <defs>
     <linearGradient id="cdb_shaft" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#f0e8cc"/>
@@ -10,7 +10,6 @@
       <stop offset="1" stop-color="#a89270"/>
     </linearGradient>
   </defs>
-  <ellipse cx="100" cy="588" rx="92" ry="11" fill="#000" opacity="0.42"/>
   <rect x="20" y="548" width="160" height="34" fill="url(#cdb_cap)"/>
   <rect x="30" y="528" width="140" height="22" fill="#d8c498"/>
   <rect x="48" y="120" width="104" height="420" fill="url(#cdb_shaft)"/>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="70 40 140 310" width="140" height="310">
+  <defs>
+    <linearGradient id="spb_body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#345038"/>
+      <stop offset="0.5" stop-color="#1e3420"/>
+      <stop offset="1" stop-color="#0a1a10"/>
+    </linearGradient>
+  </defs>
+  <!-- 더 좁고 키 큰 가문비 -->
+  <path d="M 140 40 L 110 130 L 170 130 Z" fill="url(#spb_body)"/>
+  <path d="M 140 100 L 95 200 L 185 200 Z" fill="url(#spb_body)"/>
+  <path d="M 140 170 L 80 270 L 200 270 Z" fill="url(#spb_body)"/>
+  <path d="M 140 240 L 70 320 L 210 320 Z" fill="url(#spb_body)"/>
+  <path d="M 140 40 L 124 100 L 132 130 Z" fill="#506840" opacity="0.45"/>
+  <path d="M 140 100 L 118 180 L 128 200 Z" fill="#506840" opacity="0.4"/>
+  <path d="M 140 170 L 105 250 L 120 270 Z" fill="#506840" opacity="0.35"/>
+</svg>

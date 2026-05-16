@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 268 120 312" width="120" height="312">
+  <defs>
+    <linearGradient id="slb_stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#908578"/>
+      <stop offset="1" stop-color="#383028"/>
+    </linearGradient>
+  </defs>
+  <!-- 작은 노송 등 (이끼 낀) -->
+  <rect x="60" y="540" width="100" height="40" fill="url(#slb_stone)"/>
+  <rect x="50" y="530" width="120" height="14" fill="#504030"/>
+  <!-- 기둥 -->
+  <rect x="96" y="400" width="28" height="140" fill="url(#slb_stone)"/>
+  <!-- 받침 -->
+  <ellipse cx="110" cy="400" rx="42" ry="10" fill="url(#slb_stone)"/>
+  <!-- 램프 (꺼진) -->
+  <rect x="78" y="310" width="64" height="84" fill="#2a2018"/>
+  <line x1="94" y1="320" x2="94" y2="384" stroke="#0a0808" stroke-width="2"/>
+  <line x1="110" y1="320" x2="110" y2="384" stroke="#0a0808" stroke-width="2"/>
+  <line x1="126" y1="320" x2="126" y2="384" stroke="#0a0808" stroke-width="2"/>
+  <!-- 지붕 (휘어진) -->
+  <path d="M 58 310 Q 110 280 162 310 L 152 318 L 68 318 Z" fill="url(#slb_stone)"/>
+  <!-- 상단 -->
+  <circle cx="110" cy="276" r="8" fill="url(#slb_stone)"/>
+  <!-- 이끼 (녹색) -->
+  <ellipse cx="80" cy="555" rx="14" ry="6" fill="#385030" opacity="0.6"/>
+  <ellipse cx="105" cy="395" rx="14" ry="4" fill="#385030" opacity="0.5"/>
+</svg>

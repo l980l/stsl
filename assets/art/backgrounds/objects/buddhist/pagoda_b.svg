@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="96 170 408 290" width="408" height="290">
+  <defs>
+    <linearGradient id="pgb_roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#603018"/>
+      <stop offset="1" stop-color="#321008"/>
+    </linearGradient>
+    <linearGradient id="pgb_wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c8a868"/>
+      <stop offset="1" stop-color="#604820"/>
+    </linearGradient>
+  </defs>
+  <!-- 단순한 단층 사찰 -->
+  <rect x="100" y="430" width="400" height="30" fill="#605040"/>
+  <rect x="140" y="280" width="320" height="150" fill="url(#pgb_wall)"/>
+  <!-- 중앙 문 -->
+  <rect x="270" y="320" width="60" height="110" fill="#3a1808"/>
+  <rect x="270" y="320" width="60" height="6" fill="#5a3020"/>
+  <!-- 양쪽 격자 창 -->
+  <rect x="170" y="320" width="60" height="60" fill="#3a1808"/>
+  <line x1="170" y1="350" x2="230" y2="350" stroke="#806848" stroke-width="2"/>
+  <line x1="200" y1="320" x2="200" y2="380" stroke="#806848" stroke-width="2"/>
+  <rect x="370" y="320" width="60" height="60" fill="#3a1808"/>
+  <line x1="370" y1="350" x2="430" y2="350" stroke="#806848" stroke-width="2"/>
+  <line x1="400" y1="320" x2="400" y2="380" stroke="#806848" stroke-width="2"/>
+  <!-- 처마 (이중) -->
+  <path d="M 100 280 L 300 220 L 500 280 L 480 280 L 300 240 L 120 280 Z" fill="url(#pgb_roof)"/>
+  <rect x="100" y="260" width="400" height="22" fill="url(#pgb_roof)"/>
+  <ellipse cx="106" cy="280" rx="10" ry="4" fill="#1a0808"/>
+  <ellipse cx="494" cy="280" rx="10" ry="4" fill="#1a0808"/>
+  <!-- 첨탑 -->
+  <rect x="295" y="180" width="10" height="50" fill="#5a3020"/>
+  <circle cx="300" cy="175" r="5" fill="#d8a040"/>
+</svg>

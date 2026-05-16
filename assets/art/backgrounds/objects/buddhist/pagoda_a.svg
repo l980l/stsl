@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="147 36 306 424" width="306" height="424">
+  <defs>
+    <linearGradient id="pga_roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a3818"/>
+      <stop offset="1" stop-color="#4a1808"/>
+    </linearGradient>
+    <linearGradient id="pga_wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8b878"/>
+      <stop offset="1" stop-color="#705028"/>
+    </linearGradient>
+  </defs>
+  <!-- 받침 단 -->
+  <rect x="150" y="420" width="300" height="40" fill="#605040"/>
+  <rect x="150" y="420" width="300" height="6" fill="#8a7860"/>
+  <!-- 1층 (가장 큰) -->
+  <rect x="180" y="320" width="240" height="100" fill="url(#pga_wall)"/>
+  <rect x="280" y="370" width="40" height="50" fill="#3a1808"/>
+  <!-- 1층 처마 -->
+  <path d="M 150 320 L 300 290 L 450 320 L 430 320 L 300 305 L 170 320 Z" fill="url(#pga_roof)"/>
+  <rect x="150" y="305" width="300" height="18" fill="url(#pga_roof)"/>
+  <!-- 처마 끝 곡선 (한국/중국 풍) -->
+  <ellipse cx="155" cy="320" rx="8" ry="3" fill="#3a1808"/>
+  <ellipse cx="445" cy="320" rx="8" ry="3" fill="#3a1808"/>
+  <!-- 2층 -->
+  <rect x="210" y="220" width="180" height="80" fill="url(#pga_wall)"/>
+  <rect x="290" y="245" width="20" height="55" fill="#3a1808"/>
+  <!-- 2층 처마 -->
+  <path d="M 185 220 L 300 195 L 415 220 L 400 220 L 300 207 L 200 220 Z" fill="url(#pga_roof)"/>
+  <rect x="185" y="207" width="230" height="15" fill="url(#pga_roof)"/>
+  <!-- 3층 -->
+  <rect x="240" y="135" width="120" height="70" fill="url(#pga_wall)"/>
+  <!-- 3층 처마 -->
+  <path d="M 220 135 L 300 115 L 380 135 L 365 135 L 300 122 L 235 135 Z" fill="url(#pga_roof)"/>
+  <rect x="220" y="122" width="160" height="14" fill="url(#pga_roof)"/>
+  <!-- 첨탑 (꼭대기) -->
+  <rect x="295" y="60" width="10" height="60" fill="#5a3020"/>
+  <circle cx="300" cy="55" r="6" fill="#d8a040"/>
+  <circle cx="300" cy="40" r="4" fill="#d8a040"/>
+  <!-- 단청 패턴 (1층 벽) -->
+  <line x1="180" y1="350" x2="280" y2="350" stroke="#3a1808" stroke-width="2" opacity="0.4"/>
+  <line x1="320" y1="350" x2="420" y2="350" stroke="#3a1808" stroke-width="2" opacity="0.4"/>
+</svg>

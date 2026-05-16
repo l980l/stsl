@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 78 120 512" width="120" height="512">
+  <defs>
+    <linearGradient id="cba_wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a04020"/>
+      <stop offset="0.5" stop-color="#702818"/>
+      <stop offset="1" stop-color="#3a1208"/>
+    </linearGradient>
+  </defs>
+  <!-- 받침 -->
+  <rect x="40" y="560" width="120" height="30" fill="#3a1808"/>
+  <rect x="40" y="560" width="120" height="6" fill="#5a2818"/>
+  <!-- 목조 기둥 (단청 빨강) -->
+  <rect x="70" y="100" width="60" height="460" fill="url(#cba_wood)"/>
+  <!-- 단청 패턴 (가로 띠) -->
+  <rect x="70" y="150" width="60" height="8" fill="#d8a040"/>
+  <rect x="70" y="158" width="60" height="3" fill="#3a1808"/>
+  <rect x="70" y="280" width="60" height="8" fill="#d8a040"/>
+  <rect x="70" y="288" width="60" height="3" fill="#3a1808"/>
+  <rect x="70" y="410" width="60" height="8" fill="#d8a040"/>
+  <rect x="70" y="418" width="60" height="3" fill="#3a1808"/>
+  <!-- 위쪽 캡 (목조 처마 받침) -->
+  <rect x="55" y="90" width="90" height="14" fill="#503020"/>
+  <rect x="50" y="80" width="100" height="12" fill="#603020"/>
+  <rect x="50" y="78" width="100" height="4" fill="#a04020"/>
+  <!-- 작은 만(卍) 모양 (단청 가운데) -->
+  <line x1="100" y1="200" x2="100" y2="240" stroke="#d8a040" stroke-width="2"/>
+  <line x1="80" y1="220" x2="120" y2="220" stroke="#d8a040" stroke-width="2"/>
+</svg>

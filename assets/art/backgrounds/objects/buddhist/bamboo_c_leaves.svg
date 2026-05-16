@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 40 138 430" width="138" height="430">
+  <defs>
+    <linearGradient id="bmc_leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#98b058"/>
+      <stop offset="1" stop-color="#506028"/>
+    </linearGradient>
+  </defs>
+  <!-- 풍성한 잎 -->
+  <path d="M 50 90 Q 30 75 10 60 Q 30 78 50 88 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 50 95 Q 35 88 22 85 Q 35 95 50 95 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 70 70 Q 50 50 30 40 Q 50 60 70 70 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 90 80 Q 110 60 130 50 Q 110 70 90 80 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 110 100 Q 130 85 145 80 Q 130 95 110 100 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 50 180 Q 30 175 12 180 Q 30 185 50 180 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 70 165 Q 90 160 110 165 Q 90 170 70 165 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 90 195 Q 110 190 128 195 Q 110 200 90 195 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 110 220 Q 130 215 148 220 Q 130 225 110 220 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 50 280 Q 30 275 12 280 Q 30 285 50 280 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 90 260 Q 110 255 128 260 Q 110 265 90 260 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 110 300 Q 130 295 148 300 Q 130 305 110 300 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 50 360 Q 30 355 12 360 Q 30 365 50 360 Z" fill="url(#bmc_leaf)"/>
+  <path d="M 90 340 Q 110 335 128 340 Q 110 345 90 340 Z" fill="url(#bmc_leaf)"/>
+</svg>

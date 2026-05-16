@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 100 160 180" width="160" height="180">
+  <defs>
+    <linearGradient id="asb_wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8c8a8"/>
+      <stop offset="1" stop-color="#705030"/>
+    </linearGradient>
+  </defs>
+  <!-- 작은 제단 (단순) -->
+  <rect x="60" y="220" width="120" height="60" fill="#403020"/>
+  <rect x="50" y="160" width="140" height="60" fill="url(#asb_wood)"/>
+  <rect x="40" y="156" width="160" height="10" fill="#8a6840"/>
+  <!-- 시메나와 -->
+  <rect x="40" y="180" width="160" height="5" fill="#e8d8a8"/>
+  <!-- 시데 -->
+  <path d="M 90 185 L 85 192 L 90 195 L 85 200 L 90 202" stroke="#fff" stroke-width="1.5" fill="none"/>
+  <path d="M 150 185 L 145 192 L 150 195 L 145 200 L 150 202" stroke="#fff" stroke-width="1.5" fill="none"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 56 240 285" width="240" height="285">
+  <defs>
+    <radialGradient id="byb_canopy" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#b8c878"/>
+      <stop offset="0.55" stop-color="#788838"/>
+      <stop offset="1" stop-color="#3a4818"/>
+    </radialGradient>
+  </defs>
+  <!-- 작은 둥근 캐노피 -->
+  <ellipse cx="80" cy="130" rx="58" ry="48" fill="url(#byb_canopy)" opacity="0.9"/>
+  <ellipse cx="200" cy="125" rx="62" ry="50" fill="url(#byb_canopy)" opacity="0.9"/>
+  <ellipse cx="140" cy="100" rx="80" ry="44" fill="url(#byb_canopy)" opacity="0.75"/>
+  <ellipse cx="90" cy="140" rx="12" ry="18" fill="#c8d888" opacity="0.5"/>
+  <ellipse cx="190" cy="135" rx="13" ry="19" fill="#c8d888" opacity="0.5"/>
+  <circle cx="100" cy="155" r="3" fill="#a04030"/>
+  <circle cx="180" cy="150" r="3" fill="#a04030"/>
+</svg>

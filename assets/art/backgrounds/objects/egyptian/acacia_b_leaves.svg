@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 54 240 307" width="240" height="307">
+  <defs>
+    <radialGradient id="acb_canopy" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#b8c878"/>
+      <stop offset="0.55" stop-color="#788848"/>
+      <stop offset="1" stop-color="#465018"/>
+    </radialGradient>
+  </defs>
+  <!-- 작은 우산 -->
+  <ellipse cx="80" cy="120" rx="58" ry="42" fill="url(#acb_canopy)" opacity="0.9"/>
+  <ellipse cx="200" cy="115" rx="62" ry="44" fill="url(#acb_canopy)" opacity="0.9"/>
+  <ellipse cx="140" cy="90" rx="80" ry="36" fill="url(#acb_canopy)" opacity="0.75"/>
+  <circle cx="90" cy="140" r="3" fill="#f0d040"/>
+  <circle cx="195" cy="135" r="3" fill="#f0d040"/>
+  <circle cx="140" cy="110" r="3" fill="#f0d040"/>
+</svg>

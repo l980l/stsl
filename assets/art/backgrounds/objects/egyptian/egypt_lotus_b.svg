@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 130" width="130" height="130">
+  <defs>
+    <radialGradient id="elb_petal" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe0a0"/>
+      <stop offset="0.7" stop-color="#e09848"/>
+      <stop offset="1" stop-color="#883820"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="65" cy="124" rx="38" ry="3" fill="#000" opacity="0.35"/>
+  <path d="M 35 124 Q 35 95 30 60" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 65 124 Q 65 85 62 45" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 100 124 Q 100 95 105 70" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="38" cy="115" rx="14" ry="8" fill="#587030"/>
+  <ellipse cx="100" cy="115" rx="14" ry="8" fill="#587030"/>
+  <!-- 더 작은 노란 연꽃 (이집트 파피루스/연꽃) -->
+  <g transform="translate(30 60)">
+    <ellipse cx="0" cy="-6" rx="3" ry="8" fill="url(#elb_petal)"/>
+    <ellipse cx="4.5" cy="-2.5" rx="3" ry="8" transform="rotate(45)" fill="url(#elb_petal)"/>
+    <ellipse cx="4.5" cy="2.5" rx="3" ry="8" transform="rotate(135)" fill="url(#elb_petal)"/>
+    <ellipse cx="0" cy="6" rx="3" ry="8" fill="url(#elb_petal)"/>
+    <ellipse cx="-4.5" cy="2.5" rx="3" ry="8" transform="rotate(45)" fill="url(#elb_petal)"/>
+    <ellipse cx="-4.5" cy="-2.5" rx="3" ry="8" transform="rotate(135)" fill="url(#elb_petal)"/>
+    <circle cx="0" cy="0" r="2.5" fill="#e88030"/>
+  </g>
+  <g transform="translate(62 45)">
+    <ellipse cx="0" cy="-7" rx="3.5" ry="9" fill="url(#elb_petal)"/>
+    <ellipse cx="5" cy="-3" rx="3.5" ry="9" transform="rotate(45)" fill="url(#elb_petal)"/>
+    <ellipse cx="5" cy="3" rx="3.5" ry="9" transform="rotate(135)" fill="url(#elb_petal)"/>
+    <ellipse cx="0" cy="7" rx="3.5" ry="9" fill="url(#elb_petal)"/>
+    <ellipse cx="-5" cy="3" rx="3.5" ry="9" transform="rotate(45)" fill="url(#elb_petal)"/>
+    <ellipse cx="-5" cy="-3" rx="3.5" ry="9" transform="rotate(135)" fill="url(#elb_petal)"/>
+    <circle cx="0" cy="0" r="3" fill="#e88030"/>
+  </g>
+  <g transform="translate(105 70)">
+    <ellipse cx="0" cy="-6" rx="3" ry="8" fill="url(#elb_petal)"/>
+    <ellipse cx="4.5" cy="-2.5" rx="3" ry="8" transform="rotate(45)" fill="url(#elb_petal)"/>
+    <ellipse cx="4.5" cy="2.5" rx="3" ry="8" transform="rotate(135)" fill="url(#elb_petal)"/>
+    <ellipse cx="0" cy="6" rx="3" ry="8" fill="url(#elb_petal)"/>
+    <ellipse cx="-4.5" cy="2.5" rx="3" ry="8" transform="rotate(45)" fill="url(#elb_petal)"/>
+    <ellipse cx="-4.5" cy="-2.5" rx="3" ry="8" transform="rotate(135)" fill="url(#elb_petal)"/>
+    <circle cx="0" cy="0" r="2.5" fill="#e88030"/>
+  </g>
+</svg>

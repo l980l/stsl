@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 480" width="160" height="480">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 28 110 448" width="110" height="448">
   <defs>
     <linearGradient id="cyd_body" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#48604a"/>
@@ -6,7 +6,6 @@
       <stop offset="1" stop-color="#102415"/>
     </linearGradient>
   </defs>
-  <ellipse cx="80" cy="468" rx="46" ry="10" fill="#000" opacity="0.45"/>
   <rect x="74" y="380" width="12" height="90" fill="#3a2a1a"/>
   <path d="M 80 28 Q 50 200 30 470 L 130 470 Q 110 200 80 28 Z" fill="url(#cyd_body)"/>
   <path d="M 80 28 Q 70 130 80 210 Q 90 130 80 28 Z" fill="#5e7a48" opacity="0.6"/>

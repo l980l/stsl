@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48.5 67.5 178 272.5" width="178" height="272.5">
+  <defs>
+    <linearGradient id="wwc_trunk" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#604020"/>
+      <stop offset="0.5" stop-color="#3a2410"/>
+      <stop offset="1" stop-color="#1a0a04"/>
+    </linearGradient>
+  </defs>
+  <!-- 가장 큰 줄기 (장수 버들) -->
+  <path d="M 125 340 Q 110 250 122 170 Q 132 130 145 130 Q 158 130 165 170 Q 178 250 165 340 Z" fill="url(#wwc_trunk)"/>
+  <path d="M 122 160 Q 90 145 60 130" stroke="#3a2410" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M 148 150 Q 175 135 200 122" stroke="#3a2410" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M 128 130 Q 95 100 65 75" stroke="#3a2410" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 152 120 Q 185 90 220 70" stroke="#3a2410" stroke-width="5" fill="none" stroke-linecap="round"/>
+</svg>

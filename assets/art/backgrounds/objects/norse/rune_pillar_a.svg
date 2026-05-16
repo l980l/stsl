@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="45 60 110 532" width="110" height="532">
+  <defs>
+    <linearGradient id="rpa_stone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#807c78"/>
+      <stop offset="0.5" stop-color="#585450"/>
+      <stop offset="1" stop-color="#2a2622"/>
+    </linearGradient>
+  </defs>
+  <!-- 거친 돌기둥 (다듬어지지 않은 자연석 형태) -->
+  <path d="M 60 580 Q 55 540 50 400 L 55 200 L 70 80 L 130 60 L 145 200 L 150 400 Q 145 540 140 580 Z" fill="url(#rpa_stone)"/>
+  <!-- 받침 -->
+  <ellipse cx="100" cy="580" rx="55" ry="12" fill="#383430"/>
+  <!-- 룬 새김 (위에서 아래로) -->
+  <line x1="85" y1="130" x2="115" y2="130" stroke="#1a1814" stroke-width="3"/>
+  <line x1="100" y1="130" x2="100" y2="170" stroke="#1a1814" stroke-width="3"/>
+  <line x1="85" y1="220" x2="115" y2="260" stroke="#1a1814" stroke-width="3"/>
+  <line x1="115" y1="220" x2="85" y2="260" stroke="#1a1814" stroke-width="3"/>
+  <line x1="85" y1="310" x2="115" y2="310" stroke="#1a1814" stroke-width="3"/>
+  <line x1="85" y1="310" x2="85" y2="350" stroke="#1a1814" stroke-width="3"/>
+  <line x1="100" y1="400" x2="85" y2="440" stroke="#1a1814" stroke-width="3"/>
+  <line x1="100" y1="400" x2="115" y2="440" stroke="#1a1814" stroke-width="3"/>
+  <line x1="85" y1="490" x2="115" y2="490" stroke="#1a1814" stroke-width="3"/>
+  <!-- 이끼 -->
+  <ellipse cx="65" cy="450" rx="10" ry="25" fill="#3a5028" opacity="0.55"/>
+</svg>

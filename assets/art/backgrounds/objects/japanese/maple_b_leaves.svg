@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 73 206 277" width="206" height="277">
+  <defs>
+    <radialGradient id="mbl_red" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffb070"/>
+      <stop offset="0.5" stop-color="#d83018"/>
+      <stop offset="1" stop-color="#70100a"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="140" cy="130" rx="66" ry="42" fill="url(#mbl_red)"/>
+  <ellipse cx="70" cy="155" rx="32" ry="22" fill="url(#mbl_red)"/>
+  <ellipse cx="210" cy="155" rx="34" ry="22" fill="url(#mbl_red)"/>
+  <ellipse cx="140" cy="95" rx="40" ry="22" fill="url(#mbl_red)"/>
+</svg>

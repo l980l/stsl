@@ -1,11 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" width="240" height="280">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 50 200 220" width="200" height="220">
   <defs>
     <linearGradient id="al_stone" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#e2cfa0"/>
       <stop offset="1" stop-color="#7e6a48"/>
     </linearGradient>
   </defs>
-  <ellipse cx="120" cy="270" rx="100" ry="9" fill="#000" opacity="0.5"/>
   <rect x="20" y="220" width="200" height="50" fill="url(#al_stone)"/>
   <rect x="20" y="220" width="200" height="6" fill="#fff" opacity="0.3"/>
   <rect x="34" y="200" width="172" height="22" fill="#bfa978"/>

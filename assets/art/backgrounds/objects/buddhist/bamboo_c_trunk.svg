@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 40 138 430" width="138" height="430">
+  <!-- 더 굵은 줄기 4개 -->
+  <rect x="46" y="90" width="10" height="380" fill="#789048"/>
+  <rect x="46" y="90" width="3" height="380" fill="#4a5828" opacity="0.6"/>
+  <rect x="66" y="70" width="10" height="400" fill="#88a058"/>
+  <rect x="66" y="70" width="3" height="400" fill="#5a6830" opacity="0.6"/>
+  <rect x="86" y="80" width="10" height="390" fill="#789048"/>
+  <rect x="86" y="80" width="3" height="390" fill="#4a5828" opacity="0.6"/>
+  <rect x="106" y="100" width="10" height="370" fill="#88a058"/>
+  <rect x="106" y="100" width="3" height="370" fill="#5a6830" opacity="0.6"/>
+  <!-- 마디 -->
+  <line x1="46" y1="140" x2="56" y2="140" stroke="#2a3818" stroke-width="2"/>
+  <line x1="46" y1="220" x2="56" y2="220" stroke="#2a3818" stroke-width="2"/>
+  <line x1="46" y1="300" x2="56" y2="300" stroke="#2a3818" stroke-width="2"/>
+  <line x1="46" y1="380" x2="56" y2="380" stroke="#2a3818" stroke-width="2"/>
+  <line x1="66" y1="120" x2="76" y2="120" stroke="#2a3818" stroke-width="2"/>
+  <line x1="66" y1="200" x2="76" y2="200" stroke="#2a3818" stroke-width="2"/>
+  <line x1="66" y1="280" x2="76" y2="280" stroke="#2a3818" stroke-width="2"/>
+  <line x1="66" y1="360" x2="76" y2="360" stroke="#2a3818" stroke-width="2"/>
+  <line x1="86" y1="130" x2="96" y2="130" stroke="#2a3818" stroke-width="2"/>
+  <line x1="86" y1="210" x2="96" y2="210" stroke="#2a3818" stroke-width="2"/>
+  <line x1="86" y1="290" x2="96" y2="290" stroke="#2a3818" stroke-width="2"/>
+  <line x1="86" y1="370" x2="96" y2="370" stroke="#2a3818" stroke-width="2"/>
+  <line x1="106" y1="150" x2="116" y2="150" stroke="#2a3818" stroke-width="2"/>
+  <line x1="106" y1="230" x2="116" y2="230" stroke="#2a3818" stroke-width="2"/>
+  <line x1="106" y1="310" x2="116" y2="310" stroke="#2a3818" stroke-width="2"/>
+  <line x1="106" y1="390" x2="116" y2="390" stroke="#2a3818" stroke-width="2"/>
+</svg>

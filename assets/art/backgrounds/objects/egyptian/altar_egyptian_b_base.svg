@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 100 184 178" width="184" height="178">
+  <defs>
+    <linearGradient id="aeb_stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c8a060"/>
+      <stop offset="1" stop-color="#603810"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="120" cy="270" rx="92" ry="8" fill="#000" opacity="0.45"/>
+  <!-- 단순 의식 제단 (낮은 형식) -->
+  <rect x="38" y="218" width="164" height="52" fill="url(#aeb_stone)"/>
+  <rect x="38" y="218" width="164" height="5" fill="#e0b870" opacity="0.4"/>
+  <rect x="52" y="180" width="136" height="42" fill="#946828"/>
+  <!-- 양쪽 작은 사자상 디테일 -->
+  <ellipse cx="58" cy="200" rx="10" ry="14" fill="#785030"/>
+  <ellipse cx="182" cy="200" rx="10" ry="14" fill="#785030"/>
+  <!-- 불꽃 받침 -->
+  <ellipse cx="120" cy="178" rx="40" ry="5" fill="#3a1810" opacity="0.7"/>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 48 180 222" width="180" height="222">
+  <defs>
+    <radialGradient id="atoa_fire" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#fff8d8" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffd060" stop-opacity="0.9"/>
+      <stop offset="0.8" stop-color="#e07020" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#503010" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 도교 의식 황금 불꽃 (음과 양 — 따뜻한 색) -->
+  <ellipse cx="120" cy="105" rx="50" ry="38" fill="url(#atoa_fire)"/>
+  <path d="M 100 110 Q 92 75 105 55 Q 113 75 110 100 Q 120 70 128 80 Q 138 100 132 110 Q 142 88 146 100 Z" fill="#ffe068" opacity="0.88"/>
+  <path d="M 110 100 Q 108 65 118 55 Q 126 70 124 100 Z" fill="#fff8d8" opacity="0.9"/>
+  <ellipse cx="120" cy="120" rx="38" ry="18" fill="#ff9030" opacity="0.45"/>
+  <!-- 위로 솟는 빛 점 -->
+  <circle cx="100" cy="80" r="3" fill="#ffe890" opacity="0.7"/>
+  <circle cx="138" cy="68" r="2" fill="#ffe890" opacity="0.6"/>
+  <circle cx="118" cy="50" r="2" fill="#ffe890" opacity="0.55"/>
+</svg>

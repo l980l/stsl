@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 252 591" width="252" height="591">
+  <defs>
+    <linearGradient id="cta_wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1a0e08"/>
+      <stop offset="0.5" stop-color="#0a0604"/>
+      <stop offset="1" stop-color="#000"/>
+    </linearGradient>
+  </defs>
+  <!-- 받침 -->
+  <rect x="40" y="560" width="120" height="30" fill="#2a1a10"/>
+  <rect x="40" y="560" width="120" height="6" fill="#503020"/>
+  <!-- 검은 목조 기둥 -->
+  <rect x="70" y="100" width="60" height="460" fill="url(#cta_wood)"/>
+  <!-- 금색 띠 (도교) -->
+  <rect x="70" y="180" width="60" height="10" fill="#d8a040"/>
+  <rect x="70" y="190" width="60" height="3" fill="#1a0808"/>
+  <rect x="70" y="320" width="60" height="10" fill="#d8a040"/>
+  <rect x="70" y="330" width="60" height="3" fill="#1a0808"/>
+  <rect x="70" y="460" width="60" height="10" fill="#d8a040"/>
+  <rect x="70" y="470" width="60" height="3" fill="#1a0808"/>
+  <!-- 위쪽 캡 -->
+  <rect x="55" y="86" width="90" height="14" fill="#2a1a10"/>
+  <rect x="48" y="78" width="104" height="10" fill="#1a0e08"/>
+  <!-- 음양 (가운데) -->
+  <circle cx="100" cy="250" r="14" fill="none" stroke="#d8a040" stroke-width="2"/>
+  <path d="M 100 236 A 7 7 0 0 1 100 250 A 7 7 0 0 0 100 264" stroke="#d8a040" stroke-width="2" fill="none"/>
+  <circle cx="100" cy="243" r="2" fill="#d8a040"/>
+  <circle cx="100" cy="257" r="2" fill="#000"/>
+</svg>

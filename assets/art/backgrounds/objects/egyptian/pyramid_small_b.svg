@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 90 560 363" width="560" height="363">
+  <defs>
+    <linearGradient id="pyb_stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8a868"/>
+      <stop offset="1" stop-color="#684820"/>
+    </linearGradient>
+    <linearGradient id="pyb_shade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#321808" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="300" cy="440" rx="280" ry="13" fill="#8a6838" opacity="0.55"/>
+  <!-- 더 낮은 피라미드 + 옆에 작은 피라미드 -->
+  <path d="M 110 440 L 280 90 L 450 440 Z" fill="url(#pyb_stone)"/>
+  <path d="M 280 90 L 450 440 L 280 440 Z" fill="url(#pyb_shade)"/>
+  <!-- 작은 피라미드 (오른쪽) -->
+  <path d="M 420 440 L 510 280 L 580 440 Z" fill="url(#pyb_stone)"/>
+  <path d="M 510 280 L 580 440 L 510 440 Z" fill="url(#pyb_shade)"/>
+  <!-- 블록 라인 -->
+  <line x1="170" y1="300" x2="390" y2="300" stroke="#4a2818" stroke-width="2" opacity="0.4"/>
+  <line x1="200" y1="220" x2="360" y2="220" stroke="#4a2818" stroke-width="2" opacity="0.4"/>
+  <line x1="450" y1="380" x2="555" y2="380" stroke="#4a2818" stroke-width="2" opacity="0.4"/>
+  <!-- 입구 -->
+  <rect x="270" y="400" width="22" height="40" fill="#1a1008"/>
+</svg>

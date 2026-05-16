@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="13 38 254 312" width="254" height="312">
+  <defs>
+    <linearGradient id="mat_bark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#705848"/>
+      <stop offset="1" stop-color="#382820"/>
+    </linearGradient>
+  </defs>
+  <!-- 단풍 줄기 (얇고 가지 많음) -->
+  <path d="M 135 350 Q 130 280 140 200 L 156 200 Q 146 280 145 350 Z" fill="url(#mat_bark)"/>
+  <!-- 가지 (Y 자) -->
+  <path d="M 148 200 Q 110 180 80 160" stroke="#604030" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 148 200 Q 180 180 210 165" stroke="#604030" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 148 200 Q 150 170 152 140" stroke="#604030" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- 세부 가지 -->
+  <path d="M 90 160 Q 70 140 55 120" stroke="#604030" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M 200 170 Q 220 150 235 130" stroke="#604030" stroke-width="4" fill="none" stroke-linecap="round"/>
+</svg>

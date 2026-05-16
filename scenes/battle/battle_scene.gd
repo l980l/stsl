@@ -2641,19 +2641,37 @@ func _spawn_fg_specs(specs: Array, tint: Color) -> void:
 		var anchor: Vector2 = spec["pos"]
 		var sc: float = spec["scale"]
 		var z_main: int = int(anchor.y)
-		# 발 그림자 — SVG 자체에 ellipse shadow 포함되어 있어 중복 추가 안 함 (사용자 피드백)
+		# 발 그림자 — 코드 동적 생성. 모두 식생 수준 크기 (콘텐츠 폭 50%), 구조물만 살짝 짙음.
+		var is_soft: bool = SceneBackground._wind_eligible(svg_id) if svg_id != "" else false
+		var is_altar: bool = svg_id.begins_with("altar")
+		var size_w: float = SceneBackground.OBJECT_SIZE.get(svg_id, Vector2(120, 240)).x
+		var soft_shadow: bool = is_soft and not is_altar
+		var shadow_w: float = size_w * sc * 0.50
+		var shadow_h: float = max(4.0, size_w * sc * 0.05)
+		var shadow_alpha: float = 0.30 if soft_shadow else 0.40
+		_add_ground_shadow(self, anchor, shadow_w, shadow_h, shadow_alpha, z_main - 1)
 		# split spawn — base(정지) + sway 부분(shader). 나무: trunk/leaves. altar: base/flame.
+		# z 순서: 식생 (cypress 류) 는 trunk 가 위 (잎이 발까지 덮는 디자인이라 trunk 보이도록).
+		# altar 는 flame 이 위 (base 가 받침). 식생 vs altar 분기.
 		if spec.get("split", false):
 			var suffixes: Array = spec.get("split_suffixes", ["_trunk", "_leaves"])
-			var base_path: String = "res://assets/art/backgrounds/objects/greek/%s%s.svg" % [svg_id, suffixes[0]]
-			var sway_path: String = "res://assets/art/backgrounds/objects/greek/%s%s.svg" % [svg_id, suffixes[1]]
-			_spawn_tree_part(base_path, anchor, sc, tint, z_main, null)
+			var spec_path: String = spec["path"]
+			var base_path: String = spec_path.replace(".svg", "%s.svg" % suffixes[0])
+			var sway_path: String = spec_path.replace(".svg", "%s.svg" % suffixes[1])
 			var sway_mat := ShaderMaterial.new()
 			sway_mat.shader = WIND_SHADER
 			sway_mat.set_shader_parameter("amplitude", float(spec.get("wind_amp", 4.0)))
 			sway_mat.set_shader_parameter("speed", float(spec.get("wind_speed", 1.0)))
 			sway_mat.set_shader_parameter("phase", float(spec.get("wind_phase", 0.0)))
-			_spawn_tree_part(sway_path, anchor, sc, tint, z_main + 1, sway_mat)
+			var is_tree: bool = suffixes[0] == "_trunk"
+			if is_tree:
+				# 식생: leaves(아래) + trunk(위) — trunk 가 잎 사이로 보임
+				_spawn_tree_part(sway_path, anchor, sc, tint, z_main, sway_mat)
+				_spawn_tree_part(base_path, anchor, sc, tint, z_main + 1, null)
+			else:
+				# altar: base(아래) + flame(위)
+				_spawn_tree_part(base_path, anchor, sc, tint, z_main, null)
+				_spawn_tree_part(sway_path, anchor, sc, tint, z_main + 1, sway_mat)
 			continue
 		# 일반 fg sprite (구조물 또는 grass/flower 통째)
 		var path: String = spec["path"]

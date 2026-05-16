@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 30 160 547" width="160" height="547">
+  <defs>
+    <linearGradient id="oba_stone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d8b070"/>
+      <stop offset="0.5" stop-color="#a07840"/>
+      <stop offset="1" stop-color="#5a3820"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="110" cy="568" rx="80" ry="9" fill="#000" opacity="0.45"/>
+  <!-- 받침 -->
+  <rect x="60" y="520" width="100" height="50" fill="#a08040"/>
+  <rect x="60" y="520" width="100" height="6" fill="#c8a060" opacity="0.5"/>
+  <!-- 본체 (가늘게 위로) -->
+  <path d="M 80 510 L 95 80 L 125 80 L 140 510 Z" fill="url(#oba_stone)"/>
+  <!-- 꼭대기 작은 피라미드 -->
+  <path d="M 95 80 L 110 30 L 125 80 Z" fill="#f0d088"/>
+  <!-- 상형문자 (단순 줄) -->
+  <line x1="105" y1="150" x2="115" y2="150" stroke="#1a1008" stroke-width="2"/>
+  <line x1="105" y1="170" x2="115" y2="170" stroke="#1a1008" stroke-width="2"/>
+  <line x1="100" y1="190" x2="120" y2="190" stroke="#1a1008" stroke-width="2"/>
+  <circle cx="110" cy="220" r="3" fill="#1a1008"/>
+  <line x1="105" y1="250" x2="115" y2="270" stroke="#1a1008" stroke-width="2"/>
+  <line x1="115" y1="250" x2="105" y2="270" stroke="#1a1008" stroke-width="2"/>
+  <line x1="100" y1="310" x2="120" y2="310" stroke="#1a1008" stroke-width="2"/>
+  <circle cx="110" cy="340" r="3" fill="#1a1008"/>
+  <line x1="105" y1="380" x2="115" y2="400" stroke="#1a1008" stroke-width="2"/>
+  <line x1="115" y1="380" x2="105" y2="400" stroke="#1a1008" stroke-width="2"/>
+  <line x1="100" y1="440" x2="120" y2="440" stroke="#1a1008" stroke-width="2"/>
+  <!-- 받침 표시 -->
+  <line x1="60" y1="540" x2="160" y2="540" stroke="#5a3018" stroke-width="2"/>
+</svg>

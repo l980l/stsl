@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="17.25 21 63.5 58" width="63.5" height="58">
+  <defs>
+    <linearGradient id="jga_blade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7a8a48"/>
+      <stop offset="1" stop-color="#384020"/>
+    </linearGradient>
+  </defs>
+  <!-- 일본 풀 (작은 무리) -->
+  <path d="M 30 78 Q 28 50 22 25 L 30 78 Q 32 50 30 28" stroke="url(#jga_blade)" stroke-width="2" fill="none"/>
+  <path d="M 45 78 Q 43 55 38 32 L 45 78 Q 47 55 45 30" stroke="url(#jga_blade)" stroke-width="2" fill="none"/>
+  <path d="M 60 78 Q 58 50 52 22 L 60 78 Q 62 50 60 25" stroke="url(#jga_blade)" stroke-width="2" fill="none"/>
+  <path d="M 75 78 Q 73 55 68 35 L 75 78 Q 77 55 75 32" stroke="url(#jga_blade)" stroke-width="2" fill="none"/>
+  <path d="M 25 78 Q 23 60 18 45" stroke="url(#jga_blade)" stroke-width="1.5" fill="none"/>
+  <path d="M 80 78 Q 78 60 75 45" stroke="url(#jga_blade)" stroke-width="1.5" fill="none"/>
+</svg>

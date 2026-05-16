@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 100 160 180" width="160" height="180">
+  <defs>
+    <radialGradient id="asb_fire" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#fff8d0"/>
+      <stop offset="0.5" stop-color="#ff9030"/>
+      <stop offset="1" stop-color="#a01010" stop-opacity="0.1"/>
+    </radialGradient>
+  </defs>
+  <!-- 중앙 화염 (단일) -->
+  <ellipse cx="120" cy="140" rx="20" ry="30" fill="url(#asb_fire)" opacity="0.9"/>
+  <path d="M 112 145 Q 120 110 128 100 Q 122 130 120 150 Z" fill="#fff0a0"/>
+</svg>

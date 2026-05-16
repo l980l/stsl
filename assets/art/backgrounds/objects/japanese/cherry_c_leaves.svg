@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 18 164 452" width="164" height="452">
+  <defs>
+    <radialGradient id="ccl_pink" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd8e8"/>
+      <stop offset="0.7" stop-color="#f0a0c0"/>
+      <stop offset="1" stop-color="#a86080"/>
+    </radialGradient>
+  </defs>
+  <!-- 큰 사쿠라 잎무리 -->
+  <ellipse cx="80" cy="70" rx="68" ry="48" fill="url(#ccl_pink)"/>
+  <ellipse cx="32" cy="100" rx="32" ry="22" fill="url(#ccl_pink)"/>
+  <ellipse cx="130" cy="105" rx="34" ry="24" fill="url(#ccl_pink)"/>
+  <ellipse cx="80" cy="200" rx="36" ry="20" fill="url(#ccl_pink)" opacity="0.85"/>
+  <ellipse cx="140" cy="195" rx="22" ry="14" fill="url(#ccl_pink)" opacity="0.8"/>
+  <ellipse cx="80" cy="40" rx="42" ry="22" fill="url(#ccl_pink)"/>
+</svg>

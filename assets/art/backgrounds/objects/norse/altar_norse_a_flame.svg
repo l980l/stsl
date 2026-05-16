@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 50 180 220" width="180" height="220">
+  <defs>
+    <radialGradient id="ana_fire" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#fff8d8" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffa848" stop-opacity="0.9"/>
+      <stop offset="0.8" stop-color="#e83820" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#a01010" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 큰 모닥불 (longhouse 안 향연 — norse 톤) -->
+  <ellipse cx="120" cy="115" rx="58" ry="42" fill="url(#ana_fire)"/>
+  <path d="M 95 120 Q 85 80 100 50 Q 110 80 108 110 Q 118 60 128 70 Q 138 90 132 120 Q 144 80 148 100 Z" fill="#ffc850" opacity="0.85"/>
+  <path d="M 108 100 Q 108 60 118 50 Q 128 65 126 100 Z" fill="#fff8d8" opacity="0.9"/>
+  <ellipse cx="120" cy="135" rx="42" ry="18" fill="#ff7020" opacity="0.45"/>
+  <!-- 불꽃 점 (위로 솟구침) -->
+  <circle cx="100" cy="85" r="3" fill="#ffe890" opacity="0.7"/>
+  <circle cx="135" cy="70" r="2" fill="#ffe890" opacity="0.6"/>
+  <circle cx="115" cy="55" r="2" fill="#ffe890" opacity="0.55"/>
+  <circle cx="142" cy="90" r="2" fill="#ffe890" opacity="0.5"/>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48.5 67.5 178 272.5" width="178" height="272.5">
+  <defs>
+    <linearGradient id="wwc_leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#78a058"/>
+      <stop offset="1" stop-color="#406028"/>
+    </linearGradient>
+  </defs>
+  <!-- 매우 많은 늘어진 잎새 (풍성한 장수 버들) -->
+  <path d="M 60 130 Q 55 220 50 310" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 75 130 Q 72 220 68 305" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 90 130 Q 90 220 88 305" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 105 130 Q 108 230 105 320" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 120 130 Q 122 230 120 320" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 135 110 Q 135 240 130 325" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 150 110 Q 150 230 148 325" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 165 110 Q 165 240 162 325" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 180 122 Q 185 230 185 320" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 195 122 Q 200 230 200 315" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 210 122 Q 215 220 215 310" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 225 130 Q 225 220 222 305" stroke="url(#wwc_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- 잎 -->
+  <ellipse cx="60" cy="260" rx="3" ry="8" fill="#588038"/>
+  <ellipse cx="90" cy="250" rx="3" ry="8" fill="#588038"/>
+  <ellipse cx="120" cy="270" rx="3" ry="8" fill="#588038"/>
+  <ellipse cx="150" cy="280" rx="3" ry="8" fill="#588038"/>
+  <ellipse cx="180" cy="260" rx="3" ry="8" fill="#588038"/>
+  <ellipse cx="210" cy="250" rx="3" ry="8" fill="#588038"/>
+</svg>

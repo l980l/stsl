@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="55 20 170 330" width="170" height="330">
+  <defs>
+    <linearGradient id="spa_body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2e4828"/>
+      <stop offset="0.5" stop-color="#1a2e18"/>
+      <stop offset="1" stop-color="#0a1a08"/>
+    </linearGradient>
+  </defs>
+  <!-- 가문비 — 다층 원뿔 (눈 쌓이는 침엽수) -->
+  <path d="M 140 20 L 95 110 L 185 110 Z" fill="url(#spa_body)"/>
+  <path d="M 140 80 L 80 180 L 200 180 Z" fill="url(#spa_body)"/>
+  <path d="M 140 150 L 65 250 L 215 250 Z" fill="url(#spa_body)"/>
+  <path d="M 140 220 L 55 310 L 225 310 Z" fill="url(#spa_body)"/>
+  <!-- 밝은 면 (왼쪽 highlight) -->
+  <path d="M 140 20 L 120 80 L 130 110 Z" fill="#4a6238" opacity="0.5"/>
+  <path d="M 140 80 L 110 160 L 125 180 Z" fill="#4a6238" opacity="0.4"/>
+  <path d="M 140 150 L 95 230 L 115 250 Z" fill="#4a6238" opacity="0.35"/>
+  <!-- 어두운 면 (오른쪽 그림자) -->
+  <path d="M 140 20 L 160 80 L 150 110 Z" fill="#0a1408" opacity="0.5"/>
+  <path d="M 140 80 L 170 160 L 155 180 Z" fill="#0a1408" opacity="0.5"/>
+  <path d="M 140 150 L 185 230 L 165 250 Z" fill="#0a1408" opacity="0.5"/>
+</svg>

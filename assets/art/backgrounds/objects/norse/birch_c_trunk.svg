@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="6 5 148 465" width="148" height="465">
+  <!-- 두꺼운 줄기 -->
+  <rect x="64" y="70" width="32" height="400" fill="#e0dcc8"/>
+  <rect x="64" y="70" width="8" height="400" fill="#a8a4a0" opacity="0.4"/>
+  <!-- 더 많은 가로 줄 -->
+  <rect x="64" y="110" width="32" height="6" fill="#1a1814"/>
+  <rect x="64" y="170" width="32" height="5" fill="#1a1814"/>
+  <rect x="64" y="230" width="32" height="6" fill="#1a1814"/>
+  <rect x="64" y="290" width="32" height="5" fill="#1a1814"/>
+  <rect x="64" y="350" width="32" height="6" fill="#1a1814"/>
+  <rect x="64" y="410" width="32" height="5" fill="#1a1814"/>
+</svg>

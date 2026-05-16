@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="13.75 16.5 87.25 80" width="87.25" height="80">
+  <defs>
+    <linearGradient id="jgb_blade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#88a050"/>
+      <stop offset="1" stop-color="#384020"/>
+    </linearGradient>
+  </defs>
+  <!-- 큰 풀 무리 -->
+  <path d="M 25 95 Q 22 60 15 30" stroke="url(#jgb_blade)" stroke-width="2.5" fill="none"/>
+  <path d="M 40 95 Q 38 55 30 22" stroke="url(#jgb_blade)" stroke-width="2.5" fill="none"/>
+  <path d="M 55 95 Q 53 50 45 18" stroke="url(#jgb_blade)" stroke-width="3" fill="none"/>
+  <path d="M 70 95 Q 68 55 62 22" stroke="url(#jgb_blade)" stroke-width="2.5" fill="none"/>
+  <path d="M 85 95 Q 83 60 78 30" stroke="url(#jgb_blade)" stroke-width="2.5" fill="none"/>
+  <path d="M 100 95 Q 98 65 95 40" stroke="url(#jgb_blade)" stroke-width="2" fill="none"/>
+  <path d="M 32 95 Q 30 75 26 60" stroke="url(#jgb_blade)" stroke-width="1.5" fill="none"/>
+  <path d="M 95 95 Q 93 75 90 60" stroke="url(#jgb_blade)" stroke-width="1.5" fill="none"/>
+</svg>

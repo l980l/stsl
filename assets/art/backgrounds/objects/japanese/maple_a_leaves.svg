@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="13 38 254 312" width="254" height="312">
+  <defs>
+    <radialGradient id="mal_red" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffc080"/>
+      <stop offset="0.5" stop-color="#e84020"/>
+      <stop offset="1" stop-color="#80100a"/>
+    </radialGradient>
+  </defs>
+  <!-- 단풍 잎무리 (빨간 구름) -->
+  <ellipse cx="140" cy="100" rx="80" ry="50" fill="url(#mal_red)"/>
+  <ellipse cx="55" cy="130" rx="42" ry="28" fill="url(#mal_red)"/>
+  <ellipse cx="225" cy="130" rx="42" ry="28" fill="url(#mal_red)"/>
+  <ellipse cx="100" cy="60" rx="38" ry="22" fill="url(#mal_red)"/>
+  <ellipse cx="180" cy="60" rx="38" ry="22" fill="url(#mal_red)"/>
+  <!-- 진한 부분 -->
+  <ellipse cx="140" cy="110" rx="60" ry="36" fill="#c02818" opacity="0.5"/>
+</svg>

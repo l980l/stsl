@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 54 240 307" width="240" height="307">
+  <defs>
+    <linearGradient id="acb_trunk" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#503010"/>
+      <stop offset="0.5" stop-color="#321808"/>
+      <stop offset="1" stop-color="#180404"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="140" cy="350" rx="92" ry="11" fill="#000" opacity="0.45"/>
+  <!-- 짧은 굵은 줄기 -->
+  <path d="M 132 340 Q 125 230 130 160 Q 138 130 145 130 Q 150 200 152 340 Z" fill="url(#acb_trunk)"/>
+  <path d="M 134 200 Q 90 175 60 140" stroke="#321808" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M 148 180 Q 195 155 225 130" stroke="#321808" stroke-width="7" fill="none" stroke-linecap="round"/>
+</svg>

@@ -14,7 +14,7 @@ const ENEMY_SLOTS := [
 	Vector2(1084, 498), Vector2(1609, 484), Vector2(1354, 472),
 ]
 
-const MYTHS := ["greek"]  # 1차 PR — greek 만
+const MYTHS := ["greek", "norse", "egyptian", "buddhist", "daoist", "japanese"]
 const TIMES := ["random", "dawn", "day", "dusk", "night"]
 const WEATHERS := ["random", "clear", "cloudy", "overcast", "rain", "snow"]
 
@@ -210,19 +210,60 @@ func _regenerate() -> void:
 		_scene_bg.force_env(myth, act, randi(), time_choice, weather_choice, occupied)
 	var actual_env: Dictionary = _scene_bg.current_env
 
-	# fg specs spawn (battle_scene 패턴)
+	# fg specs spawn — battle_scene._spawn_fg_specs 와 동일 패턴 (split + 그림자 + wind shader)
+	const WIND_SHADER := preload("res://assets/shaders/wind_sway.gdshader")
+	var tint: Color = actual_env.get("tint", Color.WHITE)
 	for spec_v in _scene_bg.front_specs:
 		var spec: Dictionary = spec_v
+		var svg_id: String = spec.get("svg_id", "")
+		var anchor: Vector2 = spec["pos"]
+		var sc: float = spec["scale"]
+		var z_main: int = int(anchor.y)
+		# 그림자
+		var is_soft: bool = SceneBackground._wind_eligible(svg_id) if svg_id != "" else false
+		var is_altar: bool = svg_id.begins_with("altar")
+		var size_w: float = SceneBackground.OBJECT_SIZE.get(svg_id, Vector2(120, 240)).x
+		var soft_shadow: bool = is_soft and not is_altar
+		var shadow_w: float = size_w * sc * 0.50
+		var shadow_h: float = max(4.0, size_w * sc * 0.05)
+		var shadow_alpha: float = 0.30 if soft_shadow else 0.40
+		_preview_add_shadow(anchor, shadow_w, shadow_h, shadow_alpha, z_main - 1)
+		# split spawn (식생: leaves+trunk, altar: base+flame)
+		if spec.get("split", false):
+			var suffixes: Array = spec.get("split_suffixes", ["_trunk", "_leaves"])
+			var spec_path: String = spec["path"]
+			var base_path: String = spec_path.replace(".svg", "%s.svg" % suffixes[0])
+			var sway_path: String = spec_path.replace(".svg", "%s.svg" % suffixes[1])
+			var sway_mat := ShaderMaterial.new()
+			sway_mat.shader = WIND_SHADER
+			sway_mat.set_shader_parameter("amplitude", float(spec.get("wind_amp", 4.0)))
+			sway_mat.set_shader_parameter("speed", float(spec.get("wind_speed", 1.0)))
+			sway_mat.set_shader_parameter("phase", float(spec.get("wind_phase", 0.0)))
+			var is_tree: bool = suffixes[0] == "_trunk"
+			if is_tree:
+				_preview_spawn_part(sway_path, anchor, sc, tint, z_main, sway_mat)
+				_preview_spawn_part(base_path, anchor, sc, tint, z_main + 1, null)
+			else:
+				_preview_spawn_part(base_path, anchor, sc, tint, z_main, null)
+				_preview_spawn_part(sway_path, anchor, sc, tint, z_main + 1, sway_mat)
+			continue
+		# 일반 sprite (구조물 또는 grass/flower 통째)
 		if not ResourceLoader.exists(spec["path"]):
 			continue
 		var spr := Sprite2D.new()
 		spr.texture = load(spec["path"])
-		var sc: float = spec["scale"]
 		spr.scale = Vector2(sc, sc)
-		var anchor: Vector2 = spec["pos"]
 		spr.position = anchor
 		spr.offset = Vector2(0, -spr.texture.get_height() * 0.5)
-		spr.modulate = actual_env.get("tint", Color.WHITE)
+		spr.modulate = tint
+		spr.z_index = z_main
+		if spec.get("wind", false):
+			var mat := ShaderMaterial.new()
+			mat.shader = WIND_SHADER
+			mat.set_shader_parameter("amplitude", float(spec.get("wind_amp", 4.0)))
+			mat.set_shader_parameter("speed", float(spec.get("wind_speed", 1.0)))
+			mat.set_shader_parameter("phase", float(spec.get("wind_phase", 0.0)))
+			spr.material = mat
 		add_child(spr)
 		_fg_nodes.append(spr)
 
@@ -295,6 +336,7 @@ func _spawn_char_placeholder(slot_pos: Vector2, color: Color, label: String) -> 
 	# battle_scene: char_node.position = (slot.x + 120, slot.y + 184), scale (1.44, 2.4)
 	# 발 위치 = position.y + sprite_h*scale.y*0.5. 단순화: 발 = slot.y + SLOT_H
 	var foot_y: float = slot_pos.y + SLOT_H
+	var z_main: int = int(foot_y)  # battle_scene 패턴 — 발 y 가 z (큰 y = 앞)
 	# 발 그림자 — sprite 보다 z 작게
 	var shadow := Polygon2D.new()
 	shadow.color = Color(0, 0, 0, 0.45)
@@ -304,7 +346,7 @@ func _spawn_char_placeholder(slot_pos: Vector2, color: Color, label: String) -> 
 		var a: float = TAU * float(i) / 24.0
 		shadow_pts.append(Vector2(sx + cos(a) * 90.0, foot_y - 4.0 + sin(a) * 16.0))
 	shadow.polygon = shadow_pts
-	shadow.z_index = -1
+	shadow.z_index = z_main - 1
 	add_child(shadow)
 	_char_nodes.append(shadow)
 	var spr := Sprite2D.new()
@@ -315,6 +357,7 @@ func _spawn_char_placeholder(slot_pos: Vector2, color: Color, label: String) -> 
 	spr.texture = ImageTexture.create_from_image(img)
 	spr.position = Vector2(slot_pos.x + SLOT_W * 0.5, foot_y)  # y_sort 기준 = 발
 	spr.offset = Vector2(0, -pl_h * 0.5)  # 발이 origin 에 위치
+	spr.z_index = z_main
 	add_child(spr)
 	_char_nodes.append(spr)
 	# 라벨
@@ -332,3 +375,30 @@ func _count_active(arr: Array) -> int:
 		if cb.button_pressed:
 			n += 1
 	return n
+
+func _preview_spawn_part(path: String, anchor: Vector2, sc: float, tint: Color, z_idx: int, mat: ShaderMaterial) -> void:
+	if not ResourceLoader.exists(path):
+		return
+	var spr := Sprite2D.new()
+	spr.texture = load(path)
+	spr.scale = Vector2(sc, sc)
+	spr.position = anchor
+	spr.offset = Vector2(0, -spr.texture.get_height() * 0.5)
+	spr.modulate = tint
+	spr.z_index = z_idx
+	if mat != null:
+		spr.material = mat
+	add_child(spr)
+	_fg_nodes.append(spr)
+
+func _preview_add_shadow(pos: Vector2, rx: float, ry: float, alpha: float, z_idx: int) -> void:
+	var shadow := Polygon2D.new()
+	shadow.color = Color(0, 0, 0, alpha)
+	var pts := PackedVector2Array()
+	for i in 24:
+		var a: float = TAU * float(i) / 24.0
+		pts.append(pos + Vector2(cos(a) * rx, sin(a) * ry))
+	shadow.polygon = pts
+	shadow.z_index = z_idx
+	add_child(shadow)
+	_fg_nodes.append(shadow)

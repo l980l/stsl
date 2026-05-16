@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10.5 2 117 98" width="117" height="98">
+  <defs>
+    <linearGradient id="dgb_blade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b89858"/>
+      <stop offset="1" stop-color="#604820"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="70" cy="96" rx="56" ry="4" fill="#000" opacity="0.35"/>
+  <!-- 더 큰 사막 풀 무더기 -->
+  <path d="M 20 96 Q 18 70 12 38" stroke="url(#dgb_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 30 96 Q 28 60 22 22" stroke="url(#dgb_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 42 96 Q 42 52 38 14" stroke="url(#dgb_blade)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M 54 96 Q 56 48 52 6" stroke="url(#dgb_blade)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M 66 96 Q 68 40 70 4" stroke="url(#dgb_blade)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M 78 96 Q 80 48 88 8" stroke="url(#dgb_blade)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M 90 96 Q 92 56 100 16" stroke="url(#dgb_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 102 96 Q 104 64 112 26" stroke="url(#dgb_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 116 96 Q 118 72 126 44" stroke="url(#dgb_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 36 96 Q 34 80 30 64" stroke="#a08850" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 60 96 Q 60 76 62 52" stroke="#a08850" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 84 96 Q 84 80 86 60" stroke="#a08850" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

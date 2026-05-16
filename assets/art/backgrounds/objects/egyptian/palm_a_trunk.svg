@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="5 10 150 466" width="150" height="466">
+  <ellipse cx="80" cy="468" rx="40" ry="8" fill="#000" opacity="0.45"/>
+  <!-- 약간 휘어진 긴 줄기 (야자수 특유) -->
+  <path d="M 72 130 Q 60 280 78 470 L 90 470 Q 100 280 84 130 Z" fill="#785838"/>
+  <path d="M 72 130 Q 60 280 78 470 L 82 470 Q 70 280 78 130 Z" fill="#5a3820" opacity="0.5"/>
+  <!-- 줄기 마디 (가로) -->
+  <ellipse cx="78" cy="180" rx="9" ry="3" fill="#3a2010"/>
+  <ellipse cx="78" cy="230" rx="10" ry="3" fill="#3a2010"/>
+  <ellipse cx="79" cy="280" rx="10" ry="3" fill="#3a2010"/>
+  <ellipse cx="80" cy="330" rx="11" ry="3" fill="#3a2010"/>
+  <ellipse cx="81" cy="380" rx="11" ry="3" fill="#3a2010"/>
+  <ellipse cx="82" cy="430" rx="12" ry="4" fill="#3a2010"/>
+</svg>

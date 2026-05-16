@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 477" width="160" height="477">
+  <ellipse cx="80" cy="468" rx="44" ry="9" fill="#000" opacity="0.45"/>
+  <!-- 키 더 큰 야자수 -->
+  <path d="M 74 90 Q 64 280 76 470 L 90 470 Q 102 280 86 90 Z" fill="#6a4828"/>
+  <path d="M 74 90 Q 64 280 76 470 L 80 470 Q 70 280 78 90 Z" fill="#4a2818" opacity="0.5"/>
+  <ellipse cx="79" cy="150" rx="8" ry="3" fill="#3a2010"/>
+  <ellipse cx="79" cy="200" rx="9" ry="3" fill="#3a2010"/>
+  <ellipse cx="80" cy="250" rx="10" ry="3" fill="#3a2010"/>
+  <ellipse cx="81" cy="300" rx="10" ry="3" fill="#3a2010"/>
+  <ellipse cx="82" cy="350" rx="11" ry="3" fill="#3a2010"/>
+  <ellipse cx="83" cy="400" rx="12" ry="4" fill="#3a2010"/>
+  <ellipse cx="84" cy="450" rx="13" ry="4" fill="#3a2010"/>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 45 200 234" width="200" height="234">
+  <defs>
+    <radialGradient id="aea_fire" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#fff8d8" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffc060" stop-opacity="0.9"/>
+      <stop offset="0.8" stop-color="#e85020" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#802010" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 황금 빛 불꽃 (이집트 종교 의식) -->
+  <ellipse cx="120" cy="100" rx="55" ry="40" fill="url(#aea_fire)"/>
+  <path d="M 100 100 Q 92 65 105 45 Q 113 65 110 90 Q 120 60 128 70 Q 135 90 130 100 Q 140 80 144 95 Z" fill="#ffd860" opacity="0.88"/>
+  <path d="M 110 90 Q 108 55 118 45 Q 126 60 124 90 Z" fill="#fff8d8" opacity="0.9"/>
+  <ellipse cx="120" cy="110" rx="40" ry="22" fill="#ff9038" opacity="0.42"/>
+  <!-- 위로 솟구치는 불꽃 점 -->
+  <circle cx="102" cy="78" r="3" fill="#ffe890" opacity="0.65"/>
+  <circle cx="138" cy="60" r="2" fill="#ffe890" opacity="0.55"/>
+  <circle cx="118" cy="52" r="2" fill="#ffe890" opacity="0.5"/>
+</svg>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" width="120" height="140">
+  <defs>
+    <radialGradient id="ela_petal" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.7" stop-color="#f0c8a8"/>
+      <stop offset="1" stop-color="#a86840"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="60" cy="134" rx="34" ry="3" fill="#000" opacity="0.35"/>
+  <!-- 연꽃 줄기 -->
+  <path d="M 36 134 Q 36 100 30 60" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 60 134 Q 60 90 58 30" stroke="#587030" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 84 134 Q 84 100 90 70" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- 연꽃 잎 (수련) -->
+  <ellipse cx="38" cy="124" rx="14" ry="8" fill="#587030"/>
+  <ellipse cx="80" cy="125" rx="14" ry="8" fill="#587030"/>
+  <!-- 이집트 연꽃 (위로 핀 모양) -->
+  <g transform="translate(30 60)">
+    <ellipse cx="0" cy="-7" rx="3.5" ry="9" fill="url(#ela_petal)"/>
+    <ellipse cx="5" cy="-3" rx="3.5" ry="9" transform="rotate(45)" fill="url(#ela_petal)"/>
+    <ellipse cx="5" cy="3" rx="3.5" ry="9" transform="rotate(135)" fill="url(#ela_petal)"/>
+    <ellipse cx="0" cy="7" rx="3.5" ry="9" fill="url(#ela_petal)"/>
+    <ellipse cx="-5" cy="3" rx="3.5" ry="9" transform="rotate(45)" fill="url(#ela_petal)"/>
+    <ellipse cx="-5" cy="-3" rx="3.5" ry="9" transform="rotate(135)" fill="url(#ela_petal)"/>
+    <circle cx="0" cy="0" r="3" fill="#f0a040"/>
+  </g>
+  <g transform="translate(58 30)">
+    <ellipse cx="0" cy="-9" rx="4" ry="11" fill="url(#ela_petal)"/>
+    <ellipse cx="6" cy="-4" rx="4" ry="11" transform="rotate(45)" fill="url(#ela_petal)"/>
+    <ellipse cx="6" cy="4" rx="4" ry="11" transform="rotate(135)" fill="url(#ela_petal)"/>
+    <ellipse cx="0" cy="9" rx="4" ry="11" fill="url(#ela_petal)"/>
+    <ellipse cx="-6" cy="4" rx="4" ry="11" transform="rotate(45)" fill="url(#ela_petal)"/>
+    <ellipse cx="-6" cy="-4" rx="4" ry="11" transform="rotate(135)" fill="url(#ela_petal)"/>
+    <circle cx="0" cy="0" r="3.5" fill="#f0a040"/>
+  </g>
+  <g transform="translate(90 70)">
+    <ellipse cx="0" cy="-6" rx="3" ry="8" fill="url(#ela_petal)"/>
+    <ellipse cx="4.5" cy="-2.5" rx="3" ry="8" transform="rotate(45)" fill="url(#ela_petal)"/>
+    <ellipse cx="4.5" cy="2.5" rx="3" ry="8" transform="rotate(135)" fill="url(#ela_petal)"/>
+    <ellipse cx="0" cy="6" rx="3" ry="8" fill="url(#ela_petal)"/>
+    <ellipse cx="-4.5" cy="2.5" rx="3" ry="8" transform="rotate(45)" fill="url(#ela_petal)"/>
+    <ellipse cx="-4.5" cy="-2.5" rx="3" ry="8" transform="rotate(135)" fill="url(#ela_petal)"/>
+    <circle cx="0" cy="0" r="2.5" fill="#f0a040"/>
+  </g>
+</svg>

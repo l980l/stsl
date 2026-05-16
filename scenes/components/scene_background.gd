@@ -23,9 +23,39 @@ const PALETTES := {
 		{"sky": Color("#5a7090"), "horizon": Color("#e0b070"), "silhouette": Color("#2a3a4a"), "scenery": Color("#4a5040")},
 		{"sky": Color("#1a1024"), "horizon": Color("#6a3030"), "silhouette": Color("#080608"), "scenery": Color("#1a1018")},
 	],
+	# 북유럽 — 차가운 푸른/회색 톤. Act 3 라그나뢰크(검은+핏빛).
+	"norse": [
+		{"sky": Color("#4a6080"), "horizon": Color("#a09070"), "silhouette": Color("#1a2030"), "scenery": Color("#2a3a30")},
+		{"sky": Color("#3a4a60"), "horizon": Color("#705060"), "silhouette": Color("#150e1e"), "scenery": Color("#1a2028")},
+		{"sky": Color("#1a0e10"), "horizon": Color("#7a2020"), "silhouette": Color("#080000"), "scenery": Color("#160808")},
+	],
+	# 이집트 — 사막 톤. Act 1 밝은 푸른+모래, Act 2 황혼 주황/금, Act 3 사후세계 어두운 보라.
+	"egyptian": [
+		{"sky": Color("#6890b0"), "horizon": Color("#d8b070"), "silhouette": Color("#4a3820"), "scenery": Color("#6a5028")},
+		{"sky": Color("#b06840"), "horizon": Color("#f0a050"), "silhouette": Color("#5a2818"), "scenery": Color("#8a4828")},
+		{"sky": Color("#2a1830"), "horizon": Color("#503040"), "silhouette": Color("#100808"), "scenery": Color("#281828")},
+	],
+	# 불교 — 짙은 녹+주황. Act 1 평화 산골, Act 2 노을 사찰, Act 3 어두운 명부.
+	"buddhist": [
+		{"sky": Color("#7090a0"), "horizon": Color("#c8a868"), "silhouette": Color("#2a3a28"), "scenery": Color("#3a5028")},
+		{"sky": Color("#a06038"), "horizon": Color("#e09040"), "silhouette": Color("#3a1808"), "scenery": Color("#6a3818")},
+		{"sky": Color("#180810"), "horizon": Color("#403018"), "silhouette": Color("#060000"), "scenery": Color("#180a10")},
+	],
+	# 도교 — 흑/금 신비. Act 1 산골 흐림(회색+갈색), Act 2 노을 진홍, Act 3 어두운 도교 동굴(검+금).
+	"daoist": [
+		{"sky": Color("#7888a0"), "horizon": Color("#a89070"), "silhouette": Color("#2a2820"), "scenery": Color("#3a3828")},
+		{"sky": Color("#a04830"), "horizon": Color("#e0a050"), "silhouette": Color("#401818"), "scenery": Color("#702828")},
+		{"sky": Color("#0a0810"), "horizon": Color("#403018"), "silhouette": Color("#060000"), "scenery": Color("#181010")},
+	],
+	# 일본 — 홍/먹/사쿠라. Act 1 봄 사쿠라(분홍+회녹), Act 2 가을 단풍(빨강+주황), Act 3 밤(먹+홍).
+	"japanese": [
+		{"sky": Color("#f0c8d0"), "horizon": Color("#e0a0b8"), "silhouette": Color("#705068"), "scenery": Color("#9078a0")},
+		{"sky": Color("#a04018"), "horizon": Color("#e08030"), "silhouette": Color("#501008"), "scenery": Color("#803018")},
+		{"sky": Color("#1a0810"), "horizon": Color("#601818"), "silhouette": Color("#0a0008"), "scenery": Color("#280810")},
+	],
 }
 
-# 신화별 SVG 오브젝트 풀 + spawn 가중치 (1차 PR = greek 만)
+# 신화별 SVG 오브젝트 풀 + spawn 가중치
 const OBJECTS := {
 	"greek": {
 		"large":  ["temple_small_a", "temple_small_b", "temple_small_d"],
@@ -37,39 +67,225 @@ const OBJECTS := {
 				   "flower_a", "flower_b", "flower_c"],
 		"pillars":["column_doric_a", "column_doric_b", "column_doric_c", "column_doric_d"],
 	},
+	"norse": {
+		"large":  ["longhouse_a", "longhouse_b"],
+		"medium": ["rune_stone_a", "rune_stone_b",
+				   "altar_norse_a", "altar_norse_b"],
+		"small":  ["birch_a", "birch_b", "birch_c", "birch_d",
+				   "spruce_a", "spruce_b", "spruce_c", "spruce_d",
+				   "tundra_grass_a", "tundra_grass_b",
+				   "edelweiss_a", "edelweiss_b"],
+		"pillars":["rune_pillar_a", "rune_pillar_b"],
+	},
+	"egyptian": {
+		"large":  ["pyramid_small_a", "pyramid_small_b"],
+		"medium": ["obelisk_a", "obelisk_b",
+				   "altar_egyptian_a", "altar_egyptian_b"],
+		"small":  ["palm_a", "palm_b", "palm_c", "palm_d",
+				   "acacia_a", "acacia_b", "acacia_c", "acacia_d",
+				   "desert_grass_a", "desert_grass_b",
+				   "egypt_lotus_a", "egypt_lotus_b"],
+		"pillars":["column_lotus_a", "column_lotus_b"],
+	},
+	"buddhist": {
+		"large":  ["pagoda_a", "pagoda_b"],
+		"medium": ["buddha_statue_a", "buddha_statue_b",
+				   "altar_buddhist_a", "altar_buddhist_b"],
+		"small":  ["bamboo_a", "bamboo_b", "bamboo_c", "bamboo_d",
+				   "banyan_a", "banyan_b", "banyan_c", "banyan_d",
+				   "bamboo_grass_a", "bamboo_grass_b",
+				   "buddhist_lotus_a", "buddhist_lotus_b"],
+		"pillars":["column_buddhist_a", "column_buddhist_b"],
+	},
+	"daoist": {
+		"large":  ["temple_taoist_a", "temple_taoist_b"],
+		"medium": ["crane_statue_a", "crane_statue_b",
+				   "altar_taoist_a", "altar_taoist_b"],
+		"small":  ["pine_a", "pine_b", "pine_c", "pine_d",
+				   "weeping_willow_a", "weeping_willow_b", "weeping_willow_c", "weeping_willow_d",
+				   "mountain_grass_a", "mountain_grass_b",
+				   "chrysanthemum_a", "chrysanthemum_b"],
+		"pillars":["column_taoist_a", "column_taoist_b"],
+	},
+	"japanese": {
+		"large":  ["shrine_a", "shrine_b"],
+		"medium": ["stone_lantern_a", "stone_lantern_b",
+				   "altar_shinto_a", "altar_shinto_b"],
+		"small":  ["cherry_a", "cherry_b", "cherry_c", "cherry_d",
+				   "maple_a", "maple_b", "maple_c", "maple_d",
+				   "japanese_grass_a", "japanese_grass_b",
+				   "sakura_flower_a", "sakura_flower_b"],
+		"pillars":["torii_a", "torii_b"],
+	},
 }
 
-# SVG viewBox 크기 (충돌 검사용). 같은 base 의 a/b/c/d 는 동일 viewBox.
+# SVG 콘텐츠 BBox 크기 (tools/trim_svg_viewbox.py 로 viewBox 정리 후 자동 측정).
+# split 쌍 (trunk/leaves, base/flame) 은 같은 viewBox 공유.
 const OBJECT_SIZE := {
-	"temple_small_a":   Vector2(600, 460), "temple_small_b": Vector2(600, 460),
-	"temple_small_d":   Vector2(600, 460),
-	"statue_warrior_a": Vector2(220, 580), "statue_warrior_b": Vector2(220, 580),
-	"statue_warrior_d": Vector2(220, 480),
-	"altar_a":          Vector2(240, 280), "altar_b": Vector2(240, 280),
-	"altar_c":          Vector2(240, 280), "altar_d": Vector2(240, 280),
-	"cypress_a":        Vector2(160, 480), "cypress_b": Vector2(160, 480),
-	"cypress_c":        Vector2(160, 480), "cypress_d": Vector2(160, 480),
-	"olive_tree_a":     Vector2(280, 360), "olive_tree_b": Vector2(280, 360),
-	"olive_tree_c":     Vector2(280, 360), "olive_tree_d": Vector2(280, 360),
-	"column_doric_a":   Vector2(200, 600), "column_doric_b": Vector2(200, 600),
-	"column_doric_c":   Vector2(200, 600), "column_doric_d": Vector2(200, 600),
-	"grass_a":          Vector2(100, 80),  "grass_b":         Vector2(140, 100),
-	"flower_a":         Vector2(120, 140), "flower_b":        Vector2(130, 130),
-	"flower_c":         Vector2(110, 110),
+	"altar_a":                  Vector2(200, 220),
+	"altar_b":                  Vector2(172, 210),
+	"altar_c":                  Vector2(204, 210),
+	"altar_d":                  Vector2(184, 200),
+	"altar_norse_a":            Vector2(180, 220),
+	"altar_norse_b":            Vector2(160, 220),
+	"birch_a":                  Vector2(136, 450),
+	"birch_b":                  Vector2(116, 420),
+	"birch_c":                  Vector2(148, 465),
+	"birch_d":                  Vector2(139, 443),
+	"column_doric_a":           Vector2(160, 546),
+	"column_doric_b":           Vector2(160, 497),
+	"column_doric_c":           Vector2(168, 554),
+	"column_doric_d":           Vector2(180, 562),
+	"cypress_a":                Vector2(104, 452),
+	"cypress_b":                Vector2(80, 430),
+	"cypress_c":                Vector2(116, 460),
+	"cypress_d":                Vector2(110, 448),
+	# flower / edelweiss — g transform="translate" 자식 ellipse 좌표 trim 부정확 → 원본 viewBox 유지
+	"edelweiss_a":              Vector2(120, 140),
+	"edelweiss_b":              Vector2(130, 130),
+	"flower_a":                 Vector2(120, 140),
+	"flower_b":                 Vector2(130, 130),
+	"flower_c":                 Vector2(110, 110),
+	"grass_a":                  Vector2(59, 76),
+	"grass_b":                  Vector2(119, 98),
+	"longhouse_a":              Vector2(540, 370),
+	"longhouse_b":              Vector2(480, 290),
+	"olive_tree_a":             Vector2(240, 300),
+	"olive_tree_b":             Vector2(250, 281),
+	"olive_tree_c":             Vector2(270, 302),
+	"olive_tree_d":             Vector2(193, 322),
+	"rune_pillar_a":            Vector2(110, 532),
+	"rune_pillar_b":            Vector2(110, 517),
+	"rune_stone_a":             Vector2(125, 539),
+	"rune_stone_b":             Vector2(116, 418),
+	"spruce_a":                 Vector2(170, 330),
+	"spruce_b":                 Vector2(140, 310),
+	"spruce_c":                 Vector2(190, 340),
+	"spruce_d":                 Vector2(160, 320),
+	"statue_warrior_a":         Vector2(180, 486),
+	"statue_warrior_b":         Vector2(180, 530),
+	"statue_warrior_d":         Vector2(180, 386),
+	"temple_small_a":           Vector2(600, 430),
+	"temple_small_b":           Vector2(560, 414),
+	"temple_small_d":           Vector2(540, 420),
+	"tundra_grass_a":           Vector2(59, 72),
+	"tundra_grass_b":           Vector2(117, 96),
+	# egyptian — trim_svg_viewbox.py 측정 결과 (g transform 사용 egypt_lotus 는 원본 유지).
+	"pyramid_small_a":          Vector2(580, 418),
+	"pyramid_small_b":          Vector2(560, 363),
+	"obelisk_a":                Vector2(160, 547),
+	"obelisk_b":                Vector2(156, 412),
+	"altar_egyptian_a":         Vector2(200, 234),
+	"altar_egyptian_b":         Vector2(184, 178),
+	"palm_a":                   Vector2(150, 466),
+	"palm_b":                   Vector2(160, 471),
+	"palm_c":                   Vector2(160, 477),
+	"palm_d":                   Vector2(144, 471),
+	"acacia_a":                 Vector2(275, 325),
+	"acacia_b":                 Vector2(240, 307),
+	"acacia_c":                 Vector2(283, 325),
+	"acacia_d":                 Vector2(196, 334),
+	"column_lotus_a":           Vector2(160, 568),
+	"column_lotus_b":           Vector2(156, 448),
+	"desert_grass_a":           Vector2(72, 71),
+	"desert_grass_b":           Vector2(117, 98),
+	"egypt_lotus_a":            Vector2(120, 140),
+	"egypt_lotus_b":            Vector2(130, 130),
+	# buddhist
+	"pagoda_a":                 Vector2(306, 424),
+	"pagoda_b":                 Vector2(408, 290),
+	"buddha_statue_a":          Vector2(140, 389),
+	"buddha_statue_b":          Vector2(140, 378),
+	"altar_buddhist_a":         Vector2(200, 256),
+	"altar_buddhist_b":         Vector2(170, 248),
+	"bamboo_a":                 Vector2(100, 415),
+	"bamboo_b":                 Vector2(88, 386),
+	"bamboo_c":                 Vector2(138, 430),
+	"bamboo_d":                 Vector2(92, 400),
+	"banyan_a":                 Vector2(275, 311.5),
+	"banyan_b":                 Vector2(240, 285),
+	"banyan_c":                 Vector2(295, 334.5),
+	"banyan_d":                 Vector2(193, 323),
+	"column_buddhist_a":        Vector2(120, 512),
+	"column_buddhist_b":        Vector2(156, 423),
+	"bamboo_grass_a":           Vector2(72, 77),
+	"bamboo_grass_b":           Vector2(117, 100),
+	"buddhist_lotus_a":         Vector2(120, 140),
+	"buddhist_lotus_b":         Vector2(130, 130),
+	# daoist — altar_taoist_a/chrysanthemum 은 g transform 사용 → 원본 viewBox 유지.
+	"temple_taoist_a":          Vector2(531, 461),
+	"temple_taoist_b":          Vector2(324, 330),
+	"crane_statue_a":           Vector2(111, 370),
+	"crane_statue_b":           Vector2(104, 213),
+	"altar_taoist_a":           Vector2(180, 222),
+	"altar_taoist_b":           Vector2(224, 271),
+	"pine_a":                   Vector2(153, 394),
+	"pine_b":                   Vector2(133, 300),
+	"pine_c":                   Vector2(169, 408),
+	"pine_d":                   Vector2(153, 350),
+	"weeping_willow_a":         Vector2(123, 247.5),
+	"weeping_willow_b":         Vector2(110, 231.5),
+	"weeping_willow_c":         Vector2(178, 272.5),
+	"weeping_willow_d":         Vector2(127.5, 242),
+	"column_taoist_a":          Vector2(252, 591),
+	"column_taoist_b":          Vector2(156, 423),
+	"mountain_grass_a":         Vector2(72, 77),
+	"mountain_grass_b":         Vector2(117, 100),
+	"chrysanthemum_a":          Vector2(120, 140),
+	"chrysanthemum_b":          Vector2(130, 130),
+	# japanese — sakura_flower 는 g transform 사용 → 원본 viewBox 유지.
+	"shrine_a":                 Vector2(480, 340),
+	"shrine_b":                 Vector2(350, 260),
+	"stone_lantern_a":          Vector2(140, 370),
+	"stone_lantern_b":          Vector2(120, 312),
+	"altar_shinto_a":           Vector2(160, 165),
+	"altar_shinto_b":           Vector2(160, 180),
+	"cherry_a":                 Vector2(149, 448),
+	"cherry_b":                 Vector2(117, 407),
+	"cherry_c":                 Vector2(164, 452),
+	"cherry_d":                 Vector2(143, 437),
+	"maple_a":                  Vector2(254, 312),
+	"maple_b":                  Vector2(206, 277),
+	"maple_c":                  Vector2(281, 322),
+	"maple_d":                  Vector2(182, 255),
+	"torii_a":                  Vector2(180, 530),
+	"torii_b":                  Vector2(156, 442),
+	"japanese_grass_a":         Vector2(63.5, 58),
+	"japanese_grass_b":         Vector2(87.25, 80),
+	"sakura_flower_a":          Vector2(120, 140),
+	"sakura_flower_b":          Vector2(130, 130),
 }
 
-# 바람/펄럭임 sway — grass/flower 는 통째, cypress/olive_tree/altar 는 split (위 부분만).
-# 구조물 X (temple/statue/column).
+# 바람/펄럭임 sway — 풀/꽃 (통째 sway) + split 식생/altar (위쪽만 sway).
+# 신화 추가 시 풀/꽃 prefix 추가. 구조물 X (temple/statue/column).
+const _WIND_SMALL_PREFIXES := [
+	"grass", "flower",                # greek
+	"tundra_grass", "edelweiss",      # norse
+	"desert_grass", "egypt_lotus",    # egyptian
+	"bamboo_grass", "buddhist_lotus", # buddhist
+	"mountain_grass", "chrysanthemum", # daoist
+	"japanese_grass", "sakura_flower", # japanese
+]
+
 static func _wind_eligible(svg_id: String) -> bool:
-	return (
-		svg_id.begins_with("grass") or svg_id.begins_with("flower")
-		or _split_suffixes(svg_id).size() > 0
-	)
+	for prefix in _WIND_SMALL_PREFIXES:
+		if svg_id.begins_with(prefix):
+			return true
+	return _split_suffixes(svg_id).size() > 0
 
 # 정지/sway 두 sprite 로 spawn — base + sway 부분. 빈 배열이면 split 아님.
 # 나무: trunk(정지) + leaves(sway). altar: base(정지) + flame(sway).
+# 신화 추가 시 식생 prefix 만 늘리면 됨. altar 는 prefix "altar" 자동 매칭 (altar_norse 등).
 static func _split_suffixes(svg_id: String) -> Array:
-	if svg_id.begins_with("cypress") or svg_id.begins_with("olive_tree"):
+	# bamboo_grass 는 풀(통째) — split 제외. bamboo_a/b/c/d 식생만 split.
+	if svg_id.begins_with("bamboo_") and not svg_id.begins_with("bamboo_grass"):
+		return ["_trunk", "_leaves"]
+	if (svg_id.begins_with("cypress") or svg_id.begins_with("olive_tree")
+			or svg_id.begins_with("birch") or svg_id.begins_with("spruce")
+			or svg_id.begins_with("palm") or svg_id.begins_with("acacia")
+			or svg_id.begins_with("banyan")
+			or svg_id.begins_with("pine") or svg_id.begins_with("weeping_willow")
+			or svg_id.begins_with("cherry") or svg_id.begins_with("maple")):
 		return ["_trunk", "_leaves"]
 	if svg_id.begins_with("altar"):
 		return ["_base", "_flame"]

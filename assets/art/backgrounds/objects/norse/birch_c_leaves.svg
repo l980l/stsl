@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="6 5 148 465" width="148" height="465">
+  <defs>
+    <radialGradient id="blc_canopy" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#b8c878"/>
+      <stop offset="0.55" stop-color="#789848"/>
+      <stop offset="1" stop-color="#3a5028"/>
+    </radialGradient>
+  </defs>
+  <!-- 큰 풍성한 캐노피 -->
+  <ellipse cx="80" cy="90" rx="72" ry="85" fill="url(#blc_canopy)" opacity="0.95"/>
+  <ellipse cx="44" cy="125" rx="38" ry="44" fill="url(#blc_canopy)" opacity="0.85"/>
+  <ellipse cx="116" cy="125" rx="38" ry="44" fill="url(#blc_canopy)" opacity="0.85"/>
+  <ellipse cx="80" cy="40" rx="46" ry="32" fill="url(#blc_canopy)" opacity="0.7"/>
+  <ellipse cx="62" cy="70" rx="14" ry="10" fill="#c8d888" opacity="0.5"/>
+  <ellipse cx="100" cy="100" rx="13" ry="9" fill="#c8d888" opacity="0.5"/>
+  <circle cx="55" cy="155" r="2" fill="#3a4818"/>
+  <circle cx="105" cy="160" r="2" fill="#3a4818"/>
+</svg>

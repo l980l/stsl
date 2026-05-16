@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="23 50 116 420" width="116" height="420">
+  <!-- 약간 휘어진 줄기 -->
+  <path d="M 70 95 Q 65 220 75 470 L 88 470 Q 95 220 85 95 Z" fill="#d8d4c8"/>
+  <path d="M 70 95 Q 65 220 75 470 L 78 470 Q 73 220 78 95 Z" fill="#a8a4a0" opacity="0.45"/>
+  <!-- 가로 줄 -->
+  <rect x="68" y="145" width="22" height="5" fill="#1a1814"/>
+  <rect x="68" y="215" width="22" height="6" fill="#1a1814"/>
+  <rect x="68" y="285" width="22" height="5" fill="#1a1814"/>
+  <rect x="68" y="355" width="22" height="6" fill="#1a1814"/>
+  <rect x="68" y="420" width="22" height="5" fill="#1a1814"/>
+</svg>

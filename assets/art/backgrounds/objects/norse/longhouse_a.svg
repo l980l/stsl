@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 50 540 370" width="540" height="370">
+  <defs>
+    <linearGradient id="lha_roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#604838"/>
+      <stop offset="1" stop-color="#2c1c10"/>
+    </linearGradient>
+    <linearGradient id="lha_wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7a5838"/>
+      <stop offset="1" stop-color="#3a2818"/>
+    </linearGradient>
+  </defs>
+  <!-- 통나무 벽 (가로 줄) -->
+  <rect x="50" y="240" width="500" height="180" fill="url(#lha_wall)"/>
+  <line x1="50" y1="270" x2="550" y2="270" stroke="#1a0e08" stroke-width="2" opacity="0.6"/>
+  <line x1="50" y1="305" x2="550" y2="305" stroke="#1a0e08" stroke-width="2" opacity="0.6"/>
+  <line x1="50" y1="340" x2="550" y2="340" stroke="#1a0e08" stroke-width="2" opacity="0.6"/>
+  <line x1="50" y1="375" x2="550" y2="375" stroke="#1a0e08" stroke-width="2" opacity="0.6"/>
+  <!-- 목조 지붕 (긴 사각형 처마) -->
+  <path d="M 30 240 L 300 80 L 570 240 L 540 240 L 300 110 L 60 240 Z" fill="url(#lha_roof)"/>
+  <rect x="40" y="232" width="520" height="14" fill="#382418"/>
+  <!-- 박공 (gable) 끝 장식 — 용머리 흉내 작은 도형 -->
+  <path d="M 300 75 L 290 60 L 300 50 L 310 60 Z" fill="#5a3a20"/>
+  <!-- 문 (가운데) -->
+  <rect x="270" y="320" width="60" height="100" fill="#2a1810"/>
+  <rect x="270" y="320" width="60" height="6" fill="#1a0a08"/>
+  <circle cx="320" cy="370" r="3" fill="#8a6038"/>
+  <!-- 작은 창 (좌우) -->
+  <rect x="130" y="290" width="40" height="40" fill="#1a0a08"/>
+  <rect x="130" y="290" width="40" height="6" fill="#3a2418"/>
+  <rect x="430" y="290" width="40" height="40" fill="#1a0a08"/>
+  <rect x="430" y="290" width="40" height="6" fill="#3a2418"/>
+  <!-- 굴뚝 연기 -->
+  <ellipse cx="380" cy="100" rx="14" ry="8" fill="#5a5a5a" opacity="0.4"/>
+  <ellipse cx="378" cy="80" rx="18" ry="10" fill="#5a5a5a" opacity="0.3"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 5 144 471" width="144" height="471">
+  <defs>
+    <linearGradient id="pld_leaf" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a8b860"/>
+      <stop offset="0.5" stop-color="#6e7c30"/>
+      <stop offset="1" stop-color="#3e4818"/>
+    </linearGradient>
+  </defs>
+  <!-- 시들어가는 색 — 노랑/갈색 강조 -->
+  <path d="M 80 110 Q 30 60 12 38 Q 30 70 78 115 Z" fill="url(#pld_leaf)"/>
+  <path d="M 80 110 Q 70 50 78 5 Q 86 50 82 115 Z" fill="url(#pld_leaf)"/>
+  <path d="M 80 110 Q 130 60 148 38 Q 130 70 82 115 Z" fill="url(#pld_leaf)"/>
+  <path d="M 80 110 Q 30 115 8 130 Q 32 138 80 118 Z" fill="url(#pld_leaf)"/>
+  <path d="M 80 110 Q 130 115 152 130 Q 128 138 80 118 Z" fill="url(#pld_leaf)"/>
+  <path d="M 80 110 Q 50 160 38 200 Q 60 170 80 118 Z" fill="url(#pld_leaf)"/>
+  <path d="M 80 110 Q 110 160 122 200 Q 100 170 80 118 Z" fill="url(#pld_leaf)"/>
+  <!-- 노랑 잎 하이라이트 -->
+  <ellipse cx="50" cy="75" rx="14" ry="6" fill="#d8c060" opacity="0.4"/>
+  <ellipse cx="110" cy="75" rx="14" ry="6" fill="#d8c060" opacity="0.4"/>
+</svg>

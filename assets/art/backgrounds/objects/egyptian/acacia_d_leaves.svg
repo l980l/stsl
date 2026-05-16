@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 27 196 334" width="196" height="334">
+  <defs>
+    <radialGradient id="acd_canopy" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#b4c878"/>
+      <stop offset="0.55" stop-color="#788858"/>
+      <stop offset="1" stop-color="#3a4824"/>
+    </radialGradient>
+  </defs>
+  <!-- 시든 캐노피 (사막 가뭄) -->
+  <ellipse cx="100" cy="95" rx="56" ry="36" fill="url(#acd_canopy)" opacity="0.9"/>
+  <ellipse cx="175" cy="80" rx="62" ry="38" fill="url(#acd_canopy)" opacity="0.9"/>
+  <ellipse cx="140" cy="55" rx="50" ry="28" fill="url(#acd_canopy)" opacity="0.75"/>
+  <!-- 노란 가지 + 죽은 가지 -->
+  <ellipse cx="80" cy="55" rx="20" ry="10" fill="#d8b860" opacity="0.5"/>
+  <ellipse cx="200" cy="50" rx="18" ry="10" fill="#d8b860" opacity="0.5"/>
+  <circle cx="120" cy="115" r="3" fill="#3a2818"/>
+  <circle cx="180" cy="105" r="3" fill="#3a2818"/>
+  <circle cx="155" cy="80" r="2" fill="#3a2818"/>
+</svg>

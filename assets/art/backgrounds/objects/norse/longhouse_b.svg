@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 130 480 290" width="480" height="290">
+  <defs>
+    <linearGradient id="lhb_roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#503828"/>
+      <stop offset="1" stop-color="#241608"/>
+    </linearGradient>
+    <linearGradient id="lhb_wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6a4828"/>
+      <stop offset="1" stop-color="#2a1808"/>
+    </linearGradient>
+  </defs>
+  <!-- 더 작은 longhouse — 단순 사각형 -->
+  <rect x="80" y="260" width="440" height="160" fill="url(#lhb_wall)"/>
+  <line x1="80" y1="290" x2="520" y2="290" stroke="#1a0e08" stroke-width="2" opacity="0.6"/>
+  <line x1="80" y1="325" x2="520" y2="325" stroke="#1a0e08" stroke-width="2" opacity="0.6"/>
+  <line x1="80" y1="360" x2="520" y2="360" stroke="#1a0e08" stroke-width="2" opacity="0.6"/>
+  <!-- 지붕 -->
+  <path d="M 60 260 L 300 130 L 540 260 L 510 260 L 300 155 L 90 260 Z" fill="url(#lhb_roof)"/>
+  <rect x="70" y="252" width="460" height="14" fill="#321810"/>
+  <!-- 둥근 통나무 끝 (지붕 처마 끝) -->
+  <circle cx="80" cy="266" r="6" fill="#5a3a20"/>
+  <circle cx="520" cy="266" r="6" fill="#5a3a20"/>
+  <!-- 문 -->
+  <rect x="280" y="340" width="40" height="80" fill="#1a0a08"/>
+  <rect x="280" y="340" width="40" height="6" fill="#3a2418"/>
+  <!-- 창 — 더 적게 -->
+  <rect x="160" y="310" width="30" height="30" fill="#1a0a08"/>
+  <rect x="410" y="310" width="30" height="30" fill="#1a0a08"/>
+</svg>

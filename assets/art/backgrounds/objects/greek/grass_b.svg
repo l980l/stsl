@@ -1,11 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 100" width="140" height="100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8.5 0 119 98" width="119" height="98">
   <defs>
     <linearGradient id="gb_blade" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#94b860"/>
       <stop offset="1" stop-color="#3e5424"/>
     </linearGradient>
   </defs>
-  <ellipse cx="70" cy="96" rx="56" ry="4" fill="#000" opacity="0.35"/>
   <!-- 덥수룩한 풀 무더기 -->
   <path d="M 20 96 Q 16 70 10 36" stroke="url(#gb_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>
   <path d="M 30 96 Q 28 60 22 20" stroke="url(#gb_blade)" stroke-width="3" fill="none" stroke-linecap="round"/>

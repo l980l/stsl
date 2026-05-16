@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 27 139 443" width="139" height="443">
+  <defs>
+    <radialGradient id="bld_canopy" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#d0d878"/>
+      <stop offset="0.55" stop-color="#909c50"/>
+      <stop offset="1" stop-color="#485828"/>
+    </radialGradient>
+  </defs>
+  <!-- 가을 색 — 더 노랑/주황 -->
+  <ellipse cx="80" cy="110" rx="62" ry="78" fill="url(#bld_canopy)" opacity="0.95"/>
+  <ellipse cx="50" cy="145" rx="36" ry="42" fill="url(#bld_canopy)" opacity="0.85"/>
+  <ellipse cx="115" cy="140" rx="38" ry="44" fill="url(#bld_canopy)" opacity="0.85"/>
+  <ellipse cx="80" cy="55" rx="40" ry="28" fill="url(#bld_canopy)" opacity="0.7"/>
+  <!-- 주황 잎 강조 -->
+  <ellipse cx="65" cy="100" rx="10" ry="7" fill="#e09838" opacity="0.55"/>
+  <ellipse cx="100" cy="125" rx="11" ry="8" fill="#e09838" opacity="0.55"/>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 115 160 165" width="160" height="165">
+  <defs>
+    <linearGradient id="asa_wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8d8b8"/>
+      <stop offset="1" stop-color="#806040"/>
+    </linearGradient>
+  </defs>
+  <!-- 흰 천 (시메나와 매단 모양 — 단순화) -->
+  <rect x="40" y="240" width="160" height="40" fill="#504030"/>
+  <!-- 본체 — 흰 나무 단 (시토 풍) -->
+  <rect x="60" y="160" width="120" height="80" fill="url(#asa_wood)"/>
+  <rect x="50" y="156" width="140" height="10" fill="#a08060"/>
+  <!-- 시메나와 (밧줄 모양) -->
+  <rect x="50" y="180" width="140" height="6" fill="#f0e8c0"/>
+  <line x1="80" y1="186" x2="76" y2="200" stroke="#d8c898" stroke-width="2"/>
+  <line x1="120" y1="186" x2="120" y2="204" stroke="#d8c898" stroke-width="2"/>
+  <line x1="160" y1="186" x2="164" y2="200" stroke="#d8c898" stroke-width="2"/>
+  <!-- 시데 (지그재그 종이) -->
+  <path d="M 80 186 L 75 192 L 80 195 L 75 200 L 80 202" stroke="#fff" stroke-width="1.5" fill="none"/>
+  <path d="M 120 186 L 115 192 L 120 195 L 115 200 L 120 202" stroke="#fff" stroke-width="1.5" fill="none"/>
+  <path d="M 160 186 L 155 192 L 160 195 L 155 200 L 160 202" stroke="#fff" stroke-width="1.5" fill="none"/>
+  <!-- 거울 (위 원) -->
+  <circle cx="120" cy="140" r="14" fill="#d0d0c0"/>
+  <circle cx="120" cy="140" r="14" fill="none" stroke="#806040" stroke-width="2"/>
+</svg>

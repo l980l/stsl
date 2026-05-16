@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="86.5 108.5 110 231.5" width="110" height="231.5">
+  <defs>
+    <linearGradient id="wwb_trunk" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#503818"/>
+      <stop offset="0.5" stop-color="#321a08"/>
+      <stop offset="1" stop-color="#180808"/>
+    </linearGradient>
+  </defs>
+  <path d="M 134 340 Q 128 230 132 160 Q 138 130 145 130 Q 150 200 152 340 Z" fill="url(#wwb_trunk)"/>
+  <path d="M 138 150 Q 110 140 92 130" stroke="#321a08" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 145 145 Q 170 135 192 128" stroke="#321a08" stroke-width="5" fill="none" stroke-linecap="round"/>
+</svg>

@@ -52,10 +52,10 @@ var _sigil_age := -1.0      # <0 = 비활성, 경과 초 (마법진)
 var _ambient_timer := 0.0   # 잔류 독무 남은 시간
 
 # ── 점 묶음을 center 기준 회전+스케일 (autoload 비의존 static — 단위 테스트 가능) ──
-static func rotate_points(pts: PackedVector2Array, center: Vector2, ang: float, scale: float) -> PackedVector2Array:
+static func rotate_points(pts: PackedVector2Array, center: Vector2, ang: float, sc: float) -> PackedVector2Array:
 	var out := PackedVector2Array()
 	for p in pts:
-		out.append(center + (p * scale).rotated(ang))
+		out.append(center + (p * sc).rotated(ang))
 	return out
 
 # 라디얼 그라데이션 구체 텍스처 — orb.png는 배경이 불투명해 검은 박스로 보이므로 코드 생성.

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="63.5 98 127.5 242" width="127.5" height="242">
+  <defs>
+    <linearGradient id="wwd_trunk" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#604020"/>
+      <stop offset="0.5" stop-color="#3a2410"/>
+      <stop offset="1" stop-color="#1a0a04"/>
+    </linearGradient>
+  </defs>
+  <!-- 좀 기울어진 줄기 -->
+  <path d="M 130 340 Q 124 240 110 170 Q 115 130 130 130 Q 145 140 148 200 Q 150 270 150 340 Z" fill="url(#wwd_trunk)"/>
+  <path d="M 122 150 Q 95 140 75 130" stroke="#3a2410" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 142 145 Q 165 140 188 132" stroke="#3a2410" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 128 130 Q 100 115 80 100" stroke="#3a2410" stroke-width="4" fill="none" stroke-linecap="round"/>
+</svg>

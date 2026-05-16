@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="140 180 350 260" width="350" height="260">
+  <defs>
+    <linearGradient id="shb_roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#702018"/>
+      <stop offset="1" stop-color="#400808"/>
+    </linearGradient>
+    <linearGradient id="shb_wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8d8c0"/>
+      <stop offset="1" stop-color="#907860"/>
+    </linearGradient>
+  </defs>
+  <!-- 작은 신사 (반쯤 파손) -->
+  <rect x="140" y="400" width="320" height="40" fill="#383028"/>
+  <!-- 벽 (왼쪽 파손) -->
+  <rect x="200" y="280" width="240" height="120" fill="url(#shb_wall)"/>
+  <path d="M 180 280 L 200 280 L 200 400 L 170 400 L 175 350 L 185 320 Z" fill="#8a7050" opacity="0.6"/>
+  <!-- 기둥 -->
+  <rect x="200" y="280" width="10" height="120" fill="#6a2010"/>
+  <rect x="430" y="280" width="10" height="120" fill="#6a2010"/>
+  <!-- 격자 문 -->
+  <rect x="290" y="320" width="60" height="80" fill="#1a0e08"/>
+  <!-- 처마 -->
+  <rect x="170" y="270" width="300" height="14" fill="#2a1008"/>
+  <!-- 지붕 (낮은 본전 — b는 작음) -->
+  <path d="M 150 270 Q 320 180 490 270 L 460 270 Q 320 200 180 270 Z" fill="url(#shb_roof)"/>
+  <!-- 지붕 중앙 -->
+  <rect x="310" y="200" width="16" height="40" fill="#806040"/>
+</svg>

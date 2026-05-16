@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="35 22 170 248" width="170" height="248">
+  <defs>
+    <radialGradient id="abub_smoke" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#c8c0a8" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#807868" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 향연만 (불꽃 X — 향만) -->
+  <ellipse cx="120" cy="120" rx="35" ry="22" fill="url(#abub_smoke)"/>
+  <ellipse cx="125" cy="80" rx="45" ry="20" fill="url(#abub_smoke)"/>
+  <ellipse cx="115" cy="40" rx="40" ry="18" fill="url(#abub_smoke)"/>
+  <!-- 향 막대 5개 -->
+  <rect x="95" y="160" width="2" height="50" fill="#4a2818"/>
+  <rect x="108" y="155" width="2" height="55" fill="#4a2818"/>
+  <rect x="120" y="155" width="2" height="55" fill="#4a2818"/>
+  <rect x="132" y="158" width="2" height="52" fill="#4a2818"/>
+  <rect x="145" y="160" width="2" height="50" fill="#4a2818"/>
+  <!-- 끝 불씨 -->
+  <circle cx="96" cy="160" r="2" fill="#ff8030"/>
+  <circle cx="109" cy="155" r="2" fill="#ff8030"/>
+  <circle cx="121" cy="155" r="2" fill="#ff8030"/>
+  <circle cx="133" cy="158" r="2" fill="#ff8030"/>
+  <circle cx="146" cy="160" r="2" fill="#ff8030"/>
+</svg>
