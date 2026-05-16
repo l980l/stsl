@@ -1424,15 +1424,20 @@ func _refresh_turn_queue_widget() -> void:
 	if _turn_queue_slots.is_empty():
 		return
 	# 현재 차례 액터 + 다음 N-1 차례 미리보기
+	# get_turn_queue_preview 는 현재 actor 가 행동 중일 때 첫 결과로 그 actor 를 반환 (큐 카운터 아직 진행 안 됨).
+	# 슬롯 0 에 current 를 따로 넣었으니 중복 방지를 위해 첫 항목 skip.
 	var preview: Array = []
 	var current_aid: String = BattleManager.get_current_actor_id()
 	if current_aid != "":
 		preview.append(current_aid)
-	var next_preview: Array = BattleManager.get_turn_queue_preview(TURN_QUEUE_PREVIEW_COUNT)
-	for aid in next_preview:
+	var next_preview: Array = BattleManager.get_turn_queue_preview(TURN_QUEUE_PREVIEW_COUNT + 1)
+	var start_idx: int = 0
+	if current_aid != "" and next_preview.size() > 0 and next_preview[0] == current_aid:
+		start_idx = 1
+	for i in range(start_idx, next_preview.size()):
 		if preview.size() >= TURN_QUEUE_PREVIEW_COUNT:
 			break
-		preview.append(aid)
+		preview.append(next_preview[i])
 	for i in range(_turn_queue_slots.size()):
 		var slot: Dictionary = _turn_queue_slots[i]
 		if i >= preview.size():
