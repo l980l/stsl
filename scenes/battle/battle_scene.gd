@@ -2719,6 +2719,12 @@ func _update_camera_sway(_delta: float) -> void:
 	# 평상시 sway X, shake 시 모든 자식 같이 이동 (battle_scene.position 변경 효과).
 	pass
 
+# 디버그용 — kill_cam_enabled 설정 무관하게 강제 실행 (Shift+K 단축키)
+func debug_play_kill_cam(target_pos: Vector2) -> void:
+	if _kill_cam_active or _camera == null:
+		return
+	_run_kill_cam(target_pos)
+
 func _play_kill_cam(target_pos: Vector2) -> void:
 	# autoload 안전 접근 (CLI 테스트 환경 회피)
 	var gs := get_node_or_null("/root/GameSettings")
@@ -2726,17 +2732,20 @@ func _play_kill_cam(target_pos: Vector2) -> void:
 		return
 	if _kill_cam_active or _camera == null:
 		return
+	_run_kill_cam(target_pos)
+
+func _run_kill_cam(target_pos: Vector2) -> void:
 	_kill_cam_active = true
 	var prev_scale := Engine.time_scale
 	Engine.time_scale = 0.3
-	# 줌인 + 이동 (트윈도 scaled time 영향 — 영화적 느낌)
+	# 균일 줌 — 2D parallax 만으로 dolly 효과 흉내는 ground/sky 좌표계 변형 야기. HD-2D 까지 가야 함.
 	var tw_in := create_tween().set_parallel(true)
 	tw_in.tween_property(_camera, "zoom", Vector2(1.6, 1.6), 0.10).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw_in.tween_property(_camera, "position", target_pos, 0.10).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	await tw_in.finished
 	# slowmo 유지 (scaled 0.18s ≈ unscaled 0.6s)
 	await get_tree().create_timer(0.18).timeout
-	# 줌아웃 — 정상 속도로 복귀하면서
+	# 줌아웃 — 정상 속도로 복귀
 	Engine.time_scale = prev_scale
 	var tw_out := create_tween().set_parallel(true)
 	tw_out.tween_property(_camera, "zoom", Vector2.ONE, 0.20).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
