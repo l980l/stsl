@@ -65,7 +65,6 @@ const VFX_LEGACY := [
 	{"name": "slash",          "kind": "impact", "path": "res://scenes/vfx/slash_particle.tscn"},
 	{"name": "projectile",     "kind": "impact", "path": "res://scenes/vfx/projectile_particle.tscn"},
 	{"name": "explosive",      "kind": "impact", "path": "res://scenes/vfx/explosive_particle.tscn"},
-	{"name": "divine",         "kind": "impact", "path": "res://scenes/vfx/divine_particle.tscn"},
 	{"name": "curse",          "kind": "impact", "path": "res://scenes/vfx/curse_particle.tscn"},
 	{"name": "default",        "kind": "impact", "path": "res://scenes/vfx/default_particle.tscn"},
 	{"name": "block",          "kind": "self",   "path": "res://scenes/vfx/block_particle.tscn"},

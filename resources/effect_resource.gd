@@ -54,7 +54,7 @@ enum EffectType {
 @export var base_bonus_value: int = 0       # bonus_value의 0강 기준값.
 @export var hit_count: int = 1              # DAMAGE 히트 횟수 (이도류, 징기스의 분노)
 @export var condition: String = ""  # 빈 문자열=무조건 발동. "hand_size_0"등 조건 키 설정 시 조건 불충족이면 이 효과 스킵
-@export var damage_type: String = ""  # DAMAGE 계열 시각 타입. "" → slash fallback. slash/blunt/projectile/explosive/poison/divine/curse
+@export var damage_type: String = ""  # DAMAGE 계열 시각 타입. "" → slash fallback. slash/blunt/projectile/bullet/explosive/poison/curse/holy_strike/holy_slash/holy_bolt/holy_blunt/holy_fire
 
 const _STATUS_NAME_KEYS := {
 	"weak":          "status.weak.name",
@@ -65,14 +65,17 @@ const _STATUS_NAME_KEYS := {
 	"taunt":         "status.taunt.name",
 }
 
-func display_text() -> String:
+func display_text(override_value: int = -1) -> String:
+	# override_value >= 0 면 데미지 표시에 그 값 사용 (UI 가 buff/debuff 적용한 효과 데미지).
+	# DAMAGE / CONDITIONAL_DMG 등 데미지 계열만 override 의미 있음.
+	var v: int = override_value if override_value >= 0 else value
 	match effect_type:
 		EffectType.DAMAGE:
 			var hit_str: String = ""
 			if hit_count > 1:
 				hit_str = " ×%d" % hit_count
 			var _dmg_key: String = "effect.damage.all.text" if target == "ALL" else "effect.damage.single.text"
-			return TranslationServer.translate(_dmg_key) % [value, hit_str]
+			return TranslationServer.translate(_dmg_key) % [v, hit_str]
 		EffectType.BLOCK:
 			return TranslationServer.translate("effect.block.text") % value
 		EffectType.BLOCK_ALL:

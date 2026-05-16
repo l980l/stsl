@@ -189,21 +189,32 @@ func start_run(initial_hero_id: String = "napoleon", chapter: int = 1) -> void:
 		dm.clear()
 
 	if _DEBUG_TEST_DECK:
-		# 임시 테스트 덱 — 나폴레옹+클레오파트라+무사시, 7가지 파티클 타입 확인용
-		for hid: String in ["napoleon", "cleopatra", "musashi"]:
+		# 임시 테스트 덱 — 가능한 VFX 최대 커버 (napoleon+joan_of_arc+cleopatra).
+		# 못 트리거: ice/lightning/fire (카드 미존재), holy_slash/projectile (musashi/genghis 만).
+		for hid: String in ["napoleon", "joan_of_arc", "cleopatra"]:
 			var h = _make_hero_by_id(hid)
 			if tm:
 				tm.add_hero(h)
 		if dm:
 			var test_cards: Array = [
-				_NapoleonCards._strike(),           # slash
-				_NapoleonCards._hussar_charge(),    # blunt
-				_NapoleonCards._salvo(),            # projectile
-				_NapoleonCards._artillery_volley(), # explosive
-				_CleopatraCards._venom_needle(),    # poison
-				_CleopatraCards._sandstorm(),       # curse
-				_MusashiCards._mushin_blade(),      # divine
-				_MusashiCards._defend(),            # block
+				# napoleon — slash/blunt/bullet/explosive + block
+				_NapoleonCards._strike(),            # slash
+				_NapoleonCards._defend(),            # block → defense_buff
+				_NapoleonCards._hussar_charge(),     # blunt
+				_NapoleonCards._salvo(),             # bullet → bullet_shot
+				_NapoleonCards._artillery_volley(),  # explosive
+				# joan_of_arc — holy_*/heal/revive/strength
+				_JoanCards._holy_smite(),            # holy_strike + vulnerable → debuff_hex
+				_JoanCards._holy_bolt(),             # holy_bolt → holy_arrow
+				_JoanCards._orleans_charge(),        # holy_blunt
+				_JoanCards._saints_flame(),          # holy_fire
+				_JoanCards._holy_touch(),            # HEAL → heal_blessing
+				_JoanCards._miracle_revive(),        # REVIVE → revive_blessing
+				_JoanCards._crusaders_faith(),       # strength power → warrior_buff
+				# cleopatra — poison/curse/charm
+				_CleopatraCards._venom_needle(),     # poison → poison_splash + poison_tick
+				_CleopatraCards._sandstorm(),        # curse + weak → debuff_hex
+				_CleopatraCards._cleopatras_kiss(),  # charm → charm_kiss / infatuation (enthrall)
 			]
 			for card in test_cards:
 				dm.add_card_to_deck(card)

@@ -1463,6 +1463,23 @@ func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
 	_drag_end_pos = screen_pos
 	_update_drag_arrow(screen_pos)
 	_message_label.text = tr("battle.cancel_use") if _drag_cancel_ready and screen_pos.y >= BOTTOM_Y else _drag_hint_text()
+	# enemy 타겟 카드일 때 — 호버 중인 적 인덱스 검출 → 카드 데미지 표시에 target vulnerable 반영
+	if _card_target_type(_drag_card) == "enemy":
+		var hover_idx: int = -1
+		for i in range(_enemy_nodes.size()):
+			var panel: ColorRect = _enemy_nodes[i]["panel"]
+			if not panel.visible or not BattleManager.is_enemy_alive(i):
+				continue
+			if panel.get_global_rect().has_point(screen_pos):
+				hover_idx = i
+				break
+		_set_drag_card_target(hover_idx)
+
+func _set_drag_card_target(enemy_index: int) -> void:
+	for btn in _card_buttons:
+		if is_instance_valid(btn) and btn.get_meta("_card_res", null) == _drag_card and btn.has_method("set_target_enemy_index"):
+			btn.set_target_enemy_index(enemy_index)
+			break
 
 func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 	if _drag_card != null:
@@ -1934,7 +1951,6 @@ func _stop_target_bloom(panel: ColorRect) -> void:
 
 const _VFX_SCENES: Dictionary = {
 	"slash":      preload("res://scenes/vfx/slash_particle.tscn"),
-	"divine":     preload("res://scenes/vfx/divine_particle.tscn"),
 	# curse 는 _caster_beam_script 에서 debuff_hex 빔으로 처리
 }
 const _VFX_DEFAULT: PackedScene = preload("res://scenes/vfx/default_particle.tscn")
@@ -2302,7 +2318,6 @@ func _sfx_for_dtype(dtype: String) -> String:
 		"slash":       return "impact_slash"
 		"holy_slash":  return "impact_slash"
 		"curse":       return "impact_curse"
-		"divine":      return "impact_divine"
 		_:             return "impact_default"
 
 # status_type → SFX 키. 디버프/매혹 전용 SFX 가 없으면 curse/divine 재활용.
@@ -2467,7 +2482,7 @@ func _spawn_defense_buff(pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	# VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 이미 차지 시작.
 	# 데미지 시그널은 임팩트 시점이므로 — 피격 피드백 즉시 (UI·팝업·플래시·틴트·hurt 애니).
-	# 빔이 없는 dtype (divine 등 impact-only) 은 별도 _spawn_impact_particles.
+	# 빔이 없는 dtype (slash 등 impact-only) 은 별도 _spawn_impact_particles.
 	_update_hero_ui(hero_id)
 	for entry in _hero_nodes:
 		if entry["hero_id"] == hero_id and entry["panel"].visible:
@@ -3135,6 +3150,8 @@ func _on_active_powers_changed() -> void:
 		var base_key: String = power_key.split(":")[0] if ":" in power_key else power_key
 		var v: int = power.get("value", 0)
 		_active_powers_box.add_child(_make_power_item(base_key, v))
+	# strength_player 변경 시 카드 데미지 표시 갱신
+	_refresh_hand_card_damage()
 
 func _make_power_item(base_key: String, v: int) -> Control:
 	var hbox := HBoxContainer.new()
@@ -3195,6 +3212,14 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 			_play_status_flash(char_node, flash_color)
 	# weak/vulnerable/charm/enthrall VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 차지 시작.
 	# 여기서는 상태 아이콘 갱신·status_popup·tint flash 만 (임팩트 시점 동기).
+	# 카드 데미지 표시는 hero strength/weak (자기) + 적 vulnerable (드래그 호버 시) 반영.
+	if status_type in ["weak", "vulnerable", "strength"]:
+		_refresh_hand_card_damage()
+
+func _refresh_hand_card_damage() -> void:
+	for btn in _card_buttons:
+		if is_instance_valid(btn) and btn.has_method("refresh"):
+			btn.refresh()
 
 func _refresh_debug_badge() -> void:
 	if _debug_badge == null:
@@ -3785,6 +3810,8 @@ func _cleanup_drag() -> void:
 			var card_res: Resource = btn.get_meta("_card_res", null)
 			if card_res != null:
 				_apply_card_state(btn, card_res)
+			if btn.has_method("set_target_enemy_index"):
+				btn.set_target_enemy_index(-1)
 	_drag_card = null
 	_selected_card = null
 	_message_label.text = tr("battle.msg_player_turn") if BattleManager.is_player_turn else ""

@@ -152,7 +152,7 @@ func _vfx_impact_delay_for_damage_type(dtype: String) -> float:
 		"holy_fire":   base = _VFX_HOLY_FIRE.IMPACT_DELAY
 		"holy_blunt":  base = _VFX_HOLY_BLUNT.IMPACT_DELAY
 		"curse":       base = _VFX_DEBUFF_HEX.IMPACT_DELAY  # curse 공격 = debuff hex 빔
-		_:             base = 0.0  # divine/slash 등 impact-only — 즉발
+		_:             base = 0.0  # slash 등 impact-only — 즉발
 	return base * _vfx_speed_mul()
 
 func _vfx_impact_delay_for_status(stype: String) -> float:
@@ -225,6 +225,24 @@ func _card_has_damage(card: Resource) -> bool:
 		if effect.damage_type != "":
 			return true
 	return false
+
+# UI 용 — 단일 DAMAGE effect 의 buff/debuff 반영 데미지 (1회 hit 기준).
+# target_enemy_index >= 0 시 그 적의 vulnerable 추가 반영. -1 면 hero strength/weak 만.
+# DAMAGE 아니면 effect.value 그대로.
+func estimate_effect_damage(effect: Resource, owner_id: String, target_enemy_index: int = -1) -> int:
+	if effect.effect_type != EffectRes.EffectType.DAMAGE:
+		return effect.value
+	var dmg: int = effect.value
+	var owner_status: Dictionary = _hero_status.get(owner_id, {})
+	if owner_status.get("weak", 0) > 0:
+		dmg = int(dmg * 0.75)
+	var strength: int = _active_powers.get("power.strength_player:" + owner_id, {}).get("value", 0)
+	dmg += strength
+	if target_enemy_index >= 0 and target_enemy_index < _enemy_status.size():
+		var t_status: Dictionary = _enemy_status[target_enemy_index]
+		if t_status.get("vulnerable", 0) > 0:
+			dmg = int(dmg * 1.5)
+	return max(0, dmg)
 
 # 카드의 단일 타겟/ALL 데미지 추정 — weak/strength/vulnerable 만 적용 (정확보다 보수적)
 # 결과: enemy_index → 예측 데미지 합 (hit_count 포함)
