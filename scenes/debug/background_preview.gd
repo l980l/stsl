@@ -91,6 +91,29 @@ func _build_ui() -> void:
 		_enemy_checks.append(cb)
 		panel.add_child(cb)
 
+	# critter 트리거 — 즉시 발동
+	var sep2 := HSeparator.new()
+	panel.add_child(sep2)
+	var critter_lbl := Label.new()
+	critter_lbl.text = "── Critter 트리거 ──"
+	panel.add_child(critter_lbl)
+	var hb := HBoxContainer.new()
+	panel.add_child(hb)
+	var bird_btn := Button.new()
+	bird_btn.text = "🦅 새"
+	bird_btn.custom_minimum_size = Vector2(105, 32)
+	bird_btn.pressed.connect(func() -> void:
+		if _critters and _critters.has_method("_spawn_bird"):
+			_critters.call("_spawn_bird"))
+	hb.add_child(bird_btn)
+	var meteor_btn := Button.new()
+	meteor_btn.text = "🌠 별똥별"
+	meteor_btn.custom_minimum_size = Vector2(105, 32)
+	meteor_btn.pressed.connect(func() -> void:
+		if _critters and _critters.has_method("_spawn_shooting_star"):
+			_critters.call("_spawn_shooting_star"))
+	hb.add_child(meteor_btn)
+
 	# info label (env 표시)
 	_info_lbl = Label.new()
 	_info_lbl.add_theme_color_override("font_color", Color(0.9, 0.95, 0.7))
@@ -208,9 +231,8 @@ func _regenerate() -> void:
 	add_child(_critters)
 	_critters.setup(actual_env)
 
-	# weather
+	# weather (Node2D, z_index 1100 자체 set)
 	_weather = WEATHER.new()
-	_weather.layer = -50
 	add_child(_weather)
 	_weather.setup(actual_env.get("weather", "clear"))
 

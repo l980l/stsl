@@ -50,15 +50,14 @@ static func _sprite_rect(svg_id: String, anchor: Vector2, sc: float) -> Rect2:
 	var sz: Vector2 = OBJECT_SIZE.get(svg_id, Vector2(120, 240)) * sc
 	return Rect2(anchor.x - sz.x * 0.5, anchor.y - sz.y, sz.x, sz.y)
 
-# anchor_y < rect 발 y 면 — sprite 가 캐릭터 뒤(z 작음) → 안 가림 → 통과.
-# anchor_y >= rect 발 y 면 — sprite 가 앞(z 큼) → 박스 겹치면 가림 → 충돌.
+# anchor_y < rect 발 y 면 — sprite 가 캐릭터 뒤(z 작음) → 통과.
 static func _overlaps_any(rect: Rect2, anchor_y: float, occupied: Array) -> bool:
 	for r_v in occupied:
 		var r: Rect2 = r_v
 		if not rect.intersects(r):
 			continue
 		if anchor_y < r.end.y:
-			continue  # sprite 가 뒤 — z_index 작아서 가리지 못함
+			continue
 		return true
 	return false
 
@@ -147,31 +146,36 @@ func _setup_internal(myth: String, variant: int, seed_val: int, time_force: Stri
 	_add_silhouette_layer(palette["silhouette"], 0.15, HORIZON_Y, 10, 95.0)
 
 	# 3~5. 모든 SVG 오브젝트 — front_specs.
-	# anchor.y 는 random 범위 — 화면 위쪽(y 작음)부터 아래쪽(y 큼)까지 다양 = 자연스러운 깊이.
-	# y 작은 sprite 는 캐릭터 뒤(z 작음)로 자동 그려짐 (가림 X).
+	# 엄격한 perspective — y 작음(멀리) → scale 작음 / y 큼(가까이) → scale 큼.
+	# sc_lo/sc_hi 둘 다 y 비례 lerp. ±10% jitter 로 다양성.
 	var pool: Dictionary = OBJECTS.get(myth, {})
 	var occupied_local: Array = occupied.duplicate()
-	# large (temple 등) — 멀리 (y 350~550), scale 작게
 	if pool.has("large") and pool["large"].size() > 0:
 		var large_id: String = pool["large"][rng.randi() % pool["large"].size()]
-		_try_place(large_id, myth, rng, 0.30, 0.45, occupied_local, rng.randf_range(350.0, 550.0))
-	# medium (statue, altar 등) — 중간 (y 500~750)
+		var y_rand: float = rng.randf_range(HORIZON_Y + 10.0, 700.0)
+		var t: float = (y_rand - HORIZON_Y) / 430.0
+		var sc_base: float = lerp(0.18, 0.55, t)
+		_try_place(large_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand)
 	if pool.has("medium") and rng.randf() < 0.7:
 		var med_id: String = pool["medium"][rng.randi() % pool["medium"].size()]
-		_try_place(med_id, myth, rng, 0.40, 0.60, occupied_local, rng.randf_range(500.0, 750.0))
-	# pillars — 50% 확률, y 600~770
+		var y_rand: float = rng.randf_range(HORIZON_Y + 50.0, 1000.0)
+		var t: float = (y_rand - HORIZON_Y) / 730.0
+		var sc_base: float = lerp(0.25, 0.85, t)
+		_try_place(med_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand)
 	if pool.has("pillars") and rng.randf() < 0.50:
 		var pillar_id: String = pool["pillars"][0]
-		_try_place(pillar_id, myth, rng, 0.40, 0.60, occupied_local, rng.randf_range(600.0, 770.0))
-	# small (식생) — 5~9개, y 다양
+		var y_rand: float = rng.randf_range(500.0, 1050.0)
+		var t: float = (y_rand - 500.0) / 550.0
+		var sc_base: float = lerp(0.35, 0.95, t)
+		_try_place(pillar_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand)
 	if pool.has("small"):
-		var fg_count: int = rng.randi_range(5, 9)
+		var fg_count: int = rng.randi_range(8, 14)
 		for i in fg_count:
 			var small_id: String = pool["small"][rng.randi() % pool["small"].size()]
-			# y 가 작을수록 멀리 = scale 작게 (간단한 perspective)
-			var y_rand: float = rng.randf_range(450.0, 770.0)
-			var sc_max: float = lerp(0.35, 0.65, (y_rand - 450.0) / 320.0)  # y 450 → sc 0.35, y 770 → sc 0.65
-			_try_place(small_id, myth, rng, 0.30, sc_max, occupied_local, y_rand)
+			var y_rand: float = rng.randf_range(HORIZON_Y + 30.0, 1050.0)
+			var t: float = (y_rand - HORIZON_Y) / 780.0
+			var sc_base: float = lerp(0.18, 0.90, t)
+			_try_place(small_id, myth, rng, sc_base * 0.9, sc_base * 1.1, occupied_local, y_rand)
 
 	# 시각 modulate — _back 의 ParallaxLayer 자식 CanvasItem 에 일괄 적용
 	current_env["tint"] = TIME_TINT.get(time_of_day, Color.WHITE)
@@ -185,7 +189,7 @@ func _setup_internal(myth: String, variant: int, seed_val: int, time_force: Stri
 # 후보 위치 무작위 → 충돌 검사 → 안 겹치면 spec 추가, 겹치면 재시도.
 # anchor_y 가 z_index 기준 (큰 값 = 앞). large 600 / medium 720 / fg 770 등 차등.
 func _try_place(svg_id: String, myth: String, rng: RandomNumberGenerator, sc_lo: float, sc_hi: float, occupied_local: Array, anchor_y: float = 770.0) -> void:
-	const MAX_TRIES := 12
+	const MAX_TRIES := 30
 	for _try in MAX_TRIES:
 		var sc: float = rng.randf_range(sc_lo, sc_hi)
 		# x 화면 전체 (-50~1970) — 충돌 검사가 anchor.y 비교로 캐릭터 가림 여부 결정
@@ -266,7 +270,6 @@ func _add_svg_object(myth: String, obj_id: String, motion: float, pos_anchor: Ve
 	spr.scale = Vector2(scale_v, scale_v)
 	# pos_anchor 는 오브젝트의 바닥 중심 — Sprite2D centered 라 y 보정
 	var tex_h: float = (spr.texture as Texture2D).get_height() * scale_v
-	var tex_w: float = (spr.texture as Texture2D).get_width() * scale_v
 	spr.position = Vector2(pos_anchor.x, pos_anchor.y - tex_h * 0.5)
 	pl.add_child(spr)
 

@@ -2630,14 +2630,10 @@ func _current_mythology() -> String:
 		return pool[act_idx]
 	return "greek"
 
-func _update_camera_sway(delta: float) -> void:
-	# parallax 만 미세 sway — UI/캐릭터엔 영향 없음
-	if _scene_bg == null or not is_instance_valid(_scene_bg):
-		return
-	_sway_t += delta
-	var dx: float = sin(_sway_t * TAU / _SWAY_PERIOD) * _SWAY_AMP
-	var dy: float = sin(_sway_t * TAU / (_SWAY_PERIOD * 1.7)) * _SWAY_AMP * 0.35
-	_scene_bg.set_scroll_offset(Vector2(dx, dy))
+func _update_camera_sway(_delta: float) -> void:
+	# parallax 보정 비활성화 — 캐릭터/바닥은 안 움직이는데 fg/bg 만 움직이면 어색.
+	# 평상시 sway X, shake 시 모든 자식 같이 이동 (battle_scene.position 변경 효과).
+	pass
 
 func _play_kill_cam(target_pos: Vector2) -> void:
 	# autoload 안전 접근 (CLI 테스트 환경 회피)
