@@ -1,17 +1,20 @@
 # autoload/deck_manager.gd
+# 개체별 턴 시스템 — 영웅별 덱/핸드/discard/exhaust/에너지 분리.
+# 모든 데이터: Dictionary[hero_id → {draw, hand, discard, exhaust, energy, pending_cost_reduction, pending_all_cost_zero, cards_played_this_turn}]
+# 외부 호출자 일부 (legacy) 는 card.owner_id 자동 분기. setup_for_battle 호출 전 add_card_to_deck 도 임시 풀에 저장 후 setup 시 분배.
 class_name DeckManagerClass
 extends Node
 
-var base_draw_count: int = 5
+var base_draw_count: int = 4
 const MAX_ENERGY: int = 3
 
-var draw_pile: Array = []
-var hand: Array = []
-var discard_pile: Array = []
-var exhaust_pile: Array = []
-var current_energy: int = 0
-var pending_cost_reduction: int = 0
-var pending_all_cost_zero: bool = false
+# 영웅별 데이터 — setup_for_battle 후 채워짐
+var _heroes: Dictionary = {}  # hero_id → {draw, hand, discard, exhaust, energy, pending_cost_reduction, pending_all_cost_zero, cards_played_this_turn}
+
+# 전투 외 (메타) — start_run 시 add_card_to_deck 으로 누적되는 임시 풀.
+# setup_for_battle 시 owner_id 기반으로 _heroes 에 분배.
+var _meta_deck: Array = []  # 전투 외 보유 카드 전체
+
 var debug_unlimited_energy: bool = false
 
 signal card_drawn(card: Resource)
@@ -19,111 +22,294 @@ signal card_played(card: Resource)
 signal hand_changed()
 signal energy_changed(new_energy: int)
 
-func start_turn() -> void:
-	current_energy = MAX_ENERGY
-	pending_cost_reduction = 0
-	pending_all_cost_zero = false
-	energy_changed.emit(current_energy)
-	# innate 카드 먼저 손패로 (draw pile에서 찾아서 앞으로)
+# ── Legacy properties (read-only 합) — 외부 호출자 점진 마이그레이션용 ──
+var draw_pile: Array:
+	get: return _all_pile("draw")
+var hand: Array:
+	get: return _all_pile("hand")
+var discard_pile: Array:
+	get: return _all_pile("discard")
+var exhaust_pile: Array:
+	get: return _all_pile("exhaust")
+var current_energy: int:
+	get:
+		# 첫 영웅의 에너지 (legacy 호환 — 현재 차례 영웅 의미)
+		for hid in _heroes.keys():
+			return _heroes[hid]["energy"]
+		return 0
+var pending_cost_reduction: int:
+	get:
+		for hid in _heroes.keys():
+			return _heroes[hid]["pending_cost_reduction"]
+		return 0
+var pending_all_cost_zero: bool:
+	get:
+		for hid in _heroes.keys():
+			return _heroes[hid]["pending_all_cost_zero"]
+		return false
+
+func _all_pile(pile_name: String) -> Array:
+	if _heroes.is_empty():
+		return _meta_deck.duplicate() if pile_name == "draw" else []
+	var all: Array = []
+	for hid in _heroes.keys():
+		all.append_array(_heroes[hid][pile_name])
+	return all
+
+# ── 전투 초기화 ─────────────────────────────────────
+func setup_for_battle(hero_ids: Array) -> void:
+	_heroes.clear()
+	for hid in hero_ids:
+		_heroes[hid] = _new_hero_entry()
+	# meta_deck 의 카드를 owner_id 기반으로 _heroes 에 분배
+	for card in _meta_deck:
+		var hid: String = card.owner_id
+		if not _heroes.has(hid):
+			# 영웅 없으면 무시 (사망 상태이지만 사용 안 함)
+			continue
+		(_heroes[hid]["draw"] as Array).append(card)
+	for hid in _heroes.keys():
+		(_heroes[hid]["draw"] as Array).shuffle()
+
+func _new_hero_entry() -> Dictionary:
+	return {
+		"draw": [],
+		"hand": [],
+		"discard": [],
+		"exhaust": [],
+		"energy": 0,
+		"pending_cost_reduction": 0,
+		"pending_all_cost_zero": false,
+		"cards_played_this_turn": 0,
+		"draws_this_turn": 0,
+	}
+
+# ── 본인 차례 시작/종료 ──────────────────────────────
+func start_hero_turn(hero_id: String) -> void:
+	if not _heroes.has(hero_id):
+		return
+	var entry: Dictionary = _heroes[hero_id]
+	entry["energy"] = MAX_ENERGY
+	entry["pending_cost_reduction"] = 0
+	entry["pending_all_cost_zero"] = false
+	entry["cards_played_this_turn"] = 0
+	entry["draws_this_turn"] = 0
+	energy_changed.emit(entry["energy"])
+	# innate 카드 먼저
 	var innate_count: int = 0
-	for i in range(draw_pile.size() - 1, -1, -1):
-		if draw_pile[i].get("is_innate") == true:
-			var c = draw_pile[i]
-			draw_pile.remove_at(i)
-			hand.append(c)
+	for i in range((entry["draw"] as Array).size() - 1, -1, -1):
+		if (entry["draw"] as Array)[i].get("is_innate") == true:
+			var c = (entry["draw"] as Array)[i]
+			(entry["draw"] as Array).remove_at(i)
+			(entry["hand"] as Array).append(c)
 			card_drawn.emit(c)
 			innate_count += 1
-	draw_cards(max(0, base_draw_count - innate_count))
+	draw_cards_h(hero_id, max(0, base_draw_count - innate_count))
 
-func draw_cards(count: int) -> void:
+func end_hero_turn(hero_id: String) -> void:
+	if not _heroes.has(hero_id):
+		return
+	var entry: Dictionary = _heroes[hero_id]
+	var retained: Array = []
+	for card in entry["hand"]:
+		if card.get("is_retain") == true:
+			retained.append(card)
+		elif card.get("is_ethereal") == true:
+			(entry["exhaust"] as Array).append(card)
+		else:
+			(entry["discard"] as Array).append(card)
+	entry["hand"] = retained
+	hand_changed.emit()
+
+func draw_cards_h(hero_id: String, count: int) -> void:
+	if not _heroes.has(hero_id):
+		return
+	var entry: Dictionary = _heroes[hero_id]
 	for i in range(count):
-		if draw_pile.is_empty():
-			_reshuffle()
-		if draw_pile.is_empty():
+		if (entry["draw"] as Array).is_empty():
+			_reshuffle(hero_id)
+		if (entry["draw"] as Array).is_empty():
 			break
-		var card: Resource = draw_pile.pop_back()
-		hand.append(card)
+		var card: Resource = (entry["draw"] as Array).pop_back()
+		(entry["hand"] as Array).append(card)
+		entry["draws_this_turn"] += 1
 		card_drawn.emit(card)
 	hand_changed.emit()
 
-func _reshuffle() -> void:
-	draw_pile = discard_pile.duplicate()
-	draw_pile.shuffle()
-	discard_pile.clear()
+# Legacy — 첫 영웅 또는 모든 영웅 분배. 외부 호출자 (draw_cards(count)) 보존.
+func draw_cards(count: int) -> void:
+	# 첫 영웅에만 (legacy 의미)
+	for hid in _heroes.keys():
+		draw_cards_h(hid, count)
+		return
 
+func _reshuffle(hero_id: String) -> void:
+	var entry: Dictionary = _heroes[hero_id]
+	entry["draw"] = (entry["discard"] as Array).duplicate()
+	(entry["draw"] as Array).shuffle()
+	(entry["discard"] as Array).clear()
+
+# ── 카드 사용 / can_play ────────────────────────────
 func can_play(card: Resource) -> bool:
+	# owner_id 기반 자동 분기 (legacy 호환)
+	if card == null:
+		return false
+	return can_play_hero(card.owner_id, card)
+
+func can_play_hero(hero_id: String, card: Resource) -> bool:
+	if not _heroes.has(hero_id):
+		return false
+	var entry: Dictionary = _heroes[hero_id]
 	if debug_unlimited_energy:
-		return hand.has(card)
-	if pending_all_cost_zero:
-		return hand.has(card)
-	var effective_cost: int = max(0, card.cost - pending_cost_reduction)
-	return hand.has(card) and current_energy >= effective_cost
+		return (entry["hand"] as Array).has(card)
+	if entry["pending_all_cost_zero"]:
+		return (entry["hand"] as Array).has(card)
+	var effective_cost: int = max(0, card.cost - entry["pending_cost_reduction"])
+	return (entry["hand"] as Array).has(card) and entry["energy"] >= effective_cost
 
 func play_card(card: Resource) -> bool:
-	if not can_play(card):
+	return play_card_hero(card.owner_id, card)
+
+func play_card_hero(hero_id: String, card: Resource) -> bool:
+	if not can_play_hero(hero_id, card):
 		return false
-	var effective_cost: int = 0 if pending_all_cost_zero else max(0, card.cost - pending_cost_reduction)
-	pending_cost_reduction = 0
+	var entry: Dictionary = _heroes[hero_id]
+	var effective_cost: int = 0 if entry["pending_all_cost_zero"] else max(0, card.cost - entry["pending_cost_reduction"])
+	entry["pending_cost_reduction"] = 0
 	if not debug_unlimited_energy:
-		current_energy -= effective_cost
-	energy_changed.emit(current_energy)
-	hand.erase(card)
+		entry["energy"] -= effective_cost
+	energy_changed.emit(entry["energy"])
+	(entry["hand"] as Array).erase(card)
+	entry["cards_played_this_turn"] += 1
 	if card.get("card_type") == 2 or card.get("is_exhaust") == true:
-		exhaust_pile.append(card)
+		(entry["exhaust"] as Array).append(card)
 	else:
-		discard_pile.append(card)
+		(entry["discard"] as Array).append(card)
 	card_played.emit(card)
 	hand_changed.emit()
 	return true
 
 func exhaust_card(card: Resource) -> void:
-	hand.erase(card)
-	exhaust_pile.append(card)
+	var hid: String = card.owner_id
+	if not _heroes.has(hid):
+		return
+	var entry: Dictionary = _heroes[hid]
+	(entry["hand"] as Array).erase(card)
+	(entry["exhaust"] as Array).append(card)
 	hand_changed.emit()
 
 func discard_card(card: Resource) -> void:
-	if not hand.has(card):
+	var hid: String = card.owner_id
+	if not _heroes.has(hid):
 		return
-	hand.erase(card)
-	discard_pile.append(card)
+	var entry: Dictionary = _heroes[hid]
+	if not (entry["hand"] as Array).has(card):
+		return
+	(entry["hand"] as Array).erase(card)
+	(entry["discard"] as Array).append(card)
 	hand_changed.emit()
 
-func discard_hand() -> void:
-	var retained: Array = []
-	for card in hand:
-		if card.get("is_retain") == true:
-			retained.append(card)
-		elif card.get("is_ethereal") == true:
-			exhaust_pile.append(card)
-		else:
-			discard_pile.append(card)
-	hand = retained
-	hand_changed.emit()
+# ── Getters (영웅별 + 통합) ───────────────────────
+func get_hand(hero_id: String) -> Array:
+	return (_heroes[hero_id]["hand"] as Array) if _heroes.has(hero_id) else []
 
+func get_energy(hero_id: String) -> int:
+	return _heroes[hero_id]["energy"] if _heroes.has(hero_id) else 0
+
+func get_pending_cost_reduction(hero_id: String) -> int:
+	return _heroes[hero_id]["pending_cost_reduction"] if _heroes.has(hero_id) else 0
+
+func set_pending_cost_reduction(hero_id: String, val: int) -> void:
+	if _heroes.has(hero_id):
+		_heroes[hero_id]["pending_cost_reduction"] = val
+
+func add_pending_cost_reduction(hero_id: String, delta: int) -> void:
+	if _heroes.has(hero_id):
+		_heroes[hero_id]["pending_cost_reduction"] += delta
+
+func set_pending_all_cost_zero(hero_id: String, val: bool) -> void:
+	if _heroes.has(hero_id):
+		_heroes[hero_id]["pending_all_cost_zero"] = val
+
+func add_energy_h(hero_id: String, delta: int) -> void:
+	if _heroes.has(hero_id):
+		_heroes[hero_id]["energy"] += delta
+		energy_changed.emit(_heroes[hero_id]["energy"])
+
+func set_energy_h(hero_id: String, val: int) -> void:
+	if _heroes.has(hero_id):
+		_heroes[hero_id]["energy"] = val
+		energy_changed.emit(val)
+
+func get_cards_played_this_turn(hero_id: String) -> int:
+	return _heroes[hero_id]["cards_played_this_turn"] if _heroes.has(hero_id) else 0
+
+func get_draws_this_turn(hero_id: String) -> int:
+	return _heroes[hero_id]["draws_this_turn"] if _heroes.has(hero_id) else 0
+
+func get_draw_size(hero_id: String) -> int:
+	return (_heroes[hero_id]["draw"] as Array).size() if _heroes.has(hero_id) else 0
+
+func get_discard_size(hero_id: String) -> int:
+	return (_heroes[hero_id]["discard"] as Array).size() if _heroes.has(hero_id) else 0
+
+# 통합 hand — 모든 영웅 hand 합쳐서 (legacy 호환)
+func get_all_hands() -> Array:
+	var all: Array = []
+	for hid in _heroes.keys():
+		all.append_array(_heroes[hid]["hand"])
+	return all
+
+# ── meta deck (전투 외) ─────────────────────────────
 func add_card_to_deck(card: Resource) -> void:
-	discard_pile.append(card)
+	# 전투 외 — meta_deck 에 누적. 전투 시작 시 owner_id 기반 분배.
+	# 전투 중 — 카드 보상 등 — owner_id 영웅의 discard 에 직접 추가.
+	if _heroes.is_empty():
+		_meta_deck.append(card)
+	else:
+		var hid: String = card.owner_id
+		if _heroes.has(hid):
+			(_heroes[hid]["discard"] as Array).append(card)
+		else:
+			_meta_deck.append(card)
+
+func get_meta_deck() -> Array:
+	return _meta_deck.duplicate()
 
 func get_full_deck() -> Array:
+	# meta + 모든 영웅의 draw/hand/discard/exhaust 합산 (legacy 호환).
+	# 보통 전투 외 시 호출 → _heroes 비어있으면 _meta_deck 만.
+	if _heroes.is_empty():
+		return _meta_deck.duplicate()
 	var full: Array = []
-	full.append_array(draw_pile)
-	full.append_array(hand)
-	full.append_array(discard_pile)
+	for hid in _heroes.keys():
+		full.append_array(_heroes[hid]["draw"])
+		full.append_array(_heroes[hid]["hand"])
+		full.append_array(_heroes[hid]["discard"])
+		full.append_array(_heroes[hid]["exhaust"])
 	return full
 
 func discard_random(n: int) -> void:
-	for _i in range(min(n, hand.size())):
-		var idx := randi() % hand.size()
-		discard_pile.append(hand[idx])
-		hand.remove_at(idx)
+	# 모든 영웅 핸드 합쳐서 무작위 n장. 영웅별 discard 로.
+	var all_hand_refs: Array = []  # [(hid, card)]
+	for hid in _heroes.keys():
+		for c in _heroes[hid]["hand"]:
+			all_hand_refs.append([hid, c])
+	for _i in range(min(n, all_hand_refs.size())):
+		var pick = all_hand_refs[randi() % all_hand_refs.size()]
+		var hid: String = pick[0]
+		var card: Resource = pick[1]
+		(_heroes[hid]["hand"] as Array).erase(card)
+		(_heroes[hid]["discard"] as Array).append(card)
+		all_hand_refs.erase(pick)
 	hand_changed.emit()
 
+# ── 직렬화 v3 ────────────────────────────────────
 func to_dict() -> Dictionary:
-	var full := draw_pile.duplicate()
-	full.append_array(discard_pile)
-	full.append_array(exhaust_pile)
-	# hand는 맵 저장 시점에 비어있음 — 무시
+	# 전투 외 — _meta_deck 직렬화. 전투 중이면 모든 영웅 합쳐서.
+	var cards: Array = _meta_deck if _heroes.is_empty() else get_full_deck()
 	var card_data := []
-	for card in full:
+	for card in cards:
 		var effects_data := []
 		for eff in card.effects:
 			effects_data.append({
@@ -141,11 +327,11 @@ func to_dict() -> Dictionary:
 			"upgrade_level": card.upgrade_level,
 			"effects": effects_data,
 		})
-	return {"base_draw_count": base_draw_count, "full_deck": card_data}
+	return {"version": 3, "base_draw_count": base_draw_count, "full_deck": card_data}
 
 func from_dict(data: Dictionary) -> void:
 	clear()
-	base_draw_count = data.get("base_draw_count", 5)
+	base_draw_count = data.get("base_draw_count", 4)
 	var CardRes = load("res://resources/card_resource.gd")
 	var EffRes = load("res://resources/effect_resource.gd")
 	for cd in data.get("full_deck", []):
@@ -165,44 +351,68 @@ func from_dict(data: Dictionary) -> void:
 			eff.bonus_value = ed.get("bonus_value", 0)
 			effects.append(eff)
 		card.effects = effects
-		draw_pile.append(card)
-	draw_pile.shuffle()
+		_meta_deck.append(card)
 
 func remove_from_deck(card: Resource) -> bool:
-	if draw_pile.has(card):
-		draw_pile.erase(card)
+	# meta + 모든 영웅 풀에서 검색
+	if _meta_deck.has(card):
+		_meta_deck.erase(card)
 		return true
-	if discard_pile.has(card):
-		discard_pile.erase(card)
-		return true
+	for hid in _heroes.keys():
+		for pile in ["draw", "discard", "hand", "exhaust"]:
+			if (_heroes[hid][pile] as Array).has(card):
+				(_heroes[hid][pile] as Array).erase(card)
+				return true
 	return false
 
-# 무작위 카드 1장 영구 제거 — 이벤트 등 전투 밖에서 호출.
-# 전투 후엔 카드가 draw/hand/discard/exhaust로 흩어져 있으므로 모든 더미를 대상으로 한다.
 func remove_random_card() -> bool:
-	var pools: Array = [draw_pile, hand, discard_pile, exhaust_pile]
-	var non_empty: Array = pools.filter(func(p: Array) -> bool: return not p.is_empty())
-	if non_empty.is_empty():
+	# 전투 외 — meta_deck 에서. 전투 중이면 모든 영웅 풀에서.
+	if _heroes.is_empty():
+		if _meta_deck.is_empty():
+			return false
+		_meta_deck.remove_at(randi() % _meta_deck.size())
+		return true
+	var pools: Array = []  # [(hid, pile_name, idx)]
+	for hid in _heroes.keys():
+		for pile in ["draw", "hand", "discard", "exhaust"]:
+			var arr: Array = _heroes[hid][pile]
+			for i in range(arr.size()):
+				pools.append([hid, pile, i])
+	if pools.is_empty():
 		return false
-	var pool: Array = non_empty[randi() % non_empty.size()]
-	pool.remove_at(randi() % pool.size())
+	var pick = pools[randi() % pools.size()]
+	(_heroes[pick[0]][pick[1]] as Array).remove_at(pick[2])
 	return true
 
 func consolidate_for_battle() -> void:
-	draw_pile.append_array(hand)
-	draw_pile.append_array(discard_pile)
-	draw_pile.append_array(exhaust_pile)
-	hand.clear()
-	discard_pile.clear()
-	exhaust_pile.clear()
-	draw_pile.shuffle()
+	# 모든 영웅의 hand/discard/exhaust 를 draw 로 합치고 shuffle.
+	# 전투 종료 시 호출.
+	for hid in _heroes.keys():
+		var entry: Dictionary = _heroes[hid]
+		(entry["draw"] as Array).append_array(entry["hand"])
+		(entry["draw"] as Array).append_array(entry["discard"])
+		(entry["draw"] as Array).append_array(entry["exhaust"])
+		entry["hand"].clear()
+		entry["discard"].clear()
+		entry["exhaust"].clear()
+		(entry["draw"] as Array).shuffle()
 	hand_changed.emit()
 
 func clear() -> void:
-	draw_pile.clear()
-	hand.clear()
-	discard_pile.clear()
-	exhaust_pile.clear()
-	current_energy = 0
-	pending_cost_reduction = 0
-	pending_all_cost_zero = false
+	_heroes.clear()
+	_meta_deck.clear()
+
+# ── Legacy 함수 wrapper — 외부 호출자 점진 마이그레이션 ──
+# start_turn() (인자 없음) → 모든 영웅 차례 시작 (의미 변형: 통합 → 영웅별 합)
+func start_turn() -> void:
+	for hid in _heroes.keys():
+		start_hero_turn(hid)
+
+# draw_cards_legacy — draw_cards(count) 와 동의 (deprecated alias)
+func draw_cards_legacy(count: int) -> void:
+	draw_cards(count)
+
+# discard_hand() — 모든 영웅 핸드 처리
+func discard_hand() -> void:
+	for hid in _heroes.keys():
+		end_hero_turn(hid)

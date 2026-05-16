@@ -881,7 +881,11 @@ func _play_battle_bgm() -> void:
 		_bgm_boss_id = first.enemy_name.split(".")[-1]
 		AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, 0)
 	else:
-		var myth: String = GameManager.act_mythologies[GameManager.current_act - 1]
+		# F6 단독 실행 폴백 — GameManager 미초기화 시 act_mythologies 비어있음
+		var act_idx: int = GameManager.current_act - 1
+		if act_idx < 0 or act_idx >= GameManager.act_mythologies.size():
+			return
+		var myth: String = GameManager.act_mythologies[act_idx]
 		AudioManager.play_bgm_dynamic("battle", myth)
 
 func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
@@ -1375,7 +1379,9 @@ func _refresh_hand() -> void:
 			n.queue_free()
 	_card_buttons.clear()
 
-	var hand: Array = DeckManager.hand
+	# 본인 차례 영웅의 핸드만 표시 (적 차례 / 차례 사이엔 빈 핸드)
+	var hid: String = BattleManager.get_current_hero_id()
+	var hand: Array = DeckManager.get_hand(hid) if hid != "" else []
 	if hand.is_empty():
 		return
 
@@ -1598,9 +1604,19 @@ func _on_end_turn_pressed() -> void:
 func _on_player_turn_started() -> void:
 	AudioManager.play_sfx("card_draw")
 	_end_turn_btn.disabled = false
-	_message_label.text = tr("battle.msg_player_turn")
-	_energy_label.text = "%d/%d" % [DeckManager.current_energy, DeckManager.MAX_ENERGY]
-	# 영웅 블록 UI 갱신 (start_player_turn이 블록 초기화했으므로)
+	# 현재 영웅 이름 표시 (개체 차례 시스템)
+	var cur_hid: String = BattleManager.get_current_hero_id()
+	var hero_name: String = cur_hid
+	if cur_hid != "" and TeamManager != null:
+		var hero_res = TeamManager.get_hero(cur_hid)
+		if hero_res != null:
+			hero_name = tr(hero_res.hero_name)
+	_message_label.text = "%s — %s" % [hero_name, tr("battle.msg_player_turn")]
+	# 본인 영웅 에너지 표시
+	_energy_label.text = "%d/%d" % [DeckManager.get_energy(cur_hid), DeckManager.MAX_ENERGY]
+	# 본인 영웅 핸드 표시 (start_hero_turn 가 드로우 완료)
+	_refresh_hand()
+	# 영웅 블록 UI 갱신
 	for entry in _hero_nodes:
 		var hid: String = entry["hero_id"]
 		if hid != "":
@@ -1618,9 +1634,19 @@ func _on_player_turn_started() -> void:
 func _on_enemy_turn_started() -> void:
 	_end_turn_btn.disabled = true
 	_selected_card = null
-	_message_label.text = tr("battle.msg_enemy_turn")
+	# 현재 적 이름 표시
+	var cur_aid: String = BattleManager.get_current_actor_id()
+	var enemy_label: String = tr("battle.msg_enemy_turn")
+	if cur_aid.begins_with("enemy:"):
+		var idx: int = int(cur_aid.substr(6))
+		var ename: Resource = BattleManager.get_enemy(idx)
+		if ename != null:
+			enemy_label = "%s — %s" % [tr(ename.enemy_name), tr("battle.msg_enemy_turn")]
+	_message_label.text = enemy_label
 	_last_card_play_pos = Vector2.ZERO
 	_signatures_shown_this_turn.clear()  # 시그니처 토스트 throttle 리셋 (1회/턴)
+	# 적 차례 — 본인 영웅 핸드 숨김
+	_refresh_hand()
 	# 적 클릭 버튼 비활성
 	for entry in _enemy_nodes:
 		if entry["panel"].visible and not entry["btn"].disabled:
@@ -1628,8 +1654,9 @@ func _on_enemy_turn_started() -> void:
 
 func _on_energy_changed(new_energy: int) -> void:
 	_energy_label.text = "%d / %d" % [new_energy, DeckManager.MAX_ENERGY]
-	# 카드 노드 활성/비활성 갱신
-	var hand: Array = DeckManager.hand
+	# 카드 노드 활성/비활성 갱신 — 본인 차례 영웅 핸드 기준
+	var hid: String = BattleManager.get_current_hero_id()
+	var hand: Array = DeckManager.get_hand(hid) if hid != "" else []
 	for i in range(min(_card_buttons.size(), hand.size())):
 		_apply_card_state(_card_buttons[i], hand[i])
 

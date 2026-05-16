@@ -971,9 +971,13 @@ func get_random_cursed_relic() -> Resource:
 	return available[randi() % available.size()]
 
 func trigger_relics(trigger: int, context: Dictionary = {}) -> void:
+	# 본인 영웅 차례 한정 (PLAYER_TURN_START/END) — owner_hero_id 가 있는 렐릭은 그 영웅 차례에만 발동
+	var ctx_hero: String = context.get("hero_id", "")
 	for relic in relics:
 		# 메인 효과
 		if relic.trigger == trigger:
+			if ctx_hero != "" and relic.owner_hero_id != "" and relic.owner_hero_id != ctx_hero:
+				continue
 			var effective_value: int = relic.value
 			if relic.owner_hero_id == "" or _is_hero_alive(relic.owner_hero_id):
 				if relic.owner_hero_id != "":
@@ -1022,24 +1026,38 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 				return
 	# is_inside_tree() 가드는 over-defensive. add_relic/trigger_relics는 항상 게임 진행
 	# 중에 호출되며 그 시점에 GameManager는 tree에 있음. null 체크만으로 충분.
+	# 본인 영웅 차례 (PLAYER_TURN_START/END) — ctx.hero_id 가 있으면 그 영웅에게만, 없으면 전체 (호환)
+	var ctx_hero: String = context.get("hero_id", "")
 	match relic.effect_type:
 		RelicRes.EffectType.HEAL:
 			if tm:
-				for hero in tm.heroes:
-					tm.heal(hero.hero_id, value)
+				if ctx_hero != "":
+					tm.heal(ctx_hero, value)
+				else:
+					for hero in tm.heroes:
+						tm.heal(hero.hero_id, value)
 		RelicRes.EffectType.ENERGY:
 			if dm:
-				dm.current_energy += value
-				dm.energy_changed.emit(dm.current_energy)
+				if ctx_hero != "":
+					dm.add_energy_h(ctx_hero, value)
+				else:
+					for hid in dm._heroes.keys():
+						dm.add_energy_h(hid, value)
 		RelicRes.EffectType.DRAW:
 			if dm:
-				dm.draw_cards(value)
+				if ctx_hero != "":
+					dm.draw_cards_h(ctx_hero, value)
+				else:
+					dm.draw_cards(value)
 		RelicRes.EffectType.BLOCK:
 			var bm_block := _get_bm()
 			if bm_block and tm:
-				for hero in tm.heroes:
-					bm_block._hero_block[hero.hero_id] = \
-						bm_block._hero_block.get(hero.hero_id, 0) + value
+				if ctx_hero != "":
+					bm_block._hero_block[ctx_hero] = bm_block._hero_block.get(ctx_hero, 0) + value
+				else:
+					for hero in tm.heroes:
+						bm_block._hero_block[hero.hero_id] = \
+							bm_block._hero_block.get(hero.hero_id, 0) + value
 		RelicRes.EffectType.APPLY_STATUS_ENEMY:
 			var bm_ase := _get_bm()
 			if bm_ase and bm_ase.is_battle_active:

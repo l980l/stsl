@@ -86,11 +86,22 @@ var _kills_this_card: int = 0
 var _enthralls_this_card: int = 0
 var _in_echo_replay: bool = false
 
+# 개체별 턴 큐 (ATB) — actor_id → 다음 차례 카운터 (작을수록 먼저)
+var _turn_queue_at: Dictionary = {}
+var _current_actor_id: String = ""
+
 signal battle_started()
 signal battle_won()
 signal battle_lost()
 signal player_turn_started()
 signal enemy_turn_started()
+# 개체별 턴 시스템 (33옵스퀴르 식 ATB) — actor_id 는 "hero:<id>" 또는 "enemy:<idx>"
+@warning_ignore("unused_signal")
+signal turn_started(actor_id: String)
+@warning_ignore("unused_signal")
+signal turn_ended(actor_id: String)
+@warning_ignore("unused_signal")
+signal turn_queue_changed(preview: Array)  # 다음 N차례 미리보기 (UI 갱신)
 signal enemy_died(enemy_index: int)
 signal enemy_damaged(enemy_index: int, amount: int, damage_type: String)
 signal hero_damaged(hero_id: String, amount: int, damage_type: String)
@@ -324,6 +335,12 @@ func _await_vfx_impact(fallback_timeout: float) -> void:
 func setup_battle(enemies: Array) -> void:
 	if deck_mgr != null:
 		deck_mgr.consolidate_for_battle()
+		# 영웅별 덱 분배 — owner_id 기준
+		if team_mgr != null:
+			var hero_ids: Array = []
+			for hero in team_mgr.heroes:
+				hero_ids.append(hero.hero_id)
+			deck_mgr.setup_for_battle(hero_ids)
 	turn_count = 0
 	damage_taken_this_battle = 0
 	_enemies = enemies.duplicate()
@@ -341,6 +358,8 @@ func setup_battle(enemies: Array) -> void:
 	if team_mgr != null:
 		if not team_mgr.hero_revived.is_connected(_on_hero_revived_clear_state):
 			team_mgr.hero_revived.connect(_on_hero_revived_clear_state)
+		if not team_mgr.hero_died.is_connected(_on_hero_died_queue):
+			team_mgr.hero_died.connect(_on_hero_died_queue)
 	for ei in range(_enemies.size()):
 		var trig = _enemies[ei].get("card_count_trigger")
 		if trig != null and trig is Dictionary and trig.size() > 0:
@@ -358,6 +377,7 @@ func setup_battle(enemies: Array) -> void:
 	for _e in _enemies:
 		_enemy_phase.append(0)
 	is_battle_active = true
+	_initialize_turn_counters()
 	battle_started.emit()
 	var _gm_bs = _get_gm()
 	if _gm_bs and _gm_bs.is_inside_tree():
@@ -371,74 +391,224 @@ func _get_gm() -> Object:
 		return ml.root.get_node_or_null("GameManager")
 	return null
 
+# ── 개체별 턴 큐 (ATB) 헬퍼 ──
+# actor_id 포맷: "hero:<hero_id>" / "enemy:<index>"
+func _actor_id_for_hero(hid: String) -> String:
+	return "hero:" + hid
+
+func _actor_id_for_enemy(idx: int) -> String:
+	return "enemy:" + str(idx)
+
+func _parse_actor_id(actor_id: String) -> Dictionary:
+	var parts := actor_id.split(":", false, 1)
+	if parts.size() < 2:
+		return {}
+	return {"kind": parts[0], "key": parts[1]}
+
+# 적 유효 speed — EnemyResource.speed (없으면 grade 기반 기본값)
+func _enemy_effective_speed(enemy_index: int) -> int:
+	if enemy_index < 0 or enemy_index >= _enemies.size():
+		return 40
+	var enemy = _enemies[enemy_index]
+	var s: int = int(enemy.get("speed"))
+	if s > 0:
+		return s
+	# grade 기본값 — NORMAL 45 (영웅 평균 55 보다 약간 느림) / ELITE 53 (영웅 평균과 동급) / BOSS 65 (가장 빠른 영웅 60 보다 빠름)
+	var grade: int = int(enemy.get("grade"))
+	match grade:
+		1: return 53  # ELITE
+		2: return 65  # BOSS
+		_: return 45  # NORMAL
+
+func _hero_effective_speed(hid: String) -> int:
+	if team_mgr == null:
+		return 50
+	for hero in team_mgr.heroes:
+		if hero.hero_id == hid:
+			return max(1, int(hero.speed))
+	return 50
+
+func _actor_speed(actor_id: String) -> int:
+	var p := _parse_actor_id(actor_id)
+	if p.is_empty():
+		return 50
+	if p["kind"] == "hero":
+		return _hero_effective_speed(p["key"])
+	elif p["kind"] == "enemy":
+		return _enemy_effective_speed(int(p["key"]))
+	return 50
+
+# 초기 큐 — 모든 생존 액터의 next_at = 1000 / speed
+func _initialize_turn_counters() -> void:
+	_turn_queue_at.clear()
+	_current_actor_id = ""
+	if team_mgr != null:
+		for hero in team_mgr.heroes:
+			if team_mgr.is_alive(hero.hero_id):
+				var aid := _actor_id_for_hero(hero.hero_id)
+				_turn_queue_at[aid] = 1000.0 / max(1, int(hero.speed))
+	for i in range(_enemies.size()):
+		if _enemy_alive[i]:
+			var aid := _actor_id_for_enemy(i)
+			_turn_queue_at[aid] = 1000.0 / max(1, _enemy_effective_speed(i))
+
+func get_current_actor_id() -> String:
+	return _current_actor_id
+
+func get_current_hero_id() -> String:
+	if _current_actor_id.begins_with("hero:"):
+		return _current_actor_id.substr(5)
+	return ""
+
+# 다음 차례 액터 (가장 작은 _next_turn_at). 동률은 영웅 우선.
+func _peek_next_actor() -> String:
+	if _turn_queue_at.is_empty():
+		return ""
+	var best_aid: String = ""
+	var best_val: float = INF
+	for aid in _turn_queue_at:
+		var v: float = _turn_queue_at[aid]
+		if v < best_val:
+			best_val = v
+			best_aid = aid
+		elif v == best_val and best_aid != "" and aid.begins_with("hero:") and not best_aid.begins_with("hero:"):
+			best_aid = aid
+	return best_aid
+
+# 차례 종료 후 카운터 진행 — 모든 액터에서 best_val 만큼 빼고 본인은 +cost 추가
+func _advance_turn_counter(actor_id: String) -> void:
+	if not _turn_queue_at.has(actor_id):
+		return
+	var base: float = _turn_queue_at[actor_id]
+	for aid in _turn_queue_at.keys():
+		_turn_queue_at[aid] = _turn_queue_at[aid] - base
+	_turn_queue_at[actor_id] = 1000.0 / max(1, _actor_speed(actor_id))
+
+func _remove_from_queue(actor_id: String) -> void:
+	if _turn_queue_at.has(actor_id):
+		_turn_queue_at.erase(actor_id)
+
+# UI 미리보기 — 다음 count 차례 시뮬레이션 (실제 큐는 건드리지 않음)
+func get_turn_queue_preview(count: int = 5) -> Array:
+	var sim: Dictionary = _turn_queue_at.duplicate()
+	var result: Array = []
+	for _i in range(count):
+		if sim.is_empty():
+			break
+		var best_aid: String = ""
+		var best_val: float = INF
+		for aid in sim:
+			var v: float = sim[aid]
+			if v < best_val:
+				best_val = v
+				best_aid = aid
+			elif v == best_val and best_aid != "" and aid.begins_with("hero:") and not best_aid.begins_with("hero:"):
+				best_aid = aid
+		if best_aid == "":
+			break
+		result.append(best_aid)
+		var cost: float = 1000.0 / max(1, _actor_speed(best_aid))
+		var base: float = sim[best_aid]
+		for aid in sim.keys():
+			sim[aid] = sim[aid] - base
+		sim[best_aid] = cost
+	return result
+
+## ───────────────────────────────────────────────
+## 영구 큐 (ATB) — 개체별 차례 시스템
+## ───────────────────────────────────────────────
+
+# 외부 호출 진입점 (battle_scene). 큐를 보고 다음 actor 차례 시작.
+# 이름은 호환성 — 실제 동작은 "다음 영웅/적 actor 차례 시작".
 func start_player_turn() -> void:
 	if not is_battle_active:
 		return
+	# 큐가 비어있으면 초기화 (호환 — setup_battle 후 첫 호출)
+	if _turn_queue_at.is_empty():
+		_initialize_turn_counters()
+	await _run_next_actor_turn()
+
+# 큐 다음 actor 시작. hero → 사용자 입력 대기. enemy → 자동 진행 후 chain.
+func _run_next_actor_turn() -> void:
+	if not is_battle_active:
+		return
+	var next_id: String = _peek_next_actor()
+	if next_id == "":
+		return
+	turn_queue_changed.emit(get_turn_queue_preview())
+	if next_id.begins_with("hero:"):
+		var hid: String = next_id.substr(5)
+		_start_hero_turn(hid)
+	elif next_id.begins_with("enemy:"):
+		var idx: int = int(next_id.substr(6))
+		await _run_one_enemy_turn(idx)
+		# 적 차례 후 다음 actor 자동 진행
+		if is_battle_active:
+			await _run_next_actor_turn()
+
+# 단일 영웅 차례 시작 — 본인 영웅만 phase 처리, 입력 대기
+func _start_hero_turn(hid: String) -> void:
+	_current_actor_id = _actor_id_for_hero(hid)
 	turn_count += 1
 	_player_damage_this_turn = 0  # T3-MIMIC 트래커 리셋
 	_in_player_turn = true
-	var pre_did: bool = _phase_player_pre()
+	var pre_did: bool = _phase_hero_pre(hid)
 	if pre_did and turn_interval > 0.0:
 		await get_tree().create_timer(turn_interval).timeout
 	if not is_battle_active:
 		return
-	_phase_player_main()
+	_phase_hero_main(hid)
+	turn_started.emit(_current_actor_id)
 
-func _phase_player_pre() -> bool:
-	if team_mgr == null:
+# 본인 영웅 차례 시작 사전 처리 — 본인 토큰 공격 + 본인 poison tick
+func _phase_hero_pre(hid: String) -> bool:
+	if team_mgr == null or not team_mgr.is_alive(hid):
 		return false
 	var did_work: bool = false
-	for hero in team_mgr.heroes:
-		if not team_mgr.is_alive(hero.hero_id):
-			continue
-		var token_count: int = _hero_status.get(hero.hero_id, {}).get("tokens", 0)
-		if token_count <= 0:
-			continue
-		for _ti in range(token_count):
-			var alive_indices: Array = []
-			for ei in range(_enemies.size()):
-				if _enemy_alive[ei]:
-					alive_indices.append(ei)
-			if alive_indices.is_empty():
-				break
-			var pick: int = alive_indices[randi() % alive_indices.size()]
-			_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK)
-			_last_attacker[pick] = hero.hero_id
-			did_work = true
+	var token_count: int = _hero_status.get(hid, {}).get("tokens", 0)
+	for _ti in range(token_count):
+		var alive_indices: Array = []
+		for ei in range(_enemies.size()):
+			if _enemy_alive[ei]:
+				alive_indices.append(ei)
+		if alive_indices.is_empty():
+			break
+		var pick: int = alive_indices[randi() % alive_indices.size()]
+		_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK)
+		_last_attacker[pick] = hid
+		did_work = true
+	# 본인 poison tick (영웅이 받은 독)
+	var dmg: int = _hero_status.get(hid, {}).get("poison_dmg", 0)
+	var dur: int = _hero_status.get(hid, {}).get("poison_dur", 0)
+	if dmg > 0 and dur > 0:
+		_tick_hero_poison(hid)
+		did_work = true
 	return did_work
 
-func _phase_player_main() -> void:
+# 본인 영웅 차례 메인 — 본인 block reset, 본인 power trigger, 본인 덱 시작
+func _phase_hero_main(hid: String) -> void:
 	is_player_turn = true
 	_cards_played_this_turn = 0
 	_cards_drawn_this_turn = 0
-	if team_mgr:
-		for hero in team_mgr.heroes:
-			_hero_block[hero.hero_id] = 0
-	_trigger_active_powers("player_turn_start")
+	# 본인 영웅 block 만 리셋
+	_hero_block[hid] = 0
+	_trigger_active_powers("player_turn_start", {"hero_id": hid})
 	if deck_mgr:
-		deck_mgr.start_turn()
+		deck_mgr.start_hero_turn(hid)
 	var _gm_pts = _get_gm()
 	if _gm_pts and _gm_pts.is_inside_tree():
-		_gm_pts.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": turn_count})
+		_gm_pts.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": turn_count, "hero_id": hid})
 	player_turn_started.emit()
 
-func _phase_player_post() -> bool:
-	if team_mgr:
-		for hero in team_mgr.heroes:
-			for stype: String in ["weak", "vulnerable", "taunt"]:
-				var cur: int = _hero_status.get(hero.hero_id, {}).get(stype, 0)
-				if cur > 0:
-					if not _hero_status.has(hero.hero_id):
-						_hero_status[hero.hero_id] = {}
-					_hero_status[hero.hero_id][stype] = cur - 1
+# 본인 영웅 차례 종료 — 본인 status -1
+func _phase_hero_post(hid: String) -> bool:
 	var did_work: bool = false
-	for i in range(_enemies.size()):
-		if not _enemy_alive[i]:
-			continue
-		var dmg: int = _enemy_status[i].get("poison_dmg", 0)
-		var dur: int = _enemy_status[i].get("poison_dur", 0)
-		if dmg > 0 and dur > 0:
-			_tick_enemy_poison(i)
+	for stype: String in ["weak", "vulnerable", "taunt"]:
+		var cur: int = _hero_status.get(hid, {}).get(stype, 0)
+		if cur > 0:
+			if not _hero_status.has(hid):
+				_hero_status[hid] = {}
+			_hero_status[hid][stype] = cur - 1
 			did_work = true
 	_check_win_condition()
 	return did_work
@@ -464,24 +634,49 @@ func end_player_turn() -> void:
 	if not is_player_turn or not is_battle_active:
 		return
 	is_player_turn = false
+	_in_player_turn = false
+	# 현재 hero actor id 추출 (없으면 fallback — 첫 hero)
+	var hid: String = ""
+	if _current_actor_id.begins_with("hero:"):
+		hid = _current_actor_id.substr(5)
+	elif team_mgr != null and team_mgr.heroes.size() > 0:
+		hid = team_mgr.heroes[0].hero_id
 	var _gm_pte = _get_gm()
 	if _gm_pte and _gm_pte.is_inside_tree():
-		_gm_pte.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_END)
-	if deck_mgr:
-		deck_mgr.discard_hand()
-	var post_did: bool = _phase_player_post()
+		_gm_pte.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_END, {"hero_id": hid})
+	if deck_mgr and hid != "":
+		deck_mgr.end_hero_turn(hid)
+	var post_did: bool = _phase_hero_post(hid)
 	if post_did and turn_interval > 0.0:
 		await get_tree().create_timer(turn_interval).timeout
 	if not is_battle_active:
 		return
-	_execute_enemy_turn()
+	# 큐 진행 — 현재 영웅 차례 비용 +1000/speed
+	_advance_turn_counter(_current_actor_id)
+	turn_ended.emit(_current_actor_id)
+	_current_actor_id = ""
+	await _run_next_actor_turn()
 
 const DND_KEY := "power.double_next_damage:__global__"
 
+func _dnd_key(hid: String) -> String:
+	return "power.double_next_damage:" + hid
+
 func _consume_double_next_damage(amount: int) -> int:
-	if _active_powers.has(DND_KEY):
+	# 현재 hero actor 의 DND 우선, 없으면 legacy global 키
+	var consumed: bool = false
+	if _current_actor_id.begins_with("hero:"):
+		var hid: String = _current_actor_id.substr(5)
+		var key: String = _dnd_key(hid)
+		if _active_powers.has(key):
+			amount *= 2
+			_active_powers.erase(key)
+			consumed = true
+	if not consumed and _active_powers.has(DND_KEY):
 		amount *= 2
 		_active_powers.erase(DND_KEY)
+		consumed = true
+	if consumed:
 		active_powers_changed.emit()
 	return amount
 
@@ -523,11 +718,16 @@ func _register_power(key: String, owner_id: String, value: int, params: Dictiona
 	active_powers_changed.emit()
 
 func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
+	# 본인 영웅 차례 한정 — owner_id 영웅 power 만 발동 (owner 없는 글로벌 power 는 모든 영웅 차례에 발동, 3× 효과)
+	var target_hero: String = ctx.get("hero_id", "")
 	for power_key in _active_powers:
 		var power: Dictionary = _active_powers[power_key]
 		var key: String = power_key.split(":")[0] if ":" in power_key else power_key
 		var owner_id: String = power.get("owner_id", "")
 		var v: int = power.get("value", 0)
+		# player_turn_start 시 본인 영웅 power 만 발동 (다른 영웅 차례에는 skip)
+		if phase == "player_turn_start" and target_hero != "" and owner_id != "" and owner_id != target_hero:
+			continue
 		match key:
 			"power.poison_per_turn":
 				if phase == "player_turn_start":
@@ -543,8 +743,8 @@ func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
 						team_mgr.heal(hero.hero_id, v)
 			"power.draw_per_turn":
 				if phase == "player_turn_start" and deck_mgr:
-					deck_mgr.draw_cards(v)
-					_cards_drawn_this_turn += v
+					# 본인 영웅에게 추가 드로우
+					deck_mgr.draw_cards_h(owner_id, v)
 			"power.counter_per_attack":
 				if phase == "enemy_attack":
 					var enemy_idx: int = ctx.get("enemy_index", -1)
@@ -823,7 +1023,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + count * effect.value
 			EffectRes.EffectType.COST_NEXT:
 				if deck_mgr:
-					deck_mgr.pending_cost_reduction += effect.value
+					deck_mgr.add_pending_cost_reduction(card.owner_id, effect.value)
 			EffectRes.EffectType.CONDITIONAL_DMG:
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					if effect.status_type == "dead_ally_count":
@@ -908,22 +1108,22 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_check_lose_condition()
 			EffectRes.EffectType.COST_ZERO_TURN:
 				if deck_mgr:
-					deck_mgr.pending_all_cost_zero = true
+					deck_mgr.set_pending_all_cost_zero(card.owner_id, true)
 			EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED:
-				var block_amount: int = _cards_played_this_turn * effect.value
+				# 본인 영웅 차례 내 카드 사용 횟수 (DeckManager 영웅별)
+				var played: int = deck_mgr.get_cards_played_this_turn(card.owner_id) if deck_mgr else 0
+				var block_amount: int = played * effect.value
 				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + block_amount
 			EffectRes.EffectType.ON_KILL_DRAW:
-				# 이번 카드로 처치된 적 수만큼 드로우
+				# 이번 카드로 처치된 적 수만큼 본인 영웅 드로우
 				if deck_mgr:
 					for _i in range(_kills_this_card):
-						deck_mgr.draw_cards(effect.value)
-						_cards_drawn_this_turn += effect.value
+						deck_mgr.draw_cards_h(card.owner_id, effect.value)
 			EffectRes.EffectType.DRAW_PER_ENTHRALL:
-				# 이번 카드로 반함 발동 횟수 × value 드로우
+				# 이번 카드로 반함 발동 횟수 × value, 본인 영웅 드로우
 				if deck_mgr and _enthralls_this_card > 0:
 					var _draw_amt: int = _enthralls_this_card * effect.value
-					deck_mgr.draw_cards(_draw_amt)
-					_cards_drawn_this_turn += _draw_amt
+					deck_mgr.draw_cards_h(card.owner_id, _draw_amt)
 			EffectRes.EffectType.DAMAGE_PER_CHARMED_ENEMY:
 				# charm 스택 보유 적 수 × value 피해
 				var _charmed_count: int = 0
@@ -953,8 +1153,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						for debuff in ["weak", "vulnerable", "poison_dmg", "charm"]:
 							_hero_status[h.hero_id].erase(debuff)
 			EffectRes.EffectType.PER_DRAW_DMG:
-				if target_enemy_index >= 0 and _cards_drawn_this_turn > 0:
-					var dmg: int = _cards_drawn_this_turn * effect.value
+				# 본인 영웅의 이번 차례 드로우 수 × value
+				var drawn: int = deck_mgr.get_draws_this_turn(card.owner_id) if deck_mgr else 0
+				if target_enemy_index >= 0 and drawn > 0:
+					var dmg: int = drawn * effect.value
 					_deal_damage_to_enemy(target_enemy_index, dmg)
 			EffectRes.EffectType.DAMAGE_PER_BLOCK:
 				var block: int = _hero_block.get(card.owner_id, 0)
@@ -970,7 +1172,8 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if dead_count > 0:
 						_deal_damage_to_enemy(target_enemy_index, dead_count * effect.value, effect.damage_type)
 			EffectRes.EffectType.DOUBLE_NEXT_DAMAGE:
-				_active_powers[DND_KEY] = {"value": 1, "owner_id": "__global__", "params": {}}
+				# 본인 영웅의 다음 데미지 한 번만 ×2
+				_active_powers[_dnd_key(card.owner_id)] = {"value": 1, "owner_id": card.owner_id, "params": {}}
 				active_powers_changed.emit()
 			EffectRes.EffectType.DISCARD_PICK_DRAW:
 				_trigger_discard_pick(effect.value, 1)
@@ -979,8 +1182,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				if morale > 0:
 					_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + morale * effect.value
 			EffectRes.EffectType.DAMAGE_PER_HAND_SIZE:
+				# 본인 영웅의 현재 핸드 크기 × value
 				if target_enemy_index >= 0 and deck_mgr:
-					var hand_size: int = deck_mgr.hand.size()
+					var hand_size: int = deck_mgr.get_hand(card.owner_id).size()
 					if hand_size > 0:
 						_deal_damage_to_enemy(target_enemy_index, hand_size * effect.value, effect.damage_type)
 			EffectRes.EffectType.DAMAGE_PER_TOKEN:
@@ -1008,12 +1212,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						else:
 							team_mgr.heal(card.owner_id, heal_amt)
 			EffectRes.EffectType.ENERGY_TO_DAMAGE:
+				# 본인 영웅의 현재 에너지 × value (모두 소비)
 				if target_enemy_index >= 0 and deck_mgr:
-					var energy: int = deck_mgr.current_energy
+					var energy: int = deck_mgr.get_energy(card.owner_id)
 					if energy > 0:
 						_deal_damage_to_enemy(target_enemy_index, energy * effect.value, effect.damage_type)
-						deck_mgr.current_energy = 0
-						deck_mgr.energy_changed.emit(0)
+						deck_mgr.set_energy_h(card.owner_id, 0)
 			EffectRes.EffectType.STATUS_DOUBLE:
 				var sd_targets: Array = []
 				if effect.target == "ALL":
@@ -1157,6 +1361,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 		SignatureSys.on_enemy_damaged(self, enemy_index, amount)
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
+		_remove_from_queue(_actor_id_for_enemy(enemy_index))
 		_kills_this_card += 1
 		_fire_death_trigger(enemy_index)
 		# 시그니처 hook: 사망 (불교 인과응보)
@@ -1266,35 +1471,15 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 		_enemy_status[enemy_index]["poison_dur"] = dur
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
+		_remove_from_queue(_actor_id_for_enemy(enemy_index))
 		_fire_death_trigger(enemy_index)
 		enemy_died.emit(enemy_index)
 		_check_win_condition()
 
+# Legacy 호환 — 테스트가 직접 호출. 모든 생존 적을 순차 진행.
 func _execute_enemy_turn() -> void:
 	if not is_battle_active:
 		return
-	var pre_did: bool = _phase_enemy_pre()
-	if pre_did and turn_interval > 0.0:
-		await get_tree().create_timer(turn_interval).timeout
-	if not is_battle_active:
-		return
-	await _phase_enemy_main()
-	if not is_battle_active:
-		return
-	if turn_interval > 0.0:
-		await get_tree().create_timer(turn_interval).timeout
-	var post_did: bool = _phase_enemy_post()
-	if post_did and turn_interval > 0.0:
-		await get_tree().create_timer(turn_interval).timeout
-	if not is_battle_active:
-		return
-	start_player_turn()
-
-func _phase_enemy_pre() -> bool:
-	return false
-
-func _phase_enemy_main() -> void:
-	_in_player_turn = false  # MIMIC 트래커 게이트 종료
 	enemy_turn_started.emit()
 	var first: bool = true
 	for i in range(_enemies.size()):
@@ -1303,67 +1488,83 @@ func _phase_enemy_main() -> void:
 		if not first and turn_interval > 0.0:
 			await get_tree().create_timer(turn_interval * _monster_interval_mul()).timeout
 		first = false
-		_enemy_block[i] = 0
-		# 시그니처 hook: 턴 시작 (휴브리스 pending 처리, 도교 음양, 일본 결계)
-		SignatureSys.on_enemy_turn_start(self, i)
-		for stype: String in ["weak", "vulnerable"]:
-			if _enemy_status[i].get(stype, 0) > 0:
-				_enemy_status[i][stype] -= 1
-		# T3-WARD: invuln 카운트 매 턴 감소 (만료 시 0)
-		if _enemy_status[i].get("invuln", 0) > 0:
-			_enemy_status[i]["invuln"] -= 1
-		var charm: int = _enemy_status[i].get("charm", 0)
-		var _charm_reduce_turn: int = 0
-		for _cpk2 in _active_powers:
-			if _cpk2.begins_with("power.charm_threshold_minus:"):
-				_charm_reduce_turn += _active_powers[_cpk2].get("value", 0)
-		var charm_threshold: int = max(1, CHARM_THRESHOLD_BASE + _enemy_status[i].get("charm_resistance", 0) - _charm_reduce_turn)
-		if charm >= charm_threshold:
-			_enemy_status[i]["charm"] = 0
-			_enemy_status[i]["enthrall"] = _enemy_status[i].get("enthrall", 0) + 1
-			status_applied.emit("enemy_%d" % i, "enthrall", 1)
-			_trigger_active_powers("on_enthrall", {"enemy_index": i})
-		var enthrall: int = _enemy_status[i].get("enthrall", 0)
-		if enthrall > 0:
-			_enemy_status[i]["enthrall"] = enthrall - 1
-			var other_targets: Array = []
-			for j in range(_enemies.size()):
-				if j != i and _enemy_alive[j]:
-					other_targets.append(j)
-			if not other_targets.is_empty():
-				var target_j: int = other_targets[randi() % other_targets.size()]
-				var charm_pattern: Array = _get_active_pattern(i)
-				if not charm_pattern.is_empty():
-					var charm_intent: Resource = charm_pattern[_enemy_intent_index[i]]
-					if charm_intent.action_type == IntentRes.ActionType.ATTACK:
-						_deal_damage_to_enemy(target_j, charm_intent.value)
-			_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % _get_active_pattern(i).size()
-			continue
-		var pattern: Array = _get_active_pattern(i)
-		if pattern.is_empty():
-			continue
-		var intent: Resource = pattern[_enemy_intent_index[i]]
-		_vfx_caster = i  # 이 적이 공격자 — lightning 등 빔 VFX 시전자 좌표용
-		await _execute_intent(i, intent)  # 차지 + 임팩트 + 데미지 적용까지 대기
-		_vfx_caster = null
-		_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
+		await _run_one_enemy_turn(i, true)  # legacy 모드: 큐 카운터 진행 스킵
 	_check_win_condition()
 	_check_lose_condition()
 
-func _phase_enemy_post() -> bool:
-	if team_mgr == null:
-		return false
-	var did_work: bool = false
-	for hero in team_mgr.heroes:
-		if not team_mgr.is_alive(hero.hero_id):
-			continue
-		var dmg: int = _hero_status.get(hero.hero_id, {}).get("poison_dmg", 0)
-		var dur: int = _hero_status.get(hero.hero_id, {}).get("poison_dur", 0)
-		if dmg > 0 and dur > 0:
-			_tick_hero_poison(hero.hero_id)
-			did_work = true
-	_check_lose_condition()
-	return did_work
+# 단일 적 차례 처리 — 본인 차례 시작 (status -1, 시그니처 hook, charm, intent 실행).
+# legacy=true 면 _advance_turn_counter 스킵 (테스트 호환용).
+func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
+	if not is_battle_active:
+		return
+	if i < 0 or i >= _enemies.size() or not _enemy_alive[i]:
+		return
+	if not legacy:
+		_current_actor_id = _actor_id_for_enemy(i)
+		_in_player_turn = false  # MIMIC 트래커 게이트 종료
+		enemy_turn_started.emit()
+		turn_started.emit(_current_actor_id)
+	_enemy_block[i] = 0
+	# 시그니처 hook: 턴 시작 (휴브리스 pending 처리, 도교 음양, 일본 결계)
+	SignatureSys.on_enemy_turn_start(self, i)
+	for stype: String in ["weak", "vulnerable"]:
+		if _enemy_status[i].get(stype, 0) > 0:
+			_enemy_status[i][stype] -= 1
+	# 본인 poison tick (영웅이 가한 독 — 본인 차례 시작 시 발동)
+	var p_dmg: int = _enemy_status[i].get("poison_dmg", 0)
+	var p_dur: int = _enemy_status[i].get("poison_dur", 0)
+	if p_dmg > 0 and p_dur > 0:
+		_tick_enemy_poison(i)
+		if not _enemy_alive[i]:
+			if not legacy:
+				_advance_turn_counter(_current_actor_id)
+				turn_ended.emit(_current_actor_id)
+				_current_actor_id = ""
+			return
+	# T3-WARD: invuln 카운트 매 턴 감소 (만료 시 0)
+	if _enemy_status[i].get("invuln", 0) > 0:
+		_enemy_status[i]["invuln"] -= 1
+	var charm: int = _enemy_status[i].get("charm", 0)
+	var _charm_reduce_turn: int = 0
+	for _cpk2 in _active_powers:
+		if _cpk2.begins_with("power.charm_threshold_minus:"):
+			_charm_reduce_turn += _active_powers[_cpk2].get("value", 0)
+	var charm_threshold: int = max(1, CHARM_THRESHOLD_BASE + _enemy_status[i].get("charm_resistance", 0) - _charm_reduce_turn)
+	if charm >= charm_threshold:
+		_enemy_status[i]["charm"] = 0
+		_enemy_status[i]["enthrall"] = _enemy_status[i].get("enthrall", 0) + 1
+		status_applied.emit("enemy_%d" % i, "enthrall", 1)
+		_trigger_active_powers("on_enthrall", {"enemy_index": i})
+	var enthrall: int = _enemy_status[i].get("enthrall", 0)
+	if enthrall > 0:
+		_enemy_status[i]["enthrall"] = enthrall - 1
+		var other_targets: Array = []
+		for j in range(_enemies.size()):
+			if j != i and _enemy_alive[j]:
+				other_targets.append(j)
+		if not other_targets.is_empty():
+			var target_j: int = other_targets[randi() % other_targets.size()]
+			var charm_pattern: Array = _get_active_pattern(i)
+			if not charm_pattern.is_empty():
+				var charm_intent: Resource = charm_pattern[_enemy_intent_index[i]]
+				if charm_intent.action_type == IntentRes.ActionType.ATTACK:
+					_deal_damage_to_enemy(target_j, charm_intent.value)
+		var charm_pat: Array = _get_active_pattern(i)
+		if not charm_pat.is_empty():
+			_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % charm_pat.size()
+	else:
+		var pattern: Array = _get_active_pattern(i)
+		if not pattern.is_empty():
+			var intent: Resource = pattern[_enemy_intent_index[i]]
+			_vfx_caster = i  # 이 적이 공격자 — lightning 등 빔 VFX 시전자 좌표용
+			await _execute_intent(i, intent)
+			_vfx_caster = null
+			_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
+	if not legacy:
+		if is_battle_active:
+			_advance_turn_counter(_current_actor_id)
+		turn_ended.emit(_current_actor_id)
+		_current_actor_id = ""
 
 func _execute_intent(enemy_index: int, intent: Resource) -> void:
 	# 단일 타겟 인텐트는 시그널 emit 전에 영웅 타겟 미리 결정 — battle_scene 이 정확한 영웅 위치에 VFX 표시
@@ -1515,7 +1716,17 @@ func _add_enemy_to_battle(enemy: Resource) -> void:
 	_enemy_status.append({})
 	_enemy_phase.append(0)
 	_enemy_intent_index.append(0)
-	enemy_spawned.emit(_enemies.size() - 1)
+	var new_idx: int = _enemies.size() - 1
+	# 큐 등재 — 평균 카운터 + 1턴 비용 (소환 즉시 행동 방지)
+	var aid := _actor_id_for_enemy(new_idx)
+	var avg: float = 0.0
+	var n: int = _turn_queue_at.size()
+	if n > 0:
+		for v in _turn_queue_at.values():
+			avg += v
+		avg /= float(n)
+	_turn_queue_at[aid] = avg + 1000.0 / max(1, _enemy_effective_speed(new_idx))
+	enemy_spawned.emit(new_idx)
 
 # DEATH-RATTLE: 사망 직후 1회 실행. 자기 자신은 이미 _enemy_alive=false 상태이므로
 # BUFF_ALLY 등 동료 효과는 자신을 제외한 살아있는 동료에게만 적용됨.
@@ -1730,6 +1941,19 @@ func _on_hero_revived_clear_state(hero_id: String) -> void:
 	# 부활 시 블록·상태 초기화 (사망 전 독/출혈/블록 제거)
 	_hero_block[hero_id] = 0
 	_hero_status[hero_id] = {}
+	# 부활 영웅 큐 재진입 — 평균 카운터 + 1턴 비용 (즉시 행동 방지)
+	var aid := _actor_id_for_hero(hero_id)
+	if not _turn_queue_at.has(aid):
+		var avg: float = 0.0
+		var n: int = _turn_queue_at.size()
+		if n > 0:
+			for v in _turn_queue_at.values():
+				avg += v
+			avg /= float(n)
+		_turn_queue_at[aid] = avg + 1000.0 / max(1, _hero_effective_speed(hero_id))
+
+func _on_hero_died_queue(hero_id: String) -> void:
+	_remove_from_queue(_actor_id_for_hero(hero_id))
 
 func _evaluate_condition(cond: String, _card: Resource) -> bool:
 	match cond:
@@ -1965,6 +2189,7 @@ func debug_set_enemy_hp(index: int, hp: int) -> void:
 	_enemy_hp[index] = hp
 	if hp == 0 and _enemy_alive[index]:
 		_enemy_alive[index] = false
+		_remove_from_queue(_actor_id_for_enemy(index))
 		enemy_died.emit(index)
 		_check_win_condition()
 	elif hp > 0 and not _enemy_alive[index]:
