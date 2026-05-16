@@ -10,7 +10,11 @@
 assets/audio/
 
 # 아트 에셋 — git 미추적, 로컬에서 직접 관리 (라인 SVG 아이콘 제외)
-assets/art/backgrounds/
+assets/art/backgrounds/*
+# M7.5 — 직접 만든 SVG 오브젝트/critter/입자는 git tracked (게임 실행 필수)
+!assets/art/backgrounds/objects/
+!assets/art/backgrounds/critters/
+!assets/art/backgrounds/particles/
 assets/art/cards/
 assets/art/chapters/
 assets/art/characters/
