@@ -2721,7 +2721,7 @@ const WIND_SHADER := preload("res://assets/shaders/wind_sway.gdshader")
 # ── 차례 카메라 줌 시스템 (영웅 차례 줌인 / 드래그·VFX 줌아웃 / 적 차례 멀리) ──
 enum CamState { IDLE_FAR, HERO_FOCUS, DRAGGING, VFX_PLAYING }
 var _cam_state: int = CamState.IDLE_FAR
-const CAM_ZOOM_HERO := Vector2(1.5, 1.5)
+const CAM_ZOOM_HERO := Vector2(1.3, 1.3)
 const CAM_ZOOM_FAR := Vector2.ONE
 const CAM_TWEEN_TIME := 0.3
 const CAM_VFX_TIMEOUT := 3.0  # VFX 카운터 fallback (모든 VFX 가 가장 오래 가도 3s 안에 끝남)
