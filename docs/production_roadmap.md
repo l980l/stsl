@@ -983,6 +983,40 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ---
 
+## Milestone 12 — 비주얼 업그레이드 검토: HD-2D 전환 (대규모, 향후 결정)
+
+> 옥토패스 트래블러 / 라이브 어 라이브 리메이크 / 드퀘3 HD-2D 류 — **2D 픽셀 sprite 캐릭터를 3D 환경에 배치 + perspective 카메라**.
+> 카메라 dolly/줌 효과의 진짜 원근감이 핵심 ROI. 단순 2D 카메라 zoom 은 균일 확대라 평면 느낌.
+>
+> **현재 보류 사유:** 작업량 3~5주 (혼자 풀타임). 카드 게임 (Slay the Spire 류) 컨벤션상 균일 줌으로도 충분. 출시 전 또는 후 메이저 업데이트 후보.
+
+### 12-1. Prototype 결과 (PR `feat/hd2d-prototype` 브랜치, 커밋 `0bd136f`, 미머지)
+- ✅ `scenes/debug/hd2d_demo.tscn` — Camera3D(fov 28°) + Plane3D ground + Sprite3D billboard 9 캐릭터(영웅3+적6, battle_scene 슬롯 좌표 매핑) + greek 배경
+- ✅ 마우스 클릭 ground 점으로 카메라 dolly in/out — 진짜 perspective 변형 동작
+- ✅ `scenes/vfx/defense_buff_3d.gd` — defense_buff 의 B안 3D 포팅 (룬링 ground / orb / dome / barrier). ImmediateMesh + Sprite3D billboard + 두꺼운 라인 quad strip + 인접 segment 평균 perpendicular 로 vertex 공유 (틈 방지) + alpha_cut OPAQUE_PREPASS 로 z-buffer 자동 정렬
+- ✅ Felt 확인: HD-2D 시각이 평면 2D 보다 명확히 좋음. 다만 풀 전환 작업량 큼
+
+### 12-2. 풀 전환 작업 항목 (착수 시)
+- 🔲 **VFX 26개 → 3D 포팅** (가장 큰 병목, 5 PR 단계별 — `scenes/vfx/*_3d.gd` 패턴)
+  - PR 1: preview UI + 단순 vfx 3개 (arrow / bullet / stun)
+  - PR 2: 블래스트 (fire / ice / lightning / blunt / explosion)
+  - PR 3: holy (strike / slash / arrow / fire / blunt)
+  - PR 4: 디버프 (debuff_hex / charm / infatuation / poison / poison_tick)
+  - PR 5: 버프/사망 (heal / blood / holy_buff / warrior_buff / death / revive)
+- 🔲 **battle_scene.tscn 3D 전환** — Camera2D → Camera3D, Marker2D → Marker3D, 캐릭터 → Sprite3D billboard
+- 🔲 **캐릭터 위 UI 라벨** (이름/HP/intent) — CanvasLayer 안 Control 을 `camera.unproject_position(char3d.global_position)` 으로 매 프레임 추적
+- 🔲 **카드 드래그 타겟팅** — 마우스 → 3D ray (`Camera3D.project_ray_origin/normal`) 로 적 노드 교차
+- 🔲 **배경/조명** — Plane3D ground + DirectionalLight3D + 신화별 ambient
+- 🔲 **다른 씬 (map / event / shop / rest / menu)** — 2D 유지 (전환 범위 한정)
+
+### 12-3. 핵심 결정 사항 (착수 전)
+- VFX A안 (CanvasLayer + unproject 추적, 평면 한계) vs B안 (3D 포팅, 완전 변환) — Prototype 에서 B안이 명확히 좋음 확인
+- 작업 분할 — 5 PR 권장 (각 1주, felt 검증 단계별)
+- 다른 씬 전환 여부 — battle_scene 만 권장 (map/event 등은 2D 유지)
+- 모바일 성능 — 3D 가 2D 보다 fillrate 부담. 그림자 fake (ground decal) 권장
+
+---
+
 ## 우선순위 요약
 
 > 최종 갱신: 2026-05-16 v16. PR #114·#115 반영 — 설정 graphics/gameplay 탭 + 전투 UX 폴리싱 v2 (VFX impact 정확 동기화·글로벌 툴팁·popup 글로우·카드 흐름·사망 예측·HP 블룸 임계치·파티클 4단계). 1470 테스트 통과 / 0 fail.
@@ -1026,6 +1060,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | 🔵 출시 직전 | 법무 문서 (M9-5) | 개인정보처리방침·라이선스 고지. 모바일 스토어 등재 조건 |
 | 🔵 출시 직전 | 마케팅·커뮤니티 (M9-6) | 프레스 킷·소셜·베타 테스터 |
 | 🔵 출시 | 스토어 출시 (M10) | Steam·Google Play·App Store 각 플랫폼 제출 |
+| 🟣 위시리스트 | HD-2D 전환 검토 (M12) | 옥토패스류 perspective 카메라 + 3D ground + sprite billboard. Prototype 완료 (브랜치 `feat/hd2d-prototype` 미머지). 풀 전환 3~5주 (VFX 26 포팅이 병목). 출시 전 또는 후 메이저 업데이트 후보 |
 
 ---
 
