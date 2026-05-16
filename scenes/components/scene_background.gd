@@ -23,9 +23,15 @@ const PALETTES := {
 		{"sky": Color("#5a7090"), "horizon": Color("#e0b070"), "silhouette": Color("#2a3a4a"), "scenery": Color("#4a5040")},
 		{"sky": Color("#1a1024"), "horizon": Color("#6a3030"), "silhouette": Color("#080608"), "scenery": Color("#1a1018")},
 	],
+	# 북유럽 — 차가운 푸른/회색 톤. Act 3 라그나뢰크(검은+핏빛).
+	"norse": [
+		{"sky": Color("#4a6080"), "horizon": Color("#a09070"), "silhouette": Color("#1a2030"), "scenery": Color("#2a3a30")},
+		{"sky": Color("#3a4a60"), "horizon": Color("#705060"), "silhouette": Color("#150e1e"), "scenery": Color("#1a2028")},
+		{"sky": Color("#1a0e10"), "horizon": Color("#7a2020"), "silhouette": Color("#080000"), "scenery": Color("#160808")},
+	],
 }
 
-# 신화별 SVG 오브젝트 풀 + spawn 가중치 (1차 PR = greek 만)
+# 신화별 SVG 오브젝트 풀 + spawn 가중치
 const OBJECTS := {
 	"greek": {
 		"large":  ["temple_small_a", "temple_small_b", "temple_small_d"],
@@ -36,6 +42,16 @@ const OBJECTS := {
 				   "grass_a", "grass_b",
 				   "flower_a", "flower_b", "flower_c"],
 		"pillars":["column_doric_a", "column_doric_b", "column_doric_c", "column_doric_d"],
+	},
+	"norse": {
+		"large":  ["longhouse_a", "longhouse_b"],
+		"medium": ["rune_stone_a", "rune_stone_b",
+				   "altar_norse_a", "altar_norse_b"],
+		"small":  ["birch_a", "birch_b", "birch_c", "birch_d",
+				   "spruce_a", "spruce_b", "spruce_c", "spruce_d",
+				   "tundra_grass_a", "tundra_grass_b",
+				   "edelweiss_a", "edelweiss_b"],
+		"pillars":["rune_pillar_a", "rune_pillar_b"],
 	},
 }
 
@@ -56,6 +72,17 @@ const OBJECT_SIZE := {
 	"grass_a":          Vector2(100, 80),  "grass_b":         Vector2(140, 100),
 	"flower_a":         Vector2(120, 140), "flower_b":        Vector2(130, 130),
 	"flower_c":         Vector2(110, 110),
+	# norse
+	"longhouse_a":      Vector2(600, 460), "longhouse_b":      Vector2(600, 460),
+	"rune_stone_a":     Vector2(220, 580), "rune_stone_b":     Vector2(220, 580),
+	"altar_norse_a":    Vector2(240, 280), "altar_norse_b":    Vector2(240, 280),
+	"birch_a":          Vector2(160, 480), "birch_b":          Vector2(160, 480),
+	"birch_c":          Vector2(160, 480), "birch_d":          Vector2(160, 480),
+	"spruce_a":         Vector2(280, 360), "spruce_b":         Vector2(280, 360),
+	"spruce_c":         Vector2(280, 360), "spruce_d":         Vector2(280, 360),
+	"rune_pillar_a":    Vector2(200, 600), "rune_pillar_b":    Vector2(200, 600),
+	"tundra_grass_a":   Vector2(100, 80),  "tundra_grass_b":   Vector2(140, 100),
+	"edelweiss_a":      Vector2(120, 140), "edelweiss_b":      Vector2(130, 130),
 }
 
 # 바람/펄럭임 sway — grass/flower 는 통째, cypress/olive_tree/altar 는 split (위 부분만).
@@ -68,8 +95,10 @@ static func _wind_eligible(svg_id: String) -> bool:
 
 # 정지/sway 두 sprite 로 spawn — base + sway 부분. 빈 배열이면 split 아님.
 # 나무: trunk(정지) + leaves(sway). altar: base(정지) + flame(sway).
+# 신화 추가 시 식생 prefix 만 늘리면 됨. altar 는 prefix "altar" 자동 매칭 (altar_norse 등).
 static func _split_suffixes(svg_id: String) -> Array:
-	if svg_id.begins_with("cypress") or svg_id.begins_with("olive_tree"):
+	if (svg_id.begins_with("cypress") or svg_id.begins_with("olive_tree")
+			or svg_id.begins_with("birch") or svg_id.begins_with("spruce")):
 		return ["_trunk", "_leaves"]
 	if svg_id.begins_with("altar"):
 		return ["_base", "_flame"]

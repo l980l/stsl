@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 480" width="160" height="480">
+  <ellipse cx="80" cy="468" rx="44" ry="9" fill="#000" opacity="0.45"/>
+  <!-- 두꺼운 줄기 -->
+  <rect x="64" y="70" width="32" height="400" fill="#e0dcc8"/>
+  <rect x="64" y="70" width="8" height="400" fill="#a8a4a0" opacity="0.4"/>
+  <!-- 더 많은 가로 줄 -->
+  <rect x="64" y="110" width="32" height="6" fill="#1a1814"/>
+  <rect x="64" y="170" width="32" height="5" fill="#1a1814"/>
+  <rect x="64" y="230" width="32" height="6" fill="#1a1814"/>
+  <rect x="64" y="290" width="32" height="5" fill="#1a1814"/>
+  <rect x="64" y="350" width="32" height="6" fill="#1a1814"/>
+  <rect x="64" y="410" width="32" height="5" fill="#1a1814"/>
+</svg>

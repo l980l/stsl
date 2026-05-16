@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 580" width="220" height="580">
+  <defs>
+    <linearGradient id="rsa_stone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a8884"/>
+      <stop offset="0.5" stop-color="#605c58"/>
+      <stop offset="1" stop-color="#2c2824"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="110" cy="568" rx="92" ry="10" fill="#000" opacity="0.5"/>
+  <!-- 룬스톤 — 위쪽 둥근 거대한 돌 -->
+  <path d="M 60 560 Q 50 540 50 480 Q 50 350 50 200 Q 50 120 80 60 Q 100 30 120 30 Q 145 30 165 80 Q 175 130 175 200 Q 175 350 175 480 Q 175 540 160 560 Z" fill="url(#rsa_stone)"/>
+  <!-- 받침 -->
+  <ellipse cx="110" cy="555" rx="60" ry="14" fill="#403c38"/>
+  <!-- 룬 문자 (단순 줄/Y/V) -->
+  <line x1="95" y1="160" x2="125" y2="160" stroke="#1a1816" stroke-width="3"/>
+  <line x1="110" y1="160" x2="110" y2="200" stroke="#1a1816" stroke-width="3"/>
+  <line x1="95" y1="240" x2="125" y2="280" stroke="#1a1816" stroke-width="3"/>
+  <line x1="125" y1="240" x2="95" y2="280" stroke="#1a1816" stroke-width="3"/>
+  <line x1="110" y1="320" x2="95" y2="360" stroke="#1a1816" stroke-width="3"/>
+  <line x1="110" y1="320" x2="125" y2="360" stroke="#1a1816" stroke-width="3"/>
+  <line x1="100" y1="400" x2="120" y2="400" stroke="#1a1816" stroke-width="3"/>
+  <line x1="110" y1="400" x2="110" y2="440" stroke="#1a1816" stroke-width="3"/>
+  <!-- 이끼 (녹색 얼룩) -->
+  <ellipse cx="70" cy="350" rx="15" ry="35" fill="#3a5028" opacity="0.5"/>
+  <ellipse cx="155" cy="450" rx="12" ry="25" fill="#3a5028" opacity="0.5"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 480" width="160" height="480">
+  <defs>
+    <radialGradient id="blb_canopy" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#d8e088"/>
+      <stop offset="0.55" stop-color="#98b058"/>
+      <stop offset="1" stop-color="#506830"/>
+    </radialGradient>
+  </defs>
+  <!-- 더 작고 sparse 한 잎 -->
+  <ellipse cx="80" cy="120" rx="55" ry="70" fill="url(#blb_canopy)" opacity="0.9"/>
+  <ellipse cx="55" cy="150" rx="32" ry="38" fill="url(#blb_canopy)" opacity="0.8"/>
+  <ellipse cx="105" cy="160" rx="34" ry="40" fill="url(#blb_canopy)" opacity="0.8"/>
+  <ellipse cx="68" cy="100" rx="14" ry="10" fill="#e8f098" opacity="0.5"/>
+</svg>

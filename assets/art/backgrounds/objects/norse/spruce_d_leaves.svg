@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 360" width="280" height="360">
+  <defs>
+    <linearGradient id="spd_body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#406040"/>
+      <stop offset="0.5" stop-color="#1f3825"/>
+      <stop offset="1" stop-color="#0a1a10"/>
+    </linearGradient>
+  </defs>
+  <!-- 눈 쌓인 가문비 — 흰 highlights -->
+  <path d="M 140 30 L 100 120 L 180 120 Z" fill="url(#spd_body)"/>
+  <path d="M 140 90 L 85 190 L 195 190 Z" fill="url(#spd_body)"/>
+  <path d="M 140 160 L 70 260 L 210 260 Z" fill="url(#spd_body)"/>
+  <path d="M 140 230 L 60 315 L 220 315 Z" fill="url(#spd_body)"/>
+  <!-- 눈 자국 (흰) -->
+  <path d="M 140 30 L 130 60 L 150 60 Z" fill="#f0f4f8" opacity="0.85"/>
+  <path d="M 105 120 L 115 130 L 145 130 L 130 120 Z" fill="#f0f4f8" opacity="0.65"/>
+  <path d="M 90 190 L 100 200 L 145 200 L 130 190 Z" fill="#f0f4f8" opacity="0.55"/>
+  <path d="M 75 260 L 85 270 L 145 270 L 130 260 Z" fill="#f0f4f8" opacity="0.45"/>
+</svg>

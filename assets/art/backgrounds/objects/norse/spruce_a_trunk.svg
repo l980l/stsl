@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 360" width="280" height="360">
+  <defs>
+    <linearGradient id="spa_trunk" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a3e28"/>
+      <stop offset="0.5" stop-color="#3a2618"/>
+      <stop offset="1" stop-color="#1a100a"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="140" cy="350" rx="80" ry="11" fill="#000" opacity="0.45"/>
+  <!-- 짧은 줄기 (잎이 거의 발까지 덮어서 짧게 보임) -->
+  <rect x="128" y="280" width="24" height="70" fill="url(#spa_trunk)"/>
+</svg>

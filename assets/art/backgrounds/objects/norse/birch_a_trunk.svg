@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 480" width="160" height="480">
+  <ellipse cx="80" cy="468" rx="42" ry="9" fill="#000" opacity="0.45"/>
+  <!-- 흰 자작나무 줄기 -->
+  <rect x="68" y="80" width="24" height="390" fill="#e8e4d8"/>
+  <rect x="68" y="80" width="6" height="390" fill="#a8a4a0" opacity="0.4"/>
+  <!-- 가로 검정 줄 (자작나무 특유) -->
+  <rect x="68" y="130" width="24" height="6" fill="#1a1814"/>
+  <rect x="68" y="200" width="24" height="5" fill="#1a1814"/>
+  <rect x="68" y="270" width="24" height="6" fill="#1a1814"/>
+  <rect x="68" y="340" width="24" height="5" fill="#1a1814"/>
+  <rect x="68" y="410" width="24" height="6" fill="#1a1814"/>
+</svg>

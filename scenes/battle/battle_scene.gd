@@ -2645,8 +2645,10 @@ func _spawn_fg_specs(specs: Array, tint: Color) -> void:
 		# split spawn — base(정지) + sway 부분(shader). 나무: trunk/leaves. altar: base/flame.
 		if spec.get("split", false):
 			var suffixes: Array = spec.get("split_suffixes", ["_trunk", "_leaves"])
-			var base_path: String = "res://assets/art/backgrounds/objects/greek/%s%s.svg" % [svg_id, suffixes[0]]
-			var sway_path: String = "res://assets/art/backgrounds/objects/greek/%s%s.svg" % [svg_id, suffixes[1]]
+			# spec.path 가 신화별 경로 포함 — ".svg" 를 suffix 로 교체
+			var spec_path: String = spec["path"]
+			var base_path: String = spec_path.replace(".svg", "%s.svg" % suffixes[0])
+			var sway_path: String = spec_path.replace(".svg", "%s.svg" % suffixes[1])
 			_spawn_tree_part(base_path, anchor, sc, tint, z_main, null)
 			var sway_mat := ShaderMaterial.new()
 			sway_mat.shader = WIND_SHADER
