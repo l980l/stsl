@@ -68,6 +68,21 @@ var _relic_container: FlowContainer
 var _turn_queue_box: HBoxContainer
 var _turn_queue_slots: Array = []  # 각 슬롯: {root: PanelContainer, swatch: ColorRect, label: Label}
 const TURN_QUEUE_PREVIEW_COUNT: int = 5
+
+# UI 전용 CanvasLayer — 카메라 zoom 영향 없음 (카드/패널/버튼/라벨 등)
+var _ui_layer: CanvasLayer = null
+
+func _setup_ui_layer() -> void:
+	_ui_layer = CanvasLayer.new()
+	_ui_layer.layer = 10  # 캐릭터/배경 위
+	add_child(_ui_layer)
+
+# UI 노드 add_child 헬퍼 — _ui_layer 가 있으면 거기에, 없으면 self 에
+func _ui_add(node: Node) -> void:
+	if _ui_layer:
+		_ui_layer.add_child(node)
+	else:
+		add_child(node)
 var _selected_card: Resource = null
 var _lose_played: bool = false
 var _defeat_layer: CanvasLayer = null
@@ -130,6 +145,7 @@ func _trf(key: String, args) -> String:
 func _ready() -> void:
 	# y-sort: 캐릭터·전경 SVG 모두 같은 좌표계 — y 큰(아래) 노드가 위로 자동 정렬
 	y_sort_enabled = true
+	_setup_ui_layer()  # UI 전용 CanvasLayer 먼저 — _build_ui 가 거기에 add_child
 	_build_ui()
 	_setup_kill_cam()
 	if OS.is_debug_build():
@@ -360,6 +376,14 @@ func _build_ui() -> void:
 	# 모든 UI Control 의 z_index = 1000 — fg/캐릭터(z_index 0~1080) 보다 항상 위
 	# 카드(z 1000+), 호버 카드(1200), 디버그 overlay(5000) 와 호환
 	_apply_ui_z_index_recursive(self, 1500)
+
+	# UI 노드들을 CanvasLayer 로 reparent — 카메라 zoom 영향 제거
+	# (영웅/적 패널은 캐릭터 따라가야 해서 self 자식 유지)
+	if _ui_layer:
+		for n in [banner, end_btn_wrap, deck_wrap, hand_rule, hand_diamond,
+				_relic_container, _active_powers_box, _turn_queue_box]:
+			if n != null and is_instance_valid(n):
+				n.reparent(_ui_layer)
 
 # battle_scene 의 직접 자식 Control z_index set (재귀 X — 캐릭터 안 Body 영향 회피).
 # 캐릭터 UI(panel/hp/intent/btn/status) 는 별도로 800 (VFX 900 보다 뒤).
@@ -1390,7 +1414,7 @@ func _build_turn_queue_widget() -> void:
 	_turn_queue_box.position = Vector2(20, 18)
 	_turn_queue_box.size = Vector2(WINDOW_W - 40, 48)
 	_turn_queue_box.add_theme_constant_override("separation", 6)
-	add_child(_turn_queue_box)
+	add_child(_turn_queue_box)  # _build_ui 끝에서 _ui_layer 로 reparent 됨
 	for i in range(TURN_QUEUE_PREVIEW_COUNT):
 		var slot := PanelContainer.new()
 		slot.custom_minimum_size = Vector2(80, 44)
@@ -1513,7 +1537,7 @@ func _refresh_hand() -> void:
 		var captured_node := node
 		node.card_hovered.connect(func(c: Resource): _on_card_hovered(c, captured_node))
 		node.card_unhovered.connect(_on_card_unhovered)
-		add_child(node)
+		_ui_add(node)  # CanvasLayer 자식 — 카메라 zoom 영향 없음
 		_card_buttons.append(node)
 
 # ─────────────────────────────────────────────
@@ -3794,7 +3818,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			DeckManager.debug_unlimited_energy = not DeckManager.debug_unlimited_energy
 			_refresh_debug_badge()
 		elif event.keycode == KEY_D and event.shift_pressed:
-			DeckManager.draw_cards(1)
+			# 현재 차례 영웅에게 1장 draw (개체 차례 시스템)
+			var cur_hid: String = BattleManager.get_current_hero_id()
+			if cur_hid != "":
+				DeckManager.draw_cards_h(cur_hid, 1)
+			else:
+				DeckManager.draw_cards(1)  # fallback — 첫 영웅
 		elif event.keycode == KEY_H and event.shift_pressed:
 			_debug_hp_target_mode = not _debug_hp_target_mode
 			if _debug_hp_target_mode:
