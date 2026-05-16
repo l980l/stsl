@@ -2157,6 +2157,8 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: St
 		ir.ActionType.BUFF:
 			if intent.status_type == "block":
 				_spawn_defense_buff(caster_pos, caster_foot)
+			elif _is_holy_enemy(enemy_index):
+				_spawn_holy_buff(caster_pos, caster_foot)
 			else:
 				_spawn_warrior_buff(caster_pos, caster_foot)
 		ir.ActionType.DEBUFF:
@@ -2282,6 +2284,21 @@ func _enemy_alive_visible() -> int:
 		if _enemy_char_nodes[i] != null and BattleManager.is_enemy_alive(i):
 			n += 1
 	return n
+
+# 신성 적 판정 — ATTACK intent 의 damage_type 이 holy_* 인 게 하나라도 있으면 신성.
+# phase_patterns 까지 검사. BUFF intent vfx 분기 (warrior_buff vs holy_buff) 용.
+func _is_holy_enemy(enemy_index: int) -> bool:
+	var er: Resource = BattleManager.get_enemy(enemy_index)
+	if er == null:
+		return false
+	for intent in er.intent_pattern:
+		if intent.damage_type != "" and intent.damage_type.begins_with("holy_"):
+			return true
+	for phase in er.phase_patterns:
+		for intent in phase:
+			if intent.damage_type != "" and intent.damage_type.begins_with("holy_"):
+				return true
+	return false
 
 # 디버프 status_type → VFX 스크립트
 func _debuff_script_for_status(stype: String) -> GDScript:
