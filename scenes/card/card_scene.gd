@@ -37,6 +37,8 @@ var _mode: int = Mode.HAND
 var _disabled: bool = false
 var _owner_dead: bool = false
 var _pick_selectable: bool = false
+# UI 표시값 — hero buff/debuff + 타겟 vulnerable 반영용. -1 면 타겟 호버 X (hero 만).
+var _target_enemy_index: int = -1
 var _press_pos: Vector2
 var _pressing: bool = false
 var _dragging: bool = false
@@ -132,10 +134,25 @@ func refresh() -> void:
 	$Container/DescLabel.text = _build_desc()
 
 
+func set_target_enemy_index(idx: int) -> void:
+	# battle_scene 이 드래그 호버 중인 적 인덱스 갱신. 변경 시에만 refresh (불필요한 재빌드 회피).
+	if _target_enemy_index == idx:
+		return
+	_target_enemy_index = idx
+	if _card != null:
+		$Container/DescLabel.text = _build_desc()
+
 func _build_desc() -> String:
 	var lines: Array = []
+	var bm := get_node_or_null("/root/BattleManager")
 	for eff in _card.effects:
-		lines.append(eff.display_text())
+		# 데미지 effect 면 hero strength/weak (+ 호버 시 타겟 vulnerable) 반영한 값 표시.
+		# 그 외 effect 는 raw value.
+		if bm != null and eff.effect_type == EffectResource.EffectType.DAMAGE and _mode == Mode.HAND:
+			var v: int = bm.estimate_effect_damage(eff, _card.owner_id, _target_enemy_index)
+			lines.append(eff.display_text(v))
+		else:
+			lines.append(eff.display_text())
 	var tags: Array = []
 	if _card.is_exhaust:  tags.append("[%s]" % tr("card.tag.exhaust"))
 	if _card.is_ethereal: tags.append("[%s]" % tr("card.tag.ethereal"))

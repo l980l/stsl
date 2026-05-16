@@ -1,6 +1,6 @@
 # scenes/vfx/holy_strike.gd
 # 성스러운 일격 VFX — ui_sample/vfx/Holy Strike VFX.html 재현 (데미지 숫자 제외).
-# battle_scene이 divine damage_type 공격 시 .new() → add_child → play(caster, target).
+# battle_scene이 holy_strike damage_type 공격 시 .new() → add_child → play(caster, target).
 # 노드는 position (0,0)으로 add_child해야 한다 (좌표를 global로 받아 그대로 그림).
 # 어두운 황금 안개는 가산 블렌드로 흐려지므로 기둥·글리프·안개·깃털(일반)·빛입자/칼(가산) 2레이어로 그린다.
 extends Node2D
