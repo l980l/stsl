@@ -336,6 +336,7 @@ func _spawn_char_placeholder(slot_pos: Vector2, color: Color, label: String) -> 
 	# battle_scene: char_node.position = (slot.x + 120, slot.y + 184), scale (1.44, 2.4)
 	# 발 위치 = position.y + sprite_h*scale.y*0.5. 단순화: 발 = slot.y + SLOT_H
 	var foot_y: float = slot_pos.y + SLOT_H
+	var z_main: int = int(foot_y)  # battle_scene 패턴 — 발 y 가 z (큰 y = 앞)
 	# 발 그림자 — sprite 보다 z 작게
 	var shadow := Polygon2D.new()
 	shadow.color = Color(0, 0, 0, 0.45)
@@ -345,7 +346,7 @@ func _spawn_char_placeholder(slot_pos: Vector2, color: Color, label: String) -> 
 		var a: float = TAU * float(i) / 24.0
 		shadow_pts.append(Vector2(sx + cos(a) * 90.0, foot_y - 4.0 + sin(a) * 16.0))
 	shadow.polygon = shadow_pts
-	shadow.z_index = -1
+	shadow.z_index = z_main - 1
 	add_child(shadow)
 	_char_nodes.append(shadow)
 	var spr := Sprite2D.new()
@@ -356,6 +357,7 @@ func _spawn_char_placeholder(slot_pos: Vector2, color: Color, label: String) -> 
 	spr.texture = ImageTexture.create_from_image(img)
 	spr.position = Vector2(slot_pos.x + SLOT_W * 0.5, foot_y)  # y_sort 기준 = 발
 	spr.offset = Vector2(0, -pl_h * 0.5)  # 발이 origin 에 위치
+	spr.z_index = z_main
 	add_child(spr)
 	_char_nodes.append(spr)
 	# 라벨

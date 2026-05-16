@@ -5,8 +5,11 @@ class_name SceneCritters
 extends Node2D
 
 const W := 1920.0
+const H := 1080.0
 const HORIZON_Y := 270.0
 const BIRD_TEX := preload("res://assets/art/backgrounds/critters/bird.svg")
+const SCORPION_TEX := preload("res://assets/art/backgrounds/critters/scorpion.svg")
+const SNAKE_TEX := preload("res://assets/art/backgrounds/critters/snake.svg")
 
 var _env: Dictionary = {}
 var _timer: Timer = null
@@ -28,14 +31,19 @@ func _schedule_next() -> void:
 	_timer.start()
 
 func _on_tick() -> void:
-	# 환경에 따라 새/별똥별 비율
+	# 환경에 따라 새/별똥별/사막 critter 비율
 	var time_of_day: String = _env.get("time_of_day", "day")
 	var weather: String = _env.get("weather", "clear")
+	var myth: String = _env.get("myth", "greek")
 	if time_of_day == "night" and weather != "overcast" and randf() < 0.4:
 		# 별똥별 우수수 (3~6개) — _active 제한 무시 (다발 효과)
 		_spawn_shooting_star()
 	elif _active < 3:
-		_spawn_bird()
+		# egyptian 사막 — 50% 확률로 ground critter (전갈/뱀), 나머지 새
+		if myth == "egyptian" and time_of_day != "night" and randf() < 0.5:
+			_spawn_ground_critter()
+		else:
+			_spawn_bird()
 	_schedule_next()
 
 func _spawn_bird() -> void:
@@ -112,4 +120,33 @@ func _spawn_single_meteor(ang: float, length: float, duration: float, width: flo
 	tw.tween_property(line, "modulate:a", 0.0, 0.3)
 	tw.tween_callback(func() -> void:
 		line.queue_free()
+		_active = max(0, _active - 1))
+
+# 사막 ground critter — 화면 하단(y > 800) 에서 좌→우/우→좌 천천히 가로지름.
+# 전갈 또는 뱀 (50/50). z_index 는 발 y 기준 — 캐릭터/fg 와 자연 정렬.
+func _spawn_ground_critter() -> void:
+	var is_snake: bool = randf() < 0.5
+	var spr := Sprite2D.new()
+	spr.texture = SNAKE_TEX if is_snake else SCORPION_TEX
+	var dir: int = 1 if randf() < 0.5 else -1  # 좌→우 (+1) or 우→좌 (-1)
+	# critter 가 spawn 위치 (시작 x) — 화면 밖. 끝 x — 반대편 밖.
+	var start_x: float = -120.0 if dir == 1 else W + 120.0
+	var end_x: float = W + 120.0 if dir == 1 else -120.0
+	# y — 화면 하단 (y=830~1020). 약간 다양하게.
+	var y_pos: float = randf_range(830.0, 1020.0)
+	# 스케일 — 가까울 수록 크게 (y 큼 = 가까움)
+	var sc: float = lerp(1.0, 1.5, (y_pos - 830.0) / 190.0)
+	spr.scale = Vector2(sc * dir, sc)  # dir 반전으로 향함 방향
+	spr.position = Vector2(start_x, y_pos)
+	spr.modulate.a = 0.0
+	spr.z_index = int(y_pos)  # 발 y 기준 — fg/캐릭터와 자연 정렬
+	add_child(spr)
+	_active += 1
+	var dur: float = randf_range(10.0, 16.0)  # 천천히 (뱀/전갈 느림)
+	var tw := create_tween().set_parallel(true)
+	tw.tween_property(spr, "modulate:a", 0.9, 1.0)
+	tw.tween_property(spr, "position:x", end_x, dur)
+	tw.chain().tween_property(spr, "modulate:a", 0.0, 0.6)
+	tw.chain().tween_callback(func() -> void:
+		spr.queue_free()
 		_active = max(0, _active - 1))

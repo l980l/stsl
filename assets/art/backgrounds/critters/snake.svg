@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 30" width="120" height="30">
+  <defs>
+    <linearGradient id="sn_body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#988040"/>
+      <stop offset="1" stop-color="#503818"/>
+    </linearGradient>
+  </defs>
+  <!-- S 형 몸 (구불구불) -->
+  <path d="M 8 15 Q 28 5 48 15 Q 68 25 88 15 Q 100 9 112 15"
+        stroke="url(#sn_body)" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- 패턴 (점박) -->
+  <circle cx="28" cy="11" r="2" fill="#3a2818"/>
+  <circle cx="48" cy="15" r="2" fill="#3a2818"/>
+  <circle cx="68" cy="20" r="2" fill="#3a2818"/>
+  <circle cx="88" cy="14" r="2" fill="#3a2818"/>
+  <!-- 머리 (오른쪽 끝, 살짝 두꺼움) -->
+  <ellipse cx="112" cy="15" rx="6" ry="5" fill="#a08850"/>
+  <!-- 눈 -->
+  <circle cx="115" cy="14" r="1" fill="#000"/>
+  <!-- 혀 (분홍 V) -->
+  <path d="M 118 15 L 122 12 M 118 15 L 122 18" stroke="#d04060" stroke-width="1" fill="none"/>
+  <!-- 꼬리 (왼쪽 끝, 가늘게) -->
+  <circle cx="6" cy="15" r="2" fill="#604018"/>
+</svg>
