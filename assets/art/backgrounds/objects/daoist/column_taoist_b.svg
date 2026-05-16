@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 175 156 423" width="156" height="423">
+  <defs>
+    <linearGradient id="ctb_wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#180a08"/>
+      <stop offset="0.5" stop-color="#080404"/>
+      <stop offset="1" stop-color="#000"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="100" cy="588" rx="78" ry="10" fill="#000" opacity="0.5"/>
+  <!-- 부서진 도교 기둥 -->
+  <rect x="45" y="565" width="110" height="25" fill="#1a0e08"/>
+  <rect x="70" y="200" width="60" height="365" fill="url(#ctb_wood)"/>
+  <path d="M 70 200 L 80 180 L 90 195 L 100 175 L 110 195 L 130 200 Z" fill="#1a0e08"/>
+  <rect x="70" y="280" width="60" height="8" fill="#a87830"/>
+  <rect x="70" y="380" width="60" height="8" fill="#a87830"/>
+  <path d="M 100 240 L 95 380 L 105 500" stroke="#000" opacity="0.45" stroke-width="2" fill="none"/>
+</svg>

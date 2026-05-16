@@ -14,6 +14,7 @@ SVG_DIRS = [
     "assets/art/backgrounds/objects/norse",
     "assets/art/backgrounds/objects/egyptian",
     "assets/art/backgrounds/objects/buddhist",
+    "assets/art/backgrounds/objects/daoist",
 ]
 
 def parse_path_coords(d):

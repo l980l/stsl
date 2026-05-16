@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="13 170 133 300" width="133" height="300">
+  <defs>
+    <radialGradient id="pnb_canopy" cx="0.5" cy="0.5" r="0.7">
+      <stop offset="0" stop-color="#688040"/>
+      <stop offset="0.6" stop-color="#385030"/>
+      <stop offset="1" stop-color="#152410"/>
+    </radialGradient>
+  </defs>
+  <!-- 작은 우산형 잎 무리 -->
+  <ellipse cx="78" cy="220" rx="55" ry="32" fill="url(#pnb_canopy)" opacity="0.95"/>
+  <ellipse cx="38" cy="240" rx="25" ry="18" fill="url(#pnb_canopy)" opacity="0.85"/>
+  <ellipse cx="118" cy="245" rx="28" ry="20" fill="url(#pnb_canopy)" opacity="0.85"/>
+  <ellipse cx="78" cy="190" rx="35" ry="20" fill="url(#pnb_canopy)" opacity="0.75"/>
+  <circle cx="55" cy="230" r="2" fill="#152410"/>
+  <circle cx="100" cy="230" r="2" fill="#152410"/>
+</svg>

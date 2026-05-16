@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="63.5 98 127.5 242" width="127.5" height="242">
+  <defs>
+    <linearGradient id="wwd_leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8b860"/>
+      <stop offset="1" stop-color="#785828"/>
+    </linearGradient>
+  </defs>
+  <!-- 가을 색 (노란/갈색) -->
+  <path d="M 75 130 Q 70 220 65 290" stroke="url(#wwd_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 90 130 Q 90 220 87 290" stroke="url(#wwd_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 105 130 Q 108 220 105 295" stroke="url(#wwd_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 125 130 Q 128 230 125 310" stroke="url(#wwd_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 140 130 Q 143 220 140 300" stroke="url(#wwd_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 160 132 Q 165 225 165 295" stroke="url(#wwd_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 175 132 Q 180 220 180 290" stroke="url(#wwd_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <ellipse cx="80" cy="240" rx="3" ry="7" fill="#a08828"/>
+  <ellipse cx="120" cy="260" rx="3" ry="7" fill="#a08828"/>
+  <ellipse cx="160" cy="250" rx="3" ry="7" fill="#a08828"/>
+</svg>

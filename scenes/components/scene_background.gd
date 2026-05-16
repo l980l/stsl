@@ -41,6 +41,12 @@ const PALETTES := {
 		{"sky": Color("#a06038"), "horizon": Color("#e09040"), "silhouette": Color("#3a1808"), "scenery": Color("#6a3818")},
 		{"sky": Color("#180810"), "horizon": Color("#403018"), "silhouette": Color("#060000"), "scenery": Color("#180a10")},
 	],
+	# 도교 — 흑/금 신비. Act 1 산골 흐림(회색+갈색), Act 2 노을 진홍, Act 3 어두운 도교 동굴(검+금).
+	"daoist": [
+		{"sky": Color("#7888a0"), "horizon": Color("#a89070"), "silhouette": Color("#2a2820"), "scenery": Color("#3a3828")},
+		{"sky": Color("#a04830"), "horizon": Color("#e0a050"), "silhouette": Color("#401818"), "scenery": Color("#702828")},
+		{"sky": Color("#0a0810"), "horizon": Color("#403018"), "silhouette": Color("#060000"), "scenery": Color("#181010")},
+	],
 }
 
 # 신화별 SVG 오브젝트 풀 + spawn 가중치
@@ -84,6 +90,16 @@ const OBJECTS := {
 				   "bamboo_grass_a", "bamboo_grass_b",
 				   "buddhist_lotus_a", "buddhist_lotus_b"],
 		"pillars":["column_buddhist_a", "column_buddhist_b"],
+	},
+	"daoist": {
+		"large":  ["temple_taoist_a", "temple_taoist_b"],
+		"medium": ["crane_statue_a", "crane_statue_b",
+				   "altar_taoist_a", "altar_taoist_b"],
+		"small":  ["pine_a", "pine_b", "pine_c", "pine_d",
+				   "weeping_willow_a", "weeping_willow_b", "weeping_willow_c", "weeping_willow_d",
+				   "mountain_grass_a", "mountain_grass_b",
+				   "chrysanthemum_a", "chrysanthemum_b"],
+		"pillars":["column_taoist_a", "column_taoist_b"],
 	},
 }
 
@@ -180,6 +196,27 @@ const OBJECT_SIZE := {
 	"bamboo_grass_b":           Vector2(117, 100),
 	"buddhist_lotus_a":         Vector2(120, 140),
 	"buddhist_lotus_b":         Vector2(130, 130),
+	# daoist — altar_taoist_a/chrysanthemum 은 g transform 사용 → 원본 viewBox 유지.
+	"temple_taoist_a":          Vector2(531, 461),
+	"temple_taoist_b":          Vector2(324, 330),
+	"crane_statue_a":           Vector2(111, 370),
+	"crane_statue_b":           Vector2(104, 213),
+	"altar_taoist_a":           Vector2(240, 280),
+	"altar_taoist_b":           Vector2(224, 271),
+	"pine_a":                   Vector2(153, 394),
+	"pine_b":                   Vector2(133, 300),
+	"pine_c":                   Vector2(169, 408),
+	"pine_d":                   Vector2(153, 350),
+	"weeping_willow_a":         Vector2(123, 247.5),
+	"weeping_willow_b":         Vector2(110, 231.5),
+	"weeping_willow_c":         Vector2(178, 272.5),
+	"weeping_willow_d":         Vector2(127.5, 242),
+	"column_taoist_a":          Vector2(252, 591),
+	"column_taoist_b":          Vector2(156, 423),
+	"mountain_grass_a":         Vector2(72, 77),
+	"mountain_grass_b":         Vector2(117, 100),
+	"chrysanthemum_a":          Vector2(120, 140),
+	"chrysanthemum_b":          Vector2(130, 130),
 }
 
 # 바람/펄럭임 sway — 풀/꽃 (통째 sway) + split 식생/altar (위쪽만 sway).
@@ -189,6 +226,7 @@ const _WIND_SMALL_PREFIXES := [
 	"tundra_grass", "edelweiss",      # norse
 	"desert_grass", "egypt_lotus",    # egyptian
 	"bamboo_grass", "buddhist_lotus", # buddhist
+	"mountain_grass", "chrysanthemum", # daoist
 ]
 
 static func _wind_eligible(svg_id: String) -> bool:
@@ -207,7 +245,8 @@ static func _split_suffixes(svg_id: String) -> Array:
 	if (svg_id.begins_with("cypress") or svg_id.begins_with("olive_tree")
 			or svg_id.begins_with("birch") or svg_id.begins_with("spruce")
 			or svg_id.begins_with("palm") or svg_id.begins_with("acacia")
-			or svg_id.begins_with("banyan")):
+			or svg_id.begins_with("banyan")
+			or svg_id.begins_with("pine") or svg_id.begins_with("weeping_willow")):
 		return ["_trunk", "_leaves"]
 	if svg_id.begins_with("altar"):
 		return ["_base", "_flame"]

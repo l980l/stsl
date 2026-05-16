@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 120 153 350" width="153" height="350">
+  <!-- 비대칭 구부러진 줄기 (왼쪽으로 기울임) -->
+  <path d="M 80 200 Q 60 270 50 360 Q 55 430 60 470 L 78 470 Q 80 430 75 360 Q 88 270 92 200 Z" fill="#4a3220"/>
+  <path d="M 80 200 Q 60 270 50 360 Q 55 430 60 470 L 65 470 Q 67 430 62 360 Q 72 270 80 200 Z" fill="#2a1808" opacity="0.55"/>
+  <path d="M 72 240 Q 45 220 25 200" stroke="#2a1808" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 84 270 Q 110 250 130 235" stroke="#2a1808" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 60 360 Q 38 360 22 350" stroke="#2a1808" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <line x1="55" y1="320" x2="80" y2="322" stroke="#1a0e08" stroke-width="1.5"/>
+  <line x1="55" y1="400" x2="80" y2="402" stroke="#1a0e08" stroke-width="1.5"/>
+</svg>

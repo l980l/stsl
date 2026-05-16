@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="7 76 153 394" width="153" height="394">
+  <defs>
+    <radialGradient id="pna_canopy" cx="0.5" cy="0.5" r="0.7">
+      <stop offset="0" stop-color="#587038"/>
+      <stop offset="0.6" stop-color="#304820"/>
+      <stop offset="1" stop-color="#102008"/>
+    </radialGradient>
+  </defs>
+  <!-- 소나무 잎 무리 (도교 산수화 — 우산형 둥근 클러스터 여러개) -->
+  <ellipse cx="80" cy="160" rx="60" ry="35" fill="url(#pna_canopy)" opacity="0.95"/>
+  <ellipse cx="35" cy="180" rx="28" ry="20" fill="url(#pna_canopy)" opacity="0.85"/>
+  <ellipse cx="130" cy="210" rx="30" ry="22" fill="url(#pna_canopy)" opacity="0.85"/>
+  <ellipse cx="80" cy="120" rx="40" ry="22" fill="url(#pna_canopy)" opacity="0.75"/>
+  <!-- 위쪽 작은 클러스터 -->
+  <ellipse cx="80" cy="90" rx="20" ry="14" fill="url(#pna_canopy)" opacity="0.8"/>
+  <!-- 솔잎 점 (작은 침엽) -->
+  <circle cx="60" cy="180" r="2" fill="#102008"/>
+  <circle cx="100" cy="180" r="2" fill="#102008"/>
+  <circle cx="80" cy="140" r="2" fill="#102008"/>
+  <circle cx="40" cy="200" r="2" fill="#102008"/>
+  <circle cx="125" cy="220" r="2" fill="#102008"/>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 224 271" width="224" height="271">
+  <defs>
+    <linearGradient id="atob_stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#302218"/>
+      <stop offset="1" stop-color="#0a0604"/>
+    </linearGradient>
+  </defs>
+  <!-- 단순 원형 받침 -->
+  <ellipse cx="120" cy="250" rx="92" ry="20" fill="url(#atob_stone)"/>
+  <ellipse cx="120" cy="248" rx="92" ry="8" fill="#403028"/>
+  <rect x="55" y="200" width="130" height="48" fill="url(#atob_stone)"/>
+  <!-- 음양 가운데 큰 -->
+  <circle cx="120" cy="222" r="18" fill="none" stroke="#d8a040" stroke-width="2"/>
+  <path d="M 120 204 A 9 9 0 0 1 120 222 A 9 9 0 0 0 120 240" stroke="#d8a040" stroke-width="2" fill="none"/>
+  <circle cx="120" cy="213" r="2.5" fill="#d8a040"/>
+  <circle cx="120" cy="231" r="2.5" fill="#0a0604"/>
+  <!-- 향로 받침 (위) -->
+  <ellipse cx="120" cy="195" rx="50" ry="6" fill="#1a0e08" opacity="0.7"/>
+</svg>

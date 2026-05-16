@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="138 120 324 330" width="324" height="330">
+  <defs>
+    <linearGradient id="ttb_roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#251a10"/>
+      <stop offset="1" stop-color="#0a0604"/>
+    </linearGradient>
+    <linearGradient id="ttb_wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#403018"/>
+      <stop offset="1" stop-color="#1a0e08"/>
+    </linearGradient>
+  </defs>
+  <!-- 작은 정자 (다층, 더 가벼움) -->
+  <rect x="160" y="430" width="280" height="20" fill="#3a2818"/>
+  <!-- 1층 -->
+  <rect x="200" y="320" width="200" height="110" fill="url(#ttb_wall)"/>
+  <rect x="275" y="365" width="50" height="65" fill="#0a0604"/>
+  <!-- 1층 처마 -->
+  <path d="M 170 320 L 300 270 L 430 320 L 410 320 L 300 285 L 190 320 Z" fill="url(#ttb_roof)"/>
+  <rect x="170" y="305" width="260" height="16" fill="url(#ttb_roof)"/>
+  <path d="M 170 320 Q 145 312 138 328 Q 155 322 172 322 Z" fill="url(#ttb_roof)"/>
+  <path d="M 430 320 Q 455 312 462 328 Q 445 322 428 322 Z" fill="url(#ttb_roof)"/>
+  <!-- 2층 (위 -->
+  <rect x="230" y="220" width="140" height="60" fill="url(#ttb_wall)"/>
+  <!-- 2층 처마 -->
+  <path d="M 200 220 L 300 175 L 400 220 L 385 220 L 300 188 L 215 220 Z" fill="url(#ttb_roof)"/>
+  <rect x="200" y="208" width="200" height="14" fill="url(#ttb_roof)"/>
+  <path d="M 200 220 Q 180 215 175 225 Q 188 222 202 222 Z" fill="url(#ttb_roof)"/>
+  <path d="M 400 220 Q 420 215 425 225 Q 412 222 398 222 Z" fill="url(#ttb_roof)"/>
+  <!-- 첨탑 -->
+  <rect x="295" y="130" width="10" height="48" fill="#3a2818"/>
+  <circle cx="300" cy="125" r="5" fill="#d8a040"/>
+  <!-- 음양 문양 (2층 가운데 작음) -->
+  <circle cx="300" cy="248" r="10" fill="none" stroke="#d8a040" stroke-width="1.5"/>
+  <circle cx="300" cy="244" r="1.5" fill="#d8a040"/>
+  <circle cx="300" cy="252" r="1.5" fill="#0a0604"/>
+</svg>

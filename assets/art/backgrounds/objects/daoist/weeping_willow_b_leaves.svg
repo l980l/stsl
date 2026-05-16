@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="86.5 108.5 110 231.5" width="110" height="231.5">
+  <defs>
+    <linearGradient id="wwb_leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#90b070"/>
+      <stop offset="1" stop-color="#587030"/>
+    </linearGradient>
+  </defs>
+  <!-- 좀 더 짧고 sparse 한 늘어진 잎 -->
+  <path d="M 95 130 Q 92 200 88 270" stroke="url(#wwb_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 110 130 Q 110 210 108 275" stroke="url(#wwb_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 140 110 Q 140 210 138 285" stroke="url(#wwb_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 155 110 Q 155 200 155 270" stroke="url(#wwb_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 175 125 Q 178 200 178 270" stroke="url(#wwb_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 190 128 Q 195 220 195 285" stroke="url(#wwb_leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <ellipse cx="92" cy="220" rx="3" ry="7" fill="#608838"/>
+  <ellipse cx="140" cy="240" rx="3" ry="7" fill="#608838"/>
+  <ellipse cx="180" cy="230" rx="3" ry="7" fill="#608838"/>
+</svg>

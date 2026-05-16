@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="7 76 153 394" width="153" height="394">
+  <!-- 굽은 소나무 줄기 (도교 산수화 풍) -->
+  <path d="M 70 180 Q 50 280 60 380 Q 70 440 75 470 L 92 470 Q 96 440 90 380 Q 92 280 85 180 Z" fill="#503820"/>
+  <path d="M 70 180 Q 50 280 60 380 Q 70 440 75 470 L 80 470 Q 65 440 70 380 Q 60 280 70 180 Z" fill="#2a1808" opacity="0.55"/>
+  <!-- 가지 (양쪽 굽음) -->
+  <path d="M 75 220 Q 50 200 30 180" stroke="#2a1808" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 80 250 Q 110 230 130 210" stroke="#2a1808" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 70 320 Q 45 310 30 290" stroke="#2a1808" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M 88 340 Q 115 330 135 320" stroke="#2a1808" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- 껍질 무늬 (가로 줄) -->
+  <line x1="65" y1="280" x2="85" y2="282" stroke="#1a0e08" stroke-width="1.5"/>
+  <line x1="62" y1="350" x2="88" y2="352" stroke="#1a0e08" stroke-width="1.5"/>
+  <line x1="65" y1="420" x2="90" y2="422" stroke="#1a0e08" stroke-width="1.5"/>
+</svg>
