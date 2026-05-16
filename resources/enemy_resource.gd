@@ -8,6 +8,7 @@ enum Grade { NORMAL, ELITE, BOSS }
 @export var mythology: String = ""
 @export var grade: Grade = Grade.NORMAL
 @export var max_hp: int = 30
+@export var speed: int = 40                  # turn queue 정렬 (v2 프로토타입). 높으면 라운드당 더 많이 행동
 @export var intent_pattern: Array = []
 @export var phase_thresholds: Array = []   # HP 비율 기준 [0.6, 0.3]
 @export var phase_patterns: Array = []     # Array of Array — 페이즈별 패턴
