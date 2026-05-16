@@ -29,6 +29,12 @@ const PALETTES := {
 		{"sky": Color("#3a4a60"), "horizon": Color("#705060"), "silhouette": Color("#150e1e"), "scenery": Color("#1a2028")},
 		{"sky": Color("#1a0e10"), "horizon": Color("#7a2020"), "silhouette": Color("#080000"), "scenery": Color("#160808")},
 	],
+	# 이집트 — 사막 톤. Act 1 밝은 푸른+모래, Act 2 황혼 주황/금, Act 3 사후세계 어두운 보라.
+	"egyptian": [
+		{"sky": Color("#6890b0"), "horizon": Color("#d8b070"), "silhouette": Color("#4a3820"), "scenery": Color("#6a5028")},
+		{"sky": Color("#b06840"), "horizon": Color("#f0a050"), "silhouette": Color("#5a2818"), "scenery": Color("#8a4828")},
+		{"sky": Color("#2a1830"), "horizon": Color("#503040"), "silhouette": Color("#100808"), "scenery": Color("#281828")},
+	],
 }
 
 # 신화별 SVG 오브젝트 풀 + spawn 가중치
@@ -52,6 +58,16 @@ const OBJECTS := {
 				   "tundra_grass_a", "tundra_grass_b",
 				   "edelweiss_a", "edelweiss_b"],
 		"pillars":["rune_pillar_a", "rune_pillar_b"],
+	},
+	"egyptian": {
+		"large":  ["pyramid_small_a", "pyramid_small_b"],
+		"medium": ["obelisk_a", "obelisk_b",
+				   "altar_egyptian_a", "altar_egyptian_b"],
+		"small":  ["palm_a", "palm_b", "palm_c", "palm_d",
+				   "acacia_a", "acacia_b", "acacia_c", "acacia_d",
+				   "desert_grass_a", "desert_grass_b",
+				   "egypt_lotus_a", "egypt_lotus_b"],
+		"pillars":["column_lotus_a", "column_lotus_b"],
 	},
 }
 
@@ -106,6 +122,27 @@ const OBJECT_SIZE := {
 	"temple_small_d":           Vector2(540, 420),
 	"tundra_grass_a":           Vector2(59, 72),
 	"tundra_grass_b":           Vector2(117, 96),
+	# egyptian — trim_svg_viewbox.py 측정 결과 (g transform 사용 egypt_lotus 는 원본 유지).
+	"pyramid_small_a":          Vector2(580, 418),
+	"pyramid_small_b":          Vector2(560, 363),
+	"obelisk_a":                Vector2(160, 547),
+	"obelisk_b":                Vector2(156, 412),
+	"altar_egyptian_a":         Vector2(200, 234),
+	"altar_egyptian_b":         Vector2(184, 178),
+	"palm_a":                   Vector2(150, 466),
+	"palm_b":                   Vector2(160, 471),
+	"palm_c":                   Vector2(160, 477),
+	"palm_d":                   Vector2(144, 471),
+	"acacia_a":                 Vector2(275, 325),
+	"acacia_b":                 Vector2(240, 307),
+	"acacia_c":                 Vector2(283, 325),
+	"acacia_d":                 Vector2(196, 334),
+	"column_lotus_a":           Vector2(160, 568),
+	"column_lotus_b":           Vector2(156, 448),
+	"desert_grass_a":           Vector2(72, 71),
+	"desert_grass_b":           Vector2(117, 98),
+	"egypt_lotus_a":            Vector2(120, 140),
+	"egypt_lotus_b":            Vector2(130, 130),
 }
 
 # 바람/펄럭임 sway — 풀/꽃 (통째 sway) + split 식생/altar (위쪽만 sway).
@@ -113,6 +150,7 @@ const OBJECT_SIZE := {
 const _WIND_SMALL_PREFIXES := [
 	"grass", "flower",                # greek
 	"tundra_grass", "edelweiss",      # norse
+	"desert_grass", "egypt_lotus",    # egyptian
 ]
 
 static func _wind_eligible(svg_id: String) -> bool:
@@ -126,7 +164,8 @@ static func _wind_eligible(svg_id: String) -> bool:
 # 신화 추가 시 식생 prefix 만 늘리면 됨. altar 는 prefix "altar" 자동 매칭 (altar_norse 등).
 static func _split_suffixes(svg_id: String) -> Array:
 	if (svg_id.begins_with("cypress") or svg_id.begins_with("olive_tree")
-			or svg_id.begins_with("birch") or svg_id.begins_with("spruce")):
+			or svg_id.begins_with("birch") or svg_id.begins_with("spruce")
+			or svg_id.begins_with("palm") or svg_id.begins_with("acacia")):
 		return ["_trunk", "_leaves"]
 	if svg_id.begins_with("altar"):
 		return ["_base", "_flame"]

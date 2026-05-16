@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 45 200 234" width="200" height="234">
+  <defs>
+    <linearGradient id="aea_stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8b070"/>
+      <stop offset="1" stop-color="#704828"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="120" cy="270" rx="100" ry="9" fill="#000" opacity="0.5"/>
+  <!-- 사암 받침 -->
+  <rect x="20" y="220" width="200" height="50" fill="url(#aea_stone)"/>
+  <rect x="20" y="220" width="200" height="6" fill="#f0c878" opacity="0.4"/>
+  <!-- 호루스 (매) 새김 — 받침 정면 -->
+  <ellipse cx="120" cy="248" rx="14" ry="6" fill="#1a1008" opacity="0.7"/>
+  <path d="M 110 248 L 130 248 L 125 240 L 115 240 Z" fill="#1a1008" opacity="0.6"/>
+  <!-- 중간단 -->
+  <rect x="40" y="200" width="160" height="22" fill="#a07838"/>
+  <rect x="40" y="216" width="160" height="6" fill="#000" opacity="0.25"/>
+  <!-- 위쪽 단 (불꽃 받침) -->
+  <rect x="60" y="130" width="120" height="72" fill="url(#aea_stone)"/>
+  <!-- 좌우 작은 기둥 (양쪽 보호) -->
+  <rect x="38" y="120" width="14" height="82" fill="#a07838"/>
+  <rect x="188" y="120" width="14" height="82" fill="#a07838"/>
+  <!-- 상형문자 줄 -->
+  <line x1="80" y1="155" x2="160" y2="155" stroke="#1a1008" stroke-width="2"/>
+  <line x1="80" y1="170" x2="160" y2="170" stroke="#1a1008" stroke-width="2"/>
+  <!-- 그릇 (불꽃 받는) -->
+  <ellipse cx="120" cy="118" rx="50" ry="6" fill="#3a2010" opacity="0.7"/>
+</svg>

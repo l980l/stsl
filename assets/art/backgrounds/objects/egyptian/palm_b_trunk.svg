@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 5 160 471" width="160" height="471">
+  <ellipse cx="80" cy="468" rx="38" ry="8" fill="#000" opacity="0.42"/>
+  <!-- 더 곧은 줄기 -->
+  <rect x="74" y="160" width="14" height="310" fill="#704830"/>
+  <rect x="74" y="160" width="4" height="310" fill="#4a2818" opacity="0.5"/>
+  <ellipse cx="81" cy="210" rx="9" ry="3" fill="#3a2010"/>
+  <ellipse cx="81" cy="260" rx="9" ry="3" fill="#3a2010"/>
+  <ellipse cx="81" cy="310" rx="9" ry="3" fill="#3a2010"/>
+  <ellipse cx="81" cy="360" rx="10" ry="3" fill="#3a2010"/>
+  <ellipse cx="81" cy="410" rx="10" ry="3" fill="#3a2010"/>
+</svg>

@@ -9,7 +9,11 @@
 import glob, os, re
 from collections import defaultdict
 
-SVG_DIRS = ["assets/art/backgrounds/objects/greek", "assets/art/backgrounds/objects/norse"]
+SVG_DIRS = [
+    "assets/art/backgrounds/objects/greek",
+    "assets/art/backgrounds/objects/norse",
+    "assets/art/backgrounds/objects/egyptian",
+]
 
 def parse_path_coords(d):
     """path d 의 모든 숫자 좌표 (x, y) 쌍 반환. 상대/절대 구분 없이 단순 추출."""
@@ -100,6 +104,11 @@ def main():
         for path in sorted(glob.glob(f"{d}/*.svg")):
             with open(path, "r", encoding="utf-8") as f:
                 text = f.read()
+            # g transform 사용 시 (flower/edelweiss/egypt_lotus 등) — script 가 local 좌표
+            # 만 보고 BBox 계산하면 음수 viewBox 됨. skip.
+            if re.search(r'<g\s+transform=', text):
+                print(f"  SKIP (has g transform): {path}")
+                continue
             bb = svg_bbox(text)
             if bb is None:
                 print(f"  SKIP (no elements): {path}")

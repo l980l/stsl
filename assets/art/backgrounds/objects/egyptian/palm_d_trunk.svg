@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 5 144 471" width="144" height="471">
+  <ellipse cx="80" cy="468" rx="40" ry="8" fill="#000" opacity="0.45"/>
+  <!-- 가는 줄기, 약간 기울어짐 -->
+  <path d="M 70 110 L 60 470 L 96 470 L 90 110 Z" fill="#7a5838"/>
+  <path d="M 70 110 L 60 470 L 68 470 L 74 110 Z" fill="#503018" opacity="0.5"/>
+  <ellipse cx="76" cy="160" rx="9" ry="3" fill="#3a2010"/>
+  <ellipse cx="76" cy="210" rx="9" ry="3" fill="#3a2010"/>
+  <ellipse cx="77" cy="270" rx="10" ry="3" fill="#3a2010"/>
+  <ellipse cx="78" cy="330" rx="10" ry="3" fill="#3a2010"/>
+  <ellipse cx="79" cy="390" rx="11" ry="3" fill="#3a2010"/>
+  <ellipse cx="80" cy="440" rx="12" ry="4" fill="#3a2010"/>
+</svg>

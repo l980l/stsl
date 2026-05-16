@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="32 165 156 412" width="156" height="412">
+  <defs>
+    <linearGradient id="obb_stone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c8a068"/>
+      <stop offset="0.5" stop-color="#946838"/>
+      <stop offset="1" stop-color="#502810"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="110" cy="568" rx="78" ry="9" fill="#000" opacity="0.45"/>
+  <!-- 무너진 오벨리스크 (위 부분 깨짐) -->
+  <rect x="65" y="530" width="90" height="40" fill="#946830"/>
+  <rect x="75" y="510" width="70" height="22" fill="#a07840"/>
+  <path d="M 85 510 L 95 200 L 90 180 L 130 180 L 125 200 L 135 510 Z" fill="url(#obb_stone)"/>
+  <!-- 깨진 꼭대기 — 들쭉날쭉 -->
+  <path d="M 90 180 L 100 165 L 110 175 L 120 165 L 130 180 Z" fill="#604020"/>
+  <!-- 균열 -->
+  <path d="M 110 220 L 105 350 L 112 460" stroke="#000" opacity="0.45" stroke-width="2" fill="none"/>
+  <!-- 상형문자 (적음 — 부서져서) -->
+  <line x1="105" y1="260" x2="115" y2="260" stroke="#1a1008" stroke-width="2"/>
+  <circle cx="110" cy="290" r="3" fill="#1a1008"/>
+  <line x1="105" y1="340" x2="115" y2="360" stroke="#1a1008" stroke-width="2"/>
+  <line x1="100" y1="400" x2="120" y2="400" stroke="#1a1008" stroke-width="2"/>
+</svg>

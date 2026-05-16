@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 150 156 448" width="156" height="448">
+  <defs>
+    <linearGradient id="clb_stone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c8a060"/>
+      <stop offset="0.5" stop-color="#906830"/>
+      <stop offset="1" stop-color="#503010"/>
+    </linearGradient>
+    <linearGradient id="clb_cap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#98b860"/>
+      <stop offset="1" stop-color="#5a7838"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="100" cy="588" rx="78" ry="10" fill="#000" opacity="0.5"/>
+  <!-- 부서진 기둥 (위쪽 잘림) -->
+  <rect x="45" y="565" width="110" height="25" fill="#704828"/>
+  <path d="M 68 565 Q 72 350 78 200 L 122 200 Q 128 350 132 565 Z" fill="url(#clb_stone)"/>
+  <!-- 잘린 끝 -->
+  <path d="M 78 200 L 90 180 L 100 195 L 110 175 L 122 200 Z" fill="#604020"/>
+  <!-- 균열 -->
+  <path d="M 100 240 L 95 380 L 105 500" stroke="#000" opacity="0.45" stroke-width="2" fill="none"/>
+  <!-- 상형문자 (드물게) -->
+  <line x1="90" y1="280" x2="110" y2="280" stroke="#1a1008" stroke-width="2"/>
+  <circle cx="100" cy="320" r="3" fill="#1a1008"/>
+  <line x1="85" y1="400" x2="115" y2="400" stroke="#1a1008" stroke-width="2"/>
+  <!-- 부서진 연꽃 잔재 (왼쪽 위 약간) -->
+  <path d="M 70 200 Q 60 170 45 150 Q 65 175 75 195 Z" fill="url(#clb_cap)" opacity="0.7"/>
+</svg>
