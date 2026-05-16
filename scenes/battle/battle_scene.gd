@@ -854,6 +854,7 @@ func _connect_signals() -> void:
 	BattleManager.enemy_turn_started.connect(_on_enemy_turn_started)
 	# Turn queue UI 갱신 — 차례 전환·큐 변경 시점 (사망/소환/부활 포함)
 	BattleManager.turn_queue_changed.connect(_on_turn_queue_changed)
+	BattleManager.vfx_impact_resolved.connect(_cam_on_vfx_ended)
 	BattleManager.turn_ended.connect(func(_aid: String): _refresh_turn_queue_widget())
 	BattleManager.enemy_died.connect(func(_idx: int): _refresh_turn_queue_widget())
 	BattleManager.enemy_spawned.connect(func(_idx: int): _refresh_turn_queue_widget())
@@ -1550,6 +1551,7 @@ func _on_card_drag_started(card: Resource, screen_pos: Vector2) -> void:
 	get_tree().create_timer(0.25).timeout.connect(func(): _drag_cancel_ready = true)
 	_start_drag(card)
 	_create_drag_arrow(screen_pos)
+	_cam_on_drag_started()
 
 func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
 	# 우클릭 등으로 이미 cleanup 됐으면 — 라벨 덮어쓰지 않음
@@ -1579,6 +1581,9 @@ func _set_drag_card_target(enemy_index: int) -> void:
 func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 	if _drag_card != null:
 		_finish_drag(screen_pos)
+	# 드래그 종료 — 카드가 사용되면 _on_card_played 가 VFX_PLAYING 으로 전환했을 것.
+	# 여전히 DRAGGING 이면 = 취소 → 영웅 줌인 복귀.
+	_cam_on_drag_canceled()
 
 func _on_card_hovered(_card: Resource, card_node: CardScene) -> void:
 	if _drag_card != null:
@@ -1727,6 +1732,9 @@ func _on_player_turn_started() -> void:
 		if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
 			_enemy_nodes[i]["btn"].disabled = false
 	_refresh_synergy_hud()
+	# 영웅 줌인 (영구 큐 본인 차례 카메라)
+	if cur_hid != "":
+		_cam_on_hero_turn_start(cur_hid)
 
 func _on_enemy_turn_started() -> void:
 	_end_turn_btn.disabled = true
@@ -1749,6 +1757,8 @@ func _on_enemy_turn_started() -> void:
 	for entry in _enemy_nodes:
 		if entry["panel"].visible and not entry["btn"].disabled:
 			entry["btn"].disabled = true
+	# 적 차례 — 전체 보기 (멀리)
+	_cam_on_enemy_turn_start()
 
 func _on_energy_changed(new_energy: int) -> void:
 	_energy_label.text = "%d / %d" % [new_energy, DeckManager.MAX_ENERGY]
@@ -1760,6 +1770,7 @@ func _on_energy_changed(new_energy: int) -> void:
 
 func _on_card_played(card: Resource) -> void:
 	call_deferred("_refresh_all_hero_ui")
+	_cam_on_card_played()  # VFX 재생 상태 진입 (이미 줌아웃 — VFX 끝나면 영웅 복귀)
 	# VFX (DAMAGE/BLOCK/HEAL/APPLY_STATUS) 는 BattleManager.card_vfx_charge_start → _on_card_vfx_start 가 처리.
 	# 여기서는 영웅 attack 애니메이션만 (anim_speed_multiplier 적용).
 	var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
@@ -2680,6 +2691,86 @@ const _KC_HOME_POS := Vector2(960, 540)
 var _kill_cam_active: bool = false
 var _scene_bg: Node2D = null  # SceneBackground (Node2D, _back/_front 두 ParallaxBackground 보유)
 const WIND_SHADER := preload("res://assets/shaders/wind_sway.gdshader")
+
+# ── 차례 카메라 줌 시스템 (영웅 차례 줌인 / 드래그·VFX 줌아웃 / 적 차례 멀리) ──
+enum CamState { IDLE_FAR, HERO_FOCUS, DRAGGING, VFX_PLAYING }
+var _cam_state: int = CamState.IDLE_FAR
+const CAM_ZOOM_HERO := Vector2(1.5, 1.5)
+const CAM_ZOOM_FAR := Vector2.ONE
+const CAM_TWEEN_TIME := 0.3
+const CAM_VFX_TIMEOUT := 1.0  # VFX 종료 후 영웅 복귀 timer (fallback — vfx_impact_resolved 못 받을 때 대비)
+var _cam_tween: Tween = null
+
+func _cam_zoom_to_hero(hid: String) -> void:
+	if _kill_cam_active or _camera == null:
+		return
+	if not _hero_char_nodes.has(hid):
+		return
+	var node: Node2D = _hero_char_nodes[hid]
+	if not is_instance_valid(node):
+		return
+	if _cam_tween:
+		_cam_tween.kill()
+	_cam_tween = create_tween().set_parallel(true)
+	_cam_tween.tween_property(_camera, "zoom", CAM_ZOOM_HERO, CAM_TWEEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_cam_tween.tween_property(_camera, "position", node.global_position, CAM_TWEEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _cam_zoom_out() -> void:
+	if _kill_cam_active or _camera == null:
+		return
+	if _cam_tween:
+		_cam_tween.kill()
+	_cam_tween = create_tween().set_parallel(true)
+	_cam_tween.tween_property(_camera, "zoom", CAM_ZOOM_FAR, CAM_TWEEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	_cam_tween.tween_property(_camera, "position", _KC_HOME_POS, CAM_TWEEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+
+func _cam_on_hero_turn_start(hid: String) -> void:
+	_cam_state = CamState.HERO_FOCUS
+	_cam_zoom_to_hero(hid)
+
+func _cam_on_enemy_turn_start() -> void:
+	_cam_state = CamState.IDLE_FAR
+	_cam_zoom_out()
+
+func _cam_on_drag_started() -> void:
+	# VFX 중에 새 드래그 시작 — DRAGGING 우선 (VFX 종료 후 영웅 복귀 안 됨)
+	_cam_state = CamState.DRAGGING
+	_cam_zoom_out()
+
+func _cam_on_drag_canceled() -> void:
+	# 카드 사용 안 됐을 때 — DRAGGING 상태일 때만 영웅 복귀
+	if _cam_state != CamState.DRAGGING:
+		return
+	var hid: String = BattleManager.get_current_hero_id()
+	if hid != "":
+		_cam_state = CamState.HERO_FOCUS
+		_cam_zoom_to_hero(hid)
+	else:
+		_cam_state = CamState.IDLE_FAR
+		_cam_zoom_out()
+
+func _cam_on_card_played() -> void:
+	# 카드 사용 직후 — VFX 재생 상태로 전환 (이미 줌아웃 유지)
+	_cam_state = CamState.VFX_PLAYING
+	# fallback timer — vfx_impact_resolved 못 받아도 일정 시간 후 복귀
+	get_tree().create_timer(CAM_VFX_TIMEOUT).timeout.connect(_cam_try_return_to_hero, CONNECT_ONE_SHOT)
+
+func _cam_on_vfx_ended() -> void:
+	# vfx_impact_resolved 시그널 — VFX_PLAYING 상태일 때만 복귀 (DRAGGING 우선)
+	if _cam_state == CamState.VFX_PLAYING:
+		_cam_try_return_to_hero()
+
+func _cam_try_return_to_hero() -> void:
+	# VFX 끝 또는 timer fallback — DRAGGING 으로 전환됐으면 skip
+	if _cam_state != CamState.VFX_PLAYING:
+		return
+	var hid: String = BattleManager.get_current_hero_id()
+	if hid != "":
+		_cam_state = CamState.HERO_FOCUS
+		_cam_zoom_to_hero(hid)
+	else:
+		_cam_state = CamState.IDLE_FAR
+		_cam_zoom_out()
 
 func _setup_kill_cam() -> void:
 	_camera = Camera2D.new()
