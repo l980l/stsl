@@ -72,6 +72,9 @@ const TURN_QUEUE_PREVIEW_COUNT: int = 5
 # UI 전용 CanvasLayer — 카메라 zoom 영향 없음 (카드/패널/버튼/라벨 등)
 var _ui_layer: CanvasLayer = null
 
+# 덱 보기 기본 탭 — 현재 영웅 없으면 마지막 차례 영웅
+var _last_hero_actor_id: String = ""
+
 func _setup_ui_layer() -> void:
 	_ui_layer = CanvasLayer.new()
 	_ui_layer.layer = 5  # 캐릭터/배경 위, SettingsOverlay(10) 아래
@@ -1764,6 +1767,7 @@ func _on_player_turn_started() -> void:
 	_refresh_synergy_hud()
 	# 영웅 줌인 (영구 큐 본인 차례 카메라)
 	if cur_hid != "":
+		_last_hero_actor_id = cur_hid  # 덱 보기 기본 탭 추적
 		_cam_on_hero_turn_start(cur_hid)
 
 func _on_enemy_turn_started() -> void:
@@ -3674,9 +3678,26 @@ func _show_deck_viewer_in_battle() -> void:
 	var tabs := TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# 탭 라벨 폰트/색 — _add_deck_column 헤더 라벨 (AccentLabel) 과 통일
+	var accent_font: Font = SacredTheme.theme.get_font("font", "AccentLabel") if SacredTheme.theme else null
+	if accent_font:
+		tabs.add_theme_font_override("font", accent_font)
+	tabs.add_theme_font_size_override("font_size", 15)
+	tabs.add_theme_color_override("font_selected_color", SacredPalette.BRASS_400)
+	tabs.add_theme_color_override("font_unselected_color", SacredPalette.BRASS_700)
+	tabs.add_theme_color_override("font_hovered_color", SacredPalette.BRASS_300)
 	vbox.add_child(tabs)
 
-	for hid in DeckManager._heroes.keys():
+	# 기본 활성 탭 — 현재 영웅 / 없으면 마지막 차례 영웅 / 둘 다 없으면 첫 영웅
+	var hero_ids: Array = DeckManager._heroes.keys()
+	var focus_hid: String = BattleManager.get_current_hero_id()
+	if focus_hid == "":
+		focus_hid = _last_hero_actor_id
+	var default_tab: int = hero_ids.find(focus_hid)
+	if default_tab < 0:
+		default_tab = 0
+
+	for hid in hero_ids:
 		var hero_name: String = hid
 		if TeamManager != null:
 			var hero_res = TeamManager.get_hero(hid)
@@ -3701,6 +3722,7 @@ func _show_deck_viewer_in_battle() -> void:
 		_add_deck_column(page_columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_h.size(), discard_h)
 		_add_v_divider(page_columns)
 		_add_deck_column(page_columns, tr("ui.battle.deck_viewer.exhaust") + " (%d)" % exhaust_h.size(), exhaust_h)
+	tabs.current_tab = default_tab
 
 	_deck_group  = group
 	_deck_viewer = canvas
