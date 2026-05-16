@@ -20,7 +20,7 @@ const WEATHERS := ["random", "clear", "cloudy", "overcast", "rain", "snow"]
 
 var _scene_bg: Node2D = null
 var _critters: Node2D = null
-var _weather: CanvasLayer = null
+var _weather: Node2D = null
 var _fg_nodes: Array = []        # spawn 된 fg Sprite2D (재생성 시 제거)
 var _char_nodes: Array = []      # placeholder 노드들 (토글 시 제거)
 var _info_lbl: Label = null
