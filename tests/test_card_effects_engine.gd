@@ -434,7 +434,7 @@ func test_exhaust_draw_happy() -> void:
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 1000))
 	bm.setup_battle([_make_enemy(500)])
-	var dummy_card := CardRes.new(); dummy_card.card_name = "dummy"; dummy_card.cost = 0; dummy_card.effects = []
+	var dummy_card := CardRes.new(); dummy_card.card_name = "dummy"; dummy_card.cost = 0; dummy_card.effects = []; dummy_card.owner_id = "yi_sun_sin"
 	# 핸드 3장, 드로우 파일 3장
 	for _i in range(3):
 		bm.deck_mgr.hand.append(dummy_card)

@@ -134,7 +134,7 @@ func test_deck_manager_roundtrip() -> void:
 
 	var d: Dictionary = dm.to_dict()
 	_assert(d["full_deck"].size() == 5, "덱 5장 직렬화")
-	_assert(d["base_draw_count"] == 5, "base_draw_count 보존")
+	_assert(d["base_draw_count"] == 4, "base_draw_count 보존 (기본값 4)")
 
 	var dm2 := DeckManagerClass.new()
 	_to_free.append(dm2)

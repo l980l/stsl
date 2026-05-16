@@ -432,6 +432,7 @@ func test_sacred_scroll_draws_only_on_matching_turn() -> void:
 	tm.add_hero(_make_hero("napoleon", 100))
 	var dm := DeckManagerClass.new()
 	_to_free.append(dm)
+	dm.setup_for_battle(["napoleon"])
 	var gm := _make_gm_with_tm(tm)
 	gm._test_dm_override = dm
 	# 2번째 턴 두루마리 — condition_value=2
@@ -439,13 +440,13 @@ func test_sacred_scroll_draws_only_on_matching_turn() -> void:
 	gm.relics.append(RelicsGd._make_sacred_scroll(2))
 	var CardRes = load("res://resources/card_resource.gd")
 	for i in range(5):
-		dm.draw_pile.append(CardRes.new())
+		dm._heroes["napoleon"]["draw"].append(CardRes.new())
 	# 1턴 — condition_value 2 != turn 1 → 미발동
-	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 1})
+	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 1, "hero_id": "napoleon"})
 	_assert(dm.hand.size() == 0, "1턴엔 2번째 두루마리 미발동 (hand 0, 실제: %d)" % dm.hand.size())
 	# 2턴 — 발동, 카드 2장 드로우
-	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 2})
+	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 2, "hero_id": "napoleon"})
 	_assert(dm.hand.size() == 2, "2턴에 발동 — 카드 2장 드로우 (실제: %d)" % dm.hand.size())
 	# 3턴 — 다시 미발동
-	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 3})
+	gm.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": 3, "hero_id": "napoleon"})
 	_assert(dm.hand.size() == 2, "3턴엔 미발동 (hand 2 유지, 실제: %d)" % dm.hand.size())

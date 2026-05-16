@@ -509,8 +509,7 @@ func test_mark_target_does_not_affect_unmarked_hero() -> void:
 	enemy.intent_pattern = [i_mark]
 	enemy.signatures_enabled = false
 	bm.setup_battle([enemy])
-	bm.start_player_turn()
-	bm.end_player_turn()  # MARK yi_sun_sin
+	bm._execute_enemy_turn()  # MARK yi_sun_sin
 	_assert(bm._hero_status.get("yi_sun_sin", {}).get("marked_by", []).has(0), "yi_sun_sin 마킹됨")
 	_assert(not bm._hero_status.get("napoleon", {}).get("marked_by", []).has(0), "napoleon은 미마킹")
 
