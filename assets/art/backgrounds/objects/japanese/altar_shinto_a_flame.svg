@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 115 160 165" width="160" height="165">
+  <defs>
+    <radialGradient id="asa_fire" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#fff8d0"/>
+      <stop offset="0.5" stop-color="#ffb040"/>
+      <stop offset="1" stop-color="#a82010" stop-opacity="0.1"/>
+    </radialGradient>
+  </defs>
+  <!-- 작은 향로 화염 — 거울 양옆 -->
+  <ellipse cx="80" cy="140" rx="12" ry="20" fill="url(#asa_fire)" opacity="0.85"/>
+  <path d="M 76 145 Q 80 125 84 115 Q 80 130 80 145 Z" fill="#fff0a0"/>
+  <ellipse cx="160" cy="140" rx="12" ry="20" fill="url(#asa_fire)" opacity="0.85"/>
+  <path d="M 156 145 Q 160 125 164 115 Q 160 130 160 145 Z" fill="#fff0a0"/>
+</svg>

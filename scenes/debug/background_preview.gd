@@ -14,7 +14,7 @@ const ENEMY_SLOTS := [
 	Vector2(1084, 498), Vector2(1609, 484), Vector2(1354, 472),
 ]
 
-const MYTHS := ["greek", "norse", "egyptian", "buddhist", "daoist"]
+const MYTHS := ["greek", "norse", "egyptian", "buddhist", "daoist", "japanese"]
 const TIMES := ["random", "dawn", "day", "dusk", "night"]
 const WEATHERS := ["random", "clear", "cloudy", "overcast", "rain", "snow"]
 

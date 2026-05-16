@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 70 180 530" width="180" height="530">
+  <defs>
+    <linearGradient id="toa_red" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d83020"/>
+      <stop offset="1" stop-color="#800810"/>
+    </linearGradient>
+  </defs>
+  <!-- 토리이 (붉은 게이트) -->
+  <!-- 양 기둥 -->
+  <rect x="30" y="100" width="22" height="500" fill="url(#toa_red)"/>
+  <rect x="148" y="100" width="22" height="500" fill="url(#toa_red)"/>
+  <!-- 기단 -->
+  <rect x="22" y="580" width="38" height="20" fill="#403028"/>
+  <rect x="140" y="580" width="38" height="20" fill="#403028"/>
+  <!-- 카사기 (위 가로보, 휘어진) -->
+  <path d="M 10 100 Q 100 70 190 100 L 175 115 L 25 115 Z" fill="url(#toa_red)"/>
+  <rect x="20" y="115" width="160" height="12" fill="#601008"/>
+  <!-- 누키 (아래 가로보) -->
+  <rect x="20" y="155" width="160" height="16" fill="url(#toa_red)"/>
+  <!-- 중앙 가쿠즈카 (작은 사각형) -->
+  <rect x="92" y="127" width="16" height="28" fill="#601008"/>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 210 140 370" width="140" height="370">
+  <defs>
+    <linearGradient id="sla_stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a09588"/>
+      <stop offset="1" stop-color="#403830"/>
+    </linearGradient>
+    <radialGradient id="sla_glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff0c0" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#ffa040" stop-opacity="0.1"/>
+    </radialGradient>
+  </defs>
+  <!-- 기단 -->
+  <rect x="50" y="540" width="120" height="40" fill="url(#sla_stone)"/>
+  <rect x="40" y="530" width="140" height="14" fill="#605040"/>
+  <!-- 기둥 -->
+  <rect x="92" y="380" width="36" height="160" fill="url(#sla_stone)"/>
+  <!-- 받침대 (꽃 모양) -->
+  <ellipse cx="110" cy="380" rx="50" ry="14" fill="url(#sla_stone)"/>
+  <rect x="60" y="368" width="100" height="14" fill="#605040"/>
+  <!-- 등 (램프 박스) -->
+  <rect x="70" y="270" width="80" height="100" fill="#3a3028"/>
+  <rect x="70" y="270" width="80" height="100" fill="url(#sla_glow)" opacity="0.7"/>
+  <!-- 4 창 (격자) -->
+  <line x1="90" y1="280" x2="90" y2="360" stroke="#1a1008" stroke-width="2"/>
+  <line x1="110" y1="280" x2="110" y2="360" stroke="#1a1008" stroke-width="2"/>
+  <line x1="130" y1="280" x2="130" y2="360" stroke="#1a1008" stroke-width="2"/>
+  <line x1="78" y1="300" x2="142" y2="300" stroke="#1a1008" stroke-width="2"/>
+  <line x1="78" y1="330" x2="142" y2="330" stroke="#1a1008" stroke-width="2"/>
+  <!-- 지붕 (6각 -->
+  <path d="M 50 270 L 110 230 L 170 270 L 160 280 L 60 280 Z" fill="url(#sla_stone)"/>
+  <!-- 상단 보주 -->
+  <circle cx="110" cy="220" r="10" fill="url(#sla_stone)"/>
+  <rect x="105" y="225" width="10" height="10" fill="#605040"/>
+</svg>

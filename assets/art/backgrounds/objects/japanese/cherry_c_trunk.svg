@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 18 164 452" width="164" height="452">
+  <defs>
+    <linearGradient id="cct_bark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#806858"/>
+      <stop offset="1" stop-color="#302418"/>
+    </linearGradient>
+  </defs>
+  <!-- 굵은 사쿠라 (큰 가지) -->
+  <path d="M 68 470 Q 60 380 70 290 Q 56 200 76 130 Q 84 100 70 70 L 100 70 Q 86 100 92 130 Q 110 200 96 290 Q 110 380 100 470 Z" fill="url(#cct_bark)"/>
+  <line x1="64" y1="220" x2="100" y2="220" stroke="#604030" stroke-width="1"/>
+  <line x1="60" y1="300" x2="106" y2="300" stroke="#604030" stroke-width="1"/>
+  <line x1="64" y1="380" x2="100" y2="380" stroke="#604030" stroke-width="1"/>
+  <!-- 여러 가지 -->
+  <path d="M 96 150 Q 120 140 140 130" stroke="#604838" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M 70 90 Q 45 80 25 70" stroke="#604838" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 96 220 Q 130 200 150 190" stroke="#604838" stroke-width="4" fill="none" stroke-linecap="round"/>
+</svg>

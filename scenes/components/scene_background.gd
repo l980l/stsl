@@ -47,6 +47,12 @@ const PALETTES := {
 		{"sky": Color("#a04830"), "horizon": Color("#e0a050"), "silhouette": Color("#401818"), "scenery": Color("#702828")},
 		{"sky": Color("#0a0810"), "horizon": Color("#403018"), "silhouette": Color("#060000"), "scenery": Color("#181010")},
 	],
+	# 일본 — 홍/먹/사쿠라. Act 1 봄 사쿠라(분홍+회녹), Act 2 가을 단풍(빨강+주황), Act 3 밤(먹+홍).
+	"japanese": [
+		{"sky": Color("#f0c8d0"), "horizon": Color("#e0a0b8"), "silhouette": Color("#705068"), "scenery": Color("#9078a0")},
+		{"sky": Color("#a04018"), "horizon": Color("#e08030"), "silhouette": Color("#501008"), "scenery": Color("#803018")},
+		{"sky": Color("#1a0810"), "horizon": Color("#601818"), "silhouette": Color("#0a0008"), "scenery": Color("#280810")},
+	],
 }
 
 # 신화별 SVG 오브젝트 풀 + spawn 가중치
@@ -100,6 +106,16 @@ const OBJECTS := {
 				   "mountain_grass_a", "mountain_grass_b",
 				   "chrysanthemum_a", "chrysanthemum_b"],
 		"pillars":["column_taoist_a", "column_taoist_b"],
+	},
+	"japanese": {
+		"large":  ["shrine_a", "shrine_b"],
+		"medium": ["stone_lantern_a", "stone_lantern_b",
+				   "altar_shinto_a", "altar_shinto_b"],
+		"small":  ["cherry_a", "cherry_b", "cherry_c", "cherry_d",
+				   "maple_a", "maple_b", "maple_c", "maple_d",
+				   "japanese_grass_a", "japanese_grass_b",
+				   "sakura_flower_a", "sakura_flower_b"],
+		"pillars":["torii_a", "torii_b"],
 	},
 }
 
@@ -217,6 +233,27 @@ const OBJECT_SIZE := {
 	"mountain_grass_b":         Vector2(117, 100),
 	"chrysanthemum_a":          Vector2(120, 140),
 	"chrysanthemum_b":          Vector2(130, 130),
+	# japanese — sakura_flower 는 g transform 사용 → 원본 viewBox 유지.
+	"shrine_a":                 Vector2(480, 340),
+	"shrine_b":                 Vector2(350, 260),
+	"stone_lantern_a":          Vector2(140, 370),
+	"stone_lantern_b":          Vector2(120, 312),
+	"altar_shinto_a":           Vector2(160, 165),
+	"altar_shinto_b":           Vector2(160, 180),
+	"cherry_a":                 Vector2(149, 448),
+	"cherry_b":                 Vector2(117, 407),
+	"cherry_c":                 Vector2(164, 452),
+	"cherry_d":                 Vector2(143, 437),
+	"maple_a":                  Vector2(254, 312),
+	"maple_b":                  Vector2(206, 277),
+	"maple_c":                  Vector2(281, 322),
+	"maple_d":                  Vector2(182, 255),
+	"torii_a":                  Vector2(180, 530),
+	"torii_b":                  Vector2(156, 442),
+	"japanese_grass_a":         Vector2(63.5, 58),
+	"japanese_grass_b":         Vector2(87.25, 80),
+	"sakura_flower_a":          Vector2(120, 140),
+	"sakura_flower_b":          Vector2(130, 130),
 }
 
 # 바람/펄럭임 sway — 풀/꽃 (통째 sway) + split 식생/altar (위쪽만 sway).
@@ -227,6 +264,7 @@ const _WIND_SMALL_PREFIXES := [
 	"desert_grass", "egypt_lotus",    # egyptian
 	"bamboo_grass", "buddhist_lotus", # buddhist
 	"mountain_grass", "chrysanthemum", # daoist
+	"japanese_grass", "sakura_flower", # japanese
 ]
 
 static func _wind_eligible(svg_id: String) -> bool:
@@ -246,7 +284,8 @@ static func _split_suffixes(svg_id: String) -> Array:
 			or svg_id.begins_with("birch") or svg_id.begins_with("spruce")
 			or svg_id.begins_with("palm") or svg_id.begins_with("acacia")
 			or svg_id.begins_with("banyan")
-			or svg_id.begins_with("pine") or svg_id.begins_with("weeping_willow")):
+			or svg_id.begins_with("pine") or svg_id.begins_with("weeping_willow")
+			or svg_id.begins_with("cherry") or svg_id.begins_with("maple")):
 		return ["_trunk", "_leaves"]
 	if svg_id.begins_with("altar"):
 		return ["_base", "_flame"]

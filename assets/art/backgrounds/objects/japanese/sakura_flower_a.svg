@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" width="120" height="140">
+  <defs>
+    <radialGradient id="sfa_petal" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff0f4"/>
+      <stop offset="0.7" stop-color="#f8c0d0"/>
+      <stop offset="1" stop-color="#c87090"/>
+    </radialGradient>
+  </defs>
+  <!-- 사쿠라 꽃 무리 (땅 위) -->
+  <path d="M 36 134 Q 34 100 28 60" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 60 134 Q 60 90 58 42" stroke="#587030" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 84 134 Q 86 100 92 70" stroke="#587030" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- 잎 -->
+  <path d="M 60 90 Q 50 84 46 92 Q 54 96 60 92 Z" fill="#789068"/>
+  <!-- 사쿠라 꽃 — 5 꽃잎 (각 transform 으로 회전) -->
+  <g transform="translate(28 60)">
+    <ellipse cx="0" cy="-8" rx="5" ry="8" fill="url(#sfa_petal)"/>
+    <ellipse cx="7.6" cy="-2.5" rx="5" ry="8" transform="rotate(72)" fill="url(#sfa_petal)"/>
+    <ellipse cx="4.7" cy="6.5" rx="5" ry="8" transform="rotate(144)" fill="url(#sfa_petal)"/>
+    <ellipse cx="-4.7" cy="6.5" rx="5" ry="8" transform="rotate(216)" fill="url(#sfa_petal)"/>
+    <ellipse cx="-7.6" cy="-2.5" rx="5" ry="8" transform="rotate(288)" fill="url(#sfa_petal)"/>
+    <circle cx="0" cy="0" r="2.5" fill="#e8c440"/>
+  </g>
+  <g transform="translate(58 42)">
+    <ellipse cx="0" cy="-10" rx="6" ry="10" fill="url(#sfa_petal)"/>
+    <ellipse cx="9.5" cy="-3" rx="6" ry="10" transform="rotate(72)" fill="url(#sfa_petal)"/>
+    <ellipse cx="5.9" cy="8" rx="6" ry="10" transform="rotate(144)" fill="url(#sfa_petal)"/>
+    <ellipse cx="-5.9" cy="8" rx="6" ry="10" transform="rotate(216)" fill="url(#sfa_petal)"/>
+    <ellipse cx="-9.5" cy="-3" rx="6" ry="10" transform="rotate(288)" fill="url(#sfa_petal)"/>
+    <circle cx="0" cy="0" r="3" fill="#e8c440"/>
+  </g>
+  <g transform="translate(92 70)">
+    <ellipse cx="0" cy="-7" rx="4.5" ry="7" fill="url(#sfa_petal)"/>
+    <ellipse cx="6.6" cy="-2" rx="4.5" ry="7" transform="rotate(72)" fill="url(#sfa_petal)"/>
+    <ellipse cx="4" cy="5.7" rx="4.5" ry="7" transform="rotate(144)" fill="url(#sfa_petal)"/>
+    <ellipse cx="-4" cy="5.7" rx="4.5" ry="7" transform="rotate(216)" fill="url(#sfa_petal)"/>
+    <ellipse cx="-6.6" cy="-2" rx="4.5" ry="7" transform="rotate(288)" fill="url(#sfa_petal)"/>
+    <circle cx="0" cy="0" r="2.5" fill="#e8c440"/>
+  </g>
+</svg>

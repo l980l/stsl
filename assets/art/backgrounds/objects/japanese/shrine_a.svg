@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 100 480 340" width="480" height="340">
+  <defs>
+    <linearGradient id="sha_roof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a1818"/>
+      <stop offset="1" stop-color="#5a0808"/>
+    </linearGradient>
+    <linearGradient id="sha_wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0e8d8"/>
+      <stop offset="1" stop-color="#a89878"/>
+    </linearGradient>
+    <linearGradient id="sha_post" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a3018"/>
+      <stop offset="1" stop-color="#501808"/>
+    </linearGradient>
+  </defs>
+  <!-- 본전 기단 -->
+  <rect x="80" y="380" width="440" height="60" fill="#403828"/>
+  <rect x="80" y="380" width="440" height="6" fill="#605040"/>
+  <!-- 흰 벽 본전 -->
+  <rect x="120" y="240" width="360" height="140" fill="url(#sha_wall)"/>
+  <!-- 본전 기둥 (빨강) -->
+  <rect x="120" y="240" width="14" height="140" fill="url(#sha_post)"/>
+  <rect x="466" y="240" width="14" height="140" fill="url(#sha_post)"/>
+  <rect x="220" y="240" width="10" height="140" fill="url(#sha_post)"/>
+  <rect x="370" y="240" width="10" height="140" fill="url(#sha_post)"/>
+  <!-- 격자 문 -->
+  <rect x="270" y="280" width="60" height="100" fill="#2a1810"/>
+  <line x1="285" y1="280" x2="285" y2="380" stroke="#604030" stroke-width="1"/>
+  <line x1="300" y1="280" x2="300" y2="380" stroke="#604030" stroke-width="1"/>
+  <line x1="315" y1="280" x2="315" y2="380" stroke="#604030" stroke-width="1"/>
+  <!-- 처마 (위 빨간 지붕 하단 가로보) -->
+  <rect x="90" y="226" width="420" height="18" fill="#3a1808"/>
+  <!-- 본전 지붕 (커브 — 일본식 휘어진 처마) -->
+  <path d="M 60 226 Q 300 100 540 226 L 510 226 Q 300 130 90 226 Z" fill="url(#sha_roof)"/>
+  <!-- 지붕 중앙 카쓰오기 (장식 통나무) -->
+  <rect x="290" y="120" width="20" height="50" fill="#a08060"/>
+  <rect x="280" y="115" width="40" height="8" fill="#604838"/>
+  <!-- 계단 -->
+  <rect x="260" y="380" width="80" height="6" fill="#605040"/>
+  <rect x="250" y="386" width="100" height="6" fill="#605040"/>
+  <rect x="240" y="392" width="120" height="6" fill="#605040"/>
+  <rect x="230" y="398" width="140" height="6" fill="#605040"/>
+</svg>

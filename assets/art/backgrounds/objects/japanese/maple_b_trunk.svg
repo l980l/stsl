@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 73 206 277" width="206" height="277">
+  <defs>
+    <linearGradient id="mbt_bark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#685040"/>
+      <stop offset="1" stop-color="#302018"/>
+    </linearGradient>
+  </defs>
+  <path d="M 138 350 Q 132 280 140 220 L 154 220 Q 148 280 148 350 Z" fill="url(#mbt_bark)"/>
+  <path d="M 146 220 Q 115 195 90 180" stroke="#503020" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 146 220 Q 175 200 200 185" stroke="#503020" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M 146 220 Q 148 195 150 170" stroke="#503020" stroke-width="4" fill="none" stroke-linecap="round"/>
+</svg>
