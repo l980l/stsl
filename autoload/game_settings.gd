@@ -26,9 +26,9 @@ const KILL_CAM_DEFAULT := true
 # 영웅 차례 카메라 줌인 (개체 차례 시스템) — 기본 on
 const HERO_ZOOM_DEFAULT := true
 
-# 카메라 줌 전환 속도 (영웅 줌인/줌아웃 트윈 시간 multiplier)
-const CAM_ZOOM_SPEED_KEYS    := ["fast", "normal", "slow"]
-const CAM_ZOOM_SPEED_VALUES  := [0.6, 1.0, 1.5]  # 트윈 시간 = base 0.3s * value
+# 카메라 줌 속도 (영웅 줌인/줌아웃) — 값이 클수록 빠름. 트윈 시간 = base 0.3s / value
+const CAM_ZOOM_SPEED_KEYS    := ["slow", "normal", "fast"]
+const CAM_ZOOM_SPEED_VALUES  := [0.6, 1.0, 1.7]  # slow=0.5s / normal=0.3s / fast=0.18s
 const CAM_ZOOM_SPEED_DEFAULT := "normal"
 
 # 배경 시스템 v1 — parallax 다중 레이어 + 신화별 팔레트 (M7.5)

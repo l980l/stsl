@@ -2756,9 +2756,12 @@ func _on_child_exited_vfx_track(node: Node) -> void:
 		_cam_on_vfx_ended()
 
 func _cam_tween_time() -> float:
+	# 시간 = base / speed_multiplier (값이 클수록 빨라짐)
 	var gs := get_node_or_null("/root/GameSettings")
 	var mul: float = gs.cam_zoom_speed_multiplier if gs else 1.0
-	return CAM_TWEEN_TIME * mul
+	if mul <= 0.0:
+		mul = 1.0
+	return CAM_TWEEN_TIME / mul
 
 func _hero_zoom_disabled() -> bool:
 	var gs := get_node_or_null("/root/GameSettings")
