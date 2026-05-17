@@ -388,7 +388,7 @@ func _open_monster_pick_dialog() -> void:
 				seen[fn] = true
 				var enemy: Resource = normals_mod.call(fn, dummy_scene)
 				opts.append(["[%s · 일반]  %s" % [myth, tr(enemy.enemy_name)],
-					{"module": normals_mod, "fn_name": fn}, false, Color.WHITE])
+					{"module": normals_mod, "fn_name": fn}, Color.WHITE])
 
 		var acts: Array = entry["acts"]
 		for act_i in range(acts.size()):
@@ -399,13 +399,13 @@ func _open_monster_pick_dialog() -> void:
 				for fn: String in act_mod.elites():
 					var enemy: Resource = act_mod.call(fn, dummy_scene)
 					opts.append(["[%s · 엘리트 A%d]  %s" % [myth, act_i + 1, tr(enemy.enemy_name)],
-						{"module": act_mod, "fn_name": fn}, false, Color(0.9, 0.7, 0.3)])
+						{"module": act_mod, "fn_name": fn}, Color(0.9, 0.7, 0.3)])
 			if act_mod.has_method("boss"):
 				var fn: String = act_mod.boss()
 				if fn != "":
 					var enemy: Resource = act_mod.call(fn, dummy_scene)
 					opts.append(["[%s · 보스 A%d]  %s" % [myth, act_i + 1, tr(enemy.enemy_name)],
-						{"module": act_mod, "fn_name": fn}, false, Color(1.0, 0.4, 0.4)])
+						{"module": act_mod, "fn_name": fn}, Color(1.0, 0.4, 0.4)])
 
 	_make_checkbox_dialog("몬스터 선택 전투 (최대 %d마리)" % 6, opts, "전투 시작", func(picked: Array):
 		if picked.is_empty():
