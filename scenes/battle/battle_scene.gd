@@ -1426,54 +1426,61 @@ func _update_enemy_ui(index: int) -> void:
 func _format_intent_tooltip(enemy_index: int, intent: Resource) -> String:
 	# 인텐트 hover 시 표시할 자세한 설명. 모든 action_type 지원.
 	var v: int = intent.value
-	var target_str: String = " (전체)" if intent.target == IntentRes.TargetType.ALL else ""
+	var target_all: bool = intent.target == IntentRes.TargetType.ALL
 	match intent.action_type:
 		IntentRes.ActionType.ATTACK:
 			var dmg: int = BattleManager.get_intent_display_damage(enemy_index, intent)
-			var line: String = "공격 %d 데미지%s" % [dmg, target_str]
+			var line: String = tr("battle.intent.tooltip.attack") % dmg
+			if target_all:
+				line += " (" + tr("battle.intent.tooltip.target_all") + ")"
 			if intent.damage_type != "":
-				line += " · %s 속성" % intent.damage_type
+				line += " · " + (tr("battle.intent.tooltip.element") % intent.damage_type)
 			return line
 		IntentRes.ActionType.BUFF:
 			match intent.status_type:
-				"strength": return "자신 강화: 힘 +%d" % v
-				"block": return "자신 방어: 블록 +%d" % v
-				_: return "자신 강화: %s +%d" % [intent.status_type, v]
+				"strength": return tr("battle.intent.tooltip.buff_strength") % v
+				"block": return tr("battle.intent.tooltip.buff_block") % v
+				_: return tr("battle.intent.tooltip.buff_generic") % [intent.status_type, v]
 		IntentRes.ActionType.DEBUFF:
+			var key: String
 			match intent.status_type:
-				"weak": return "약화 부여%s (다음 차례 영웅 공격 -25%%)" % target_str
-				"vulnerable": return "취약 부여%s (영웅이 받는 데미지 +50%%)" % target_str
-				"poison": return "독 부여%s (스택 %d, 차례마다 HP 감소)" % [target_str, v]
-				"charm": return "매혹 부여%s (스택 %d, 100 도달 시 enthrall)" % [target_str, v]
-				_: return "%s 부여%s (+%d)" % [intent.status_type, target_str, v]
+				"weak": key = "battle.intent.tooltip.debuff_weak"
+				"vulnerable": key = "battle.intent.tooltip.debuff_vulnerable"
+				"poison":
+					return tr("battle.intent.tooltip.debuff_poison") % v
+				"charm":
+					return tr("battle.intent.tooltip.debuff_charm") % v
+				_:
+					return tr("battle.intent.tooltip.debuff_generic") % [intent.status_type, v]
+			return tr(key)
 		IntentRes.ActionType.PREPARE:
-			return "준비 — 다음 차례 강한 공격 예고"
+			return tr("battle.intent.tooltip.prepare")
 		IntentRes.ActionType.HEAL_ALLY:
-			return "동료 회복 +%d HP" % v
+			return tr("battle.intent.tooltip.heal_ally") % v
 		IntentRes.ActionType.BUFF_ALLY:
-			return "동료에게 %s +%d 부여" % [intent.status_type, v]
+			return tr("battle.intent.tooltip.buff_ally") % [intent.status_type, v]
 		IntentRes.ActionType.COUNTER_PREPARE:
-			return "반격 태세 — 받은 데미지 %d%% 다음 공격에 추가" % v
+			return tr("battle.intent.tooltip.counter_prepare") % v
 		IntentRes.ActionType.MARK_TARGET:
-			return "마킹 — 표시한 영웅이 다음 적 공격으로 받는 데미지 +50%"
+			return tr("battle.intent.tooltip.mark_target")
 		IntentRes.ActionType.SACRIFICE:
-			return "희생 — 자신 HP %d 소비, 다음 공격 데미지 강화" % v
+			return tr("battle.intent.tooltip.sacrifice") % v
 		IntentRes.ActionType.WARD:
-			return "수호 — %d 차례 동안 무적" % v
+			return tr("battle.intent.tooltip.ward") % v
 		IntentRes.ActionType.SUMMON:
-			return "소환 — 적 %d 마리 추가" % max(1, v)
+			return tr("battle.intent.tooltip.summon") % max(1, v)
 		IntentRes.ActionType.MIMIC:
-			return "흉내 — 영웅이 이번 차례 가한 데미지의 %d%% 반사" % v
+			return tr("battle.intent.tooltip.mimic") % v
 		IntentRes.ActionType.SPECIAL:
 			match intent.status_type:
-				"remove_card": return "특수: 영웅 덱에서 카드 %d장 영구 제거" % max(1, v)
-				"summon": return "특수: 적 소환"
+				"remove_card": return tr("battle.intent.tooltip.special_remove_card") % max(1, v)
+				"summon": return tr("battle.intent.tooltip.special_summon")
 				_:
 					if intent.status_type != "":
-						return "특수: %s" % intent.status_type
-					return "특수 효과"
+						return tr("battle.intent.tooltip.special_generic") % intent.status_type
+					return tr("battle.intent.tooltip.special_unknown")
 		_:
-			return "알 수 없는 인텐트"
+			return tr("battle.intent.tooltip.unknown")
 
 func _drag_hint_text() -> String:
 	if _drag_card == null:
