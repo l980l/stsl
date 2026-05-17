@@ -119,9 +119,9 @@ ui.hero_select.unlock_condition_none,해금 조건 미달성,Unlock condition no
 ui.hero_select.btn_recruit,%s 영입,Recruit %s,Recruter %s,Recluta %s,Reclutar %s,%s を仲間に,Στράτευσε %s,招募 %s,招募 %s
 ui.hero_select.btn_select,%s 선택,Select %s,Choisir %s,Scegli %s,Elegir %s,%s を選択,Επίλεξε %s,选择 %s,选择 %s
 ui.battle.btn_deck_view,덱 보기,View Deck,Voir Deck,Visualizza Mazzo,Ver Mazo,デッキ表示,Προβολή Τράπουλας,查看卡组,查看卡组
-ui.battle.deck_viewer.draw,드로우 파일,Draw Pile,Pioche,Pesca,Robo,ドロー山,Στοίβα Ανάληψης,抽牌堆,抽牌堆
-ui.battle.deck_viewer.discard,버린 덱,Discard Pile,Défausse,Scarto,Descarte,捨て山,Σωρός Απόρριψης,弃牌堆,弃牌堆
-ui.battle.deck_viewer.exhaust,소멸,Exhausted,Épuisé,Esaurite,Agotadas,消滅,Εξάντληση,消耗,消耗
+ui.battle.deck_viewer.draw,현재 덱,Current Deck,Deck Actuel,Mazzo Attuale,Mazo Actual,現在のデッキ,Τρέχουσα Τράπουλα,当前牌组,當前牌組
+ui.battle.deck_viewer.discard,사용한 덱,Used Cards,Cartes Utilisées,Carte Usate,Cartas Usadas,使用済み,Χρησιμοποιημένες,已用牌,已用牌
+ui.battle.deck_viewer.exhaust,이용불가,Unavailable,Indisponibles,Non Disponibili,No Disponibles,使用不可,Μη Διαθέσιμες,不可用,不可用
 ui.battle.deck_viewer.empty,(비어 있음),(Empty),(Vide),(Vuoto),(Vacío),(空),(Κενό),(空),(空)
 ui.battle.modal.discard_pick.title,버릴 카드를 1장 선택하세요,Choose 1 card to discard,Choisissez 1 carte à défausser,Scegli 1 carta da scartare,Elige 1 carta para descartar,捨てるカードを1枚選んでください,Επίλεξε 1 κάρτα για απόρριψη,选择1张要弃置的牌,選擇1張要棄置的牌
 ui.battle.modal.discard_pick.confirm,버리기,Discard,Défausser,Scartare,Descartar,捨てる,Απόρριψη,弃置,棄置
