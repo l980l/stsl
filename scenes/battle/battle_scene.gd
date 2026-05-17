@@ -2753,8 +2753,21 @@ func _on_child_exited_vfx_track(node: Node) -> void:
 		# 모든 VFX 노드 종료 — 카메라 복귀 시도 (DRAGGING 으로 전환됐으면 _cam_on_vfx_ended 안에서 skip)
 		_cam_on_vfx_ended()
 
+func _cam_tween_time() -> float:
+	var gs := get_node_or_null("/root/GameSettings")
+	var mul: float = gs.cam_zoom_speed_multiplier if gs else 1.0
+	return CAM_TWEEN_TIME * mul
+
+func _hero_zoom_disabled() -> bool:
+	var gs := get_node_or_null("/root/GameSettings")
+	return gs != null and not gs.hero_zoom_enabled
+
 func _cam_zoom_to_hero(hid: String) -> void:
 	if _kill_cam_active or _camera == null:
+		return
+	# 영웅 줌인 옵션 off — 줌아웃 유지
+	if _hero_zoom_disabled():
+		_cam_zoom_out()
 		return
 	if not _hero_char_nodes.has(hid):
 		return
@@ -2763,18 +2776,20 @@ func _cam_zoom_to_hero(hid: String) -> void:
 		return
 	if _cam_tween:
 		_cam_tween.kill()
+	var t: float = _cam_tween_time()
 	_cam_tween = create_tween().set_parallel(true)
-	_cam_tween.tween_property(_camera, "zoom", CAM_ZOOM_HERO, CAM_TWEEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_cam_tween.tween_property(_camera, "position", node.global_position, CAM_TWEEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_cam_tween.tween_property(_camera, "zoom", CAM_ZOOM_HERO, t).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_cam_tween.tween_property(_camera, "position", node.global_position, t).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _cam_zoom_out() -> void:
 	if _kill_cam_active or _camera == null:
 		return
 	if _cam_tween:
 		_cam_tween.kill()
+	var t: float = _cam_tween_time()
 	_cam_tween = create_tween().set_parallel(true)
-	_cam_tween.tween_property(_camera, "zoom", CAM_ZOOM_FAR, CAM_TWEEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
-	_cam_tween.tween_property(_camera, "position", _KC_HOME_POS, CAM_TWEEN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	_cam_tween.tween_property(_camera, "zoom", CAM_ZOOM_FAR, t).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	_cam_tween.tween_property(_camera, "position", _KC_HOME_POS, t).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 
 func _cam_on_hero_turn_start(hid: String) -> void:
 	_cam_state = CamState.HERO_FOCUS

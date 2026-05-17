@@ -74,6 +74,8 @@ ui.settings.gameplay,게임플레이,Gameplay,Jouabilité,Gameplay,Jugabilidad,�
 ui.settings.vfx_speed,VFX 속도,VFX Speed,Vitesse VFX,Velocità VFX,Velocidad VFX,VFX速度,Ταχύτητα VFX,VFX速度,VFX速度
 ui.settings.anim_speed,애니메이션 속도,Animation Speed,Vitesse animation,Velocità animazione,Velocidad animación,アニメ速度,Ταχύτητα κίνησης,动画速度,動畫速度
 ui.settings.turn_interval,차례 전환 인터벌,Turn Interval,Intervalle de tour,Intervallo turno,Intervalo de turno,ターン間隔,Διάστημα γύρου,回合间隔,回合間隔
+ui.settings.hero_zoom,영웅 차례 줌인,Hero Turn Zoom,Zoom au Tour du Héros,Zoom Turno Eroe,Zoom Turno Héroe,英雄ターンズーム,Ζουμ Γύρου Ήρωα,英雄回合缩放,英雄回合縮放
+ui.settings.cam_zoom_speed,카메라 줌 속도,Camera Zoom Speed,Vitesse Zoom Caméra,Velocità Zoom Camera,Velocidad Zoom Cámara,カメラズーム速度,Ταχύτητα Ζουμ Κάμερας,镜头缩放速度,鏡頭縮放速度
 ui.settings.particle_quality,파티클 갯수,Particle Count,Nombre particules,Numero particelle,Cantidad partículas,パーティクル数,Αριθμός σωματιδίων,粒子数量,粒子數量
 ui.settings.kill_cam,킬캠 (슬로우+줌),Kill Cam (Slow+Zoom),Caméra kill,Kill cam,Cámara final,キルカム,Κάμερα φόνου,击杀镜头,擊殺鏡頭
 ui.settings.background,배경 (시차+팔레트),Background (Parallax),Arrière-plan,Sfondo,Fondo,背景,Φόντο,背景,背景

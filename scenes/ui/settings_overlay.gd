@@ -213,6 +213,8 @@ func open() -> void:
 		"vfx_speed":        GameSettings.vfx_speed_key,
 		"anim_speed":       GameSettings.anim_speed_key,
 		"turn_interval":    GameSettings.turn_interval_key,
+		"hero_zoom":        "on" if GameSettings.hero_zoom_enabled else "off",
+		"cam_zoom_speed":   GameSettings.cam_zoom_speed_key,
 		"kill_cam":         "on" if GameSettings.kill_cam_enabled else "off",
 		"background":       "on" if GameSettings.background_enabled else "off",
 	}
@@ -277,6 +279,8 @@ func _on_defaults() -> void:
 		"vfx_speed":        GameSettings.VFX_SPEED_DEFAULT,
 		"anim_speed":       GameSettings.ANIM_SPEED_DEFAULT,
 		"turn_interval":    GameSettings.TURN_INTERVAL_DEFAULT,
+		"hero_zoom":        "on" if GameSettings.HERO_ZOOM_DEFAULT else "off",
+		"cam_zoom_speed":   GameSettings.CAM_ZOOM_SPEED_DEFAULT,
 		"kill_cam":         "on" if GameSettings.KILL_CAM_DEFAULT else "off",
 		"background":       "on" if GameSettings.BACKGROUND_DEFAULT else "off",
 	}
@@ -434,6 +438,20 @@ func _build_gameplay_panel() -> void:
 		{"off": tr("ui.settings.off"), "on": tr("ui.settings.on")},
 		"on" if GameSettings.kill_cam_enabled else "off",
 		func(k: String) -> void: GameSettings.set_kill_cam_enabled(k == "on"))
+
+	# 영웅 차례 카메라 줌인 (개체 차례 시스템)
+	_build_seg_row(p, mono, 248.0, tr("ui.settings.hero_zoom"), "hero_zoom",
+		["off", "on"],
+		{"off": tr("ui.settings.off"), "on": tr("ui.settings.on")},
+		"on" if GameSettings.hero_zoom_enabled else "off",
+		func(k: String) -> void: GameSettings.set_hero_zoom_enabled(k == "on"))
+
+	# 카메라 줌 전환 속도
+	_build_seg_row(p, mono, 304.0, tr("ui.settings.cam_zoom_speed"), "cam_zoom_speed",
+		GameSettings.CAM_ZOOM_SPEED_KEYS,
+		_build_x_labels(GameSettings.CAM_ZOOM_SPEED_KEYS, GameSettings.CAM_ZOOM_SPEED_VALUES),
+		GameSettings.cam_zoom_speed_key,
+		func(k: String) -> void: GameSettings.set_cam_zoom_speed(k))
 
 # 일반 segment row 빌더 — 라벨 + N개 버튼. group_id 로 _seg_groups 등록.
 func _build_seg_row(parent: Control, mono: Font, row_y: float, label_text: String,
