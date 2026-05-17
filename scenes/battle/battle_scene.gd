@@ -1521,7 +1521,7 @@ func _build_turn_queue_widget() -> void:
 	add_child(_turn_queue_box)  # _build_ui 끝에서 _ui_layer 로 reparent 됨
 	for i in range(TURN_QUEUE_PREVIEW_COUNT):
 		var slot := PanelContainer.new()
-		slot.custom_minimum_size = Vector2(80, 30)
+		slot.custom_minimum_size = Vector2(96, 30)
 		var sbx := StyleBoxFlat.new()
 		sbx.bg_color = Color(0.08, 0.07, 0.05, 0.85)
 		sbx.border_color = SacredPalette.BRASS_300
