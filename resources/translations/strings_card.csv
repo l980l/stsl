@@ -178,7 +178,7 @@ card.cleopatra.pharaoh_decree.name,파라오의 명,Pharaoh's Decree,Décret du 
 card.cleopatra.pharaoh_decree.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.nile_whisper.name,나일의 속삭임,Nile's Whisper,Murmure du Nil,Sussurro del Nilo,Susurro del Nilo,ナイルのささやき,Ψίθυρος του Νείλου,尼罗河私语,尼罗河私语
 card.cleopatra.nile_whisper.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
-card.cleopatra.cleopatras_kiss.name,클레오파트라의 입맞춤,Cleopatra's Kiss,Baiser de Cléopâtre,Bacio di Cleopatra,Beso de Cleopatra,クレオパトラの接吻,Φιλί της Κλεοπάτρας,克利奥帕特拉之吻,克利奥帕特拉之吻
+card.cleopatra.cleopatras_kiss.name,파라오의 입맞춤,the Pharaoh's Kiss,Baiser de la Pharaonne,Bacio di la Faraona,Beso de la Faraona,ファラオの接吻,Φιλί της Φαραώς,法老之吻,法老之吻
 card.cleopatra.cleopatras_kiss.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.poison_fog_spray.name,독안개 살포,Poison Fog Spray,Pulvérisation de brume empoisonnée,Spruzzo di nebbia velenosa,Aerosol de niebla venenosa,毒霧散布,Ψεκασμός Δηλητηριώδους Ομίχλης,喷洒毒雾,喷洒毒雾
 card.cleopatra.poison_fog_spray.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
@@ -418,7 +418,7 @@ card.joan_of_arc.purifying_sacrifice.name,정화의 희생,Purifying Sacrifice,S
 card.joan_of_arc.purifying_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.saints_vow.name,성녀의 맹약,Saint's Vow,Voeu de la sainte,Voto della santa,Voto de la santa,성녀의 맹약,Όρκος της Αγίας,圣女盟约,圣女盟约
 card.joan_of_arc.saints_vow.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
-card.joan_of_arc.joan_return.name,잔 다르크의 귀환,Joan's Return,Retour de Jeanne,Ritorno di Giovanna,Regreso de Juana,ジャンヌ・ダルクの帰還,Επιστροφή της Ιωάννας,贞德回归,贞德回归
+card.joan_of_arc.joan_return.name,성녀의 귀환,the Saint's Return,Retour de la Sainte,Ritorno di la Santa,Regreso de la Santa,聖女の帰還,Επιστροφή της Αγίας,圣女回归,聖女回归
 card.joan_of_arc.joan_return.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.holy_war.name,성전,Holy War,Guerre sainte,Guerra santa,Guerra santa,聖戦,Ιερός Πόλεμος,圣战,圣战
 card.joan_of_arc.holy_war.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
@@ -454,7 +454,7 @@ card.genghis_khan.long_march.name,만리 원정,Long March,Longue marche,Lunga m
 card.genghis_khan.long_march.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
 card.genghis_khan.great_khans_command.name,대칸의 명령,Great Khan's Command,Commandement du Grand Khan,Comando del Gran Khan,Mando del Gran Khan,大ハンの命令,Διαταγή του Μεγάλου Χαν,大汗的命令,大汗的命令
 card.genghis_khan.great_khans_command.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
-card.genghis_khan.genghis_fury.name,징기스의 분노,Genghis' Fury,Fureur de Gengis,Furia di Gengis,Furia de Gengis,チンギスの憤怒,Οργή του Τζένγκις,成吉思汗之怒,成吉思汗之怒
+card.genghis_khan.genghis_fury.name,징기스의 분노,the Conqueror' Fury,Fureur de le Conquérant,Furia di il Conquistatore,Furia de el Conquistador,征服者の憤怒,Οργή του Κατακτητής,征服者之怒,征服者之怒
 card.genghis_khan.genghis_fury.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
 card.genghis_khan.light_cavalry_sprint.name,경기병 질주,Light Cavalry Sprint,Sprint de la cavalerie légère,Sprint della cavalleria leggera,Sprint de caballería ligera,軽騎兵疾走,Ταχεία Έφοδος Ελαφρού Ιππικού,轻骑兵疾驰,轻骑兵疾驰
 card.genghis_khan.light_cavalry_sprint.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
@@ -492,7 +492,7 @@ card.genghis_khan.territory_expansion.name,영토 확장,Territory Expansion,Exp
 card.genghis_khan.territory_expansion.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
 card.genghis_khan.red_horizon.name,붉은 지평선,Red Horizon,Horizon rouge,Orizzonte rosso,Horizonte rojo,赤い地平線,Κόκκινος Ορίζοντας,红色地平线,红色地平线
 card.genghis_khan.red_horizon.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
-card.genghis_khan.genghis_territory.name,징기스의 영토,Genghis' Territory,Territoire de Gengis,Territorio di Gengis,Territorio de Gengis,チンギスの領土,Εδάφη του Τζένγκις,成吉思汗的领土,成吉思汗的领土
+card.genghis_khan.genghis_territory.name,징기스의 영토,the Conqueror' Territory,Territoire de le Conquérant,Territorio di il Conquistatore,Territorio de el Conquistador,征服者の領土,Εδάφη του Κατακτητής,征服者的领土,征服者的领土
 card.genghis_khan.genghis_territory.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
 card.genghis_khan.submission.name,굴복,Submission,Soumission,Sottomissione,Sumisión,屈服,Υποταγή,屈服,屈服
 card.genghis_khan.submission.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
