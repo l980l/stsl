@@ -2812,7 +2812,9 @@ func _on_token_attack_fired(hero_id: String, token_index: int, enemy_index: int)
 		return
 	# 카메라 줌아웃 (적이 화면 밖에 있으면 bullet 안 보이므로) — VFX 종료 시 자동 복귀
 	if _cam_state == CamState.HERO_FOCUS:
-		_cam_on_card_played()
+		_cam_state = CamState.VFX_PLAYING
+		_cam_zoom_out()
+		_start_enemy_sidebar_transition(0.0)
 	_spawn_caster_beam(_VFX_BULLET_SHOT, caster_pos, target_node.global_position, "bullet", func(): pass)
 
 func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
