@@ -3686,12 +3686,19 @@ func _show_deck_viewer_in_battle() -> void:
 	tabs.add_theme_color_override("font_selected_color", SacredPalette.BRASS_400)
 	tabs.add_theme_color_override("font_unselected_color", SacredPalette.BRASS_700)
 	tabs.add_theme_color_override("font_hovered_color", SacredPalette.BRASS_300)
-	# 선택 탭 위쪽 라인만 BRASS_400 — 옆/아래 border 제거
+	# 선택 탭 위쪽 라인만 BRASS_400 — 옆/아래 border 제거 + 선택 시 크기 변화 방지
 	var _tab_sbx := StyleBoxFlat.new()
 	_tab_sbx.bg_color = Color.TRANSPARENT
 	_tab_sbx.border_color = SacredPalette.BRASS_400
 	_tab_sbx.set_border_width_all(0)
 	_tab_sbx.border_width_top = 2
+	# content margin — unselected stylebox 와 동일하게 (선택 시 버튼 크기 일관)
+	var _unsel := SacredTheme.theme.get_stylebox("tab_unselected", "TabContainer") if SacredTheme.theme else null
+	if _unsel:
+		_tab_sbx.content_margin_left = _unsel.content_margin_left
+		_tab_sbx.content_margin_right = _unsel.content_margin_right
+		_tab_sbx.content_margin_top = _unsel.content_margin_top
+		_tab_sbx.content_margin_bottom = _unsel.content_margin_bottom
 	tabs.add_theme_stylebox_override("tab_selected", _tab_sbx)
 	vbox.add_child(tabs)
 
