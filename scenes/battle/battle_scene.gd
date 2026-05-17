@@ -2816,6 +2816,12 @@ func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 	if amount > 0 and char_node and _caster_beam_script(dtype) == null:
 		var spark_pos: Vector2 = char_node.global_position + _impact_jitter()
 		_spawn_impact_particles(spark_pos, amount, false, dtype)
+	# 토큰 (병사) 공격 시 bullet beam VFX — caster = 영웅, target = 적
+	if dtype == "bullet" and char_node:
+		var _atk = BattleManager._last_attacker.get(index, "")
+		if _atk is String and _atk != "" and _hero_char_nodes.has(_atk):
+			var _caster_pos: Vector2 = _hero_char_nodes[_atk].global_position
+			_spawn_caster_beam(_VFX_BULLET_SHOT, _caster_pos, char_node.global_position, "bullet", func(): pass)
 
 # ── 킬캠 + parallax sway (M7.5 깊이감) ──────────────────────────────
 # 킬캠: 처치/사망 시 슬로우 + 카메라 줌인. GameSettings.kill_cam_enabled 옵션.

@@ -602,8 +602,8 @@ func _phase_hero_pre(hid: String) -> bool:
 		if alive_indices.is_empty():
 			break
 		var pick: int = alive_indices[randi() % alive_indices.size()]
-		_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK)
-		_last_attacker[pick] = hid
+		_last_attacker[pick] = hid  # bullet VFX caster_pos 조회용 — emit 전에 set
+		_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK, "bullet")
 		did_work = true
 	# 본인 poison tick (영웅이 받은 독)
 	var dmg: int = _hero_status.get(hid, {}).get("poison_dmg", 0)
