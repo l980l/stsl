@@ -40,6 +40,8 @@
 **이벤트·렐릭 v2** (PR #104~#107): `EventChoiceResource`에 신규 EffectType 3종(TRIGGER_BATTLE/MULTI/ADD_CARD) + 신규 필드(secondary/alt/reward/required_hero_id/encounter_tier/card_id), 22개 중복 이벤트를 새 메커니즘(전투-보상/확률/MULTI/조건부)으로 다양화, 5개 렐릭 차별화(scarab→APPLY_STATUS_ENEMY, ankh→ON_HERO_DAMAGED+condition_value, idun→PLAYER_TURN_END, dharma→PASSIVE MAX_HP, tengu→BATTLE_WIN), 5개 신규 이벤트 추가(sphinx_gate/ymir_blood/bodhi_tree/eight_immortals/kitsune_kit). **PASSIVE 트리거 적용 버그 수정**(_ancient_artifact/_dharma_seal/_cursed_crown MAX_HP 보너스 회복 — `add_relic` 시 즉시 적용). `condition_value` 처리를 HEAL/BLOCK까지 확장. `relic.status_type` 무시 버그 수정(_orochi_scale weak 회복). 카탈로그 스크립트 새 EffectType 인식, 사전 fail 37개 정리(i18n 키 마이그레이션·맵 노드·카드 풀 카운트), 통합 테스트 +14. **1365 테스트 통과 / 0 fail**.
 **개체별 ATB 차례 시스템** (PR #121~#125): 라운드 기반 → 33옵스퀴르 식 **영구 ATB 큐** (영웅 1명/적 1마리씩 speed 순). DeckManager 영웅별 분리 (각 영웅 덱·핸드·에너지·`owner_id` 자동 분배), 카드 효과 9개·Power 6개·Relic 44개 본인 차례 단위로 재정의. 영웅 차례 카메라 줌인 1.3x, 사이드바 (화면 밖 적 UI 만 우측 2x3 grid 트윈), turn queue 미리보기 위젯, 덱 보기 영웅별 탭, 차례 전환 인터벌 통합. **1465 테스트 통과 / 0 failed**. M5 영웅 6명 speed 50~60 (편차 줄임), 적 grade 폴백 NORMAL 45 / ELITE 53 / BOSS 65 (보스 > 영웅).
 **전투 UX 폴리싱 v3** (PR #126): 차례 인터벌 fine-tune (영웅→영웅 1x, 영웅↔적 2x, 적→적 3x), 적 인텐트 hover tooltip (모든 action_type + SPECIAL, 9 언어, base/사이드바 모두 작동), 상태이상 UI 시그니처 6 + 활성 파워 15 SVG 아이콘 추가 (이모지 폴백 제거), 파워 tooltip = 시전자 영웅 이름 (옆 라벨의 효과 설명과 역할 분리). GDScript 워닝/런타임 에러 일괄 정리 — Shift+T 번역 키 디버그 모드 크래시 해결 (`_format_intent_tooltip` `tr() %` → `_trf`), `ui_sound` meta flag 로 중복 connect 차단, `card_scene._build_desc` 절대 경로 get_node → autoload 직접 참조.
+**영웅 별명 + i18n 통일** (PR #128): 스토리 설정 (영웅들이 현생 기억 X → 본명 모름) — 영웅 6명 `.name` 을 영웅적 칭호로 (아우스터리츠의 태양 / 마지막 파라오 / 불패의 통제사 / 오를레앙의 성녀 / 초원의 정복자 / 두 자루의 검객). 메커니즘 desc·시너지 의 본명 → 짧은 직함 일괄 치환 (488 셀, 4 csv, 9 언어, 그리스어 격변화/정관사 후처리). 1인칭 유물 4종 (난중일기·오를레앙 깃발·니텐이치류·오륜서) 추상화. 누락 번역키 일괄 채움 — battle.intent.tooltip ja/el/zh 26 키, joan archetype 12, 시그너처 toast 6, status name 8, 유물/카드 effect 텍스트 등 ~150 셀. turn queue 슬롯 가로 96 (별명 길이 대응).
+**speed 시스템** (PR #129): 영웅·적 `speed` 스탯에 동적 buff/debuff 시스템. status `speed_bonus`/`speed_penalty` + `_dur` (poison 패턴 일정 효과), power `power.speed_buff` (전투 끝까지). 카드 6 종 (영웅별 1: 전격 진군/유혹의 정체/거북선 점호/성령의 가호/기마 돌격/신속의 검) + 유물 2 종 (신속의 인장 BATTLE_START 모든 영웅 +3, 시간의 모래시계 영웅 차례 5회마다 +1 누적). speed 변경 시 `_adjust_turn_queue_for_speed_change` 가 `_turn_queue_at` 비율 보정 + `turn_queue_changed` emit → UI 즉시 갱신. APPLY_STATUS target 에 ALL_ALLIES/ALLY 추가. CP 테이블 `SPEED_PER_TURN_V`/`SPEED_POWER_V` + 배수 추가, balance_check 전체 통과 (246 OK + 50 upgrade + 중복 0). 9 언어 i18n 21 키. **1448 passed / 0 failed**.
 
 ---
 
@@ -722,6 +724,91 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - ✅ VFX 3 종 (blood_spray / death_dissolve / revive_blessing) 의 인터페이스 통일용 signal 에 `@warning_ignore("unused_signal")`
 - ✅ `ui_sound._on_node_added` — meta flag `_ui_sound_connected` 로 중복 connect 차단 (reparent 시 'already connected' 에러)
 - ✅ `card_scene._build_desc` — `get_node("/root/BattleManager")` 절대 경로 → autoload 직접 참조 (tree 진입 전 호출 에러 해결)
+
+---
+
+## Milestone 6.12 — 영웅 별명 + i18n 통일 ✅ (PR #128)
+
+> 스토리 설정: **영웅들이 현생 기억을 잃어 자신의 이름을 모름**. 본명 대신 영웅적 칭호(별명) 사용. 4 csv 488 셀 일괄 치환 + 누락 번역키 ~150 셀 채움.
+
+### 6.12-1. 영웅 .name 별명화 (9 언어)
+- ✅ 나폴레옹 → 아우스터리츠의 태양 / Sun of Austerlitz
+- ✅ 클레오파트라 → 마지막 파라오 / The Last Pharaoh
+- ✅ 이순신 → 불패의 통제사 / The Undefeated Admiral
+- ✅ 잔다르크 → 오를레앙의 성녀 / The Maid of Orléans
+- ✅ 칭기즈칸 → 초원의 정복자 / Lord of the Steppe
+- ✅ 무사시 → 두 자루의 검객 / The Twin-Blade Swordsman
+- ✅ `.figure` 키 (본명) 는 코드 미사용 — 메타 정보로 유지
+
+### 6.12-2. 메커니즘/시너지 desc 본명 → 직함 일괄 치환
+- ✅ 황제/파라오/통제사/성녀/정복자/검객 (각 9 언어 매핑)
+- ✅ 단축형 (Napo / Joan / Cleo / Yi / Jeanne / Giovanna / Juana / Gengis / Cléo) word-boundary regex 치환
+- ✅ 그리스어 격변화 (Ναπολέοντα, Ιωάννας 등) + 더블 정관사 (`ο ο` → `ο`) 후처리
+- ✅ 488 셀 치환 (relic 117, synergy 328, card 34, event 9)
+
+### 6.12-3. 1인칭 유물 4종 .name 추상화
+- ✅ 난중일기 → 통제사의 일지 / Admiral's Journal
+- ✅ 오를레앙 깃발 → 백합의 깃발 / Banner of the Lily
+- ✅ 니텐이치류 → 이도류 비전 / Twin-Blade Doctrine
+- ✅ 오륜서 → 검리의 서 / Treatise of the Blade
+- ✅ 신화 유물 (mjolnir/ankh/eye_of_horus 등 인류 공동 자산) 은 유지
+
+### 6.12-4. 누락 번역키 일괄 채움 (~150 셀)
+- ✅ battle.intent.tooltip.* 26 키 (ja/el/zh/zh_TW 영어 그대로 → 정확 번역)
+- ✅ joan_of_arc archetype 12 키 (축복/성전/정화/깃발 4 분류)
+- ✅ 시그너처 toast 6 종 (hubris/ragnarok/egyptian_curse/karma/yin_yang/kekkai)
+- ✅ status 누락 (poison.desc + 7 .name) + power 누락 (double_next_damage/heal_per_turn/on_enthrall_strength/on_kill_energy)
+- ✅ effect.*.text 12 (damage/apply_status/heal_per_dead_ally/purge_status/status_double 등) + 카드 4 typo
+- ✅ turtle_power.name fr/it/es/el, ui.vol_master fr/it/es/el
+
+### 6.12-5. UI 보정
+- ✅ turn queue 슬롯 가로 80 → 96 (별명 길이 증가 대응)
+
+---
+
+## Milestone 6.13 — speed 시스템 ✅ (PR #129)
+
+> 영웅·적 `speed` 스탯에 동적 buff/debuff 시스템 추가. 카드 6 (영웅별 1) + 유물 2 (보편) + turn queue 즉시 재연산.
+
+### 6.13-1. 백엔드 — speed 동적 합산
+- ✅ `_hero_effective_speed` / `_enemy_effective_speed` = base + `status.speed_bonus` − `speed_penalty` + `power.speed_buff`
+- ✅ status: `speed_bonus` + `speed_bonus_dur`, `speed_penalty` + `speed_penalty_dur` (poison_dmg/poison_dur 패턴, 매 턴 dur 만 −1, 0 도달 시 value 도 0 — 일정 효과)
+- ✅ APPLY_STATUS target 에 `ALL_ALLIES` / `ALLY` 추가 (파티원 buff)
+- ✅ 신규 EffectType `BUFF_SPEED` / `DEBUFF_SPEED` (value=강도, bonus_value=duration)
+
+### 6.13-2. turn queue 즉시 재연산
+- ✅ `_adjust_turn_queue_for_speed_change(actor_id, old_speed)` — speed 변경 후 `_turn_queue_at[actor_id] = 기존 × (old_speed / new_speed)` 비율 보정
+- ✅ `turn_queue_changed.emit(get_turn_queue_preview())` → UI 즉시 갱신
+- ✅ BUFF/DEBUFF_SPEED 효과 처리 직후 + `power.speed_buff` 등록 후 호출
+
+### 6.13-3. 카드 6 종 (영웅별 1)
+- ✅ 나폴레옹 전격 진군 — 본인 +5 (3턴), 1코 U
+- ✅ 클레오파트라 유혹의 정체 — 적 1 −5 (3턴), 1코 U
+- ✅ 이순신 거북선 점호 — 파티 전원 +4 (4턴), 2코 R
+- ✅ 잔다르크 성령의 가호 — 파티원 1 +4 (3턴), 1코 U
+- ✅ 칭기즈칸 기마 돌격 — 본인 +6 (3턴), 1코 R
+- ✅ 무사시 신속의 검 — 본인 power.speed_buff +6 (전투 끝), 2코 R POWER
+
+### 6.13-4. 유물 2 종 (보편)
+- ✅ 신속의 인장 — BATTLE_START 시 모든 영웅 power.speed_buff +3 (전투 끝까지)
+- ✅ 시간의 모래시계 — 영웅 차례 5회마다 모든 영웅 power.speed_buff +1 누적
+- ✅ RelicResource.EffectType 에 BUFF_SPEED_TEAM, TIME_HOURGLASS 추가
+- ✅ BattleManager._hourglass_counter (전투 시작 시 0 리셋)
+
+### 6.13-5. CP 테이블 + balance_check
+- ✅ `SPEED_PER_TURN_V = 0.08`, `SPEED_POWER_V = 0.40`
+- ✅ ALLY 배수 1.1, ALL_ALLIES 1.8, ALL_ENEMY 1.5
+- ✅ balance_check EffectType 40/41 + `power.speed_buff` 분기 추가
+- ✅ card_value_table.md 갱신
+- ✅ balance_check 전체 통과 (CP 246 OK + upgrade 50 OK + 중복 0)
+
+### 6.13-6. i18n 21 키 × 9 언어
+- ✅ 카드 .name 6, 유물 .name+.desc 4, effect.buff/debuff_speed.* 5, status.speed_bonus/penalty.{name,desc} 4, power.speed_buff.{label,desc} 2
+
+### 6.13-7. 테스트
+- ✅ 1448 passed / 0 failed
+- ✅ 영웅별 카드 풀 31장 + archetype/rarity 카운트 갱신
+- ✅ 유물 풀 42 종
 
 ---
 
