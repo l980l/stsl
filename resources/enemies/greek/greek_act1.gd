@@ -135,10 +135,14 @@ static func hydra(scene: PackedScene) -> Resource:
 	var p2i5 := IntentRes.new()
 	p2i5.action_type = IntentRes.ActionType.DEBUFF; p2i5.value = 2; p2i5.status_type = "vulnerable"
 	p2i5.target = IntentRes.TargetType.ALL
+	# p2i6 — 광폭화 단계 다머리 가속 (보스 self speed_bonus 4 / 3턴)
+	var p2i6 := IntentRes.new()
+	p2i6.action_type = IntentRes.ActionType.BUFF; p2i6.value = 4; p2i6.status_type = "speed_bonus"
+	p2i6.duration = 3
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
 		[p1i1, p1i2, p1i3, p1i4],
-		[p2i1, p2i2, p2i3, p2i4, p2i5]
+		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20
