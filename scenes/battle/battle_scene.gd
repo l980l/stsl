@@ -33,7 +33,7 @@ const TOKEN_ROWS := 1
 # 따라서 별도 SIDEBAR_LAYOUT 불필요. sidebar 좌표 = (SIDEBAR_X, SIDEBAR_Y + i*VSPACE) + (node.base - panel.base)
 const SIDEBAR_X := 1620.0
 const SIDEBAR_Y := 200.0  # 위쪽 (relic_container y 70~142) 차단 영역 회피
-const SIDEBAR_SLOT_VSPACE := 140.0
+const SIDEBAR_SLOT_VSPACE := 100.0  # 6마리 fit (200 + 5*100 + 80 = 780, end_turn_btn y 856 위)
 var _enemy_sidebar_t: float = 0.0  # 0=base, 1=sidebar
 var _enemy_sidebar_tween: Tween = null
 const TOKEN_TILE_W := 111
@@ -2906,6 +2906,14 @@ func _update_enemy_sidebar_positions() -> void:
 func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 	var bp: Dictionary = entry["base_positions"]
 	var panel_base: Vector2 = bp.get("panel", Vector2.ZERO)
+	# 사이드바 활성 시 적 base panel/btn 의 mouse hit 차단 비활성 (사이드바 노드 hover 위해)
+	var sidebar_mode: bool = _enemy_sidebar_t > 0.5
+	var panel_node = entry.get("panel")
+	if panel_node != null and is_instance_valid(panel_node):
+		panel_node.mouse_filter = Control.MOUSE_FILTER_IGNORE if sidebar_mode else Control.MOUSE_FILTER_STOP
+	var btn_node = entry.get("btn")
+	if btn_node != null and is_instance_valid(btn_node):
+		btn_node.mouse_filter = Control.MOUSE_FILTER_IGNORE if sidebar_mode else Control.MOUSE_FILTER_STOP
 	# sidebar 슬롯의 panel 위치 (화면 좌표). 노드별 offset 은 base 와 동일 (node.base - panel.base).
 	var sidebar_panel_screen := Vector2(SIDEBAR_X, SIDEBAR_Y + slot_idx * SIDEBAR_SLOT_VSPACE)
 	var t: float = _enemy_sidebar_t
