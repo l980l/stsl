@@ -36,7 +36,23 @@ static func pool() -> Array:
 		_mushin_blade(), _clear_wind(),                          # P
 		_mushin_burst(), _void_guard(),                          # C
 		_five_rings_realm(),                                     # Chaos
+		# speed buff power (무심 추가)
+		_swift_blade(),
 	]
+
+static func _swift_blade() -> Resource:
+	# 신속의 검 — RARE, 2코, POWER, 무심: 전투 시작 시 본인 power.speed_buff +5 (전투 끝까지)
+	var c := CardRes.new()
+	c.card_name = "card.musashi.swift_blade.name"; c.owner_id = "musashi"
+	c.cost = 2; c.card_type = CardRes.CardType.POWER
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.musashi.meditation.archetype"  # 무심
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.APPLY_STATUS
+	e.status_type = "power.speed_buff"
+	e.value = 5; e.base_value = 5
+	e.target = "SELF"
+	c.effects = [e]; return c
 
 # ─────────────────────────────────────────
 # 시작덱 (4종)

@@ -146,7 +146,8 @@ const STATUS_EMOJI := {
 const STATUS_INTERNAL_KEYS := [
 	"poison_dur", "tokens", "counter_ratio", "damage_taken",
 	"greek_hubris_pending", "norse_ragnarok_fired",
-	"daoist_stance", "japanese_turn_count"
+	"daoist_stance", "japanese_turn_count",
+	"speed_bonus_dur", "speed_penalty_dur"
 ]
 
 func _trf(key: String, args) -> String:

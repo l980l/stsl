@@ -405,27 +405,34 @@ func _parse_actor_id(actor_id: String) -> Dictionary:
 		return {}
 	return {"kind": parts[0], "key": parts[1]}
 
-# 적 유효 speed — EnemyResource.speed (없으면 grade 기반 기본값)
+# 적 유효 speed — EnemyResource.speed (없으면 grade 기반 기본값) + status/power 동적
 func _enemy_effective_speed(enemy_index: int) -> int:
 	if enemy_index < 0 or enemy_index >= _enemies.size():
 		return 40
 	var enemy = _enemies[enemy_index]
-	var s: int = int(enemy.get("speed"))
-	if s > 0:
-		return s
-	# grade 기본값 — NORMAL 45 (영웅 평균 55 보다 약간 느림) / ELITE 53 (영웅 평균과 동급) / BOSS 65 (가장 빠른 영웅 60 보다 빠름)
-	var grade: int = int(enemy.get("grade"))
-	match grade:
-		1: return 53  # ELITE
-		2: return 65  # BOSS
-		_: return 45  # NORMAL
+	var base: int = int(enemy.get("speed"))
+	if base <= 0:
+		# grade 기본값 — NORMAL 45 / ELITE 53 / BOSS 65
+		var grade: int = int(enemy.get("grade"))
+		match grade:
+			1: base = 53  # ELITE
+			2: base = 65  # BOSS
+			_: base = 45  # NORMAL
+	var st: Dictionary = _enemy_status[enemy_index] if enemy_index < _enemy_status.size() else {}
+	var bonus: int = st.get("speed_bonus", 0) - st.get("speed_penalty", 0)
+	var power_buff: int = _active_powers.get("power.speed_buff:enemy_%d" % enemy_index, {}).get("value", 0)
+	return max(1, base + bonus + power_buff)
 
 func _hero_effective_speed(hid: String) -> int:
 	if team_mgr == null:
 		return 50
 	for hero in team_mgr.heroes:
 		if hero.hero_id == hid:
-			return max(1, int(hero.speed))
+			# base + status.speed_bonus - status.speed_penalty + power.speed_buff (전투 내 동적)
+			var st: Dictionary = _hero_status.get(hid, {})
+			var bonus: int = st.get("speed_bonus", 0) - st.get("speed_penalty", 0)
+			var power_buff: int = _active_powers.get("power.speed_buff:" + hid, {}).get("value", 0)
+			return max(1, int(hero.speed) + bonus + power_buff)
 	return 50
 
 func _actor_speed(actor_id: String) -> int:
@@ -617,6 +624,16 @@ func _phase_hero_post(hid: String) -> bool:
 			if not _hero_status.has(hid):
 				_hero_status[hid] = {}
 			_hero_status[hid][stype] = cur - 1
+			did_work = true
+	# speed_bonus / speed_penalty — value 유지, dur 만 감소. dur=0 도달 시 value 도 0
+	for pair in [["speed_bonus", "speed_bonus_dur"], ["speed_penalty", "speed_penalty_dur"]]:
+		var dur: int = _hero_status.get(hid, {}).get(pair[1], 0)
+		if dur > 0:
+			if not _hero_status.has(hid):
+				_hero_status[hid] = {}
+			_hero_status[hid][pair[1]] = dur - 1
+			if dur - 1 == 0:
+				_hero_status[hid][pair[0]] = 0
 			did_work = true
 	_check_win_condition()
 	return did_work
@@ -923,6 +940,13 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								_apply_status_to_enemy(i, effect.status_type, _as_stacks)
 					elif effect.target == "SELF":
 						_apply_status_to_hero(card.owner_id, effect.status_type, _as_stacks)
+					elif effect.target == "ALL_ALLIES":
+						if team_mgr:
+							for hero in team_mgr.get_living_heroes():
+								_apply_status_to_hero(hero.hero_id, effect.status_type, _as_stacks)
+					elif effect.target == "ALLY":
+						var ally_id: String = target_hero_id if target_hero_id != "" else card.owner_id
+						_apply_status_to_hero(ally_id, effect.status_type, _as_stacks)
 					else:
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 							_apply_status_to_enemy(target_enemy_index, effect.status_type, _as_stacks)
@@ -1311,6 +1335,34 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if _types > 0:
 						_deal_damage_to_enemy(_di, _types * effect.value, effect.damage_type)
 						_last_attacker[_di] = card.owner_id
+			EffectRes.EffectType.BUFF_SPEED:
+				# value = 강도, bonus_value = 지속 턴. target SELF/ALL_ALLIES/ALLY
+				var _bs_targets: Array = []
+				if effect.target == "ALL_ALLIES" and team_mgr:
+					for h in team_mgr.get_living_heroes():
+						_bs_targets.append(h.hero_id)
+				elif effect.target == "ALLY":
+					_bs_targets.append(target_hero_id if target_hero_id != "" else card.owner_id)
+				else:
+					_bs_targets.append(card.owner_id)
+				for _bs_hid in _bs_targets:
+					if not _hero_status.has(_bs_hid):
+						_hero_status[_bs_hid] = {}
+					_hero_status[_bs_hid]["speed_bonus"] = effect.value
+					_hero_status[_bs_hid]["speed_bonus_dur"] = effect.bonus_value
+					status_applied.emit(_bs_hid, "speed_bonus", effect.value)
+			EffectRes.EffectType.DEBUFF_SPEED:
+				var _ds_targets: Array = []
+				if effect.target == "ALL":
+					for i in range(_enemies.size()):
+						if _enemy_alive[i]:
+							_ds_targets.append(i)
+				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+					_ds_targets.append(target_enemy_index)
+				for _ds_ei in _ds_targets:
+					_enemy_status[_ds_ei]["speed_penalty"] = effect.value
+					_enemy_status[_ds_ei]["speed_penalty_dur"] = effect.bonus_value
+					status_applied.emit("enemy_%d" % _ds_ei, "speed_penalty", effect.value)
 	# power.echo_next_attack: 이 ATTACK 카드 효과 전체를 1회 재시전 (재진입 가드)
 	if not _in_echo_replay and card.card_type == CardRes.CardType.ATTACK:
 		var _echo_key: String = "power.echo_next_attack:" + card.owner_id
@@ -1528,6 +1580,13 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 	for stype: String in ["weak", "vulnerable"]:
 		if _enemy_status[i].get(stype, 0) > 0:
 			_enemy_status[i][stype] -= 1
+	# speed_bonus / speed_penalty — value 유지, dur 만 감소
+	for pair in [["speed_bonus", "speed_bonus_dur"], ["speed_penalty", "speed_penalty_dur"]]:
+		var dur_e: int = _enemy_status[i].get(pair[1], 0)
+		if dur_e > 0:
+			_enemy_status[i][pair[1]] = dur_e - 1
+			if dur_e - 1 == 0:
+				_enemy_status[i][pair[0]] = 0
 	# 본인 poison tick (영웅이 가한 독 — 본인 차례 시작 시 발동)
 	var p_dmg: int = _enemy_status[i].get("poison_dmg", 0)
 	var p_dur: int = _enemy_status[i].get("poison_dur", 0)

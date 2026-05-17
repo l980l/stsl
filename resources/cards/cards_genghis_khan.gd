@@ -36,7 +36,23 @@ static func pool() -> Array:
 		_massacre_khan(),                                                   # P
 		_khans_treasury(), _war_tribute(),                                  # C
 		_khans_gamble(),                                                    # Chaos
+		# speed buff long (기동 추가)
+		_cavalry_charge_speed(),
 	]
+
+static func _cavalry_charge_speed() -> Resource:
+	# 기마 돌격 — RARE, 1코, SKILL, 기동: 본인 speed +5 (5턴)
+	var c := CardRes.new()
+	c.card_name = "card.genghis_khan.cavalry_charge_speed.name"; c.owner_id = "genghis_khan"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.archetype = "card.genghis_khan.sprint.archetype"  # 기동
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.BUFF_SPEED
+	e.value = 5; e.base_value = 5
+	e.bonus_value = 5; e.base_bonus_value = 5
+	e.target = "SELF"
+	c.effects = [e]; return c
 
 # ─────────────────────────────────────────
 # 시작덱 (4종)

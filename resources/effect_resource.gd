@@ -43,6 +43,8 @@ enum EffectType {
 	DAMAGE_PER_STATUS_TYPE, # 대상 적의 디버프 종류 수(weak/vuln/poison/charm) × value 피해
 	DRAW_PER_ENTHRALL,    # 이 카드 사용 중 반함(enthrall) 발동 횟수 × value 드로우 (클레오 입맞춤)
 	DAMAGE_PER_CHARMED_ENEMY, # 현재 charm 스택 보유 적 수 × value 피해 (황금 왕좌)
+	BUFF_SPEED,      # 영웅 speed +value, bonus_value 턴 일정 지속 (SELF/ALL_ALLIES/ALLY)
+	DEBUFF_SPEED,    # 적 speed -value, bonus_value 턴 일정 지속 (SINGLE/ALL)
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
@@ -190,4 +192,14 @@ func display_text(override_value: int = -1) -> String:
 			return TranslationServer.translate("effect.draw_per_enthrall.text") % value
 		EffectType.DAMAGE_PER_CHARMED_ENEMY:
 			return TranslationServer.translate("effect.damage_per_charmed_enemy.text") % value
+		EffectType.BUFF_SPEED:
+			var _bsk: String
+			match target:
+				"SELF": _bsk = "effect.buff_speed.self.text"
+				"ALL_ALLIES": _bsk = "effect.buff_speed.all_allies.text"
+				_: _bsk = "effect.buff_speed.ally.text"
+			return TranslationServer.translate(_bsk) % [value, bonus_value]
+		EffectType.DEBUFF_SPEED:
+			var _dsk: String = "effect.debuff_speed.all.text" if target == "ALL" else "effect.debuff_speed.single.text"
+			return TranslationServer.translate(_dsk) % [value, bonus_value]
 	return ""
