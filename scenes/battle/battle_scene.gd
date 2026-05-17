@@ -884,6 +884,8 @@ func _connect_signals() -> void:
 	# VFX 노드 종료 추적 — 임팩트 시점이 아니라 노드가 완전히 free 되는 시점 기준
 	self.child_entered_tree.connect(_on_child_entered_vfx_track)
 	self.child_exiting_tree.connect(_on_child_exited_vfx_track)
+	# 영웅 줌인 옵션 변경 — 즉시 카메라 상태 반영
+	GameSettings.hero_zoom_enabled_changed.connect(_on_hero_zoom_setting_changed)
 	BattleManager.turn_ended.connect(func(_aid: String): _refresh_turn_queue_widget())
 	BattleManager.enemy_died.connect(func(_idx: int): _refresh_turn_queue_widget())
 	BattleManager.enemy_spawned.connect(func(_idx: int): _refresh_turn_queue_widget())
@@ -2846,6 +2848,17 @@ func _cam_try_return_to_hero() -> void:
 	else:
 		_cam_state = CamState.IDLE_FAR
 		_cam_zoom_out()
+
+# 설정 변경 즉시 반영 — 영웅 줌인 옵션 on/off
+func _on_hero_zoom_setting_changed(enabled: bool) -> void:
+	if not enabled:
+		# 줌인 → 줌아웃 (현재 상태와 무관하게)
+		_cam_zoom_out()
+		return
+	# 줌아웃 → 영웅 차례 중이면 즉시 줌인
+	var hid: String = BattleManager.get_current_hero_id()
+	if hid != "" and _cam_state == CamState.HERO_FOCUS:
+		_cam_zoom_to_hero(hid)
 
 func _setup_kill_cam() -> void:
 	_camera = Camera2D.new()

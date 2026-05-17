@@ -53,6 +53,10 @@ var hero_zoom_enabled: bool = HERO_ZOOM_DEFAULT
 var cam_zoom_speed_key: String = CAM_ZOOM_SPEED_DEFAULT
 var cam_zoom_speed_multiplier: float = 1.0
 
+# 설정 변경 시그널 — 변경 즉시 반영 필요한 곳에서 구독
+@warning_ignore("unused_signal")
+signal hero_zoom_enabled_changed(enabled: bool)
+
 func _ready() -> void:
 	load_settings()
 
@@ -93,6 +97,7 @@ func set_background_enabled(enabled: bool) -> void:
 
 func set_hero_zoom_enabled(enabled: bool) -> void:
 	hero_zoom_enabled = enabled
+	hero_zoom_enabled_changed.emit(enabled)
 
 func set_cam_zoom_speed(key: String) -> void:
 	var idx := CAM_ZOOM_SPEED_KEYS.find(key)
