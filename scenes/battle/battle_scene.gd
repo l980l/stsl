@@ -918,6 +918,7 @@ func _connect_signals() -> void:
 	BattleManager.hero_damaged.connect(_on_hero_damaged)
 	BattleManager.hero_block_gained.connect(_on_hero_block_gained)
 	BattleManager.enemy_damaged.connect(_on_enemy_damaged)
+	BattleManager.token_attack_fired.connect(_on_token_attack_fired)
 	TeamManager.hero_healed.connect(_on_hero_healed)
 	BattleManager.enemy_died.connect(_on_enemy_died)
 	BattleManager.battle_won.connect(_on_battle_won)
@@ -2666,10 +2667,12 @@ func _spawn_caster_beam(beam_script: GDScript, caster_pos: Vector2, target_pos: 
 	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	# bullet 은 전용 SFX 파일이 없어 projectile SFX 로 폴백
+	var _sfx_key: String = "impact_projectile" if dtype == "bullet" else "impact_" + dtype
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		_play_screen_shake()
-		AudioManager.play_sfx("impact_" + dtype)
+		AudioManager.play_sfx(_sfx_key)
 		on_impact.call()
 	)
 	fx.play(caster_pos, target_pos)
@@ -2791,6 +2794,29 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 		var hero_spark_pos: Vector2 = char_node.global_position + _impact_jitter()
 		_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
 
+func _on_token_attack_fired(hero_id: String, token_index: int, enemy_index: int) -> void:
+	# 병사 토큰 공격 — 각 병사 타일 위치에서 bullet beam 발사 (각자 위치 + SFX 분산)
+	if enemy_index < 0 or enemy_index >= _enemy_char_nodes.size():
+		return
+	var target_node = _enemy_char_nodes[enemy_index]
+	if not is_instance_valid(target_node):
+		return
+	var caster_pos: Vector2
+	var tiles: Array = _token_tile_nodes.get(hero_id, [])
+	if token_index < tiles.size() and is_instance_valid(tiles[token_index]):
+		caster_pos = tiles[token_index].global_position
+	elif _hero_char_nodes.has(hero_id):
+		# 토큰 노드 못 찾으면 영웅 위치로 폴백
+		caster_pos = _hero_char_nodes[hero_id].global_position
+	else:
+		return
+	# 카메라 줌아웃 (적이 화면 밖에 있으면 bullet 안 보이므로) — VFX 종료 시 자동 복귀
+	if _cam_state == CamState.HERO_FOCUS:
+		_cam_state = CamState.VFX_PLAYING
+		_cam_zoom_out()
+		_start_enemy_sidebar_transition(0.0)
+	_spawn_caster_beam(_VFX_BULLET_SHOT, caster_pos, target_node.global_position, "bullet", func(): pass)
+
 func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 	_update_enemy_ui(index)
 	if index < _enemy_nodes.size() and _enemy_nodes[index]["panel"].visible:
@@ -2816,6 +2842,7 @@ func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 	if amount > 0 and char_node and _caster_beam_script(dtype) == null:
 		var spark_pos: Vector2 = char_node.global_position + _impact_jitter()
 		_spawn_impact_particles(spark_pos, amount, false, dtype)
+	# bullet 분기 — token_attack_fired signal 에서 처리 (각 병사 타일 위치 + SFX 분산)
 
 # ── 킬캠 + parallax sway (M7.5 깊이감) ──────────────────────────────
 # 킬캠: 처치/사망 시 슬로우 + 카메라 줌인. GameSettings.kill_cam_enabled 옵션.

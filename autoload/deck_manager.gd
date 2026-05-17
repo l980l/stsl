@@ -286,15 +286,22 @@ func get_all_hands() -> Array:
 # ── meta deck (전투 외) ─────────────────────────────
 func add_card_to_deck(card: Resource) -> void:
 	# 전투 외 — meta_deck 에 누적. 전투 시작 시 owner_id 기반 분배.
-	# 전투 중 — 카드 보상 등 — owner_id 영웅의 discard 에 직접 추가.
+	# 전투 중 — owner 가 현재 차례 영웅이면 hand 로 (디버그 즉시 사용), 아니면 discard 로.
 	if _heroes.is_empty():
 		_meta_deck.append(card)
+		return
+	var hid: String = card.owner_id
+	if not _heroes.has(hid):
+		_meta_deck.append(card)
+		hand_changed.emit()
+		return
+	var bm = Engine.get_main_loop().root.get_node_or_null("BattleManager")
+	var current_hid: String = bm.get_current_hero_id() if bm and bm.has_method("get_current_hero_id") else ""
+	if current_hid == hid:
+		(_heroes[hid]["hand"] as Array).append(card)
 	else:
-		var hid: String = card.owner_id
-		if _heroes.has(hid):
-			(_heroes[hid]["discard"] as Array).append(card)
-		else:
-			_meta_deck.append(card)
+		(_heroes[hid]["discard"] as Array).append(card)
+	hand_changed.emit()
 
 func get_meta_deck() -> Array:
 	return _meta_deck.duplicate()
