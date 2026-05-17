@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="sd-bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#1a2030"/>
+      <stop offset="100%" stop-color="#06080c"/>
+    </radialGradient>
+  </defs>
+  <circle cx="128" cy="128" r="112" fill="url(#sd-bg)" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 음양 (☯) — 음양 자세 교대 -->
+  <!-- 양 (밝은 절반) -->
+  <path d="M 128,52 A 76,76 0 0 1 128,204 A 38,38 0 0 1 128,128 A 38,38 0 0 0 128,52 Z"
+        fill="#e8f4ff" stroke="#c9a84c" stroke-width="4"/>
+  <!-- 음 (어두운 절반) -->
+  <path d="M 128,52 A 76,76 0 0 0 128,204 A 38,38 0 0 0 128,128 A 38,38 0 0 1 128,52 Z"
+        fill="#1c2838" stroke="#c9a84c" stroke-width="4"/>
+  <!-- 음 안의 양 점 -->
+  <circle cx="128" cy="90" r="11" fill="#e8f4ff"/>
+  <!-- 양 안의 음 점 -->
+  <circle cx="128" cy="166" r="11" fill="#1c2838"/>
+  <!-- 외곽 청백 광채 -->
+  <circle cx="128" cy="128" r="78" fill="none" stroke="#d9f2ff" stroke-width="2" opacity="0.5"/>
+</svg>

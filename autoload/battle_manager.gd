@@ -542,7 +542,7 @@ func _run_next_actor_turn() -> void:
 	elif next_id.begins_with("enemy:"):
 		var idx: int = int(next_id.substr(6))
 		await _run_one_enemy_turn(idx)
-		# 적 차례 후 다음 actor 자동 진행 — 차례 전환 인터벌 대기
+		# 적 차례 후 다음 actor 자동 진행 — 1x (적→적 너무 느림 방지)
 		if is_battle_active:
 			if turn_interval > 0.0:
 				await get_tree().create_timer(turn_interval * _turn_interval_mul()).timeout
@@ -555,6 +555,11 @@ func _start_hero_turn(hid: String) -> void:
 	turn_count += 1
 	_player_damage_this_turn = 0  # T3-MIMIC 트래커 리셋
 	_in_player_turn = true
+	# 영웅 차례 시작 인터벌 — 1x (적→영웅 너무 빠름 방지, 카메라 줌인과 동시 진행)
+	if turn_interval > 0.0:
+		await get_tree().create_timer(turn_interval * _turn_interval_mul()).timeout
+	if not is_battle_active:
+		return
 	var pre_did: bool = _phase_hero_pre(hid)
 	if pre_did and turn_interval > 0.0:
 		await get_tree().create_timer(turn_interval).timeout
@@ -658,9 +663,7 @@ func end_player_turn() -> void:
 	_advance_turn_counter(_current_actor_id)
 	turn_ended.emit(_current_actor_id)
 	_current_actor_id = ""
-	# 차례 전환 인터벌 — 영웅→다음 actor (영웅이든 적이든)
-	if is_battle_active and turn_interval > 0.0:
-		await get_tree().create_timer(turn_interval * _turn_interval_mul()).timeout
+	# 영웅 종료 후 인터벌 제거 — 다음 actor 의 시작 인터벌 (영웅/적 각각) 으로 통합
 	if is_battle_active:
 		await _run_next_actor_turn()
 
@@ -1514,6 +1517,11 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 		_in_player_turn = false  # MIMIC 트래커 게이트 종료
 		enemy_turn_started.emit()
 		turn_started.emit(_current_actor_id)
+		# 적 차례 시작 인터벌 — 사용자가 적 차례 인식 시간 (영웅 차례보다 짧게 느껴지지 않게 2배)
+		if turn_interval > 0.0:
+			await get_tree().create_timer(turn_interval * 2.0 * _turn_interval_mul()).timeout
+		if not is_battle_active:
+			return
 	_enemy_block[i] = 0
 	# 시그니처 hook: 턴 시작 (휴브리스 pending 처리, 도교 음양, 일본 결계)
 	SignatureSys.on_enemy_turn_start(self, i)
@@ -1525,6 +1533,9 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 	var p_dur: int = _enemy_status[i].get("poison_dur", 0)
 	if p_dmg > 0 and p_dur > 0:
 		_tick_enemy_poison(i)
+		# 독 적용 후 인터벌 — 공격과 분리해서 인식 시간 (2x — 독 데미지 popup 시각 확인 시간)
+		if not legacy and turn_interval > 0.0:
+			await get_tree().create_timer(turn_interval * 2.0 * _turn_interval_mul()).timeout
 		if not _enemy_alive[i]:
 			if not legacy:
 				_advance_turn_counter(_current_actor_id)

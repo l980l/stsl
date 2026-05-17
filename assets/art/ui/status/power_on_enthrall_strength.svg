@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <circle cx="128" cy="128" r="112" fill="#1a0814" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 좌측 사슬 (예속) -->
+  <ellipse cx="60" cy="100" rx="14" ry="10" fill="none" stroke="#b079ff" stroke-width="5"/>
+  <ellipse cx="60" cy="124" rx="10" ry="14" fill="none" stroke="#b079ff" stroke-width="5"/>
+  <ellipse cx="60" cy="152" rx="14" ry="10" fill="none" stroke="#b079ff" stroke-width="5"/>
+  <!-- 변환 화살표 → -->
+  <line x1="92" y1="128" x2="148" y2="128" stroke="#ffd84d" stroke-width="9" stroke-linecap="round"/>
+  <polygon points="160,128 142,116 142,140" fill="#ffd84d" stroke="#5a4020" stroke-width="2"/>
+  <!-- 우측 주먹 (힘) -->
+  <rect x="170" y="100" width="58" height="48" rx="10" fill="#cc3322" stroke="#c9a84c" stroke-width="4"/>
+  <line x1="184" y1="100" x2="184" y2="148" stroke="#5a1a08" stroke-width="2"/>
+  <line x1="198" y1="100" x2="198" y2="148" stroke="#5a1a08" stroke-width="2"/>
+  <line x1="212" y1="100" x2="212" y2="148" stroke="#5a1a08" stroke-width="2"/>
+  <!-- 위 ↑ 화살표 (힘 증가) -->
+  <line x1="199" y1="92" x2="199" y2="56" stroke="#ffd84d" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="199,44 184,68 214,68" fill="#ffd84d" stroke="#5a4020" stroke-width="1.5"/>
+</svg>

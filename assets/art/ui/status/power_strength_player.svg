@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="psp-arrow" cx="50%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#d8a8ff"/>
+      <stop offset="100%" stop-color="#5a1aaa"/>
+    </radialGradient>
+  </defs>
+  <circle cx="128" cy="128" r="112" fill="#100820" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 위로 향한 주먹 (팔뚝) -->
+  <path d="M 100,230 L 100,158 Q 100,148 110,148 L 146,148 Q 156,148 156,158 L 156,230 Z"
+        fill="#5a3a90" stroke="#c9a84c" stroke-width="3"/>
+  <!-- 주먹 -->
+  <rect x="92" y="108" width="72" height="50" rx="12" fill="#7a52b8" stroke="#c9a84c" stroke-width="3.5"/>
+  <line x1="110" y1="108" x2="110" y2="158" stroke="#c9a84c" stroke-width="1.5" opacity="0.5"/>
+  <line x1="128" y1="108" x2="128" y2="158" stroke="#c9a84c" stroke-width="1.5" opacity="0.5"/>
+  <line x1="146" y1="108" x2="146" y2="158" stroke="#c9a84c" stroke-width="1.5" opacity="0.5"/>
+  <!-- 엄지 -->
+  <path d="M 88,148 Q 75,138 78,123 Q 80,113 90,116 L 92,128 Z"
+        fill="#7a52b8" stroke="#c9a84c" stroke-width="2.5"/>
+  <!-- 위쪽 화살표 (보라 — 영구) -->
+  <path d="M 128,100 L 105,128 L 118,120 L 118,138 L 138,138 L 138,120 L 151,128 Z"
+        fill="url(#psp-arrow)" stroke="#d8a8ff" stroke-width="2.5"/>
+  <!-- 무한 마크 ∞ (영구 power) — 우상단 -->
+  <path d="M 170,46 Q 180,36 188,46 Q 196,56 204,46 Q 212,36 220,46 Q 212,56 204,46 Q 196,36 188,46 Q 180,56 170,46 Z"
+        fill="none" stroke="#ffd84d" stroke-width="3"/>
+</svg>

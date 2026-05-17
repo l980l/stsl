@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="sg-bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#3a0e04"/>
+      <stop offset="100%" stop-color="#0c0402"/>
+    </radialGradient>
+  </defs>
+  <!-- 외곽 링 -->
+  <circle cx="128" cy="128" r="112" fill="url(#sg-bg)" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 코린트식 투구 (휴브리스의 그리스) -->
+  <path d="M 80,90 Q 80,60 128,55 Q 176,60 176,90 L 176,150 Q 176,170 165,178 L 165,205 Q 165,210 160,210 L 145,210 L 145,178 L 111,178 L 111,210 L 96,210 Q 91,210 91,205 L 91,178 Q 80,170 80,150 Z"
+        fill="#3a1a08" stroke="#c9a84c" stroke-width="4"/>
+  <!-- 투구 볏 (붉은 깃털) -->
+  <path d="M 128,55 Q 132,30 145,18 Q 138,25 138,55 Q 145,25 162,15 Q 150,30 150,55 Q 158,30 175,22 Q 162,32 158,58"
+        fill="#ff7733" stroke="#ff4400" stroke-width="2" opacity="0.85"/>
+  <!-- 투구 눈구멍 (Y 슬릿) -->
+  <path d="M 105,110 L 115,110 L 115,140 L 110,150 L 100,150 Z" fill="#080000"/>
+  <path d="M 141,110 L 151,110 L 151,140 L 146,150 L 156,150 Z" fill="#080000"/>
+  <!-- 코 가드 -->
+  <rect x="125" y="110" width="6" height="55" fill="#1a0a04" stroke="#c9a84c" stroke-width="1.5"/>
+  <!-- 번개 (휴브리스 — 신의 분노) -->
+  <path d="M 200,40 L 178,90 L 195,90 L 178,140 L 220,75 L 200,75 L 215,40 Z"
+        fill="#ffd84d" stroke="#ff9020" stroke-width="3" opacity="0.95"/>
+  <path d="M 56,40 L 78,90 L 61,90 L 78,140 L 36,75 L 56,75 L 41,40 Z"
+        fill="#ffd84d" stroke="#ff9020" stroke-width="3" opacity="0.55"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <circle cx="128" cy="128" r="112" fill="#0c0816" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 검 (가운데) -->
+  <line x1="98" y1="60" x2="158" y2="200" stroke="#d4c3a8" stroke-width="14" stroke-linecap="square"/>
+  <line x1="98" y1="60" x2="158" y2="200" stroke="#fffce0" stroke-width="4" stroke-linecap="square" opacity="0.7"/>
+  <rect x="86" y="50" width="32" height="9" fill="#c9a84c" stroke="#5a4020" stroke-width="2" transform="rotate(66 102 54)"/>
+  <circle cx="92" cy="56" r="7" fill="#c9a84c" stroke="#5a4020" stroke-width="2"/>
+  <!-- 메아리 호 (검 주변 보라 반향) -->
+  <path d="M 168,76 Q 196,108 188,148" stroke="#b079ff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 188,60 Q 222,108 210,160" stroke="#b079ff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.55"/>
+  <path d="M 88,184 Q 60,152 68,112" stroke="#b079ff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 68,200 Q 34,152 46,100" stroke="#b079ff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.55"/>
+</svg>

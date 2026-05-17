@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <circle cx="128" cy="128" r="112" fill="#100c08" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 토큰 3 개 (좌측) -->
+  <circle cx="60" cy="100" r="22" fill="#ffd84d" stroke="#5a4020" stroke-width="3"/>
+  <circle cx="60" cy="100" r="14" fill="none" stroke="#5a4020" stroke-width="2"/>
+  <circle cx="60" cy="148" r="22" fill="#ffd84d" stroke="#5a4020" stroke-width="3"/>
+  <circle cx="60" cy="148" r="14" fill="none" stroke="#5a4020" stroke-width="2"/>
+  <circle cx="60" cy="196" r="22" fill="#ffd84d" stroke="#5a4020" stroke-width="3"/>
+  <circle cx="60" cy="196" r="14" fill="none" stroke="#5a4020" stroke-width="2"/>
+  <!-- + 화살표 → -->
+  <line x1="92" y1="130" x2="138" y2="130" stroke="#ffd84d" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="148,130 132,120 132,140" fill="#ffd84d" stroke="#5a4020" stroke-width="1.5"/>
+  <!-- 검 (우측, 보너스 데미지) -->
+  <line x1="186" y1="60" x2="186" y2="200" stroke="#d4c3a8" stroke-width="14" stroke-linecap="square"/>
+  <line x1="186" y1="60" x2="186" y2="200" stroke="#fffce0" stroke-width="4" stroke-linecap="square" opacity="0.7"/>
+  <!-- 검 가드 -->
+  <rect x="162" y="200" width="48" height="10" fill="#c9a84c" stroke="#5a4020" stroke-width="2"/>
+  <!-- 검 폼멜 -->
+  <circle cx="186" cy="218" r="8" fill="#c9a84c" stroke="#5a4020" stroke-width="2"/>
+  <!-- 검 끝 광채 -->
+  <polygon points="186,52 178,68 194,68" fill="#fffce0"/>
+</svg>

@@ -79,7 +79,9 @@
 
 <div class="tab-bar">
   <div class="tab active" onclick="showTab('all',this)">전체</div>
-  <div class="tab" onclick="showTab('status',this)">상태이상 / 카운터 (11)</div>
+  <div class="tab" onclick="showTab('status',this)">상태이상 / 카운터 (15)</div>
+  <div class="tab" onclick="showTab('signature',this)">신화 시그니처 (6)</div>
+  <div class="tab" onclick="showTab('power',this)">활성 파워 (21)</div>
   <div class="tab" onclick="showTab('relic',this)">렐릭 (40)</div>
   <div class="tab" onclick="showTab('synergy',this)">시너지 (15)</div>
   <div class="tab" onclick="showTab('map',this)">맵 (7)</div>
@@ -94,7 +96,23 @@
 const DATA = {
   status: {
     label: "상태이상 / 카운터", dir: "status/", ext: "svg",
-    items: ["charm","enthrall","charm_resistance","counter_block","morale","poison","strength","taunt","vulnerable","weak","__clock__"]
+    items: ["charm","charm_resistance","counter_block","counter_pool","death_rattle","enthrall","invuln","marked_by","morale","poison","strength","taunt","vulnerable","weak","__clock__"]
+  },
+  signature: {
+    label: "신화 시그니처", dir: "status/", ext: "svg",
+    items: ["sig_greek","sig_norse","sig_egyptian","sig_buddhist","sig_daoist","sig_japanese"]
+  },
+  power: {
+    label: "활성 파워", dir: "status/", ext: "svg",
+    items: [
+      "power_block_per_turn","power_bonus_per_hit","power_charm_double_apply",
+      "power_charm_threshold_minus","power_counter_per_attack","power_debuff_amplify",
+      "power_double_next_damage","power_draw_per_turn","power_echo_next_attack",
+      "power_every_nth_attack_bonus","power_heal_per_turn","power_heal_team_per_turn",
+      "power_morale_per_turn","power_on_enthrall_strength","power_on_kill_energy",
+      "power_poison_double_application","power_poison_per_turn","power_sacrifice_bank",
+      "power_strength_player","power_summon_per_turn","power_token_bonus_dmg"
+    ]
   },
   relic: {
     label: "렐릭", dir: "relic/", ext: "svg",

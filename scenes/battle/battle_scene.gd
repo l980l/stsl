@@ -36,7 +36,6 @@ const SIDEBAR_Y := 80.0    # turn_queue (y 18~52) 아래, 캐릭터 패널 위
 const SIDEBAR_SLOT_VSPACE := 90.0  # row 간 거리
 const SIDEBAR_SLOT_HSPACE := 230.0  # col 간 거리 (hp_bar 폭 211 + 19px gap)
 const SIDEBAR_SLOTS_PER_ROW := 3   # 위쪽/아래쪽 각 3 슬롯, 우측부터 채움
-var _enemy_sidebar_t: float = 0.0  # 0=base, 1=sidebar
 var _enemy_sidebar_tween: Tween = null
 const TOKEN_TILE_W := 111
 const TOKEN_TILE_H := 138
@@ -419,14 +418,17 @@ func _apply_ui_z_index_recursive(_node: Node, z: int) -> void:
 func _set_char_entry_z(entry: Dictionary) -> void:
 	const Z_PANEL := 1200   # 배경 panel + bracket
 	const Z_BAR := 1210     # hp_bar wrapper + bg/fill/bloom/ghost (z_as_relative)
-	const Z_LBL := 1220     # 모든 라벨 — bar 위
+	const Z_LBL := 1220     # 일반 라벨 — bar 위
+	const Z_INTENT := 1230  # intent_lbl — btn(1220) 보다 위 (base 시 tooltip hover)
 	if entry.has("panel") and is_instance_valid(entry["panel"]):
 		entry["panel"].z_index = Z_PANEL
 	if entry.has("hp_bar") and is_instance_valid(entry["hp_bar"]):
 		entry["hp_bar"].z_index = Z_BAR
-	for k in ["name_lbl", "hp_lbl", "block_lbl", "intent_lbl", "btn", "status_box"]:
+	for k in ["name_lbl", "hp_lbl", "block_lbl", "btn", "status_box"]:
 		if entry.has(k) and is_instance_valid(entry[k]):
 			entry[k].z_index = Z_LBL
+	if entry.has("intent_lbl") and is_instance_valid(entry["intent_lbl"]):
+		entry["intent_lbl"].z_index = Z_INTENT
 
 func _hero_slot_pos(index: int) -> Vector2:
 	return (get_node("HeroSlot%d" % (index + 1)) as Marker2D).position
@@ -508,6 +510,7 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	intent_lbl.modulate = Color(1.0, 0.8, 0.2)
 	intent_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	intent_lbl.z_index = 1
+	intent_lbl.mouse_filter = Control.MOUSE_FILTER_STOP  # tooltip hover
 
 	var btn := Button.new()
 	btn.flat = true
@@ -1412,6 +1415,12 @@ func _update_enemy_ui(index: int) -> void:
 				entry["intent_lbl"].text = tr("battle.intent.special")
 			_:
 				entry["intent_lbl"].text = "?"
+		# 모든 인텐트에 tooltip 부착 (SPECIAL 도 자연스럽게 hover 유도)
+		# base 시: btn(SLOT_W x SLOT_H) 이 위에 있어 intent_lbl hover 차단 → btn 에도 동일 tooltip
+		# 사이드바 시: btn IGNORE 로 변경됨 → intent_lbl 가 직접 받음
+		var intent_tip: String = _format_intent_tooltip(index, intent)
+		SacredTheme.attach_tooltip(entry["intent_lbl"], intent_tip)
+		SacredTheme.attach_tooltip(entry["btn"], intent_tip)
 
 	if not BattleManager.is_enemy_alive(index):
 		entry["panel"].modulate = Color(0.3, 0.3, 0.3)
@@ -1419,6 +1428,61 @@ func _update_enemy_ui(index: int) -> void:
 		entry["intent_lbl"].text = tr("battle.intent.dead")
 
 	_refresh_status_icons_enemy(index)
+
+func _format_intent_tooltip(enemy_index: int, intent: Resource) -> String:
+	# 인텐트 hover 시 표시할 자세한 설명. 모든 action_type 지원.
+	# _trf 사용 — 번역 키 누락/specifier 없을 때 args 자동 무시 (% 직접 사용 시 터짐).
+	var v: int = intent.value
+	var target_all: bool = intent.target == IntentRes.TargetType.ALL
+	match intent.action_type:
+		IntentRes.ActionType.ATTACK:
+			var dmg: int = BattleManager.get_intent_display_damage(enemy_index, intent)
+			var line: String = _trf("battle.intent.tooltip.attack", dmg)
+			if target_all:
+				line += " (" + tr("battle.intent.tooltip.target_all") + ")"
+			if intent.damage_type != "":
+				line += " · " + _trf("battle.intent.tooltip.element", intent.damage_type)
+			return line
+		IntentRes.ActionType.BUFF:
+			match intent.status_type:
+				"strength": return _trf("battle.intent.tooltip.buff_strength", v)
+				"block": return _trf("battle.intent.tooltip.buff_block", v)
+				_: return _trf("battle.intent.tooltip.buff_generic", [intent.status_type, v])
+		IntentRes.ActionType.DEBUFF:
+			match intent.status_type:
+				"weak": return tr("battle.intent.tooltip.debuff_weak")
+				"vulnerable": return tr("battle.intent.tooltip.debuff_vulnerable")
+				"poison": return _trf("battle.intent.tooltip.debuff_poison", v)
+				"charm": return _trf("battle.intent.tooltip.debuff_charm", v)
+				_: return _trf("battle.intent.tooltip.debuff_generic", [intent.status_type, v])
+		IntentRes.ActionType.PREPARE:
+			return tr("battle.intent.tooltip.prepare")
+		IntentRes.ActionType.HEAL_ALLY:
+			return _trf("battle.intent.tooltip.heal_ally", v)
+		IntentRes.ActionType.BUFF_ALLY:
+			return _trf("battle.intent.tooltip.buff_ally", [intent.status_type, v])
+		IntentRes.ActionType.COUNTER_PREPARE:
+			return _trf("battle.intent.tooltip.counter_prepare", v)
+		IntentRes.ActionType.MARK_TARGET:
+			return tr("battle.intent.tooltip.mark_target")
+		IntentRes.ActionType.SACRIFICE:
+			return _trf("battle.intent.tooltip.sacrifice", v)
+		IntentRes.ActionType.WARD:
+			return _trf("battle.intent.tooltip.ward", v)
+		IntentRes.ActionType.SUMMON:
+			return _trf("battle.intent.tooltip.summon", max(1, v))
+		IntentRes.ActionType.MIMIC:
+			return _trf("battle.intent.tooltip.mimic", v)
+		IntentRes.ActionType.SPECIAL:
+			match intent.status_type:
+				"remove_card": return _trf("battle.intent.tooltip.special_remove_card", max(1, v))
+				"summon": return tr("battle.intent.tooltip.special_summon")
+				_:
+					if intent.status_type != "":
+						return _trf("battle.intent.tooltip.special_generic", intent.status_type)
+					return tr("battle.intent.tooltip.special_unknown")
+		_:
+			return tr("battle.intent.tooltip.unknown")
 
 func _drag_hint_text() -> String:
 	if _drag_card == null:
@@ -2923,6 +2987,7 @@ func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 	# sidebar 2x3 grid 위치 — 사이드바 가는 적의 sequential 인덱스 (entry["sidebar_slot_idx"]) 우선.
 	# 빈칸 없이 우측 위→아래→중 위→중 아래→좌 위→좌 아래 순.
 	var sb_idx: int = entry.get("sidebar_slot_idx", slot_idx)
+	@warning_ignore("integer_division")
 	var col: int = sb_idx / 2
 	var row: int = sb_idx % 2
 	var sidebar_panel_screen := Vector2(SIDEBAR_X - col * SIDEBAR_SLOT_HSPACE, SIDEBAR_Y + row * SIDEBAR_SLOT_VSPACE)
@@ -2952,9 +3017,6 @@ func _start_enemy_sidebar_transition(target_t_global: float) -> void:
 		_enemy_sidebar_tween.kill()
 	var dur: float = _cam_tween_time()
 	_enemy_sidebar_tween = create_tween().set_parallel(true)
-	# 글로벌 t 유지 (호환) + 적별 t 트윈 (visible 적은 base 유지)
-	_enemy_sidebar_tween.tween_property(self, "_enemy_sidebar_t", target_t_global, dur) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	var hero_pos: Vector2 = _get_current_hero_world_pos()
 	var sidebar_slot_counter: int = 0  # 사이드바 가는 적 sequential 카운터 (빈칸 없이 우측 위→아래 순)
 	for i in range(_enemy_nodes.size()):
@@ -3617,18 +3679,21 @@ func _on_active_powers_changed() -> void:
 		var power: Dictionary = powers[power_key]
 		var base_key: String = power_key.split(":")[0] if ":" in power_key else power_key
 		var v: int = power.get("value", 0)
-		_active_powers_box.add_child(_make_power_item(base_key, v))
+		var owner_id: String = power.get("owner_id", "")
+		_active_powers_box.add_child(_make_power_item(base_key, v, owner_id))
 	# strength_player 변경 시 카드 데미지 표시 갱신
 	_refresh_hand_card_damage()
 
-func _make_power_item(base_key: String, v: int) -> Control:
+func _make_power_item(base_key: String, v: int, owner_id: String = "") -> Control:
 	var hbox := HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 4)
 	hbox.custom_minimum_size = Vector2(0, 24)
 	hbox.mouse_filter = Control.MOUSE_FILTER_STOP
-	var desc_fmt: String = tr(base_key + ".desc")
-	if desc_fmt != base_key + ".desc":
-		SacredTheme.attach_tooltip(hbox, desc_fmt % v if desc_fmt.contains("%d") else desc_fmt)
+	# tooltip — 시전자(영웅) 이름. 옆 라벨이 이미 효과 설명이라 desc 중복은 제거.
+	# __global__ 같은 비-영웅 owner 는 부착 안 함.
+	if owner_id != "" and TeamManager.has_hero(owner_id):
+		var hero: Resource = TeamManager.get_hero(owner_id)
+		SacredTheme.attach_tooltip(hbox, tr(hero.hero_name))
 
 	var tex: Texture2D = IconUtils.get_power_icon(base_key)
 	if tex != null:

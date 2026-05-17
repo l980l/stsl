@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <circle cx="128" cy="128" r="112" fill="#1a0814" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 하트 (매혹) -->
+  <path d="M 128,80 Q 96,40 64,72 Q 50,90 64,116 L 128,196 L 192,116 Q 206,90 192,72 Q 160,40 128,80 Z"
+        fill="#ff66aa" stroke="#c9a84c" stroke-width="4"/>
+  <path d="M 128,80 Q 96,40 64,72 Q 50,90 64,116 L 128,196 L 192,116 Q 206,90 192,72 Q 160,40 128,80 Z"
+        fill="#ffaacc" opacity="0.4"/>
+  <!-- 하향 화살표 (임계치 ↓) — 하트 위에 겹침 -->
+  <line x1="128" y1="78" x2="128" y2="158" stroke="#ffd84d" stroke-width="14" stroke-linecap="round"/>
+  <polygon points="128,174 104,142 152,142" fill="#ffd84d" stroke="#5a4020" stroke-width="2"/>
+  <!-- − 기호 (감소) -->
+  <circle cx="200" cy="56" r="22" fill="#1a0814" stroke="#ffd84d" stroke-width="4"/>
+  <line x1="186" y1="56" x2="214" y2="56" stroke="#ffd84d" stroke-width="6" stroke-linecap="round"/>
+</svg>

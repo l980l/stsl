@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="sb-bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#3a2810"/>
+      <stop offset="100%" stop-color="#100804"/>
+    </radialGradient>
+  </defs>
+  <circle cx="128" cy="128" r="112" fill="url(#sb-bg)" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 법륜 (다르마차크라, 8 spoke) — 인과응보 -->
+  <!-- 외륜 -->
+  <circle cx="128" cy="128" r="78" fill="none" stroke="#ffd84d" stroke-width="8"/>
+  <circle cx="128" cy="128" r="68" fill="none" stroke="#c9a84c" stroke-width="3" opacity="0.6"/>
+  <!-- 8개 살 -->
+  <g stroke="#ffd84d" stroke-width="6" stroke-linecap="round">
+    <line x1="128" y1="60" x2="128" y2="196"/>
+    <line x1="60" y1="128" x2="196" y2="128"/>
+    <line x1="80" y1="80" x2="176" y2="176"/>
+    <line x1="80" y1="176" x2="176" y2="80"/>
+  </g>
+  <!-- 살 끝 화살표 (외측) -->
+  <g fill="#ffd84d">
+    <polygon points="128,52 120,68 136,68"/>
+    <polygon points="128,204 120,188 136,188"/>
+    <polygon points="52,128 68,120 68,136"/>
+    <polygon points="204,128 188,120 188,136"/>
+  </g>
+  <!-- 중심 허브 -->
+  <circle cx="128" cy="128" r="22" fill="#3a2810" stroke="#ffd84d" stroke-width="4"/>
+  <circle cx="128" cy="128" r="10" fill="#ffd84d"/>
+</svg>

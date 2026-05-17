@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="sn-bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#1a0830"/>
+      <stop offset="100%" stop-color="#06010c"/>
+    </radialGradient>
+  </defs>
+  <circle cx="128" cy="128" r="112" fill="url(#sn-bg)" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 라그나로크 — 묠니르 (토르의 망치) -->
+  <!-- 손잡이 -->
+  <rect x="120" y="138" width="16" height="78" fill="#5a3a1c" stroke="#c9a84c" stroke-width="3" rx="3"/>
+  <!-- 망치 머리 -->
+  <path d="M 64,76 L 192,76 Q 200,76 200,84 L 200,134 Q 200,142 192,142 L 64,142 Q 56,142 56,134 L 56,84 Q 56,76 64,76 Z"
+        fill="#8a7c66" stroke="#c9a84c" stroke-width="4"/>
+  <!-- 망치 면 음각 룬 (ᚱ Raido) -->
+  <path d="M 100,90 L 100,128 M 100,90 L 122,90 Q 132,90 132,100 Q 132,110 122,110 L 100,110 M 122,110 L 134,128"
+        stroke="#b340d8" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- 우측 룬 (ᚦ Thurisaz — 토르) -->
+  <path d="M 150,90 L 150,128 M 150,100 L 168,109 L 150,118"
+        stroke="#b340d8" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- 망치 모서리 광채 -->
+  <line x1="56" y1="82" x2="200" y2="82" stroke="#d4c3a8" stroke-width="2" opacity="0.6"/>
+  <!-- 라그나로크 균열 (망치 머리 위) -->
+  <path d="M 80,46 L 90,68 L 80,56 M 130,40 L 140,68 L 130,55 M 180,46 L 170,68 L 180,56"
+        stroke="#b340d8" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.85"/>
+</svg>
