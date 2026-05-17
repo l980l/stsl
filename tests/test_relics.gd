@@ -101,7 +101,7 @@ func test_relic_pool_size() -> void:
 	print("[TestRelics] test_relic_pool_size")
 	var RelicsGd = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicsGd.build_pool()
-	_assert(pool.size() == 40, "릴릭 풀 40종")
+	_assert(pool.size() == 42, "릴릭 풀 42종 (40 + speed 2: 신속의 인장, 시간의 모래시계)")
 
 func test_trigger_type_values() -> void:
 	print("[TestRelics] test_trigger_type_values")
@@ -278,7 +278,7 @@ func test_daoist_relics_exist() -> void:
 	print("[TestRelics] test_daoist_relics_exist")
 	var RelicsGd = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicsGd.build_pool()
-	_assert(pool.size() == 40, "릴릭 풀 40종")
+	_assert(pool.size() == 42, "릴릭 풀 42종 (40 + speed 2: 신속의 인장, 시간의 모래시계)")
 	var names := pool.map(func(r): return r.relic_name)
 	_assert("relic.yin_yang_mirror.name" in names, "음양경 존재")
 	_assert("relic.five_elements_jade.name" in names, "오행 옥 존재")
@@ -293,7 +293,7 @@ func test_japanese_relics_exist() -> void:
 	print("[TestRelics] test_japanese_relics_exist")
 	var RelicsGd = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicsGd.build_pool()
-	_assert(pool.size() == 40, "릴릭 풀 40종")
+	_assert(pool.size() == 42, "릴릭 풀 42종 (40 + speed 2: 신속의 인장, 시간의 모래시계)")
 	var names := pool.map(func(r): return r.relic_name)
 	_assert("relic.ghost_talisman.name" in names, "귀신 부적 존재")
 	_assert("relic.tengu_feather.name" in names, "텐구의 깃털 존재")

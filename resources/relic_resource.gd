@@ -13,7 +13,9 @@ enum TriggerType {
 enum EffectType {
 	HEAL, ENERGY, DRAW, APPLY_STATUS_ENEMY, MAX_HP, RECOVER_CARD,
 	GAIN_MORALE, COST_REDUCTION, BLOCK,
-	DAMAGE_HERO, RUN_STRENGTH
+	DAMAGE_HERO, RUN_STRENGTH,
+	BUFF_SPEED_TEAM,    # BATTLE_START — 모든 영웅 power.speed_buff = value (전투 끝까지)
+	TIME_HOURGLASS,     # PLAYER_TURN_END — 매 영웅 차례 종료 시 counter++, condition_value 배수마다 모든 영웅 speed_buff += value 누적
 }
 
 @export var relic_name: String = ""

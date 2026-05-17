@@ -36,3 +36,7 @@ status.counter_pool.name,반격 누적,Counter Pool,Réserve Contre-att.,Riserva
 status.charm_resistance.name,매혹 저항,Charm Resistance,Résistance au charme,Resistenza al Fascino,Resistencia al Encanto,魅了耐性,Αντίσταση στη Γοητεία,魅惑抗性,魅惑抗性
 status.marked_by.name,마킹,Marked,Marqué,Marcato,Marcado,マーク,Σημαδεμένος,被标记,被標記
 status.death_rattle.name,사망 발동,Death Rattle,Râle d'agonie,Rantolo di Morte,Estertor de Muerte,断末魔,Επιθανάτιος Ρόγχος,死亡触发,死亡觸發
+status.speed_bonus.name,신속,Swift,Rapide,Rapido,Veloz,迅速,Ταχύς,迅捷,迅捷
+status.speed_bonus.desc,속도 +%d,Speed +%d,Vitesse +%d,Velocità +%d,Velocidad +%d,速度+%d,Ταχύτητα +%d,速度+%d,速度+%d
+status.speed_penalty.name,둔화,Slowed,Ralenti,Rallentato,Lento,減速,Βραδύς,减速,減速
+status.speed_penalty.desc,속도 -%d,Speed -%d,Vitesse -%d,Velocità -%d,Velocidad -%d,速度-%d,Ταχύτητα -%d,速度-%d,速度-%d

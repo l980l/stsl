@@ -60,6 +60,11 @@ const STATUS_DOUBLE_V   := 2.1   # STATUS_DOUBLE ALL 고정 CP (1코 LEGENDARY E
 const DUEL_LOCK_V       := 0.8   # duel_lock — 1턴당 CP (2코 역산)
 const ECHO_CAST_V       := 1.07  # power.echo_next_attack — 총 시전 횟수당 CP (2코 EXHAUST 역산)
 const SPEND_E_POISON_DOUBLE_PER_E := 1.2  # X코 독더블 에너지당 CP (유효코스트=AVG_ENERGY RARE 역산)
+const SPEED_PER_TURN_V := 0.08   # BUFF/DEBUFF_SPEED — 1 speed × 1 turn duration 의 단위 CP
+const SPEED_POWER_V    := 0.40   # power.speed_buff — 1 speed (전투 끝까지) CP
+const SPEED_ALLY_MULT  := 1.1    # ALLY (단일 동맹) — 선택 가능 보너스
+const SPEED_ALL_ALLIES_MULT := 1.8  # ALL_ALLIES — 3 영웅 보정
+const SPEED_ALL_ENEMY_MULT  := 1.5  # ALL (적 전체)
 const AVG_DRAW          := 5.0
 const AVG_MORALE        := 3.0
 const AVG_ENERGY        := 2.0
@@ -270,6 +275,14 @@ func _calc_effect_cp(eff: Resource) -> float:
 		37: return AVG_STATUS_TYPES * float(eff.value) * (DMG_ALL if is_all else DMG_SINGLE)  # DAMAGE_PER_STATUS_TYPE
 		38: return float(eff.value) * DRAW_V * P_ENTHRALL  # DRAW_PER_ENTHRALL
 		39: return AVG_CHARMED * float(eff.value) * (DMG_ALL if is_all else DMG_SINGLE)  # DAMAGE_PER_CHARMED_ENEMY
+		40:  # BUFF_SPEED
+			var bs_mult: float = 1.0
+			if eff.target == "ALL_ALLIES": bs_mult = SPEED_ALL_ALLIES_MULT
+			elif eff.target == "ALLY":     bs_mult = SPEED_ALLY_MULT
+			return float(eff.value) * float(eff.bonus_value) * SPEED_PER_TURN_V * bs_mult
+		41:  # DEBUFF_SPEED
+			var ds_mult: float = SPEED_ALL_ENEMY_MULT if is_all else 1.0
+			return float(eff.value) * float(eff.bonus_value) * SPEED_PER_TURN_V * ds_mult
 	return -999.0
 
 func _calc_status_cp(eff: Resource) -> float:
@@ -303,6 +316,7 @@ func _calc_status_cp(eff: Resource) -> float:
 			"power.sacrifice_bank":         return 1.2
 			"power.echo_next_attack":          return float(eff.value) * ECHO_CAST_V
 			"power.spend_all_energy_poison_double": return float(AVG_ENERGY) * SPEND_E_POISON_DOUBLE_PER_E
+			"power.speed_buff":                return float(eff.value) * SPEED_POWER_V
 		return -999.0  # 복합/조건부/시너지형 — SKIP 유지
 	return -999.0
 

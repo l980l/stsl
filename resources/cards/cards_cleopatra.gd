@@ -35,7 +35,23 @@ static func pool() -> Array:
 		_queens_dignity(),                                           # A
 		_charming_perfume(), _charm_execution(), _serpent_ritual(),  # P
 		_golden_throne(),                                            # Chaos
+		# speed debuff (조종 추가)
+		_seductive_stillness(),
 	]
+
+static func _seductive_stillness() -> Resource:
+	# 유혹의 정체 — UNCOMMON, 1코, SKILL, 조종: 적 1명 speed -5 (3턴)
+	var c := CardRes.new()
+	c.card_name = "card.cleopatra.seductive_stillness.name"; c.owner_id = "cleopatra"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.cleopatra.temptation.archetype"  # 조종
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.DEBUFF_SPEED
+	e.value = 5; e.base_value = 5
+	e.bonus_value = 3; e.base_bonus_value = 3
+	e.target = "SINGLE"
+	c.effects = [e]; return c
 
 # ─────────────────────────────────────────
 # 시작덱 (4종)

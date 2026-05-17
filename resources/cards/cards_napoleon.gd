@@ -37,7 +37,23 @@ static func pool() -> Array:
 		_emperors_command(), _victory_proclamation(),                   # P
 		_emperors_encirclement(),                                       # C
 		_reconnaissance(),                                              # Chaos
+		# speed buff (돌격 추가)
+		_blitz_advance(),
 	]
+
+static func _blitz_advance() -> Resource:
+	# 전격 진군 — UNCOMMON, 1코, SKILL, 돌격: 본인 speed +5 (3턴)
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.blitz_advance.name"; c.owner_id = "napoleon"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.napoleon.swift_march.archetype"  # 돌격
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.BUFF_SPEED
+	e.value = 5; e.base_value = 5
+	e.bonus_value = 3; e.base_bonus_value = 3  # 지속 3턴
+	e.target = "SELF"
+	c.effects = [e]; return c
 
 # ─────────────────────────────────────────
 # 시작덱 (2종)

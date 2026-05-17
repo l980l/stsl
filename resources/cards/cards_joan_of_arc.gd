@@ -36,7 +36,23 @@ static func pool() -> Array:
 		_saints_revelation(), _martyrs_light(),                         # P
 		_last_shield(),                                                 # C
 		_saints_flame(),                                                # Chaos
+		# speed buff ally (축복 추가)
+		_grace_of_spirit(),
 	]
+
+static func _grace_of_spirit() -> Resource:
+	# 성령의 가호 — UNCOMMON, 1코, SKILL, 축복: 파티원 1명 speed +4 (3턴)
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.grace_of_spirit.name"; c.owner_id = "joan_of_arc"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = "card.joan_of_arc.holy_touch.archetype"  # 축복
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.BUFF_SPEED
+	e.value = 4; e.base_value = 4
+	e.bonus_value = 3; e.base_bonus_value = 3
+	e.target = "ALLY"
+	c.effects = [e]; return c
 
 # ─────────────────────────────────────────
 # 시작덱 (4종)

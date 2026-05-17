@@ -127,3 +127,5 @@ battle.signature.egyptian_curse.toast,저주의 시선!,EGYPTIAN CURSE!,MALÉDIC
 battle.signature.karma.toast,인과응보!,KARMA!,KARMA !,KARMA!,¡KARMA!,因果応報！,ΚΑΡΜΑ!,因果报应！,因果報應！
 battle.signature.yin_yang.toast,음양 교대!,YIN YANG!,YIN YANG !,YIN YANG!,¡YIN YANG!,陰陽交代！,ΓΙΝ ΓΙΑΝΓΚ!,阴阳交替！,陰陽交替！
 battle.signature.kekkai.toast,결계 발동!,KEKKAI!,KEKKAI !,KEKKAI!,¡KEKKAI!,結界発動！,ΚΕΚΚΑΪ!,结界发动！,結界發動！
+power.speed_buff.label,속도 +%d,Speed +%d,Vitesse +%d,Velocità +%d,Velocidad +%d,速度+%d,Ταχύτητα +%d,速度+%d,速度+%d
+power.speed_buff.desc,전투 끝까지 속도 +%d,Speed +%d until end of battle,Vitesse +%d jusqu'à la fin du combat,Velocità +%d fino alla fine della battaglia,Velocidad +%d hasta el fin de la batalla,戦闘終了まで速度+%d,Ταχύτητα +%d μέχρι το τέλος της μάχης,战斗结束前速度+%d,戰鬥結束前速度+%d
