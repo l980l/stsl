@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="sb-bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#202810"/>
+      <stop offset="100%" stop-color="#080a04"/>
+    </radialGradient>
+    <linearGradient id="sb-bolt" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#fff4a0"/>
+      <stop offset="100%" stop-color="#ffaa22"/>
+    </linearGradient>
+  </defs>
+  <!-- 외곽 링 -->
+  <circle cx="128" cy="128" r="112" fill="url(#sb-bg)" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 속도선 (오른쪽으로 흐르는 라인 — 가속 방향) -->
+  <path d="M 40,80 L 100,80" stroke="#c9a84c" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+  <path d="M 30,128 L 90,128" stroke="#c9a84c" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+  <path d="M 40,176 L 100,176" stroke="#c9a84c" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+  <path d="M 50,100 L 100,100" stroke="#c9a84c" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+  <path d="M 50,156 L 100,156" stroke="#c9a84c" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+  <!-- 위쪽 향한 화살표 (가속 = 상승) -->
+  <polygon points="128,40 88,108 110,108 110,176 146,176 146,108 168,108"
+           fill="url(#sb-bolt)" stroke="#ff9020" stroke-width="3.5"/>
+  <!-- 광채 (속도 잔영) -->
+  <circle cx="128" cy="128" r="50" fill="none" stroke="#ffd84d" stroke-width="2" opacity="0.35"/>
+  <circle cx="128" cy="128" r="70" fill="none" stroke="#ffd84d" stroke-width="1.5" opacity="0.2"/>
+</svg>

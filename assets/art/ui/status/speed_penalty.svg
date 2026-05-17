@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="sp-bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#101828"/>
+      <stop offset="100%" stop-color="#04060a"/>
+    </radialGradient>
+    <linearGradient id="sp-arrow" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#80a8d0"/>
+      <stop offset="100%" stop-color="#3a5278"/>
+    </linearGradient>
+  </defs>
+  <!-- 외곽 링 -->
+  <circle cx="128" cy="128" r="112" fill="url(#sp-bg)" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 사슬 — 둔화 모티프 -->
+  <ellipse cx="68" cy="100" rx="14" ry="10" fill="none" stroke="#7a8298" stroke-width="5"/>
+  <ellipse cx="68" cy="124" rx="10" ry="14" fill="none" stroke="#7a8298" stroke-width="5"/>
+  <ellipse cx="68" cy="152" rx="14" ry="10" fill="none" stroke="#7a8298" stroke-width="5"/>
+  <ellipse cx="188" cy="100" rx="14" ry="10" fill="none" stroke="#7a8298" stroke-width="5"/>
+  <ellipse cx="188" cy="124" rx="10" ry="14" fill="none" stroke="#7a8298" stroke-width="5"/>
+  <ellipse cx="188" cy="152" rx="14" ry="10" fill="none" stroke="#7a8298" stroke-width="5"/>
+  <!-- 아래 향한 화살표 (감속 = 하강) -->
+  <polygon points="128,216 168,148 146,148 146,80 110,80 110,148 88,148"
+           fill="url(#sp-arrow)" stroke="#5a7298" stroke-width="3.5"/>
+  <!-- 거북이 발자국 같은 잔상 (속도 둔화) — 작은 점들 -->
+  <circle cx="128" cy="56" r="4" fill="#80a8d0" opacity="0.6"/>
+  <circle cx="118" cy="66" r="3" fill="#80a8d0" opacity="0.45"/>
+  <circle cx="138" cy="66" r="3" fill="#80a8d0" opacity="0.45"/>
+  <!-- 광채 (둔화 잔영) -->
+  <circle cx="128" cy="128" r="62" fill="none" stroke="#5a7298" stroke-width="2" opacity="0.4"/>
+</svg>

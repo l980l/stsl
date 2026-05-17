@@ -146,8 +146,7 @@ const STATUS_EMOJI := {
 const STATUS_INTERNAL_KEYS := [
 	"poison_dur", "counter_ratio", "damage_taken",
 	"greek_hubris_pending", "norse_ragnarok_fired",
-	"daoist_stance", "japanese_turn_count",
-	"speed_bonus_dur", "speed_penalty_dur"
+	"daoist_stance", "japanese_turn_count"
 ]
 
 func _trf(key: String, args) -> String:
@@ -934,6 +933,7 @@ func _connect_signals() -> void:
 	BattleManager.enemy_spawned.connect(_on_enemy_spawned)
 	# VFX 차지 시작 — 적 인텐트/영웅 카드 출처 모두 임팩트 시점에 데미지·SFX 동기
 	BattleManager.intent_vfx_charge_start.connect(_on_intent_vfx_start)
+	BattleManager.passive_buff_applied.connect(_on_passive_buff_applied)
 	BattleManager.card_vfx_charge_start.connect(_on_card_vfx_start)
 	BattleManager.poison_tick_applied.connect(_on_poison_tick)
 	BattleManager.signature_fired.connect(_on_signature_fired)
@@ -2375,6 +2375,25 @@ func _all_living_hero_positions() -> Array:
 
 # 적 인텐트 차지 시작 — battle_manager 가 미리 결정한 target_hero_id 사용.
 # VFX 의 screen_effect 시점이 데미지 시그널 emit 시점과 일치 (임팩트 동기화).
+func _on_passive_buff_applied(enemy_index: int, status_type: String, _value: int) -> void:
+	# phase_buffs / 시그너처 등 intent 외 자동 BUFF — warrior_buff/defense_buff VFX spawn.
+	# spawn 함수 내부에서 fx.screen_effect.connect 로 vfx_impact_resolved emit — battle_manager 가 await 로 동기화.
+	if enemy_index < 0 or enemy_index >= _enemy_char_nodes.size():
+		BattleManager.vfx_impact_resolved.emit()  # 적 무효 → 즉시 resolve
+		return
+	var caster_node: Node2D = _enemy_char_nodes[enemy_index]
+	if caster_node == null:
+		BattleManager.vfx_impact_resolved.emit()
+		return
+	var caster_pos: Vector2 = caster_node.global_position
+	var caster_foot: Vector2 = _foot_pos(caster_node)
+	if status_type == "block":
+		_spawn_defense_buff(caster_pos, caster_foot)
+	elif _is_holy_enemy(enemy_index):
+		_spawn_holy_buff(caster_pos, caster_foot)
+	else:
+		_spawn_warrior_buff(caster_pos, caster_foot)
+
 func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: String) -> void:
 	if enemy_index < 0 or enemy_index >= _enemy_char_nodes.size():
 		return
@@ -2456,17 +2475,22 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 	# 카드의 모든 effect 에 대해 적절한 VFX 시작 — 단, 같은 효과군은 한 번만 표시.
 	# damage_type 이 명시된 effect 는 모두 ATTACK 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF 등)
 	# 차지 시간 동기화는 첫 effect 기준 (_card_vfx_impact_delay) — 다른 VFX 는 자체 타이밍.
+	# 여러 효과군 (예: BUFF + DEBUFF) 은 순차 spawn — VFX 사이 짧은 delay.
+	const _VFX_STEP_DELAY: float = 0.25
+	var _vfx_spawn_count: int = 0
 	var did_attack: bool = false   # ATTACK 빔 한 번만 (모래폭풍 = DMG ALL curse + WEAK ALL → 빔 중복 방지)
 	var did_buff: bool = false     # POWER 버프 한 번만
 	var did_self_aoe: bool = false # heal/block 한 번만
 	var did_debuff: bool = false   # 디버프 빔 한 번만 (ATTACK 이 이미 있으면 status 추가 표시 안 함)
 	for effect in card.effects:
+		var spawned_this: bool = false
 		if effect.damage_type != "":
 			if did_attack:
 				continue
 			did_attack = true
 			# ATTACK 이 발동되면 같은 카드의 status 빔(weak/vulnerable 등)은 중복으로 안 띄움
 			did_debuff = true
+			spawned_this = true
 			var dtype: String = effect.damage_type
 			if effect.target == "ALL":
 				for i in range(_enemy_char_nodes.size()):
@@ -2474,48 +2498,55 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 						_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[i].global_position + _impact_jitter(), _foot_pos(_enemy_char_nodes[i]))
 			elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
 				_spawn_attack_beam_simple(dtype, caster_pos, _enemy_char_nodes[target_enemy_index].global_position + _impact_jitter(), _foot_pos(_enemy_char_nodes[target_enemy_index]))
-			continue
-		var et = effect.effect_type
-		if et == EffectResource.EffectType.APPLY_STATUS:
-			if effect.status_type.begins_with("power."):
-				if not did_buff:
-					if owner_id == "joan_of_arc":
-						_spawn_holy_buff(caster_pos, caster_foot)
-					else:
-						_spawn_warrior_buff(caster_pos, caster_foot)
-					did_buff = true
-			else:
-				if did_debuff:
-					continue
-				var fx_script: GDScript = _debuff_script_for_status(effect.status_type)
-				if fx_script:
+		else:
+			var et = effect.effect_type
+			if et == EffectResource.EffectType.APPLY_STATUS:
+				if effect.status_type.begins_with("power."):
+					if not did_buff:
+						if owner_id == "joan_of_arc":
+							_spawn_holy_buff(caster_pos, caster_foot)
+						else:
+							_spawn_warrior_buff(caster_pos, caster_foot)
+						did_buff = true
+						spawned_this = true
+				else:
+					if not did_debuff:
+						var fx_script: GDScript = _debuff_script_for_status(effect.status_type)
+						if fx_script:
+							did_debuff = true
+							spawned_this = true
+							if effect.target == "ALL":
+								for i in range(_enemy_char_nodes.size()):
+									if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
+										_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[i].global_position, effect.status_type, _foot_pos(_enemy_char_nodes[i]))
+							elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
+								_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type, _foot_pos(_enemy_char_nodes[target_enemy_index]))
+			elif et == EffectResource.EffectType.CHARM:
+				if not did_debuff:
 					did_debuff = true
+					spawned_this = true
+					var charm_stacks: int = effect.value
 					if effect.target == "ALL":
 						for i in range(_enemy_char_nodes.size()):
 							if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
-								_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[i].global_position, effect.status_type, _foot_pos(_enemy_char_nodes[i]))
+								_spawn_charm_or_infatuation(caster_pos, _enemy_char_nodes[i].global_position, i, charm_stacks, _foot_pos(_enemy_char_nodes[i]))
 					elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
-						_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type, _foot_pos(_enemy_char_nodes[target_enemy_index]))
-		elif et == EffectResource.EffectType.CHARM:
-			# Cleopatra 매혹 카드 — 적별로 enthrall 임계치 도달 여부 판정 → infatuation 또는 charm_kiss
-			if did_debuff:
-				continue
-			did_debuff = true
-			var charm_stacks: int = effect.value
-			if effect.target == "ALL":
-				for i in range(_enemy_char_nodes.size()):
-					if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
-						_spawn_charm_or_infatuation(caster_pos, _enemy_char_nodes[i].global_position, i, charm_stacks, _foot_pos(_enemy_char_nodes[i]))
-			elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
-				_spawn_charm_or_infatuation(caster_pos, _enemy_char_nodes[target_enemy_index].global_position, target_enemy_index, charm_stacks, _foot_pos(_enemy_char_nodes[target_enemy_index]))
-		elif et == EffectResource.EffectType.HEAL or et == EffectResource.EffectType.HEAL_ALL:
-			if not did_self_aoe:
-				_spawn_heal_blessing(caster_pos, caster_foot)
-				did_self_aoe = true
-		elif et == EffectResource.EffectType.BLOCK or et == EffectResource.EffectType.BLOCK_ALL:
-			if not did_self_aoe:
-				_spawn_defense_buff(caster_pos, caster_foot)
-				did_self_aoe = true
+						_spawn_charm_or_infatuation(caster_pos, _enemy_char_nodes[target_enemy_index].global_position, target_enemy_index, charm_stacks, _foot_pos(_enemy_char_nodes[target_enemy_index]))
+			elif et == EffectResource.EffectType.HEAL or et == EffectResource.EffectType.HEAL_ALL:
+				if not did_self_aoe:
+					_spawn_heal_blessing(caster_pos, caster_foot)
+					did_self_aoe = true
+					spawned_this = true
+			elif et == EffectResource.EffectType.BLOCK or et == EffectResource.EffectType.BLOCK_ALL:
+				if not did_self_aoe:
+					_spawn_defense_buff(caster_pos, caster_foot)
+					did_self_aoe = true
+					spawned_this = true
+		# 순차 spawn — 첫 spawn 은 즉시, 이후 spawn 은 _VFX_STEP_DELAY 만큼 지연
+		if spawned_this:
+			_vfx_spawn_count += 1
+			if _vfx_spawn_count < 4:  # 최대 4 종 (attack/buff/debuff/self_aoe). 마지막엔 delay 불필요하지만 단순화.
+				await get_tree().create_timer(_VFX_STEP_DELAY).timeout
 
 # 살아있는 적 인덱스 카운트 (target=ALL 영웅 카드의 visible 적 갯수)
 func _enemy_alive_visible() -> int:
@@ -2548,6 +2579,8 @@ func _debuff_script_for_status(stype: String) -> GDScript:
 		return _VFX_CHARM_KISS
 	elif stype == "enthrall":
 		return _VFX_INFATUATION
+	elif stype == "poison":
+		return _VFX_POISON_SPLASH
 	return null
 
 # dtype → 적절한 SFX 키. 등록되지 않은 holy_* 는 기본 계열 SFX 재활용.
@@ -3561,6 +3594,13 @@ func _format_death_rattle_tooltip(dt: Resource) -> String:
 func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	var tex: Texture2D = IconUtils.get_status_icon(key)
 	var tooltip: String = _trf("status.%s.desc" % key, val)
+	# speed_bonus / speed_penalty — 각 instance 별 "+N/M턴" list tooltip
+	if key in ["speed_bonus", "speed_penalty"] and typeof(status.get(key, null)) == TYPE_ARRAY:
+		var lines: Array[String] = []
+		var sign_str: String = "+" if key == "speed_bonus" else "-"
+		for ins in status[key]:
+			lines.append("%s%d / %d턴" % [sign_str, int(ins.get("value", 0)), int(ins.get("dur", 0))])
+		tooltip = "%s\n  " % _trf("status.%s.desc" % key, val) + "\n  ".join(lines)
 
 	if tex != null:
 		var hbox := HBoxContainer.new()
@@ -3623,6 +3663,14 @@ func _refresh_status_icons_hero(hero_id: String) -> void:
 	for key in status:
 		if key in STATUS_INTERNAL_KEYS or key == "marked_by":
 			continue
+		# speed_bonus / speed_penalty — Array of {value, dur}. 합산값으로 label 생성
+		if key in ["speed_bonus", "speed_penalty"] and typeof(status[key]) == TYPE_ARRAY:
+			var total: int = 0
+			for ins in status[key]:
+				total += int(ins.get("value", 0))
+			if total > 0:
+				box.add_child(_make_status_label(key, total, status))
+			continue
 		if typeof(status[key]) != TYPE_INT:
 			continue
 		var val: int = status[key]
@@ -3680,6 +3728,14 @@ func _refresh_status_icons_enemy(index: int) -> void:
 			box.add_child(sig_lbl)
 	for key in status:
 		if key in STATUS_INTERNAL_KEYS:
+			continue
+		# speed_bonus / speed_penalty — Array 합산
+		if key in ["speed_bonus", "speed_penalty"] and typeof(status[key]) == TYPE_ARRAY:
+			var total: int = 0
+			for ins in status[key]:
+				total += int(ins.get("value", 0))
+			if total > 0:
+				box.add_child(_make_status_label(key, total, status))
 			continue
 		if typeof(status[key]) != TYPE_INT:
 			continue
@@ -4335,6 +4391,12 @@ func _card_target_type(card: Resource) -> String:
 					return "ally"
 			EffectRes.EffectType.REVIVE:
 				return "dead_ally"
+			EffectRes.EffectType.BUFF_SPEED:
+				if effect.target == "ALLY":
+					return "ally"
+			EffectRes.EffectType.DEBUFF_SPEED:
+				if effect.target == "SINGLE":
+					return "enemy"
 	return "none"
 
 func _start_drag(card: Resource) -> void:
