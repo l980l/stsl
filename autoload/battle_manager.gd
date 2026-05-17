@@ -663,9 +663,7 @@ func end_player_turn() -> void:
 	_advance_turn_counter(_current_actor_id)
 	turn_ended.emit(_current_actor_id)
 	_current_actor_id = ""
-	# 차례 전환 인터벌 — 영웅→다음 actor (영웅이든 적이든)
-	if is_battle_active and turn_interval > 0.0:
-		await get_tree().create_timer(turn_interval * _turn_interval_mul()).timeout
+	# 영웅 종료 후 인터벌 제거 — 다음 actor 의 시작 인터벌 (영웅/적 각각) 으로 통합
 	if is_battle_active:
 		await _run_next_actor_turn()
 
