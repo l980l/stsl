@@ -2801,7 +2801,9 @@ func _on_token_attack_fired(hero_id: String, token_index: int, enemy_index: int)
 	tw.tween_property(soldier, "position", grid_pos, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.tween_callback(func():
 		soldier.z_index = hero_node.z_index + 1
-		_spawn_caster_beam(_VFX_BULLET_SHOT, soldier.global_position, target_node.global_position, "bullet", func(): pass)
+		# 발사 위치 = 병사 스프라이트 중앙 (origin 좌상단 → scale 2.0 적용 시 +40, +50 offset)
+		var muzzle_pos: Vector2 = soldier.global_position + Vector2(40, 50)
+		_spawn_caster_beam(_VFX_BULLET_SHOT, muzzle_pos, target_node.global_position, "bullet", func(): pass)
 	)
 	tw.tween_interval(0.25)
 	tw.tween_property(soldier, "position", hero_node.position, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
