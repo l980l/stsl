@@ -4236,9 +4236,9 @@ func _refresh_debug_grid() -> void:
 			cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			add_child(cell)
 			_debug_grid_nodes.append(cell)
-				for border in _make_border_rects(cx, cy, TOKEN_TILE_W, TOKEN_TILE_H, Color(0.9, 0.9, 0.3, 0.6)):
-					add_child(border)
-					_debug_grid_nodes.append(border)
+			for border in _make_border_rects(cx, cy, TOKEN_TILE_W, TOKEN_TILE_H, Color(0.9, 0.9, 0.3, 0.6)):
+				add_child(border)
+				_debug_grid_nodes.append(border)
 
 	# 적 슬롯 외곽선 (빨간색)
 	var total: int = _enemy_nodes.size()
