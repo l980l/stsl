@@ -1036,6 +1036,7 @@ func _attach_signature_icon(panel: ColorRect, mythology) -> Label:
 	lbl.add_theme_font_size_override("font_size", 22)
 	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 	lbl.z_index = 1900
+	lbl.mouse_entered.connect(func(): print("[sig_icon] entered, pos=", lbl.position, " global_rect=", lbl.get_global_rect()))
 	var pp: Vector2 = panel.position
 	lbl.position = pp + Vector2(panel.size.x - 34.0, 4.0)
 	lbl.size = Vector2(26, 28)
