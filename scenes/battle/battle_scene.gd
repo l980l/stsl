@@ -1032,7 +1032,7 @@ func _attach_signature_icon(panel: ColorRect, mythology) -> Label:
 	lbl.text = info["emoji"]
 	lbl.add_theme_font_size_override("font_size", 22)
 	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-	lbl.z_index = 1500  # 시그니처 아이콘 — UI 표준
+	lbl.z_index = 1900  # 시그니처 아이콘 — UI 보다 위 (사이드바 시 hover 차단 방지)
 	var pp: Vector2 = panel.position
 	lbl.position = pp + Vector2(panel.size.x - 34.0, 4.0)
 	lbl.size = Vector2(26, 28)
