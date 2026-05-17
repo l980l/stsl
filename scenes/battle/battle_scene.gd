@@ -3679,18 +3679,21 @@ func _on_active_powers_changed() -> void:
 		var power: Dictionary = powers[power_key]
 		var base_key: String = power_key.split(":")[0] if ":" in power_key else power_key
 		var v: int = power.get("value", 0)
-		_active_powers_box.add_child(_make_power_item(base_key, v))
+		var owner_id: String = power.get("owner_id", "")
+		_active_powers_box.add_child(_make_power_item(base_key, v, owner_id))
 	# strength_player 변경 시 카드 데미지 표시 갱신
 	_refresh_hand_card_damage()
 
-func _make_power_item(base_key: String, v: int) -> Control:
+func _make_power_item(base_key: String, v: int, owner_id: String = "") -> Control:
 	var hbox := HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 4)
 	hbox.custom_minimum_size = Vector2(0, 24)
 	hbox.mouse_filter = Control.MOUSE_FILTER_STOP
-	var desc_fmt: String = tr(base_key + ".desc")
-	if desc_fmt != base_key + ".desc":
-		SacredTheme.attach_tooltip(hbox, desc_fmt % v if desc_fmt.contains("%d") else desc_fmt)
+	# tooltip — 시전자(영웅) 이름. 옆 라벨이 이미 효과 설명이라 desc 중복은 제거.
+	# __global__ 같은 비-영웅 owner 는 부착 안 함.
+	if owner_id != "" and TeamManager.has_hero(owner_id):
+		var hero: Resource = TeamManager.get_hero(owner_id)
+		SacredTheme.attach_tooltip(hbox, tr(hero.hero_name))
 
 	var tex: Texture2D = IconUtils.get_power_icon(base_key)
 	if tex != null:
