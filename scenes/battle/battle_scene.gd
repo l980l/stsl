@@ -33,7 +33,9 @@ const TOKEN_ROWS := 1
 # 따라서 별도 SIDEBAR_LAYOUT 불필요. sidebar 좌표 = (SIDEBAR_X, SIDEBAR_Y + i*VSPACE) + (node.base - panel.base)
 const SIDEBAR_X := 1620.0
 const SIDEBAR_Y := 80.0    # turn_queue (y 18~52) 아래, 캐릭터 패널 위
-const SIDEBAR_SLOT_VSPACE := 90.0  # 6마리 fit (80 + 5*90 + 80 = 610, end_turn_btn y 856 위)
+const SIDEBAR_SLOT_VSPACE := 90.0  # row 간 거리
+const SIDEBAR_SLOT_HSPACE := 211.0  # col 간 거리 (hp_bar 폭)
+const SIDEBAR_SLOTS_PER_ROW := 3   # 위쪽/아래쪽 각 3 슬롯, 우측부터 채움
 var _enemy_sidebar_t: float = 0.0  # 0=base, 1=sidebar
 var _enemy_sidebar_tween: Tween = null
 const TOKEN_TILE_W := 111
@@ -160,8 +162,6 @@ func _ready() -> void:
 	_setup_ui_layer()  # UI 전용 CanvasLayer 먼저 — _build_ui 가 거기에 add_child
 	_build_ui()
 	_setup_kill_cam()
-	if OS.is_debug_build():
-		_debug_find_best_sidebar_layout()
 	if OS.is_debug_build():
 		_build_debug_tooltip()
 	BattleManager.team_mgr = TeamManager
@@ -2918,8 +2918,10 @@ func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 	var btn_node = entry.get("btn")
 	if btn_node != null and is_instance_valid(btn_node):
 		btn_node.mouse_filter = Control.MOUSE_FILTER_IGNORE if sidebar_mode else Control.MOUSE_FILTER_STOP
-	# sidebar 슬롯의 panel 위치 (화면 좌표). 노드별 offset 은 base 와 동일 (node.base - panel.base).
-	var sidebar_panel_screen := Vector2(SIDEBAR_X, SIDEBAR_Y + slot_idx * SIDEBAR_SLOT_VSPACE)
+	# sidebar 2x3 grid 위치 — 우측부터 채움. col 0 = 우측 (SIDEBAR_X), col 2 = 좌측.
+	var col: int = slot_idx % SIDEBAR_SLOTS_PER_ROW
+	var row: int = slot_idx / SIDEBAR_SLOTS_PER_ROW
+	var sidebar_panel_screen := Vector2(SIDEBAR_X - col * SIDEBAR_SLOT_HSPACE, SIDEBAR_Y + row * SIDEBAR_SLOT_VSPACE)
 	var inv_zoom: Vector2 = Vector2.ONE
 	if _camera != null and abs(_camera.zoom.x) > 0.001:
 		inv_zoom = Vector2.ONE / _camera.zoom
