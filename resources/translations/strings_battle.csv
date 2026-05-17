@@ -117,3 +117,13 @@ power.debuff_amplify.label,디버프 적용 시 스택 +%d 추가합니다.,+%d 
 power.debuff_amplify.desc,이 영웅이 약화/취약 부여 시 %d 추가 스택,Apply %d extra stacks on weak/vulnerable,Applique %d stacks supplémentaires,Applica %d stack extra,Aplica %d pilas extra,弱化/脆弱付与時 %d スタック追加,+%d στοίβες κατά εφαρμογή εξασθένησης,施加减益时额外 %d 层,施加减益时额外 %d 层
 power.echo_next_attack.label,다음 공격 카드 효과를 1회 재시전합니다.,Echo Next Attack,Écho Prochain Att.,Eco Prox. Attacco,Eco Próx. Ataque,次の攻撃エコー,Ηχώ Επόμ. Επίθεσης,下次攻击回响,下次攻击回响
 power.echo_next_attack.desc,다음 ATTACK 카드의 모든 효과를 1회 추가 시전,Replay all effects of the next ATTACK card once,Rejoue tous les effets de la prochaine attaque,Ripete tutti gli effetti del prossimo attacco,Repite todos los efectos del próximo ataque,次のATTACKカードの全効果を1回再発動,Επαναλαμβάνει όλες τις επιδράσεις της επόμενης επίθεσης,下张攻击牌的所有效果再次触发,下张攻击牌的所有效果再次触发
+power.double_next_damage.label,다음 데미지 ×%d,Next Damage ×%d,Prochain dégât ×%d,Prossimo Danno ×%d,Próximo Daño ×%d,次のダメージ ×%d,Επόμενη Ζημιά ×%d,下次伤害 ×%d,下次傷害 ×%d
+power.double_next_damage.desc,다음 데미지 카드 1회 ×%d 피해,Next damage card deals ×%d damage (once),Prochaine carte de dégâts ×%d (une fois),Prossima carta danno ×%d (una volta),Próxima carta de daño ×%d (una vez),次のダメージカード ×%d ダメージ（1回）,Η επόμενη κάρτα ζημιάς ×%d (μία φορά),下张伤害牌 ×%d 伤害（一次）,下張傷害牌 ×%d 傷害（一次）
+power.heal_per_turn.label,체력 회복 +%d/턴,Heal +%d/Turn,Soin +%d/Tour,Cura +%d/Turno,Curar +%d/Turno,回復 +%d/ターン,Θεραπεία +%d/Γύρο,治疗 +%d/回合,治療 +%d/回合
+power.heal_per_turn.desc,플레이어 턴 시작마다 본인 HP %d 회복,Restore %d HP at the start of each player turn,Restaure %d PV au début de chaque tour du joueur,Restaura %d PV all'inizio di ogni turno del giocatore,Restaura %d PV al inicio de cada turno del jugador,プレイヤーターン開始時に %d HP 回復,Αποκαθιστά %d HP στην αρχή κάθε γύρου του παίκτη,每回合开始时恢复 %d HP,每回合開始時恢復 %d HP
+battle.signature.hubris.toast,휴브리스!,HUBRIS!,HUBRIS !,HUBRIS!,¡HUBRIS!,ヒュブリス！,ΥΒΡΙΣ!,傲慢之罪！,傲慢之罪！
+battle.signature.ragnarok.toast,라그나로크!,RAGNAROK!,RAGNARÖK !,RAGNARÖK!,¡RAGNARÖK!,ラグナロク！,ΡΑΓΝΑΡΟΚ!,诸神黄昏！,諸神黃昏！
+battle.signature.egyptian_curse.toast,저주의 시선!,EGYPTIAN CURSE!,MALÉDICTION ÉGYPTIENNE !,MALEDIZIONE EGIZIA!,¡MALDICIÓN EGIPCIA!,エジプトの呪い！,ΑΙΓΥΠΤΙΑΚΗ ΚΑΤΑΡΑ!,埃及诅咒！,埃及詛咒！
+battle.signature.karma.toast,인과응보!,KARMA!,KARMA !,KARMA!,¡KARMA!,因果応報！,ΚΑΡΜΑ!,因果报应！,因果報應！
+battle.signature.yin_yang.toast,음양 교대!,YIN YANG!,YIN YANG !,YIN YANG!,¡YIN YANG!,陰陽交代！,ΓΙΝ ΓΙΑΝΓΚ!,阴阳交替！,陰陽交替！
+battle.signature.kekkai.toast,결계 발동!,KEKKAI!,KEKKAI !,KEKKAI!,¡KEKKAI!,結界発動！,ΚΕΚΚΑΪ!,结界发动！,結界發動！
