@@ -368,6 +368,7 @@ func _build_ui() -> void:
 	_relic_container.size = Vector2(WINDOW_W - 40, 72)
 	_relic_container.add_theme_constant_override("h_separation", 6)
 	_relic_container.add_theme_constant_override("v_separation", 4)
+	_relic_container.mouse_filter = Control.MOUSE_FILTER_PASS  # 자체는 통과, 자식 (relic icon) 만 hover (사이드바 sig_icon 차단 방지)
 	add_child(_relic_container)
 	_synergy_box = _relic_container
 	_refresh_hud()
@@ -1032,10 +1033,7 @@ func _attach_signature_icon(panel: ColorRect, mythology) -> Label:
 	lbl.text = info["emoji"]
 	lbl.add_theme_font_size_override("font_size", 22)
 	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-	lbl.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	lbl.z_index = 1900  # 시그니처 아이콘 — UI 보다 위 (사이드바 시 hover 차단 방지)
-	# 디버그: hover detect 작동 검증
-	lbl.mouse_entered.connect(func(): print("[sig_icon] mouse_entered, pos=", lbl.position, " global_rect=", lbl.get_global_rect(), " sidebar_t=", _enemy_sidebar_t, " cam_zoom=", _camera.zoom if _camera else "null", " cam_pos=", _camera.position if _camera else "null"))
+	lbl.z_index = 1900
 	var pp: Vector2 = panel.position
 	lbl.position = pp + Vector2(panel.size.x - 34.0, 4.0)
 	lbl.size = Vector2(26, 28)
