@@ -86,11 +86,17 @@ func _build_illo(frame: Panel) -> void:
 	illo.clip_contents = true
 	frame.add_child(illo)
 
-	# 휴식 씬 일러스트
-	const REST_ILLUST := "res://assets/art/scenes/rest.png"
-	if ResourceLoader.exists(REST_ILLUST):
+	# 휴식 씬 일러스트 — 현재 act 신화별 분기. 폴백: rest_greek.png
+	var myth: String = ""
+	var gm = get_node_or_null("/root/GameManager")
+	if gm and gm.current_act > 0 and gm.current_act <= gm.act_mythologies.size():
+		myth = gm.act_mythologies[gm.current_act - 1]
+	var rest_path: String = "res://assets/art/scenes/rest_%s.png" % myth if myth != "" else ""
+	if not ResourceLoader.exists(rest_path):
+		rest_path = "res://assets/art/scenes/rest_generic.png"  # 폴백 (모닥불 일반)
+	if ResourceLoader.exists(rest_path):
 		var illo_tex := TextureRect.new()
-		illo_tex.texture = load(REST_ILLUST)
+		illo_tex.texture = load(rest_path)
 		illo_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		illo_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		illo_tex.size = Vector2(FRAME_W, ILLO_H)
