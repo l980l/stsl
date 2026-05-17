@@ -542,10 +542,10 @@ func _run_next_actor_turn() -> void:
 	elif next_id.begins_with("enemy:"):
 		var idx: int = int(next_id.substr(6))
 		await _run_one_enemy_turn(idx)
-		# 적 차례 후 다음 actor 자동 진행 — 차례 전환 인터벌 대기
+		# 적 차례 후 다음 actor 자동 진행 — 차례 전환 인터벌 대기 (적 종료 인식 시간 위해 2배)
 		if is_battle_active:
 			if turn_interval > 0.0:
-				await get_tree().create_timer(turn_interval * _turn_interval_mul()).timeout
+				await get_tree().create_timer(turn_interval * 2.0 * _turn_interval_mul()).timeout
 			if is_battle_active:
 				await _run_next_actor_turn()
 
@@ -1514,9 +1514,9 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 		_in_player_turn = false  # MIMIC 트래커 게이트 종료
 		enemy_turn_started.emit()
 		turn_started.emit(_current_actor_id)
-		# 적 차례 시작 인터벌 — 사용자가 적 차례 인식 시간
+		# 적 차례 시작 인터벌 — 사용자가 적 차례 인식 시간 (영웅 차례보다 짧게 느껴지지 않게 2배)
 		if turn_interval > 0.0:
-			await get_tree().create_timer(turn_interval * _turn_interval_mul()).timeout
+			await get_tree().create_timer(turn_interval * 2.0 * _turn_interval_mul()).timeout
 		if not is_battle_active:
 			return
 	_enemy_block[i] = 0
