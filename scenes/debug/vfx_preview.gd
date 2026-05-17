@@ -28,6 +28,7 @@ const WARRIOR_BUFF := preload("res://scenes/vfx/warrior_buff.gd")
 const INFATUATION := preload("res://scenes/vfx/infatuation.gd")
 const DEFENSE_BUFF := preload("res://scenes/vfx/defense_buff.gd")
 const POISON_TICK := preload("res://scenes/vfx/poison_tick.gd")
+const SUMMON_BURST := preload("res://scenes/vfx/summon_burst.gd")
 
 # kind: "impact"=피격 버스트(타겟 위치) / "self"=자기 버프 버스트 / "beam"=시전자→타겟 빔
 # 현재버전 — 게임에서 실제 사용 중
@@ -58,6 +59,7 @@ const VFX_CURRENT := [
 	{"name": "warrior_buff",   "kind": "beam",   "path": "res://scenes/vfx/warrior_buff.gd"},
 	{"name": "infatuation",    "kind": "beam",   "path": "res://scenes/vfx/infatuation.gd"},
 	{"name": "defense_buff",   "kind": "beam",   "path": "res://scenes/vfx/defense_buff.gd"},
+	{"name": "summon_burst",   "kind": "beam",   "path": "res://scenes/vfx/summon_burst.gd"},
 ]
 
 # 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.
@@ -297,6 +299,11 @@ func _update_info() -> void:
 		"poison_tick":
 			s += "독 DoT tick — 잔류 가스만 (poison_splash 의 ambient 추출)\n"
 			s += "지속 %.1fs · sfx=impact_poison · 시전자 마커 무시" % POISON_TICK.TICK_TIME
+		"summon_burst":
+			s += "병사 소환 — callRing 반경 %.0f · pillar %.0fx%.0f\n" % [
+				SUMMON_BURST.RING_MAX_R, SUMMON_BURST.PILLAR_W, SUMMON_BURST.PILLAR_H]
+			s += "차지 %.2fs · pillar 지속 %.2fs (타겟 좌우 3슬롯 자동 spawn)" % [
+				SUMMON_BURST.CHARGE_TIME, SUMMON_BURST.PILLAR_GROW + SUMMON_BURST.PILLAR_HOLD + SUMMON_BURST.PILLAR_FADE]
 		_:
 			s += "시전자 마커는 beam 전용 — impact/self는 타겟 위치에서 재생"
 	# IMPACT_DELAY 한 줄 자동 추가 — VFX 스크립트에 노출돼 있으면 표시 (battle_manager 가 동기화에 사용)
@@ -350,6 +357,13 @@ func _play(entry: Dictionary) -> void:
 				fx.position = Vector2.ZERO
 				fx.screen_effect.connect(_preview_flash)
 				fx.screen_effect.connect(_show_impact_marker.bind(entry["name"]))
+				# summon_burst — 타겟을 중심으로 좌우 3 슬롯 자동 spawn (실제 게임에선 토큰 그리드 좌표)
+				if entry["name"] == "summon_burst" and fx.has_method("set_spawn_positions"):
+					fx.set_spawn_positions([
+						_target_pos + Vector2(-130.0, 0.0),
+						_target_pos,
+						_target_pos + Vector2(130.0, 0.0),
+					])
 				fx.play(_caster_pos, _target_pos)
 		"impact":
 			var packed := load(entry["path"]) as PackedScene
