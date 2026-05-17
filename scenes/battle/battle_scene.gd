@@ -1345,6 +1345,8 @@ func _refresh_token_tiles(hero_id: String) -> void:
 		_token_tile_nodes[hero_id].append(char_node)
 
 func _update_enemy_ui(index: int) -> void:
+	if index < 0 or index >= _enemy_nodes.size():
+		return  # setup_battle 중 PASSIVE relic 트리거 시 _enemy_nodes 비어있음
 	var entry: Dictionary = _enemy_nodes[index]
 	var enemy: Resource = BattleManager.get_enemy(index)
 	if enemy == null:
