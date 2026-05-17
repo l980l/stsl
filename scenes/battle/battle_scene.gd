@@ -32,7 +32,7 @@ const TOKEN_ROWS := 1
 # Layout 은 base panel (SLOT_W=240, SLOT_H=280) 과 동일 — sidebar 내 node offset = base 와 같음.
 # 따라서 별도 SIDEBAR_LAYOUT 불필요. sidebar 좌표 = (SIDEBAR_X, SIDEBAR_Y + i*VSPACE) + (node.base - panel.base)
 const SIDEBAR_X := 1620.0
-const SIDEBAR_Y := 90.0
+const SIDEBAR_Y := 200.0  # 위쪽 (relic_container y 70~142) 차단 영역 회피
 const SIDEBAR_SLOT_VSPACE := 140.0
 var _enemy_sidebar_t: float = 0.0  # 0=base, 1=sidebar
 var _enemy_sidebar_tween: Tween = null
