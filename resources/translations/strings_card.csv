@@ -36,18 +36,18 @@ effect.purge_status.text,디버프 제거,Remove debuffs,Retire les malus,Rimuov
 effect.per_draw_dmg.text,이번 턴 뽑은 카드 1장당 적에게 피해 %d을 입힙니다.,%d damage per draw,%d dégâts par pioche,%d danni per pesca,%d daño por robo,ドロー数×%d ダメージ,%d ζημιά ανά τράβηγμα,抽牌数×%d 伤害,抽牌数×%d 伤害
 effect.apply_status_poison.text,%s %d 데미지,%s %d damage,%s %d dégâts,%s %d danni,%s %d de daño,%s %d ダメージ,%s %d ζημιά,%s %d 伤害,%s %d 伤害
 effect.aoe_suffix, (전체), (All), (Tous), (Tutti), (Todos), (全体), (Όλοι), (全体), (全体)
-effect.damage.single.text,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s
-effect.damage.all.text,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s
-effect.apply_status.single.text,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.
-effect.apply_status.all.text,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.
-effect.apply_status_poison.single.text,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.
-effect.apply_status_poison.all.text,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.
-effect.status_double.single.text,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.
-effect.status_double.all.text,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.
-effect.purge_status.single.text,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.
-effect.purge_status.all.text,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.
-effect.heal_per_dead_ally.single.text,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.
-effect.heal_per_dead_ally.all.text,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.
+effect.damage.single.text,적에게 피해 %d을 입힙니다.%s,Deal %d damage to an enemy.%s,Inflige %d dégâts à un ennemi.%s,Infligge %d danni a un nemico.%s,Inflige %d de daño a un enemigo.%s,敵に %d ダメージ。%s,Προκάλεσε %d ζημιά σε εχθρό.%s,对一名敌人造成 %d 点伤害。%s,對一名敵人造成 %d 點傷害。%s
+effect.damage.all.text,모든 적에게 피해 %d을 입힙니다.%s,Deal %d damage to all enemies.%s,Inflige %d dégâts à tous les ennemis.%s,Infligge %d danni a tutti i nemici.%s,Inflige %d de daño a todos los enemigos.%s,全敵に %d ダメージ。%s,Προκάλεσε %d ζημιά σε όλους τους εχθρούς.%s,对所有敌人造成 %d 点伤害。%s,對所有敵人造成 %d 點傷害。%s
+effect.apply_status.single.text,적에게 %s을 부여합니다.,Apply %s to an enemy.,Applique %s à un ennemi.,Applica %s a un nemico.,Aplica %s a un enemigo.,敵に %s を付与。,Εφάρμοσε %s σε εχθρό.,对一名敌人施加 %s。,對一名敵人施加 %s。
+effect.apply_status.all.text,모든 적에게 %s을 부여합니다.,Apply %s to all enemies.,Applique %s à tous les ennemis.,Applica %s a tutti i nemici.,Aplica %s a todos los enemigos.,全敵に %s を付与。,Εφάρμοσε %s σε όλους τους εχθρούς.,对所有敌人施加 %s。,對所有敵人施加 %s。
+effect.apply_status_poison.single.text,적에게 독 %d 데미지를 부여합니다.,Apply %d Poison damage to an enemy.,Applique %d dégâts de Poison à un ennemi.,Applica %d danni di Veleno a un nemico.,Aplica %d de daño de Veneno a un enemigo.,敵に毒 %d ダメージを付与。,Εφάρμοσε %d ζημιά Δηλητηρίου σε εχθρό.,对一名敌人施加 %d 中毒伤害。,對一名敵人施加 %d 中毒傷害。
+effect.apply_status_poison.all.text,모든 적에게 독 %d 데미지를 부여합니다.,Apply %d Poison damage to all enemies.,Applique %d dégâts de Poison à tous les ennemis.,Applica %d danni di Veleno a tutti i nemici.,Aplica %d de daño de Veneno a todos los enemigos.,全敵に毒 %d ダメージを付与。,Εφάρμοσε %d ζημιά Δηλητηρίου σε όλους τους εχθρούς.,对所有敌人施加 %d 中毒伤害。,對所有敵人施加 %d 中毒傷害。
+effect.status_double.single.text,적의 디버프 스택을 2배로 만듭니다.,Double an enemy's debuff stacks.,Double les piles de débuff d'un ennemi.,Raddoppia gli stack di debuff di un nemico.,Duplica las pilas de desventaja de un enemigo.,敵のデバフスタックを2倍にする。,Διπλασίασε τις στοίβες εξασθένησης ενός εχθρού.,将一名敌人的减益层数翻倍。,將一名敵人的減益層數翻倍。
+effect.status_double.all.text,모든 적의 디버프 스택을 2배로 만듭니다.,Double all enemies' debuff stacks.,Double les piles de débuff de tous les ennemis.,Raddoppia gli stack di debuff di tutti i nemici.,Duplica las pilas de desventaja de todos los enemigos.,全敵のデバフスタックを2倍にする。,Διπλασίασε τις στοίβες εξασθένησης όλων των εχθρών.,将所有敌人的减益层数翻倍。,將所有敵人的減益層數翻倍。
+effect.purge_status.single.text,아군 1명의 디버프를 모두 제거합니다.,Remove all debuffs from one ally.,Retire tous les débuffs d'un allié.,Rimuove tutti i debuff da un alleato.,Elimina todas las desventajas de un aliado.,味方1名のデバフを全て解除。,Αφαίρεσε όλες τις εξασθενήσεις από έναν σύμμαχο.,移除一名队友的所有减益。,移除一名隊友的所有減益。
+effect.purge_status.all.text,모든 아군의 디버프를 제거합니다.,Remove debuffs from all allies.,Retire les débuffs de tous les alliés.,Rimuove i debuff da tutti gli alleati.,Elimina las desventajas de todos los aliados.,全味方のデバフを解除。,Αφαίρεσε εξασθενήσεις από όλους τους συμμάχους.,移除所有队友的减益。,移除所有隊友的減益。
+effect.heal_per_dead_ally.single.text,사망한 아군 1명당 체력 %d을 회복합니다.,Restore %d HP per dead ally.,Restaure %d PV par allié mort.,Ripristina %d PV per alleato morto.,Restaura %d PV por aliado muerto.,戦死した味方1名につき %d HP 回復。,Αποκατάσταση %d HP ανά νεκρό σύμμαχο.,每名阵亡队友恢复 %d HP。,每名陣亡隊友恢復 %d HP。
+effect.heal_per_dead_ally.all.text,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,All allies restore %d HP per dead ally.,Tous les alliés restaurent %d PV par allié mort.,Tutti gli alleati ripristinano %d PV per alleato morto.,Todos los aliados restauran %d PV por aliado muerto.,戦死した味方1名につき全味方 %d HP 回復。,Όλοι οι σύμμαχοι αποκαθιστούν %d HP ανά νεκρό σύμμαχο.,所有队友每名阵亡队友恢复 %d HP。,所有隊友每名陣亡隊友恢復 %d HP。
 card.napoleon.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライク,Χτύπημα,打击,打击
 card.napoleon.strike.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
 card.napoleon.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
@@ -139,7 +139,7 @@ card.napoleon.conquest_decree.archetype,돌격,Assault,Assaut,Assalto,Asalto,突
 card.napoleon.alps_crossing.name,알프스 횡단,Alps Crossing,Traversée des Alpes,Attraversamento delle Alpi,Cruce de los Alpes,アルプス越え,Διάσχιση των Άλπεων,翻越阿尔卑斯,翻越阿尔卑斯
 card.napoleon.alps_crossing.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
 card.napoleon.emperors_legion.name,황제의 군단,Emperor's Legion,Légion de l'Empereur,Legione dell'Imperatore,Legión del Emperador,皇帝の軍団,Λεγεώνα του Αυτοκράτορα,皇帝的军团,皇帝的军团
-card.napoleon.emperors_legion.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,군단,군단
+card.napoleon.emperors_legion.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,軍團
 card.napoleon.emperors_will.name,황제의 의지,Emperor's Will,Volonté de l'Empereur,Volontà dell'Imperatore,Voluntad del Emperador,皇帝の意志,Θέληση του Αυτοκράτορα,皇帝的意志,皇帝的意志
 card.napoleon.emperors_will.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
 card.napoleon.reconnaissance.name,정찰,Reconnaissance,Reconnaissance,Ricognizione,Reconocimiento,偵察,Αναγνώριση,侦察,侦察
@@ -416,7 +416,7 @@ card.joan_of_arc.last_shield.name,최후의 방패,Last Shield,Dernier bouclier,
 card.joan_of_arc.last_shield.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.purifying_sacrifice.name,정화의 희생,Purifying Sacrifice,Sacrifice purificateur,Sacrificio purificatore,Sacrificio purificador,浄化の犠牲,Θυσία Εξαγνισμού,净化牺牲,净化牺牲
 card.joan_of_arc.purifying_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
-card.joan_of_arc.saints_vow.name,성녀의 맹약,Saint's Vow,Voeu de la sainte,Voto della santa,Voto de la santa,성녀의 맹약,Όρκος της Αγίας,圣女盟约,圣女盟约
+card.joan_of_arc.saints_vow.name,성녀의 맹약,Saint's Vow,Voeu de la sainte,Voto della santa,Voto de la santa,聖女の盟約,Όρκος της Αγίας,圣女盟约,聖女盟約
 card.joan_of_arc.saints_vow.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.joan_return.name,성녀의 귀환,the Saint's Return,Retour de la Sainte,Ritorno di la Santa,Regreso de la Santa,聖女の帰還,Επιστροφή της Αγίας,圣女回归,聖女回归
 card.joan_of_arc.joan_return.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
@@ -532,7 +532,7 @@ card.musashi.empty_state.name,무아지경,Empty State,État de vide,Stato di vu
 card.musashi.empty_state.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
 card.musashi.single_cut.name,일도양단,Single Cut,Coupe unique,Taglio singolo,Corte único,一刀両断,Μονό Χτύπημα,一刀两断,一刀两断
 card.musashi.single_cut.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
-card.musashi.afterimage_cut.name,잔영 참,Afterimage Cut,Coupe d'image rémanente,Taglio dell'immagine residua,Corte de imagen residual,残影斬,Χτύπημα Μετα단ίδας,残影斩,残影斩
+card.musashi.afterimage_cut.name,잔영 참,Afterimage Cut,Coupe d'image rémanente,Taglio dell'immagine residua,Corte de imagen residual,残影斬,Λεπίδα της Σκιάς,残影斩,殘影斬
 card.musashi.afterimage_cut.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
 card.musashi.strategy_path.name,병법의 길,Strategy Path,Voie de la stratégie,Via della strategia,Senda de la estrategia,兵法の道,Μονοπάτι της Στρατηγικής,兵法之道,兵法之道
 card.musashi.strategy_path.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
@@ -655,7 +655,7 @@ card.genghis_khan.soul_strike.name,영혼 베기,Soul Strike,Frappe de l'âme,Co
 card.genghis_khan.soul_strike.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,機動
 card.genghis_khan.berserk_blow.name,광폭한 일격,Berserk Blow,Coup berserk,Colpo berserk,Golpe berserk,狂暴の一撃,Χτύπημα Μανίας,狂暴一击,狂暴一擊
 card.genghis_khan.berserk_blow.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,機動
-card.napoleon.legion_charge.name,군단의 진격,Legion Charge,Charge de la légion,Carica della legione,Carga de la legión,軍団の突進,돌격 Λεγεώνας,军团冲锋,軍團衝鋒
+card.napoleon.legion_charge.name,군단의 진격,Legion Charge,Charge de la légion,Carica della legione,Carga de la legión,軍団の突進,Επέλαση Λεγεώνας,军团冲锋,軍團衝鋒
 card.napoleon.legion_charge.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,軍團
 card.napoleon.glory_shout.name,영광의 함성,Glory Shout,Cri de gloire,Grido di gloria,Grito de gloria,栄光の叫び,Κραυγή Δόξας,荣耀呐喊,榮耀吶喊
 card.napoleon.glory_shout.archetype,사기,Morale,Moral,Morale,Moral,士気,Ηθικό,士气,士氣
