@@ -2215,6 +2215,7 @@ const _VFX_HOLY_BUFF := preload("res://scenes/vfx/holy_buff.gd")
 const _VFX_WARRIOR_BUFF := preload("res://scenes/vfx/warrior_buff.gd")
 const _VFX_BLOCK: PackedScene = preload("res://scenes/vfx/block_particle.tscn")
 const _VFX_DEFENSE_BUFF := preload("res://scenes/vfx/defense_buff.gd")
+const _VFX_SUMMON_BURST := preload("res://scenes/vfx/summon_burst.gd")
 
 # lightning으로 죽는 적/영웅 — 사망 연출을 빔 임팩트 시점까지 지연하기 위한 빔 참조
 # key: "enemy_%d" 또는 hero_id → lightning_beam 인스턴스
@@ -2542,6 +2543,11 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 					_spawn_defense_buff(caster_pos, caster_foot)
 					did_self_aoe = true
 					spawned_this = true
+			elif et == EffectResource.EffectType.SUMMON_TOKEN:
+				if not did_self_aoe:
+					_spawn_summon_burst(owner_id, caster_pos, effect.value)
+					did_self_aoe = true
+					spawned_this = true
 		# 순차 spawn — 첫 spawn 은 즉시, 이후 spawn 은 _VFX_STEP_DELAY 만큼 지연
 		if spawned_this:
 			_vfx_spawn_count += 1
@@ -2763,6 +2769,66 @@ func _spawn_defense_buff(pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void
 		AudioManager.play_sfx("block")
 	)
 	fx.play(pos, pos)
+
+# 병사 소환 VFX — 영웅 위치 callRing + 새 토큰 슬롯들에 spawnPillar + 병사 등장 모션
+# count = 이번 카드로 소환되는 토큰 수. 현재 토큰 수 다음 슬롯부터 배치.
+# 만석(현재 + count > max_stack)이라 추가될 병사가 없으면 VFX·모션 모두 skip.
+# (battle_manager 의 _await_vfx_impact 는 fallback timer 가 있어 hang 없음.)
+func _spawn_summon_burst(hero_id: String, caster_pos: Vector2, count: int) -> void:
+	if count <= 0:
+		return
+	var hero_node: Node2D = _hero_char_nodes.get(hero_id)
+	if hero_node == null:
+		return
+	var cur: int = BattleManager._hero_status.get(hero_id, {}).get("tokens", 0)
+	var max_stack: int = BattleManager.TOKEN_MAX_STACK
+	var effective_count: int = mini(count, max_stack - cur)
+	if effective_count <= 0:
+		return  # 만석 — VFX·모션 skip
+	var soldier_spawn_positions: Array = []  # 병사 노드 좌상단 spawn 위치 (_animate_token_shot 와 동일)
+	var pillar_positions: Array = []         # VFX pillar 발치 위치 (병사 발치)
+	var area_pos := _summon_area_pos(_SHARED_TOKEN_GRID_AREA_IDX)
+	for i in range(effective_count):
+		var idx: int = cur + i
+		@warning_ignore("integer_division")
+		var col: int = int(idx / TOKEN_ROWS)
+		var row: int = idx % TOKEN_ROWS
+		var tile_x: int = int(area_pos.x) + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
+		var tile_y: int = int(area_pos.y) + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
+		var soldier_pos := Vector2(tile_x + TOKEN_TILE_W / 2.0 - 40.0, tile_y + TOKEN_TILE_H / 4.0)
+		soldier_spawn_positions.append(soldier_pos)
+		# pillar 발치 = 병사 스프라이트 중심 X + 발 Y (sprite 40x50 × scale 2.0)
+		pillar_positions.append(soldier_pos + Vector2(40.0, 100.0))
+	var fx := _VFX_SUMMON_BURST.new()
+	fx.set_spawn_positions(pillar_positions)
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_divine")
+		for i in range(effective_count):
+			_animate_soldier_summon_motion(hero_node, soldier_spawn_positions[i])
+	)
+	fx.play(caster_pos, pillar_positions[0])
+
+# 병사 등장 모션 — 영웅 위치에서 페이드인+이동으로 슬롯에 도착,
+# 잠시 머문 뒤 영웅으로 페이드아웃 복귀 (영구 토큰 그리드 폐기 정책 일관성).
+func _animate_soldier_summon_motion(hero_node: Node2D, grid_pos: Vector2) -> void:
+	var soldier = SoldierScene.instantiate()
+	soldier.scale = Vector2(2.0, 2.0)
+	soldier.position = hero_node.position
+	soldier.modulate.a = 0.0
+	soldier.z_index = hero_node.z_index + 1
+	add_child(soldier)
+	var tw := create_tween()
+	tw.tween_property(soldier, "modulate:a", 1.0, 0.18)
+	tw.parallel().tween_property(soldier, "position", grid_pos, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_interval(0.35)
+	tw.tween_property(soldier, "modulate:a", 0.0, 0.25)
+	tw.parallel().tween_property(soldier, "position", hero_node.position, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.tween_callback(soldier.queue_free)
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	# VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 이미 차지 시작.
