@@ -29,20 +29,11 @@ const TOKEN_COLS := 6
 const TOKEN_ROWS := 1
 
 # 적 패널 일부 UI 사이드바 (영웅 줌인 시 우측 세로 트윈)
+# Layout 은 base panel (SLOT_W=240, SLOT_H=280) 과 동일 — sidebar 내 node offset = base 와 같음.
+# 따라서 별도 SIDEBAR_LAYOUT 불필요. sidebar 좌표 = (SIDEBAR_X, SIDEBAR_Y + i*VSPACE) + (node.base - panel.base)
 const SIDEBAR_X := 1620.0
 const SIDEBAR_Y := 90.0
 const SIDEBAR_SLOT_VSPACE := 140.0
-const SIDEBAR_W := 211.0
-# 사이드바 슬롯 내 각 노드 화면 좌표 offset (slot top-left 기준)
-const SIDEBAR_LAYOUT := {
-	"name_lbl":   Vector2(0, 0),
-	"hp_bar":     Vector2(0, 22),
-	"hp_lbl":     Vector2(0, 18),
-	"block_lbl":  Vector2(0, 18),
-	"intent_lbl": Vector2(0, 54),
-	"status_box": Vector2(0, 80),
-	"sig_icon":   Vector2(SIDEBAR_W - 28, -4),
-}
 var _enemy_sidebar_t: float = 0.0  # 0=base, 1=sidebar
 var _enemy_sidebar_tween: Tween = null
 const TOKEN_TILE_W := 111
@@ -555,6 +546,7 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	add_child(status_box)
 
 	var base_positions := {
+		"panel":      panel.position,  # sidebar 계산 기준점 (panel 자체는 이동 X)
 		"name_lbl":   name_lbl.position,
 		"hp_bar":     hp_bar.position,
 		"hp_lbl":     hp_lbl.position,
@@ -2912,7 +2904,9 @@ func _update_enemy_sidebar_positions() -> void:
 
 func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 	var bp: Dictionary = entry["base_positions"]
-	var sidebar_slot_top_screen := Vector2(SIDEBAR_X, SIDEBAR_Y + slot_idx * SIDEBAR_SLOT_VSPACE)
+	var panel_base: Vector2 = bp.get("panel", Vector2.ZERO)
+	# sidebar 슬롯의 panel 위치 (화면 좌표). 노드별 offset 은 base 와 동일 (node.base - panel.base).
+	var sidebar_panel_screen := Vector2(SIDEBAR_X, SIDEBAR_Y + slot_idx * SIDEBAR_SLOT_VSPACE)
 	var t: float = _enemy_sidebar_t
 	var inv_zoom: Vector2 = Vector2.ONE
 	if _camera != null and abs(_camera.zoom.x) > 0.001:
@@ -2925,8 +2919,8 @@ func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 		if not bp.has(key):
 			continue
 		var base_pos: Vector2 = bp[key]
-		var sb_offset: Vector2 = SIDEBAR_LAYOUT.get(key, Vector2.ZERO)
-		var sb_screen: Vector2 = sidebar_slot_top_screen + sb_offset
+		# sidebar 에서 node 위치 = sidebar_panel + (node.base - panel.base)
+		var sb_screen: Vector2 = sidebar_panel_screen + (base_pos - panel_base)
 		var sb_self: Vector2 = _screen_to_self(sb_screen)
 		node.position = base_pos.lerp(sb_self, t)
 		node.scale = scale_now
