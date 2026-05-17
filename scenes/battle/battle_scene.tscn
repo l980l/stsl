@@ -14,34 +14,34 @@ script = ExtResource("1")
 environment = ExtResource("env")
 
 [node name="HeroSlot1" type="Marker2D" parent="." unique_id=1130807597]
-position = Vector2(345, 228)
+position = Vector2(350, 255)
 
 [node name="HeroSlot2" type="Marker2D" parent="." unique_id=1451905086]
-position = Vector2(77, 274)
+position = Vector2(91, 293)
 
 [node name="HeroSlot3" type="Marker2D" parent="." unique_id=249707295]
-position = Vector2(610, 283)
+position = Vector2(601, 300)
 
 [node name="EnemySlot1" type="Marker2D" parent="." unique_id=2015652129]
-position = Vector2(1332, 216)
+position = Vector2(1090, 248)
 
 [node name="EnemySlot2" type="Marker2D" parent="." unique_id=583857282]
 position = Vector2(1593, 251)
 
 [node name="EnemySlot3" type="Marker2D" parent="." unique_id=458996965]
-position = Vector2(1073, 281)
+position = Vector2(1339, 205)
 
 [node name="EnemySlot4" type="Marker2D" parent="." unique_id=477250368]
-position = Vector2(1084, 498)
+position = Vector2(1104, 509)
 
 [node name="EnemySlot5" type="Marker2D" parent="." unique_id=1098211461]
 position = Vector2(1609, 484)
 
 [node name="EnemySlot6" type="Marker2D" parent="." unique_id=948065002]
-position = Vector2(1354, 472)
+position = Vector2(1353, 537)
 
 [node name="SummonArea2" type="Marker2D" parent="." unique_id=1999169857]
-position = Vector2(126, 193)
+position = Vector2(138, 587)
 
 [node name="SlotPreview" type="Node2D" parent="." unique_id=1071944172]
 script = ExtResource("preview")
