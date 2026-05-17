@@ -3803,7 +3803,7 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		grid.add_child(empty_lbl)
 		return
 
-	var card_w := 197.0
+	var card_w := 194.0
 	var card_scale := card_w / 140.0
 	var card_h := 200.0 * card_scale
 	var base_scale := Vector2(card_scale, card_scale)
