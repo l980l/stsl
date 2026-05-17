@@ -2906,8 +2906,10 @@ func _update_enemy_sidebar_positions() -> void:
 func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 	var bp: Dictionary = entry["base_positions"]
 	var panel_base: Vector2 = bp.get("panel", Vector2.ZERO)
+	# 적별 transition_t — visible 적은 0 유지 (base), 안 보이는 적만 1 (사이드바)
+	var t: float = entry.get("transition_t", 0.0)
 	# 사이드바 활성 시 적 base panel/btn 의 mouse hit 차단 비활성 (사이드바 노드 hover 위해)
-	var sidebar_mode: bool = _enemy_sidebar_t > 0.5
+	var sidebar_mode: bool = t > 0.5
 	var panel_node = entry.get("panel")
 	if panel_node != null and is_instance_valid(panel_node):
 		panel_node.mouse_filter = Control.MOUSE_FILTER_IGNORE if sidebar_mode else Control.MOUSE_FILTER_STOP
@@ -2916,7 +2918,6 @@ func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 		btn_node.mouse_filter = Control.MOUSE_FILTER_IGNORE if sidebar_mode else Control.MOUSE_FILTER_STOP
 	# sidebar 슬롯의 panel 위치 (화면 좌표). 노드별 offset 은 base 와 동일 (node.base - panel.base).
 	var sidebar_panel_screen := Vector2(SIDEBAR_X, SIDEBAR_Y + slot_idx * SIDEBAR_SLOT_VSPACE)
-	var t: float = _enemy_sidebar_t
 	var inv_zoom: Vector2 = Vector2.ONE
 	if _camera != null and abs(_camera.zoom.x) > 0.001:
 		inv_zoom = Vector2.ONE / _camera.zoom
@@ -2938,13 +2939,47 @@ func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 		else:
 			node.scale = scale_now
 
-func _start_enemy_sidebar_transition(target_t: float) -> void:
+func _start_enemy_sidebar_transition(target_t_global: float) -> void:
 	if _enemy_sidebar_tween != null:
 		_enemy_sidebar_tween.kill()
 	var dur: float = _cam_tween_time()
-	_enemy_sidebar_tween = create_tween()
-	_enemy_sidebar_tween.tween_property(self, "_enemy_sidebar_t", target_t, dur) \
+	_enemy_sidebar_tween = create_tween().set_parallel(true)
+	# 글로벌 t 유지 (호환) + 적별 t 트윈 (visible 적은 base 유지)
+	_enemy_sidebar_tween.tween_property(self, "_enemy_sidebar_t", target_t_global, dur) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var hero_pos: Vector2 = _get_current_hero_world_pos()
+	for i in range(_enemy_nodes.size()):
+		var entry: Dictionary = _enemy_nodes[i]
+		var target_t: float = target_t_global
+		# 줌인 활성 시도 + 적이 화면 안 fully visible → base 유지 (사이드바 X)
+		if target_t_global > 0.5 and _is_enemy_visible_after_zoom(entry, hero_pos):
+			target_t = 0.0
+		var captured_idx: int = i
+		_enemy_sidebar_tween.tween_method(
+			func(v: float): _enemy_nodes[captured_idx]["transition_t"] = v,
+			float(entry.get("transition_t", 0.0)), target_t, dur
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _get_current_hero_world_pos() -> Vector2:
+	var hid: String = BattleManager.get_current_hero_id()
+	if hid == "" or not _hero_char_nodes.has(hid):
+		return _KC_HOME_POS
+	var node: Node2D = _hero_char_nodes[hid]
+	return node.global_position if is_instance_valid(node) else _KC_HOME_POS
+
+# 영웅 줌인 후 카메라 가정 (hero 위치 + zoom 1.3) 으로 적 panel 이 화면 안 fully visible
+func _is_enemy_visible_after_zoom(entry: Dictionary, hero_pos: Vector2) -> bool:
+	var bp: Dictionary = entry["base_positions"]
+	var panel_base: Vector2 = bp.get("panel", Vector2.ZERO)
+	var center_self: Vector2 = panel_base + Vector2(SLOT_W, SLOT_H) / 2.0
+	var vp_center := Vector2(WINDOW_W, WINDOW_H) * 0.5
+	var center_screen: Vector2 = (center_self - hero_pos) * CAM_ZOOM_HERO + vp_center
+	var half_w: float = SLOT_W * CAM_ZOOM_HERO.x * 0.5
+	var half_h: float = SLOT_H * CAM_ZOOM_HERO.y * 0.5
+	return (center_screen.x - half_w >= 0.0
+			and center_screen.x + half_w <= WINDOW_W
+			and center_screen.y - half_h >= 0.0
+			and center_screen.y + half_h <= WINDOW_H)
 
 # 설정 변경 즉시 반영 — 영웅 줌인 옵션 on/off
 func _on_hero_zoom_setting_changed(enabled: bool) -> void:
