@@ -367,7 +367,7 @@ func _build_ui() -> void:
 	# HUD 바 — 시너지 + 릴릭 아이콘, 메시지 레이블 아래
 	_relic_container = FlowContainer.new()
 	_relic_container.position = Vector2(20, 70)
-	_relic_container.size = Vector2(WINDOW_W - 40, 72)
+	_relic_container.size = Vector2(WINDOW_W / 3.0 - 20.0, 72)  # 좌측 1/3 (사이드바 hover 차단 방지)
 	_relic_container.add_theme_constant_override("h_separation", 6)
 	_relic_container.add_theme_constant_override("v_separation", 4)
 	_relic_container.mouse_filter = Control.MOUSE_FILTER_PASS  # 자체는 통과, 자식 (relic icon) 만 hover (사이드바 sig_icon 차단 방지)
@@ -1036,7 +1036,6 @@ func _attach_signature_icon(panel: ColorRect, mythology) -> Label:
 	lbl.add_theme_font_size_override("font_size", 22)
 	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 	lbl.z_index = 1900
-	lbl.mouse_entered.connect(func(): print("[sig_icon] entered, pos=", lbl.position, " global_rect=", lbl.get_global_rect()))
 	var pp: Vector2 = panel.position
 	lbl.position = pp + Vector2(panel.size.x - 34.0, 4.0)
 	lbl.size = Vector2(26, 28)
@@ -2970,65 +2969,6 @@ func _start_enemy_sidebar_transition(target_t_global: float) -> void:
 			func(v: float): _enemy_nodes[captured_idx]["transition_t"] = v,
 			float(entry.get("transition_t", 0.0)), target_t, dur
 		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-
-# [DEBUG ONLY] 영웅 3 + 적 6 케이스 가정. 모든 영웅 차례 시 각 사이드바 슬롯이
-# 다른 영웅/적의 UI 영역 (panel 상단 80px) 과 충돌하는지 검사. best SIDEBAR_Y / VSPACE 찾기.
-func _debug_find_best_sidebar_layout() -> void:
-	const UI_HEIGHT := 80.0  # panel 상단 UI 영역 (name/hp/intent/status)
-	var hero_world: Array[Vector2] = [
-		Vector2(345, 228), Vector2(77, 274), Vector2(610, 283)
-	]
-	var enemy_world: Array[Vector2] = [
-		Vector2(1332, 216), Vector2(1593, 251), Vector2(1073, 281),
-		Vector2(1084, 498), Vector2(1609, 484), Vector2(1354, 472)
-	]
-	var vp_center := Vector2(WINDOW_W, WINDOW_H) * 0.5
-	var occupied_y_ranges: Array = []  # 모든 영웅 차례의 모든 캐릭터 UI 화면 y range
-	for hero_pos in hero_world:
-		for char_pos in hero_world + enemy_world:
-			var panel_screen: Vector2 = (char_pos - hero_pos) * CAM_ZOOM_HERO + vp_center
-			# 화면 안 visible 만 (안 보이면 사이드바 가니까 영역 차지 X)
-			var half_w: float = SLOT_W * CAM_ZOOM_HERO.x * 0.5
-			var half_h: float = SLOT_H * CAM_ZOOM_HERO.y * 0.5
-			if panel_screen.x - half_w < 0 or panel_screen.x + half_w > WINDOW_W:
-				continue
-			if panel_screen.y - half_h < 0 or panel_screen.y + half_h > WINDOW_H:
-				continue
-			# UI 영역 = panel.top ~ panel.top + UI_HEIGHT*zoom
-			var ui_top: float = panel_screen.y - half_h
-			var ui_bottom: float = ui_top + UI_HEIGHT * CAM_ZOOM_HERO.y
-			occupied_y_ranges.append([ui_top, ui_bottom])
-	# 사이드바 슬롯 best layout 검색 — SIDEBAR_Y 와 VSPACE 조합 (slot 6 fit, end_turn_btn y < 856)
-	var best: Dictionary = {}
-	for sy in range(20, 200, 10):
-		for vs in range(50, 150, 5):
-			var ends: Array = []
-			var conflict: bool = false
-			for i in range(6):
-				var slot_top: float = float(sy) + i * float(vs)
-				var slot_bot: float = slot_top + 80.0  # slot 자체 height
-				if slot_bot > 850.0:
-					conflict = true
-					break
-				# 인접 슬롯 겹침 X (vs >= 80 if slot height 80)
-				if vs < 80:
-					conflict = true
-					break
-				# 영웅 UI 영역 충돌 검사
-				for yr in occupied_y_ranges:
-					var ut: float = yr[0]
-					var ub: float = yr[1]
-					if slot_top < ub and slot_bot > ut:
-						conflict = true
-						break
-				if conflict:
-					break
-				ends.append([slot_top, slot_bot])
-			if not conflict:
-				if best.is_empty() or float(sy) < best.get("sy", 9999.0):
-					best = {"sy": float(sy), "vs": float(vs), "ends": ends}
-	print("[DEBUG] occupied UI y ranges (영웅 차례별 visible 캐릭터): ", occupied_y_ranges)
-	print("[DEBUG] best sidebar layout: ", best)
 
 func _get_current_hero_world_pos() -> Vector2:
 	var hid: String = BattleManager.get_current_hero_id()
