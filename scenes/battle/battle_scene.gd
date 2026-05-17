@@ -419,14 +419,17 @@ func _apply_ui_z_index_recursive(_node: Node, z: int) -> void:
 func _set_char_entry_z(entry: Dictionary) -> void:
 	const Z_PANEL := 1200   # 배경 panel + bracket
 	const Z_BAR := 1210     # hp_bar wrapper + bg/fill/bloom/ghost (z_as_relative)
-	const Z_LBL := 1220     # 모든 라벨 — bar 위
+	const Z_LBL := 1220     # 일반 라벨 — bar 위
+	const Z_INTENT := 1230  # intent_lbl — btn(1220) 보다 위 (base 시 tooltip hover)
 	if entry.has("panel") and is_instance_valid(entry["panel"]):
 		entry["panel"].z_index = Z_PANEL
 	if entry.has("hp_bar") and is_instance_valid(entry["hp_bar"]):
 		entry["hp_bar"].z_index = Z_BAR
-	for k in ["name_lbl", "hp_lbl", "block_lbl", "intent_lbl", "btn", "status_box"]:
+	for k in ["name_lbl", "hp_lbl", "block_lbl", "btn", "status_box"]:
 		if entry.has(k) and is_instance_valid(entry[k]):
 			entry[k].z_index = Z_LBL
+	if entry.has("intent_lbl") and is_instance_valid(entry["intent_lbl"]):
+		entry["intent_lbl"].z_index = Z_INTENT
 
 func _hero_slot_pos(index: int) -> Vector2:
 	return (get_node("HeroSlot%d" % (index + 1)) as Marker2D).position
