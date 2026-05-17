@@ -347,35 +347,35 @@ card.joan_of_arc.divine_punishment.archetype,신성공격,Divine Attack,Attaque 
 card.joan_of_arc.archangels_wrath.name,대천사의 분노,Archangel's Wrath,Courroux de l'Archange,Collera dell'Arcangelo,Ira del Arcángel,大天使の怒り,Οργή Αρχαγγέλου,大天使之怒,大天使之怒
 card.joan_of_arc.archangels_wrath.archetype,신성공격,Divine Attack,Attaque divine,Attacco divino,Ataque divino,神聖攻撃,Θεϊκή Επίθεση,神圣攻击,神圣攻击
 card.joan_of_arc.holy_touch.name,성녀의 손길,Holy Touch,Toucher sacré,Tocco sacro,Toque sagrado,聖女の導き,Άγιο Άγγιγμα,圣女之抚,圣女之抚
-card.joan_of_arc.holy_touch.archetype,신성,,,,,,,,
+card.joan_of_arc.holy_touch.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.blessing_of_light.name,축복의 빛,Blessing of Light,Bénédiction de lumière,Benedizione della luce,Bendición de luz,祝福の光,Ευλογία του Φωτός,祝福之光,祝福之光
-card.joan_of_arc.blessing_of_light.archetype,신성,,,,,,,,
+card.joan_of_arc.blessing_of_light.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.hymn.name,성가,Hymn,Hymne,Inno,Himno,聖歌,Ύμνος,圣歌,圣歌
-card.joan_of_arc.hymn.archetype,신성,,,,,,,,
+card.joan_of_arc.hymn.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.purifying_flame.name,정화의 불꽃,Purifying Flame,Flamme purificatrice,Fiamma purificatrice,Llama purificadora,浄化の炎,Φλόγα Εξαγνισμού,净化之火,净化之火
-card.joan_of_arc.purifying_flame.archetype,신성,,,,,,,,
+card.joan_of_arc.purifying_flame.archetype,정화,Purification,Purification,Purificazione,Purificación,浄化,Εξαγνισμός,净化,淨化
 card.joan_of_arc.self_sacrifice.name,자기희생,Self-Sacrifice,Sacrifice de soi,Autosacrificio,Sacrificio personal,自己犠牲,Αυτοθυσία,自我牺牲,自我牺牲
 card.joan_of_arc.self_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.orleans_charge.name,오를레앙의 돌격,Orleans Charge,Charge d'Orléans,Carica di Orléans,Carga de Orleans,オルレアンの突撃,Έφοδος της Ορλεάνης,奥尔良突击,奥尔良突击
-card.joan_of_arc.orleans_charge.archetype,신성,,,,,,,,
+card.joan_of_arc.orleans_charge.archetype,성전,Crusade,Croisade,Crociata,Cruzada,聖戦,Σταυροφορία,圣战,聖戰
 card.joan_of_arc.miracle_revive.name,기적의 부활,Miracle Revive,Résurrection miraculeuse,Rianimazione miracolosa,Resurrección milagrosa,奇跡の復活,Θαυματουργή Αναβίωση,奇迹复活,奇迹复活
 card.joan_of_arc.miracle_revive.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.divine_protection.name,신의 가호,Divine Protection,Protection divine,Protezione divina,Protección divina,神の加護,Θεία Προστασία,神之加护,神之加护
-card.joan_of_arc.divine_protection.archetype,신성,,,,,,,,
+card.joan_of_arc.divine_protection.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.holy_fury.name,성스러운 분노,Holy Fury,Fureur sacrée,Furia sacra,Furia sagrada,聖なる憤怒,Θεία Οργή,神圣之怒,神圣之怒
-card.joan_of_arc.holy_fury.archetype,신성,,,,,,,,
+card.joan_of_arc.holy_fury.archetype,성전,Crusade,Croisade,Crociata,Cruzada,聖戦,Σταυροφορία,圣战,聖戰
 card.joan_of_arc.martyrs_will.name,순교의 의지,Martyr's Will,Volonté du martyr,Volontà del martire,Voluntad del mártir,殉教の意志,Θέληση του Μάρτυρα,殉教之志,殉教之志
 card.joan_of_arc.martyrs_will.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.knights_oath.name,기사단의 맹세,Knight's Oath,Serment de chevalier,Giuramento del cavaliere,Juramento del caballero,騎士団の誓い,Όρκος των Ιπποτών,骑士团誓言,骑士团誓言
 card.joan_of_arc.knights_oath.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.flag_of_orleans.name,신국의 깃발,Flag of Orleans,Bannière de Dieu,Bandiera di Dio,Bandera de Dios,神国の旗,Σημαία της Ορλεάνης,神国之旗,神国之旗
-card.joan_of_arc.flag_of_orleans.archetype,신성,,,,,,,,
+card.joan_of_arc.flag_of_orleans.archetype,깃발,Banner,Bannière,Vessillo,Estandarte,旗,Λάβαρο,旗帜,旗幟
 card.joan_of_arc.saints_flame.name,성녀의 화염,Saint's Flame,Flamme de la sainte,Fiamma della santa,Llama de la santa,聖女の火焔,Φλόγα της Αγίας,圣女之焰,圣女之焰
 card.joan_of_arc.saints_flame.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.holy_light.name,성스러운 빛,Holy Light,Lumière sacrée,Luce sacra,Luz sagrada,聖なる光,Άγιο Φως,神圣之光,神圣之光
-card.joan_of_arc.holy_light.archetype,신성,,,,,,,,
+card.joan_of_arc.holy_light.archetype,성전,Crusade,Croisade,Crociata,Cruzada,聖戦,Σταυροφορία,圣战,聖戰
 card.joan_of_arc.communion.name,성찬,Communion,Communion,Comunione,Comunión,聖餐,Θεία Κοινωνία,圣餐,圣餐
-card.joan_of_arc.communion.archetype,신성,,,,,,,,
+card.joan_of_arc.communion.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.revive_spark.name,부활의 불씨,Revive Spark,Étincelle de résurrection,Scintilla di rinascita,Chispa de resurrección,復活の火種,Σπίθα Αναβίωσης,复活火种,复活火种
 card.joan_of_arc.revive_spark.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.divine_providence.name,신의 섭리,Divine Providence,Providence divine,Provvidenza divina,Providencia divina,神の摂理,Θεία Πρόνοια,神之摄理,神之摄理
@@ -385,7 +385,7 @@ card.joan_of_arc.small_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Mar
 card.joan_of_arc.sacrifice_cry.name,희생의 함성,Sacrifice Cry,Cri de sacrifice,Grido di sacrificio,Grito de sacrificio,犠牲の叫び,Κραυγή Θυσίας,牺牲之吼,牺牲之吼
 card.joan_of_arc.sacrifice_cry.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.angel_wings.name,천사의 날개,Angel Wings,Ailes d'ange,Ali d'angelo,Alas de ángel,天使の翼,Φτερά Αγγέλου,天使之翼,天使之翼
-card.joan_of_arc.angel_wings.archetype,신성,,,,,,,,
+card.joan_of_arc.angel_wings.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.second_chance.name,두 번째 기회,Second Chance,Deuxième chance,Seconda occasione,Segunda oportunidad,二度目の機会,Δεύτερη Ευκαιρία,第二次机会,第二次机会
 card.joan_of_arc.second_chance.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.revive_scroll.name,부활의 서,Revive Scroll,Parchemin de résurrection,Pergamena della rinascita,Pergamino de resurrección,復活の書,Πάπυρος Αναβίωσης,复活之书,复活之书
@@ -403,7 +403,7 @@ card.joan_of_arc.altar_flame.archetype,순교,Martyrdom,Martyre,Martirio,Martiri
 card.joan_of_arc.holy_rage.name,신성한 격노,Holy Rage,Rage sacrée,Rabbia sacra,Ira sagrada,神聖な激怒,Θεία Μανία,神圣激怒,神圣激怒
 card.joan_of_arc.holy_rage.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.holy_purification.name,신성한 정화,Holy Purification,Purification sacrée,Purificazione sacra,Purificación sagrada,神聖な浄化,Θείος Εξαγνισμός,神圣净化,神圣净化
-card.joan_of_arc.holy_purification.archetype,신성,,,,,,,,
+card.joan_of_arc.holy_purification.archetype,정화,Purification,Purification,Purificazione,Purificación,浄化,Εξαγνισμός,净化,淨化
 card.joan_of_arc.knights_guard.name,기사의 수호,Knight's Guard,Garde du chevalier,Guardia del cavaliere,Guardia del caballero,騎士の守護,Φρουρά του Ιππότη,骑士守护,骑士守护
 card.joan_of_arc.knights_guard.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.martyrs_legacy.name,순교자의 유산,Martyr's Legacy,Héritage du martyr,Eredità del martire,Legado del mártir,殉教者の遺産,Κληρονομιά του Μάρτυρα,殉教者遗产,殉教者遗产
@@ -689,7 +689,7 @@ effect.sacrifice_payoff.text,HP 희생 100당 적에게 피해 %d을 입힙니�
 effect.sacrifice_payoff.block.text,HP 희생 100당 방어도 %d을 얻습니다.,Gain %d Block per 100 HP sacrificed,Gagnez %d Bloc par 100 PV sacrifiés,Ottieni %d Blocco per 100 PV sacrificati,Gana %d Bloqueo por 100 PV sacrificados,HP犠牲100毎に %d ブロック,Απόκτηση %d Μπλοκ ανά 100 HP,每牺牲100HP获得 %d 格挡,每牺牲100HP获得 %d 格挡
 effect.charm_to_damage.text,매혹 스택을 소비해 스택당 피해 %d을 입힙니다.,Convert charm: %d damage per stack,Convertit charme en %d dégâts/pile,Converte fascino in %d danno/pila,Convierte encanto en %d daño/pila,魅了を %d ダメージに変換,Μετατρέπει γοητεία σε %d ζημιά/στοίβα,将魅惑转为每层 %d 伤害,将魅惑转为每层 %d 伤害
 effect.multi_hit_random.text,랜덤 적에게 %d회 피해 %d을 입힙니다.,Hit random enemies %d×%d,Frappe aléatoire %d×%d,Colpisce casuale %d×%d,Golpea aleatorio %d×%d,ランダム敵 %d×%d ダメージ,Τυχαία %d×%d ζημιά,随机攻击 %d×%d 伤害,随机攻击 %d×%d 伤害
-card.yi_sun_sin.turtle_power.name,거북의 권능,Turtle Power,Turtle Power,Turtle Power,Turtle Power,亀の権能,Turtle Power,亀甲权能,亀甲权能
+card.yi_sun_sin.turtle_power.name,거북의 권능,Turtle Power,Pouvoir de la Tortue,Potere della Tartaruga,Poder de la Tortuga,亀の権能,Δύναμη της Χελώνας,龟甲权能,龜甲權能
 card.yi_sun_sin.turtle_power.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
 card.yi_sun_sin.cannon_rhythm.name,포격 리듬,Cannon Rhythm,Rythme de canonnade,Ritmo di cannone,Ritmo de cañón,砲撃リズム,Ρυθμός Κανονιοβολισμού,炮击节奏,炮击节奏
 card.yi_sun_sin.cannon_rhythm.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
