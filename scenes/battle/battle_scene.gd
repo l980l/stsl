@@ -1432,59 +1432,55 @@ func _update_enemy_ui(index: int) -> void:
 
 func _format_intent_tooltip(enemy_index: int, intent: Resource) -> String:
 	# 인텐트 hover 시 표시할 자세한 설명. 모든 action_type 지원.
+	# _trf 사용 — 번역 키 누락/specifier 없을 때 args 자동 무시 (% 직접 사용 시 터짐).
 	var v: int = intent.value
 	var target_all: bool = intent.target == IntentRes.TargetType.ALL
 	match intent.action_type:
 		IntentRes.ActionType.ATTACK:
 			var dmg: int = BattleManager.get_intent_display_damage(enemy_index, intent)
-			var line: String = tr("battle.intent.tooltip.attack") % dmg
+			var line: String = _trf("battle.intent.tooltip.attack", dmg)
 			if target_all:
 				line += " (" + tr("battle.intent.tooltip.target_all") + ")"
 			if intent.damage_type != "":
-				line += " · " + (tr("battle.intent.tooltip.element") % intent.damage_type)
+				line += " · " + _trf("battle.intent.tooltip.element", intent.damage_type)
 			return line
 		IntentRes.ActionType.BUFF:
 			match intent.status_type:
-				"strength": return tr("battle.intent.tooltip.buff_strength") % v
-				"block": return tr("battle.intent.tooltip.buff_block") % v
-				_: return tr("battle.intent.tooltip.buff_generic") % [intent.status_type, v]
+				"strength": return _trf("battle.intent.tooltip.buff_strength", v)
+				"block": return _trf("battle.intent.tooltip.buff_block", v)
+				_: return _trf("battle.intent.tooltip.buff_generic", [intent.status_type, v])
 		IntentRes.ActionType.DEBUFF:
-			var key: String
 			match intent.status_type:
-				"weak": key = "battle.intent.tooltip.debuff_weak"
-				"vulnerable": key = "battle.intent.tooltip.debuff_vulnerable"
-				"poison":
-					return tr("battle.intent.tooltip.debuff_poison") % v
-				"charm":
-					return tr("battle.intent.tooltip.debuff_charm") % v
-				_:
-					return tr("battle.intent.tooltip.debuff_generic") % [intent.status_type, v]
-			return tr(key)
+				"weak": return tr("battle.intent.tooltip.debuff_weak")
+				"vulnerable": return tr("battle.intent.tooltip.debuff_vulnerable")
+				"poison": return _trf("battle.intent.tooltip.debuff_poison", v)
+				"charm": return _trf("battle.intent.tooltip.debuff_charm", v)
+				_: return _trf("battle.intent.tooltip.debuff_generic", [intent.status_type, v])
 		IntentRes.ActionType.PREPARE:
 			return tr("battle.intent.tooltip.prepare")
 		IntentRes.ActionType.HEAL_ALLY:
-			return tr("battle.intent.tooltip.heal_ally") % v
+			return _trf("battle.intent.tooltip.heal_ally", v)
 		IntentRes.ActionType.BUFF_ALLY:
-			return tr("battle.intent.tooltip.buff_ally") % [intent.status_type, v]
+			return _trf("battle.intent.tooltip.buff_ally", [intent.status_type, v])
 		IntentRes.ActionType.COUNTER_PREPARE:
-			return tr("battle.intent.tooltip.counter_prepare") % v
+			return _trf("battle.intent.tooltip.counter_prepare", v)
 		IntentRes.ActionType.MARK_TARGET:
 			return tr("battle.intent.tooltip.mark_target")
 		IntentRes.ActionType.SACRIFICE:
-			return tr("battle.intent.tooltip.sacrifice") % v
+			return _trf("battle.intent.tooltip.sacrifice", v)
 		IntentRes.ActionType.WARD:
-			return tr("battle.intent.tooltip.ward") % v
+			return _trf("battle.intent.tooltip.ward", v)
 		IntentRes.ActionType.SUMMON:
-			return tr("battle.intent.tooltip.summon") % max(1, v)
+			return _trf("battle.intent.tooltip.summon", max(1, v))
 		IntentRes.ActionType.MIMIC:
-			return tr("battle.intent.tooltip.mimic") % v
+			return _trf("battle.intent.tooltip.mimic", v)
 		IntentRes.ActionType.SPECIAL:
 			match intent.status_type:
-				"remove_card": return tr("battle.intent.tooltip.special_remove_card") % max(1, v)
+				"remove_card": return _trf("battle.intent.tooltip.special_remove_card", max(1, v))
 				"summon": return tr("battle.intent.tooltip.special_summon")
 				_:
 					if intent.status_type != "":
-						return tr("battle.intent.tooltip.special_generic") % intent.status_type
+						return _trf("battle.intent.tooltip.special_generic", intent.status_type)
 					return tr("battle.intent.tooltip.special_unknown")
 		_:
 			return tr("battle.intent.tooltip.unknown")
