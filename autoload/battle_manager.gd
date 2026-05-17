@@ -117,6 +117,7 @@ signal boss_phase_changed(enemy_index: int, new_phase: int)
 signal enemy_spawned(enemy_index: int)  # T3-SUMMON: 런타임 적 추가 알림 (UI 갱신용)
 @warning_ignore("unused_signal")
 signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시그니처 발동 알림 (UI 토스트용)
+signal token_attack_fired(hero_id: String, token_index: int, enemy_index: int)  # 토큰 (병사) 발사 — VFX/SFX 시각 처리용
 
 # VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생.
 # 차지(IMPACT_DELAY) 이후 데미지/상태 적용 + 기존 시그널 (hero_damaged 등) emit.
@@ -580,7 +581,7 @@ func _start_hero_turn(hid: String) -> void:
 		await get_tree().create_timer(turn_interval * _turn_interval_mul()).timeout
 	if not is_battle_active:
 		return
-	var pre_did: bool = _phase_hero_pre(hid)
+	var pre_did: bool = await _phase_hero_pre(hid)
 	if pre_did and turn_interval > 0.0:
 		await get_tree().create_timer(turn_interval).timeout
 	if not is_battle_active:
@@ -602,9 +603,16 @@ func _phase_hero_pre(hid: String) -> bool:
 		if alive_indices.is_empty():
 			break
 		var pick: int = alive_indices[randi() % alive_indices.size()]
-		_last_attacker[pick] = hid  # bullet VFX caster_pos 조회용 — emit 전에 set
+		_last_attacker[pick] = hid
+		# 토큰 인덱스 + 타겟 적 전달 — battle_scene 이 병사 타일 위치에서 bullet VFX 발사
+		token_attack_fired.emit(hid, _ti, pick)
 		_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK, "bullet")
 		did_work = true
+		# 토큰 사이 짧은 랜덤 지연 — SFX 겹침 방지 (0.08~0.18s)
+		if token_count > 1:
+			await get_tree().create_timer(0.08 + randf() * 0.10).timeout
+			if not is_battle_active:
+				return did_work
 	# 본인 poison tick (영웅이 받은 독)
 	var dmg: int = _hero_status.get(hid, {}).get("poison_dmg", 0)
 	var dur: int = _hero_status.get(hid, {}).get("poison_dur", 0)
