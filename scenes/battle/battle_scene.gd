@@ -1035,7 +1035,7 @@ func _attach_signature_icon(panel: ColorRect, mythology) -> Label:
 	lbl.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	lbl.z_index = 1900  # 시그니처 아이콘 — UI 보다 위 (사이드바 시 hover 차단 방지)
 	# 디버그: hover detect 작동 검증
-	lbl.mouse_entered.connect(func(): print("[sig_icon] mouse_entered, pos=", lbl.position, " global_rect=", lbl.get_global_rect()))
+	lbl.mouse_entered.connect(func(): print("[sig_icon] mouse_entered, pos=", lbl.position, " global_rect=", lbl.get_global_rect(), " sidebar_t=", _enemy_sidebar_t, " cam_zoom=", _camera.zoom if _camera else "null", " cam_pos=", _camera.position if _camera else "null"))
 	var pp: Vector2 = panel.position
 	lbl.position = pp + Vector2(panel.size.x - 34.0, 4.0)
 	lbl.size = Vector2(26, 28)
