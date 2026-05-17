@@ -69,6 +69,10 @@ var _turn_queue_box: HBoxContainer
 var _turn_queue_slots: Array = []  # 각 슬롯: {root: PanelContainer, swatch: ColorRect, label: Label}
 const TURN_QUEUE_PREVIEW_COUNT: int = 5
 
+# 적 사이드바 (영웅 줌인 시만 표시) — 적 머리 위 정보 압축
+var _enemy_sidebar: VBoxContainer = null
+var _enemy_sidebar_slots: Array = []  # idx → {root, name_lbl, hp_lbl, intent_lbl, status_lbl}
+
 # UI 전용 CanvasLayer — 카메라 zoom 영향 없음 (카드/패널/버튼/라벨 등)
 var _ui_layer: CanvasLayer = null
 
@@ -1068,6 +1072,7 @@ func _start_battle() -> void:
 		BattleManager.setup_battle(GameManager.pending_enemies)
 		_setup_heroes()
 		_setup_enemies()
+		_build_enemy_sidebar()
 		await _play_battle_intro()
 		BattleManager.start_player_turn()
 	else:
@@ -1315,6 +1320,8 @@ func _refresh_token_tiles(hero_id: String) -> void:
 		_token_tile_nodes[hero_id].append(char_node)
 
 func _update_enemy_ui(index: int) -> void:
+	if _enemy_sidebar and _enemy_sidebar.visible:
+		_refresh_enemy_sidebar()
 	var entry: Dictionary = _enemy_nodes[index]
 	var enemy: Resource = BattleManager.get_enemy(index)
 	if enemy == null:
@@ -2798,15 +2805,18 @@ func _cam_zoom_out() -> void:
 func _cam_on_hero_turn_start(hid: String) -> void:
 	_cam_state = CamState.HERO_FOCUS
 	_cam_zoom_to_hero(hid)
+	_set_enemy_sidebar_visible(not _hero_zoom_disabled())
 
 func _cam_on_enemy_turn_start() -> void:
 	_cam_state = CamState.IDLE_FAR
 	_cam_zoom_out()
+	_set_enemy_sidebar_visible(false)
 
 func _cam_on_drag_started() -> void:
 	# VFX 중에 새 드래그 시작 — DRAGGING 우선 (VFX 종료 후 영웅 복귀 안 됨)
 	_cam_state = CamState.DRAGGING
 	_cam_zoom_out()
+	_set_enemy_sidebar_visible(false)
 
 func _cam_on_drag_canceled() -> void:
 	# 카드 사용 안 됐을 때 — DRAGGING 상태일 때만 영웅 복귀
@@ -2816,6 +2826,7 @@ func _cam_on_drag_canceled() -> void:
 	if hid != "":
 		_cam_state = CamState.HERO_FOCUS
 		_cam_zoom_to_hero(hid)
+		_set_enemy_sidebar_visible(not _hero_zoom_disabled())
 	else:
 		_cam_state = CamState.IDLE_FAR
 		_cam_zoom_out()
@@ -2847,20 +2858,129 @@ func _cam_try_return_to_hero() -> void:
 	if hid != "":
 		_cam_state = CamState.HERO_FOCUS
 		_cam_zoom_to_hero(hid)
+		_set_enemy_sidebar_visible(not _hero_zoom_disabled())
 	else:
 		_cam_state = CamState.IDLE_FAR
 		_cam_zoom_out()
+
+# ── 적 사이드바 (영웅 줌인 시 표시) ──
+const SIDEBAR_X := 1720.0
+const SIDEBAR_Y := 90.0
+const SIDEBAR_W := 200.0
+const SIDEBAR_SLOT_H := 88.0
+
+func _build_enemy_sidebar() -> void:
+	if _enemy_sidebar:
+		_enemy_sidebar.queue_free()
+	_enemy_sidebar_slots.clear()
+	_enemy_sidebar = VBoxContainer.new()
+	_enemy_sidebar.position = Vector2(SIDEBAR_X, SIDEBAR_Y)
+	_enemy_sidebar.custom_minimum_size = Vector2(SIDEBAR_W, 0)
+	_enemy_sidebar.add_theme_constant_override("separation", 6)
+	_enemy_sidebar.visible = false
+	_enemy_sidebar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ui_add(_enemy_sidebar)
+	for i in range(BattleManager._enemies.size()):
+		var slot := _build_sidebar_slot(i)
+		_enemy_sidebar.add_child(slot["root"])
+		_enemy_sidebar_slots.append(slot)
+	_refresh_enemy_sidebar()
+
+func _build_sidebar_slot(_idx: int) -> Dictionary:
+	var root := PanelContainer.new()
+	root.custom_minimum_size = Vector2(SIDEBAR_W, SIDEBAR_SLOT_H)
+	var sbx := StyleBoxFlat.new()
+	sbx.bg_color = Color(0.08, 0.07, 0.05, 0.85)
+	sbx.border_color = SacredPalette.BRASS_500
+	sbx.set_border_width_all(1)
+	sbx.set_corner_radius_all(4)
+	sbx.set_content_margin_all(6)
+	root.add_theme_stylebox_override("panel", sbx)
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 2)
+	root.add_child(vb)
+	var name_lbl := Label.new()
+	name_lbl.add_theme_font_size_override("font_size", 13)
+	name_lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+	name_lbl.clip_text = true
+	vb.add_child(name_lbl)
+	var hp_lbl := Label.new()
+	hp_lbl.add_theme_font_size_override("font_size", 12)
+	vb.add_child(hp_lbl)
+	var intent_lbl := Label.new()
+	intent_lbl.add_theme_font_size_override("font_size", 12)
+	intent_lbl.add_theme_color_override("font_color", Color(1.0, 0.8, 0.2))
+	vb.add_child(intent_lbl)
+	var status_lbl := Label.new()
+	status_lbl.add_theme_font_size_override("font_size", 11)
+	status_lbl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	status_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vb.add_child(status_lbl)
+	return {"root": root, "name_lbl": name_lbl, "hp_lbl": hp_lbl, "intent_lbl": intent_lbl, "status_lbl": status_lbl}
+
+func _refresh_enemy_sidebar() -> void:
+	if _enemy_sidebar_slots.is_empty():
+		return
+	for i in range(_enemy_sidebar_slots.size()):
+		var slot: Dictionary = _enemy_sidebar_slots[i]
+		if i >= BattleManager._enemies.size() or not BattleManager.is_enemy_alive(i):
+			slot["root"].visible = false
+			continue
+		slot["root"].visible = true
+		var enemy: Resource = BattleManager.get_enemy(i)
+		slot["name_lbl"].text = tr(enemy.enemy_name) if enemy else "enemy"
+		slot["hp_lbl"].text = "HP %d/%d" % [BattleManager.get_enemy_hp(i), enemy.max_hp]
+		# intent
+		var pattern: Array = enemy.intent_pattern if enemy.phase_patterns.is_empty() else enemy.phase_patterns[BattleManager._enemy_phase[i]]
+		if pattern.is_empty():
+			slot["intent_lbl"].text = ""
+		else:
+			var intent: Resource = pattern[BattleManager._enemy_intent_index[i]]
+			slot["intent_lbl"].text = _intent_short_text(i, intent)
+		# status
+		slot["status_lbl"].text = _enemy_status_short_text(i)
+
+func _intent_short_text(enemy_index: int, intent: Resource) -> String:
+	match intent.action_type:
+		0: return "공격 %d" % BattleManager.get_intent_display_damage(enemy_index, intent)  # ATTACK
+		1: return "방어/버프"  # BUFF
+		2: return "디버프 %s" % intent.status_type  # DEBUFF
+		3: return "준비"  # PREPARE
+		_: return ""
+
+func _enemy_status_short_text(enemy_index: int) -> String:
+	var s: Dictionary = BattleManager._enemy_status[enemy_index]
+	var parts: Array = []
+	if s.get("poison_dmg", 0) > 0:
+		parts.append("독 %d" % s["poison_dmg"])
+	if s.get("weak", 0) > 0:
+		parts.append("약화 %d" % s["weak"])
+	if s.get("vulnerable", 0) > 0:
+		parts.append("취약 %d" % s["vulnerable"])
+	if s.get("strength", 0) > 0:
+		parts.append("힘 %d" % s["strength"])
+	if s.get("invuln", 0) > 0:
+		parts.append("무적 %d" % s["invuln"])
+	return ", ".join(parts)
+
+func _set_enemy_sidebar_visible(v: bool) -> void:
+	if _enemy_sidebar:
+		_enemy_sidebar.visible = v
+		if v:
+			_refresh_enemy_sidebar()
 
 # 설정 변경 즉시 반영 — 영웅 줌인 옵션 on/off
 func _on_hero_zoom_setting_changed(enabled: bool) -> void:
 	if not enabled:
 		# 줌인 → 줌아웃 (현재 상태와 무관하게)
 		_cam_zoom_out()
+		_set_enemy_sidebar_visible(false)
 		return
 	# 줌아웃 → 영웅 차례 중이면 즉시 줌인
 	var hid: String = BattleManager.get_current_hero_id()
 	if hid != "" and _cam_state == CamState.HERO_FOCUS:
 		_cam_zoom_to_hero(hid)
+		_set_enemy_sidebar_visible(true)
 
 func _setup_kill_cam() -> void:
 	_camera = Camera2D.new()
