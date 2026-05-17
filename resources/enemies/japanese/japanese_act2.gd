@@ -13,8 +13,9 @@ static func chaos_tengu(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "vulnerable"
-	i3.target = IntentRes.TargetType.RANDOM
+	# 텐구의 바람 — 영웅 1명 speed_penalty 3 (3턴 일정 효과)
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 3; i3.status_type = "speed_penalty"
+	i3.duration = 3; i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]
 	e.charm_resistance = 20
 	return e

@@ -233,7 +233,9 @@ static func wind_sprite(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 60; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "weak"; i3.target = IntentRes.TargetType.RANDOM
+	# 바람의 가속 — 본인 speed_bonus 3 (3턴 일정 효과, 컨셉 빠른 정령)
+	i3.action_type = IntentRes.ActionType.BUFF; i3.value = 3; i3.status_type = "speed_bonus"
+	i3.duration = 3
 	e.intent_pattern = [i1, i2, i3]
 	e.phase_thresholds = [0.5]
 	e.phase_buffs = [[{"status": "strength", "value": 2}]]

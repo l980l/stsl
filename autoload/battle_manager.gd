@@ -1725,20 +1725,49 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 		IntentRes.ActionType.BUFF:
 			if intent.status_type == "block" or intent.status_type == "":
 				_enemy_block[enemy_index] += intent.value
+			elif intent.status_type in ["speed_bonus", "speed_penalty"]:
+				# 일정 효과 — value=강도, duration=지속 턴 (덮어쓰기)
+				var _bs_aid: String = "enemy:%d" % enemy_index
+				var _bs_old_sp: int = _actor_speed(_bs_aid)
+				_enemy_status[enemy_index][intent.status_type] = intent.value
+				_enemy_status[enemy_index][intent.status_type + "_dur"] = max(1, intent.duration)
+				_adjust_turn_queue_for_speed_change(_bs_aid, _bs_old_sp)
+				status_applied.emit(_bs_aid, intent.status_type, intent.value)
 			else:
 				_apply_status_to_enemy(enemy_index, intent.status_type, intent.value)
 		IntentRes.ActionType.DEBUFF:
 			var stype: String = intent.status_type
+			var _is_speed: bool = stype in ["speed_bonus", "speed_penalty"]
 			if intent.target == IntentRes.TargetType.ALL:
 				if team_mgr:
 					for hero in team_mgr.get_living_heroes():
-						_apply_status_to_hero(hero.hero_id, stype, intent.value)
+						if _is_speed:
+							var _ds_aid: String = "hero:" + hero.hero_id
+							var _ds_old_sp: int = _actor_speed(_ds_aid)
+							if not _hero_status.has(hero.hero_id):
+								_hero_status[hero.hero_id] = {}
+							_hero_status[hero.hero_id][stype] = intent.value
+							_hero_status[hero.hero_id][stype + "_dur"] = max(1, intent.duration)
+							_adjust_turn_queue_for_speed_change(_ds_aid, _ds_old_sp)
+							status_applied.emit(hero.hero_id, stype, intent.value)
+						else:
+							_apply_status_to_hero(hero.hero_id, stype, intent.value)
 			else:
 				var target_id: String = pre_target_id
 				if target_id == "" or (team_mgr and not team_mgr.is_alive(target_id)):
 					target_id = _pick_hero_target(intent.target, enemy_index)
 				if target_id != "":
-					_apply_status_to_hero(target_id, stype, intent.value)
+					if _is_speed:
+						var _ds_aid2: String = "hero:" + target_id
+						var _ds_old_sp2: int = _actor_speed(_ds_aid2)
+						if not _hero_status.has(target_id):
+							_hero_status[target_id] = {}
+						_hero_status[target_id][stype] = intent.value
+						_hero_status[target_id][stype + "_dur"] = max(1, intent.duration)
+						_adjust_turn_queue_for_speed_change(_ds_aid2, _ds_old_sp2)
+						status_applied.emit(target_id, stype, intent.value)
+					else:
+						_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
 			_execute_special(enemy_index, intent)
 		IntentRes.ActionType.PREPARE:

@@ -29,7 +29,9 @@ static func medusa(scene: PackedScene) -> Resource:
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "weak"
 	i2.target = IntentRes.TargetType.ALL
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "vulnerable"
+	# 석화의 시선 — 영웅 전체 speed_penalty 3 (3턴 일정 효과)
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 3; i3.status_type = "speed_penalty"
+	i3.duration = 3
 	i3.target = IntentRes.TargetType.ALL
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 180; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "curse"

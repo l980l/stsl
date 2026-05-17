@@ -1448,6 +1448,7 @@ func _format_intent_tooltip(enemy_index: int, intent: Resource) -> String:
 			match intent.status_type:
 				"strength": return _trf("battle.intent.tooltip.buff_strength", v)
 				"block": return _trf("battle.intent.tooltip.buff_block", v)
+				"speed_bonus": return _trf("battle.intent.tooltip.buff_speed", [v, intent.duration])
 				_: return _trf("battle.intent.tooltip.buff_generic", [intent.status_type, v])
 		IntentRes.ActionType.DEBUFF:
 			match intent.status_type:
@@ -1455,6 +1456,7 @@ func _format_intent_tooltip(enemy_index: int, intent: Resource) -> String:
 				"vulnerable": return tr("battle.intent.tooltip.debuff_vulnerable")
 				"poison": return _trf("battle.intent.tooltip.debuff_poison", v)
 				"charm": return _trf("battle.intent.tooltip.debuff_charm", v)
+				"speed_penalty": return _trf("battle.intent.tooltip.debuff_speed", [v, intent.duration])
 				_: return _trf("battle.intent.tooltip.debuff_generic", [intent.status_type, v])
 		IntentRes.ActionType.PREPARE:
 			return tr("battle.intent.tooltip.prepare")
