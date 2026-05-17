@@ -34,7 +34,7 @@ const TOKEN_ROWS := 1
 const SIDEBAR_X := 1620.0
 const SIDEBAR_Y := 80.0    # turn_queue (y 18~52) 아래, 캐릭터 패널 위
 const SIDEBAR_SLOT_VSPACE := 90.0  # row 간 거리
-const SIDEBAR_SLOT_HSPACE := 211.0  # col 간 거리 (hp_bar 폭)
+const SIDEBAR_SLOT_HSPACE := 230.0  # col 간 거리 (hp_bar 폭 211 + 19px gap)
 const SIDEBAR_SLOTS_PER_ROW := 3   # 위쪽/아래쪽 각 3 슬롯, 우측부터 채움
 var _enemy_sidebar_t: float = 0.0  # 0=base, 1=sidebar
 var _enemy_sidebar_tween: Tween = null
