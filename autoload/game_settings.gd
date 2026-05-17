@@ -23,8 +23,13 @@ const PARTICLE_DEFAULT := "high"  # 상
 # 킬캠 — 처치/사망 시 슬로우 + 카메라 줌인 (사용자 옵션, 기본 on)
 const KILL_CAM_DEFAULT := true
 
-# 배경 시스템 v1 — parallax 다중 레이어 + 신화별 팔레트 (M7.5)
-const BACKGROUND_DEFAULT := true
+# 영웅 차례 카메라 줌인 (개체 차례 시스템) — 기본 on
+const HERO_ZOOM_DEFAULT := true
+
+# 카메라 줌 속도 (영웅 줌인/줌아웃) — 값이 클수록 빠름. 트윈 시간 = base 0.3s / value
+const CAM_ZOOM_SPEED_KEYS    := ["slow", "normal", "fast"]
+const CAM_ZOOM_SPEED_VALUES  := [0.6, 1.0, 1.7]  # slow=0.5s / normal=0.3s / fast=0.18s
+const CAM_ZOOM_SPEED_DEFAULT := "normal"
 
 const _CONFIG_PATH := "user://game_settings.cfg"
 
@@ -40,7 +45,13 @@ var anim_speed_key: String = ANIM_SPEED_DEFAULT
 var turn_interval_key: String = TURN_INTERVAL_DEFAULT
 var particle_key: String = PARTICLE_DEFAULT
 var kill_cam_enabled: bool = KILL_CAM_DEFAULT
-var background_enabled: bool = BACKGROUND_DEFAULT
+var hero_zoom_enabled: bool = HERO_ZOOM_DEFAULT
+var cam_zoom_speed_key: String = CAM_ZOOM_SPEED_DEFAULT
+var cam_zoom_speed_multiplier: float = 1.0
+
+# 설정 변경 시그널 — 변경 즉시 반영 필요한 곳에서 구독
+@warning_ignore("unused_signal")
+signal hero_zoom_enabled_changed(enabled: bool)
 
 func _ready() -> void:
 	load_settings()
@@ -77,8 +88,16 @@ func set_particle_quality(key: String) -> void:
 func set_kill_cam_enabled(enabled: bool) -> void:
 	kill_cam_enabled = enabled
 
-func set_background_enabled(enabled: bool) -> void:
-	background_enabled = enabled
+func set_hero_zoom_enabled(enabled: bool) -> void:
+	hero_zoom_enabled = enabled
+	hero_zoom_enabled_changed.emit(enabled)
+
+func set_cam_zoom_speed(key: String) -> void:
+	var idx := CAM_ZOOM_SPEED_KEYS.find(key)
+	if idx < 0:
+		return
+	cam_zoom_speed_key = key
+	cam_zoom_speed_multiplier = CAM_ZOOM_SPEED_VALUES[idx]
 
 # ── 적용된 값 조회 (battle_manager 등이 사용) ──
 func get_vfx_delay(base: float) -> float:
@@ -101,7 +120,8 @@ func save_settings() -> void:
 	cfg.set_value("gameplay", "anim_speed", anim_speed_key)
 	cfg.set_value("gameplay", "turn_interval", turn_interval_key)
 	cfg.set_value("gameplay", "kill_cam_enabled", kill_cam_enabled)
-	cfg.set_value("graphics", "background_enabled", background_enabled)
+	cfg.set_value("gameplay", "hero_zoom_enabled", hero_zoom_enabled)
+	cfg.set_value("gameplay", "cam_zoom_speed", cam_zoom_speed_key)
 	cfg.save(_CONFIG_PATH)
 
 func load_settings() -> void:
@@ -113,7 +133,8 @@ func load_settings() -> void:
 		set_anim_speed(ANIM_SPEED_DEFAULT)
 		set_turn_interval(TURN_INTERVAL_DEFAULT)
 		set_kill_cam_enabled(KILL_CAM_DEFAULT)
-		set_background_enabled(BACKGROUND_DEFAULT)
+		set_hero_zoom_enabled(HERO_ZOOM_DEFAULT)
+		set_cam_zoom_speed(CAM_ZOOM_SPEED_DEFAULT)
 		return
 	set_particle_quality(cfg.get_value("graphics", "particle_quality", PARTICLE_DEFAULT))
 	set_vfx_speed(cfg.get_value("gameplay", "vfx_speed", VFX_SPEED_DEFAULT))
@@ -122,4 +143,5 @@ func load_settings() -> void:
 	var ti_key: String = cfg.get_value("gameplay", "turn_interval", cfg.get_value("gameplay", "monster_interval", TURN_INTERVAL_DEFAULT))
 	set_turn_interval(ti_key)
 	set_kill_cam_enabled(cfg.get_value("gameplay", "kill_cam_enabled", KILL_CAM_DEFAULT))
-	set_background_enabled(cfg.get_value("graphics", "background_enabled", BACKGROUND_DEFAULT))
+	set_hero_zoom_enabled(cfg.get_value("gameplay", "hero_zoom_enabled", HERO_ZOOM_DEFAULT))
+	set_cam_zoom_speed(cfg.get_value("gameplay", "cam_zoom_speed", CAM_ZOOM_SPEED_DEFAULT))

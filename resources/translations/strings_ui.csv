@@ -74,9 +74,10 @@ ui.settings.gameplay,게임플레이,Gameplay,Jouabilité,Gameplay,Jugabilidad,�
 ui.settings.vfx_speed,VFX 속도,VFX Speed,Vitesse VFX,Velocità VFX,Velocidad VFX,VFX速度,Ταχύτητα VFX,VFX速度,VFX速度
 ui.settings.anim_speed,애니메이션 속도,Animation Speed,Vitesse animation,Velocità animazione,Velocidad animación,アニメ速度,Ταχύτητα κίνησης,动画速度,動畫速度
 ui.settings.turn_interval,차례 전환 인터벌,Turn Interval,Intervalle de tour,Intervallo turno,Intervalo de turno,ターン間隔,Διάστημα γύρου,回合间隔,回合間隔
+ui.settings.hero_zoom,영웅 줌인,Hero Zoom,Zoom Héros,Zoom Eroe,Zoom Héroe,英雄ズーム,Ζουμ Ήρωα,英雄缩放,英雄縮放
+ui.settings.cam_zoom_speed,카메라 줌 속도,Camera Zoom Speed,Vitesse Zoom Caméra,Velocità Zoom Camera,Velocidad Zoom Cámara,カメラズーム速度,Ταχύτητα Ζουμ Κάμερας,镜头缩放速度,鏡頭縮放速度
 ui.settings.particle_quality,파티클 갯수,Particle Count,Nombre particules,Numero particelle,Cantidad partículas,パーティクル数,Αριθμός σωματιδίων,粒子数量,粒子數量
-ui.settings.kill_cam,킬캠 (슬로우+줌),Kill Cam (Slow+Zoom),Caméra kill,Kill cam,Cámara final,キルカム,Κάμερα φόνου,击杀镜头,擊殺鏡頭
-ui.settings.background,배경 (시차+팔레트),Background (Parallax),Arrière-plan,Sfondo,Fondo,背景,Φόντο,背景,背景
+ui.settings.kill_cam,킬캠,Kill Cam,Caméra kill,Kill cam,Cámara final,キルカム,Κάμερα φόνου,击杀镜头,擊殺鏡頭
 ui.settings.on,켜짐,On,On,On,On,オン,Ναι,开,開
 ui.settings.off,꺼짐,Off,Off,Off,Off,オフ,Όχι,关,關
 ui.settings.language_tab,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言,语言
@@ -119,9 +120,9 @@ ui.hero_select.unlock_condition_none,해금 조건 미달성,Unlock condition no
 ui.hero_select.btn_recruit,%s 영입,Recruit %s,Recruter %s,Recluta %s,Reclutar %s,%s を仲間に,Στράτευσε %s,招募 %s,招募 %s
 ui.hero_select.btn_select,%s 선택,Select %s,Choisir %s,Scegli %s,Elegir %s,%s を選択,Επίλεξε %s,选择 %s,选择 %s
 ui.battle.btn_deck_view,덱 보기,View Deck,Voir Deck,Visualizza Mazzo,Ver Mazo,デッキ表示,Προβολή Τράπουλας,查看卡组,查看卡组
-ui.battle.deck_viewer.draw,드로우 파일,Draw Pile,Pioche,Pesca,Robo,ドロー山,Στοίβα Ανάληψης,抽牌堆,抽牌堆
-ui.battle.deck_viewer.discard,버린 덱,Discard Pile,Défausse,Scarto,Descarte,捨て山,Σωρός Απόρριψης,弃牌堆,弃牌堆
-ui.battle.deck_viewer.exhaust,소멸,Exhausted,Épuisé,Esaurite,Agotadas,消滅,Εξάντληση,消耗,消耗
+ui.battle.deck_viewer.draw,현재 덱,Current Deck,Deck Actuel,Mazzo Attuale,Mazo Actual,現在のデッキ,Τρέχουσα Τράπουλα,当前牌组,當前牌組
+ui.battle.deck_viewer.discard,사용한 덱,Used Cards,Cartes Utilisées,Carte Usate,Cartas Usadas,使用済み,Χρησιμοποιημένες,已用牌,已用牌
+ui.battle.deck_viewer.exhaust,이용불가,Unavailable,Indisponibles,Non Disponibili,No Disponibles,使用不可,Μη Διαθέσιμες,不可用,不可用
 ui.battle.deck_viewer.empty,(비어 있음),(Empty),(Vide),(Vuoto),(Vacío),(空),(Κενό),(空),(空)
 ui.battle.modal.discard_pick.title,버릴 카드를 1장 선택하세요,Choose 1 card to discard,Choisissez 1 carte à défausser,Scegli 1 carta da scartare,Elige 1 carta para descartar,捨てるカードを1枚選んでください,Επίλεξε 1 κάρτα για απόρριψη,选择1张要弃置的牌,選擇1張要棄置的牌
 ui.battle.modal.discard_pick.confirm,버리기,Discard,Défausser,Scartare,Descartar,捨てる,Απόρριψη,弃置,棄置

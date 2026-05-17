@@ -68,6 +68,24 @@ var _relic_container: FlowContainer
 var _turn_queue_box: HBoxContainer
 var _turn_queue_slots: Array = []  # 각 슬롯: {root: PanelContainer, swatch: ColorRect, label: Label}
 const TURN_QUEUE_PREVIEW_COUNT: int = 5
+
+# UI 전용 CanvasLayer — 카메라 zoom 영향 없음 (카드/패널/버튼/라벨 등)
+var _ui_layer: CanvasLayer = null
+
+# 덱 보기 기본 탭 — 현재 영웅 없으면 마지막 차례 영웅
+var _last_hero_actor_id: String = ""
+
+func _setup_ui_layer() -> void:
+	_ui_layer = CanvasLayer.new()
+	_ui_layer.layer = 5  # 캐릭터/배경 위, SettingsOverlay(10) 아래
+	add_child(_ui_layer)
+
+# UI 노드 add_child 헬퍼 — _ui_layer 가 있으면 거기에, 없으면 self 에
+func _ui_add(node: Node) -> void:
+	if _ui_layer:
+		_ui_layer.add_child(node)
+	else:
+		add_child(node)
 var _selected_card: Resource = null
 var _lose_played: bool = false
 var _defeat_layer: CanvasLayer = null
@@ -130,6 +148,7 @@ func _trf(key: String, args) -> String:
 func _ready() -> void:
 	# y-sort: 캐릭터·전경 SVG 모두 같은 좌표계 — y 큰(아래) 노드가 위로 자동 정렬
 	y_sort_enabled = true
+	_setup_ui_layer()  # UI 전용 CanvasLayer 먼저 — _build_ui 가 거기에 add_child
 	_build_ui()
 	_setup_kill_cam()
 	if OS.is_debug_build():
@@ -162,8 +181,7 @@ func _build_debug_tooltip() -> void:
 
 func _build_ui() -> void:
 	# 배경 — M7.5 v2 SVG 컴포지션 + 무작위 환경(시각/날씨) + critters + weather 입자
-	var gs := get_node_or_null("/root/GameSettings")
-	if gs == null or gs.background_enabled:
+	if true:
 		var SBG := preload("res://scenes/components/scene_background.gd")
 		_scene_bg = SBG.new()
 		var act_v: int = GameManager.current_act if GameManager else 1
@@ -360,6 +378,14 @@ func _build_ui() -> void:
 	# 모든 UI Control 의 z_index = 1000 — fg/캐릭터(z_index 0~1080) 보다 항상 위
 	# 카드(z 1000+), 호버 카드(1200), 디버그 overlay(5000) 와 호환
 	_apply_ui_z_index_recursive(self, 1500)
+
+	# UI 노드들을 CanvasLayer 로 reparent — 카메라 zoom 영향 제거
+	# (영웅/적 패널은 캐릭터 따라가야 해서 self 자식 유지)
+	if _ui_layer:
+		for n in [banner, end_btn_wrap, deck_wrap, hand_rule, hand_diamond,
+				_relic_container, _active_powers_box, _turn_queue_box]:
+			if n != null and is_instance_valid(n):
+				n.reparent(_ui_layer)
 
 # battle_scene 의 직접 자식 Control z_index set (재귀 X — 캐릭터 안 Body 영향 회피).
 # 캐릭터 UI(panel/hp/intent/btn/status) 는 별도로 800 (VFX 900 보다 뒤).
@@ -854,6 +880,11 @@ func _connect_signals() -> void:
 	BattleManager.enemy_turn_started.connect(_on_enemy_turn_started)
 	# Turn queue UI 갱신 — 차례 전환·큐 변경 시점 (사망/소환/부활 포함)
 	BattleManager.turn_queue_changed.connect(_on_turn_queue_changed)
+	# VFX 노드 종료 추적 — 임팩트 시점이 아니라 노드가 완전히 free 되는 시점 기준
+	self.child_entered_tree.connect(_on_child_entered_vfx_track)
+	self.child_exiting_tree.connect(_on_child_exited_vfx_track)
+	# 영웅 줌인 옵션 변경 — 즉시 카메라 상태 반영
+	GameSettings.hero_zoom_enabled_changed.connect(_on_hero_zoom_setting_changed)
 	BattleManager.turn_ended.connect(func(_aid: String): _refresh_turn_queue_widget())
 	BattleManager.enemy_died.connect(func(_idx: int): _refresh_turn_queue_widget())
 	BattleManager.enemy_spawned.connect(func(_idx: int): _refresh_turn_queue_widget())
@@ -1037,6 +1068,7 @@ func _start_battle() -> void:
 		BattleManager.setup_battle(GameManager.pending_enemies)
 		_setup_heroes()
 		_setup_enemies()
+		await _play_battle_intro()
 		BattleManager.start_player_turn()
 	else:
 		_start_test_battle()  # GameManager 없이 단독 실행 시 폴백
@@ -1098,6 +1130,7 @@ func _start_test_battle() -> void:
 	BattleManager.setup_battle([satyr])
 	_setup_heroes()
 	_setup_enemies()
+	await _play_battle_intro()
 	BattleManager.start_player_turn()
 
 # ─────────────────────────────────────────────
@@ -1387,12 +1420,12 @@ func _apply_card_state(node: CardScene, card_res: Resource) -> void:
 func _build_turn_queue_widget() -> void:
 	_turn_queue_box = HBoxContainer.new()
 	_turn_queue_box.position = Vector2(20, 18)
-	_turn_queue_box.size = Vector2(WINDOW_W - 40, 48)
+	_turn_queue_box.size = Vector2(WINDOW_W - 40, 34)
 	_turn_queue_box.add_theme_constant_override("separation", 6)
-	add_child(_turn_queue_box)
+	add_child(_turn_queue_box)  # _build_ui 끝에서 _ui_layer 로 reparent 됨
 	for i in range(TURN_QUEUE_PREVIEW_COUNT):
 		var slot := PanelContainer.new()
-		slot.custom_minimum_size = Vector2(80, 44)
+		slot.custom_minimum_size = Vector2(80, 30)
 		var sbx := StyleBoxFlat.new()
 		sbx.bg_color = Color(0.08, 0.07, 0.05, 0.85)
 		sbx.border_color = SacredPalette.BRASS_300
@@ -1448,6 +1481,8 @@ func _refresh_turn_queue_widget() -> void:
 		var info: Dictionary = _resolve_actor_info(aid)
 		slot["label"].text = info["name"]
 		slot["swatch"].color = info["color"]
+		# 폰트 크기 자동 조절 — 슬롯 너비 72px (80 - 좌우 4px padding) 안에 맞춤
+		LabelUtils.fit_text(slot["label"], 11, 7, 72.0)
 		# 현재 차례 = 첫 슬롯 강조 (밝게)
 		slot["root"].modulate = Color(1.0, 1.0, 1.0, 1.0) if i == 0 else Color(1.0, 1.0, 1.0, 0.7)
 
@@ -1512,7 +1547,7 @@ func _refresh_hand() -> void:
 		var captured_node := node
 		node.card_hovered.connect(func(c: Resource): _on_card_hovered(c, captured_node))
 		node.card_unhovered.connect(_on_card_unhovered)
-		add_child(node)
+		_ui_add(node)  # CanvasLayer 자식 — 카메라 zoom 영향 없음
 		_card_buttons.append(node)
 
 # ─────────────────────────────────────────────
@@ -1550,6 +1585,7 @@ func _on_card_drag_started(card: Resource, screen_pos: Vector2) -> void:
 	get_tree().create_timer(0.25).timeout.connect(func(): _drag_cancel_ready = true)
 	_start_drag(card)
 	_create_drag_arrow(screen_pos)
+	_cam_on_drag_started()
 
 func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
 	# 우클릭 등으로 이미 cleanup 됐으면 — 라벨 덮어쓰지 않음
@@ -1579,6 +1615,9 @@ func _set_drag_card_target(enemy_index: int) -> void:
 func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 	if _drag_card != null:
 		_finish_drag(screen_pos)
+	# 드래그 종료 — 카드가 사용되면 _on_card_played 가 VFX_PLAYING 으로 전환했을 것.
+	# 여전히 DRAGGING 이면 = 취소 → 영웅 줌인 복귀.
+	_cam_on_drag_canceled()
 
 func _on_card_hovered(_card: Resource, card_node: CardScene) -> void:
 	if _drag_card != null:
@@ -1727,6 +1766,10 @@ func _on_player_turn_started() -> void:
 		if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
 			_enemy_nodes[i]["btn"].disabled = false
 	_refresh_synergy_hud()
+	# 영웅 줌인 (영구 큐 본인 차례 카메라)
+	if cur_hid != "":
+		_last_hero_actor_id = cur_hid  # 덱 보기 기본 탭 추적
+		_cam_on_hero_turn_start(cur_hid)
 
 func _on_enemy_turn_started() -> void:
 	_end_turn_btn.disabled = true
@@ -1749,6 +1792,8 @@ func _on_enemy_turn_started() -> void:
 	for entry in _enemy_nodes:
 		if entry["panel"].visible and not entry["btn"].disabled:
 			entry["btn"].disabled = true
+	# 적 차례 — 전체 보기 (멀리)
+	_cam_on_enemy_turn_start()
 
 func _on_energy_changed(new_energy: int) -> void:
 	_energy_label.text = "%d / %d" % [new_energy, DeckManager.MAX_ENERGY]
@@ -1760,6 +1805,7 @@ func _on_energy_changed(new_energy: int) -> void:
 
 func _on_card_played(card: Resource) -> void:
 	call_deferred("_refresh_all_hero_ui")
+	_cam_on_card_played()  # VFX 재생 상태 진입 (이미 줌아웃 — VFX 끝나면 영웅 복귀)
 	# VFX (DAMAGE/BLOCK/HEAL/APPLY_STATUS) 는 BattleManager.card_vfx_charge_start → _on_card_vfx_start 가 처리.
 	# 여기서는 영웅 attack 애니메이션만 (anim_speed_multiplier 적용).
 	var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
@@ -2681,12 +2727,155 @@ var _kill_cam_active: bool = false
 var _scene_bg: Node2D = null  # SceneBackground (Node2D, _back/_front 두 ParallaxBackground 보유)
 const WIND_SHADER := preload("res://assets/shaders/wind_sway.gdshader")
 
+# ── 차례 카메라 줌 시스템 (영웅 차례 줌인 / 드래그·VFX 줌아웃 / 적 차례 멀리) ──
+enum CamState { IDLE_FAR, HERO_FOCUS, DRAGGING, VFX_PLAYING }
+var _cam_state: int = CamState.IDLE_FAR
+const CAM_ZOOM_HERO := Vector2(1.3, 1.3)
+const CAM_ZOOM_FAR := Vector2.ONE
+const CAM_TWEEN_TIME := 0.3
+const CAM_VFX_TIMEOUT := 3.0  # VFX 카운터 fallback (모든 VFX 가 가장 오래 가도 3s 안에 끝남)
+var _cam_tween: Tween = null
+var _active_vfx_count: int = 0
+
+func _is_vfx_node(node: Node) -> bool:
+	var script = node.get_script()
+	return script != null and script.resource_path.contains("scenes/vfx/")
+
+func _on_child_entered_vfx_track(node: Node) -> void:
+	if _is_vfx_node(node):
+		_active_vfx_count += 1
+
+func _on_child_exited_vfx_track(node: Node) -> void:
+	if not _is_vfx_node(node):
+		return
+	_active_vfx_count -= 1
+	if _active_vfx_count <= 0:
+		_active_vfx_count = 0
+		# 모든 VFX 노드 종료 — 카메라 복귀 시도 (DRAGGING 으로 전환됐으면 _cam_on_vfx_ended 안에서 skip)
+		_cam_on_vfx_ended()
+
+func _cam_tween_time() -> float:
+	# 시간 = base / speed_multiplier (값이 클수록 빨라짐)
+	var gs := get_node_or_null("/root/GameSettings")
+	var mul: float = gs.cam_zoom_speed_multiplier if gs else 1.0
+	if mul <= 0.0:
+		mul = 1.0
+	return CAM_TWEEN_TIME / mul
+
+func _hero_zoom_disabled() -> bool:
+	var gs := get_node_or_null("/root/GameSettings")
+	return gs != null and not gs.hero_zoom_enabled
+
+func _cam_zoom_to_hero(hid: String) -> void:
+	if _kill_cam_active or _camera == null:
+		return
+	# 영웅 줌인 옵션 off — 줌아웃 유지
+	if _hero_zoom_disabled():
+		_cam_zoom_out()
+		return
+	if not _hero_char_nodes.has(hid):
+		return
+	var node: Node2D = _hero_char_nodes[hid]
+	if not is_instance_valid(node):
+		return
+	if _cam_tween:
+		_cam_tween.kill()
+	var t: float = _cam_tween_time()
+	_cam_tween = create_tween().set_parallel(true)
+	_cam_tween.tween_property(_camera, "zoom", CAM_ZOOM_HERO, t).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_cam_tween.tween_property(_camera, "position", node.global_position, t).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _cam_zoom_out() -> void:
+	if _kill_cam_active or _camera == null:
+		return
+	if _cam_tween:
+		_cam_tween.kill()
+	var t: float = _cam_tween_time()
+	_cam_tween = create_tween().set_parallel(true)
+	_cam_tween.tween_property(_camera, "zoom", CAM_ZOOM_FAR, t).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	_cam_tween.tween_property(_camera, "position", _KC_HOME_POS, t).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+
+func _cam_on_hero_turn_start(hid: String) -> void:
+	_cam_state = CamState.HERO_FOCUS
+	_cam_zoom_to_hero(hid)
+
+func _cam_on_enemy_turn_start() -> void:
+	_cam_state = CamState.IDLE_FAR
+	_cam_zoom_out()
+
+func _cam_on_drag_started() -> void:
+	# VFX 중에 새 드래그 시작 — DRAGGING 우선 (VFX 종료 후 영웅 복귀 안 됨)
+	_cam_state = CamState.DRAGGING
+	_cam_zoom_out()
+
+func _cam_on_drag_canceled() -> void:
+	# 카드 사용 안 됐을 때 — DRAGGING 상태일 때만 영웅 복귀
+	if _cam_state != CamState.DRAGGING:
+		return
+	var hid: String = BattleManager.get_current_hero_id()
+	if hid != "":
+		_cam_state = CamState.HERO_FOCUS
+		_cam_zoom_to_hero(hid)
+	else:
+		_cam_state = CamState.IDLE_FAR
+		_cam_zoom_out()
+
+func _cam_on_card_played() -> void:
+	# 카드 사용 직후 — VFX 재생 상태로 전환 (이미 줌아웃 유지)
+	_cam_state = CamState.VFX_PLAYING
+	# 짧은 fallback — VFX 가 아예 생성 안 되는 카드 (POWER 등) 대비. 0.5s 후 카운터 0 이면 복귀.
+	get_tree().create_timer(0.5).timeout.connect(_cam_check_vfx_complete, CONNECT_ONE_SHOT)
+
+func _cam_check_vfx_complete() -> void:
+	# VFX 카운터가 0 이고 아직 VFX_PLAYING 이면 즉시 복귀 (비-VFX 카드 사용 후)
+	if _active_vfx_count == 0 and _cam_state == CamState.VFX_PLAYING:
+		_cam_try_return_to_hero()
+
+func _cam_on_vfx_ended() -> void:
+	# 모든 VFX 노드 종료 — VFX_PLAYING 상태일 때만 복귀 (DRAGGING 우선)
+	if _cam_state == CamState.VFX_PLAYING:
+		_cam_try_return_to_hero()
+
+func _cam_try_return_to_hero() -> void:
+	# 아직 VFX 진행 중이면 skip (child_exited 가 종료 시 다시 호출)
+	if _active_vfx_count > 0:
+		return
+	# DRAGGING 으로 전환됐으면 skip — 새 드래그 우선
+	if _cam_state != CamState.VFX_PLAYING:
+		return
+	var hid: String = BattleManager.get_current_hero_id()
+	if hid != "":
+		_cam_state = CamState.HERO_FOCUS
+		_cam_zoom_to_hero(hid)
+	else:
+		_cam_state = CamState.IDLE_FAR
+		_cam_zoom_out()
+
+# 설정 변경 즉시 반영 — 영웅 줌인 옵션 on/off
+func _on_hero_zoom_setting_changed(enabled: bool) -> void:
+	if not enabled:
+		# 줌인 → 줌아웃 (현재 상태와 무관하게)
+		_cam_zoom_out()
+		return
+	# 줌아웃 → 영웅 차례 중이면 즉시 줌인
+	var hid: String = BattleManager.get_current_hero_id()
+	if hid != "" and _cam_state == CamState.HERO_FOCUS:
+		_cam_zoom_to_hero(hid)
+
 func _setup_kill_cam() -> void:
 	_camera = Camera2D.new()
 	_camera.position = _KC_HOME_POS
 	_camera.zoom = Vector2.ONE
 	add_child(_camera)
 	_camera.make_current()  # tree 에 attach 후 호출
+
+# 배틀 인트로 — 1초 줌아웃 유지 + 타이틀 라벨에 "전투!" 표시
+func _play_battle_intro() -> void:
+	if _message_label:
+		_message_label.text = tr("battle.msg_intro")
+	await get_tree().create_timer(1.0).timeout
+	if _message_label:
+		_message_label.text = ""
 
 # Shift+Y 디버그 — 모든 fg sprite + 캐릭터 노드 박스 + (x,y,z) 라벨 표시/숨김
 var _bg_debug_overlay: Node2D = null
@@ -3515,21 +3704,79 @@ func _show_deck_viewer_in_battle() -> void:
 	close_btn.size     = Vector2(40, 40)
 	SacredTheme.animate_button(close_btn)
 
-	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", 8)
-	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vbox.add_child(columns)
+	# 영웅별 탭 — 각 탭 = 그 영웅의 draw / discard / exhaust 3 컬럼
+	var tabs := TabContainer.new()
+	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# 탭 라벨 폰트/색 — _add_deck_column 헤더 라벨 (AccentLabel) 과 통일
+	var accent_font: Font = SacredTheme.theme.get_font("font", "AccentLabel") if SacredTheme.theme else null
+	if accent_font:
+		tabs.add_theme_font_override("font", accent_font)
+	tabs.add_theme_font_size_override("font_size", 15)
+	tabs.add_theme_color_override("font_selected_color", SacredPalette.BRASS_400)
+	tabs.add_theme_color_override("font_unselected_color", SacredPalette.BRASS_700)
+	tabs.add_theme_color_override("font_hovered_color", SacredPalette.BRASS_300)
+	# 선택/미선택 탭 stylebox 통일 — 크기 일관성 + 배경색은 패널과 동일 (INK_900)
+	# 선택 탭만 위쪽 BRASS_400 2px 라인 추가
+	const _TAB_PAD_X := 16.0
+	const _TAB_PAD_Y := 8.0
+	var _tab_sel := StyleBoxFlat.new()
+	_tab_sel.bg_color = SacredPalette.INK_900
+	_tab_sel.border_color = SacredPalette.BRASS_400
+	_tab_sel.set_border_width_all(0)
+	_tab_sel.border_width_top = 2
+	_tab_sel.content_margin_left = _TAB_PAD_X
+	_tab_sel.content_margin_right = _TAB_PAD_X
+	_tab_sel.content_margin_top = _TAB_PAD_Y
+	_tab_sel.content_margin_bottom = _TAB_PAD_Y
+	tabs.add_theme_stylebox_override("tab_selected", _tab_sel)
+	var _tab_unsel := StyleBoxFlat.new()
+	_tab_unsel.bg_color = Color.TRANSPARENT
+	_tab_unsel.set_border_width_all(0)
+	_tab_unsel.content_margin_left = _TAB_PAD_X
+	_tab_unsel.content_margin_right = _TAB_PAD_X
+	_tab_unsel.content_margin_top = _TAB_PAD_Y
+	_tab_unsel.content_margin_bottom = _TAB_PAD_Y
+	tabs.add_theme_stylebox_override("tab_unselected", _tab_unsel)
+	var _tab_hov := _tab_unsel.duplicate()
+	tabs.add_theme_stylebox_override("tab_hovered", _tab_hov)
+	vbox.add_child(tabs)
 
-	var draw_cards := DeckManager.draw_pile.duplicate()
-	draw_cards.shuffle()
-	var discard_cards  := DeckManager.discard_pile.duplicate()
-	var exhaust_cards  := DeckManager.exhaust_pile.duplicate()
+	# 기본 활성 탭 — 현재 영웅 / 없으면 마지막 차례 영웅 / 둘 다 없으면 첫 영웅
+	var hero_ids: Array = DeckManager._heroes.keys()
+	var focus_hid: String = BattleManager.get_current_hero_id()
+	if focus_hid == "":
+		focus_hid = _last_hero_actor_id
+	var default_tab: int = hero_ids.find(focus_hid)
+	if default_tab < 0:
+		default_tab = 0
 
-	_add_deck_column(columns, tr("ui.battle.deck_viewer.draw")    + " (%d)" % draw_cards.size(),    draw_cards)
-	_add_v_divider(columns)
-	_add_deck_column(columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_cards.size(), discard_cards)
-	_add_v_divider(columns)
-	_add_deck_column(columns, tr("ui.battle.deck_viewer.exhaust") + " (%d)" % exhaust_cards.size(), exhaust_cards)
+	for hid in hero_ids:
+		var hero_name: String = hid
+		if TeamManager != null:
+			var hero_res = TeamManager.get_hero(hid)
+			if hero_res != null:
+				hero_name = tr(hero_res.hero_name)
+		var page := Control.new()
+		page.name = hero_name
+		tabs.add_child(page)
+
+		var page_columns := HBoxContainer.new()
+		page_columns.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		page_columns.add_theme_constant_override("separation", 8)
+		page.add_child(page_columns)
+
+		var draw_h: Array = (DeckManager._heroes[hid]["draw"] as Array).duplicate()
+		draw_h.shuffle()
+		var discard_h: Array = (DeckManager._heroes[hid]["discard"] as Array).duplicate()
+		var exhaust_h: Array = (DeckManager._heroes[hid]["exhaust"] as Array).duplicate()
+
+		_add_deck_column(page_columns, tr("ui.battle.deck_viewer.draw")    + " (%d)" % draw_h.size(),    draw_h)
+		_add_v_divider(page_columns)
+		_add_deck_column(page_columns, tr("ui.battle.deck_viewer.discard") + " (%d)" % discard_h.size(), discard_h)
+		_add_v_divider(page_columns)
+		_add_deck_column(page_columns, tr("ui.battle.deck_viewer.exhaust") + " (%d)" % exhaust_h.size(), exhaust_h)
+	tabs.current_tab = default_tab
 
 	_deck_group  = group
 	_deck_viewer = canvas
@@ -3586,7 +3833,7 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		grid.add_child(empty_lbl)
 		return
 
-	var card_w := 197.0
+	var card_w := 194.0
 	var card_scale := card_w / 140.0
 	var card_h := 200.0 * card_scale
 	var base_scale := Vector2(card_scale, card_scale)
@@ -3703,7 +3950,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			DeckManager.debug_unlimited_energy = not DeckManager.debug_unlimited_energy
 			_refresh_debug_badge()
 		elif event.keycode == KEY_D and event.shift_pressed:
-			DeckManager.draw_cards(1)
+			# 현재 차례 영웅에게 1장 draw (개체 차례 시스템)
+			var cur_hid: String = BattleManager.get_current_hero_id()
+			if cur_hid != "":
+				DeckManager.draw_cards_h(cur_hid, 1)
+			else:
+				DeckManager.draw_cards(1)  # fallback — 첫 영웅
 		elif event.keycode == KEY_H and event.shift_pressed:
 			_debug_hp_target_mode = not _debug_hp_target_mode
 			if _debug_hp_target_mode:
@@ -3969,7 +4221,7 @@ func _create_drag_arrow(start_pos: Vector2) -> void:
 			chev.scale = Vector2(0.15 if i % 2 == 0 else -0.15, 0.15)
 			chev.modulate = Color(1.0, 1.0, 1.0, 0.0)
 			chev.z_index = 1550  # 카드 드래그 arrow chevron
-			add_child(chev)
+			_ui_add(chev)  # CanvasLayer — 카메라 zoom 영향 없음
 			_drag_chevrons.append(chev)
 
 	_drag_arrow_head = Sprite2D.new()
@@ -3978,7 +4230,7 @@ func _create_drag_arrow(start_pos: Vector2) -> void:
 	_drag_arrow_head.scale = Vector2(0.5, 0.5)
 	_drag_arrow_head.modulate = Color.WHITE
 	_drag_arrow_head.z_index = 1551  # 화살표 머리 — chevron 위
-	add_child(_drag_arrow_head)
+	_ui_add(_drag_arrow_head)  # CanvasLayer — 카메라 zoom 영향 없음
 
 	_update_drag_arrow(start_pos)
 
