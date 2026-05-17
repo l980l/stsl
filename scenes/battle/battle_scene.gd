@@ -27,6 +27,24 @@ const HAND_BASE_Y := 960
 const MAX_ENEMY_COUNT := 6
 const TOKEN_COLS := 6
 const TOKEN_ROWS := 1
+
+# 적 패널 일부 UI 사이드바 (영웅 줌인 시 우측 세로 트윈)
+const SIDEBAR_X := 1620.0
+const SIDEBAR_Y := 90.0
+const SIDEBAR_SLOT_VSPACE := 140.0
+const SIDEBAR_W := 211.0
+# 사이드바 슬롯 내 각 노드 화면 좌표 offset (slot top-left 기준)
+const SIDEBAR_LAYOUT := {
+	"name_lbl":   Vector2(0, 0),
+	"hp_bar":     Vector2(0, 22),
+	"hp_lbl":     Vector2(0, 18),
+	"block_lbl":  Vector2(0, 18),
+	"intent_lbl": Vector2(0, 54),
+	"status_box": Vector2(0, 80),
+	"sig_icon":   Vector2(SIDEBAR_W - 28, -4),
+}
+var _enemy_sidebar_t: float = 0.0  # 0=base, 1=sidebar
+var _enemy_sidebar_tween: Tween = null
 const TOKEN_TILE_W := 111
 const TOKEN_TILE_H := 138
 const TOKEN_TILE_GAP := 4
@@ -171,6 +189,7 @@ func _process(delta: float) -> void:
 	if _drag_card != null and not _drag_chevrons.is_empty():
 		_drag_t_offset = fmod(_drag_t_offset + delta * 0.165, 1.0)
 		_update_drag_chevrons()
+	_update_enemy_sidebar_positions()
 
 func _build_debug_tooltip() -> void:
 	pass  # DebugManager autoload에서 전역 처리
@@ -535,9 +554,18 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	status_box.z_index = 1
 	add_child(status_box)
 
+	var base_positions := {
+		"name_lbl":   name_lbl.position,
+		"hp_bar":     hp_bar.position,
+		"hp_lbl":     hp_lbl.position,
+		"block_lbl":  block_lbl.position,
+		"intent_lbl": intent_lbl.position,
+		"status_box": status_box.position,
+	}
 	return { "panel": panel, "intent_lbl": intent_lbl, "btn": btn,
 			 "name_lbl": name_lbl, "hp_bar": hp_bar, "hp_lbl": hp_lbl,
-			 "block_lbl": block_lbl, "status_box": status_box }
+			 "block_lbl": block_lbl, "status_box": status_box,
+			 "base_positions": base_positions, "sig_icon": null }
 
 func _refresh_hud() -> void:
 	if _relic_container == null:
@@ -998,15 +1026,15 @@ func _burst_signature_at_enemy(_enemy_index: int, _color: Color) -> void:
 # 신화 시그니처 아이콘 — 적 panel 우측 상단. 호버 시 툴팁으로 효과 설명.
 # 주의: btn 이 panel 과 같은 사이즈로 self 의 자식이라 — panel 자식 Label 은 가려짐.
 # 해결: Label 을 self(battle_scene) 의 자식 + 매우 늦게 add (btn 위) + z_index 최상위.
-func _attach_signature_icon(panel: ColorRect, mythology) -> void:
+func _attach_signature_icon(panel: ColorRect, mythology) -> Label:
 	if panel == null or mythology == null:
-		return
+		return null
 	var info: Dictionary = SIGNATURE_INFO.get(mythology, {})
 	if info.is_empty():
-		return
+		return null
 	var existing := get_node_or_null(NodePath("_SigIcon_%s" % str(panel.get_instance_id())))
 	if existing != null:
-		return
+		return existing as Label
 	var lbl := Label.new()
 	lbl.name = "_SigIcon_%s" % str(panel.get_instance_id())
 	lbl.text = info["emoji"]
@@ -1018,6 +1046,7 @@ func _attach_signature_icon(panel: ColorRect, mythology) -> void:
 	lbl.size = Vector2(26, 28)
 	add_child(lbl)
 	SacredTheme.attach_tooltip(lbl, tr(info["desc_key"]))
+	return lbl
 
 # T3-SUMMON: 런타임에 spawn된 적의 UI 패널 + 캐릭터 노드 추가
 func _on_enemy_spawned(enemy_index: int) -> void:
@@ -1033,7 +1062,10 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 	entry["btn"].visible = true
 	entry["btn"].disabled = false
 	entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
-	_attach_signature_icon(entry["panel"], enemy.get("mythology"))
+	var sig_node_spawn: Label = _attach_signature_icon(entry["panel"], enemy.get("mythology"))
+	entry["sig_icon"] = sig_node_spawn
+	if sig_node_spawn != null:
+		entry["base_positions"]["sig_icon"] = sig_node_spawn.position
 	var slot_pos: Vector2 = _enemy_slot_pos(enemy_index, total)
 	if enemy.character_scene != null:
 		var char_node = enemy.character_scene.instantiate()
@@ -1222,7 +1254,10 @@ func _setup_enemies() -> void:
 		entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
 
 		# 신화 시그니처 아이콘 + 툴팁 — panel 우측 상단
-		_attach_signature_icon(entry["panel"], enemy.get("mythology"))
+		var sig_node_setup: Label = _attach_signature_icon(entry["panel"], enemy.get("mythology"))
+		entry["sig_icon"] = sig_node_setup
+		if sig_node_setup != null:
+			entry["base_positions"]["sig_icon"] = sig_node_setup.position
 
 		var slot_pos: Vector2 = _enemy_slot_pos(i, total)
 		if enemy.character_scene != null:
@@ -2798,15 +2833,18 @@ func _cam_zoom_out() -> void:
 func _cam_on_hero_turn_start(hid: String) -> void:
 	_cam_state = CamState.HERO_FOCUS
 	_cam_zoom_to_hero(hid)
+	_start_enemy_sidebar_transition(0.0 if _hero_zoom_disabled() else 1.0)
 
 func _cam_on_enemy_turn_start() -> void:
 	_cam_state = CamState.IDLE_FAR
 	_cam_zoom_out()
+	_start_enemy_sidebar_transition(0.0)
 
 func _cam_on_drag_started() -> void:
 	# VFX 중에 새 드래그 시작 — DRAGGING 우선 (VFX 종료 후 영웅 복귀 안 됨)
 	_cam_state = CamState.DRAGGING
 	_cam_zoom_out()
+	_start_enemy_sidebar_transition(0.0)
 
 func _cam_on_drag_canceled() -> void:
 	# 카드 사용 안 됐을 때 — DRAGGING 상태일 때만 영웅 복귀
@@ -2816,9 +2854,11 @@ func _cam_on_drag_canceled() -> void:
 	if hid != "":
 		_cam_state = CamState.HERO_FOCUS
 		_cam_zoom_to_hero(hid)
+		_start_enemy_sidebar_transition(0.0 if _hero_zoom_disabled() else 1.0)
 	else:
 		_cam_state = CamState.IDLE_FAR
 		_cam_zoom_out()
+		_start_enemy_sidebar_transition(0.0)
 
 func _cam_on_card_played() -> void:
 	# 카드 사용 직후 — VFX 재생 상태로 전환 (이미 줌아웃 유지)
@@ -2847,20 +2887,70 @@ func _cam_try_return_to_hero() -> void:
 	if hid != "":
 		_cam_state = CamState.HERO_FOCUS
 		_cam_zoom_to_hero(hid)
+		_start_enemy_sidebar_transition(0.0 if _hero_zoom_disabled() else 1.0)
 	else:
 		_cam_state = CamState.IDLE_FAR
 		_cam_zoom_out()
+		_start_enemy_sidebar_transition(0.0)
+
+# ── 적 패널 일부 UI 사이드바 트윈 (영웅 줌인 시) ──
+# 화면 좌표 → self(BattleScene) 좌표 — 카메라 zoom/position 역변환
+func _screen_to_self(screen_pos: Vector2) -> Vector2:
+	if _camera == null:
+		return screen_pos
+	var vp_center := Vector2(WINDOW_W, WINDOW_H) * 0.5
+	return (screen_pos - vp_center) / _camera.zoom + _camera.position
+
+func _update_enemy_sidebar_positions() -> void:
+	if _kill_cam_active:
+		return  # 킬캠 중에는 사이드바 갱신 정지 (마지막 위치 freeze)
+	for i in range(_enemy_nodes.size()):
+		var entry: Dictionary = _enemy_nodes[i]
+		if entry.is_empty() or not entry.has("base_positions"):
+			continue
+		_apply_enemy_sidebar_to_entry(entry, i)
+
+func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
+	var bp: Dictionary = entry["base_positions"]
+	var sidebar_slot_top_screen := Vector2(SIDEBAR_X, SIDEBAR_Y + slot_idx * SIDEBAR_SLOT_VSPACE)
+	var t: float = _enemy_sidebar_t
+	var inv_zoom: Vector2 = Vector2.ONE
+	if _camera != null and abs(_camera.zoom.x) > 0.001:
+		inv_zoom = Vector2.ONE / _camera.zoom
+	var scale_now: Vector2 = Vector2.ONE.lerp(inv_zoom, t)
+	for key in ["name_lbl", "hp_bar", "hp_lbl", "block_lbl", "intent_lbl", "status_box", "sig_icon"]:
+		var node = entry.get(key)
+		if node == null or not is_instance_valid(node):
+			continue
+		if not bp.has(key):
+			continue
+		var base_pos: Vector2 = bp[key]
+		var sb_offset: Vector2 = SIDEBAR_LAYOUT.get(key, Vector2.ZERO)
+		var sb_screen: Vector2 = sidebar_slot_top_screen + sb_offset
+		var sb_self: Vector2 = _screen_to_self(sb_screen)
+		node.position = base_pos.lerp(sb_self, t)
+		node.scale = scale_now
+
+func _start_enemy_sidebar_transition(target_t: float) -> void:
+	if _enemy_sidebar_tween != null:
+		_enemy_sidebar_tween.kill()
+	var dur: float = _cam_tween_time()
+	_enemy_sidebar_tween = create_tween()
+	_enemy_sidebar_tween.tween_property(self, "_enemy_sidebar_t", target_t, dur) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 # 설정 변경 즉시 반영 — 영웅 줌인 옵션 on/off
 func _on_hero_zoom_setting_changed(enabled: bool) -> void:
 	if not enabled:
 		# 줌인 → 줌아웃 (현재 상태와 무관하게)
 		_cam_zoom_out()
+		_start_enemy_sidebar_transition(0.0)
 		return
 	# 줌아웃 → 영웅 차례 중이면 즉시 줌인
 	var hid: String = BattleManager.get_current_hero_id()
 	if hid != "" and _cam_state == CamState.HERO_FOCUS:
 		_cam_zoom_to_hero(hid)
+		_start_enemy_sidebar_transition(1.0)
 
 func _setup_kill_cam() -> void:
 	_camera = Camera2D.new()
