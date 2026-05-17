@@ -118,6 +118,7 @@ signal enemy_spawned(enemy_index: int)  # T3-SUMMON: 런타임 적 추가 알림
 @warning_ignore("unused_signal")
 signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시그니처 발동 알림 (UI 토스트용)
 signal token_attack_fired(hero_id: String, token_index: int, enemy_index: int)  # 토큰 (병사) 발사 — VFX/SFX 시각 처리용
+signal passive_buff_applied(enemy_index: int, status_type: String, value: int)  # phase_buffs / 시그너처 등 intent 외 자동 BUFF — battle_scene 이 VFX spawn 용도
 
 # VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생.
 # 차지(IMPACT_DELAY) 이후 데미지/상태 적용 + 기존 시그널 (hero_damaged 등) emit.
@@ -177,6 +178,8 @@ func _vfx_impact_delay_for_status(stype: String) -> float:
 		base = _VFX_CHARM_KISS.IMPACT_DELAY
 	elif stype == "enthrall":
 		base = _VFX_INFATUATION.IMPACT_DELAY
+	elif stype == "poison":
+		base = _VFX_POISON_SPLASH.IMPACT_DELAY
 	elif stype.begins_with("power."):
 		base = _VFX_HOLY_BUFF.IMPACT_DELAY  # holy_buff / warrior_buff 동일 차지
 	return base * _vfx_speed_mul()
@@ -1607,7 +1610,12 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 			return
 	_enemy_block[i] = 0
 	# 시그니처 hook: 턴 시작 (휴브리스 pending 처리, 도교 음양, 일본 결계)
-	SignatureSys.on_enemy_turn_start(self, i)
+	# emit 된 passive_buff_applied 횟수만큼 VFX impact 대기 — 후속 intent VFX 와 순차 처리
+	var _sig_buffs: int = SignatureSys.on_enemy_turn_start(self, i)
+	for _b in range(_sig_buffs):
+		await _await_vfx_impact(_VFX_WARRIOR_BUFF.IMPACT_DELAY + 0.5)
+		if not is_battle_active:
+			return
 	for stype: String in ["weak", "vulnerable"]:
 		if _enemy_status[i].get(stype, 0) > 0:
 			_enemy_status[i][stype] -= 1
@@ -2149,7 +2157,11 @@ func _check_phase_transition(enemy_index: int) -> void:
 		if enemy.get("phase_buffs") != null and current_phase < enemy.phase_buffs.size():
 			var buffs: Array = enemy.phase_buffs[current_phase]
 			for buff in buffs:
-				_apply_status_to_enemy(enemy_index, buff.get("status", ""), int(buff.get("value", 0)))
+				var _bs_type: String = buff.get("status", "")
+				var _bs_val: int = int(buff.get("value", 0))
+				_apply_status_to_enemy(enemy_index, _bs_type, _bs_val)
+				# 자동 BUFF VFX 트리거 — battle_scene 이 받아 warrior_buff 등 spawn
+				passive_buff_applied.emit(enemy_index, _bs_type, _bs_val)
 
 
 func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:

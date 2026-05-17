@@ -27,6 +27,7 @@ static func on_enemy_damaged(bm: Object, idx: int, amount: int) -> void:
 					for i in range(bm._enemy_alive.size()):
 						if bm._enemy_alive[i]:
 							bm._apply_status_to_enemy(i, "strength", 1)
+							bm.passive_buff_applied.emit(i, "strength", 1)
 					bm.signature_fired.emit(idx, "ragnarok")  # 토스트용 (전투당 1회)
 
 # ─── Hook: 적이 영웅에게 ATTACK ───
@@ -59,21 +60,28 @@ static func on_enemy_death(bm: Object, idx: int) -> void:
 # 그리스 휴브리스 pending 처리 — strength +2 부여 후 플래그 해제
 # 도교 음양 — 공격형(strength +1) ↔ 방어형(block +15) 자동 교대
 # 일본 결계 — 매 5턴마다 자기 block +20
-static func on_enemy_turn_start(bm: Object, idx: int) -> void:
+static func on_enemy_turn_start(bm: Object, idx: int) -> int:
+	# 반환: passive_buff_applied emit 횟수 (caller 가 vfx_impact_resolved await 위해)
 	if not _signatures_enabled(bm, idx):
-		return
+		return 0
 	var enemy: Resource = bm._enemies[idx]
+	var emitted: int = 0
 	# Greek: hubris pending 처리
 	if enemy.mythology == "greek" and bm._enemy_status[idx].get("greek_hubris_pending", false):
 		bm._apply_status_to_enemy(idx, "strength", 2)
 		bm._enemy_status[idx]["greek_hubris_pending"] = false
+		bm.passive_buff_applied.emit(idx, "strength", 2)
+		emitted += 1
 	# Daoist: 음양 자세 교대
 	elif enemy.mythology == "daoist":
 		var stance: int = bm._enemy_status[idx].get("daoist_stance", 0)
 		if stance == 0:
 			bm._apply_status_to_enemy(idx, "strength", 1)
+			bm.passive_buff_applied.emit(idx, "strength", 1)
 		else:
 			bm._enemy_block[idx] += 15
+			bm.passive_buff_applied.emit(idx, "block", 15)
+		emitted += 1
 		bm._enemy_status[idx]["daoist_stance"] = 1 - stance
 		bm.signature_fired.emit(idx, "yin_yang")  # 토스트 (1턴 1회 throttle)
 	# Japanese: 결계 매 5턴마다
@@ -82,7 +90,10 @@ static func on_enemy_turn_start(bm: Object, idx: int) -> void:
 		bm._enemy_status[idx]["japanese_turn_count"] = turn_count
 		if turn_count % 5 == 0:
 			bm._enemy_block[idx] += 20
+			bm.passive_buff_applied.emit(idx, "block", 20)
+			emitted += 1
 			bm.signature_fired.emit(idx, "kekkai")  # 토스트용 (5턴마다)
+	return emitted
 
 # ─── 헬퍼 ───
 static func _signatures_enabled(bm: Object, idx: int) -> bool:
