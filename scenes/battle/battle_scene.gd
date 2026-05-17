@@ -36,7 +36,6 @@ const SIDEBAR_Y := 80.0    # turn_queue (y 18~52) 아래, 캐릭터 패널 위
 const SIDEBAR_SLOT_VSPACE := 90.0  # row 간 거리
 const SIDEBAR_SLOT_HSPACE := 230.0  # col 간 거리 (hp_bar 폭 211 + 19px gap)
 const SIDEBAR_SLOTS_PER_ROW := 3   # 위쪽/아래쪽 각 3 슬롯, 우측부터 채움
-var _enemy_sidebar_t: float = 0.0  # 0=base, 1=sidebar
 var _enemy_sidebar_tween: Tween = null
 const TOKEN_TILE_W := 111
 const TOKEN_TILE_H := 138
@@ -2988,6 +2987,7 @@ func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 	# sidebar 2x3 grid 위치 — 사이드바 가는 적의 sequential 인덱스 (entry["sidebar_slot_idx"]) 우선.
 	# 빈칸 없이 우측 위→아래→중 위→중 아래→좌 위→좌 아래 순.
 	var sb_idx: int = entry.get("sidebar_slot_idx", slot_idx)
+	@warning_ignore("integer_division")
 	var col: int = sb_idx / 2
 	var row: int = sb_idx % 2
 	var sidebar_panel_screen := Vector2(SIDEBAR_X - col * SIDEBAR_SLOT_HSPACE, SIDEBAR_Y + row * SIDEBAR_SLOT_VSPACE)
@@ -3017,9 +3017,6 @@ func _start_enemy_sidebar_transition(target_t_global: float) -> void:
 		_enemy_sidebar_tween.kill()
 	var dur: float = _cam_tween_time()
 	_enemy_sidebar_tween = create_tween().set_parallel(true)
-	# 글로벌 t 유지 (호환) + 적별 t 트윈 (visible 적은 base 유지)
-	_enemy_sidebar_tween.tween_property(self, "_enemy_sidebar_t", target_t_global, dur) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	var hero_pos: Vector2 = _get_current_hero_world_pos()
 	var sidebar_slot_counter: int = 0  # 사이드바 가는 적 sequential 카운터 (빈칸 없이 우측 위→아래 순)
 	for i in range(_enemy_nodes.size()):

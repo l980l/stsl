@@ -23,6 +23,7 @@ const BLOOD_BIG_COUNT := 14    # 큰 핏방울
 const PSPEED          := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수
 
 ## 빔 VFX와 인터페이스 통일용 — 피 분출 VFX는 emit하지 않는다.
+@warning_ignore("unused_signal")
 signal screen_effect
 
 var _particles: Array = []  # [{pos, vel, life, max_life, r, grav}]

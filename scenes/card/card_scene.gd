@@ -144,12 +144,13 @@ func set_target_enemy_index(idx: int) -> void:
 
 func _build_desc() -> String:
 	var lines: Array = []
-	var bm := get_node_or_null("/root/BattleManager")
+	# autoload 는 글로벌 — get_node 대신 직접 참조 (tree 진입 전 호출 시 에러 회피).
+	# card_scene 은 battle 외 (shop/event) 에서도 쓰이므로 BattleManager 사용 여부는 mode 로 판단.
 	for eff in _card.effects:
 		# 데미지 effect 면 hero strength/weak (+ 호버 시 타겟 vulnerable) 반영한 값 표시.
 		# 그 외 effect 는 raw value.
-		if bm != null and eff.effect_type == EffectResource.EffectType.DAMAGE and _mode == Mode.HAND:
-			var v: int = bm.estimate_effect_damage(eff, _card.owner_id, _target_enemy_index)
+		if _mode == Mode.HAND and eff.effect_type == EffectResource.EffectType.DAMAGE:
+			var v: int = BattleManager.estimate_effect_damage(eff, _card.owner_id, _target_enemy_index)
 			lines.append(eff.display_text(v))
 		else:
 			lines.append(eff.display_text())

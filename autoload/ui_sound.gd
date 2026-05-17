@@ -5,7 +5,9 @@ func _ready() -> void:
 	get_tree().node_added.connect(_on_node_added)
 
 func _on_node_added(node: Node) -> void:
-	if node is BaseButton and not node.get_meta("no_ui_sound", false):
+	# reparent 등으로 node_added 가 같은 노드에 재발화될 수 있어 meta flag 로 중복 connect 차단
+	if node is BaseButton and not node.get_meta("no_ui_sound", false) and not node.has_meta("_ui_sound_connected"):
+		node.set_meta("_ui_sound_connected", true)
 		node.mouse_entered.connect(_on_hover.bind(node))
 		node.pressed.connect(_on_click.bind(node))
 
