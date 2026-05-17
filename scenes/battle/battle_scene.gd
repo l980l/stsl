@@ -4369,6 +4369,12 @@ func _card_target_type(card: Resource) -> String:
 					return "ally"
 			EffectRes.EffectType.REVIVE:
 				return "dead_ally"
+			EffectRes.EffectType.BUFF_SPEED:
+				if effect.target == "ALLY":
+					return "ally"
+			EffectRes.EffectType.DEBUFF_SPEED:
+				if effect.target == "SINGLE":
+					return "enemy"
 	return "none"
 
 func _start_drag(card: Resource) -> void:
