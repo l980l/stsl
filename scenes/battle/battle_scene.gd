@@ -2919,9 +2919,11 @@ func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 	var btn_node = entry.get("btn")
 	if btn_node != null and is_instance_valid(btn_node):
 		btn_node.mouse_filter = Control.MOUSE_FILTER_IGNORE if sidebar_mode else Control.MOUSE_FILTER_STOP
-	# sidebar 2x3 grid 위치 — 우측부터 채움. col 0 = 우측 (SIDEBAR_X), col 2 = 좌측.
-	var col: int = slot_idx % SIDEBAR_SLOTS_PER_ROW
-	var row: int = slot_idx / SIDEBAR_SLOTS_PER_ROW
+	# sidebar 2x3 grid 위치 — 사이드바 가는 적의 sequential 인덱스 (entry["sidebar_slot_idx"]) 우선.
+	# 빈칸 없이 우측 위→아래→중 위→중 아래→좌 위→좌 아래 순.
+	var sb_idx: int = entry.get("sidebar_slot_idx", slot_idx)
+	var col: int = sb_idx / 2
+	var row: int = sb_idx % 2
 	var sidebar_panel_screen := Vector2(SIDEBAR_X - col * SIDEBAR_SLOT_HSPACE, SIDEBAR_Y + row * SIDEBAR_SLOT_VSPACE)
 	var inv_zoom: Vector2 = Vector2.ONE
 	if _camera != null and abs(_camera.zoom.x) > 0.001:
@@ -2953,12 +2955,16 @@ func _start_enemy_sidebar_transition(target_t_global: float) -> void:
 	_enemy_sidebar_tween.tween_property(self, "_enemy_sidebar_t", target_t_global, dur) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	var hero_pos: Vector2 = _get_current_hero_world_pos()
+	var sidebar_slot_counter: int = 0  # 사이드바 가는 적 sequential 카운터 (빈칸 없이 우측 위→아래 순)
 	for i in range(_enemy_nodes.size()):
 		var entry: Dictionary = _enemy_nodes[i]
 		var target_t: float = target_t_global
 		# 줌인 활성 시도 + 적이 화면 안 fully visible → base 유지 (사이드바 X)
 		if target_t_global > 0.5 and _is_enemy_visible_after_zoom(entry, hero_pos):
 			target_t = 0.0
+		if target_t > 0.5:
+			entry["sidebar_slot_idx"] = sidebar_slot_counter
+			sidebar_slot_counter += 1
 		var captured_idx: int = i
 		_enemy_sidebar_tween.tween_method(
 			func(v: float): _enemy_nodes[captured_idx]["transition_t"] = v,
