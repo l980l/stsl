@@ -25,31 +25,31 @@ battle.intent.ward,🛡 결계 %d턴,🛡 Ward %dT,🛡 Bouclier %dT,🛡 Scherm
 battle.intent.summon,🐾 소환 ×%d,🐾 Summon ×%d,🐾 Invocation ×%d,🐾 Evoca ×%d,🐾 Invocar ×%d,🐾 召喚 ×%d,🐾 Επίκληση ×%d,🐾 召唤 ×%d,🐾 召喚 ×%d
 battle.intent.mimic,🪞 메아리 %d%%,🪞 Mimic %d%%,🪞 Mimétisme %d%%,🪞 Mimica %d%%,🪞 Imitar %d%%,🪞 模倣 %d%%,🪞 Μίμηση %d%%,🪞 模仿 %d%%,🪞 模仿 %d%%
 battle.intent.special,❓ 특수,❓ Special,❓ Spécial,❓ Speciale,❓ Especial,❓ 特殊,❓ Ειδικό,❓ 特殊,❓ 特殊
-battle.intent.tooltip.attack,공격 %d 데미지,Deal %d damage,Deal %d damage,Deal %d damage,Deal %d damage,Deal %d damage,Deal %d damage,Deal %d damage,Deal %d damage
-battle.intent.tooltip.target_all,전체,all targets,all targets,all targets,all targets,all targets,all targets,all targets,all targets
-battle.intent.tooltip.element,%s 속성,%s element,%s element,%s element,%s element,%s element,%s element,%s element,%s element
-battle.intent.tooltip.buff_strength,자신 강화: 힘 +%d,Self: +%d strength,Self: +%d strength,Self: +%d strength,Self: +%d strength,Self: +%d strength,Self: +%d strength,Self: +%d strength,Self: +%d strength
-battle.intent.tooltip.buff_block,자신 방어: 블록 +%d,Self: +%d block,Self: +%d block,Self: +%d block,Self: +%d block,Self: +%d block,Self: +%d block,Self: +%d block,Self: +%d block
-battle.intent.tooltip.buff_generic,자신 강화: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d
-battle.intent.tooltip.debuff_weak,약화 부여 (영웅 공격 -25%%),Apply weak (-25%% atk),Apply weak (-25%% atk),Apply weak (-25%% atk),Apply weak (-25%% atk),Apply weak (-25%% atk),Apply weak (-25%% atk),Apply weak (-25%% atk),Apply weak (-25%% atk)
-battle.intent.tooltip.debuff_vulnerable,취약 부여 (받는 데미지 +50%%),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken)
-battle.intent.tooltip.debuff_poison,독 부여 (%d 스택),Apply poison (%d stacks),Apply poison (%d stacks),Apply poison (%d stacks),Apply poison (%d stacks),Apply poison (%d stacks),Apply poison (%d stacks),Apply poison (%d stacks),Apply poison (%d stacks)
-battle.intent.tooltip.debuff_charm,매혹 부여 (%d 스택),Apply charm (%d stacks),Apply charm (%d stacks),Apply charm (%d stacks),Apply charm (%d stacks),Apply charm (%d stacks),Apply charm (%d stacks),Apply charm (%d stacks),Apply charm (%d stacks)
-battle.intent.tooltip.debuff_generic,%s 부여 +%d,Apply %s +%d,Apply %s +%d,Apply %s +%d,Apply %s +%d,Apply %s +%d,Apply %s +%d,Apply %s +%d,Apply %s +%d
-battle.intent.tooltip.prepare,준비 — 다음 차례 강한 공격 예고,Prepare — strong attack next turn,Prepare — strong attack next turn,Prepare — strong attack next turn,Prepare — strong attack next turn,Prepare — strong attack next turn,Prepare — strong attack next turn,Prepare — strong attack next turn,Prepare — strong attack next turn
-battle.intent.tooltip.heal_ally,동료 회복 +%d HP,Heal ally +%d HP,Heal ally +%d HP,Heal ally +%d HP,Heal ally +%d HP,Heal ally +%d HP,Heal ally +%d HP,Heal ally +%d HP,Heal ally +%d HP
-battle.intent.tooltip.buff_ally,동료에게 %s +%d 부여,Buff ally: %s +%d,Buff ally: %s +%d,Buff ally: %s +%d,Buff ally: %s +%d,Buff ally: %s +%d,Buff ally: %s +%d,Buff ally: %s +%d,Buff ally: %s +%d
-battle.intent.tooltip.counter_prepare,반격 태세 — 받은 데미지 %d%% 다음 공격에 추가,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken
-battle.intent.tooltip.mark_target,마킹 — 표적 영웅이 받는 데미지 +50%%,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage
-battle.intent.tooltip.sacrifice,희생 — 자신 HP %d 소비 + 다음 공격 강화,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack
-battle.intent.tooltip.ward,수호 — %d 차례 동안 무적,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns
-battle.intent.tooltip.summon,소환 — 적 %d 마리 추가,Summon %d enemies,Summon %d enemies,Summon %d enemies,Summon %d enemies,Summon %d enemies,Summon %d enemies,Summon %d enemies,Summon %d enemies
-battle.intent.tooltip.mimic,흉내 — 이번 차례 받은 데미지의 %d%% 반사,Mimic — reflect %d%% of damage taken this turn,Mimic — reflect %d%% of damage taken this turn,Mimic — reflect %d%% of damage taken this turn,Mimic — reflect %d%% of damage taken this turn,Mimic — reflect %d%% of damage taken this turn,Mimic — reflect %d%% of damage taken this turn,Mimic — reflect %d%% of damage taken this turn,Mimic — reflect %d%% of damage taken this turn
-battle.intent.tooltip.special_remove_card,특수: 영웅 덱에서 카드 %d장 영구 제거,Special: remove %d cards from deck,Special: remove %d cards from deck,Special: remove %d cards from deck,Special: remove %d cards from deck,Special: remove %d cards from deck,Special: remove %d cards from deck,Special: remove %d cards from deck,Special: remove %d cards from deck
-battle.intent.tooltip.special_summon,특수: 적 소환,Special: summon enemy,Special: summon enemy,Special: summon enemy,Special: summon enemy,Special: summon enemy,Special: summon enemy,Special: summon enemy,Special: summon enemy
-battle.intent.tooltip.special_generic,특수: %s,Special: %s,Special: %s,Special: %s,Special: %s,Special: %s,Special: %s,Special: %s,Special: %s
-battle.intent.tooltip.special_unknown,특수 효과,Special effect,Special effect,Special effect,Special effect,Special effect,Special effect,Special effect,Special effect
-battle.intent.tooltip.unknown,알 수 없는 인텐트,Unknown intent,Unknown intent,Unknown intent,Unknown intent,Unknown intent,Unknown intent,Unknown intent,Unknown intent
+battle.intent.tooltip.attack,공격 %d 데미지,Deal %d damage,Deal %d damage,Deal %d damage,Deal %d damage,敵に %d ダメージ,Προκάλεσε %d ζημιά,造成 %d 点伤害,造成 %d 點傷害
+battle.intent.tooltip.target_all,전체,all targets,all targets,all targets,all targets,全対象,όλοι οι στόχοι,全部目标,全部目標
+battle.intent.tooltip.element,%s 속성,%s element,%s element,%s element,%s element,%s 属性,%s στοιχείο,%s 属性,%s 屬性
+battle.intent.tooltip.buff_strength,자신 강화: 힘 +%d,Self: +%d strength,Self: +%d strength,Self: +%d strength,Self: +%d strength,自身強化: ストレングス +%d,Αυτο-ενίσχυση: Δύναμη +%d,自身强化: 力量 +%d,自身強化: 力量 +%d
+battle.intent.tooltip.buff_block,자신 방어: 블록 +%d,Self: +%d block,Self: +%d block,Self: +%d block,Self: +%d block,自身防御: ブロック +%d,Αυτο-άμυνα: Μπλοκ +%d,自身防御: 格挡 +%d,自身防禦: 格擋 +%d
+battle.intent.tooltip.buff_generic,자신 강화: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,自身強化: %s +%d,Αυτο-ενίσχυση: %s +%d,自身强化: %s +%d,自身強化: %s +%d
+battle.intent.tooltip.debuff_weak,약화 부여 (영웅 공격 -25%%),Apply weak (-25%% atk),Apply weak (-25%% atk),Apply weak (-25%% atk),Apply weak (-25%% atk),弱体化付与（攻撃 -25%%）,Εφαρμογή Αδυναμίας (-25%% επίθεση),施加虚弱 (-25%% 攻击),施加虛弱 (-25%% 攻擊)
+battle.intent.tooltip.debuff_vulnerable,취약 부여 (받는 데미지 +50%%),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),脆弱付与（被ダメ +50%%）,Εφαρμογή Ευπάθειας (+50%% ζημιά),施加易伤 (+50%% 受伤),施加易傷 (+50%% 受傷)
+battle.intent.tooltip.debuff_poison,독 부여 (%d 스택),Apply poison (%d stacks),Apply poison (%d stacks),Apply poison (%d stacks),Apply poison (%d stacks),毒付与（%d スタック）,Εφαρμογή Δηλητηρίου (%d στοίβες),施加中毒 (%d 层),施加中毒 (%d 層)
+battle.intent.tooltip.debuff_charm,매혹 부여 (%d 스택),Apply charm (%d stacks),Apply charm (%d stacks),Apply charm (%d stacks),Apply charm (%d stacks),魅了付与（%d スタック）,Εφαρμογή Γοητείας (%d στοίβες),施加魅惑 (%d 层),施加魅惑 (%d 層)
+battle.intent.tooltip.debuff_generic,%s 부여 +%d,Apply %s +%d,Apply %s +%d,Apply %s +%d,Apply %s +%d,%s 付与 +%d,Εφαρμογή %s +%d,施加 %s +%d,施加 %s +%d
+battle.intent.tooltip.prepare,준비 — 다음 차례 강한 공격 예고,Prepare — strong attack next turn,Prepare — strong attack next turn,Prepare — strong attack next turn,Prepare — strong attack next turn,準備 — 次の番に強攻撃予告,Προετοιμασία — ισχυρή επίθεση τον επόμενο γύρο,准备 — 下回合强力攻击预告,準備 — 下回合強力攻擊預告
+battle.intent.tooltip.heal_ally,동료 회복 +%d HP,Heal ally +%d HP,Heal ally +%d HP,Heal ally +%d HP,Heal ally +%d HP,味方回復 +%d HP,Θεραπεία συμμάχου +%d HP,队友恢复 +%d HP,隊友恢復 +%d HP
+battle.intent.tooltip.buff_ally,동료에게 %s +%d 부여,Buff ally: %s +%d,Buff ally: %s +%d,Buff ally: %s +%d,Buff ally: %s +%d,味方に %s +%d 付与,Σύμμαχος: %s +%d,给队友施加 %s +%d,給隊友施加 %s +%d
+battle.intent.tooltip.counter_prepare,반격 태세 — 받은 데미지 %d%% 다음 공격에 추가,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,反撃態勢 — 被ダメの %d%% を次の攻撃に加算,Αντεπίθεση — προσθέτει %d%% της ζημιάς που δέχτηκε,反击态势 — 受到伤害的 %d%% 加到下次攻击,反擊態勢 — 受到傷害的 %d%% 加到下次攻擊
+battle.intent.tooltip.mark_target,마킹 — 표적 영웅이 받는 데미지 +50%%,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,マーキング — 対象英雄が被ダメ +50%%,Σήμανση — ο σημαδεμένος ήρωας δέχεται +50%% ζημιά,标记 — 被标记英雄受伤 +50%%,標記 — 被標記英雄受傷 +50%%
+battle.intent.tooltip.sacrifice,희생 — 자신 HP %d 소비 + 다음 공격 강화,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,犠牲 — 自身HP %d 消費 + 次の攻撃強化,Θυσία — -%d HP + ενίσχυση επόμενης επίθεσης,牺牲 — 消耗自身 %d HP + 强化下次攻击,犧牲 — 消耗自身 %d HP + 強化下次攻擊
+battle.intent.tooltip.ward,수호 — %d 차례 동안 무적,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,守護 — %d ターンの間無敵,Φύλακας — άτρωτος για %d γύρους,守护 — %d 回合内无敌,守護 — %d 回合內無敵
+battle.intent.tooltip.summon,소환 — 적 %d 마리 추가,Summon %d enemies,Summon %d enemies,Summon %d enemies,Summon %d enemies,召喚 — 敵 %d 体追加,Κάλεσμα — %d εχθροί επιπλέον,召唤 — 追加 %d 个敌人,召喚 — 追加 %d 個敵人
+battle.intent.tooltip.mimic,흉내 — 이번 차례 받은 데미지의 %d%% 반사,Mimic — reflect %d%% of damage taken this turn,Mimic — reflect %d%% of damage taken this turn,Mimic — reflect %d%% of damage taken this turn,Mimic — reflect %d%% of damage taken this turn,ミミック — このターン受けたダメの %d%% 反射,Μίμηση — αντανάκλαση %d%% της ζημιάς αυτού του γύρου,模仿 — 反射本回合所受伤害的 %d%%,模仿 — 反射本回合所受傷害的 %d%%
+battle.intent.tooltip.special_remove_card,특수: 영웅 덱에서 카드 %d장 영구 제거,Special: remove %d cards from deck,Special: remove %d cards from deck,Special: remove %d cards from deck,Special: remove %d cards from deck,特殊: 英雄デッキからカードを %d 枚永久除外,Ειδικό: αφαίρεση %d καρτών από την τράπουλα,特殊: 永久从英雄牌组移除 %d 张牌,特殊: 永久從英雄牌組移除 %d 張牌
+battle.intent.tooltip.special_summon,특수: 적 소환,Special: summon enemy,Special: summon enemy,Special: summon enemy,Special: summon enemy,特殊: 敵召喚,Ειδικό: κάλεσμα εχθρού,特殊: 召唤敌人,特殊: 召喚敵人
+battle.intent.tooltip.special_generic,특수: %s,Special: %s,Special: %s,Special: %s,Special: %s,特殊: %s,Ειδικό: %s,特殊: %s,特殊: %s
+battle.intent.tooltip.special_unknown,특수 효과,Special effect,Special effect,Special effect,Special effect,特殊効果,Ειδική επίδραση,特殊效果,特殊效果
+battle.intent.tooltip.unknown,알 수 없는 인텐트,Unknown intent,Unknown intent,Unknown intent,Unknown intent,不明なインテント,Άγνωστη πρόθεση,未知意图,未知意圖
 battle.notify.cards_exhausted,❌ 카드를 빼앗겼다!,❌ Cards stolen!,❌ Cartes volées!,❌ Carte rubate!,❌ ¡Cartas robadas!,❌ カード奪取！,❌ Κάρτες κλάπηκαν!,❌ 卡牌被夺！,❌ 卡牌被奪！
 battle.signature.hubris.toast,⚔ 휴브리스!,⚔ Hubris!,⚔ Hybris !,⚔ Hubris!,⚔ ¡Hibris!,⚔ ヒュブリス！,⚔ Ύβρις!,⚔ 傲慢！,⚔ 傲慢！
 battle.signature.ragnarok.toast,🌪 라그나로크!,🌪 Ragnarok!,🌪 Ragnarök !,🌪 Ragnarök!,🌪 ¡Ragnarök!,🌪 ラグナロク！,🌪 Ραγκναρόκ!,🌪 诸神黄昏！,🌪 諸神黃昏！
@@ -71,7 +71,7 @@ battle.target.all_ally,아군 전체,All Allies,Tous les alliés,Tutti gli Allea
 battle.target.lowest_hp_ally,최저 HP 아군,Lowest HP Ally,Allié HP le plus bas,Alleato HP più basso,Aliado con HP más bajo,最低HP味方,Σύμμαχος με Χαμηλότερο HP,最低HP队友,最低HP队友
 battle.target.random_ally,랜덤 아군,Random Ally,Allié aléatoire,Alleato Casuale,Aliado Aleatorio,ランダム味方,Τυχαίος Σύμμαχος,随机队友,随机队友
 battle.counter.effect.attack,%s에게 %d 피해,%s: %d damage,%s : %d dégâts,%s: %d danni,%s: %d daño,%s: %d ダメージ,%s: %d ζημιά,%s: %d 伤害,%s: %d 伤害
-battle.counter.effect.debuff,%s에게 %s %d 부여,%s: %s %d,%s : %s %d,%s: %s %d,%s: %s %d,%s: %s %d,%s: %s %d,%s: %s %d,%s: %s %d
+battle.counter.effect.debuff,%s에게 %s %d 부여,%s: %s %d,%s : %s %d,%s: %s %d,%s: %s %d,%s に %s %d 付与,%s: %s %d,对 %s 施加 %s %d,對 %s 施加 %s %d
 battle.counter.effect.buff,%s +%d 부여,Grant %s +%d,Accorde %s +%d,Concede %s +%d,Concede %s +%d,%s +%d 付与,%s +%d χάρισε,%s +%d 赋予,%s +%d 赋予
 battle.counter.tooltip.format,[%s] 카운터 %d회 달성 시: %s,[%s] On %d counters: %s,[%s] À %d compteurs: %s,[%s] A %d contatori: %s,[%s] A %d contadores: %s,[%s] %d カウンター時: %s,[%s] Στους %d μετρητές: %s,[%s] %d计数时: %s,[%s] %d计数时: %s
 battle.drag_dead_ally,사망한 영웅,Dead Ally,Héros mort,Eroe morto,Héroe muerto,死亡した英雄,Νεκρός Ήρωας,已死亡英雄,已死亡英雄
@@ -117,3 +117,13 @@ power.debuff_amplify.label,디버프 적용 시 스택 +%d 추가합니다.,+%d 
 power.debuff_amplify.desc,이 영웅이 약화/취약 부여 시 %d 추가 스택,Apply %d extra stacks on weak/vulnerable,Applique %d stacks supplémentaires,Applica %d stack extra,Aplica %d pilas extra,弱化/脆弱付与時 %d スタック追加,+%d στοίβες κατά εφαρμογή εξασθένησης,施加减益时额外 %d 层,施加减益时额外 %d 层
 power.echo_next_attack.label,다음 공격 카드 효과를 1회 재시전합니다.,Echo Next Attack,Écho Prochain Att.,Eco Prox. Attacco,Eco Próx. Ataque,次の攻撃エコー,Ηχώ Επόμ. Επίθεσης,下次攻击回响,下次攻击回响
 power.echo_next_attack.desc,다음 ATTACK 카드의 모든 효과를 1회 추가 시전,Replay all effects of the next ATTACK card once,Rejoue tous les effets de la prochaine attaque,Ripete tutti gli effetti del prossimo attacco,Repite todos los efectos del próximo ataque,次のATTACKカードの全効果を1回再発動,Επαναλαμβάνει όλες τις επιδράσεις της επόμενης επίθεσης,下张攻击牌的所有效果再次触发,下张攻击牌的所有效果再次触发
+power.double_next_damage.label,다음 데미지 ×%d,Next Damage ×%d,Prochain dégât ×%d,Prossimo Danno ×%d,Próximo Daño ×%d,次のダメージ ×%d,Επόμενη Ζημιά ×%d,下次伤害 ×%d,下次傷害 ×%d
+power.double_next_damage.desc,다음 데미지 카드 1회 ×%d 피해,Next damage card deals ×%d damage (once),Prochaine carte de dégâts ×%d (une fois),Prossima carta danno ×%d (una volta),Próxima carta de daño ×%d (una vez),次のダメージカード ×%d ダメージ（1回）,Η επόμενη κάρτα ζημιάς ×%d (μία φορά),下张伤害牌 ×%d 伤害（一次）,下張傷害牌 ×%d 傷害（一次）
+power.heal_per_turn.label,체력 회복 +%d/턴,Heal +%d/Turn,Soin +%d/Tour,Cura +%d/Turno,Curar +%d/Turno,回復 +%d/ターン,Θεραπεία +%d/Γύρο,治疗 +%d/回合,治療 +%d/回合
+power.heal_per_turn.desc,플레이어 턴 시작마다 본인 HP %d 회복,Restore %d HP at the start of each player turn,Restaure %d PV au début de chaque tour du joueur,Restaura %d PV all'inizio di ogni turno del giocatore,Restaura %d PV al inicio de cada turno del jugador,プレイヤーターン開始時に %d HP 回復,Αποκαθιστά %d HP στην αρχή κάθε γύρου του παίκτη,每回合开始时恢复 %d HP,每回合開始時恢復 %d HP
+battle.signature.hubris.toast,휴브리스!,HUBRIS!,HUBRIS !,HUBRIS!,¡HUBRIS!,ヒュブリス！,ΥΒΡΙΣ!,傲慢之罪！,傲慢之罪！
+battle.signature.ragnarok.toast,라그나로크!,RAGNAROK!,RAGNARÖK !,RAGNARÖK!,¡RAGNARÖK!,ラグナロク！,ΡΑΓΝΑΡΟΚ!,诸神黄昏！,諸神黃昏！
+battle.signature.egyptian_curse.toast,저주의 시선!,EGYPTIAN CURSE!,MALÉDICTION ÉGYPTIENNE !,MALEDIZIONE EGIZIA!,¡MALDICIÓN EGIPCIA!,エジプトの呪い！,ΑΙΓΥΠΤΙΑΚΗ ΚΑΤΑΡΑ!,埃及诅咒！,埃及詛咒！
+battle.signature.karma.toast,인과응보!,KARMA!,KARMA !,KARMA!,¡KARMA!,因果応報！,ΚΑΡΜΑ!,因果报应！,因果報應！
+battle.signature.yin_yang.toast,음양 교대!,YIN YANG!,YIN YANG !,YIN YANG!,¡YIN YANG!,陰陽交代！,ΓΙΝ ΓΙΑΝΓΚ!,阴阳交替！,陰陽交替！
+battle.signature.kekkai.toast,결계 발동!,KEKKAI!,KEKKAI !,KEKKAI!,¡KEKKAI!,結界発動！,ΚΕΚΚΑΪ!,结界发动！,結界發動！

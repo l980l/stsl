@@ -36,18 +36,18 @@ effect.purge_status.text,디버프 제거,Remove debuffs,Retire les malus,Rimuov
 effect.per_draw_dmg.text,이번 턴 뽑은 카드 1장당 적에게 피해 %d을 입힙니다.,%d damage per draw,%d dégâts par pioche,%d danni per pesca,%d daño por robo,ドロー数×%d ダメージ,%d ζημιά ανά τράβηγμα,抽牌数×%d 伤害,抽牌数×%d 伤害
 effect.apply_status_poison.text,%s %d 데미지,%s %d damage,%s %d dégâts,%s %d danni,%s %d de daño,%s %d ダメージ,%s %d ζημιά,%s %d 伤害,%s %d 伤害
 effect.aoe_suffix, (전체), (All), (Tous), (Tutti), (Todos), (全体), (Όλοι), (全体), (全体)
-effect.damage.single.text,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s,적에게 피해 %d을 입힙니다.%s
-effect.damage.all.text,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s,모든 적에게 피해 %d을 입힙니다.%s
-effect.apply_status.single.text,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.,적에게 %s을 부여합니다.
-effect.apply_status.all.text,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.,모든 적에게 %s을 부여합니다.
-effect.apply_status_poison.single.text,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.,적에게 독 %d 데미지를 부여합니다.
-effect.apply_status_poison.all.text,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.,모든 적에게 독 %d 데미지를 부여합니다.
-effect.status_double.single.text,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.,적의 디버프 스택을 2배로 만듭니다.
-effect.status_double.all.text,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.,모든 적의 디버프 스택을 2배로 만듭니다.
-effect.purge_status.single.text,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.,아군 1명의 디버프를 모두 제거합니다.
-effect.purge_status.all.text,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.,모든 아군의 디버프를 제거합니다.
-effect.heal_per_dead_ally.single.text,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.,사망한 아군 1명당 체력 %d을 회복합니다.
-effect.heal_per_dead_ally.all.text,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.
+effect.damage.single.text,적에게 피해 %d을 입힙니다.%s,Deal %d damage to an enemy.%s,Inflige %d dégâts à un ennemi.%s,Infligge %d danni a un nemico.%s,Inflige %d de daño a un enemigo.%s,敵に %d ダメージ。%s,Προκάλεσε %d ζημιά σε εχθρό.%s,对一名敌人造成 %d 点伤害。%s,對一名敵人造成 %d 點傷害。%s
+effect.damage.all.text,모든 적에게 피해 %d을 입힙니다.%s,Deal %d damage to all enemies.%s,Inflige %d dégâts à tous les ennemis.%s,Infligge %d danni a tutti i nemici.%s,Inflige %d de daño a todos los enemigos.%s,全敵に %d ダメージ。%s,Προκάλεσε %d ζημιά σε όλους τους εχθρούς.%s,对所有敌人造成 %d 点伤害。%s,對所有敵人造成 %d 點傷害。%s
+effect.apply_status.single.text,적에게 %s을 부여합니다.,Apply %s to an enemy.,Applique %s à un ennemi.,Applica %s a un nemico.,Aplica %s a un enemigo.,敵に %s を付与。,Εφάρμοσε %s σε εχθρό.,对一名敌人施加 %s。,對一名敵人施加 %s。
+effect.apply_status.all.text,모든 적에게 %s을 부여합니다.,Apply %s to all enemies.,Applique %s à tous les ennemis.,Applica %s a tutti i nemici.,Aplica %s a todos los enemigos.,全敵に %s を付与。,Εφάρμοσε %s σε όλους τους εχθρούς.,对所有敌人施加 %s。,對所有敵人施加 %s。
+effect.apply_status_poison.single.text,적에게 독 %d 데미지를 부여합니다.,Apply %d Poison damage to an enemy.,Applique %d dégâts de Poison à un ennemi.,Applica %d danni di Veleno a un nemico.,Aplica %d de daño de Veneno a un enemigo.,敵に毒 %d ダメージを付与。,Εφάρμοσε %d ζημιά Δηλητηρίου σε εχθρό.,对一名敌人施加 %d 中毒伤害。,對一名敵人施加 %d 中毒傷害。
+effect.apply_status_poison.all.text,모든 적에게 독 %d 데미지를 부여합니다.,Apply %d Poison damage to all enemies.,Applique %d dégâts de Poison à tous les ennemis.,Applica %d danni di Veleno a tutti i nemici.,Aplica %d de daño de Veneno a todos los enemigos.,全敵に毒 %d ダメージを付与。,Εφάρμοσε %d ζημιά Δηλητηρίου σε όλους τους εχθρούς.,对所有敌人施加 %d 中毒伤害。,對所有敵人施加 %d 中毒傷害。
+effect.status_double.single.text,적의 디버프 스택을 2배로 만듭니다.,Double an enemy's debuff stacks.,Double les piles de débuff d'un ennemi.,Raddoppia gli stack di debuff di un nemico.,Duplica las pilas de desventaja de un enemigo.,敵のデバフスタックを2倍にする。,Διπλασίασε τις στοίβες εξασθένησης ενός εχθρού.,将一名敌人的减益层数翻倍。,將一名敵人的減益層數翻倍。
+effect.status_double.all.text,모든 적의 디버프 스택을 2배로 만듭니다.,Double all enemies' debuff stacks.,Double les piles de débuff de tous les ennemis.,Raddoppia gli stack di debuff di tutti i nemici.,Duplica las pilas de desventaja de todos los enemigos.,全敵のデバフスタックを2倍にする。,Διπλασίασε τις στοίβες εξασθένησης όλων των εχθρών.,将所有敌人的减益层数翻倍。,將所有敵人的減益層數翻倍。
+effect.purge_status.single.text,아군 1명의 디버프를 모두 제거합니다.,Remove all debuffs from one ally.,Retire tous les débuffs d'un allié.,Rimuove tutti i debuff da un alleato.,Elimina todas las desventajas de un aliado.,味方1名のデバフを全て解除。,Αφαίρεσε όλες τις εξασθενήσεις από έναν σύμμαχο.,移除一名队友的所有减益。,移除一名隊友的所有減益。
+effect.purge_status.all.text,모든 아군의 디버프를 제거합니다.,Remove debuffs from all allies.,Retire les débuffs de tous les alliés.,Rimuove i debuff da tutti gli alleati.,Elimina las desventajas de todos los aliados.,全味方のデバフを解除。,Αφαίρεσε εξασθενήσεις από όλους τους συμμάχους.,移除所有队友的减益。,移除所有隊友的減益。
+effect.heal_per_dead_ally.single.text,사망한 아군 1명당 체력 %d을 회복합니다.,Restore %d HP per dead ally.,Restaure %d PV par allié mort.,Ripristina %d PV per alleato morto.,Restaura %d PV por aliado muerto.,戦死した味方1名につき %d HP 回復。,Αποκατάσταση %d HP ανά νεκρό σύμμαχο.,每名阵亡队友恢复 %d HP。,每名陣亡隊友恢復 %d HP。
+effect.heal_per_dead_ally.all.text,모든 아군이 사망한 아군 1명당 체력 %d을 회복합니다.,All allies restore %d HP per dead ally.,Tous les alliés restaurent %d PV par allié mort.,Tutti gli alleati ripristinano %d PV per alleato morto.,Todos los aliados restauran %d PV por aliado muerto.,戦死した味方1名につき全味方 %d HP 回復。,Όλοι οι σύμμαχοι αποκαθιστούν %d HP ανά νεκρό σύμμαχο.,所有队友每名阵亡队友恢复 %d HP。,所有隊友每名陣亡隊友恢復 %d HP。
 card.napoleon.strike.name,스트라이크,Strike,Frappe,Colpo,Golpe,ストライク,Χτύπημα,打击,打击
 card.napoleon.strike.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
 card.napoleon.defend.name,디펜드,Defend,Défense,Difesa,Defensa,ディフェンド,Άμυνα,防御,防御
@@ -139,7 +139,7 @@ card.napoleon.conquest_decree.archetype,돌격,Assault,Assaut,Assalto,Asalto,突
 card.napoleon.alps_crossing.name,알프스 횡단,Alps Crossing,Traversée des Alpes,Attraversamento delle Alpi,Cruce de los Alpes,アルプス越え,Διάσχιση των Άλπεων,翻越阿尔卑斯,翻越阿尔卑斯
 card.napoleon.alps_crossing.archetype,돌격,Assault,Assaut,Assalto,Asalto,突撃,Έφοδος,突击,突击
 card.napoleon.emperors_legion.name,황제의 군단,Emperor's Legion,Légion de l'Empereur,Legione dell'Imperatore,Legión del Emperador,皇帝の軍団,Λεγεώνα του Αυτοκράτορα,皇帝的军团,皇帝的军团
-card.napoleon.emperors_legion.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,군단,군단
+card.napoleon.emperors_legion.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,軍團
 card.napoleon.emperors_will.name,황제의 의지,Emperor's Will,Volonté de l'Empereur,Volontà dell'Imperatore,Voluntad del Emperador,皇帝の意志,Θέληση του Αυτοκράτορα,皇帝的意志,皇帝的意志
 card.napoleon.emperors_will.archetype,지휘,Command,Commandement,Comando,Mando,指揮,Διοίκηση,指挥,指挥
 card.napoleon.reconnaissance.name,정찰,Reconnaissance,Reconnaissance,Ricognizione,Reconocimiento,偵察,Αναγνώριση,侦察,侦察
@@ -178,7 +178,7 @@ card.cleopatra.pharaoh_decree.name,파라오의 명,Pharaoh's Decree,Décret du 
 card.cleopatra.pharaoh_decree.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.nile_whisper.name,나일의 속삭임,Nile's Whisper,Murmure du Nil,Sussurro del Nilo,Susurro del Nilo,ナイルのささやき,Ψίθυρος του Νείλου,尼罗河私语,尼罗河私语
 card.cleopatra.nile_whisper.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
-card.cleopatra.cleopatras_kiss.name,클레오파트라의 입맞춤,Cleopatra's Kiss,Baiser de Cléopâtre,Bacio di Cleopatra,Beso de Cleopatra,クレオパトラの接吻,Φιλί της Κλεοπάτρας,克利奥帕特拉之吻,克利奥帕特拉之吻
+card.cleopatra.cleopatras_kiss.name,파라오의 입맞춤,the Pharaoh's Kiss,Baiser de la Pharaonne,Bacio di la Faraona,Beso de la Faraona,ファラオの接吻,Φιλί της Φαραώς,法老之吻,法老之吻
 card.cleopatra.cleopatras_kiss.archetype,조종,Control,Contrôle,Controllo,Control,操縦,Έλεγχος,操控,操控
 card.cleopatra.poison_fog_spray.name,독안개 살포,Poison Fog Spray,Pulvérisation de brume empoisonnée,Spruzzo di nebbia velenosa,Aerosol de niebla venenosa,毒霧散布,Ψεκασμός Δηλητηριώδους Ομίχλης,喷洒毒雾,喷洒毒雾
 card.cleopatra.poison_fog_spray.archetype,독살,Poisoning,Empoisonnement,Avvelenamento,Envenenamiento,毒殺,Δηλητηρίαση,毒杀,毒杀
@@ -347,35 +347,35 @@ card.joan_of_arc.divine_punishment.archetype,신성공격,Divine Attack,Attaque 
 card.joan_of_arc.archangels_wrath.name,대천사의 분노,Archangel's Wrath,Courroux de l'Archange,Collera dell'Arcangelo,Ira del Arcángel,大天使の怒り,Οργή Αρχαγγέλου,大天使之怒,大天使之怒
 card.joan_of_arc.archangels_wrath.archetype,신성공격,Divine Attack,Attaque divine,Attacco divino,Ataque divino,神聖攻撃,Θεϊκή Επίθεση,神圣攻击,神圣攻击
 card.joan_of_arc.holy_touch.name,성녀의 손길,Holy Touch,Toucher sacré,Tocco sacro,Toque sagrado,聖女の導き,Άγιο Άγγιγμα,圣女之抚,圣女之抚
-card.joan_of_arc.holy_touch.archetype,신성,,,,,,,,
+card.joan_of_arc.holy_touch.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.blessing_of_light.name,축복의 빛,Blessing of Light,Bénédiction de lumière,Benedizione della luce,Bendición de luz,祝福の光,Ευλογία του Φωτός,祝福之光,祝福之光
-card.joan_of_arc.blessing_of_light.archetype,신성,,,,,,,,
+card.joan_of_arc.blessing_of_light.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.hymn.name,성가,Hymn,Hymne,Inno,Himno,聖歌,Ύμνος,圣歌,圣歌
-card.joan_of_arc.hymn.archetype,신성,,,,,,,,
+card.joan_of_arc.hymn.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.purifying_flame.name,정화의 불꽃,Purifying Flame,Flamme purificatrice,Fiamma purificatrice,Llama purificadora,浄化の炎,Φλόγα Εξαγνισμού,净化之火,净化之火
-card.joan_of_arc.purifying_flame.archetype,신성,,,,,,,,
+card.joan_of_arc.purifying_flame.archetype,정화,Purification,Purification,Purificazione,Purificación,浄化,Εξαγνισμός,净化,淨化
 card.joan_of_arc.self_sacrifice.name,자기희생,Self-Sacrifice,Sacrifice de soi,Autosacrificio,Sacrificio personal,自己犠牲,Αυτοθυσία,自我牺牲,自我牺牲
 card.joan_of_arc.self_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.orleans_charge.name,오를레앙의 돌격,Orleans Charge,Charge d'Orléans,Carica di Orléans,Carga de Orleans,オルレアンの突撃,Έφοδος της Ορλεάνης,奥尔良突击,奥尔良突击
-card.joan_of_arc.orleans_charge.archetype,신성,,,,,,,,
+card.joan_of_arc.orleans_charge.archetype,성전,Crusade,Croisade,Crociata,Cruzada,聖戦,Σταυροφορία,圣战,聖戰
 card.joan_of_arc.miracle_revive.name,기적의 부활,Miracle Revive,Résurrection miraculeuse,Rianimazione miracolosa,Resurrección milagrosa,奇跡の復活,Θαυματουργή Αναβίωση,奇迹复活,奇迹复活
 card.joan_of_arc.miracle_revive.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.divine_protection.name,신의 가호,Divine Protection,Protection divine,Protezione divina,Protección divina,神の加護,Θεία Προστασία,神之加护,神之加护
-card.joan_of_arc.divine_protection.archetype,신성,,,,,,,,
+card.joan_of_arc.divine_protection.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.holy_fury.name,성스러운 분노,Holy Fury,Fureur sacrée,Furia sacra,Furia sagrada,聖なる憤怒,Θεία Οργή,神圣之怒,神圣之怒
-card.joan_of_arc.holy_fury.archetype,신성,,,,,,,,
+card.joan_of_arc.holy_fury.archetype,성전,Crusade,Croisade,Crociata,Cruzada,聖戦,Σταυροφορία,圣战,聖戰
 card.joan_of_arc.martyrs_will.name,순교의 의지,Martyr's Will,Volonté du martyr,Volontà del martire,Voluntad del mártir,殉教の意志,Θέληση του Μάρτυρα,殉教之志,殉教之志
 card.joan_of_arc.martyrs_will.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.knights_oath.name,기사단의 맹세,Knight's Oath,Serment de chevalier,Giuramento del cavaliere,Juramento del caballero,騎士団の誓い,Όρκος των Ιπποτών,骑士团誓言,骑士团誓言
 card.joan_of_arc.knights_oath.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.flag_of_orleans.name,신국의 깃발,Flag of Orleans,Bannière de Dieu,Bandiera di Dio,Bandera de Dios,神国の旗,Σημαία της Ορλεάνης,神国之旗,神国之旗
-card.joan_of_arc.flag_of_orleans.archetype,신성,,,,,,,,
+card.joan_of_arc.flag_of_orleans.archetype,깃발,Banner,Bannière,Vessillo,Estandarte,旗,Λάβαρο,旗帜,旗幟
 card.joan_of_arc.saints_flame.name,성녀의 화염,Saint's Flame,Flamme de la sainte,Fiamma della santa,Llama de la santa,聖女の火焔,Φλόγα της Αγίας,圣女之焰,圣女之焰
 card.joan_of_arc.saints_flame.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.holy_light.name,성스러운 빛,Holy Light,Lumière sacrée,Luce sacra,Luz sagrada,聖なる光,Άγιο Φως,神圣之光,神圣之光
-card.joan_of_arc.holy_light.archetype,신성,,,,,,,,
+card.joan_of_arc.holy_light.archetype,성전,Crusade,Croisade,Crociata,Cruzada,聖戦,Σταυροφορία,圣战,聖戰
 card.joan_of_arc.communion.name,성찬,Communion,Communion,Comunione,Comunión,聖餐,Θεία Κοινωνία,圣餐,圣餐
-card.joan_of_arc.communion.archetype,신성,,,,,,,,
+card.joan_of_arc.communion.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.revive_spark.name,부활의 불씨,Revive Spark,Étincelle de résurrection,Scintilla di rinascita,Chispa de resurrección,復活の火種,Σπίθα Αναβίωσης,复活火种,复活火种
 card.joan_of_arc.revive_spark.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.divine_providence.name,신의 섭리,Divine Providence,Providence divine,Provvidenza divina,Providencia divina,神の摂理,Θεία Πρόνοια,神之摄理,神之摄理
@@ -385,7 +385,7 @@ card.joan_of_arc.small_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Mar
 card.joan_of_arc.sacrifice_cry.name,희생의 함성,Sacrifice Cry,Cri de sacrifice,Grido di sacrificio,Grito de sacrificio,犠牲の叫び,Κραυγή Θυσίας,牺牲之吼,牺牲之吼
 card.joan_of_arc.sacrifice_cry.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.angel_wings.name,천사의 날개,Angel Wings,Ailes d'ange,Ali d'angelo,Alas de ángel,天使の翼,Φτερά Αγγέλου,天使之翼,天使之翼
-card.joan_of_arc.angel_wings.archetype,신성,,,,,,,,
+card.joan_of_arc.angel_wings.archetype,축복,Blessing,Bénédiction,Benedizione,Bendición,祝福,Ευλογία,祝福,祝福
 card.joan_of_arc.second_chance.name,두 번째 기회,Second Chance,Deuxième chance,Seconda occasione,Segunda oportunidad,二度目の機会,Δεύτερη Ευκαιρία,第二次机会,第二次机会
 card.joan_of_arc.second_chance.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.revive_scroll.name,부활의 서,Revive Scroll,Parchemin de résurrection,Pergamena della rinascita,Pergamino de resurrección,復活の書,Πάπυρος Αναβίωσης,复活之书,复活之书
@@ -403,7 +403,7 @@ card.joan_of_arc.altar_flame.archetype,순교,Martyrdom,Martyre,Martirio,Martiri
 card.joan_of_arc.holy_rage.name,신성한 격노,Holy Rage,Rage sacrée,Rabbia sacra,Ira sagrada,神聖な激怒,Θεία Μανία,神圣激怒,神圣激怒
 card.joan_of_arc.holy_rage.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.holy_purification.name,신성한 정화,Holy Purification,Purification sacrée,Purificazione sacra,Purificación sagrada,神聖な浄化,Θείος Εξαγνισμός,神圣净化,神圣净化
-card.joan_of_arc.holy_purification.archetype,신성,,,,,,,,
+card.joan_of_arc.holy_purification.archetype,정화,Purification,Purification,Purificazione,Purificación,浄化,Εξαγνισμός,净化,淨化
 card.joan_of_arc.knights_guard.name,기사의 수호,Knight's Guard,Garde du chevalier,Guardia del cavaliere,Guardia del caballero,騎士の守護,Φρουρά του Ιππότη,骑士守护,骑士守护
 card.joan_of_arc.knights_guard.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.martyrs_legacy.name,순교자의 유산,Martyr's Legacy,Héritage du martyr,Eredità del martire,Legado del mártir,殉教者の遺産,Κληρονομιά του Μάρτυρα,殉教者遗产,殉教者遗产
@@ -416,9 +416,9 @@ card.joan_of_arc.last_shield.name,최후의 방패,Last Shield,Dernier bouclier,
 card.joan_of_arc.last_shield.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
 card.joan_of_arc.purifying_sacrifice.name,정화의 희생,Purifying Sacrifice,Sacrifice purificateur,Sacrificio purificatore,Sacrificio purificador,浄化の犠牲,Θυσία Εξαγνισμού,净化牺牲,净化牺牲
 card.joan_of_arc.purifying_sacrifice.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
-card.joan_of_arc.saints_vow.name,성녀의 맹약,Saint's Vow,Voeu de la sainte,Voto della santa,Voto de la santa,성녀의 맹약,Όρκος της Αγίας,圣女盟约,圣女盟约
+card.joan_of_arc.saints_vow.name,성녀의 맹약,Saint's Vow,Voeu de la sainte,Voto della santa,Voto de la santa,聖女の盟約,Όρκος της Αγίας,圣女盟约,聖女盟約
 card.joan_of_arc.saints_vow.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
-card.joan_of_arc.joan_return.name,잔 다르크의 귀환,Joan's Return,Retour de Jeanne,Ritorno di Giovanna,Regreso de Juana,ジャンヌ・ダルクの帰還,Επιστροφή της Ιωάννας,贞德回归,贞德回归
+card.joan_of_arc.joan_return.name,성녀의 귀환,the Saint's Return,Retour de la Sainte,Ritorno di la Santa,Regreso de la Santa,聖女の帰還,Επιστροφή της Αγίας,圣女回归,聖女回归
 card.joan_of_arc.joan_return.archetype,부활,Resurrection,Résurrection,Resurrezione,Resurrección,復活,Ανάσταση,复活,复活
 card.joan_of_arc.holy_war.name,성전,Holy War,Guerre sainte,Guerra santa,Guerra santa,聖戦,Ιερός Πόλεμος,圣战,圣战
 card.joan_of_arc.holy_war.archetype,순교,Martyrdom,Martyre,Martirio,Martirio,殉教,Μαρτύριο,殉教,殉教
@@ -454,7 +454,7 @@ card.genghis_khan.long_march.name,만리 원정,Long March,Longue marche,Lunga m
 card.genghis_khan.long_march.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
 card.genghis_khan.great_khans_command.name,대칸의 명령,Great Khan's Command,Commandement du Grand Khan,Comando del Gran Khan,Mando del Gran Khan,大ハンの命令,Διαταγή του Μεγάλου Χαν,大汗的命令,大汗的命令
 card.genghis_khan.great_khans_command.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
-card.genghis_khan.genghis_fury.name,징기스의 분노,Genghis' Fury,Fureur de Gengis,Furia di Gengis,Furia de Gengis,チンギスの憤怒,Οργή του Τζένγκις,成吉思汗之怒,成吉思汗之怒
+card.genghis_khan.genghis_fury.name,징기스의 분노,the Conqueror' Fury,Fureur de le Conquérant,Furia di il Conquistatore,Furia de el Conquistador,征服者の憤怒,Οργή του Κατακτητής,征服者之怒,征服者之怒
 card.genghis_khan.genghis_fury.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
 card.genghis_khan.light_cavalry_sprint.name,경기병 질주,Light Cavalry Sprint,Sprint de la cavalerie légère,Sprint della cavalleria leggera,Sprint de caballería ligera,軽騎兵疾走,Ταχεία Έφοδος Ελαφρού Ιππικού,轻骑兵疾驰,轻骑兵疾驰
 card.genghis_khan.light_cavalry_sprint.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
@@ -492,7 +492,7 @@ card.genghis_khan.territory_expansion.name,영토 확장,Territory Expansion,Exp
 card.genghis_khan.territory_expansion.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
 card.genghis_khan.red_horizon.name,붉은 지평선,Red Horizon,Horizon rouge,Orizzonte rosso,Horizonte rojo,赤い地平線,Κόκκινος Ορίζοντας,红色地平线,红色地平线
 card.genghis_khan.red_horizon.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,机动
-card.genghis_khan.genghis_territory.name,징기스의 영토,Genghis' Territory,Territoire de Gengis,Territorio di Gengis,Territorio de Gengis,チンギスの領土,Εδάφη του Τζένγκις,成吉思汗的领土,成吉思汗的领土
+card.genghis_khan.genghis_territory.name,징기스의 영토,the Conqueror' Territory,Territoire de le Conquérant,Territorio di il Conquistatore,Territorio de el Conquistador,征服者の領土,Εδάφη του Κατακτητής,征服者的领土,征服者的领土
 card.genghis_khan.genghis_territory.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
 card.genghis_khan.submission.name,굴복,Submission,Soumission,Sottomissione,Sumisión,屈服,Υποταγή,屈服,屈服
 card.genghis_khan.submission.archetype,약탈,Plunder,Pillage,Saccheggio,Saqueo,略奪,Λεηλασία,掠夺,掠夺
@@ -532,7 +532,7 @@ card.musashi.empty_state.name,무아지경,Empty State,État de vide,Stato di vu
 card.musashi.empty_state.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
 card.musashi.single_cut.name,일도양단,Single Cut,Coupe unique,Taglio singolo,Corte único,一刀両断,Μονό Χτύπημα,一刀两断,一刀两断
 card.musashi.single_cut.archetype,결투,Duel,Duel,Duello,Duelo,決闘,Μονομαχία,决斗,决斗
-card.musashi.afterimage_cut.name,잔영 참,Afterimage Cut,Coupe d'image rémanente,Taglio dell'immagine residua,Corte de imagen residual,残影斬,Χτύπημα Μετα단ίδας,残影斩,残影斩
+card.musashi.afterimage_cut.name,잔영 참,Afterimage Cut,Coupe d'image rémanente,Taglio dell'immagine residua,Corte de imagen residual,残影斬,Λεπίδα της Σκιάς,残影斩,殘影斬
 card.musashi.afterimage_cut.archetype,이도류,Dual Wield,Double maniement,Doppia impugnatura,Empuñadura doble,二刀流,Διπλή Λαβή,双刀流,双刀流
 card.musashi.strategy_path.name,병법의 길,Strategy Path,Voie de la stratégie,Via della strategia,Senda de la estrategia,兵法の道,Μονοπάτι της Στρατηγικής,兵法之道,兵法之道
 card.musashi.strategy_path.archetype,무심,Mushin,Mushin,Mushin,Mushin,無心,Μουσίν,无心,无心
@@ -655,7 +655,7 @@ card.genghis_khan.soul_strike.name,영혼 베기,Soul Strike,Frappe de l'âme,Co
 card.genghis_khan.soul_strike.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,機動
 card.genghis_khan.berserk_blow.name,광폭한 일격,Berserk Blow,Coup berserk,Colpo berserk,Golpe berserk,狂暴の一撃,Χτύπημα Μανίας,狂暴一击,狂暴一擊
 card.genghis_khan.berserk_blow.archetype,기동,Mobility,Mobilité,Mobilità,Movilidad,機動,Κινητικότητα,机动,機動
-card.napoleon.legion_charge.name,군단의 진격,Legion Charge,Charge de la légion,Carica della legione,Carga de la legión,軍団の突進,돌격 Λεγεώνας,军团冲锋,軍團衝鋒
+card.napoleon.legion_charge.name,군단의 진격,Legion Charge,Charge de la légion,Carica della legione,Carga de la legión,軍団の突進,Επέλαση Λεγεώνας,军团冲锋,軍團衝鋒
 card.napoleon.legion_charge.archetype,군단,Legion,Légion,Legione,Legión,軍団,Λεγεώνα,军团,軍團
 card.napoleon.glory_shout.name,영광의 함성,Glory Shout,Cri de gloire,Grido di gloria,Grito de gloria,栄光の叫び,Κραυγή Δόξας,荣耀呐喊,榮耀吶喊
 card.napoleon.glory_shout.archetype,사기,Morale,Moral,Morale,Moral,士気,Ηθικό,士气,士氣
@@ -689,7 +689,7 @@ effect.sacrifice_payoff.text,HP 희생 100당 적에게 피해 %d을 입힙니�
 effect.sacrifice_payoff.block.text,HP 희생 100당 방어도 %d을 얻습니다.,Gain %d Block per 100 HP sacrificed,Gagnez %d Bloc par 100 PV sacrifiés,Ottieni %d Blocco per 100 PV sacrificati,Gana %d Bloqueo por 100 PV sacrificados,HP犠牲100毎に %d ブロック,Απόκτηση %d Μπλοκ ανά 100 HP,每牺牲100HP获得 %d 格挡,每牺牲100HP获得 %d 格挡
 effect.charm_to_damage.text,매혹 스택을 소비해 스택당 피해 %d을 입힙니다.,Convert charm: %d damage per stack,Convertit charme en %d dégâts/pile,Converte fascino in %d danno/pila,Convierte encanto en %d daño/pila,魅了を %d ダメージに変換,Μετατρέπει γοητεία σε %d ζημιά/στοίβα,将魅惑转为每层 %d 伤害,将魅惑转为每层 %d 伤害
 effect.multi_hit_random.text,랜덤 적에게 %d회 피해 %d을 입힙니다.,Hit random enemies %d×%d,Frappe aléatoire %d×%d,Colpisce casuale %d×%d,Golpea aleatorio %d×%d,ランダム敵 %d×%d ダメージ,Τυχαία %d×%d ζημιά,随机攻击 %d×%d 伤害,随机攻击 %d×%d 伤害
-card.yi_sun_sin.turtle_power.name,거북의 권능,Turtle Power,Turtle Power,Turtle Power,Turtle Power,亀の権能,Turtle Power,亀甲权能,亀甲权能
+card.yi_sun_sin.turtle_power.name,거북의 권능,Turtle Power,Pouvoir de la Tortue,Potere della Tartaruga,Poder de la Tortuga,亀の権能,Δύναμη της Χελώνας,龟甲权能,龜甲權能
 card.yi_sun_sin.turtle_power.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
 card.yi_sun_sin.cannon_rhythm.name,포격 리듬,Cannon Rhythm,Rythme de canonnade,Ritmo di cannone,Ritmo de cañón,砲撃リズム,Ρυθμός Κανονιοβολισμού,炮击节奏,炮击节奏
 card.yi_sun_sin.cannon_rhythm.archetype,거북선,Turtle Ship,Bateau-tortue,Nave tartaruga,Barco tortuga,亀甲船,Πλοίο-Χελώνα,龟船,龟船
@@ -740,3 +740,5 @@ effect.draw_per_enthrall.text,이 카드로 반함 발동 시 카드 %d장을 �
 effect.damage_per_charmed_enemy.text,매혹된 적 1명당 %d 피해를 입힙니다.,Deal %d damage per Charmed enemy,Inflige %d dégâts par ennemi charmé,Infligge %d danni per nemico ammaliato,Inflige %d de daño por enemigo encantado,魅惑された敵1体につき %d ダメージ,Προκάλεσε %d ζημιά ανά γοητευμένο εχθρό,每个着迷的敌人造成 %d 伤害,每個著迷的敵人造成 %d 傷害
 power.on_enthrall_strength.label,매혹 반함 발동 시 strength +%d 영구,On enthrall: gain Strength +%d permanently,Réf. charme: Strength +%d permanent,Al fascino: Forza +%d permanente,Al embrujo: Fuerza +%d permanente,反心発動時: ストレングス +%d 永久,Στην Γοητεία: Δύναμη +%d μόνιμα,反迷触发: 力量 +%d 永久,反迷觸發: 力量 +%d 永久
 power.on_kill_energy.label,적 처치 시 에너지 +%d,On kill: gain %d Energy,Au meurtre: +%d Énergie,All'uccisione: +%d Energia,Al matar: +%d Energía,敵撃破時: エネルギー +%d,Στη σφαγή: +%d Ενέργεια,击杀时获得 %d 能量,擊殺時獲得 %d 能量
+power.on_enthrall_strength.desc,적이 반함 상태에 빠질 때마다 본인 strength +%d 영구 획득,Gain Strength +%d permanently each time an enemy is enthralled,Gagne Strength +%d permanent à chaque ennemi réfracté par le charme,Ottieni Forza +%d permanente ogni volta che un nemico è affascinato,Obtén Fuerza +%d permanente cada vez que un enemigo es embrujado,敵が反心状態になるたびに ストレングス +%d 永久,Αποκτάτε Δύναμη +%d μόνιμα κάθε φορά που γοητεύεται εχθρός,每当敌人被反迷时永久获得 力量 +%d,每當敵人被反迷時永久獲得 力量 +%d
+power.on_kill_energy.desc,본인이 적을 처치할 때마다 에너지 +%d 즉시 획득,Gain %d Energy each time you kill an enemy,Gagne %d Énergie à chaque ennemi tué,Ottieni %d Energia per ogni nemico ucciso,Obtén %d Energía por cada enemigo abatido,敵撃破時にエネルギー +%d 即座に獲得,Αποκτάτε %d Ενέργεια κάθε φορά που σκοτώνετε εχθρό,击杀敌人时立即获得 %d 能量,擊殺敵人時立即獲得 %d 能量

@@ -81,7 +81,7 @@ ui.settings.kill_cam,킬캠,Kill Cam,Caméra kill,Kill cam,Cámara final,キル�
 ui.settings.on,켜짐,On,On,On,On,オン,Ναι,开,開
 ui.settings.off,꺼짐,Off,Off,Off,Off,オフ,Όχι,关,關
 ui.settings.language_tab,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言,语言
-ui.settings.vol_master,마스터,Master,Master,Master,Master,マスター,Master,主音量,主音量
+ui.settings.vol_master,마스터,Master,Principal,Principale,Principal,マスター,Κύριος,主音量,主音量
 ui.settings.vol_music,음악,Music,Musique,Musica,Música,音楽,Μουσική,音乐,音樂
 ui.settings.vol_sfx,효과음,SFX,Effets,Effetti,Efectos,効果音,Ηχητικά,音效,音效
 ui.settings.vol_ui,UI,UI,UI,UI,UI,UI,UI,UI,UI

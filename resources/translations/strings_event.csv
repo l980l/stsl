@@ -141,7 +141,7 @@ event.japanese.tengu_training.name,텐구의 수련,Tengu's Training,L'Entraîne
 event.japanese.tengu_training.desc,산중에서 만난 텐구가 말한다.,A Tengu in the mountains offers his wisdom.,Un Tengu des montagnes offre sa sagesse.,Un Tengu delle montagne offre la sua sapienza.,Un Tengu de las montañas ofrece su sabiduría.,山中で出会った天狗が、汝に語りかける。,Ένα Τένγκου στο βουνό προσφέρει τη σοφία του.,山中偶遇的天狗正在说话。,山中偶遇的天狗正在说话。
 event.japanese.tengu_training.choice_1,수련을 받는다,Train,S'entraîner,Allenati,Entrenar,修練を受ける,Εκπαίδευση,接受修炼,接受修炼
 event.japanese.tengu_training.choice_2,거절 — 깃털 줍기,Refuse — Pick Feather,Refuser — Plume,Rifiuta — Piuma,Rechazar — Pluma,断る — 羽を拾う,Απόρριψη — Πτυχίο,拒绝 — 拾取羽毛,拒絕 — 拾取羽毛
-event.japanese.tengu_training.choice_musashi,무사시의 수련법,Musashi's Method,Méthode de Musashi,Metodo di Musashi,Método de Musashi,武蔵の修練法,Μέθοδος Μουσάσι,武藏的修炼法,武藏的修鍊法
+event.japanese.tengu_training.choice_musashi,검객의 수련법,the Swordsman's Method,Méthode de l'Épéiste,Metodo di lo Spadaccino,Método de el Espadachín,剣客の修練法,Μέθοδος ο Ξιφομάχος,剑客的修炼法,劍客的修鍊法
 event.japanese.shrine_omamori.name,신사의 오마모리,Shrine Omamori,L'Omamori du Sanctuaire,L'Omamori del Santuario,El Omamori del Santuario,神社の御守り,Ομαμόρι του Ιερού,神社的御守,神社的御守
 event.japanese.shrine_omamori.desc,오래된 신사에서 신관이 부적을 꺼낸다.,A priest presents a charm from an ancient shrine.,Un prêtre présente une amulette antique.,Un prete presenta un amuleto antico.,Un sacerdote presenta un amuleto antiguo.,古びた神社で、神官が守りを取り出した。,Ένας ιερέας δείχνει ένα φυλαχτό.,在古老的神社中，神官拿出了护身符。,在古老的神社中，神官拿出了护身符。
 event.japanese.shrine_omamori.choice_1,부적을 구입한다,Buy Charm,Acheter Amulette,Compra Amuleto,Comprar Amuleto,御守りを買う,Αγορά φυλαχτού,购买护身符,购买护身符
