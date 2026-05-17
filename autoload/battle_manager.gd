@@ -426,7 +426,7 @@ func _enemy_effective_speed(enemy_index: int) -> int:
 			2: base = 65  # BOSS
 			_: base = 45  # NORMAL
 	var st: Dictionary = _enemy_status[enemy_index] if enemy_index < _enemy_status.size() else {}
-	var bonus: int = st.get("speed_bonus", 0) - st.get("speed_penalty", 0)
+	var bonus: int = _sum_speed_instances(st.get("speed_bonus", [])) - _sum_speed_instances(st.get("speed_penalty", []))
 	var power_buff: int = _active_powers.get("power.speed_buff:enemy_%d" % enemy_index, {}).get("value", 0)
 	return max(1, base + bonus + power_buff)
 
@@ -435,12 +435,20 @@ func _hero_effective_speed(hid: String) -> int:
 		return 50
 	for hero in team_mgr.heroes:
 		if hero.hero_id == hid:
-			# base + status.speed_bonus - status.speed_penalty + power.speed_buff (전투 내 동적)
+			# base + Σ(status.speed_bonus instances) - Σ(status.speed_penalty instances) + power.speed_buff
+			# speed_bonus / speed_penalty = Array of {value: int, dur: int} — 여러 buff/debuff 합산
 			var st: Dictionary = _hero_status.get(hid, {})
-			var bonus: int = st.get("speed_bonus", 0) - st.get("speed_penalty", 0)
+			var bonus: int = _sum_speed_instances(st.get("speed_bonus", [])) - _sum_speed_instances(st.get("speed_penalty", []))
 			var power_buff: int = _active_powers.get("power.speed_buff:" + hid, {}).get("value", 0)
 			return max(1, int(hero.speed) + bonus + power_buff)
 	return 50
+
+# speed_bonus / speed_penalty 인스턴스 배열의 value 합산
+func _sum_speed_instances(arr: Array) -> int:
+	var total: int = 0
+	for ins in arr:
+		total += int(ins.get("value", 0))
+	return total
 
 func _actor_speed(actor_id: String) -> int:
 	var p := _parse_actor_id(actor_id)
@@ -649,16 +657,20 @@ func _phase_hero_post(hid: String) -> bool:
 				_hero_status[hid] = {}
 			_hero_status[hid][stype] = cur - 1
 			did_work = true
-	# speed_bonus / speed_penalty — value 유지, dur 만 감소. dur=0 도달 시 value 도 0
-	for pair in [["speed_bonus", "speed_bonus_dur"], ["speed_penalty", "speed_penalty_dur"]]:
-		var dur: int = _hero_status.get(hid, {}).get(pair[1], 0)
-		if dur > 0:
-			if not _hero_status.has(hid):
-				_hero_status[hid] = {}
-			_hero_status[hid][pair[1]] = dur - 1
-			if dur - 1 == 0:
-				_hero_status[hid][pair[0]] = 0
-			did_work = true
+	# speed_bonus / speed_penalty — Array of {value, dur}. 각 instance dur -1, dur<=0 인 인스턴스 제거
+	for key in ["speed_bonus", "speed_penalty"]:
+		var arr: Array = _hero_status.get(hid, {}).get(key, [])
+		if arr.is_empty():
+			continue
+		var kept: Array = []
+		for ins in arr:
+			var new_dur: int = int(ins.get("dur", 0)) - 1
+			if new_dur > 0:
+				kept.append({"value": int(ins.get("value", 0)), "dur": new_dur})
+		if not _hero_status.has(hid):
+			_hero_status[hid] = {}
+		_hero_status[hid][key] = kept
+		did_work = true
 	_check_win_condition()
 	return did_work
 
@@ -1364,7 +1376,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						_deal_damage_to_enemy(_di, _types * effect.value, effect.damage_type)
 						_last_attacker[_di] = card.owner_id
 			EffectRes.EffectType.BUFF_SPEED:
-				# value = 강도, bonus_value = 지속 턴. target SELF/ALL_ALLIES/ALLY
+				# value = 강도, bonus_value = 지속 턴. target SELF/ALL_ALLIES/ALLY. instance append (누적)
 				var _bs_targets: Array = []
 				if effect.target == "ALL_ALLIES" and team_mgr:
 					for h in team_mgr.get_living_heroes():
@@ -1378,8 +1390,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					var _bs_old_sp: int = _actor_speed(_bs_aid)
 					if not _hero_status.has(_bs_hid):
 						_hero_status[_bs_hid] = {}
-					_hero_status[_bs_hid]["speed_bonus"] = effect.value
-					_hero_status[_bs_hid]["speed_bonus_dur"] = effect.bonus_value
+					if not _hero_status[_bs_hid].has("speed_bonus") or typeof(_hero_status[_bs_hid]["speed_bonus"]) != TYPE_ARRAY:
+						_hero_status[_bs_hid]["speed_bonus"] = []
+					_hero_status[_bs_hid]["speed_bonus"].append({"value": effect.value, "dur": effect.bonus_value})
 					_adjust_turn_queue_for_speed_change(_bs_aid, _bs_old_sp)
 					status_applied.emit(_bs_hid, "speed_bonus", effect.value)
 			EffectRes.EffectType.DEBUFF_SPEED:
@@ -1393,8 +1406,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				for _ds_ei in _ds_targets:
 					var _ds_aid: String = "enemy:%d" % _ds_ei
 					var _ds_old_sp: int = _actor_speed(_ds_aid)
-					_enemy_status[_ds_ei]["speed_penalty"] = effect.value
-					_enemy_status[_ds_ei]["speed_penalty_dur"] = effect.bonus_value
+					if not _enemy_status[_ds_ei].has("speed_penalty") or typeof(_enemy_status[_ds_ei]["speed_penalty"]) != TYPE_ARRAY:
+						_enemy_status[_ds_ei]["speed_penalty"] = []
+					_enemy_status[_ds_ei]["speed_penalty"].append({"value": effect.value, "dur": effect.bonus_value})
 					_adjust_turn_queue_for_speed_change(_ds_aid, _ds_old_sp)
 					status_applied.emit("enemy_%d" % _ds_ei, "speed_penalty", effect.value)
 	# power.echo_next_attack: 이 ATTACK 카드 효과 전체를 1회 재시전 (재진입 가드)
@@ -1619,13 +1633,17 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 	for stype: String in ["weak", "vulnerable"]:
 		if _enemy_status[i].get(stype, 0) > 0:
 			_enemy_status[i][stype] -= 1
-	# speed_bonus / speed_penalty — value 유지, dur 만 감소
-	for pair in [["speed_bonus", "speed_bonus_dur"], ["speed_penalty", "speed_penalty_dur"]]:
-		var dur_e: int = _enemy_status[i].get(pair[1], 0)
-		if dur_e > 0:
-			_enemy_status[i][pair[1]] = dur_e - 1
-			if dur_e - 1 == 0:
-				_enemy_status[i][pair[0]] = 0
+	# speed_bonus / speed_penalty — Array of {value, dur}. 각 instance dur -1, dur<=0 제거
+	for key in ["speed_bonus", "speed_penalty"]:
+		var arr_e: Array = _enemy_status[i].get(key, [])
+		if arr_e.is_empty():
+			continue
+		var kept_e: Array = []
+		for ins in arr_e:
+			var new_dur_e: int = int(ins.get("dur", 0)) - 1
+			if new_dur_e > 0:
+				kept_e.append({"value": int(ins.get("value", 0)), "dur": new_dur_e})
+		_enemy_status[i][key] = kept_e
 	# 본인 poison tick (영웅이 가한 독 — 본인 차례 시작 시 발동)
 	var p_dmg: int = _enemy_status[i].get("poison_dmg", 0)
 	var p_dur: int = _enemy_status[i].get("poison_dur", 0)
@@ -1742,11 +1760,12 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			if intent.status_type == "block" or intent.status_type == "":
 				_enemy_block[enemy_index] += intent.value
 			elif intent.status_type in ["speed_bonus", "speed_penalty"]:
-				# 일정 효과 — value=강도, duration=지속 턴 (덮어쓰기)
+				# 일정 효과 — value=강도, duration=지속 턴. instance append (누적)
 				var _bs_aid: String = "enemy:%d" % enemy_index
 				var _bs_old_sp: int = _actor_speed(_bs_aid)
-				_enemy_status[enemy_index][intent.status_type] = intent.value
-				_enemy_status[enemy_index][intent.status_type + "_dur"] = max(1, intent.duration)
+				if not _enemy_status[enemy_index].has(intent.status_type) or typeof(_enemy_status[enemy_index][intent.status_type]) != TYPE_ARRAY:
+					_enemy_status[enemy_index][intent.status_type] = []
+				_enemy_status[enemy_index][intent.status_type].append({"value": intent.value, "dur": max(1, intent.duration)})
 				_adjust_turn_queue_for_speed_change(_bs_aid, _bs_old_sp)
 				status_applied.emit(_bs_aid, intent.status_type, intent.value)
 			else:
@@ -1762,8 +1781,9 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 							var _ds_old_sp: int = _actor_speed(_ds_aid)
 							if not _hero_status.has(hero.hero_id):
 								_hero_status[hero.hero_id] = {}
-							_hero_status[hero.hero_id][stype] = intent.value
-							_hero_status[hero.hero_id][stype + "_dur"] = max(1, intent.duration)
+							if not _hero_status[hero.hero_id].has(stype) or typeof(_hero_status[hero.hero_id][stype]) != TYPE_ARRAY:
+								_hero_status[hero.hero_id][stype] = []
+							_hero_status[hero.hero_id][stype].append({"value": intent.value, "dur": max(1, intent.duration)})
 							_adjust_turn_queue_for_speed_change(_ds_aid, _ds_old_sp)
 							status_applied.emit(hero.hero_id, stype, intent.value)
 						else:
@@ -1778,8 +1798,9 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 						var _ds_old_sp2: int = _actor_speed(_ds_aid2)
 						if not _hero_status.has(target_id):
 							_hero_status[target_id] = {}
-						_hero_status[target_id][stype] = intent.value
-						_hero_status[target_id][stype + "_dur"] = max(1, intent.duration)
+						if not _hero_status[target_id].has(stype) or typeof(_hero_status[target_id][stype]) != TYPE_ARRAY:
+							_hero_status[target_id][stype] = []
+						_hero_status[target_id][stype].append({"value": intent.value, "dur": max(1, intent.duration)})
 						_adjust_turn_queue_for_speed_change(_ds_aid2, _ds_old_sp2)
 						status_applied.emit(target_id, stype, intent.value)
 					else:

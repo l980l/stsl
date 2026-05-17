@@ -146,8 +146,7 @@ const STATUS_EMOJI := {
 const STATUS_INTERNAL_KEYS := [
 	"poison_dur", "counter_ratio", "damage_taken",
 	"greek_hubris_pending", "norse_ragnarok_fired",
-	"daoist_stance", "japanese_turn_count",
-	"speed_bonus_dur", "speed_penalty_dur"
+	"daoist_stance", "japanese_turn_count"
 ]
 
 func _trf(key: String, args) -> String:
@@ -3595,6 +3594,13 @@ func _format_death_rattle_tooltip(dt: Resource) -> String:
 func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	var tex: Texture2D = IconUtils.get_status_icon(key)
 	var tooltip: String = _trf("status.%s.desc" % key, val)
+	# speed_bonus / speed_penalty — 각 instance 별 "+N/M턴" list tooltip
+	if key in ["speed_bonus", "speed_penalty"] and typeof(status.get(key, null)) == TYPE_ARRAY:
+		var lines: Array[String] = []
+		var sign_str: String = "+" if key == "speed_bonus" else "-"
+		for ins in status[key]:
+			lines.append("%s%d / %d턴" % [sign_str, int(ins.get("value", 0)), int(ins.get("dur", 0))])
+		tooltip = "%s\n  " % _trf("status.%s.desc" % key, val) + "\n  ".join(lines)
 
 	if tex != null:
 		var hbox := HBoxContainer.new()
@@ -3657,6 +3663,14 @@ func _refresh_status_icons_hero(hero_id: String) -> void:
 	for key in status:
 		if key in STATUS_INTERNAL_KEYS or key == "marked_by":
 			continue
+		# speed_bonus / speed_penalty — Array of {value, dur}. 합산값으로 label 생성
+		if key in ["speed_bonus", "speed_penalty"] and typeof(status[key]) == TYPE_ARRAY:
+			var total: int = 0
+			for ins in status[key]:
+				total += int(ins.get("value", 0))
+			if total > 0:
+				box.add_child(_make_status_label(key, total, status))
+			continue
 		if typeof(status[key]) != TYPE_INT:
 			continue
 		var val: int = status[key]
@@ -3714,6 +3728,14 @@ func _refresh_status_icons_enemy(index: int) -> void:
 			box.add_child(sig_lbl)
 	for key in status:
 		if key in STATUS_INTERNAL_KEYS:
+			continue
+		# speed_bonus / speed_penalty — Array 합산
+		if key in ["speed_bonus", "speed_penalty"] and typeof(status[key]) == TYPE_ARRAY:
+			var total: int = 0
+			for ins in status[key]:
+				total += int(ins.get("value", 0))
+			if total > 0:
+				box.add_child(_make_status_label(key, total, status))
 			continue
 		if typeof(status[key]) != TYPE_INT:
 			continue
