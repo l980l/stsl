@@ -32,7 +32,7 @@ const TOKEN_ROWS := 1
 # Layout 은 base panel (SLOT_W=240, SLOT_H=280) 과 동일 — sidebar 내 node offset = base 와 같음.
 # 따라서 별도 SIDEBAR_LAYOUT 불필요. sidebar 좌표 = (SIDEBAR_X, SIDEBAR_Y + i*VSPACE) + (node.base - panel.base)
 const SIDEBAR_X := 1620.0
-const SIDEBAR_Y := 150.0   # relic_container (y 70~142) 아래, 영웅 panel (y 369~) 위
+const SIDEBAR_Y := 80.0    # turn_queue (y 18~52) 아래, 캐릭터 패널 위
 const SIDEBAR_SLOT_VSPACE := 90.0  # row 간 거리
 const SIDEBAR_SLOT_HSPACE := 230.0  # col 간 거리 (hp_bar 폭 211 + 19px gap)
 const SIDEBAR_SLOTS_PER_ROW := 3   # 위쪽/아래쪽 각 3 슬롯, 우측부터 채움
