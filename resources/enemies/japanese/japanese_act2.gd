@@ -13,8 +13,9 @@ static func chaos_tengu(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "vulnerable"
-	i3.target = IntentRes.TargetType.RANDOM
+	# 텐구의 바람 — 영웅 1명 speed_penalty 3 (3턴 일정 효과)
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 3; i3.status_type = "speed_penalty"
+	i3.duration = 3; i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]
 	e.charm_resistance = 20
 	return e
@@ -94,10 +95,14 @@ static func shuten_doji(scene: PackedScene) -> Resource:
 	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 210; p2i4.target = IntentRes.TargetType.ALL; p2i4.damage_type = "blunt"
 	var p2i5 := IntentRes.new()
 	p2i5.action_type = IntentRes.ActionType.BUFF; p2i5.value = 3; p2i5.status_type = "strength"
+	# p2i6 — 주귀 광기 가속 (보스 self speed_bonus 5 / 3턴)
+	var p2i6 := IntentRes.new()
+	p2i6.action_type = IntentRes.ActionType.BUFF; p2i6.value = 5; p2i6.status_type = "speed_bonus"
+	p2i6.duration = 3
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4],
 		[p1i1, p1i2, p1i3, p1i4, p1i5],
-		[p2i1, p2i2, p2i3, p2i4, p2i5]
+		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

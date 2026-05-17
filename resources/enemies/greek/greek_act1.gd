@@ -29,7 +29,9 @@ static func medusa(scene: PackedScene) -> Resource:
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "weak"
 	i2.target = IntentRes.TargetType.ALL
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "vulnerable"
+	# 석화의 시선 — 영웅 전체 speed_penalty 3 (3턴 일정 효과)
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 3; i3.status_type = "speed_penalty"
+	i3.duration = 3
 	i3.target = IntentRes.TargetType.ALL
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 180; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "curse"
@@ -133,10 +135,14 @@ static func hydra(scene: PackedScene) -> Resource:
 	var p2i5 := IntentRes.new()
 	p2i5.action_type = IntentRes.ActionType.DEBUFF; p2i5.value = 2; p2i5.status_type = "vulnerable"
 	p2i5.target = IntentRes.TargetType.ALL
+	# p2i6 — 광폭화 단계 다머리 가속 (보스 self speed_bonus 4 / 3턴)
+	var p2i6 := IntentRes.new()
+	p2i6.action_type = IntentRes.ActionType.BUFF; p2i6.value = 4; p2i6.status_type = "speed_bonus"
+	p2i6.duration = 3
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
 		[p1i1, p1i2, p1i3, p1i4],
-		[p2i1, p2i2, p2i3, p2i4, p2i5]
+		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

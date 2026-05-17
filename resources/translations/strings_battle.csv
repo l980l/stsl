@@ -129,3 +129,5 @@ battle.signature.yin_yang.toast,음양 교대!,YIN YANG!,YIN YANG !,YIN YANG!,¡
 battle.signature.kekkai.toast,결계 발동!,KEKKAI!,KEKKAI !,KEKKAI!,¡KEKKAI!,結界発動！,ΚΕΚΚΑΪ!,结界发动！,結界發動！
 power.speed_buff.label,속도 +%d,Speed +%d,Vitesse +%d,Velocità +%d,Velocidad +%d,速度+%d,Ταχύτητα +%d,速度+%d,速度+%d
 power.speed_buff.desc,전투 끝까지 속도 +%d,Speed +%d until end of battle,Vitesse +%d jusqu'à la fin du combat,Velocità +%d fino alla fine della battaglia,Velocidad +%d hasta el fin de la batalla,戦闘終了まで速度+%d,Ταχύτητα +%d μέχρι το τέλος της μάχης,战斗结束前速度+%d,戰鬥結束前速度+%d
+battle.intent.tooltip.buff_speed,자신 속도 +%d (%d턴),Self: Speed +%d (%d turns),Soi: Vitesse +%d (%d tours),Sé: Velocità +%d (%d turni),Yo: Velocidad +%d (%d turnos),自身: 速度+%d（%dターン）,Εαυτός: Ταχύτητα +%d (%d γύροι),自身: 速度+%d（%d回合）,自身: 速度+%d（%d回合）
+battle.intent.tooltip.debuff_speed,속도 저하 -%d (%d턴),Slow -%d (%d turns),Ralentir -%d (%d tours),Rallentare -%d (%d turni),Ralentizar -%d (%d turnos),減速 -%d（%dターン）,Επιβράδυνση -%d (%d γύροι),减速 -%d（%d回合）,減速 -%d（%d回合）

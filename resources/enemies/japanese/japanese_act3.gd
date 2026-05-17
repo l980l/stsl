@@ -46,8 +46,9 @@ static func blizzard_queen(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 160; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "ice"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "vulnerable"
-	i3.target = IntentRes.TargetType.ALL
+	# 눈보라의 동결 — 영웅 전체 speed_penalty 4 (3턴 일정 효과)
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 4; i3.status_type = "speed_penalty"
+	i3.duration = 3; i3.target = IntentRes.TargetType.ALL
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 180; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "ice"
 	var i5 := IntentRes.new()

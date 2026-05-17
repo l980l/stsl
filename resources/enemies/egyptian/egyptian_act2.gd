@@ -91,10 +91,14 @@ static func osiris(scene: PackedScene) -> Resource:
 	p1_i4b.action_type = IntentRes.ActionType.DEBUFF; p1_i4b.value = 3; p1_i4b.status_type = "vulnerable"; p1_i4b.target = IntentRes.TargetType.ALL
 	var p1_i5 := IntentRes.new()
 	p1_i5.action_type = IntentRes.ActionType.ATTACK; p1_i5.value = 300; p1_i5.target = IntentRes.TargetType.LOWEST_HP; p1_i5.damage_type = "holy_arrow"
+	# p1_i6 — 죽음의 저주 (영웅 전체 speed_penalty 4 / 3턴, 부활 페이즈)
+	var p1_i6 := IntentRes.new()
+	p1_i6.action_type = IntentRes.ActionType.DEBUFF; p1_i6.value = 4; p1_i6.status_type = "speed_penalty"
+	p1_i6.duration = 3; p1_i6.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [p0_i1, p0_i2, p0_i3, p0_i3b, p0_i4]
 	e.phase_patterns = [
 		[p0_i1, p0_i2, p0_i3, p0_i3b, p0_i4],
-		[p1_i1, p1_i2, p1_i2b, p1_i3, p1_i4, p1_i4b, p1_i5],
+		[p1_i1, p1_i2, p1_i2b, p1_i3, p1_i4, p1_i4b, p1_i5, p1_i6],
 	]
 	e.charm_resistance = 20
 	return e
