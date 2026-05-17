@@ -38,6 +38,8 @@
 **오디오 시스템 V2** (PR #94): `AudioManager` autoload (SFX 풀 16ch·BGM 크로스페이드·버스 볼륨 저장), `UISound` autoload (전역 버튼 호버·클릭 SFX, no_ui_sound 메타 opt-out), SFX 24종(-14 LUFS) + BGM 70종(-18 LUFS) 생성·정규화, 신화별 전투 BGM·보스 페이즈별 BGM 동적 선택, BGM 트랙 종료 자동 반복, 설정창 사운드 탭(볼륨 슬라이더 4개), `assets/audio/` .gitignore 처리. BurstParticleGroup2D weakref 람다 크래시 수정. 맵 룸 아이콘 툴팁 0.4s 지연 구현. `has_debuffs_N` 카드 조건 설명 동적 파싱.
 **인카운터 v2** (PR #95): 6 신화 일반 몬스터 풀 전면 재설계. 신화당 20종 × 10 인카운터 (난이도 1~10 오름차순), **각 몬스터 종이 정확히 1개 인카운터에만 등장**(중복 0). 84종 신규 몬스터 + 한국어/영어 번역. **Floor 가중치 선택 알고리즘**(`_pick_weighted_encounter`): 진행도 기반 ±3 윈도우 삼각 분포로 floor 진행에 따라 평균 난이도 상승, 같은 floor 내 변동성 보존. `test_encounter_weighting.gd` + `test_enemies.gd` 검증 3종.
 **이벤트·렐릭 v2** (PR #104~#107): `EventChoiceResource`에 신규 EffectType 3종(TRIGGER_BATTLE/MULTI/ADD_CARD) + 신규 필드(secondary/alt/reward/required_hero_id/encounter_tier/card_id), 22개 중복 이벤트를 새 메커니즘(전투-보상/확률/MULTI/조건부)으로 다양화, 5개 렐릭 차별화(scarab→APPLY_STATUS_ENEMY, ankh→ON_HERO_DAMAGED+condition_value, idun→PLAYER_TURN_END, dharma→PASSIVE MAX_HP, tengu→BATTLE_WIN), 5개 신규 이벤트 추가(sphinx_gate/ymir_blood/bodhi_tree/eight_immortals/kitsune_kit). **PASSIVE 트리거 적용 버그 수정**(_ancient_artifact/_dharma_seal/_cursed_crown MAX_HP 보너스 회복 — `add_relic` 시 즉시 적용). `condition_value` 처리를 HEAL/BLOCK까지 확장. `relic.status_type` 무시 버그 수정(_orochi_scale weak 회복). 카탈로그 스크립트 새 EffectType 인식, 사전 fail 37개 정리(i18n 키 마이그레이션·맵 노드·카드 풀 카운트), 통합 테스트 +14. **1365 테스트 통과 / 0 fail**.
+**개체별 ATB 차례 시스템** (PR #121~#125): 라운드 기반 → 33옵스퀴르 식 **영구 ATB 큐** (영웅 1명/적 1마리씩 speed 순). DeckManager 영웅별 분리 (각 영웅 덱·핸드·에너지·`owner_id` 자동 분배), 카드 효과 9개·Power 6개·Relic 44개 본인 차례 단위로 재정의. 영웅 차례 카메라 줌인 1.3x, 사이드바 (화면 밖 적 UI 만 우측 2x3 grid 트윈), turn queue 미리보기 위젯, 덱 보기 영웅별 탭, 차례 전환 인터벌 통합. **1465 테스트 통과 / 0 failed**. M5 영웅 6명 speed 50~60 (편차 줄임), 적 grade 폴백 NORMAL 45 / ELITE 53 / BOSS 65 (보스 > 영웅).
+**전투 UX 폴리싱 v3** (PR #126): 차례 인터벌 fine-tune (영웅→영웅 1x, 영웅↔적 2x, 적→적 3x), 적 인텐트 hover tooltip (모든 action_type + SPECIAL, 9 언어, base/사이드바 모두 작동), 상태이상 UI 시그니처 6 + 활성 파워 15 SVG 아이콘 추가 (이모지 폴백 제거), 파워 tooltip = 시전자 영웅 이름 (옆 라벨의 효과 설명과 역할 분리). GDScript 워닝/런타임 에러 일괄 정리 — Shift+T 번역 키 디버그 모드 크래시 해결 (`_format_intent_tooltip` `tr() %` → `_trf`), `ui_sound` meta flag 로 중복 connect 차단, `card_scene._build_desc` 절대 경로 get_node → autoload 직접 참조.
 
 ---
 
@@ -626,6 +628,100 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - ✅ `settings_overlay` graphics 탭 — 파티클 갯수 옵션 (4단계: minimal/low/medium/high — `0.1/0.25/0.5/1.0`. 저사양 대응 minimal 추가는 PR #115 후속)
 - ✅ 신규 gameplay 탭 (vfx_speed/anim_speed/monster_interval 4단계 segment)
 - ✅ ConfigFile 기반 `GameSettings.save_settings() / load_settings()` (`user://game_settings.cfg`)
+
+---
+
+## Milestone 6.10 — 전투 시스템 v3: 개체별 ATB + 카메라 줌 ✅ (PR #121~#125)
+
+> 라운드 기반 (플레이어 턴 ↔ 적 턴) → **33옵스퀴르 식 영구 ATB 큐** (영웅 1명·적 1마리씩 speed 순). 카메라가 본인 차례 영웅 줌인. 영웅별 덱·핸드·에너지 완전 분리.
+
+### 6.10-1. 영구 큐 (ATB) 차례 시스템 — PR #121
+- ✅ `HeroResource.speed` / `EnemyResource.speed` (영웅 50~60, 적 grade 폴백 NORMAL 45 / ELITE 53 / BOSS 65)
+- ✅ `BattleManager._turn_queue_at[actor_id]` — 가장 작은 값이 다음 차례, 동률은 영웅 우선
+- ✅ 차례 종료 시 `1000/speed` 충전. 사망/소환/부활 시 큐 자동 동기화
+- ✅ 시그널: `turn_started`/`turn_ended`/`turn_queue_changed`
+- ✅ 라운드 개념 제거 — Power/Relic/카드 효과 모두 본인 차례 단위로 재정의
+
+### 6.10-2. DeckManager 영웅별 분리 (v3 직렬화)
+- ✅ `Dictionary[hero_id → {draw, hand, discard, exhaust, energy, pending_*, cards_played, draws}]`
+- ✅ 새 API: `setup_for_battle`, `start_hero_turn`, `end_hero_turn`, `draw_cards_h`, `play_card_hero`, `get_hand(hid)`, `get_energy(hid)` 등
+- ✅ Legacy property (`hand`, `current_energy`, ...) read-only 합산 + 첫 영웅 ref (in-place 수정 호환)
+- ✅ to_dict/from_dict **v3** 포맷, 카드 `owner_id` 자동 분배
+
+### 6.10-3. 카드 효과·Power·Relic 본인 차례 단위 재정의
+- ✅ 카드 효과 9개 (COST_NEXT / COST_ZERO_TURN / BLOCK_PER_CARDS_PLAYED / ON_KILL_DRAW / DRAW_PER_ENTHRALL / PER_DRAW_DMG / DOUBLE_NEXT_DAMAGE / DAMAGE_PER_HAND_SIZE / ENERGY_TO_DAMAGE) — `owner_id` 영웅 단위
+- ✅ Power 6개 — `ctx.hero_id != owner_id` skip, 본인 영웅 차례에만 발동
+- ✅ Relic 44개 — owner_hero_id 본인 차례만, HEAL/ENERGY/DRAW/BLOCK 효과 본인 영웅 단위
+
+### 6.10-4. UI — 카드 핸드·turn queue·인트로 — PR #121·#122
+- ✅ 본인 차례 영웅 핸드만 표시 (`get_hand(hid)`) + 본인 에너지 표시
+- ✅ 차례 라벨에 현재 영웅/적 이름
+- ✅ 좌상단 turn queue 미리보기 위젯 (다음 5차례) — `get_turn_queue_preview(count)`
+- ✅ 배틀 인트로 — 1초 줌아웃 + "전투!" 타이틀 (`battle.msg_intro` 9 언어)
+- ✅ 모든 차례 전환에 동일 인터벌 — `GameSettings.turn_interval_multiplier` (이전 monster_interval rename)
+
+### 6.10-5. 테스트 마이그레이션 — PR #123
+- ✅ **1465 passed / 0 failed** (이전 77 failed)
+- ✅ test_deck_manager 전면 재작성 (영웅별 API), test_battle_manager `_execute_enemy_turn` 직접 호출, test_relics ctx.hero_id 전달 등 (11 파일)
+
+### 6.10-6. 차례 카메라 줌 + 덱 보기 + 설정 — PR #124
+- ✅ `CamState` 머신 (IDLE_FAR / HERO_FOCUS / DRAGGING / VFX_PLAYING)
+- ✅ 영웅 차례 줌인 1.3x, 적 차례·드래그·VFX 줌아웃. VFX 종료 = 노드 free 시점 (임팩트 X)
+- ✅ UI/카드/드래그 화살표 `_ui_layer` (CanvasLayer layer=5) 분리 — 카메라 zoom 영향 제거
+- ✅ 덱 보기 영웅별 탭 (TabContainer), 현재/마지막 차례 영웅 기본 활성, AccentLabel 색·BRASS 라인 통일
+- ✅ 설정 — 영웅 줌인 on/off, 카메라 줌 속도 3단 (slow/normal/fast), background 옵션 제거
+- ✅ i18n — 덱 보기 라벨 (현재 덱/사용한 덱/이용불가, 9 언어), `ui.settings.hero_zoom`/`cam_zoom_speed`, `ui.settings.kill_cam` 단축
+
+### 6.10-7. 적 패널 사이드바 트윈 — PR #125
+- ✅ 영웅 줌인 시 화면 밖으로 잘리는 적의 UI (name/hp/intent/status/sig) 만 화면 우측 2x3 grid 사이드바로 트윈
+- ✅ 화면 안 fully visible 적은 base 위치 그대로
+- ✅ 노드 reparent 없이 매 frame lerp (z_index / layer 변경 X)
+- ✅ 사이드바 빈칸 없이 sequential 채움 (우 위→우 아래→중 위→중 아래→좌 위→좌 아래)
+- ✅ 사이드바 활성 시 적 base panel/btn `mouse_filter = IGNORE` (cam zoom 차단 회피)
+- ✅ `_relic_container` 폭 화면 좌측 1/3 축소 + `mouse_filter = PASS` (sig_icon hover 차단 해결)
+- ✅ Shift+M 디버그 — 몬스터 다중 선택 전투 (장바구니식)
+
+### 6.10-8. 밸런스 (speed)
+- ✅ 영웅 6 명 speed 50~60 (편차 줄임). 적 grade 폴백 NORMAL 45 / ELITE 53 / BOSS 65 — 보스가 영웅보다 빠름
+
+### 후속 (이 마일스톤 후 별도 PR)
+- 🔲 Power/Relic 본인 영웅 차례 발동이 N×될 가능성 — 영웅 HP/렐릭 밸런스 튜닝 (실제 플레이 피드백)
+- 🔲 DISCARD_PICK_DRAW 등 일부 디테일 본인 영웅 단위 정리 (`_apply_discard_pick_reward`, `on_kill_energy` power 등 첫 영웅 fallback 잔존)
+
+---
+
+## Milestone 6.11 — 전투 UX 폴리싱 v3 ✅ (PR #126)
+
+> M6.10 실전 사용 피드백 — 차례 인터벌 미세 조정, 인텐트 정보 가독성, 상태이상 UI 시각 일관성, 디버그 도구 안정성.
+
+### 6.11-1. 차례 인터벌 fine-tuning
+- ✅ 영웅→영웅 1x (빠른 패스), 영웅→적 / 적→영웅 2x, 적→적 3x
+- ✅ 적 차례 시작 + 독 tick 인터벌 강화 (이전: 공격과 독 tick 거의 동시 발화)
+- ✅ 영웅 종료 후 인터벌 제거 — 영웅 간 전환에서 사용자 입력 지연 최소화
+
+### 6.11-2. 적 인텐트 hover tooltip
+- ✅ 모든 action_type (ATTACK/BUFF/DEBUFF/PREPARE/HEAL_ALLY/BUFF_ALLY/COUNTER_PREPARE/MARK_TARGET/SACRIFICE/WARD/SUMMON/MIMIC/SPECIAL 등) 에 자세한 tooltip
+- ✅ SPECIAL 의 status_type 별 분기 (remove_card/summon/generic/unknown)
+- ✅ `battle.intent.tooltip.*` 25 신규 i18n 키 (9 언어 — 한국어/영어 정확, 나머지 영어 fallback)
+- ✅ intent_lbl `z_index 1230` + btn 에도 동일 tooltip 부착 — base 시 btn(SLOT 전체 영역) 위 hover, 사이드바 시 intent_lbl 직접 hover 모두 작동
+
+### 6.11-3. 상태이상 UI svg 아이콘 21 종
+- ✅ 시그니처 6: sig_greek (휴브리스), sig_norse (라그나로크), sig_egyptian (호루스의 눈), sig_buddhist (법륜), sig_daoist (음양), sig_japanese (도리이+결계)
+- ✅ 활성 파워 15: power_bonus_per_hit, power_charm_double_apply/threshold_minus, power_debuff_amplify, power_double_next_damage, power_echo_next_attack, power_every_nth_attack_bonus, power_morale_per_turn, power_on_enthrall_strength, power_on_kill_energy, power_poison_double_application, power_sacrifice_bank, power_strength_player, power_summon_per_turn, power_token_bonus_dmg
+- ✅ 모두 신성 테마 (256×256, 외곽 황금 링 #c9a84c + 신화별 색상 또는 보라 power 톤)
+- ✅ `.gitignore` 화이트리스트 추가, `_preview.html` 신규 탭 (시그니처/파워) + status 누락 4종 보강
+
+### 6.11-4. 파워 tooltip — 시전자 영웅 이름
+- ✅ 기존 `tr(base_key + ".desc")` 중복 표시 제거 (옆 라벨이 이미 효과 설명)
+- ✅ tooltip = `tr(hero.hero_name)` — `__global__` owner 는 부착 X
+- ✅ Shift+T 디버그 시 영웅 이름 i18n 키 검사 가능
+
+### 6.11-5. GDScript 워닝/런타임 에러 정리
+- ✅ `_format_intent_tooltip` `tr() %` → `_trf` 교체 — Shift+T 번역 제거 모드에서 specifier 없는 키 string 에 args 적용 시 크래시 해결
+- ✅ `_enemy_sidebar_t` 미사용 변수 + 트윈 line 제거, `sb_idx / 2` `@warning_ignore("integer_division")`
+- ✅ VFX 3 종 (blood_spray / death_dissolve / revive_blessing) 의 인터페이스 통일용 signal 에 `@warning_ignore("unused_signal")`
+- ✅ `ui_sound._on_node_added` — meta flag `_ui_sound_connected` 로 중복 connect 차단 (reparent 시 'already connected' 에러)
+- ✅ `card_scene._build_desc` — `get_node("/root/BattleManager")` 절대 경로 → autoload 직접 참조 (tree 진입 전 호출 에러 해결)
 
 ---
 
