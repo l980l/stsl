@@ -2923,7 +2923,11 @@ func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 		var sb_screen: Vector2 = sidebar_panel_screen + (base_pos - panel_base)
 		var sb_self: Vector2 = _screen_to_self(sb_screen)
 		node.position = base_pos.lerp(sb_self, t)
-		node.scale = scale_now
+		# sig_icon 만 scale 1.0 (작은 Label hover hit area 보존). 나머지는 sidebar 시 1.0.
+		if key == "sig_icon":
+			node.scale = Vector2.ONE
+		else:
+			node.scale = scale_now
 
 func _start_enemy_sidebar_transition(target_t: float) -> void:
 	if _enemy_sidebar_tween != null:
