@@ -144,7 +144,7 @@ const STATUS_EMOJI := {
 
 # 내부 시그니처/메커니즘 추적 키 — 의도/상태 UI에 노출 안 함
 const STATUS_INTERNAL_KEYS := [
-	"poison_dur", "tokens", "counter_ratio", "damage_taken",
+	"poison_dur", "counter_ratio", "damage_taken",
 	"greek_hubris_pending", "norse_ragnarok_fired",
 	"daoist_stance", "japanese_turn_count",
 	"speed_bonus_dur", "speed_penalty_dur"
@@ -1312,42 +1312,11 @@ func _update_hero_ui(hero_id: String) -> void:
 		_refresh_token_tiles(hero_id)
 		return
 
-func _refresh_token_tiles(hero_id: String) -> void:
-	if _token_tile_nodes.has(hero_id):
-		for node in _token_tile_nodes[hero_id]:
-			node.queue_free()
-	_token_tile_nodes[hero_id] = []
-
-	if not TeamManager.is_alive(hero_id):
-		return
-
-	var token_count: int = BattleManager.get_hero_status(hero_id).get("tokens", 0)
-	if token_count <= 0:
-		return
-
-	var hero_idx: int = -1
-	for i in range(_hero_nodes.size()):
-		if _hero_nodes[i]["hero_id"] == hero_id:
-			hero_idx = i
-			break
-	if hero_idx < 0:
-		return
-
-	var area_pos := _summon_area_pos(hero_idx)
-	var max_tokens: int = TOKEN_COLS * TOKEN_ROWS
-
-	for t in range(min(token_count, max_tokens)):
-		var col: int = int(t / float(TOKEN_ROWS))
-		var row: int = t % TOKEN_ROWS
-		var tile_x: int = int(area_pos.x) + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
-		var tile_y: int = int(area_pos.y) + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
-
-		# 병사 캐릭터 씬 (2배 스케일)
-		var char_node = SoldierScene.instantiate()
-		char_node.scale = Vector2(2.0, 2.0)
-		char_node.position = Vector2(tile_x + TOKEN_TILE_W / 2.0 - 40.0, tile_y + TOKEN_TILE_H / 4.0)
-		add_child(char_node)
-		_token_tile_nodes[hero_id].append(char_node)
+func _refresh_token_tiles(_hero_id: String) -> void:
+	# 동적 모션 시스템 — 평소엔 토큰 노드 생성 안 함.
+	# 발사 시 _on_token_attack_fired 가 spawn → tween → free.
+	# 토큰 카운트는 status_box 의 "tokens" status icon 으로 표시됨.
+	pass
 
 func _update_enemy_ui(index: int) -> void:
 	if index < 0 or index >= _enemy_nodes.size():
@@ -2794,28 +2763,49 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 		var hero_spark_pos: Vector2 = char_node.global_position + _impact_jitter()
 		_spawn_impact_particles(hero_spark_pos, amount, true, dtype)
 
+const _SHARED_TOKEN_GRID_AREA_IDX := 1  # SummonArea2 (중앙) 공유
+
 func _on_token_attack_fired(hero_id: String, token_index: int, enemy_index: int) -> void:
-	# 병사 토큰 공격 — 각 병사 타일 위치에서 bullet beam 발사 (각자 위치 + SFX 분산)
+	# 병사 토큰 동적 모션 — 영웅에서 spawn → 공유 그리드 → bullet → 영웅 복귀 → free
 	if enemy_index < 0 or enemy_index >= _enemy_char_nodes.size():
 		return
 	var target_node = _enemy_char_nodes[enemy_index]
 	if not is_instance_valid(target_node):
 		return
-	var caster_pos: Vector2
-	var tiles: Array = _token_tile_nodes.get(hero_id, [])
-	if token_index < tiles.size() and is_instance_valid(tiles[token_index]):
-		caster_pos = tiles[token_index].global_position
-	elif _hero_char_nodes.has(hero_id):
-		# 토큰 노드 못 찾으면 영웅 위치로 폴백
-		caster_pos = _hero_char_nodes[hero_id].global_position
-	else:
+	if not _hero_char_nodes.has(hero_id):
 		return
-	# 카메라 줌아웃 (적이 화면 밖에 있으면 bullet 안 보이므로) — VFX 종료 시 자동 복귀
+	var hero_node: Node2D = _hero_char_nodes[hero_id]
+	if not is_instance_valid(hero_node):
+		return
+	# 카메라 줌아웃 (적이 화면 밖에 있으면 bullet 안 보임) — VFX 종료 시 자동 복귀
 	if _cam_state == CamState.HERO_FOCUS:
 		_cam_state = CamState.VFX_PLAYING
 		_cam_zoom_out()
 		_start_enemy_sidebar_transition(0.0)
-	_spawn_caster_beam(_VFX_BULLET_SHOT, caster_pos, target_node.global_position, "bullet", func(): pass)
+	# 토큰 노드 spawn (영웅 위치, 영웅 뒤 z)
+	var soldier = SoldierScene.instantiate()
+	soldier.scale = Vector2(2.0, 2.0)
+	soldier.position = hero_node.position
+	soldier.z_index = hero_node.z_index - 1
+	add_child(soldier)
+	# 공유 그리드 슬롯 좌표 (SummonArea2 기준)
+	var area_pos := _summon_area_pos(_SHARED_TOKEN_GRID_AREA_IDX)
+	@warning_ignore("integer_division")
+	var col: int = int(token_index / TOKEN_ROWS)
+	var row: int = token_index % TOKEN_ROWS
+	var tile_x: int = int(area_pos.x) + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
+	var tile_y: int = int(area_pos.y) + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
+	var grid_pos := Vector2(tile_x + TOKEN_TILE_W / 2.0 - 40.0, tile_y + TOKEN_TILE_H / 4.0)
+	# 모션: 영웅 → 그리드 (0.15s, 그 후 z 앞으로) → bullet 발사 → 대기 → 영웅 복귀 → free
+	var tw := create_tween()
+	tw.tween_property(soldier, "position", grid_pos, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_callback(func():
+		soldier.z_index = hero_node.z_index + 1
+		_spawn_caster_beam(_VFX_BULLET_SHOT, soldier.global_position, target_node.global_position, "bullet", func(): pass)
+	)
+	tw.tween_interval(0.25)
+	tw.tween_property(soldier, "position", hero_node.position, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.tween_callback(soldier.queue_free)
 
 func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
 	_update_enemy_ui(index)
