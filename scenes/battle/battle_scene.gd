@@ -4223,20 +4223,19 @@ func _refresh_debug_grid() -> void:
 			add_child(border)
 			_debug_grid_nodes.append(border)
 
-	# 소환물 그리드 (노란색)
-	for i in range(3):
-		var ap := _summon_area_pos(i)
-		for r in range(TOKEN_ROWS):
-			for c in range(TOKEN_COLS):
-				var cx: int = int(ap.x) + c * (TOKEN_TILE_W + TOKEN_TILE_GAP)
-				var cy: int = int(ap.y) + r * (TOKEN_TILE_H + TOKEN_TILE_GAP)
-				var cell := ColorRect.new()
-				cell.color = Color(0.8, 0.8, 0.2, 0.12)
-				cell.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
-				cell.position = Vector2(cx, cy)
-				cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
-				add_child(cell)
-				_debug_grid_nodes.append(cell)
+	# 소환물 공유 그리드 (노란색) — SummonArea2 1곳만
+	var ap := _summon_area_pos(_SHARED_TOKEN_GRID_AREA_IDX)
+	for r in range(TOKEN_ROWS):
+		for c in range(TOKEN_COLS):
+			var cx: int = int(ap.x) + c * (TOKEN_TILE_W + TOKEN_TILE_GAP)
+			var cy: int = int(ap.y) + r * (TOKEN_TILE_H + TOKEN_TILE_GAP)
+			var cell := ColorRect.new()
+			cell.color = Color(0.8, 0.8, 0.2, 0.12)
+			cell.size = Vector2(TOKEN_TILE_W, TOKEN_TILE_H)
+			cell.position = Vector2(cx, cy)
+			cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			add_child(cell)
+			_debug_grid_nodes.append(cell)
 				for border in _make_border_rects(cx, cy, TOKEN_TILE_W, TOKEN_TILE_H, Color(0.9, 0.9, 0.3, 0.6)):
 					add_child(border)
 					_debug_grid_nodes.append(border)
