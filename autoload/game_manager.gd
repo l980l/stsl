@@ -1016,7 +1016,9 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 	var dm := _get_dm()
 	# condition_value > 0 — 트리거별 발동 조건
 	if relic.condition_value > 0:
-		if relic.trigger == RelicRes.TriggerType.PLAYER_TURN_START:
+		if relic.effect_type == RelicRes.EffectType.TIME_HOURGLASS:
+			pass  # condition_value 는 hourglass 의 period — 효과 자체에서 처리
+		elif relic.trigger == RelicRes.TriggerType.PLAYER_TURN_START:
 			# 성스러운 두루마리 — condition_value번째 턴에만 발동
 			if context.get("turn", 0) != relic.condition_value:
 				return
@@ -1085,6 +1087,31 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 					var _bm_re := _get_bm()
 					if _bm_re:
 						_bm_re._check_lose_condition()
+		RelicRes.EffectType.BUFF_SPEED_TEAM:
+			# 신속의 인장 — BATTLE_START 시 모든 영웅 power.speed_buff = value (덮어쓰기, 전투 끝까지)
+			var bm_bst := _get_bm()
+			if bm_bst == null or tm == null:
+				return
+			for hero in tm.heroes:
+				var k_sb: String = "power.speed_buff:" + hero.hero_id
+				bm_bst._active_powers[k_sb] = {"value": value, "owner_id": hero.hero_id, "params": {}}
+				bm_bst._adjust_turn_queue_for_speed_change("hero:" + hero.hero_id, bm_bst._actor_speed("hero:" + hero.hero_id) - value)
+			bm_bst.active_powers_changed.emit()
+		RelicRes.EffectType.TIME_HOURGLASS:
+			# 시간의 모래시계 — 매 영웅 차례 종료 시 counter++, condition_value 배수 시 모든 영웅 speed_buff += value 누적
+			var bm_th := _get_bm()
+			if bm_th == null or tm == null:
+				return
+			bm_th._hourglass_counter += 1
+			var period: int = max(1, relic.condition_value)
+			if bm_th._hourglass_counter % period == 0:
+				for hero in tm.heroes:
+					var k_sh: String = "power.speed_buff:" + hero.hero_id
+					var cur_sh: int = bm_th._active_powers.get(k_sh, {}).get("value", 0)
+					bm_th._active_powers[k_sh] = {"value": cur_sh + value, "owner_id": hero.hero_id, "params": {}}
+					var _aid: String = "hero:" + hero.hero_id
+					bm_th._adjust_turn_queue_for_speed_change(_aid, bm_th._actor_speed(_aid) - value)
+				bm_th.active_powers_changed.emit()
 		RelicRes.EffectType.RUN_STRENGTH:
 			# "점점 강해지는" 렐릭 — BATTLE_START 시점에 런 카운터를 BM 파워로 세팅.
 			# status_type으로 메커니즘 구분. _active_powers는 매 전투 초기화되므로 누적처럼 동작.

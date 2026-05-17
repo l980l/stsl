@@ -480,7 +480,7 @@ func test_relic_pool_count() -> void:
 	print("[TestEnemies] test_relic_pool_count")
 	var RelicData = load("res://resources/relics/relics.gd")
 	var pool: Array = RelicData.build_pool()
-	_assert(pool.size() == 40, "릴릭 풀 40종 (기존 37 + 일본 3종)")
+	_assert(pool.size() == 42, "릴릭 풀 42종 (40 + speed 2)")
 
 func test_act3_event_pool_shape() -> void:
 	print("[TestEnemies] test_act3_event_pool_shape")

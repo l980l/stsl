@@ -41,7 +41,7 @@ static func pool() -> Array:
 	]
 
 static func _turtleship_drill() -> Resource:
-	# 거북선 점호 — RARE, 2코, SKILL, 학익진: 파티 전원 speed +3 (3턴)
+	# 거북선 점호 — RARE, 2코, SKILL, 학익진: 파티 전원 speed +4 (4턴)
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.turtleship_drill.name"; c.owner_id = "yi_sun_sin"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
@@ -49,8 +49,8 @@ static func _turtleship_drill() -> Resource:
 	c.archetype = "card.yi_sun_sin.formation_bond.archetype"  # 학익진
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BUFF_SPEED
-	e.value = 3; e.base_value = 3
-	e.bonus_value = 3; e.base_bonus_value = 3
+	e.value = 4; e.base_value = 4
+	e.bonus_value = 4; e.base_bonus_value = 4
 	e.target = "ALL_ALLIES"
 	c.effects = [e]; return c
 

@@ -88,6 +88,8 @@ var _in_echo_replay: bool = false
 
 # 개체별 턴 큐 (ATB) — actor_id → 다음 차례 카운터 (작을수록 먼저)
 var _turn_queue_at: Dictionary = {}
+# 시간의 모래시계 (relic TIME_HOURGLASS) 카운터 — 전투 시작 시 0, 매 영웅 차례 종료마다 ++
+var _hourglass_counter: int = 0
 var _current_actor_id: String = ""
 
 signal battle_started()
@@ -377,6 +379,7 @@ func setup_battle(enemies: Array) -> void:
 	for _e in _enemies:
 		_enemy_phase.append(0)
 	is_battle_active = true
+	_hourglass_counter = 0
 	_initialize_turn_counters()
 	battle_started.emit()
 	var _gm_bs = _get_gm()
@@ -444,6 +447,16 @@ func _actor_speed(actor_id: String) -> int:
 	elif p["kind"] == "enemy":
 		return _enemy_effective_speed(int(p["key"]))
 	return 50
+
+# speed 변경 즉시 _turn_queue_at 비율 보정 + UI 갱신 신호.
+# 호출 측: speed_bonus/speed_penalty/power.speed_buff 적용 직후, old_speed 인자로 변경 전 값 전달.
+func _adjust_turn_queue_for_speed_change(actor_id: String, old_speed: int) -> void:
+	var new_speed: int = _actor_speed(actor_id)
+	if old_speed == new_speed or old_speed <= 0 or new_speed <= 0:
+		return
+	if _turn_queue_at.has(actor_id):
+		_turn_queue_at[actor_id] = _turn_queue_at[actor_id] * float(old_speed) / float(new_speed)
+	turn_queue_changed.emit(get_turn_queue_preview())
 
 # 초기 큐 — 모든 생존 액터의 next_at = 1000 / speed
 func _initialize_turn_counters() -> void:
@@ -925,7 +938,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					var _pw_params: Dictionary = {}
 					if effect.bonus_value > 0:
 						_pw_params["bonus_value"] = effect.bonus_value
+					var _pw_aid: String = "hero:" + card.owner_id
+					var _pw_old_sp: int = _actor_speed(_pw_aid) if effect.status_type == "power.speed_buff" else 0
 					_register_power(effect.status_type, card.owner_id, effect.value, _pw_params)
+					if effect.status_type == "power.speed_buff":
+						_adjust_turn_queue_for_speed_change(_pw_aid, _pw_old_sp)
 				else:
 					var _as_stacks: int = effect.value
 					# power.debuff_amplify: 약화/취약/독 부여 시 추가 스택
@@ -1346,10 +1363,13 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				else:
 					_bs_targets.append(card.owner_id)
 				for _bs_hid in _bs_targets:
+					var _bs_aid: String = "hero:" + _bs_hid
+					var _bs_old_sp: int = _actor_speed(_bs_aid)
 					if not _hero_status.has(_bs_hid):
 						_hero_status[_bs_hid] = {}
 					_hero_status[_bs_hid]["speed_bonus"] = effect.value
 					_hero_status[_bs_hid]["speed_bonus_dur"] = effect.bonus_value
+					_adjust_turn_queue_for_speed_change(_bs_aid, _bs_old_sp)
 					status_applied.emit(_bs_hid, "speed_bonus", effect.value)
 			EffectRes.EffectType.DEBUFF_SPEED:
 				var _ds_targets: Array = []
@@ -1360,8 +1380,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					_ds_targets.append(target_enemy_index)
 				for _ds_ei in _ds_targets:
+					var _ds_aid: String = "enemy:%d" % _ds_ei
+					var _ds_old_sp: int = _actor_speed(_ds_aid)
 					_enemy_status[_ds_ei]["speed_penalty"] = effect.value
 					_enemy_status[_ds_ei]["speed_penalty_dur"] = effect.bonus_value
+					_adjust_turn_queue_for_speed_change(_ds_aid, _ds_old_sp)
 					status_applied.emit("enemy_%d" % _ds_ei, "speed_penalty", effect.value)
 	# power.echo_next_attack: 이 ATTACK 카드 효과 전체를 1회 재시전 (재진입 가드)
 	if not _in_echo_replay and card.card_type == CardRes.CardType.ATTACK:
