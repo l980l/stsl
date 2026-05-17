@@ -367,7 +367,7 @@ func _build_ui() -> void:
 	# HUD 바 — 시너지 + 릴릭 아이콘, 메시지 레이블 아래
 	_relic_container = FlowContainer.new()
 	_relic_container.position = Vector2(20, 70)
-	_relic_container.size = Vector2(WINDOW_W / 3.0 - 20.0, 72)  # 좌측 1/3 (사이드바 hover 차단 방지)
+	_relic_container.size = Vector2(WINDOW_W / 3.0 - 20.0, 144)  # 좌측 1/3, 높이 2배 (relic 많을 때 wrap 공간)
 	_relic_container.add_theme_constant_override("h_separation", 6)
 	_relic_container.add_theme_constant_override("v_separation", 4)
 	_relic_container.mouse_filter = Control.MOUSE_FILTER_PASS  # 자체는 통과, 자식 (relic icon) 만 hover (사이드바 sig_icon 차단 방지)
