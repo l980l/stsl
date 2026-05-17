@@ -78,7 +78,6 @@ ui.settings.hero_zoom,영웅 줌인,Hero Zoom,Zoom Héros,Zoom Eroe,Zoom Héroe,
 ui.settings.cam_zoom_speed,카메라 줌 속도,Camera Zoom Speed,Vitesse Zoom Caméra,Velocità Zoom Camera,Velocidad Zoom Cámara,カメラズーム速度,Ταχύτητα Ζουμ Κάμερας,镜头缩放速度,鏡頭縮放速度
 ui.settings.particle_quality,파티클 갯수,Particle Count,Nombre particules,Numero particelle,Cantidad partículas,パーティクル数,Αριθμός σωματιδίων,粒子数量,粒子數量
 ui.settings.kill_cam,킬캠,Kill Cam,Caméra kill,Kill cam,Cámara final,キルカム,Κάμερα φόνου,击杀镜头,擊殺鏡頭
-ui.settings.background,배경 (시차+팔레트),Background (Parallax),Arrière-plan,Sfondo,Fondo,背景,Φόντο,背景,背景
 ui.settings.on,켜짐,On,On,On,On,オン,Ναι,开,開
 ui.settings.off,꺼짐,Off,Off,Off,Off,オフ,Όχι,关,關
 ui.settings.language_tab,언어,Language,Langue,Lingua,Idioma,言語,Γλώσσα,语言,语言

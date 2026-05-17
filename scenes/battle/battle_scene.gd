@@ -181,8 +181,7 @@ func _build_debug_tooltip() -> void:
 
 func _build_ui() -> void:
 	# 배경 — M7.5 v2 SVG 컴포지션 + 무작위 환경(시각/날씨) + critters + weather 입자
-	var gs := get_node_or_null("/root/GameSettings")
-	if gs == null or gs.background_enabled:
+	if true:
 		var SBG := preload("res://scenes/components/scene_background.gd")
 		_scene_bg = SBG.new()
 		var act_v: int = GameManager.current_act if GameManager else 1
