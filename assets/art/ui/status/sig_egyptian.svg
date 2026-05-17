@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="se-bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#0a2a14"/>
+      <stop offset="100%" stop-color="#03100a"/>
+    </radialGradient>
+  </defs>
+  <circle cx="128" cy="128" r="112" fill="url(#se-bg)" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 호루스의 눈 (저주 누적) -->
+  <!-- 눈 윗선 -->
+  <path d="M 50,118 Q 90,70 128,70 Q 178,70 215,118"
+        stroke="#c9a84c" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <!-- 눈 아랫선 -->
+  <path d="M 50,118 Q 90,160 128,160 Q 178,160 215,118"
+        stroke="#c9a84c" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <!-- 눈동자 (녹색 저주) -->
+  <circle cx="128" cy="118" r="32" fill="#73f266" stroke="#c9a84c" stroke-width="4"/>
+  <circle cx="128" cy="118" r="14" fill="#0a3a1a"/>
+  <circle cx="135" cy="111" r="5" fill="#c0ffd0" opacity="0.8"/>
+  <!-- 호루스 마크 — 눈물 (수직선) -->
+  <path d="M 128,160 L 116,200 Q 116,210 122,210 L 130,210"
+        stroke="#c9a84c" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- 호루스 마크 — 꼬리선 -->
+  <path d="M 180,140 Q 200,150 215,170 L 200,166 L 210,178"
+        stroke="#c9a84c" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- 눈썹 -->
+  <path d="M 45,100 Q 90,55 138,55 Q 188,55 215,90"
+        stroke="#c9a84c" stroke-width="7" fill="none" stroke-linecap="round"/>
+</svg>

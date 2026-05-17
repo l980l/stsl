@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <circle cx="128" cy="128" r="112" fill="#0c0a18" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 소환진 (오각별 원) -->
+  <circle cx="128" cy="130" r="68" fill="#1a1428" stroke="#b079ff" stroke-width="4"/>
+  <circle cx="128" cy="130" r="60" fill="none" stroke="#b079ff" stroke-width="2" opacity="0.5"/>
+  <!-- 오각별 (소환진 내) -->
+  <polygon points="128,80 142,118 182,118 150,142 162,180 128,156 94,180 106,142 74,118 114,118"
+           fill="none" stroke="#d8a8ff" stroke-width="3"/>
+  <!-- 소환 중심 빛 -->
+  <circle cx="128" cy="130" r="14" fill="#ffd84d" opacity="0.85"/>
+  <circle cx="128" cy="130" r="20" fill="none" stroke="#ffd84d" stroke-width="2" opacity="0.5"/>
+  <!-- 순환 화살표 (매 턴) -->
+  <path d="M 60,72 A 68,68 0 1 1 196,72" stroke="#c9a84c" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <polygon points="196,72 212,58 208,80" fill="#c9a84c"/>
+</svg>

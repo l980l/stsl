@@ -24,10 +24,32 @@ assets/art/scenes/
 assets/art/ui/intent/
 assets/art/ui/relic/
 assets/art/ui/status/*
+assets/art/ui/status_backup/
 !assets/art/ui/status/invuln.svg
 !assets/art/ui/status/counter_pool.svg
 !assets/art/ui/status/marked_by.svg
 !assets/art/ui/status/death_rattle.svg
+!assets/art/ui/status/sig_greek.svg
+!assets/art/ui/status/sig_norse.svg
+!assets/art/ui/status/sig_egyptian.svg
+!assets/art/ui/status/sig_buddhist.svg
+!assets/art/ui/status/sig_daoist.svg
+!assets/art/ui/status/sig_japanese.svg
+!assets/art/ui/status/power_bonus_per_hit.svg
+!assets/art/ui/status/power_charm_double_apply.svg
+!assets/art/ui/status/power_charm_threshold_minus.svg
+!assets/art/ui/status/power_debuff_amplify.svg
+!assets/art/ui/status/power_double_next_damage.svg
+!assets/art/ui/status/power_echo_next_attack.svg
+!assets/art/ui/status/power_every_nth_attack_bonus.svg
+!assets/art/ui/status/power_morale_per_turn.svg
+!assets/art/ui/status/power_on_enthrall_strength.svg
+!assets/art/ui/status/power_on_kill_energy.svg
+!assets/art/ui/status/power_poison_double_application.svg
+!assets/art/ui/status/power_sacrifice_bank.svg
+!assets/art/ui/status/power_strength_player.svg
+!assets/art/ui/status/power_summon_per_turn.svg
+!assets/art/ui/status/power_token_bonus_dmg.svg
 assets/art/ui/synergy/
 # assets/art/ui/icon_settings.svg 및 assets/art/ui/map/ 은 추적 대상
 

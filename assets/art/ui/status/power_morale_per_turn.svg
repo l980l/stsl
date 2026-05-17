@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <circle cx="128" cy="128" r="112" fill="#101408" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 큰 별 (사기) -->
+  <polygon points="128,52 152,108 212,114 168,154 182,212 128,180 74,212 88,154 44,114 104,108"
+           fill="#ffd84d" stroke="#c9a84c" stroke-width="4"/>
+  <polygon points="128,76 144,116 184,120 156,148 164,188 128,170 92,188 100,148 72,120 112,116"
+           fill="#fff4a0" opacity="0.7"/>
+  <!-- 순환 화살표 (매 턴) — 우상단 -->
+  <path d="M 60,72 A 68,68 0 1 1 196,72" stroke="#c9a84c" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <polygon points="196,72 212,58 208,80" fill="#c9a84c" opacity="0.85"/>
+</svg>
