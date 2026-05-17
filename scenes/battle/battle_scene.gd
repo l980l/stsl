@@ -1417,7 +1417,11 @@ func _update_enemy_ui(index: int) -> void:
 			_:
 				entry["intent_lbl"].text = "?"
 		# 모든 인텐트에 tooltip 부착 (SPECIAL 도 자연스럽게 hover 유도)
-		SacredTheme.attach_tooltip(entry["intent_lbl"], _format_intent_tooltip(index, intent))
+		# base 시: btn(SLOT_W x SLOT_H) 이 위에 있어 intent_lbl hover 차단 → btn 에도 동일 tooltip
+		# 사이드바 시: btn IGNORE 로 변경됨 → intent_lbl 가 직접 받음
+		var intent_tip: String = _format_intent_tooltip(index, intent)
+		SacredTheme.attach_tooltip(entry["intent_lbl"], intent_tip)
+		SacredTheme.attach_tooltip(entry["btn"], intent_tip)
 
 	if not BattleManager.is_enemy_alive(index):
 		entry["panel"].modulate = Color(0.3, 0.3, 0.3)
