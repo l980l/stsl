@@ -6,6 +6,10 @@
 *.import
 *.translation
 
+# 로컬 테스트 러너 산출물 (재생성 가능)
+run_tests.bat
+run_tests.log
+
 # 오디오 에셋 — 로컬에서만 관리
 assets/audio/
 
