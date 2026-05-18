@@ -73,7 +73,6 @@ var card_rewards_pick_count: int = 1  # 카드픽 화면에서 선택 가능한 
 var pending_boss_upgrade: bool = false  # 보스 후 카드 강화 대기 여부
 var pending_boss_recruit: bool = false  # 보스 후 영웅 영입 대기 여부
 var _last_boss_enemy_id: String = ""    # 직전 보스 enemy_id (해금 훅용)
-var _last_elite_solo: bool = false      # 직전 엘리트 전투가 1:1 이었는지 (해금 훅용)
 # 보상 씬 TALLY 표시용 — complete_battle에서 채워짐
 var last_battle_turns: int = 0
 var last_battle_damage: int = 0
@@ -253,7 +252,6 @@ func enter_node(node_id: int) -> void:
 		_MapNodeRes.RoomType.ELITE, \
 		_MapNodeRes.RoomType.BOSS:
 			pending_enemies = _make_enemies_for_node(node)
-			_last_elite_solo = (node.room_type == _MapNodeRes.RoomType.ELITE and pending_enemies.size() == 1)
 			if node.room_type == _MapNodeRes.RoomType.BOSS and pending_enemies.size() > 0:
 				_last_boss_enemy_id = pending_enemies[0].enemy_name
 			else:
@@ -301,8 +299,6 @@ func complete_battle(won: bool) -> void:
 					add_gold(last_battle_gold)
 					if pm:
 						pm.increment_flag("elite_kills_total")
-						if _last_elite_solo:
-							pm.increment_flag("elite_solo_kills")
 						pm.check_unlock_conditions()
 				_MapNodeRes.RoomType.BOSS:
 					card_rewards_pick_count = 2
@@ -386,7 +382,6 @@ func start_event_battle(tier: int, reward: Dictionary) -> void:
 	else:
 		pending_enemies = _make_normal_enemies()
 	_apply_act_difficulty(pending_enemies, current_act)
-	_last_elite_solo = (pending_enemies.size() == 1)
 	_last_boss_enemy_id = ""
 	change_state(GameState.BATTLE)
 	_request_scene("res://scenes/battle/battle_scene.tscn")
@@ -463,7 +458,6 @@ func _resolve_secret_room() -> void:
 			# 비밀 전투 — 엘리트급 적 1마리, 승리 시 유물 보너스 보장
 			pending_enemies = _make_elite_enemies()
 			_apply_act_difficulty(pending_enemies, current_act)
-			_last_elite_solo = (pending_enemies.size() == 1)
 			_last_boss_enemy_id = ""
 			change_state(GameState.BATTLE)
 			_request_scene("res://scenes/battle/battle_scene.tscn")

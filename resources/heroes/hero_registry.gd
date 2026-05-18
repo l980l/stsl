@@ -50,7 +50,7 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.max_hp = 1000
 			hero.speed = 58  # 기동형 정복자 — 빠름
 			hero.character_scene = load("res://characters/heroes/genghis_khan/genghis_khan.tscn")
-			hero.unlock_condition = "flag:kill_boss:oshiris"
+			hero.unlock_condition = "flag:kill_boss:enemy.egyptian.osiris"
 			hero.unlock_description = "hero.genghis_khan.unlock_desc"
 		"musashi":
 			hero.hero_name = "hero.musashi.name"
@@ -58,7 +58,7 @@ static func make_hero(hero_id: String) -> Resource:
 			hero.max_hp = 1000
 			hero.speed = 60  # 결투형 검사 — 가장 빠름
 			hero.character_scene = load("res://characters/heroes/musashi/musashi.tscn")
-			hero.unlock_condition = "elite_solo_kills>=5"
+			hero.unlock_condition = "elite_kills_total>=10"
 			hero.unlock_description = "hero.musashi.unlock_desc"
 		_:
 			return null

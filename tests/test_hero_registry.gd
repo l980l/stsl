@@ -66,7 +66,7 @@ func test_make_hero_genghis_khan() -> void:
 	_assert(hero != null, "칭기즈칸 make_hero 반환값 있음")
 	_assert(hero.hero_id == "genghis_khan", "hero_id=genghis_khan")
 	_assert(hero.max_hp == 1000, "max_hp=1000")
-	_assert(hero.unlock_condition == "flag:kill_boss:oshiris", "unlock_condition=flag:kill_boss:oshiris")
+	_assert(hero.unlock_condition == "flag:kill_boss:enemy.egyptian.osiris", "unlock_condition=flag:kill_boss:enemy.egyptian.osiris")
 	_assert(hero.unlock_description != "", "unlock_description 비어있지 않음")
 
 func test_make_hero_musashi() -> void:
@@ -75,7 +75,7 @@ func test_make_hero_musashi() -> void:
 	_assert(hero != null, "무사시 make_hero 반환값 있음")
 	_assert(hero.hero_id == "musashi", "hero_id=musashi")
 	_assert(hero.max_hp == 1000, "max_hp=1000")
-	_assert(hero.unlock_condition == "elite_solo_kills>=5", "unlock_condition=elite_solo_kills>=5")
+	_assert(hero.unlock_condition == "elite_kills_total>=10", "unlock_condition=elite_kills_total>=10")
 	_assert(hero.unlock_description != "", "unlock_description 비어있지 않음")
 
 func test_get_display_info_returns_required_keys() -> void:
