@@ -118,13 +118,15 @@ static func drip_tex() -> Texture2D:
 		_drip_tex = ImageTexture.create_from_image(img)
 	return _drip_tex
 
-# 거품 — 두꺼운 외곽 ring + 안쪽 작은 ring (2중 원) + 빛반사 작은 원.
-# 사용자 피드백: 안쪽에 동그라미 하나 더 + 선 더 두껍게.
+# 거품 — 원본 poison_splash bubble 정확 매핑:
+#  - 채움 (큰 원): COL_DRIP alpha 0.25 (약한 녹)
+#  - 외곽 ring (1px arc): COL_DRIP_HL alpha 0.7 (연녹)
+#  - 좌상단 흰 하이라이트 alpha 0.7
 # 64×64, 외곽 반경 28 (size_base 28).
 static func bubble_tex() -> Texture2D:
 	if _bubble_tex == null:
-		var col_body := Color(0.549, 0.824, 0.196)  # 원본 COL_DRIP
-		var col_hl := Color(0.863, 1.0, 0.627)       # 원본 COL_DRIP_HL
+		var col_fill := Color(0.549, 0.824, 0.196)  # COL_DRIP
+		var col_ring := Color(0.863, 1.0, 0.627)     # COL_DRIP_HL (연녹)
 		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
 		img.fill(Color.TRANSPARENT)
 		var cx := 31.5
@@ -134,26 +136,23 @@ static func bubble_tex() -> Texture2D:
 				var dx := float(x) - cx
 				var dy := float(y) - cy
 				var d := sqrt(dx * dx + dy * dy)
-				# 외곽 ring — 반경 25~28 (두께 4, 더 두껍게)
-				if d >= 25.0 and d <= 28.0:
-					img.set_pixel(x, y, Color(col_body.r, col_body.g, col_body.b, 0.85))
-				# 안쪽 작은 ring — 반경 14~16 (두께 3)
-				elif d >= 14.0 and d <= 16.0:
-					img.set_pixel(x, y, Color(col_body.r, col_body.g, col_body.b, 0.85))
-				# 내부 매우 약한 채움
-				elif d < 25.0:
-					img.set_pixel(x, y, Color(col_body.r, col_body.g, col_body.b, 0.15))
-		# 좌상단 빛반사 작은 원 (외곽 ring 위에)
+				# 외곽 ring — 반경 26~28 (두께 2, 원본 1px arc 매칭)
+				if d >= 26.0 and d <= 28.0:
+					img.set_pixel(x, y, Color(col_ring.r, col_ring.g, col_ring.b, 0.7))
+				# 내부 약한 채움
+				elif d < 26.0:
+					img.set_pixel(x, y, Color(col_fill.r, col_fill.g, col_fill.b, 0.25))
+		# 좌상단 흰 하이라이트 (offset -10, -10, 반경 5)
 		for y in 64:
 			for x in 64:
-				var dx := float(x) - (cx - 12.0)
-				var dy := float(y) - (cy - 12.0)
+				var dx := float(x) - (cx - 10.0)
+				var dy := float(y) - (cy - 10.0)
 				var d := sqrt(dx * dx + dy * dy)
-				if d <= 4.5:
-					img.set_pixel(x, y, Color(col_hl.r, col_hl.g, col_hl.b, 0.8))
-				elif d <= 5.5:
+				if d <= 4.0:
+					img.set_pixel(x, y, Color(1, 1, 1, 0.7))
+				elif d <= 5.0:
 					var existing: Color = img.get_pixel(x, y)
-					img.set_pixel(x, y, Color(col_hl.r, col_hl.g, col_hl.b, maxf(existing.a, 0.8 * (5.5 - d))))
+					img.set_pixel(x, y, Color(1, 1, 1, maxf(existing.a, 0.7 * (5.0 - d))))
 		_bubble_tex = ImageTexture.create_from_image(img)
 	return _bubble_tex
 
