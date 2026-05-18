@@ -44,10 +44,10 @@ func _spawn_trail(pos: Vector2) -> void:
 			"start_alpha": 0.9, "mid_alpha": 0.45, "end_alpha": 0.0,
 		})
 		add_child(_gpu_trail_drip)
-		# gas 42/s × lifetime 1.15 ≈ 48 동시. 위로 살짝.
+		# gas 42/s × lifetime 1.15 ≈ 48 동시. 위로 살짝. 색 splash 와 통일.
 		_gpu_trail_gas = _Helpers.make_emitter({
 			"count": int(48 * _scale()), "lifetime": 1.15,
-			"color": COL_GAS,
+			"color": COL_HOT,
 			"speed_min": 12.0, "speed_max": 30.0,
 			"direction": Vector2.UP, "spread": 25.0,
 			"gravity": -18.0, "damping": 3.0,  # -0.005 * 60²
@@ -126,9 +126,9 @@ func _spawn_ambient() -> void:
 	if _amb_made:
 		return
 	_amb_made = true
-	# gas 42/s × lifetime 2.0 ≈ 84 동시. 위쪽으로.
+	# gas 42/s × lifetime 2.0 ≈ 84 동시. 위쪽으로. 색 splash gas 와 통일 (COL_HOT 흰연두).
 	_gpu_amb_gas = _Helpers.make_emitter({
-		"count": int(84 * _scale()), "lifetime": 2.0, "color": COL_GAS,
+		"count": int(84 * _scale()), "lifetime": 2.0, "color": COL_HOT,
 		"speed_min": 24.0, "speed_max": 54.0,
 		"direction": Vector2.UP, "spread": 18.0,
 		"gravity": -18.0, "damping": 3.0,
