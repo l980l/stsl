@@ -33,23 +33,18 @@ const COL_DEEP    := Color(0.419, 0.078, 0.094)   # #6b1418
 const COL_BRASS   := Color(0.910, 0.784, 0.470)   # #e8c878 황금
 const COL_INK     := Color(0.027, 0.024, 0.039)
 
-# 타이밍 (HTML 의 cast() 시퀀스)
+# 타이밍 (HTML 의 cast() 시퀀스 단순화)
 const WINDUP_TIME  := 0.32
-const IMPACT_DELAY := WINDUP_TIME               # 0.32s — chest thump
-const ARROW_DELAY  := WINDUP_TIME + 0.14        # 0.46s — aggro arrows snap
-const STAMP_DELAY  := WINDUP_TIME + 0.32        # 0.64s — TAUNTED stamp
-const HOLD_TIME    := 0.9
-const FADE_TIME    := 0.7
+const IMPACT_DELAY := WINDUP_TIME               # 0.32s — chest thump + shockwave + word + 흡입선
+const HOLD_TIME    := 0.6
+const FADE_TIME    := 0.5
 
-# 기하 — 캐릭터 sprite (64~80px) 대비 적정 비율로 축소
+# 기하 — 캐릭터 sprite (64~80px) 대비 적정 비율
 const SHOCK_BASE_R := 16.0
-const SHOCK_MAX_R  := 200.0
+const SHOCK_MAX_R  := 160.0
 const CHEST_R      := 12.0
-const GLYPH_R      := 24.0
-const WORD_OFFSET_Y := -100.0     # caster 위
-const GLYPH_OFFSET_Y := -70.0
-const CRACK_OFFSET_Y := 48.0      # 발치 아래
-const STAMP_OFFSET_Y := -64.0     # 영웅 머리 위
+const WORD_OFFSET_Y := -80.0      # 타겟 머리 위
+const CRACK_OFFSET_Y := 48.0      # (미사용 — anchor 호환만)
 
 var _caster := Vector2.ZERO
 var _target := Vector2.ZERO      # 도발 대상 영웅 (화살표 + stamp 표시용). ZERO 면 미표시.
@@ -181,34 +176,9 @@ func _update_particles(delta: float) -> void:
 		p["vy"] *= pow(0.98, delta * 60.0)
 
 # ── 레이어별 draw ──
-func _draw_bg_pass(canvas: CanvasItem) -> void:
-	var ga: float = _global_alpha()
-	if ga <= 0.0 or _age < IMPACT_DELAY:
-		return
-	# ground crack — 정확한 발 위치 (foot anchor) 사용
-	var crack_age: float = _age - IMPACT_DELAY
-	var crack_in: float = clampf(crack_age / 0.3, 0.0, 1.0)
-	var crack_alpha: float = crack_in * ga * 0.8
-	var foot := _foot_pos()
-	var s: float = _scale()
-	var col := Color(COL_BURN.r, COL_BURN.g, COL_BURN.b, crack_alpha)
-	# 메인 zigzag
-	var paths := [
-		PackedVector2Array([
-			foot + Vector2(-70.0, 0.0) * s, foot + Vector2(-26.0, -8.0) * s,
-			foot + Vector2(-12.0, 6.0) * s, foot + Vector2(20.0, -12.0) * s,
-			foot + Vector2(46.0, 0.0) * s, foot + Vector2(76.0, -6.0) * s,
-		]),
-		PackedVector2Array([
-			foot + Vector2(-50.0, 8.0) * s, foot + Vector2(-28.0, 16.0) * s,
-			foot + Vector2(-6.0, 8.0) * s, foot + Vector2(18.0, 20.0) * s,
-			foot + Vector2(52.0, 12.0) * s,
-		]),
-		PackedVector2Array([foot + Vector2(-40.0, -10.0) * s, foot + Vector2(-24.0, -20.0) * s]),
-		PackedVector2Array([foot + Vector2(10.0, 10.0) * s, foot + Vector2(22.0, 24.0) * s]),
-	]
-	for pts in paths:
-		canvas.draw_polyline(pts, col, 1.6 * s, true)
+func _draw_bg_pass(_canvas: CanvasItem) -> void:
+	# ground crack 제거 — 사용자 피드백.
+	pass
 
 func _draw_shock_pass(canvas: CanvasItem) -> void:
 	var ga: float = _global_alpha()
@@ -216,10 +186,10 @@ func _draw_shock_pass(canvas: CanvasItem) -> void:
 		return
 	var shock_age: float = _age - IMPACT_DELAY
 	var s: float = _scale()
-	# 3 concentric shockwave (s1: red strong / s2: burn / s3: brass)
-	_draw_one_shock(canvas, shock_age, 0.0, 0.9, COL_TAUNT, 3.0, ga, s)
-	_draw_one_shock(canvas, shock_age, 0.12, 1.05, COL_BURN, 2.2, ga * 0.85, s)
-	_draw_one_shock(canvas, shock_age, 0.22, 1.2, COL_BRASS, 1.6, ga * 0.7, s)
+	# 3 concentric shockwave (s1: red strong / s2: burn / s3: brass) — 빠르게 (duration 1/3)
+	_draw_one_shock(canvas, shock_age, 0.0, 0.32, COL_TAUNT, 3.0, ga, s)
+	_draw_one_shock(canvas, shock_age, 0.05, 0.38, COL_BURN, 2.2, ga * 0.85, s)
+	_draw_one_shock(canvas, shock_age, 0.10, 0.44, COL_BRASS, 1.6, ga * 0.7, s)
 	# chest flash (interior burst)
 	if shock_age < 0.35:
 		var k: float = shock_age / 0.35
@@ -286,191 +256,84 @@ func _draw_glow_pass(canvas: CanvasItem) -> void:
 		else:
 			col = Color(1.0, (140.0 - 60.0 * k) / 255.0, (80.0 - 40.0 * k) / 255.0, a * 0.9)
 			canvas.draw_circle(Vector2(p["x"], p["y"]), float(p["size"]), col)
-	# glyph (자물쇠 — 원형 + 4방향 tick + 다이아몬드 blade)
-	if _impact_emitted:
-		_draw_glyph(canvas, ga)
-	# word "도발" — 큰 텍스트 (Cinzel/SacredTheme 폰트 사용 — 한글은 NotoSans fallback)
-	if _impact_emitted:
+	# word "TAUNT" — 타겟 머리 위 (target_pos 있을 때만)
+	if _impact_emitted and _target != Vector2.ZERO:
 		_draw_word(canvas, ga)
-	# 시전자 → 영웅 화살표 (pre dashed white-grey → post solid red, ARROW_DELAY 부터 전환)
+	# 타겟 → 시전자 점선 흡입 (방향 반전)
 	if _target != Vector2.ZERO:
-		_draw_aggro_arrow(canvas, ga)
-		# 영웅 머리 위 TAUNTED stamp (STAMP_DELAY 부터)
-		if _age >= STAMP_DELAY:
-			_draw_taunted_stamp(canvas, ga)
-
-func _draw_glyph(canvas: CanvasItem, ga: float) -> void:
-	var glyph_age: float = _age - IMPACT_DELAY
-	if glyph_age < 0.0:
-		return
-	var pop_t: float = clampf(glyph_age / 0.45, 0.0, 1.0)
-	var scale_g: float = 0.2
-	if pop_t <= 0.6:
-		scale_g = 0.2 + (pop_t / 0.6) * 1.0
-	else:
-		scale_g = 1.2 - ((pop_t - 0.6) / 0.4) * 0.2
-	var rot: float = (glyph_age - 0.45) * (TAU / 4.0)  # 4초당 1회전
-	if rot < 0.0:
-		rot = 0.0
-	var s: float = _scale() * scale_g
-	var ctr := _caster + Vector2(0.0, GLYPH_OFFSET_Y)
-	# 외곽 ring
-	var alpha: float = ga * pop_t
-	_draw_ring(canvas, ctr, GLYPH_R * s, 2.5, Color(COL_BURN.r, COL_BURN.g, COL_BURN.b, alpha))
-	# 내부 ring (황금)
-	_draw_ring(canvas, ctr, GLYPH_R * 0.76 * s, 1.5, Color(COL_BRASS.r, COL_BRASS.g, COL_BRASS.b, alpha * 0.7))
-	# 4방향 tick (N/E/S/W) — 회전 적용
-	for i in range(4):
-		var a: float = rot + (TAU / 4.0) * float(i)
-		var p1: Vector2 = ctr + Vector2(cos(a), sin(a)) * (GLYPH_R - 8.0) * s
-		var p2: Vector2 = ctr + Vector2(cos(a), sin(a)) * GLYPH_R * s
-		canvas.draw_line(p1, p2, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha), 2.5 * s, true)
-	# 중심 다이아몬드 (blade)
-	var d: float = 12.0 * s
-	var diamond := PackedVector2Array([
-		ctr + Vector2(0.0, -d).rotated(rot),
-		ctr + Vector2(d * 0.6, 0.0).rotated(rot),
-		ctr + Vector2(0.0, d).rotated(rot),
-		ctr + Vector2(-d * 0.6, 0.0).rotated(rot),
-	])
-	canvas.draw_colored_polygon(diamond, Color(COL_TAUNT.r, COL_TAUNT.g, COL_TAUNT.b, alpha))
-
-func _draw_ring(canvas: CanvasItem, ctr: Vector2, r: float, width: float, col: Color) -> void:
-	var seg := 32
-	var pts := PackedVector2Array()
-	for i in range(seg + 1):
-		var a: float = TAU * float(i) / float(seg)
-		pts.append(ctr + Vector2(cos(a), sin(a)) * r)
-	canvas.draw_polyline(pts, col, width, true)
+		_draw_suction_line(canvas, ga)
 
 func _draw_word(canvas: CanvasItem, ga: float) -> void:
+	# "TAUNT" 영문 — 타겟 머리 위
 	var word_age: float = _age - IMPACT_DELAY
 	if word_age < 0.0:
 		return
 	var pop_t: float = clampf(word_age / 0.25, 0.0, 1.0)
 	var alpha: float = ga * pop_t
-	# 마지막 페이드
 	var word_end: float = HOLD_TIME
 	if word_age > word_end:
 		alpha *= clampf(1.0 - (word_age - word_end) / 0.4, 0.0, 1.0)
 	if alpha <= 0.01:
 		return
-	# 한글 폰트 가져오기 — SacredTheme display 폰트
 	var theme_font: Font = null
 	var sacred = get_node_or_null("/root/SacredTheme")
 	if sacred and sacred.theme != null:
 		theme_font = sacred.theme.default_font
 	if theme_font == null:
 		theme_font = ThemeDB.fallback_font
-	var text := "도발"
-	var fsize: int = int(56 * _scale())
-	# 흔들림
-	var shake_x: float = sin(word_age * 90.0) * 2.0 * _scale()
-	var shake_y: float = cos(word_age * 110.0) * 1.5 * _scale()
-	var pos := _caster + Vector2(shake_x, WORD_OFFSET_Y + shake_y)
+	var text := "TAUNT"
+	var fsize: int = int(36 * _scale())
+	var shake_x: float = sin(word_age * 90.0) * 1.5 * _scale()
+	var shake_y: float = cos(word_age * 110.0) * 1.0 * _scale()
+	var pos := _target + Vector2(shake_x, WORD_OFFSET_Y + shake_y)
 	var size_v: Vector2 = theme_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize)
 	var draw_pos: Vector2 = pos - Vector2(size_v.x * 0.5, 0.0)
 	# 그림자 (붉음)
-	canvas.draw_string(theme_font, draw_pos + Vector2(0.0, 4.0), text,
+	canvas.draw_string(theme_font, draw_pos + Vector2(0.0, 3.0), text,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_DEEP.r, COL_DEEP.g, COL_DEEP.b, alpha * 0.9))
 	# 본체 (흰)
 	canvas.draw_string(theme_font, draw_pos, text,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha))
 
-# ── 시전자 → 영웅 화살표 (pre: dashed 회색 / post: solid 빨강) ──
-# HTML 의 aggro 화살표 재현 — 흔들리는 dashed pre 가 thump 시점에 solid red 로 snap.
-func _draw_aggro_arrow(canvas: CanvasItem, ga: float) -> void:
-	# windup 단계: dashed 회색 (caster → target, 흐림)
-	# ARROW_DELAY (windup+0.14s) 부터: solid red 빨간 화살표
-	var to_post: float = clampf((_age - ARROW_DELAY) / 0.25, 0.0, 1.0)
-	var alpha: float = ga
-	var dir := (_target - _caster).normalized()
-	var dist: float = _caster.distance_to(_target)
-	if dist < 1.0:
+# ── 타겟 → 시전자 흡입 점선 ──
+# 타겟 위에서 시작한 점선이 시전자 쪽으로 빨려들어가는 느낌.
+# 점선이 시간에 따라 시전자 방향으로 흐름 (offset 이동) + 점선 길이가 점차 줄어듦.
+func _draw_suction_line(canvas: CanvasItem, ga: float) -> void:
+	var line_age: float = _age - IMPACT_DELAY
+	if line_age < 0.0:
 		return
-	# 화살표 시작·끝 — caster 가슴 ↔ target 머리
-	var p0 := _caster + Vector2(0.0, -50.0)
-	var p1 := _target + Vector2(0.0, -30.0)
-	# pre dashed (회색) — fade out 시 post 와 cross fade
-	if to_post < 1.0:
-		var pre_alpha: float = alpha * (1.0 - to_post) * 0.6
-		_draw_dashed_line(canvas, p0, p1, Color(0.7, 0.78, 0.86, pre_alpha), 1.5, 6.0, 4.0)
-	# post solid (빨강)
-	if to_post > 0.0:
-		var post_alpha: float = alpha * to_post
-		var col := Color(1.0, 0.31, 0.38, post_alpha)
-		canvas.draw_line(p0, p1, col, 2.4, true)
-		# 화살촉 (target 쪽 삼각형)
-		var head_size: float = 10.0
-		var perp := Vector2(-dir.y, dir.x)
-		var tip := p1
-		var base := p1 - dir * head_size
-		var pts := PackedVector2Array([
-			tip,
-			base + perp * head_size * 0.5,
-			base - perp * head_size * 0.5,
-		])
-		canvas.draw_colored_polygon(pts, col)
-
-# dashed line — 단순 구현 (각 dash 마다 draw_line)
-func _draw_dashed_line(canvas: CanvasItem, p0: Vector2, p1: Vector2, col: Color, width: float, dash_len: float, gap_len: float) -> void:
-	var dir := (p1 - p0).normalized()
-	var total: float = p0.distance_to(p1)
-	var step: float = dash_len + gap_len
-	var t: float = 0.0
-	while t < total:
-		var a: Vector2 = p0 + dir * t
-		var b: Vector2 = p0 + dir * min(t + dash_len, total)
-		canvas.draw_line(a, b, col, width, true)
-		t += step
-
-# 영웅 머리 위 "TAUNTED" / "도발됨" 스탬프 — 짧은 pop + 회전
-func _draw_taunted_stamp(canvas: CanvasItem, ga: float) -> void:
-	var stamp_age: float = _age - STAMP_DELAY
-	var pop_t: float = clampf(stamp_age / 0.25, 0.0, 1.0)
-	var alpha: float = ga * pop_t
-	# 마지막 페이드
-	var stamp_end: float = HOLD_TIME
-	if stamp_age > stamp_end:
-		alpha *= clampf(1.0 - (stamp_age - stamp_end) / 0.4, 0.0, 1.0)
+	# 0~0.5s: 흐름 활성 / 0.5s 이후 페이드
+	var active_dur := 0.6
+	var alpha: float = ga
+	if line_age > active_dur:
+		alpha *= clampf(1.0 - (line_age - active_dur) / 0.3, 0.0, 1.0)
 	if alpha <= 0.01:
 		return
-	var theme_font: Font = null
-	var sacred = get_node_or_null("/root/SacredTheme")
-	if sacred and sacred.theme != null:
-		theme_font = sacred.theme.default_font
-	if theme_font == null:
-		theme_font = ThemeDB.fallback_font
-	var text := "도발됨"
-	var fsize: int = int(14 * _scale())
-	var size_v: Vector2 = theme_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize)
-	var pad: Vector2 = Vector2(8.0, 5.0) * _scale()
-	var box_size: Vector2 = size_v + pad * 2.0
-	var ctr := _target + Vector2(0.0, STAMP_OFFSET_Y)
-	# scale pop: 1.6 → 0.96 → 1.0
-	var scale_st: float = 1.0
-	if pop_t < 0.6:
-		scale_st = 1.6 - (pop_t / 0.6) * 0.64
-	else:
-		scale_st = 0.96 + ((pop_t - 0.6) / 0.4) * 0.04
-	# 약간 기울임 (rotate -2deg)
-	var rot := -0.035
-	var half: Vector2 = box_size * scale_st * 0.5
-	# 배경 박스 (붉음)
-	var rect_pts := PackedVector2Array([
-		ctr + Vector2(-half.x, -half.y).rotated(rot),
-		ctr + Vector2( half.x, -half.y).rotated(rot),
-		ctr + Vector2( half.x,  half.y).rotated(rot),
-		ctr + Vector2(-half.x,  half.y).rotated(rot),
-	])
-	canvas.draw_colored_polygon(rect_pts, Color(COL_TAUNT.r, COL_TAUNT.g, COL_TAUNT.b, alpha * 0.92))
-	# 외곽 황금 테두리
-	canvas.draw_polyline(rect_pts + PackedVector2Array([rect_pts[0]]),
-		Color(COL_BRASS.r, COL_BRASS.g, COL_BRASS.b, alpha * 0.55), 1.5, true)
-	# 텍스트 (흰)
-	var draw_pos: Vector2 = ctr - size_v.rotated(rot) * 0.5
-	canvas.draw_string(theme_font, draw_pos, text,
-		HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha))
+	var p_target := _target + Vector2(0.0, -30.0)
+	var p_caster := _caster + Vector2(0.0, -50.0)
+	var dir := (p_caster - p_target).normalized()  # target → caster 방향
+	var dist: float = p_target.distance_to(p_caster)
+	if dist < 1.0:
+		return
+	# 흐르는 점선: 매 dash 가 시전자 쪽으로 이동 (flow_offset 시간 따라 증가)
+	var flow_speed: float = 240.0   # px/s
+	var flow_offset: float = fmod(line_age * flow_speed, 16.0)  # dash+gap = 16
+	var dash_len: float = 8.0
+	var gap_len: float = 8.0
+	var step: float = dash_len + gap_len
+	# 점선이 점차 짧아짐 — 빨려들어가는 인상 (active_dur 동안 100% → 30%)
+	var shrink: float = 1.0 - clampf(line_age / active_dur, 0.0, 1.0) * 0.7
+	var effective_dist: float = dist * shrink
+	var col := Color(COL_BURN.r, COL_BURN.g, COL_BURN.b, alpha * 0.85)
+	var t: float = -flow_offset
+	while t < effective_dist:
+		var a_t: float = max(0.0, t)
+		var b_t: float = min(t + dash_len, effective_dist)
+		if b_t > a_t:
+			var a_pos: Vector2 = p_target + dir * a_t
+			var b_pos: Vector2 = p_target + dir * b_t
+			canvas.draw_line(a_pos, b_pos, col, 1.6 * _scale(), true)
+		t += step
 
 # ── 블렌드 분리 레이어 ──
 class _DrawLayer:

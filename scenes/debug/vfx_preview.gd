@@ -445,9 +445,8 @@ func _update_info() -> void:
 			s += "ofuda %.2fs · barrier %.2fs · kanji %.2fs · hold %.2fs · fade %.2fs (매 5턴 — 4 부적 + 6각 결계)" % [
 				SIG_KEKKAI.OFUDA_DELAY, SIG_KEKKAI.BARRIER_DELAY, SIG_KEKKAI.KANJI_DELAY, SIG_KEKKAI.HOLD_TIME, SIG_KEKKAI.FADE_TIME]
 		"taunt":
-			s += "도발 — shockwave 3중 · glyph 반경 %.0f · word offset Y %.0f\n" % [
-				TAUNT_VFX.GLYPH_R, TAUNT_VFX.WORD_OFFSET_Y]
-			s += "windup %.2fs · impact %.2fs · hold %.2fs · fade %.2fs (적 DEBUFF taunt → 영웅 SINGLE 카드 lock, 발치 anchor 적용)" % [
+			s += "도발 — 빠른 shockwave 3중 · TAUNT word (타겟 위, offset Y %.0f) · 흡입 점선\n" % TAUNT_VFX.WORD_OFFSET_Y
+			s += "windup %.2fs · impact %.2fs · hold %.2fs · fade %.2fs (양방향 — 영웅↔적 도발 모두 동일 VFX)" % [
 				TAUNT_VFX.WINDUP_TIME, TAUNT_VFX.IMPACT_DELAY, TAUNT_VFX.HOLD_TIME, TAUNT_VFX.FADE_TIME]
 		"card_exhaust":
 			s += "카드 소진 — 카드 %.0fx%.0f · sweep %.2fs (위→아래 ember line + 잿불 + 회색 재)\n" % [
