@@ -1,6 +1,6 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-16 v16)
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-18 v17)
 > 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
@@ -1202,7 +1202,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-05-16 v16. PR #114·#115 반영 — 설정 graphics/gameplay 탭 + 전투 UX 폴리싱 v2 (VFX impact 정확 동기화·글로벌 툴팁·popup 글로우·카드 흐름·사망 예측·HP 블룸 임계치·파티클 4단계). 1470 테스트 통과 / 0 fail.
+> 최종 갱신: 2026-05-18 v17. PR #131~#138 반영 — 적 speed buff/debuff intent + 병사 토큰 동적 모션 + 휴식 신화별 일러스트 + 카드 순차 VFX·passive BUFF VFX·speed 다중 인스턴스 + 병사 소환·CHARGE_UP·stun·MARK_TARGET·MIMIC·SACRIFICE·COUNTER_PREPARE·SPECIAL remove_card·PURGE_STATUS·GAIN_MORALE·PREPARE·boss_phase 등 신규 VFX 14종 + 영웅 해금 조건 버그 수정. **1462 통과 / 0 fail**.
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -1232,6 +1232,12 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | VFX 시스템 v1 (M6.8) | PR #111~#113. 공격·상태·버프 VFX 20종 GDScript 포팅 + divine→holy 일괄 이주 + 임팩트 시점 동기화(`IMPACT_DELAY` + async `_execute_intent`) + GameSettings autoload hook + curse→debuff_hex 통일 + SFX 매핑 + 다수 시각 버그 수정(flash shader/시그니처 burst/screen_flash 비활성) + poison_tick 신규 + vfx_preview 디버그. **1470 통과 / 0 fail** |
 | ✅ 완료 | VFX 옵션 UI (M6.8 Phase 2) | PR #114. graphics/gameplay 탭 + 4단계 segment + ConfigFile save/load |
 | ✅ 완료 | 전투 UX 폴리싱 v2 (M6.9) | PR #115. fx.screen_effect 직접 await 동기화 + 글로벌 툴팁 시스템 + popup 글로우(Cinzel-Bold/halo)/색상(VFX HTML 톤) + 카드 입력 스무스(_card_busy 제거) + 사망 예측 차단 + HP 블룸 임계치 수정 + 파티클 4단계 + vfx_preview 4-way. **1470 통과 / 0 fail** |
+| ✅ 완료 | 개체별 ATB 차례 시스템 (M6.10) | PR #121~#125. 라운드 → 33옵스퀴르 식 영구 ATB 큐, DeckManager 영웅별 분리, 카메라 줌인 + 사이드바, turn queue 미리보기, 차례 전환 인터벌 통합. **1465 통과 / 0 fail** |
+| ✅ 완료 | 전투 UX 폴리싱 v3 + 별명·i18n + speed 시스템 (M6.11) | PR #126·#128·#129. 차례 인터벌 fine-tune + intent hover 툴팁 모든 타입 + 시그너처/파워 SVG 21개·이모지 폴백 제거 + 영웅 별명 (488 셀 4 csv 9 언어) + speed buff/debuff 시스템·카드 6 + 유물 2 + CP 테이블. **1448 통과 / 0 fail** |
+| ✅ 완료 | 적 intent speed + 토큰 동적 모션 + 휴식 일러스트 (M6.12) | PR #131·#132·#133·#134. 적 intent BUFF speed_bonus·DEBUFF speed_penalty 5종 + 나폴레옹 병사 토큰 bullet VFX + 토큰 영구 그리드 폐기 (영웅→그리드 tween → 발사 → 영웅 복귀 → free) + 휴식 신화별 일러스트 9종 + tokens svg + status_box 아이콘 + i18n |
+| ✅ 완료 | passive BUFF VFX + 카드 순차 VFX + speed 다중 인스턴스 + 병사 소환 VFX (M6.13) | PR #135·#136. phase_buffs/signature 자동 BUFF VFX + 카드 효과 순차 spawn (0.25s 간격) + status_applied 다중 BUFF 동기 + speed_bonus·penalty Array of {value, dur} 누적·툴팁 + nile_mist poison VFX 누락 수정 + BUFF_SPEED/DEBUFF_SPEED 드래그 화살표 + Shift+A 카드 추가 hand 직접 반영 + 병사 소환 VFX (HTML callRing + spawnPillar + 병사 등장 모션) |
+| ✅ 완료 | 적 intent·카드 effect 전반 신규 VFX 13종 + CHARGE_UP·stun (M6.14) | PR #137. power_up·summon_circle·speed_buff·slow_debuff·target_marking·mimic·sacrifice·counter_prepare·steal_card·purge_status·morale_boost·prepare·boss_phase_changed (cinematic letterbox + PHASE 타이틀 + inflow + 6겹 shockwave) + CHARGE_UP IntentResource (charge_turns·payoff_intents·한 턴 다중 intent 가로 표시) + stun status (hero_turn_skipped + stun.svg) + 적 6마리 (kronos·surtr·yamata·hannya·medusa·troll_warrior) + intent UI 이모지만 + STATUS_POPUP 4종 추가. **1462 통과 / 0 fail** |
+| ✅ 완료 | 영웅 해금 조건 버그 수정 (M5 fix) | PR #138. 칭기즈칸 `flag:kill_boss:oshiris` → `enemy.egyptian.osiris` (오타 + full key) / 무사시 `elite_solo_kills>=5` → `elite_kills_total>=10` (1:1 조건 무의미·완화) + `_last_elite_solo` dead code 정리 |
 | 🔴 즉시 | 배경 시스템 v1 (M7.5) | parallax 다중 레이어 + DOF 셰이더 + Light2D + SVG 식생/오브젝트. 옥토퍼스/Tunic/Hades 류 깊이감 (작업량 1/5 로 80% 효과) |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
 | 🟡 중기 | 이벤트 BGM 나머지 생성 (M7-6) | dark×3·encounter×2·fortune×2 미생성분 |
