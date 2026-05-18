@@ -4339,7 +4339,7 @@ func _get_hero_name_for_tooltip(hero_id: String) -> String:
 		return hero_id
 	for hero in TeamManager.heroes:
 		if hero.hero_id == hero_id:
-			return tr(hero.name) if hero.name != "" else hero_id
+			return tr(hero.hero_name) if hero.hero_name != "" else hero_id
 	return hero_id
 
 func _make_status_label(key: String, val: int, status: Dictionary) -> Control:

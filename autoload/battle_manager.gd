@@ -1059,9 +1059,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if effect.target == "ALL":
 						for i in range(_enemies.size()):
 							if _enemy_alive[i]:
-								_apply_status_to_enemy(i, effect.status_type, _as_stacks)
 								if effect.status_type == "taunt":
-									_set_enemy_taunt_source(i, card.owner_id)
+									_apply_taunt_to_enemy(i, _as_stacks, card.owner_id)
+								else:
+									_apply_status_to_enemy(i, effect.status_type, _as_stacks)
 					elif effect.target == "SELF":
 						_apply_status_to_hero(card.owner_id, effect.status_type, _as_stacks)
 					elif effect.target == "ALL_ALLIES":
@@ -1073,9 +1074,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						_apply_status_to_hero(ally_id, effect.status_type, _as_stacks)
 					else:
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-							_apply_status_to_enemy(target_enemy_index, effect.status_type, _as_stacks)
 							if effect.status_type == "taunt":
-								_set_enemy_taunt_source(target_enemy_index, card.owner_id)
+								_apply_taunt_to_enemy(target_enemy_index, _as_stacks, card.owner_id)
+							else:
+								_apply_status_to_enemy(target_enemy_index, effect.status_type, _as_stacks)
 			EffectRes.EffectType.DRAW:
 				if deck_mgr:
 					deck_mgr.draw_cards(effect.value)
@@ -1606,7 +1608,8 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 		_enemy_status[enemy_index]["poison_dmg"] = _enemy_status[enemy_index].get("poison_dmg", 0) + stacks
 		_enemy_status[enemy_index]["poison_dur"] = 3
 	elif status_type == "taunt":
-		# 도발 — 누적 X. max(현재, value) 로 덮어쓰기. source 는 호출처가 별도 _set_enemy_taunt_source() 로 전달.
+		# 도발 — source 는 _apply_taunt_to_enemy 가 별도로 처리하므로 여기서는 단순 max 만.
+		# (직접 호출 시 fallback. 일반 흐름에선 _apply_taunt_to_enemy 사용.)
 		var cur: int = _enemy_status[enemy_index].get("taunt", 0)
 		_enemy_status[enemy_index]["taunt"] = max(cur, stacks)
 	elif status_type == "charm":
@@ -1630,7 +1633,38 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 		_enemy_status[enemy_index][status_type] = _enemy_status[enemy_index].get(status_type, 0) + stacks
 	status_applied.emit("enemy_%d" % enemy_index, status_type, stacks)
 
-# 영웅이 적에게 도발 부여 시 source 영웅 id 저장. 후속 _enemy_target_for_attack 에서 사용.
+# 영웅이 적에게 도발 부여 — source 비교로 누적/덮어쓰기 결정.
+# - 같은 source (이미 그 영웅이 도발 중) → 지속 시간 합산 (스택 누적)
+# - 다른 source → 기존 덮어쓰기 (max 가 아니라 value 로 강제 갱신) + source 교체
+# - 신규 → value 설정 + source 등록
+func _apply_taunt_to_enemy(enemy_index: int, value: int, source_hero_id: String) -> void:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return
+	var cur_src: String = _enemy_status[enemy_index].get("taunt_source", "")
+	var cur_val: int = _enemy_status[enemy_index].get("taunt", 0)
+	if cur_src == source_hero_id and cur_val > 0:
+		# 같은 시전자 — 누적
+		_enemy_status[enemy_index]["taunt"] = cur_val + value
+	else:
+		# 다른 시전자 또는 신규 — 덮어쓰기 + source 교체
+		_enemy_status[enemy_index]["taunt"] = value
+		_enemy_status[enemy_index]["taunt_source"] = source_hero_id
+	status_applied.emit("enemy_%d" % enemy_index, "taunt", _enemy_status[enemy_index]["taunt"])
+
+# 적이 영웅에게 도발 부여 — 대칭 로직.
+func _apply_taunt_to_hero(hero_id: String, value: int, source_enemy_index: int) -> void:
+	if not _hero_status.has(hero_id):
+		_hero_status[hero_id] = {}
+	var cur_src: int = _hero_status[hero_id].get("taunt_source", -1)
+	var cur_val: int = _hero_status[hero_id].get("taunt", 0)
+	if cur_src == source_enemy_index and cur_val > 0:
+		_hero_status[hero_id]["taunt"] = cur_val + value
+	else:
+		_hero_status[hero_id]["taunt"] = value
+		_hero_status[hero_id]["taunt_source"] = source_enemy_index
+	status_applied.emit(hero_id, "taunt", _hero_status[hero_id]["taunt"])
+
+# Legacy 호환 (테스트가 직접 호출). 신규 코드는 _apply_taunt_to_enemy 사용 권장.
 func _set_enemy_taunt_source(enemy_index: int, hero_id: String) -> void:
 	if enemy_index < 0 or enemy_index >= _enemy_status.size():
 		return
@@ -1913,14 +1947,8 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 						_adjust_turn_queue_for_speed_change(_ds_aid2, _ds_old_sp2)
 						status_applied.emit(target_id, stype, intent.value)
 					elif stype == "taunt":
-						# 적 부여 도발 — value=지속 턴, taunt_source=enemy_index 로 lock 출처 추적.
-						# 누적이 아니라 max() 로 덮어쓰기 (긴 duration 이 이김). 새 source 가 이전 덮어씀.
-						if not _hero_status.has(target_id):
-							_hero_status[target_id] = {}
-						var cur_t: int = _hero_status[target_id].get("taunt", 0)
-						_hero_status[target_id]["taunt"] = max(cur_t, intent.value)
-						_hero_status[target_id]["taunt_source"] = enemy_index
-						status_applied.emit(target_id, "taunt", intent.value)
+						# 적 부여 도발 — 같은 적 추가 부여 시 누적, 다른 적이면 덮어쓰기.
+						_apply_taunt_to_hero(target_id, intent.value, enemy_index)
 					else:
 						_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
