@@ -1246,9 +1246,9 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 적 intent·카드 effect 전반 신규 VFX 13종 + CHARGE_UP·stun (M6.14) | PR #137. power_up·summon_circle·speed_buff·slow_debuff·target_marking·mimic·sacrifice·counter_prepare·steal_card·purge_status·morale_boost·prepare·boss_phase_changed (cinematic letterbox + PHASE 타이틀 + inflow + 6겹 shockwave) + CHARGE_UP IntentResource (charge_turns·payoff_intents·한 턴 다중 intent 가로 표시) + stun status (hero_turn_skipped + stun.svg) + 적 6마리 (kronos·surtr·yamata·hannya·medusa·troll_warrior) + intent UI 이모지만 + STATUS_POPUP 4종 추가. **1462 통과 / 0 fail** |
 | ✅ 완료 | 영웅 해금 조건 버그 수정 (M5 fix) | PR #138. 칭기즈칸 `flag:kill_boss:oshiris` → `enemy.egyptian.osiris` (오타 + full key) / 무사시 `elite_solo_kills>=5` → `elite_kills_total>=10` (1:1 조건 무의미·완화) + `_last_elite_solo` dead code 정리 |
 | ✅ 완료 | 배경 시스템 v1 (M7.5) | PR #117·#119. SceneBackground 컴포넌트 (parallax 5 레이어 sky/far/mid/near/fg) + 6 신화 × 3 Act = 18 환경 팔레트 + EnvSpec (time_of_day × weather) + 6 신화 SVG 오브젝트 풀 (large/medium/small/pillars) + SceneCritters (새) + weather_particles (비·눈) — battle 씬 적용 |
-| 🟡 중기 | 배경 시스템 v2 — 잔여 (M7.5+) | DOF 셰이더 + Light2D + 다른 씬 (map/event/rest/shop) 배경 확산 + 사용자 옵션 (on/off) |
+| 🟢 장기 | 배경 시스템 v2 — 잔여 (M7.5+) | DOF 셰이더 (거리 기반 blur, filmic 깊이감) + Light2D (어두운 배경 광원·그림자). 현 시점 분위기 충분 — "한 단계 더" 영역. event/rest/shop 은 별도 이미지로 이미 세팅·map 은 의도적으로 배경 없음 |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
-| 🟡 중기 | 이벤트 BGM 나머지 생성 (M7-6) | dark_1/2·encounter_2·fortune_2 미생성 (mysterious 3종·dark_3·encounter_1·fortune_1 완성) |
+| ✅ 완료 | 이벤트 BGM (M7-6) | 6 카테고리 모두 재생 가능. dark_3 → dark_1 rename + AudioManager variant 탐색 gap 허용으로 수정 (1~9 중 존재하는 것만 모음) |
 | 🟢 장기 | 비주얼 (M7-1~7-5) 캐릭터·카드 아트, 이펙트 | 몰입감 |
 | 🟢 장기 | 모바일 최적화 (M8-1~8-5) | 해상도·세이브·성능 |
 | 🟢 장기 | 접근성 (M8.6) | 색맹·자막·폰트 크기. 스팀 권장, 모바일 의무화 추세 |
