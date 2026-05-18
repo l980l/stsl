@@ -28,11 +28,14 @@ static func medusa(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "weak"
 	i2.target = IntentRes.TargetType.ALL
+	# 석화의 시선 — 한 턴에 시선 광선(curse 60) + 석화 stun 1 동시 발동 (hannya 와 동일 구조)
+	var gaze_atk := IntentRes.new()
+	gaze_atk.action_type = IntentRes.ActionType.ATTACK; gaze_atk.value = 60; gaze_atk.target = IntentRes.TargetType.LAST_ATTACKER; gaze_atk.damage_type = "curse"
+	var gaze_stun := IntentRes.new()
+	gaze_stun.action_type = IntentRes.ActionType.DEBUFF; gaze_stun.value = 1; gaze_stun.status_type = "stun"
+	gaze_stun.target = IntentRes.TargetType.LAST_ATTACKER
 	var i3 := IntentRes.new()
-	# 석화의 시선 — 영웅 전체 speed_penalty 3 (3턴 일정 효과)
-	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 3; i3.status_type = "speed_penalty"
-	i3.duration = 3
-	i3.target = IntentRes.TargetType.ALL
+	i3.action_type = IntentRes.ActionType.CHARGE_UP; i3.charge_turns = 1; i3.payoff_intents = [gaze_atk, gaze_stun]
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 180; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4]

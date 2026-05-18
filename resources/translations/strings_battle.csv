@@ -11,20 +11,20 @@ battle.drag_enemy,적을 선택하세요 ▶,Select Enemy ▶,Choisir l'ennemi �
 battle.drag_ally,아군을 선택하세요 ▶,Select Ally ▶,Choisir l'allié ▶,Seleziona Alleato ▶,Seleccionar Aliado ▶,味方を選択してください ▶,Επιλογή Συμμάχου ▶,选择队友 ▶,选择队友 ▶
 battle.drag_release,놓아서 사용 ▶,Release to Use ▶,Relâcher pour utiliser ▶,Rilascia per usare ▶,Soltar para usar ▶,離して使用 ▶,Αφήστε για Χρήση ▶,松开以使用 ▶,松开以使用 ▶
 battle.intent.attack,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d
-battle.intent.buff.strength,💪 +%d,💪 +%d,💪 +%d,💪 +%d,💪 +%d,💪 +%d,💪 +%d,💪 +%d,💪 +%d
-battle.intent.buff.block,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d,🛡 +%d
-battle.intent.debuff,👿 디버프,👿 Debuff,👿 Débuff,👿 Debuff,👿 Debuff,👿 デバフ,👿 Εξασθένηση,👿 减益,👿 减益
-battle.intent.prepare,⏳ 준비 중,⏳ Preparing,⏳ Préparation,⏳ Preparazione,⏳ Preparando,⏳ 準備中,⏳ Προετοιμασία,⏳ 准备中,⏳ 准备中
-battle.intent.dead,💀 사망,💀 Dead,💀 Mort,💀 Morto,💀 Muerto,💀 死亡,💀 Νεκρός,💀 死亡,💀 死亡
-battle.intent.heal_ally,💚 동료 회복 +%d,💚 Heal Ally +%d,💚 Soin allié +%d,💚 Cura alleato +%d,💚 Curar aliado +%d,💚 仲間回復 +%d,💚 Θεραπεία +%d,💚 治疗盟友 +%d,💚 治療盟友 +%d
-battle.intent.buff_ally,✨ 동료 강화 +%d,✨ Buff Ally +%d,✨ Renforcer allié +%d,✨ Buff alleato +%d,✨ Reforzar aliado +%d,✨ 仲間強化 +%d,✨ Ενίσχυση +%d,✨ 强化盟友 +%d,✨ 強化盟友 +%d
-battle.intent.counter_prepare,🔄 반격 준비 %d%%,🔄 Counter %d%%,🔄 Contre-attaque %d%%,🔄 Contrattacco %d%%,🔄 Contraataque %d%%,🔄 反撃準備 %d%%,🔄 Αντεπίθεση %d%%,🔄 准备反击 %d%%,🔄 準備反擊 %d%%
-battle.intent.mark_target,🎯 표적 마킹,🎯 Mark Target,🎯 Marquage,🎯 Marca bersaglio,🎯 Marcar objetivo,🎯 標的指定,🎯 Σημάδι,🎯 标记目标,🎯 標記目標
-battle.intent.sacrifice,🩸 자해 강화 +%d,🩸 Sacrifice +%d,🩸 Sacrifice +%d,🩸 Sacrificio +%d,🩸 Sacrificio +%d,🩸 自傷強化 +%d,🩸 Θυσία +%d,🩸 自损强化 +%d,🩸 自損強化 +%d
-battle.intent.ward,🛡 결계 %d턴,🛡 Ward %dT,🛡 Bouclier %dT,🛡 Schermo %dT,🛡 Escudo %dT,🛡 結界 %dT,🛡 Φύλακας %dΣ,🛡 结界 %d回,🛡 結界 %d回
-battle.intent.summon,🐾 소환 ×%d,🐾 Summon ×%d,🐾 Invocation ×%d,🐾 Evoca ×%d,🐾 Invocar ×%d,🐾 召喚 ×%d,🐾 Επίκληση ×%d,🐾 召唤 ×%d,🐾 召喚 ×%d
-battle.intent.mimic,🪞 메아리 %d%%,🪞 Mimic %d%%,🪞 Mimétisme %d%%,🪞 Mimica %d%%,🪞 Imitar %d%%,🪞 模倣 %d%%,🪞 Μίμηση %d%%,🪞 模仿 %d%%,🪞 模仿 %d%%
-battle.intent.special,❓ 특수,❓ Special,❓ Spécial,❓ Speciale,❓ Especial,❓ 特殊,❓ Ειδικό,❓ 特殊,❓ 特殊
+battle.intent.buff.strength,💪,💪,💪,💪,💪,💪,💪,💪,💪
+battle.intent.buff.block,🛡,🛡,🛡,🛡,🛡,🛡,🛡,🛡,🛡
+battle.intent.debuff,👿,👿,👿,👿,👿,👿,👿,👿,👿
+battle.intent.prepare,⏳,⏳,⏳,⏳,⏳,⏳,⏳,⏳,⏳
+battle.intent.dead,💀,💀,💀,💀,💀,💀,💀,💀,💀
+battle.intent.heal_ally,💚,💚,💚,💚,💚,💚,💚,💚,💚
+battle.intent.buff_ally,✨,✨,✨,✨,✨,✨,✨,✨,✨
+battle.intent.counter_prepare,🔄,🔄,🔄,🔄,🔄,🔄,🔄,🔄,🔄
+battle.intent.mark_target,🎯,🎯,🎯,🎯,🎯,🎯,🎯,🎯,🎯
+battle.intent.sacrifice,🩸,🩸,🩸,🩸,🩸,🩸,🩸,🩸,🩸
+battle.intent.ward,🛡,🛡,🛡,🛡,🛡,🛡,🛡,🛡,🛡
+battle.intent.summon,🐾,🐾,🐾,🐾,🐾,🐾,🐾,🐾,🐾
+battle.intent.mimic,🪞,🪞,🪞,🪞,🪞,🪞,🪞,🪞,🪞
+battle.intent.special,❓,❓,❓,❓,❓,❓,❓,❓,❓
 battle.intent.tooltip.attack,공격 %d 데미지,Deal %d damage,Deal %d damage,Deal %d damage,Deal %d damage,敵に %d ダメージ,Προκάλεσε %d ζημιά,造成 %d 点伤害,造成 %d 點傷害
 battle.intent.tooltip.target_all,전체,all targets,all targets,all targets,all targets,全対象,όλοι οι στόχοι,全部目标,全部目標
 battle.intent.tooltip.element,%s 속성,%s element,%s element,%s element,%s element,%s 属性,%s στοιχείο,%s 属性,%s 屬性
@@ -131,3 +131,7 @@ power.speed_buff.label,속도 +%d,Speed +%d,Vitesse +%d,Velocità +%d,Velocidad 
 power.speed_buff.desc,전투 끝까지 속도 +%d,Speed +%d until end of battle,Vitesse +%d jusqu'à la fin du combat,Velocità +%d fino alla fine della battaglia,Velocidad +%d hasta el fin de la batalla,戦闘終了まで速度+%d,Ταχύτητα +%d μέχρι το τέλος της μάχης,战斗结束前速度+%d,戰鬥結束前速度+%d
 battle.intent.tooltip.buff_speed,자신 속도 +%d (%d턴),Self: Speed +%d (%d turns),Soi: Vitesse +%d (%d tours),Sé: Velocità +%d (%d turni),Yo: Velocidad +%d (%d turnos),自身: 速度+%d（%dターン）,Εαυτός: Ταχύτητα +%d (%d γύροι),自身: 速度+%d（%d回合）,自身: 速度+%d（%d回合）
 battle.intent.tooltip.debuff_speed,속도 저하 -%d (%d턴),Slow -%d (%d turns),Ralentir -%d (%d tours),Rallentare -%d (%d turni),Ralentizar -%d (%d turnos),減速 -%d（%dターン）,Επιβράδυνση -%d (%d γύροι),减速 -%d（%d回合）,減速 -%d（%d回合）
+battle.intent.charge_up,💢,💢,💢,💢,💢,💢,💢,💢,💢
+battle.intent.debuff.stun,🌀,🌀,🌀,🌀,🌀,🌀,🌀,🌀,🌀
+battle.intent.tooltip.charge_up,힘을 모으고 있다.,Gathering power.,Rassemble sa puissance.,Concentra la sua forza.,Reuniendo poder.,力を溜めている。,Συγκεντρώνει δύναμη.,正在蓄力。,正在蓄力。
+battle.toast.stunned,%s 스턴! 행동 불가,%s is stunned! Cannot act,%s est étourdi ! Action impossible,%s è stordito! Non può agire,%s está aturdido! No puede actuar,%s スタン！行動不可,%s ζάλη! Δεν μπορεί να δράσει,%s 眩晕！无法行动,%s 眩暈！無法行動

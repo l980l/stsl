@@ -30,6 +30,13 @@ const _VFX_HOLY_BUFF      = preload("res://scenes/vfx/holy_buff.gd")
 const _VFX_WARRIOR_BUFF   = preload("res://scenes/vfx/warrior_buff.gd")
 const _VFX_DEFENSE_BUFF   = preload("res://scenes/vfx/defense_buff.gd")
 const _VFX_HEAL_BLESSING  = preload("res://scenes/vfx/heal_blessing.gd")
+const _VFX_POWER_UP       = preload("res://scenes/vfx/power_up.gd")
+const _VFX_SUMMON_CIRCLE  = preload("res://scenes/vfx/summon_circle.gd")
+const _VFX_TARGET_MARKING = preload("res://scenes/vfx/target_marking.gd")
+const _VFX_MIMIC          = preload("res://scenes/vfx/mimic.gd")
+const _VFX_SACRIFICE      = preload("res://scenes/vfx/sacrifice.gd")
+const _VFX_COUNTER_PREPARE = preload("res://scenes/vfx/counter_prepare.gd")
+const _VFX_STEAL_CARD     = preload("res://scenes/vfx/steal_card.gd")
 
 const POISON_DMG_PER_STACK: int = 10
 const TOKEN_DMG_PER_STACK: int = 25
@@ -119,6 +126,7 @@ signal enemy_spawned(enemy_index: int)  # T3-SUMMON: 런타임 적 추가 알림
 signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시그니처 발동 알림 (UI 토스트용)
 signal token_attack_fired(hero_id: String, token_index: int, enemy_index: int)  # 토큰 (병사) 발사 — VFX/SFX 시각 처리용
 signal passive_buff_applied(enemy_index: int, status_type: String, value: int)  # phase_buffs / 시그너처 등 intent 외 자동 BUFF — battle_scene 이 VFX spawn 용도
+signal hero_turn_skipped(hero_id: String)  # 스턴 등으로 영웅 차례 자동 종료 — 토스트·VFX 용
 
 # VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생.
 # 차지(IMPACT_DELAY) 이후 데미지/상태 적용 + 기존 시그널 (hero_damaged 등) emit.
@@ -195,6 +203,32 @@ func _intent_vfx_impact_delay(intent: Resource) -> float:
 			return base * _vfx_speed_mul()
 		IntentRes.ActionType.DEBUFF:
 			return _vfx_impact_delay_for_status(intent.status_type)
+		IntentRes.ActionType.CHARGE_UP:
+			return _VFX_POWER_UP.IMPACT_DELAY * _vfx_speed_mul()
+		IntentRes.ActionType.SUMMON:
+			return _VFX_SUMMON_CIRCLE.IMPACT_DELAY * _vfx_speed_mul()
+		IntentRes.ActionType.WARD:
+			return _VFX_DEFENSE_BUFF.IMPACT_DELAY * _vfx_speed_mul()
+		IntentRes.ActionType.HEAL_ALLY:
+			return _VFX_HEAL_BLESSING.IMPACT_DELAY * _vfx_speed_mul()
+		IntentRes.ActionType.BUFF_ALLY:
+			# block 이면 defense_buff, 그 외 warrior_buff
+			var base: float = _VFX_DEFENSE_BUFF.IMPACT_DELAY if intent.status_type == "block" else _VFX_WARRIOR_BUFF.IMPACT_DELAY
+			return base * _vfx_speed_mul()
+		IntentRes.ActionType.MARK_TARGET:
+			return _VFX_TARGET_MARKING.IMPACT_DELAY * _vfx_speed_mul()
+		IntentRes.ActionType.MIMIC:
+			return _VFX_MIMIC.IMPACT_DELAY * _vfx_speed_mul()
+		IntentRes.ActionType.SACRIFICE:
+			return _VFX_SACRIFICE.IMPACT_DELAY * _vfx_speed_mul()
+		IntentRes.ActionType.COUNTER_PREPARE:
+			return _VFX_COUNTER_PREPARE.IMPACT_DELAY * _vfx_speed_mul()
+		IntentRes.ActionType.SPECIAL:
+			# remove_card variant (또는 미설정·"weak") 만 steal_card VFX
+			var v: String = intent.status_type
+			if v == "" or v == "weak" or v == "remove_card":
+				return _VFX_STEAL_CARD.IMPACT_DELAY * _vfx_speed_mul()
+			return 0.0
 		_:
 			return 0.0
 
@@ -599,6 +633,14 @@ func _start_hero_turn(hid: String) -> void:
 		return
 	_phase_hero_main(hid)
 	turn_started.emit(_current_actor_id)
+	# 스턴 체크 — 카드 뽑기·power trigger 까지는 정상이지만 본인 행동은 막고 자동 종료.
+	# 잔여 stun -1 후 hero_turn_skipped 시그널 → battle_scene 토스트/VFX, 잠깐 대기 후 end_player_turn.
+	if _hero_status.get(hid, {}).get("stun", 0) > 0:
+		_hero_status[hid]["stun"] = max(0, _hero_status[hid]["stun"] - 1)
+		hero_turn_skipped.emit(hid)
+		await get_tree().create_timer(1.0 * _turn_interval_mul()).timeout
+		if is_player_turn and is_battle_active:
+			end_player_turn()
 
 # 본인 영웅 차례 시작 사전 처리 — 본인 토큰 공격 + 본인 poison tick
 func _phase_hero_pre(hid: String) -> bool:
@@ -1696,7 +1738,11 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 			_vfx_caster = i  # 이 적이 공격자 — lightning 등 빔 VFX 시전자 좌표용
 			await _execute_intent(i, intent)
 			_vfx_caster = null
-			_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
+			# CHARGE_UP 진행 중이면 같은 intent 유지 (advance 차단)
+			if i < _enemy_status.size() and _enemy_status[i].get("_charge_block_advance", false):
+				_enemy_status[i].erase("_charge_block_advance")
+			else:
+				_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
 	if not legacy:
 		if is_battle_active:
 			_advance_turn_counter(_current_actor_id)
@@ -1711,6 +1757,10 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			IntentRes.ActionType.ATTACK:
 				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 			IntentRes.ActionType.DEBUFF:
+				pre_target_id = _pick_hero_target(intent.target, enemy_index)
+			IntentRes.ActionType.MARK_TARGET:
+				pre_target_id = _pick_hero_target(intent.target, enemy_index)
+			IntentRes.ActionType.MIMIC:
 				pre_target_id = _pick_hero_target(intent.target, enemy_index)
 	# VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생
 	intent_vfx_charge_start.emit(enemy_index, intent, pre_target_id)
@@ -1809,6 +1859,21 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			_execute_special(enemy_index, intent)
 		IntentRes.ActionType.PREPARE:
 			pass  # 준비 턴 — 아무 효과 없음
+		IntentRes.ActionType.CHARGE_UP:
+			# N턴 숨고르기. 첫 진입 시 charge_remaining 초기화. 매 적 턴 -1.
+			# 0 도달 시 payoff_intents 순차 실행 + advance 정상. 그 외엔 advance 차단.
+			if enemy_index < _enemy_status.size():
+				var c_st: Dictionary = _enemy_status[enemy_index]
+				if not c_st.has("charge_remaining"):
+					c_st["charge_remaining"] = max(1, intent.charge_turns)
+				c_st["charge_remaining"] = int(c_st["charge_remaining"]) - 1
+				if c_st["charge_remaining"] > 0:
+					c_st["_charge_block_advance"] = true  # caller 가 advance skip + flag erase
+				else:
+					c_st.erase("charge_remaining")
+					for payoff in intent.payoff_intents:
+						if payoff != null:
+							await _execute_intent(enemy_index, payoff)
 		IntentRes.ActionType.HEAL_ALLY:
 			# 동료 1명 HP 회복 (target=LOWEST_HP 우선, 그 외 무작위)
 			var target_idx: int = -1
@@ -2064,12 +2129,30 @@ func will_enthrall_enemy(enemy_index: int, charm_stacks: int) -> bool:
 	return new_charm >= threshold
 
 func get_enemy_current_intent(index: int) -> Resource:
+	# 단일 intent — 첫 항목만 (기존 호환성).
+	var arr := get_enemy_current_intents(index)
+	return arr[0] if not arr.is_empty() else null
+
+# 같은 턴에 동시 발동할 모든 intent (가로로 함께 표시되어야 하는 묶음).
+# CHARGE_UP 마지막 턴이면 payoff_intents 전체, 그 외엔 [현재 intent] 단일.
+func get_enemy_current_intents(index: int) -> Array:
 	if index < 0 or index >= _enemies.size():
-		return null
+		return []
 	var pattern: Array = _get_active_pattern(index)
 	if pattern.is_empty():
-		return null
-	return pattern[_enemy_intent_index[index]]
+		return []
+	var intent: Resource = pattern[_enemy_intent_index[index]]
+	if intent != null and intent.action_type == IntentRes.ActionType.CHARGE_UP:
+		var st: Dictionary = _enemy_status[index] if index < _enemy_status.size() else {}
+		var remaining: int = st.get("charge_remaining", max(1, intent.charge_turns))
+		if remaining <= 1:
+			var out: Array = []
+			for p in intent.payoff_intents:
+				if p != null:
+					out.append(p)
+			if not out.is_empty():
+				return out
+	return [intent] if intent != null else []
 
 func get_enemy(index: int) -> Resource:
 	if index < 0 or index >= _enemies.size():

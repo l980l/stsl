@@ -154,7 +154,9 @@ func test_medusa_pattern_and_status_type() -> void:
 	var med: Resource = GreekAct1.medusa(_make_dummy_scene())
 	_assert(med.intent_pattern.size() == 4, "메두사 패턴 4개")
 	_assert(med.intent_pattern[1].status_type == "weak", "메두사 2번째 = weak")
-	_assert(med.intent_pattern[2].status_type == "speed_penalty", "메두사 3번째 = speed_penalty (석화 시선)")
+	_assert(med.intent_pattern[2].action_type == IntentRes.ActionType.CHARGE_UP, "메두사 3번째 = CHARGE_UP (석화 시선)")
+	_assert(med.intent_pattern[2].payoff_intents.size() == 2, "메두사 3번째 payoff = ATTACK + stun")
+	_assert(med.intent_pattern[2].payoff_intents[1].status_type == "stun", "메두사 3번째 payoff[1] = stun")
 	_assert(med.max_hp == 1700, "메두사 HP = 1700")
 
 func test_scylla_pattern() -> void:

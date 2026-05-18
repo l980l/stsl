@@ -29,6 +29,19 @@ const INFATUATION := preload("res://scenes/vfx/infatuation.gd")
 const DEFENSE_BUFF := preload("res://scenes/vfx/defense_buff.gd")
 const POISON_TICK := preload("res://scenes/vfx/poison_tick.gd")
 const SUMMON_BURST := preload("res://scenes/vfx/summon_burst.gd")
+const POWER_UP := preload("res://scenes/vfx/power_up.gd")
+const SUMMON_CIRCLE := preload("res://scenes/vfx/summon_circle.gd")
+const SPEED_BUFF := preload("res://scenes/vfx/speed_buff.gd")
+const SLOW_DEBUFF := preload("res://scenes/vfx/slow_debuff.gd")
+const TARGET_MARKING := preload("res://scenes/vfx/target_marking.gd")
+const MIMIC := preload("res://scenes/vfx/mimic.gd")
+const SACRIFICE := preload("res://scenes/vfx/sacrifice.gd")
+const COUNTER_PREPARE := preload("res://scenes/vfx/counter_prepare.gd")
+const STEAL_CARD := preload("res://scenes/vfx/steal_card.gd")
+const PURGE_STATUS := preload("res://scenes/vfx/purge_status.gd")
+const MORALE_BOOST := preload("res://scenes/vfx/morale_boost.gd")
+const PREPARE := preload("res://scenes/vfx/prepare.gd")
+const BOSS_PHASE := preload("res://scenes/vfx/boss_phase_changed.gd")
 
 # kind: "impact"=피격 버스트(타겟 위치) / "self"=자기 버프 버스트 / "beam"=시전자→타겟 빔
 # 현재버전 — 게임에서 실제 사용 중
@@ -60,6 +73,19 @@ const VFX_CURRENT := [
 	{"name": "infatuation",    "kind": "beam",   "path": "res://scenes/vfx/infatuation.gd"},
 	{"name": "defense_buff",   "kind": "beam",   "path": "res://scenes/vfx/defense_buff.gd"},
 	{"name": "summon_burst",   "kind": "beam",   "path": "res://scenes/vfx/summon_burst.gd"},
+	{"name": "power_up",       "kind": "beam",   "path": "res://scenes/vfx/power_up.gd"},
+	{"name": "summon_circle",  "kind": "beam",   "path": "res://scenes/vfx/summon_circle.gd"},
+	{"name": "speed_buff",     "kind": "beam",   "path": "res://scenes/vfx/speed_buff.gd"},
+	{"name": "slow_debuff",    "kind": "beam",   "path": "res://scenes/vfx/slow_debuff.gd"},
+	{"name": "target_marking", "kind": "beam",   "path": "res://scenes/vfx/target_marking.gd"},
+	{"name": "mimic",          "kind": "beam",   "path": "res://scenes/vfx/mimic.gd"},
+	{"name": "sacrifice",      "kind": "beam",   "path": "res://scenes/vfx/sacrifice.gd"},
+	{"name": "counter_prepare","kind": "beam",   "path": "res://scenes/vfx/counter_prepare.gd"},
+	{"name": "steal_card",     "kind": "beam",   "path": "res://scenes/vfx/steal_card.gd"},
+	{"name": "purge_status",   "kind": "beam",   "path": "res://scenes/vfx/purge_status.gd"},
+	{"name": "morale_boost",   "kind": "beam",   "path": "res://scenes/vfx/morale_boost.gd"},
+	{"name": "prepare",        "kind": "beam",   "path": "res://scenes/vfx/prepare.gd"},
+	{"name": "boss_phase",     "kind": "beam",   "path": "res://scenes/vfx/boss_phase_changed.gd"},
 ]
 
 # 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.
@@ -304,6 +330,71 @@ func _update_info() -> void:
 				SUMMON_BURST.RING_MAX_R, SUMMON_BURST.PILLAR_W, SUMMON_BURST.PILLAR_H]
 			s += "차지 %.2fs · pillar 지속 %.2fs (타겟 좌우 3슬롯 자동 spawn)" % [
 				SUMMON_BURST.CHARGE_TIME, SUMMON_BURST.PILLAR_GROW + SUMMON_BURST.PILLAR_HOLD + SUMMON_BURST.PILLAR_FADE]
+		"power_up":
+			s += "힘 모으기 — aura %.0fx%.0f · streak %.0fx%.0f (8개)\n" % [
+				POWER_UP.AURA_W, POWER_UP.AURA_H, POWER_UP.STREAK_W, POWER_UP.STREAK_H]
+			s += "차지 %.2fs · hold %.2fs · fade %.2fs (시전자 마커 무시 — 타겟 위치 중심)" % [
+				POWER_UP.CHARGE_TIME, POWER_UP.HOLD_TIME, POWER_UP.FADE_TIME]
+		"summon_circle":
+			s += "소환 — 외곽 마법진 반경 %.0f · pillar %.0fx%.0f\n" % [
+				SUMMON_CIRCLE.CIRCLE_R, SUMMON_CIRCLE.PILLAR_W, SUMMON_CIRCLE.PILLAR_H]
+			s += "채널 %.2fs · peak %.2fs · hold %.2fs · fade %.2fs (시전자 마커 무시 — 타겟 위치 발치)" % [
+				SUMMON_CIRCLE.CHANNEL_TIME, SUMMON_CIRCLE.PEAK_DELAY, SUMMON_CIRCLE.HOLD_TIME, SUMMON_CIRCLE.FADE_TIME]
+		"speed_buff":
+			s += "속도 버프 — chevron ring 반경 %.0f · orb offset %.0f\n" % [
+				SPEED_BUFF.RING_RADIUS, SPEED_BUFF.ORB_OFFSET_Y]
+			s += "차지 %.2fs · buff %.2fs · fade %.2fs (시전자 마커 무시 — 타겟 위치)" % [
+				SPEED_BUFF.CHARGE_TIME, SPEED_BUFF.BUFF_TIME, SPEED_BUFF.FADE_TIME]
+		"slow_debuff":
+			s += "속도 감소 — goop %.0fx%.0f · 역chevron ring 반경 %.0f\n" % [
+				SLOW_DEBUFF.GOOP_W, SLOW_DEBUFF.GOOP_H, SLOW_DEBUFF.RING_RADIUS]
+			s += "차지 %.2fs · debuff %.2fs · fade %.2fs (시전자 마커 무시 — 타겟 위치 발치)" % [
+				SLOW_DEBUFF.CHARGE_TIME, SLOW_DEBUFF.DEBUFF_TIME, SLOW_DEBUFF.FADE_TIME]
+		"target_marking":
+			s += "타겟 마킹 — reticle 반경 %.0f · bracket %.0fx%.0f\n" % [
+				TARGET_MARKING.RETICLE_R, TARGET_MARKING.BRACKET_W, TARGET_MARKING.BRACKET_H]
+			s += "차지 %.2fs · travel %.2fs · hold %.2fs · fade %.2fs (시전자→타겟 tracer + lock)" % [
+				TARGET_MARKING.CHARGE_TIME, TARGET_MARKING.TRAVEL_TIME, TARGET_MARKING.HOLD_TIME, TARGET_MARKING.FADE_TIME]
+		"mimic":
+			s += "메아리 반사 — source pulse 반경 %.0f · ripple %.2fs\n" % [
+				MIMIC.SOURCE_R, MIMIC.RIPPLE_TIME]
+			s += "채널 %.2fs · arc ramp %.2fs · peak %.2fs · hold %.2fs · fade %.2fs (시전자↔타겟 mirror arc)" % [
+				MIMIC.CHANNEL_TIME, MIMIC.ARC_RAMP, MIMIC.PEAK_DELAY, MIMIC.HOLD_TIME, MIMIC.FADE_TIME]
+		"sacrifice":
+			s += "자해 강화 — spiral 반경 %.0f · column %.0fx%.0f · sigil 반경 %.0f\n" % [
+				SACRIFICE.SPIRAL_R, SACRIFICE.COLUMN_W, SACRIFICE.COLUMN_H, SACRIFICE.SIGIL_R]
+			s += "차지 %.2fs · slash %.2fs · hold %.2fs · fade %.2fs (시전자 마커 무시 — 타겟 위치)" % [
+				SACRIFICE.CHARGE_TIME, SACRIFICE.IMPACT_DELAY, SACRIFICE.HOLD_TIME, SACRIFICE.FADE_TIME]
+		"counter_prepare":
+			s += "반사 준비 — shield %.0fx%.0f · ring 반경 %.0f · sigil 반경 %.0f\n" % [
+				COUNTER_PREPARE.SHIELD_W, COUNTER_PREPARE.SHIELD_H, COUNTER_PREPARE.RING_RADIUS, COUNTER_PREPARE.SIGIL_R]
+			s += "차지 %.2fs · assemble %.2fs · hold %.2fs · fade %.2fs (시전자 마커 무시 — 타겟 위치)" % [
+				COUNTER_PREPARE.CHARGE_TIME, COUNTER_PREPARE.IMPACT_DELAY, COUNTER_PREPARE.HOLD_TIME, COUNTER_PREPARE.FADE_TIME]
+		"steal_card":
+			s += "카드 빼앗기 — card %.0fx%.0f · mark 반경 %.0f · hook 반경 %.0f\n" % [
+				STEAL_CARD.CARD_W, STEAL_CARD.CARD_H, STEAL_CARD.MARK_R, STEAL_CARD.HOOK_R]
+			s += "mark %.2fs · flight %.2fs · catch %.2fs · hold %.2fs · fade %.2fs (caster=적, target=영웅)" % [
+				STEAL_CARD.CHARGE_TIME, STEAL_CARD.FLIGHT_TIME, STEAL_CARD.IMPACT_DELAY, STEAL_CARD.HOLD_TIME, STEAL_CARD.FADE_TIME]
+		"purge_status":
+			s += "디버프 정화 — core 반경 %.0f · ring %.0f · pillar %.0fx%.0f · halo %.0fx%.0f\n" % [
+				PURGE_STATUS.CORE_R, PURGE_STATUS.RING_RADIUS, PURGE_STATUS.PILLAR_W, PURGE_STATUS.PILLAR_H, PURGE_STATUS.HALO_W, PURGE_STATUS.HALO_H]
+			s += "차지 %.2fs · wave %.2fs · hold %.2fs · fade %.2fs (시전자 마커 무시 — 타겟 위치)" % [
+				PURGE_STATUS.CHARGE_TIME, PURGE_STATUS.IMPACT_DELAY, PURGE_STATUS.HOLD_TIME, PURGE_STATUS.FADE_TIME]
+		"morale_boost":
+			s += "사기 진작 — ring %.0f · sunburst ray %d × %.0f · flag %.0fx%.0f · sigil %.0f\n" % [
+				MORALE_BOOST.RING_RADIUS, MORALE_BOOST.SUNBURST_RAYS, MORALE_BOOST.SUNBURST_R, MORALE_BOOST.FLAG_W, MORALE_BOOST.FLAG_H, MORALE_BOOST.SIGIL_R]
+			s += "차지 %.2fs · trumpet %.2fs · hold %.2fs · fade %.2fs (시전자 마커 무시 — 타겟 위치)" % [
+				MORALE_BOOST.CHARGE_TIME, MORALE_BOOST.IMPACT_DELAY, MORALE_BOOST.HOLD_TIME, MORALE_BOOST.FADE_TIME]
+		"prepare":
+			s += "준비 (효과 없는 빈 턴) — orb 반경 %.0f · ring %.0f · glyph %.0f · wash %.0f\n" % [
+				PREPARE.ORB_R, PREPARE.RING_RADIUS, PREPARE.GLYPH_R, PREPARE.WASH_R]
+			s += "차지 %.2fs · brew %.2fs · fade %.2fs (절제된 차분 VFX, screen_effect emit X)" % [
+				PREPARE.CHARGE_TIME, PREPARE.BREW_TIME, PREPARE.FADE_TIME]
+		"boss_phase":
+			s += "보스 페이즈 전환 — ring %.0f · aura %.0f · core %.0f\n" % [
+				BOSS_PHASE.RING_RADIUS, BOSS_PHASE.AURA_R, BOSS_PHASE.CORE_R]
+			s += "build %.2fs · erupt %.2fs · hold %.2fs · fade %.2fs (큰 폭발 + 4겹 shockwave + 화면 flash·shake)" % [
+				BOSS_PHASE.BUILD_TIME, BOSS_PHASE.IMPACT_DELAY, BOSS_PHASE.HOLD_TIME, BOSS_PHASE.FADE_TIME]
 		_:
 			s += "시전자 마커는 beam 전용 — impact/self는 타겟 위치에서 재생"
 	# IMPACT_DELAY 한 줄 자동 추가 — VFX 스크립트에 노출돼 있으면 표시 (battle_manager 가 동기화에 사용)
@@ -345,6 +436,14 @@ func _play(entry: Dictionary) -> void:
 						fx_n.set("_particle_scale_override", scales[i])
 					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
 					var c_pos: Vector2 = _caster_pos + Vector2(x_offsets[i], 0.0)
+					# 시전자 마커 무시, 타겟 위치를 중심·발치로
+					if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase"]:
+						c_pos = t_pos
+						if fx_n.has_method("set_ground_anchor"):
+							fx_n.set_ground_anchor(t_pos)
+					# target_marking / mimic / steal_card 은 caster→target 둘 다 사용 — 타겟 발치만 anchor
+					elif entry["name"] in ["target_marking", "mimic", "steal_card"] and fx_n.has_method("set_ground_anchor"):
+						fx_n.set_ground_anchor(t_pos)
 					if i == 2:
 						# x0.5 인스턴스만 임팩트 마커 (4개가 거의 동시 발동 — 라벨은 1개)
 						fx_n.screen_effect.connect(_preview_flash)
@@ -364,7 +463,16 @@ func _play(entry: Dictionary) -> void:
 						_target_pos,
 						_target_pos + Vector2(130.0, 0.0),
 					])
-				fx.play(_caster_pos, _target_pos)
+				# 시전자 마커 무시, 타겟 위치를 중심·발치로
+				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase"]:
+					if fx.has_method("set_ground_anchor"):
+						fx.set_ground_anchor(_target_pos)
+					fx.play(_target_pos, _target_pos)
+				else:
+					# target_marking / mimic / steal_card 은 caster→target 둘 다 사용 — 타겟 발치만 anchor
+					if entry["name"] in ["target_marking", "mimic", "steal_card"] and fx.has_method("set_ground_anchor"):
+						fx.set_ground_anchor(_target_pos)
+					fx.play(_caster_pos, _target_pos)
 		"impact":
 			var packed := load(entry["path"]) as PackedScene
 			if _compare_4way:
