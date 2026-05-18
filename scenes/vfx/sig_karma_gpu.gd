@@ -23,7 +23,7 @@ func _spawn_petal() -> void:
 		"speed_min": 36.0, "speed_max": 96.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 18.0, "damping": 3.0,
-		"size_min": 2.2, "size_max": 3.8,
+		"size_min": 4.4, "size_max": 7.6,
 		"size_base": 30.0,  # feather_tex 긴축 매핑 (꽃잎 모양 근사)
 		"angle_min": -180.0, "angle_max": 180.0,
 		"angular_velocity_min": -86.0, "angular_velocity_max": 86.0,
