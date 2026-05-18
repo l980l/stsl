@@ -30,10 +30,10 @@ static func circle_tex() -> Texture2D:
 		_circle_tex = ImageTexture.create_from_image(img)
 	return _circle_tex
 
-# 균일 사각형 64×64 (chunk/debris 회전용 — size 매핑 일관)
+# 직사각형 48×64 (1:1.33 비율, chunk/debris 회전 시각화용 — 정사각형이면 회전 안 보임)
 static func square_tex() -> Texture2D:
 	if _square_tex == null:
-		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		var img := Image.create(48, 64, false, Image.FORMAT_RGBA8)
 		img.fill(Color.WHITE)
 		_square_tex = ImageTexture.create_from_image(img)
 	return _square_tex
@@ -256,17 +256,19 @@ static func make_dust_emitter(color: Color, count: int, lifetime: float,
 	})
 
 # 갈색 chunk (회전 파편 — warrior_buff, boss_death)
-# size_min/max 는 원본 draw_colored_polygon 의 한 변 픽셀 (size_base 64).
+# texture_filter NEAREST — 작은 사각형 (3~10px) 도 회전 명확히 보이게 (LINEAR 면 흐릿).
 static func make_chunk_emitter(color: Color, count: int, lifetime: float,
 		speed_min: float, speed_max: float, gravity: float = 220.0,
 		size_min: float = 0.5, size_max: float = 1.2) -> GPUParticles2D:
-	return make_emitter({
+	var ps := make_emitter({
 		"count": count, "lifetime": lifetime, "color": color,
 		"speed_min": speed_min, "speed_max": speed_max, "gravity": gravity,
 		"size_min": size_min, "size_max": size_max,
-		"size_base": 64.0,  # square_tex 한 변 64px = size 픽셀 값 그대로
+		"size_base": 48.0,  # square_tex 한 변 48 매핑
 		"additive": false, "texture": square_tex(),
 		"angle_min": -180.0, "angle_max": 180.0,
 		"angular_velocity_min": -360.0, "angular_velocity_max": 360.0,
 		"damping": 2.0,
 	})
+	ps.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	return ps
