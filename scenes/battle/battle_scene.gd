@@ -2257,6 +2257,7 @@ const _VFX_SIG_KARMA := preload("res://scenes/vfx/sig_karma.gd")
 const _VFX_SIG_YIN_YANG := preload("res://scenes/vfx/sig_yin_yang.gd")
 const _VFX_SIG_EGYPTIAN_CURSE := preload("res://scenes/vfx/sig_egyptian_curse.gd")
 const _VFX_SIG_KEKKAI := preload("res://scenes/vfx/sig_kekkai.gd")
+const _VFX_TAUNT := preload("res://scenes/vfx/taunt.gd")
 const _VFX_CARD_EXHAUST := preload("res://scenes/vfx/card_exhaust.gd")
 const _VFX_BOSS_DEATH := preload("res://scenes/vfx/boss_death.gd")
 
@@ -2551,6 +2552,9 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: St
 					var hpos2: Vector2 = _hero_pos_or_first(target_hero_id)
 					if hpos2 != Vector2.ZERO:
 						_spawn_slow_debuff(hpos2, hpos2 + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+			elif stype == "taunt":
+				# 도발 — 시전 적 위치에 chest impact + shockwave + 글리프 + 한글 word + 파티클
+				_spawn_taunt(caster_pos, caster_foot)
 			else:
 				var fx_script: GDScript = _debuff_script_for_status(stype)
 				if fx_script:
@@ -3456,6 +3460,19 @@ func _spawn_sig_kekkai(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) ->
 		AudioManager.play_sfx("impact_divine")
 	)
 	fx.play(target_pos, target_pos)
+
+# 도발 VFX — 시전 적 가슴에서 chest impact + shockwave + glyph + 한글 word + 파티클.
+# foot_pos 는 미사용 (caster 본인 중심 효과).
+func _spawn_taunt(caster_pos: Vector2, _foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_TAUNT.new()
+	add_child(fx)
+	fx.z_index = 1280
+	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_blunt")
+	)
+	fx.play(caster_pos, caster_pos)
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	# VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 이미 차지 시작.
