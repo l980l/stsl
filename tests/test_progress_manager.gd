@@ -135,10 +135,10 @@ func test_evaluate_threshold_condition() -> void:
 	print("[TestProgressManager] test_evaluate_threshold_condition")
 	var pm = PM.new()
 	pm.reset_progress()
-	_assert(not pm._evaluate_condition("elite_solo_kills>=5"), "카운터 부족 시 false")
-	pm.increment_flag("elite_solo_kills", 5)
-	_assert(pm._evaluate_condition("elite_solo_kills>=5"), "카운터 충족 시 true")
-	_assert(pm._evaluate_condition("elite_solo_kills>=4"), "카운터 초과도 true")
+	_assert(not pm._evaluate_condition("elite_kills_total>=10"), "카운터 부족 시 false")
+	pm.increment_flag("elite_kills_total", 10)
+	_assert(pm._evaluate_condition("elite_kills_total>=10"), "카운터 충족 시 true")
+	_assert(pm._evaluate_condition("elite_kills_total>=9"), "카운터 초과도 true")
 
 func test_check_unlock_conditions_unlocks_default_heroes() -> void:
 	print("[TestProgressManager] test_check_unlock_conditions_unlocks_default_heroes")
