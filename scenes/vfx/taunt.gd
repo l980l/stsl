@@ -75,9 +75,12 @@ func _ready() -> void:
 	_word_inst.clear()
 	for _i in range(3):
 		_word_inst.append({
-			"rot": deg_to_rad(randf_range(-60.0, 60.0)),
+			"rot": deg_to_rad(randf_range(-30.0, 30.0)),
 			"scale": randf_range(0.7, 1.0),
-			"offset": Vector2(randf_range(-50.0, 50.0), randf_range(-20.0, 20.0)),
+			"offset": Vector2(randf_range(-110.0, 110.0), randf_range(-50.0, 50.0)),
+			# 흔들림 각각 다른 phase — 동기 안 되게
+			"shake_phase_x": randf() * TAU,
+			"shake_phase_y": randf() * TAU,
 		})
 	_bg_layer = _DrawLayer.new()
 	_bg_layer.setup(self, false)  # ground crack — normal blend
@@ -253,11 +256,15 @@ func _draw_word(canvas: CanvasItem, ga: float) -> void:
 	var text := "Attention!"
 	var base_fsize: int = int(30 * _scale())
 	var origin := _caster + Vector2(0.0, WORD_OFFSET_Y)
+	var s: float = _scale()
 	for inst in _word_inst:
 		var fsize: int = int(base_fsize * float(inst["scale"]))
 		var size_v: Vector2 = theme_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize)
 		var rot: float = float(inst["rot"])
-		var center: Vector2 = origin + inst["offset"]
+		# 흔들림 (각 인스턴스 다른 phase) — 진폭 2~3px
+		var shake_x: float = sin(word_age * 90.0 + float(inst["shake_phase_x"])) * 2.5 * s
+		var shake_y: float = cos(word_age * 110.0 + float(inst["shake_phase_y"])) * 2.0 * s
+		var center: Vector2 = origin + inst["offset"] + Vector2(shake_x, shake_y)
 		# 회전 적용 — canvas 변환 사용
 		canvas.draw_set_transform(center, rot, Vector2.ONE)
 		var draw_pos := Vector2(-size_v.x * 0.5, 0.0)
