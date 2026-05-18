@@ -1,0 +1,172 @@
+# scenes/vfx/gpu_particle_helpers.gd
+# GPU 하이브리드 VFX 공통 헬퍼.
+# 원본 CPU VFX (_particles Array + draw_circle per frame) 의 표준 파티클 (속도/감속/gravity/색 페이드) 부분만
+# GPUParticles2D 로 대체. 폴리곤 effect (빛기둥/룬링/오라/충격파) 는 호출자가 CPU 그대로 유지.
+class_name GpuParticleHelpers
+extends Object
+
+# ── 텍스처 캐시 (한 번 생성 후 재사용) ──
+static var _circle_tex: Texture2D
+static var _square_tex: Texture2D
+
+# 부드러운 원 (radial 그라데이션) — mote/ember/dust/flame 공용
+static func circle_tex() -> Texture2D:
+	if _circle_tex == null:
+		var grad := Gradient.new()
+		grad.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
+		grad.colors = PackedColorArray([
+			Color(1, 1, 1, 1),
+			Color(1, 1, 1, 0.55),
+			Color(1, 1, 1, 0),
+		])
+		var tex := GradientTexture2D.new()
+		tex.gradient = grad
+		tex.fill = GradientTexture2D.FILL_RADIAL
+		tex.fill_from = Vector2(0.5, 0.5)
+		tex.fill_to = Vector2(1.0, 0.5)
+		tex.width = 64
+		tex.height = 64
+		_circle_tex = tex
+	return _circle_tex
+
+# 균일 사각형 (chunk/debris 회전용)
+static func square_tex() -> Texture2D:
+	if _square_tex == null:
+		var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
+		img.fill(Color.WHITE)
+		_square_tex = ImageTexture.create_from_image(img)
+	return _square_tex
+
+# 색 → 알파 페이드 ramp (life 0 → 1: alpha 1 → 0)
+static func make_fade_ramp(color: Color, mid_alpha: float = 0.7) -> GradientTexture1D:
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	g.colors = PackedColorArray([
+		Color(color.r, color.g, color.b, 1.0),
+		Color(color.r, color.g, color.b, mid_alpha),
+		Color(color.r, color.g, color.b, 0.0),
+	])
+	var t := GradientTexture1D.new()
+	t.gradient = g
+	t.width = 64
+	return t
+
+# 통일 factory. opts dictionary 로 모든 속성 지정.
+# 필수: count, lifetime, color
+# 자주 사용: speed_min/max, gravity, size_min/max, spread, direction, additive
+# 회전: angle_min/max (deg), angular_velocity_min/max (deg/s)
+# emission_shape: "point" (default) / "sphere" (radius) / "box" (extents)
+# damping: float (감속, 양수)
+# scale_curve: Curve (시간에 따른 크기 변화. nil 이면 일정)
+# explosiveness: 0.0 (지속 spawn) ~ 1.0 (전부 동시 burst, default)
+# one_shot: bool (default true)
+static func make_emitter(opts: Dictionary) -> GPUParticles2D:
+	var ps := GPUParticles2D.new()
+	ps.amount = maxi(1, int(opts.get("count", 10)))
+	ps.lifetime = float(opts.get("lifetime", 1.0))
+	ps.one_shot = bool(opts.get("one_shot", true))
+	ps.explosiveness = float(opts.get("explosiveness", 1.0))
+	ps.emitting = true
+	ps.texture = opts.get("texture", circle_tex())
+	ps.local_coords = false  # 부모(_target 따라가지 않음 — 발화 시점 좌표 고정)
+
+	var mat := ParticleProcessMaterial.new()
+	# emission shape
+	var shape: String = opts.get("emission_shape", "point")
+	match shape:
+		"sphere":
+			mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+			mat.emission_sphere_radius = float(opts.get("emission_radius", 1.0))
+		"box":
+			mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+			var ext: Vector2 = opts.get("emission_box", Vector2(20.0, 20.0))
+			mat.emission_box_extents = Vector3(ext.x, ext.y, 1.0)
+		_:
+			mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_POINT
+	# 방향·속도
+	var dir2: Vector2 = opts.get("direction", Vector2.UP)
+	mat.direction = Vector3(dir2.x, dir2.y, 0.0)
+	mat.spread = float(opts.get("spread", 180.0))
+	mat.initial_velocity_min = float(opts.get("speed_min", 30.0))
+	mat.initial_velocity_max = float(opts.get("speed_max", 90.0))
+	# gravity (y 양수 = 아래)
+	mat.gravity = Vector3(0.0, float(opts.get("gravity", 0.0)), 0.0)
+	# damping (선형 감속)
+	if opts.has("damping"):
+		mat.damping_min = float(opts["damping"])
+		mat.damping_max = float(opts["damping"])
+	# 크기 — 픽셀 반경으로 받고 GPU scale 로 변환. circle_tex 64px → scale = px / 32.
+	# 원본 CPU draw_circle(pos, r=1.5) 와 1:1 매핑 (글로우 포함).
+	mat.scale_min = float(opts.get("size_min", 1.0)) / 32.0
+	mat.scale_max = float(opts.get("size_max", 2.0)) / 32.0
+	if opts.has("scale_curve"):
+		var sc := CurveTexture.new()
+		sc.curve = opts["scale_curve"]
+		mat.scale_curve = sc
+	# 색 + 페이드
+	var col: Color = opts.get("color", Color.WHITE)
+	mat.color = col
+	mat.color_ramp = make_fade_ramp(col, float(opts.get("mid_alpha", 0.7)))
+	# 회전 (chunk)
+	if opts.has("angle_min") and opts.has("angle_max"):
+		mat.angle_min = float(opts["angle_min"])
+		mat.angle_max = float(opts["angle_max"])
+	if opts.has("angular_velocity_min") and opts.has("angular_velocity_max"):
+		mat.angular_velocity_min = float(opts["angular_velocity_min"])
+		mat.angular_velocity_max = float(opts["angular_velocity_max"])
+	ps.process_material = mat
+
+	# 가산 블렌드 (default true — ember/flame/mote)
+	if bool(opts.get("additive", true)):
+		var cm := CanvasItemMaterial.new()
+		cm.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		ps.material = cm
+	return ps
+
+# ── 자주 쓰는 wrapper (시각적 일관성 보장) ──
+
+# 흰금 mote (holy_buff, holy_strike, holy_arrow 등)
+static func make_mote_emitter(color: Color, count: int, lifetime: float,
+		speed_min: float, speed_max: float, additive: bool = true,
+		size_min: float = 0.7, size_max: float = 1.4) -> GPUParticles2D:
+	return make_emitter({
+		"count": count, "lifetime": lifetime, "color": color,
+		"speed_min": speed_min, "speed_max": speed_max,
+		"size_min": size_min, "size_max": size_max,
+		"additive": additive, "damping": 8.0,
+	})
+
+# 주황 ember (warrior_buff, sig_ragnarok, boss_death)
+static func make_ember_emitter(color: Color, count: int, lifetime: float,
+		speed_min: float, speed_max: float, gravity: float = 60.0,
+		size_min: float = 0.6, size_max: float = 1.2) -> GPUParticles2D:
+	return make_emitter({
+		"count": count, "lifetime": lifetime, "color": color,
+		"speed_min": speed_min, "speed_max": speed_max, "gravity": gravity,
+		"size_min": size_min, "size_max": size_max, "damping": 6.0,
+	})
+
+# 회색 dust (warrior_buff, blunt)
+static func make_dust_emitter(color: Color, count: int, lifetime: float,
+		speed_min: float, speed_max: float,
+		size_min: float = 1.0, size_max: float = 2.4) -> GPUParticles2D:
+	return make_emitter({
+		"count": count, "lifetime": lifetime, "color": color,
+		"speed_min": speed_min, "speed_max": speed_max,
+		"size_min": size_min, "size_max": size_max,
+		"additive": false, "damping": 4.0, "mid_alpha": 0.4,
+	})
+
+# 갈색 chunk (회전 파편 — warrior_buff, boss_death)
+static func make_chunk_emitter(color: Color, count: int, lifetime: float,
+		speed_min: float, speed_max: float, gravity: float = 220.0,
+		size_min: float = 0.5, size_max: float = 1.2) -> GPUParticles2D:
+	return make_emitter({
+		"count": count, "lifetime": lifetime, "color": color,
+		"speed_min": speed_min, "speed_max": speed_max, "gravity": gravity,
+		"size_min": size_min, "size_max": size_max,
+		"additive": false, "texture": square_tex(),
+		"angle_min": -180.0, "angle_max": 180.0,
+		"angular_velocity_min": -360.0, "angular_velocity_max": 360.0,
+		"damping": 2.0,
+	})
