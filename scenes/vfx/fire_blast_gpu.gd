@@ -100,21 +100,24 @@ func _run() -> void:
 		queue_free()
 
 # 비행 중 따라가는 trail (POINT spawn at 매 프레임 갱신 position)
+# smoke 가장 먼저 add_child = 가장 뒤. flame/ember 가 위.
 func _make_trail_emitters() -> void:
 	_trail_smoke = _Helpers.make_emitter({
 		"count": int(80 * _scale()), "lifetime": 0.6, "color": COL_SMOKE,
 		"speed_min": 18.0, "speed_max": 54.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -18.0, "size_min": 8.0, "size_max": 24.0,
-		"additive": false, "mid_alpha": 0.25,
+		"additive": false, "mid_alpha": 0.18,
 		"one_shot": false, "explosiveness": 0.0,
 	})
+	_trail_smoke.z_index = -1
 	add_child(_trail_smoke)
 	_trail_flame = _Helpers.make_emitter({
 		"count": int(60 * _scale()), "lifetime": 0.4, "color": COL_HOT,
 		"speed_min": 36.0, "speed_max": 90.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -72.0, "size_min": 3.0, "size_max": 8.0,
+		"texture": _Helpers.glow_circle_tex(),
 		"one_shot": false, "explosiveness": 0.0,
 	})
 	add_child(_trail_flame)
@@ -123,6 +126,7 @@ func _make_trail_emitters() -> void:
 		"speed_min": 60.0, "speed_max": 210.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 72.0, "size_min": 1.4, "size_max": 2.6,
+		"texture": _Helpers.glow_circle_tex(),
 		"one_shot": false, "explosiveness": 0.0,
 	})
 	add_child(_trail_ember)
@@ -158,28 +162,43 @@ func _on_impact() -> void:
 	screen_effect.emit()
 
 func _spawn_explosion(pos: Vector2) -> void:
-	# fireball — 원본 3단계: 흰노랑(0.9) → 주황(0.75) → 진홍(0.55)
+	# smoke 먼저 add_child — 불 이펙트보다 뒤로. 색 연하게 (alpha 0.18 mid).
+	var smoke := _Helpers.make_emitter({
+		"count": _pcount(40), "lifetime": 1.85, "color": COL_SMOKE,
+		"speed_min": 36.0, "speed_max": 132.0,
+		"direction": Vector2.UP, "spread": 50.0,
+		"gravity": -36.0, "damping": 4.0,
+		"size_min": 26.0, "size_max": 56.0,
+		"additive": false, "mid_alpha": 0.18,
+		"emission_shape": "box", "emission_box": Vector2(30.0, 20.0),
+	})
+	smoke.position = pos
+	smoke.z_index = -1
+	add_child(smoke)
+	# fireball — 글로우 텍스처 + 원본 3단계 색
 	var fireball := _Helpers.make_emitter({
 		"count": _pcount(70), "lifetime": 0.75, "color": COL_MID,
 		"speed_min": 60.0, "speed_max": 360.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -54.0, "damping": 5.0,
 		"size_min": 14.0, "size_max": 36.0,
+		"texture": _Helpers.glow_circle_tex(),
 		"color_ramp": _Helpers.make_color_ramp(
-			Color(1.0, 0.961, 0.824),    # 흰노랑
-			Color(1.0, 0.667, 0.275),    # 주황
-			Color(0.863, 0.235, 0.078),  # 진홍
+			Color(1.0, 0.961, 0.824),
+			Color(1.0, 0.667, 0.275),
+			Color(0.863, 0.235, 0.078),
 			0.9, 0.75, 0.0),
 	})
 	fireball.position = pos
 	add_child(fireball)
-	# ember — 원본: rgba(255, 200-120k, 100-80k, 1-k)
+	# ember — 글로우 텍스처 + rgba(255, 200-120k, 100-80k, 1-k)
 	var ember := _Helpers.make_emitter({
 		"count": _pcount(80), "lifetime": 1.05, "color": COL_HOT,
 		"speed_min": 120.0, "speed_max": 540.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 162.0, "damping": 5.0,
 		"size_min": 1.6, "size_max": 3.2,
+		"texture": _Helpers.glow_circle_tex(),
 		"color_ramp": _Helpers.make_color_ramp(
 			Color(1.0, 0.784, 0.392),
 			Color(1.0, 0.549, 0.235),
@@ -188,18 +207,6 @@ func _spawn_explosion(pos: Vector2) -> void:
 	})
 	ember.position = pos
 	add_child(ember)
-	# smoke — COL_SMOKE alpha fade
-	var smoke := _Helpers.make_emitter({
-		"count": _pcount(40), "lifetime": 1.85, "color": COL_SMOKE,
-		"speed_min": 36.0, "speed_max": 132.0,
-		"direction": Vector2.UP, "spread": 50.0,
-		"gravity": -36.0, "damping": 4.0,
-		"size_min": 26.0, "size_max": 56.0,
-		"additive": false, "mid_alpha": 0.22,
-		"emission_shape": "box", "emission_box": Vector2(30.0, 20.0),
-	})
-	smoke.position = pos
-	add_child(smoke)
 
 func _make_burn_emitters() -> void:
 	# flame 잔불 — flame 색 변화 (흰노랑→주황→진홍)
@@ -209,6 +216,7 @@ func _make_burn_emitters() -> void:
 		"direction": Vector2.UP, "spread": 18.0,
 		"gravity": -72.0, "damping": 4.0,
 		"size_min": 4.0, "size_max": 11.0,
+		"texture": _Helpers.glow_circle_tex(),
 		"emission_shape": "box", "emission_box": Vector2(20.0, 5.0),
 		"one_shot": false, "explosiveness": 0.0,
 		"color_ramp": _Helpers.make_color_ramp(
@@ -225,6 +233,7 @@ func _make_burn_emitters() -> void:
 		"direction": Vector2.UP, "spread": 25.0,
 		"gravity": 36.0, "damping": 4.0,
 		"size_min": 1.2, "size_max": 2.2,
+		"texture": _Helpers.glow_circle_tex(),
 		"emission_shape": "box", "emission_box": Vector2(18.0, 4.0),
 		"one_shot": false, "explosiveness": 0.0,
 		"color_ramp": _Helpers.make_color_ramp(

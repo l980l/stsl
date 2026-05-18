@@ -126,10 +126,11 @@ func _spawn_burst() -> void:
 		"direction": Vector2.UP, "spread": 90.0,
 		"gravity": 144.0, "damping": 5.0,
 		"size_min": 1.5, "size_max": 3.1,
+		"texture": _Helpers.glow_circle_tex(),
 		"color_ramp": _Helpers.make_color_ramp(
-			Color(1.0, 200.0/255.0, 90.0/255.0),     # start
-			Color(1.0, 140.0/255.0, 50.0/255.0),     # mid
-			Color(1.0, 80.0/255.0,  10.0/255.0),     # end
+			Color(1.0, 200.0/255.0, 90.0/255.0),
+			Color(1.0, 140.0/255.0, 50.0/255.0),
+			Color(1.0, 80.0/255.0,  10.0/255.0),
 			1.0, 0.7, 0.0),
 	})
 	ember_burst.position = ctr
@@ -152,6 +153,7 @@ func _spawn_burst() -> void:
 		"direction": Vector2.UP, "spread": 90.0,
 		"gravity": -72.0, "damping": 4.0,
 		"size_min": 14.0, "size_max": 28.0,
+		"texture": _Helpers.glow_circle_tex(),
 		"color_ramp": _Helpers.make_color_ramp(COL_HOT, COL_MID, COL_DEEP, 0.85, 0.7, 0.0),
 	})
 	flame_burst.position = ctr
@@ -169,6 +171,7 @@ func _spawn_rising() -> void:
 		"direction": Vector2.UP, "spread": 18.0,
 		"gravity": 72.0, "damping": 4.0,
 		"size_min": 1.6, "size_max": 3.2,
+		"texture": _Helpers.glow_circle_tex(),
 		"emission_shape": "box", "emission_box": Vector2(75.0, 5.0),
 		"one_shot": false, "explosiveness": 0.0,
 		"color_ramp": _Helpers.make_color_ramp(
@@ -185,6 +188,7 @@ func _spawn_rising() -> void:
 		"direction": Vector2.UP, "spread": 12.0,
 		"gravity": -72.0, "damping": 4.0,
 		"size_min": 8.0, "size_max": 18.0,
+		"texture": _Helpers.glow_circle_tex(),
 		"emission_shape": "box", "emission_box": Vector2(50.0, 3.0),
 		"one_shot": false, "explosiveness": 0.0,
 		"color_ramp": _Helpers.make_color_ramp(COL_HOT, COL_MID, COL_DEEP, 0.85, 0.7, 0.0),

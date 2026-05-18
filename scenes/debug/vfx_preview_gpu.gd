@@ -12,8 +12,9 @@ const VFX_PAIRS := [
 	{"name": "fire_blast",   "gpu": "res://scenes/vfx/fire_blast_gpu.gd",   "cpu": "res://scenes/vfx/fire_blast.gd"},
 ]
 
-# 인게임 캐릭터 sprite 영역 (vfx_preview.gd 와 동일)
-const _SPRITE_W := 96.0
+# 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
+# 발 offset: SLOT_H 280 - 184 = 96.
+const _SPRITE_W := 115.0
 const _SPRITE_H := 192.0
 const _CHAR_FOOT_Y_OFFSET := 96.0
 

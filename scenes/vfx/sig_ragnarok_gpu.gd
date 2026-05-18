@@ -64,7 +64,9 @@ func play(_caster_pos: Vector2, target_pos: Vector2) -> void:
 		"lifetime": 1.8,
 		"color": COL_EMBER,
 		"speed_min": 72.0, "speed_max": 168.0,
-		"size_min": 1.6, "size_max": 3.4,
+		# 원본 글로우 size*1.8 매칭 위해 약 1.8배
+		"size_min": 2.9, "size_max": 6.1,
+		"texture": _Helpers.glow_circle_tex(),
 		"emission_shape": "box",
 		"emission_box": Vector2(SPAWN_W, ELLIPSE_RY),
 		"direction": Vector2.UP, "spread": 18.0,

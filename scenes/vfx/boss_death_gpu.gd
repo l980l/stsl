@@ -27,6 +27,8 @@ func _spawn_ember() -> void:
 		return
 	_gpu_ember_made = true
 	var ctr: Vector2 = _blast_pos()
+	# 원본은 draw_circle(글로우 size*1.8 alpha 0.45) + draw_circle(코어 size alpha 1) 2단.
+	# GPU 는 glow_circle_tex 1 텍스처로 근사.
 	_gpu_ember = _Helpers.make_emitter({
 		"count": int(28 * _scale()),
 		"lifetime": 2.0,
@@ -34,7 +36,8 @@ func _spawn_ember() -> void:
 		"speed_min": 90.0, "speed_max": 240.0,
 		"direction": Vector2.UP, "spread": 90.0,
 		"gravity": 36.0, "damping": 4.0,
-		"size_min": 1.8, "size_max": 3.8,
+		"size_min": 3.2, "size_max": 6.8,  # 원본 코어 + 글로우 매칭 (size*1.8)
+		"texture": _Helpers.glow_circle_tex(),
 		"emission_shape": "box", "emission_box": Vector2(100.0, 40.0),
 		"one_shot": false, "explosiveness": 0.0,
 	})

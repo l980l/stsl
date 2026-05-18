@@ -119,6 +119,7 @@ func _run() -> void:
 # 발동 순간 — mote 25 + feather 10 폭발 (one_shot, explosive)
 func _spawn_burst() -> void:
 	var ctr := _target + Vector2(0.0, -30.0)
+	# mote — 별가루 sparkle 텍스처 (원본 draw_circle + draw_rect 십자)
 	_mote_burst = _Helpers.make_emitter({
 		"count": _pcount(25),
 		"lifetime": 1.55,
@@ -126,11 +127,13 @@ func _spawn_burst() -> void:
 		"speed_min": 120.0, "speed_max": 420.0,
 		"size_min": 1.5, "size_max": 3.1,
 		"direction": Vector2.UP, "spread": 180.0,
-		"gravity": 90.0,  # 약한 down
+		"gravity": 90.0,
 		"damping": 5.0,
+		"texture": _Helpers.sparkle_tex(),
 	})
 	_mote_burst.position = ctr
 	add_child(_mote_burst)
+	# feather — 깃털 텍스처 (길쭉 타원) + 회전
 	_feather_burst = _Helpers.make_emitter({
 		"count": _pcount(10),
 		"lifetime": 1.85,
@@ -143,6 +146,7 @@ func _spawn_burst() -> void:
 		"angle_min": -180.0, "angle_max": 180.0,
 		"angular_velocity_min": -180.0, "angular_velocity_max": 180.0,
 		"additive": false,
+		"texture": _Helpers.feather_tex(),
 	})
 	_feather_burst.position = ctr
 	add_child(_feather_burst)
@@ -161,10 +165,10 @@ func _spawn_rising() -> void:
 		"emission_shape": "box",
 		"emission_box": Vector2(60.0, 10.0),
 		"one_shot": false, "explosiveness": 0.0,
+		"texture": _Helpers.sparkle_tex(),
 	})
 	_mote_rising.position = ctr
 	add_child(_mote_rising)
-	# feather 0.2 확률/frame * scale → 평균 12/sec. lifetime 2.05 → 25 동시
 	_feather_rising = _Helpers.make_emitter({
 		"count": int(25 * _scale()),
 		"lifetime": 2.05,
@@ -178,6 +182,7 @@ func _spawn_rising() -> void:
 		"angular_velocity_min": -90.0, "angular_velocity_max": 90.0,
 		"additive": false,
 		"one_shot": false, "explosiveness": 0.0,
+		"texture": _Helpers.feather_tex(),
 	})
 	_feather_rising.position = ctr
 	add_child(_feather_rising)
