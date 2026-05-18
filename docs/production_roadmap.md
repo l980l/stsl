@@ -1,6 +1,6 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-18 v18)
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-18 v19)
 > 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
@@ -1046,16 +1046,38 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - ✅ 설정 화면 언어 선택 UI + 커서 크기 세그먼트 컨트롤 + 취소/적용/초기화 버튼 (PR #91)
 - ✅ `strings_ui.csv` 이벤트 선택지 키 10종 추가 (PR #92): `ui.event.choose_header`, `ui.event.tag.*` 8개
 
-### 8.5-2. 지원 언어 번역 작업
-- 🔶 한국어 — 전투·카드·상태이상·인텐트 완료. 이벤트·렐릭·영웅 설명 미완
-- 🔶 영어 — 전투·인텐트 관련 완료. 나머지 미완
-- 🔲 일본어 (ja)
-- 🔲 중국어 간체 (zh) — 일부 키 존재, 번역 내용 미입력
-- 🔲 프랑스어 (fr) — 일부 키 존재, 번역 내용 미입력
-- 🔲 스페인어 (es) — 일부 키 존재, 번역 내용 미입력
-- 🔲 이탈리아어 (it) — 일부 키 존재, 번역 내용 미입력
-- 🔲 그리스어 (el) — 일부 키 존재, 번역 내용 미입력
-- 🔲 베트남어 (vi)
+### 8.5-2. 지원 언어 번역 작업 ✅ (PR #142~#144)
+**13 언어 모두 9 csv 전부 번역 완료 — 22,113 셀 빈 셀 0.**
+- ✅ 한국어 (ko)
+- ✅ 영어 (en)
+- ✅ 일본어 (ja)
+- ✅ 중국어 간체 (zh)
+- ✅ 중국어 번체 (zh_TW)
+- ✅ 프랑스어 (fr)
+- ✅ 스페인어 (es)
+- ✅ 이탈리아어 (it)
+- ✅ 그리스어 (el)
+- ✅ 러시아어 (ru) — PR #142+#143+#144 (디자인 폰트 매핑 포함)
+- ✅ 포르투갈어 (pt)
+- ✅ 폴란드어 (pl)
+- ✅ 독일어 (de)
+- 🔲 베트남어 (vi) — 미지원 (M8.5 범위 밖)
+
+### 8.5-3. i18n 4 언어 시스템 인프라 ✅ (PR #142)
+- LocaleManager LOCALES + DISPLAY_NAMES 13개로 확장
+- project.godot `locale/translations` 117 entry (9 csv × 13 언어)
+- test_locale_manager 13개로 갱신
+- 7/9 csv 직접 번역 (hero/synergy/status/relic/battle/ui/enemy = 671행 × 4 언어)
+
+### 8.5-4. card·event 진짜 번역 ✅ (PR #143)
+- event 279행 + card 754행 × 4 언어 (ru/pt/pl/de) = 4132 셀
+- archetype 일관 매핑 (Assault/Legion/Turtle Ship/Crane Wing 등)
+- card 분할 처리 (5 chunk × 134~188 entries)
+
+### 8.5-5. fallback en + ru 디자인 폰트 ✅ (PR #144)
+- `locale/fallback` "ko" → "en"
+- `SacredTheme._LOCALE_FONTS["ru"]` 추가 — CormorantGaramond/JetBrainsMono/EBGaramond-Italic (el/ path 재사용, 키릴 글리프 포함)
+- pt/pl/de — `_LATIN_FONTS` 자동 fallback (라틴 Ext 검증 완료)
 
 ---
 
@@ -1209,7 +1231,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-05-18 v18. PR #131~#138 반영 + 우선순위 표 정합성 점검 — 병사 토큰 (M6-1) · 카드 효과 타입 참조 (M6-5c) · 배경 시스템 v1 (M7.5) 3 항목이 이미 구현된 상태였음에도 ❌·🟡 로 남아있던 것 ✅ 로 정정. 배경 v2 (DOF·Light2D·다른 씬 확산) 신규 항목 분리. 이벤트 BGM 잔여 정확화 (dark_1/2·encounter_2·fortune_2). **1462 통과 / 0 fail**.
+> 최종 갱신: 2026-05-18 v19. PR #140·#142·#143·#144 반영 — 신화 시그너처 cinematic VFX 6종 + card_exhaust + boss_death (M6.15) / i18n 9→13 언어 확장 (ru/pt/pl/de, 22,113 셀 모두 채워짐) / locale fallback ko→en + ru 디자인 폰트 매핑. **1467 통과 / 0 fail**.
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -1250,7 +1272,8 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | 🟢 장기 | 배경 시스템 v2 — 잔여 (M7.5+) | DOF 셰이더 (거리 기반 blur, filmic 깊이감) + Light2D (어두운 배경 광원·그림자). 현 시점 분위기 충분 — "한 단계 더" 영역. event/rest/shop 은 별도 이미지로 이미 세팅·map 은 의도적으로 배경 없음 |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
 | ✅ 완료 | i18n 4 언어 인프라 + 7 csv 번역 (M8.5-3) | PR #142. ru/pt/pl/de 추가 (9→13 언어). LocaleManager LOCALES + DISPLAY_NAMES + project.godot 117 entry + test 13개로 갱신. 7/9 csv 직접 번역 (hero 15·synergy 30·status 45·relic 90·battle 137·ui 159·enemy 195 = 671행 × 4 언어). card 755·event 280 은 영어 fallback 으로 import 정상화 — 별도 PR 에서 진짜 번역. **1462 통과 / 0 fail** |
-| ✅ 완료 | i18n card·event 진짜 번역 (M8.5-4) | PR #XXX. event 279행 + card 754행 모두 ru/pt/pl/de 직접 번역 (총 1033행 × 4 언어 = 4132 셀). archetype 일관 매핑 (Assault/Legion/Command/Poisoning/Curse/Control/Turtle Ship/Crane Wing/Death or Glory/Divine Attack/Blessing/Martyrdom/Resurrection/Mobility/Mongol Cavalry/Plunder/Dual Wield/Duel/Mushin). card 분할 처리 (5 chunk × 134~188 entries). **1467 통과 / 0 fail** |
+| ✅ 완료 | i18n card·event 진짜 번역 (M8.5-4) | PR #143. event 279행 + card 754행 모두 ru/pt/pl/de 직접 번역 (총 1033행 × 4 언어 = 4132 셀). archetype 일관 매핑 (Assault/Legion/Command/Poisoning/Curse/Control/Turtle Ship/Crane Wing/Death or Glory/Divine Attack/Blessing/Martyrdom/Resurrection/Mobility/Mongol Cavalry/Plunder/Dual Wield/Duel/Mushin). card 분할 처리 (5 chunk × 134~188 entries). **1467 통과 / 0 fail** |
+| ✅ 완료 | i18n fallback en + ru 디자인 폰트 (M8.5-5) | PR #144. `locale/fallback` "ko" → "en" 으로 변경 (미번역 셀 영어 fallback). `SacredTheme._LOCALE_FONTS` 에 ru 항목 추가 (CormorantGaramond/JetBrainsMono/EBGaramond-Italic, el/ path 재사용 — 키릴 글리프 포함). pt/pl/de 는 `_LATIN_FONTS` (Cinzel/Inter/IMFellEnglish/SpaceMono) 가 라틴 Ext 모두 지원 → 자동 fallback. **9 csv × 13 언어 = 22,113 셀 모두 채워짐 (빈 셀 0)** |
 | ✅ 완료 | 이벤트 BGM (M7-6) | 6 카테고리 모두 재생 가능. dark_3 → dark_1 rename + AudioManager variant 탐색 gap 허용으로 수정 (1~9 중 존재하는 것만 모음) |
 | 🟢 장기 | 비주얼 (M7-1~7-5) 캐릭터·카드 아트, 이펙트 | 몰입감 |
 | 🟢 장기 | 모바일 최적화 (M8-1~8-5) | 해상도·세이브·성능 |
