@@ -16,9 +16,10 @@ var _gpu_amb_heart_crim: GPUParticles2D
 var _gpu_amb_sparkle: GPUParticles2D
 var _amb_made: bool = false
 
-# trail emitters — 5 hearts 각각 heart + sparkle emitter (총 10).
+# trail emitters — 5 hearts 각각 heart + sparkle + halo emitter (총 15).
 var _gpu_trail_emitters: Array[GPUParticles2D] = []      # heart_small × 5
 var _gpu_trail_sparkles: Array[GPUParticles2D] = []      # sparkle × 5
+var _gpu_trail_halos: Array[GPUParticles2D] = []         # halo × 5 (비행 hearts halo)
 var _trail_setup: bool = false
 
 func _setup_trail_emitters() -> void:
@@ -36,9 +37,9 @@ func _setup_trail_emitters() -> void:
 		Color(1.0, 0.835, 0.835),
 	]
 	for i in 5:
-		# heart_small: 1/frame × 60 × lifetime 0.95 ≈ 57 동시 per heart.
+		# heart_small: 2/frame × 60 × lifetime 0.95 ≈ 114 동시 per heart (사용자 요청 2배).
 		var em := _Helpers.make_emitter({
-			"count": int(57 * _scale()), "lifetime": 0.95,
+			"count": int(114 * _scale()), "lifetime": 0.95,
 			"color": colors[i],
 			"speed_min": 24.0, "speed_max": 48.0,
 			"direction": Vector2.UP, "spread": 25.0,
@@ -71,6 +72,24 @@ func _setup_trail_emitters() -> void:
 		sp.emitting = false
 		add_child(sp)
 		_gpu_trail_sparkles.append(sp)
+		# halo — 비행 heart 의 큰+작은 halo (가산). size = heart size (fan 18~22, big 30).
+		var heart_size: float = 30.0 if i == 4 else (18.0 + 2.0)  # big 30, fan 평균 20
+		if i < _hearts.size():
+			heart_size = _hearts[i]["size"]
+		var halo := _Helpers.make_emitter({
+			"count": 1, "lifetime": 0.2, "color": colors[i],  # 1 입자 항상 spawn
+			"speed_min": 0.0, "speed_max": 0.0,
+			"direction": Vector2.UP, "spread": 0.0,
+			"gravity": 0.0, "damping": 0.0,
+			"size_min": heart_size, "size_max": heart_size,
+			"size_base": 22.86,  # 32 / 1.4 (halo_tex 안쪽 반경 매핑)
+			"texture": _Helpers.halo_tex(),
+			"one_shot": false, "explosiveness": 0.0,
+			"start_alpha": 1.0, "mid_alpha": 1.0, "end_alpha": 1.0,  # halo 는 alpha 고정 (페이드 X — 텍스처 자체 alpha 사용)
+		})
+		halo.emitting = false
+		add_child(halo)
+		_gpu_trail_halos.append(halo)
 
 # super 의 _spawn_trail override — heart_small + sparkle 모두 GPU. super CPU _particles 안 채움.
 func _spawn_trail(_pos: Vector2, _tint: String) -> void:
@@ -94,19 +113,24 @@ func _process(delta: float) -> void:
 			active_indices.append(idx)
 			var em: GPUParticles2D = _gpu_trail_emitters[idx]
 			var sp: GPUParticles2D = _gpu_trail_sparkles[idx]
+			var ha: GPUParticles2D = _gpu_trail_halos[idx]
 			if h["delay"] > 0.0:
 				em.emitting = false
 				sp.emitting = false
+				ha.emitting = false
 			else:
 				em.emitting = true
 				em.position = h["pos"]
 				sp.emitting = true
 				sp.position = h["pos"]
+				ha.emitting = true
+				ha.position = h["pos"]
 	# 비활성 emitter (현재 _hearts 에 없는) 끄기
 	for i in 5:
 		if not active_indices.has(i):
 			_gpu_trail_emitters[i].emitting = false
 			_gpu_trail_sparkles[i].emitting = false
+			_gpu_trail_halos[i].emitting = false
 
 # ── impact burst ──
 # 원본:

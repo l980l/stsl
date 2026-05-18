@@ -14,6 +14,7 @@ static var _heart_tex: Texture2D
 static var _bubble_tex: Texture2D
 static var _drip_tex: Texture2D
 static var _petal_tex: Texture2D
+static var _halo_tex: Texture2D
 
 # 100% 솔리드 원 + 가장자리 1px 안티앨리어싱.
 # CPU draw_circle(pos, r, col) 과 거의 동일 — 가장자리 페이드 없음.
@@ -83,6 +84,27 @@ static func sparkle_tex() -> Texture2D:
 				img.set_pixel(px, y, Color(1, 1, 1, maxf(existing.a, new_a)))
 		_sparkle_tex = ImageTexture.create_from_image(img)
 	return _sparkle_tex
+
+# 비행 hearts halo — 2단 alpha (안쪽 0.5 + 바깥 0.3) 가산 글로우.
+# 원본 draw_circle(r*0.7, alpha 0.5) + draw_circle(r*1.4, alpha 0.3) 매핑.
+# 64×64, 안쪽 반경 16 (r*0.7 영역), 바깥 반경 32 (r*1.4). size_base ≈ 22.86 (32/1.4).
+static func halo_tex() -> Texture2D:
+	if _halo_tex == null:
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		var cx := 31.5
+		var cy := 31.5
+		for y in 64:
+			for x in 64:
+				var dx := float(x) - cx
+				var dy := float(y) - cy
+				var d := sqrt(dx * dx + dy * dy)
+				if d <= 16.0:
+					img.set_pixel(x, y, Color(1, 1, 1, 0.5))  # 안쪽 halo
+				elif d <= 32.0:
+					img.set_pixel(x, y, Color(1, 1, 1, 0.3))  # 바깥 halo
+		_halo_tex = ImageTexture.create_from_image(img)
+	return _halo_tex
 
 # 꽃잎 — 가로:세로 0.55:1 타원 (infatuation petal). 흰색 (modulate 로 색).
 # 64×64, 가로 반경 16.5, 세로 반경 30. size_base=30.
