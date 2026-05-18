@@ -8,6 +8,7 @@ extends Object
 # ── 텍스처 캐시 (한 번 생성 후 재사용) ──
 static var _circle_tex: Texture2D
 static var _square_tex: Texture2D
+static var _glow_circle_tex: Texture2D
 static var _sparkle_tex: Texture2D
 static var _feather_tex: Texture2D
 
