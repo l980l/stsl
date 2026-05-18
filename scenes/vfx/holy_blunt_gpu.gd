@@ -15,7 +15,7 @@ func _spawn_impact_feathers() -> void:
 	# 큰 깃털 20 — 옆으로 튀는 메인. speed 3~9*60=180~540, gravity 0.06*60²=216
 	var feather := _Helpers.make_emitter({
 		"count": _pcount(20), "lifetime": 2.1,
-		"color": COL_FEATHER_HI,
+		"color": Color.WHITE,  # feather_tex 자체에 색 미리 — modulate WHITE
 		"speed_min": 180.0, "speed_max": 540.0,
 		"direction": Vector2.UP, "spread": 90.0,
 		"gravity": 216.0, "damping": 3.0,
@@ -32,7 +32,7 @@ func _spawn_impact_feathers() -> void:
 	# 작은 깃털 28 — 흩어지는 잔깃털. speed * DUST_SCALE 0.5
 	var feather_small := _Helpers.make_emitter({
 		"count": _pcount(28), "lifetime": 2.3,
-		"color": COL_FEATHER_HI,
+		"color": Color.WHITE,  # feather_tex 자체에 색 미리 — modulate WHITE
 		"speed_min": 60.0, "speed_max": 210.0,
 		"direction": Vector2.UP, "spread": 90.0,
 		"gravity": 108.0, "damping": 3.0,
@@ -49,7 +49,7 @@ func _spawn_impact_feathers() -> void:
 	# 위로 솟는 작은 깃털 14
 	var feather_rise := _Helpers.make_emitter({
 		"count": _pcount(14), "lifetime": 2.1,
-		"color": COL_FEATHER_HI,
+		"color": Color.WHITE,  # feather_tex 자체에 색 미리 — modulate WHITE
 		"speed_min": 210.0, "speed_max": 390.0,
 		"direction": Vector2.UP, "spread": 12.0,
 		"gravity": 72.0, "damping": 3.0,
