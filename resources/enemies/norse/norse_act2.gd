@@ -13,8 +13,11 @@ static func troll_warrior(scene: PackedScene) -> Resource:
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 160; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 60; i2.status_type = "block"
+	# CHARGE_UP 2턴 → 단발 강력한 둔기 한 방 (페이오프 = 강공격만, 디버프 X)
+	var payoff := IntentRes.new()
+	payoff.action_type = IntentRes.ActionType.ATTACK; payoff.value = 320; payoff.target = IntentRes.TargetType.RANDOM; payoff.damage_type = "blunt"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 160; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
+	i3.action_type = IntentRes.ActionType.CHARGE_UP; i3.charge_turns = 2; i3.payoff_intents = [payoff]
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4]
@@ -79,11 +82,16 @@ static func surtr(scene: PackedScene) -> Resource:
 	var p1i3 := IntentRes.new()
 	p1i3.action_type = IntentRes.ActionType.DEBUFF; p1i3.value = 2; p1i3.status_type = "vulnerable"
 	p1i3.target = IntentRes.TargetType.ALL
-	# 페이즈2 (30% HP 전환)
+	# 페이즈2 (30% HP 전환) — CHARGE_UP 등장: 2턴 숨고르기 후 ALL 강공격 + vulnerable 2 ALL
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.BUFF; p2i1.value = 15; p2i1.status_type = "strength"
+	var p2_charge_atk := IntentRes.new()
+	p2_charge_atk.action_type = IntentRes.ActionType.ATTACK; p2_charge_atk.value = 380; p2_charge_atk.target = IntentRes.TargetType.ALL; p2_charge_atk.damage_type = "fire"
+	var p2_charge_dbf := IntentRes.new()
+	p2_charge_dbf.action_type = IntentRes.ActionType.DEBUFF; p2_charge_dbf.value = 2; p2_charge_dbf.status_type = "vulnerable"
+	p2_charge_dbf.target = IntentRes.TargetType.ALL
 	var p2i2 := IntentRes.new()
-	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 260; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "fire"
+	p2i2.action_type = IntentRes.ActionType.CHARGE_UP; p2i2.charge_turns = 2; p2i2.payoff_intents = [p2_charge_atk, p2_charge_dbf]
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 300; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "fire"
 	e.phase_patterns = [

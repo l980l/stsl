@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="st-bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#1c1808"/>
+      <stop offset="100%" stop-color="#08050a"/>
+    </radialGradient>
+    <linearGradient id="st-star" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#fff4a0"/>
+      <stop offset="100%" stop-color="#e8b020"/>
+    </linearGradient>
+  </defs>
+  <!-- 외곽 링 -->
+  <circle cx="128" cy="128" r="112" fill="url(#st-bg)" stroke="#c9a84c" stroke-width="7"/>
+  <!-- 머리 윤곽 (스턴 = 머리 위 회전 별) -->
+  <circle cx="128" cy="170" r="40" fill="none" stroke="#7a8298" stroke-width="4" opacity="0.65"/>
+  <!-- 별 3개 — 머리 위 호 배치, 회전감 -->
+  <!-- 좌 -->
+  <polygon points="68,80 76,98 96,98 80,110 86,128 68,118 50,128 56,110 40,98 60,98"
+           fill="url(#st-star)" stroke="#a07810" stroke-width="2"
+           transform="translate(-2,-2) rotate(-12 68 105)"/>
+  <!-- 중앙 (가장 큼) -->
+  <polygon points="128,38 138,66 168,66 144,84 154,114 128,96 102,114 112,84 88,66 118,66"
+           fill="url(#st-star)" stroke="#a07810" stroke-width="2.5"/>
+  <!-- 우 -->
+  <polygon points="188,80 196,98 216,98 200,110 206,128 188,118 170,128 176,110 160,98 180,98"
+           fill="url(#st-star)" stroke="#a07810" stroke-width="2"
+           transform="translate(2,-2) rotate(12 188 105)"/>
+  <!-- 어지러움 호 (별 아래 곡선) -->
+  <path d="M 76,140 Q 128,158 180,140" fill="none" stroke="#ffd84d" stroke-width="3" opacity="0.55"/>
+  <path d="M 88,150 Q 128,164 168,150" fill="none" stroke="#ffd84d" stroke-width="2" opacity="0.4"/>
+</svg>

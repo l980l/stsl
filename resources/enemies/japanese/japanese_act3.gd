@@ -86,11 +86,16 @@ static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 180; p1i4.target = IntentRes.TargetType.ALL; p1i4.damage_type = "fire"
 	var p1i5 := IntentRes.new()
 	p1i5.action_type = IntentRes.ActionType.BUFF; p1i5.value = 2; p1i5.status_type = "strength"
-	# Phase 2 — 두 머리 (최고 공격력)
+	# Phase 2 — 두 머리 (최고 공격력) — CHARGE_UP 등장: 2턴 → 강공격 + stun
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 230; p2i1.target = IntentRes.TargetType.LOWEST_HP; p2i1.damage_type = "poison"
+	var p2_charge_bite := IntentRes.new()
+	p2_charge_bite.action_type = IntentRes.ActionType.ATTACK; p2_charge_bite.value = 260; p2_charge_bite.target = IntentRes.TargetType.LAST_ATTACKER; p2_charge_bite.damage_type = "poison"
+	var p2_charge_stun := IntentRes.new()
+	p2_charge_stun.action_type = IntentRes.ActionType.DEBUFF; p2_charge_stun.value = 1; p2_charge_stun.status_type = "stun"
+	p2_charge_stun.target = IntentRes.TargetType.LAST_ATTACKER
 	var p2i2 := IntentRes.new()
-	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 230; p2i2.target = IntentRes.TargetType.RANDOM; p2i2.damage_type = "poison"
+	p2i2.action_type = IntentRes.ActionType.CHARGE_UP; p2i2.charge_turns = 2; p2i2.payoff_intents = [p2_charge_bite, p2_charge_stun]
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.DEBUFF; p2i3.value = 3; p2i3.status_type = "vulnerable"
 	p2i3.target = IntentRes.TargetType.ALL

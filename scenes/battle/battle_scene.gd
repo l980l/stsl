@@ -146,7 +146,8 @@ const STATUS_EMOJI := {
 const STATUS_INTERNAL_KEYS := [
 	"poison_dur", "counter_ratio", "damage_taken",
 	"greek_hubris_pending", "norse_ragnarok_fired",
-	"daoist_stance", "japanese_turn_count"
+	"daoist_stance", "japanese_turn_count",
+	"charge_remaining", "_charge_block_advance"
 ]
 
 func _trf(key: String, args) -> String:
@@ -934,6 +935,7 @@ func _connect_signals() -> void:
 	# VFX 차지 시작 — 적 인텐트/영웅 카드 출처 모두 임팩트 시점에 데미지·SFX 동기
 	BattleManager.intent_vfx_charge_start.connect(_on_intent_vfx_start)
 	BattleManager.passive_buff_applied.connect(_on_passive_buff_applied)
+	BattleManager.hero_turn_skipped.connect(_on_hero_turn_skipped)
 	BattleManager.card_vfx_charge_start.connect(_on_card_vfx_start)
 	BattleManager.poison_tick_applied.connect(_on_poison_tick)
 	BattleManager.signature_fired.connect(_on_signature_fired)
@@ -957,9 +959,14 @@ func _play_battle_bgm() -> void:
 		var myth: String = GameManager.act_mythologies[act_idx]
 		AudioManager.play_bgm_dynamic("battle", myth)
 
-func _on_boss_phase_changed(_enemy_index: int, new_phase: int) -> void:
+func _on_boss_phase_changed(enemy_index: int, new_phase: int) -> void:
 	if new_phase >= 1 and not _bgm_boss_id.is_empty():
 		AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, new_phase)
+	# 보스 위치에 phase 전환 VFX + cinematic title (PHASE %d)
+	if enemy_index >= 0 and enemy_index < _enemy_char_nodes.size():
+		var boss_node: Node2D = _enemy_char_nodes[enemy_index]
+		if boss_node and is_instance_valid(boss_node):
+			_spawn_boss_phase_change(boss_node.global_position, _foot_pos(boss_node), new_phase + 1)
 
 # 신화 시그니처 발동 시 화면 중앙에 짧은 토스트 표시 (~1.5초 페이드)
 # Throttle: 같은 시그니처는 1턴에 1회만 (다중 적 동시 발동 시 중복 방지)
@@ -1350,46 +1357,20 @@ func _update_enemy_ui(index: int) -> void:
 		entry["panel"].modulate = Color.WHITE
 		# btn 의 enable 상태는 다른 경로(turn 변화 등)가 결정 — 사망 예정 해제 시는 유지
 
-	# 의도 표시
-	var intent: Resource = BattleManager.get_enemy_current_intent(index)
-	if intent != null:
-		entry["intent_lbl"].modulate = _intent_color(intent.action_type)
-		match intent.action_type:
-			IntentRes.ActionType.ATTACK:
-				# 강화/약화/counter_pool 적용된 표시값
-				entry["intent_lbl"].text = _trf("battle.intent.attack", BattleManager.get_intent_display_damage(index, intent))
-			IntentRes.ActionType.BUFF:
-				match intent.status_type:
-					"strength": entry["intent_lbl"].text = _trf("battle.intent.buff.strength", intent.value)
-					_:          entry["intent_lbl"].text = _trf("battle.intent.buff.block", intent.value)
-			IntentRes.ActionType.DEBUFF:
-				entry["intent_lbl"].text = tr("battle.intent.debuff")
-			IntentRes.ActionType.PREPARE:
-				entry["intent_lbl"].text = tr("battle.intent.prepare")
-			IntentRes.ActionType.HEAL_ALLY:
-				entry["intent_lbl"].text = _trf("battle.intent.heal_ally", intent.value)
-			IntentRes.ActionType.BUFF_ALLY:
-				entry["intent_lbl"].text = _trf("battle.intent.buff_ally", intent.value)
-			IntentRes.ActionType.COUNTER_PREPARE:
-				entry["intent_lbl"].text = _trf("battle.intent.counter_prepare", intent.value)
-			IntentRes.ActionType.MARK_TARGET:
-				entry["intent_lbl"].text = tr("battle.intent.mark_target")
-			IntentRes.ActionType.SACRIFICE:
-				entry["intent_lbl"].text = _trf("battle.intent.sacrifice", intent.value)
-			IntentRes.ActionType.WARD:
-				entry["intent_lbl"].text = _trf("battle.intent.ward", intent.value)
-			IntentRes.ActionType.SUMMON:
-				entry["intent_lbl"].text = _trf("battle.intent.summon", max(1, intent.value))
-			IntentRes.ActionType.MIMIC:
-				entry["intent_lbl"].text = _trf("battle.intent.mimic", intent.value)
-			IntentRes.ActionType.SPECIAL:
-				entry["intent_lbl"].text = tr("battle.intent.special")
-			_:
-				entry["intent_lbl"].text = "?"
+	# 의도 표시 — CHARGE_UP 페이오프 등 한 턴에 여러 효과면 가로로 모두 표시
+	var intents: Array = BattleManager.get_enemy_current_intents(index)
+	if not intents.is_empty():
+		var label_parts: Array[String] = []
+		var tip_parts: Array[String] = []
+		for it in intents:
+			label_parts.append(_format_intent_label(index, it))
+			tip_parts.append(_format_intent_tooltip(index, it))
+		entry["intent_lbl"].text = "  ".join(label_parts)
+		entry["intent_lbl"].modulate = _intent_color(intents[0].action_type)  # 첫 intent 기준 색상
 		# 모든 인텐트에 tooltip 부착 (SPECIAL 도 자연스럽게 hover 유도)
 		# base 시: btn(SLOT_W x SLOT_H) 이 위에 있어 intent_lbl hover 차단 → btn 에도 동일 tooltip
 		# 사이드바 시: btn IGNORE 로 변경됨 → intent_lbl 가 직접 받음
-		var intent_tip: String = _format_intent_tooltip(index, intent)
+		var intent_tip: String = "\n".join(tip_parts)
 		SacredTheme.attach_tooltip(entry["intent_lbl"], intent_tip)
 		SacredTheme.attach_tooltip(entry["btn"], intent_tip)
 
@@ -1399,6 +1380,33 @@ func _update_enemy_ui(index: int) -> void:
 		entry["intent_lbl"].text = tr("battle.intent.dead")
 
 	_refresh_status_icons_enemy(index)
+
+func _format_intent_label(enemy_index: int, intent: Resource) -> String:
+	# intent 1개의 라벨 문자열 (이모지 또는 ATTACK 수치 포함).
+	# 가로 묶음 표시 (multi-intent) 와 단일 표시 양쪽에서 사용.
+	match intent.action_type:
+		IntentRes.ActionType.ATTACK:
+			return _trf("battle.intent.attack", BattleManager.get_intent_display_damage(enemy_index, intent))
+		IntentRes.ActionType.BUFF:
+			match intent.status_type:
+				"strength": return _trf("battle.intent.buff.strength", intent.value)
+				_:          return _trf("battle.intent.buff.block", intent.value)
+		IntentRes.ActionType.DEBUFF:
+			match intent.status_type:
+				"stun": return tr("battle.intent.debuff.stun")
+				_:      return tr("battle.intent.debuff")
+		IntentRes.ActionType.PREPARE:    return tr("battle.intent.prepare")
+		IntentRes.ActionType.CHARGE_UP:  return tr("battle.intent.charge_up")
+		IntentRes.ActionType.HEAL_ALLY:  return _trf("battle.intent.heal_ally", intent.value)
+		IntentRes.ActionType.BUFF_ALLY:  return _trf("battle.intent.buff_ally", intent.value)
+		IntentRes.ActionType.COUNTER_PREPARE: return _trf("battle.intent.counter_prepare", intent.value)
+		IntentRes.ActionType.MARK_TARGET: return tr("battle.intent.mark_target")
+		IntentRes.ActionType.SACRIFICE:  return _trf("battle.intent.sacrifice", intent.value)
+		IntentRes.ActionType.WARD:       return _trf("battle.intent.ward", intent.value)
+		IntentRes.ActionType.SUMMON:     return _trf("battle.intent.summon", max(1, intent.value))
+		IntentRes.ActionType.MIMIC:      return _trf("battle.intent.mimic", intent.value)
+		IntentRes.ActionType.SPECIAL:    return tr("battle.intent.special")
+		_:                                return "?"
 
 func _format_intent_tooltip(enemy_index: int, intent: Resource) -> String:
 	# 인텐트 hover 시 표시할 자세한 설명. 모든 action_type 지원.
@@ -1430,6 +1438,8 @@ func _format_intent_tooltip(enemy_index: int, intent: Resource) -> String:
 				_: return _trf("battle.intent.tooltip.debuff_generic", [intent.status_type, v])
 		IntentRes.ActionType.PREPARE:
 			return tr("battle.intent.tooltip.prepare")
+		IntentRes.ActionType.CHARGE_UP:
+			return tr("battle.intent.tooltip.charge_up")
 		IntentRes.ActionType.HEAL_ALLY:
 			return _trf("battle.intent.tooltip.heal_ally", v)
 		IntentRes.ActionType.BUFF_ALLY:
@@ -1472,6 +1482,8 @@ func _intent_color(action_type: int) -> Color:
 		IntentRes.ActionType.BUFF:    return Color(0.4, 0.85, 1.0)
 		IntentRes.ActionType.DEBUFF:  return Color(0.75, 0.4, 1.0)
 		IntentRes.ActionType.PREPARE: return Color(0.75, 0.75, 0.75)
+		IntentRes.ActionType.CHARGE_UP: return Color(1.0, 0.65, 0.2)  # 의미심장한 주황 — 곧 큰 일
+		IntentRes.ActionType.WARD: return Color(0.4, 1.0, 0.8)  # 청록 — 🛡 가 BUFF.block(파랑)과 색으로 구분
 		_:                            return Color(1.0, 0.8, 0.2)
 
 # ─────────────────────────────────────────────
@@ -2058,6 +2070,10 @@ const _STATUS_POPUP_INFO := {
 	"taunt":         ["Taunt",         Color(1.00, 0.62, 0.32)],   # rgba(255,158,82)  코랄
 	"morale":        ["Morale",        Color(1.00, 0.95, 0.65)],   # rgba(255,242,166) 옅은 골드
 	"counter_block": ["Counter Block", Color(0.60, 0.85, 1.00)],   # rgba(153,217,255) 부드러운 하늘
+	"speed_bonus":   ["Haste",         Color(0.55, 0.88, 1.00)],   # rgba(140,225,255) 부드러운 청록 (가속)
+	"speed_penalty": ["Slow",          Color(0.65, 0.72, 0.85)],   # rgba(166,184,217) 차분한 청회 (둔화)
+	"stun":          ["Stun",          Color(1.00, 0.85, 0.45)],   # rgba(255,217,115) 부드러운 황금 (마비 별)
+	"tokens":        ["Soldiers",      Color(0.85, 0.78, 1.00)],   # rgba(217,199,255) 부드러운 라일락 (소환)
 }
 
 func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int, stack_key: String) -> void:
@@ -2216,6 +2232,20 @@ const _VFX_WARRIOR_BUFF := preload("res://scenes/vfx/warrior_buff.gd")
 const _VFX_BLOCK: PackedScene = preload("res://scenes/vfx/block_particle.tscn")
 const _VFX_DEFENSE_BUFF := preload("res://scenes/vfx/defense_buff.gd")
 const _VFX_SUMMON_BURST := preload("res://scenes/vfx/summon_burst.gd")
+const _VFX_STUN_STARS := preload("res://scenes/vfx/stun_stars.gd")
+const _VFX_POWER_UP := preload("res://scenes/vfx/power_up.gd")
+const _VFX_SUMMON_CIRCLE := preload("res://scenes/vfx/summon_circle.gd")
+const _VFX_SPEED_BUFF := preload("res://scenes/vfx/speed_buff.gd")
+const _VFX_SLOW_DEBUFF := preload("res://scenes/vfx/slow_debuff.gd")
+const _VFX_TARGET_MARKING := preload("res://scenes/vfx/target_marking.gd")
+const _VFX_MIMIC := preload("res://scenes/vfx/mimic.gd")
+const _VFX_SACRIFICE := preload("res://scenes/vfx/sacrifice.gd")
+const _VFX_COUNTER_PREPARE := preload("res://scenes/vfx/counter_prepare.gd")
+const _VFX_STEAL_CARD := preload("res://scenes/vfx/steal_card.gd")
+const _VFX_PURGE_STATUS := preload("res://scenes/vfx/purge_status.gd")
+const _VFX_MORALE_BOOST := preload("res://scenes/vfx/morale_boost.gd")
+const _VFX_PREPARE := preload("res://scenes/vfx/prepare.gd")
+const _VFX_BOSS_PHASE := preload("res://scenes/vfx/boss_phase_changed.gd")
 
 # lightning으로 죽는 적/영웅 — 사망 연출을 빔 임팩트 시점까지 지연하기 위한 빔 참조
 # key: "enemy_%d" 또는 hero_id → lightning_beam 인스턴스
@@ -2390,10 +2420,40 @@ func _on_passive_buff_applied(enemy_index: int, status_type: String, _value: int
 	var caster_foot: Vector2 = _foot_pos(caster_node)
 	if status_type == "block":
 		_spawn_defense_buff(caster_pos, caster_foot)
+	elif status_type == "speed_bonus":
+		_spawn_speed_buff(caster_pos, caster_foot)
 	elif _is_holy_enemy(enemy_index):
 		_spawn_holy_buff(caster_pos, caster_foot)
 	else:
 		_spawn_warrior_buff(caster_pos, caster_foot)
+
+# 스턴 등으로 영웅 차례 자동 종료 — 토스트 + 머리 위 별 표시
+func _on_hero_turn_skipped(hero_id: String) -> void:
+	var hero_node: Node2D = _hero_char_nodes.get(hero_id)
+	if hero_node:
+		_spawn_stun_stars(hero_node.global_position)
+	var hero_name: String = hero_id
+	if TeamManager != null:
+		var hero_res = TeamManager.get_hero(hero_id)
+		if hero_res != null and hero_res.get("display_name_key") != null:
+			hero_name = tr(hero_res.display_name_key)
+	var toast := Label.new()
+	toast.text = _trf("battle.toast.stunned", hero_name)
+	toast.theme_type_variation = "TitleLabel"
+	toast.add_theme_font_size_override("font_size", 28)
+	toast.modulate = Color(1.0, 0.85, 0.3)
+	toast.z_index = 2000
+	toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	toast.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	toast.position = Vector2(WINDOW_W / 2.0 - 250, 300)
+	toast.size = Vector2(500, 50)
+	add_child(toast)
+	var tw := create_tween()
+	tw.tween_property(toast, "modulate:a", 1.0, 0.15)
+	tw.tween_interval(0.8)
+	tw.tween_property(toast, "modulate:a", 0.0, 0.3)
+	tw.tween_callback(toast.queue_free)
 
 func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: String) -> void:
 	if enemy_index < 0 or enemy_index >= _enemy_char_nodes.size():
@@ -2417,21 +2477,84 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: St
 		ir.ActionType.BUFF:
 			if intent.status_type == "block":
 				_spawn_defense_buff(caster_pos, caster_foot)
+			elif intent.status_type == "speed_bonus":
+				_spawn_speed_buff(caster_pos, caster_foot)
 			elif _is_holy_enemy(enemy_index):
 				_spawn_holy_buff(caster_pos, caster_foot)
 			else:
 				_spawn_warrior_buff(caster_pos, caster_foot)
 		ir.ActionType.DEBUFF:
 			var stype: String = intent.status_type
-			var fx_script: GDScript = _debuff_script_for_status(stype)
-			if fx_script:
+			# speed_penalty 는 빔 VFX 가 아니라 발치 효과 — slow_debuff spawn 별도 처리
+			if stype == "speed_penalty":
 				if intent.target == ir.TargetType.ALL:
 					for hpos in _all_living_hero_positions():
-						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype, hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+						_spawn_slow_debuff(hpos, hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
 				else:
-					var hpos: Vector2 = _hero_pos_or_first(target_hero_id)
-					if hpos != Vector2.ZERO:
-						_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype, hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+					var hpos2: Vector2 = _hero_pos_or_first(target_hero_id)
+					if hpos2 != Vector2.ZERO:
+						_spawn_slow_debuff(hpos2, hpos2 + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+			else:
+				var fx_script: GDScript = _debuff_script_for_status(stype)
+				if fx_script:
+					if intent.target == ir.TargetType.ALL:
+						for hpos in _all_living_hero_positions():
+							_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype, hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+					else:
+						var hpos: Vector2 = _hero_pos_or_first(target_hero_id)
+						if hpos != Vector2.ZERO:
+							_spawn_debuff_beam_simple(fx_script, caster_pos, hpos, stype, hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+		ir.ActionType.CHARGE_UP:
+			_spawn_power_up(caster_pos, caster_foot)
+		ir.ActionType.SUMMON:
+			_spawn_summon_circle(caster_pos, caster_foot)
+		ir.ActionType.WARD:
+			# 1턴 무적 — defense_buff 재사용 + 청록 modulate (BUFF.block 파랑과 구분)
+			_spawn_ward_dome(caster_pos, caster_foot)
+		ir.ActionType.MARK_TARGET:
+			# 영웅 1명 마킹 — target_hero_id 위치에 reticle + bracket + mark glyph
+			var mt_pos: Vector2 = _hero_pos_or_first(target_hero_id)
+			if mt_pos != Vector2.ZERO:
+				_spawn_target_marking(caster_pos, mt_pos, mt_pos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+		ir.ActionType.MIMIC:
+			# 영웅(반사 원본) ↔ 적(시전자) 사이 mirror arc + ripple + 황동 burst
+			var mim_pos: Vector2 = _hero_pos_or_first(target_hero_id)
+			if mim_pos != Vector2.ZERO:
+				_spawn_mimic(caster_pos, mim_pos, mim_pos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+		ir.ActionType.SACRIFICE:
+			# 자해 강화 — 시전자(적) 위치에 자해 VFX
+			_spawn_sacrifice(caster_pos, caster_foot)
+		ir.ActionType.COUNTER_PREPARE:
+			# 반사 준비 — 시전자(적) 위치에 hex shield 조립 VFX
+			_spawn_counter_prepare(caster_pos, caster_foot)
+		ir.ActionType.SPECIAL:
+			# remove_card variant 만 steal_card VFX (영웅 ↔ 적)
+			var sp_v: String = intent.status_type
+			if sp_v == "" or sp_v == "weak" or sp_v == "remove_card":
+				var st_pos: Vector2 = _first_living_hero_pos()
+				if st_pos != Vector2.ZERO:
+					_spawn_steal_card(caster_pos, st_pos)
+		ir.ActionType.PREPARE:
+			# 효과 없는 빈 턴 — 절제된 차분 VFX (가슴 orb + 발치 ring + 머리 위 glyph)
+			_spawn_prepare(caster_pos, caster_foot)
+		ir.ActionType.HEAL_ALLY:
+			# 동료 1마리 회복 — 가장 HP 낮은 적 위치에 heal_blessing
+			var ally_idx: int = EnemyInteractionSystem.pick_lowest_hp_ally(BattleManager, enemy_index)
+			if ally_idx >= 0 and ally_idx < _enemy_char_nodes.size():
+				var ally_node: Node2D = _enemy_char_nodes[ally_idx]
+				if ally_node:
+					_spawn_heal_blessing(ally_node.global_position, _foot_pos(ally_node))
+		ir.ActionType.BUFF_ALLY:
+			# 동료 1마리 강화 — status_type=="block" 이면 defense_buff, 그 외 warrior_buff
+			var b_ally_idx: int = EnemyInteractionSystem.pick_lowest_hp_ally(BattleManager, enemy_index) if intent.target == ir.TargetType.LOWEST_HP else EnemyInteractionSystem.pick_random_ally(BattleManager, enemy_index)
+			if b_ally_idx >= 0 and b_ally_idx < _enemy_char_nodes.size():
+				var b_ally_node: Node2D = _enemy_char_nodes[b_ally_idx]
+				if b_ally_node:
+					var b_foot: Vector2 = _foot_pos(b_ally_node)
+					if intent.status_type == "block":
+						_spawn_defense_buff(b_ally_node.global_position, b_foot)
+					else:
+						_spawn_warrior_buff(b_ally_node.global_position, b_foot)
 
 # 독 DoT tick — 가스 VFX + impact_poison SFX
 func _on_poison_tick(target: String, _amount: int) -> void:
@@ -2466,7 +2589,7 @@ func _hero_pos_or_first(hero_id: String) -> Vector2:
 	return _first_living_hero_pos()
 
 # 영웅 카드 차지 시작 — battle_manager 가 차지 끝나기까지 await 후 효과 적용.
-func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id: String) -> void:
+func _on_card_vfx_start(card: Resource, target_enemy_index: int, target_hero_id: String) -> void:
 	var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
 	var owner_node: Node2D = _hero_char_nodes.get(owner_id)
 	if owner_node == null:
@@ -2547,6 +2670,66 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, _target_hero_id
 				if not did_self_aoe:
 					_spawn_summon_burst(owner_id, caster_pos, effect.value)
 					did_self_aoe = true
+					spawned_this = true
+			elif et == EffectResource.EffectType.BUFF_SPEED:
+				if not did_buff:
+					# 대상 영웅 위치마다 spawn. SELF(card.owner) / ALLY(target_hero_id) / ALL_ALLIES
+					var bs_targets: Array = []
+					if effect.target == "ALL_ALLIES":
+						for h in TeamManager.get_living_heroes():
+							bs_targets.append(h.hero_id)
+					elif effect.target == "ALLY":
+						bs_targets.append(target_hero_id if target_hero_id != "" else owner_id)
+					else:
+						bs_targets.append(owner_id)
+					for bs_hid in bs_targets:
+						var bs_node: Node2D = _hero_char_nodes.get(bs_hid)
+						if bs_node:
+							_spawn_speed_buff(bs_node.global_position, _foot_pos(bs_node))
+					did_buff = true
+					spawned_this = true
+			elif et == EffectResource.EffectType.SACRIFICE_HP:
+				# 잔다르크 순교 카드 — 시전자 위치에 자해 강화 VFX (POWER buff 와 함께 자주 묶임)
+				if not did_buff:
+					_spawn_sacrifice(caster_pos, caster_foot)
+					did_buff = true
+					spawned_this = true
+			elif et == EffectResource.EffectType.GAIN_MORALE:
+				# 사기 진작 (이순신·나폴레옹·칭기즈칸) — 시전자 위치에 깃발 + trumpet VFX
+				if not did_buff:
+					_spawn_morale_boost(caster_pos, caster_foot)
+					did_buff = true
+					spawned_this = true
+			elif et == EffectResource.EffectType.PURGE_STATUS:
+				# 디버프 정화 — SELF / ALL (ALL_ALLIES) 대상별 spawn. self_aoe 그룹 차지
+				if not did_self_aoe:
+					var pg_targets: Array = []
+					if effect.target == "ALL" or effect.target == "ALL_ALLIES":
+						for h in TeamManager.get_living_heroes():
+							pg_targets.append(h.hero_id)
+					else:
+						pg_targets.append(owner_id)
+					for pg_hid in pg_targets:
+						var pg_node: Node2D = _hero_char_nodes.get(pg_hid)
+						if pg_node:
+							_spawn_purge_status(pg_node.global_position, _foot_pos(pg_node))
+					did_self_aoe = true
+					spawned_this = true
+			elif et == EffectResource.EffectType.DEBUFF_SPEED:
+				if not did_debuff:
+					# 대상 적 위치마다 spawn. SINGLE(target_enemy_index) / ALL
+					var ds_targets: Array = []
+					if effect.target == "ALL":
+						for i in range(_enemy_char_nodes.size()):
+							if BattleManager.is_enemy_alive(i):
+								ds_targets.append(i)
+					elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
+						ds_targets.append(target_enemy_index)
+					for ds_ei in ds_targets:
+						var ds_node: Node2D = _enemy_char_nodes[ds_ei]
+						if ds_node:
+							_spawn_slow_debuff(ds_node.global_position, _foot_pos(ds_node))
+					did_debuff = true
 					spawned_this = true
 		# 순차 spawn — 첫 spawn 은 즉시, 이후 spawn 은 _VFX_STEP_DELAY 만큼 지연
 		if spawned_this:
@@ -2829,6 +3012,279 @@ func _animate_soldier_summon_motion(hero_node: Node2D, grid_pos: Vector2) -> voi
 	tw.tween_property(soldier, "modulate:a", 0.0, 0.25)
 	tw.parallel().tween_property(soldier, "position", hero_node.position, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tw.tween_callback(soldier.queue_free)
+
+# 보스 phase 전환 — 보스 위치 build-up → core erupt + 6겹 shockwave + 화면 flash·shake + cinematic title + letterbox
+func _spawn_boss_phase_change(target_pos: Vector2, foot_pos: Vector2, phase_num: int) -> void:
+	var fx: Node2D = _VFX_BOSS_PHASE.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		_play_screen_shake()
+		AudioManager.play_sfx("impact_explosive")
+	)
+	fx.play(target_pos, target_pos)
+	# build 단계 rumble — 0.1s 간격으로 약한 shake 4회 (긴장감)
+	for i in range(4):
+		await get_tree().create_timer(0.1).timeout
+		if is_inside_tree():
+			_play_screen_shake()
+	# cinematic letterbox + title toast
+	_spawn_boss_phase_cinematic(phase_num)
+
+# cinematic letterbox bars + "PHASE %d" 큰 텍스트 (페이드인/아웃)
+func _spawn_boss_phase_cinematic(phase_num: int) -> void:
+	# letterbox 위 띠
+	var bar_top := ColorRect.new()
+	bar_top.color = Color(0, 0, 0, 1.0)
+	bar_top.size = Vector2(WINDOW_W, 0)
+	bar_top.position = Vector2(0, 0)
+	bar_top.z_index = 2100
+	bar_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bar_top)
+	# letterbox 아래 띠
+	var bar_bot := ColorRect.new()
+	bar_bot.color = Color(0, 0, 0, 1.0)
+	bar_bot.size = Vector2(WINDOW_W, 0)
+	bar_bot.position = Vector2(0, WINDOW_H)
+	bar_bot.z_index = 2100
+	bar_bot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bar_bot)
+	# letterbox 슬라이드 인 (위·아래에서)
+	var bar_h: float = WINDOW_H * 0.09
+	var tw_bars := create_tween().set_parallel(true)
+	tw_bars.tween_property(bar_top, "size:y", bar_h, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw_bars.tween_property(bar_bot, "size:y", bar_h, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw_bars.tween_property(bar_bot, "position:y", WINDOW_H - bar_h, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	# title text (build 후 등장 — 약 0.55s 대기)
+	await get_tree().create_timer(0.55).timeout
+	if not is_inside_tree():
+		return
+	# title 컨테이너 (eyebrow + 큰 PHASE + sub)
+	var title := Label.new()
+	title.text = "— PHASE %d —" % phase_num
+	title.add_theme_font_size_override("font_size", 92)
+	title.add_theme_color_override("font_color", Color(1.0, 0.843, 0.415))  # 황금
+	title.add_theme_color_override("font_outline_color", Color(0.290, 0.050, 0.062))  # 검빨 outline
+	title.add_theme_constant_override("outline_size", 12)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title.size = Vector2(WINDOW_W, 140)
+	title.position = Vector2(0, WINDOW_H * 0.32)
+	title.z_index = 2200
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title.modulate = Color(1, 1, 1, 0)
+	title.scale = Vector2(0.7, 0.7)
+	title.pivot_offset = title.size / 2.0
+	add_child(title)
+	var tw_title := create_tween()
+	tw_title.tween_property(title, "modulate:a", 1.0, 0.25)
+	tw_title.parallel().tween_property(title, "scale", Vector2(1.0, 1.0), 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw_title.tween_interval(1.0)
+	tw_title.tween_property(title, "modulate:a", 0.0, 0.45)
+	tw_title.parallel().tween_property(title, "scale", Vector2(1.05, 1.05), 0.45)
+	tw_title.tween_callback(title.queue_free)
+	# letterbox 페이드아웃 (title 사라진 후)
+	await get_tree().create_timer(1.6).timeout
+	if not is_inside_tree():
+		return
+	var tw_out := create_tween().set_parallel(true)
+	tw_out.tween_property(bar_top, "size:y", 0.0, 0.45).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tw_out.tween_property(bar_bot, "size:y", 0.0, 0.45).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tw_out.tween_property(bar_bot, "position:y", WINDOW_H, 0.45).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tw_out.chain().tween_callback(bar_top.queue_free)
+	tw_out.tween_callback(bar_bot.queue_free)
+
+# 적 PREPARE intent — 자기 위치에 작은 orb + 발치 ring + 머리 위 glyph (절제된 차분 VFX)
+func _spawn_prepare(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_PREPARE.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	# PREPARE 는 효과 없는 빈 턴 — vfx_impact_resolved 동기화 불필요 (battle_manager 그대로 진행)
+	fx.play(target_pos, target_pos)
+
+# 영웅 카드 GAIN_MORALE — 자기 위치에 깃대 + flag + 3겹 trumpet ring + 머리 위 sigil
+func _spawn_morale_boost(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_MORALE_BOOST.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_divine")
+	)
+	fx.play(target_pos, target_pos)
+
+# 영웅 카드 PURGE_STATUS — 자기/팀 위치에 정화 core + 3겹 wave + 머리 위 halo
+func _spawn_purge_status(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_PURGE_STATUS.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_divine")
+	)
+	fx.play(target_pos, target_pos)
+
+# 적 SPECIAL remove_card — 영웅 손 빨간 mark → 카드 비행 영웅→적 → 적 catch + hook sigil
+func _spawn_steal_card(caster_pos: Vector2, target_pos: Vector2) -> void:
+	var fx: Node2D = _VFX_STEAL_CARD.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_curse")
+	)
+	fx.play(caster_pos, target_pos)
+
+# 적 COUNTER_PREPARE — 자기 위치에 황동 hex shield 조립 + 발치 ring + 머리 위 sigil
+func _spawn_counter_prepare(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_COUNTER_PREPARE.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		AudioManager.play_sfx("block")
+	)
+	fx.play(target_pos, target_pos)
+
+# 적 SACRIFICE intent + 영웅(잔다르크) SACRIFICE_HP 카드 — 자기 위치에 자해 강화 VFX
+func _spawn_sacrifice(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_SACRIFICE.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_shake()
+		AudioManager.play_sfx("impact_slash")
+	)
+	fx.play(target_pos, target_pos)
+
+# 적 MIMIC — 시전자(적) ↔ 영웅(반사 원본) mirror arc + 적 ripple + 황동 burst
+func _spawn_mimic(caster_pos: Vector2, target_pos: Vector2, target_foot: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_MIMIC.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if target_foot != Vector2.ZERO:
+		fx.set_ground_anchor(target_foot)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_divine")
+	)
+	fx.play(caster_pos, target_pos)
+
+# 적 MARK_TARGET — 시전자→영웅 tracer + reticle travel + corner brackets + 머리 위 mark glyph
+func _spawn_target_marking(caster_pos: Vector2, target_pos: Vector2, target_foot: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_TARGET_MARKING.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if target_foot != Vector2.ZERO:
+		fx.set_ground_anchor(target_foot)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_shake()
+		AudioManager.play_sfx("impact_curse")
+	)
+	fx.play(caster_pos, target_pos)
+
+# 적 WARD (1턴 무적) — defense_buff 재사용 + 청록 modulate (BUFF.block 파랑과 구분)
+func _spawn_ward_dome(pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx := _VFX_DEFENSE_BUFF.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	fx.modulate = Color(0.4, 1.0, 0.8)  # 청록 — 결계 컨셉
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		AudioManager.play_sfx("block")
+	)
+	fx.play(pos, pos)
+
+# speed_penalty 부여 시 — 타겟 위치에 goop puddle + 역chevron ring + spiral motes (감속).
+func _spawn_slow_debuff(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_SLOW_DEBUFF.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		AudioManager.play_sfx("impact_curse")
+	)
+	fx.play(target_pos, target_pos)
+
+# speed_bonus 부여 시 — 타겟 위치에 chevron ring + sonic shock + sparks (캐릭터 뒤/앞 분리).
+func _spawn_speed_buff(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_SPEED_BUFF.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_divine")
+	)
+	fx.play(target_pos, target_pos)
+
+# 적 SUMMON intent — 시전자 발치에 마법진 + 빛기둥 + 솟는 motes/rune. peak 시 SFX/플래시.
+func _spawn_summon_circle(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_SUMMON_CIRCLE.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_divine")
+	)
+	fx.play(caster_pos, caster_pos)
+
+# 적 CHARGE_UP intent — 외곽에서 적으로 inflow + 발치 aura + 솟구치는 streak. peak 시 SFX/플래시.
+# foot_pos 는 캐릭터 발 위치 (바닥 aura·dust 가 발 밑 + 캐릭터 뒤로 렌더링되게 z anchor).
+func _spawn_power_up(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_POWER_UP.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_divine")
+	)
+	fx.play(caster_pos, caster_pos)
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	# VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 이미 차지 시작.
@@ -3892,6 +4348,18 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 	# 카드 데미지 표시는 hero strength/weak (자기) + 적 vulnerable (드래그 호버 시) 반영.
 	if status_type in ["weak", "vulnerable", "strength"]:
 		_refresh_hand_card_damage()
+	# 스턴 — 영웅에게 부여 시 머리 위 별 즉발 (디버프 빔과 별개 — 임팩트 동기화 X)
+	if status_type == "stun" and not target.begins_with("enemy_"):
+		var hero_node: Node2D = _hero_char_nodes.get(target)
+		if hero_node:
+			_spawn_stun_stars(hero_node.global_position)
+
+func _spawn_stun_stars(pos: Vector2) -> void:
+	var fx: Node2D = _VFX_STUN_STARS.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	fx.play(pos, pos)
 
 func _refresh_hand_card_damage() -> void:
 	for btn in _card_buttons:

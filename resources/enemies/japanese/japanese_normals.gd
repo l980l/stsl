@@ -313,13 +313,20 @@ static func oni_king(scene: PackedScene) -> Resource:
 
 static func hannya(scene: PackedScene) -> Resource:
 	# T3-WARD: 한냐 가면의 결계 — WARD 1턴 사이클로 무적 윈도우
+	# + CHARGE_UP 2턴 후 큰 저주 한 방 + LAST_ATTACKER 스턴 (시선 마비)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.hannya"; e.max_hp = 680; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.WARD; i1.value = 1  # 1턴 무적
+	# 시선 페이오프 — 큰 저주 + stun
+	var gaze_atk := IntentRes.new()
+	gaze_atk.action_type = IntentRes.ActionType.ATTACK; gaze_atk.value = 180; gaze_atk.target = IntentRes.TargetType.LAST_ATTACKER; gaze_atk.damage_type = "curse"
+	var gaze_stun := IntentRes.new()
+	gaze_stun.action_type = IntentRes.ActionType.DEBUFF; gaze_stun.value = 1; gaze_stun.status_type = "stun"
+	gaze_stun.target = IntentRes.TargetType.LAST_ATTACKER
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "curse"
+	i2.action_type = IntentRes.ActionType.CHARGE_UP; i2.charge_turns = 2; i2.payoff_intents = [gaze_atk, gaze_stun]
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "curse"
 	var i4 := IntentRes.new()

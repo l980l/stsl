@@ -67,6 +67,7 @@ const _INTENT_ICON_FILES := {
 	2: "debuff",
 	3: "power",
 	4: "prepare",
+	13: "prepare",  # CHARGE_UP — prepare 아이콘 재활용
 }
 
 const _CARD_TYPE_ICON_FILES := {
