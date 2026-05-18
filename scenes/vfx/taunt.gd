@@ -76,7 +76,7 @@ func _ready() -> void:
 	for _i in range(3):
 		_word_inst.append({
 			"rot": deg_to_rad(randf_range(-30.0, 30.0)),
-			"scale": randf_range(0.7, 1.0),
+			"scale": randf_range(0.7, 1.3),
 			"offset": Vector2(randf_range(-110.0, 110.0), randf_range(-50.0, 50.0)),
 			# 흔들림 각각 다른 phase — 동기 안 되게
 			"shake_phase_x": randf() * TAU,
