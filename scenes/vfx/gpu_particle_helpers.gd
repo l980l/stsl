@@ -13,6 +13,7 @@ static var _feather_tex: Texture2D
 static var _heart_tex: Texture2D
 static var _bubble_tex: Texture2D
 static var _drip_tex: Texture2D
+static var _petal_tex: Texture2D
 
 # 100% 솔리드 원 + 가장자리 1px 안티앨리어싱.
 # CPU draw_circle(pos, r, col) 과 거의 동일 — 가장자리 페이드 없음.
@@ -82,6 +83,23 @@ static func sparkle_tex() -> Texture2D:
 				img.set_pixel(px, y, Color(1, 1, 1, maxf(existing.a, new_a)))
 		_sparkle_tex = ImageTexture.create_from_image(img)
 	return _sparkle_tex
+
+# 꽃잎 — 가로:세로 0.55:1 타원 (infatuation petal). 흰색 (modulate 로 색).
+# 64×64, 가로 반경 16.5, 세로 반경 30. size_base=30.
+static func petal_tex() -> Texture2D:
+	if _petal_tex == null:
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		for y in 64:
+			for x in 64:
+				var dx := (float(x) - 31.5) / 16.5
+				var dy := (float(y) - 31.5) / 30.0
+				var d := dx * dx + dy * dy
+				if d <= 1.0:
+					var a := clampf(1.0 - d * d, 0.0, 1.0)
+					img.set_pixel(x, y, Color(1, 1, 1, a))
+		_petal_tex = ImageTexture.create_from_image(img)
+	return _petal_tex
 
 # 독액 방울 — 본체 큰 원 + 작은 빛반사 원 (poison_splash drip).
 # 텍스처 자체에 연한 녹색 미리. 64×64, 본체 반경 23 (size_base 23).

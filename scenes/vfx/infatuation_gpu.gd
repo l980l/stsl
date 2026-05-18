@@ -1,88 +1,71 @@
 # scenes/vfx/infatuation_gpu.gd
-# 반함 GPU 하이브리드 — infatuation.gd 상속.
-# trail / ambient / impact_burst (heart 26 + petal 40 + sparkle 60 + smoke 22) → GPU.
-# 만다라/체인/오라/큰 키스/하트 투사체 폴리곤 CPU.
+# 반함 GPU 하이브리드 — infatuation.gd 정확 매핑.
+# _spawn_impact_burst (heart_small 26 + petal 40 + sparkle 60 + smoke 22) → GPU
+# _spawn_ambient (heart_small 0.5 + sparkle 0.3 확률) → GPU continuous
+# trail (5 hearts 매 프레임 spawn) 은 super CPU 그대로 (각 hearts 위치 동기 복잡).
+# 만다라/체인/오라/충격파/비행 hearts 폴리곤 → CPU.
 extends "res://scenes/vfx/infatuation.gd"
 
 const _Helpers = preload("res://scenes/vfx/gpu_particle_helpers.gd")
 
-var _gpu_trail: GPUParticles2D
-var _trail_made: bool = false
-var _gpu_ambient_heart: GPUParticles2D
-var _ambient_made: bool = false
 var _impact_made: bool = false
 
-func _spawn_trail(pos: Vector2, _tint: String) -> void:
-	if not _trail_made:
-		_trail_made = true
-		# heart_small + sparkle 합쳐 1 emitter
-		_gpu_trail = _Helpers.make_emitter({
-			"count": int(60 * _scale()), "lifetime": 1.0, "color": COL_RED,
-			"speed_min": 12.0, "speed_max": 36.0,
-			"direction": Vector2.UP, "spread": 90.0,
-			"gravity": 0.0, "damping": 3.0,
-			"size_min": 5.0, "size_max": 9.0,
-			"emission_shape": "box", "emission_box": Vector2(4.0, 4.0),
-			"additive": false,
-			"one_shot": false, "explosiveness": 0.0,
-			"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
-		})
-		add_child(_gpu_trail)
-	if is_instance_valid(_gpu_trail):
-		_gpu_trail.position = pos
+# ambient continuous emitters
+var _gpu_amb_heart_rose: GPUParticles2D
+var _gpu_amb_heart_crim: GPUParticles2D
+var _gpu_amb_sparkle: GPUParticles2D
+var _amb_made: bool = false
 
-func _spawn_ambient() -> void:
-	if _ambient_made:
-		return
-	_ambient_made = true
-	_gpu_ambient_heart = _Helpers.make_emitter({
-		"count": int(100 * _scale()), "lifetime": 2.4, "color": COL_RED,
-		"speed_min": 30.0, "speed_max": 72.0,
-		"direction": Vector2.UP, "spread": 30.0,
-		"gravity": 0.0, "damping": 3.0,
-		"size_min": 6.0, "size_max": 11.0,
-		"emission_shape": "box", "emission_box": Vector2(50.0, 20.0),
-		"additive": false,
-		"one_shot": false, "explosiveness": 0.0,
-		"start_alpha": 0.7, "mid_alpha": 0.35, "end_alpha": 0.0,
-	})
-	_gpu_ambient_heart.position = _target + Vector2(0.0, -10.0)
-	add_child(_gpu_ambient_heart)
-	get_tree().create_timer(BUFF_TIME).timeout.connect(func() -> void:
-		if is_instance_valid(_gpu_ambient_heart): _gpu_ambient_heart.emitting = false)
-
+# ── impact burst ──
+# 원본:
+#  - heart_small 26: vel (cos*sp, sin*sp*0.85 - 1.5), sp 2.5~9 → speed 150~540 + y bias -90
+#    lifetime 1.4~2.2, r 14~30, grav -0.012 → -43.2 px/s² (up gentle), tint crimson 45% / rose 55%
+#  - petal 40: vel (cos*sp, sin*sp*0.7 - 0.8), sp 1.5~5.5 → speed 90~330 + y bias -48
+#    lifetime 1.6~2.6, r 6~13, grav 0.02 → 72, spin ±0.08 → ±4.8 rad/s = ±275°/s
+#  - sparkle 60: vel (cos*sp, sin*sp - 0.5), sp 1.5~7.5 → speed 90~450 + y bias -30
+#    lifetime 1.0~1.7, r 1.0~2.4, grav 0.01 → 36
+#  - smoke 22: vel (cos*sp, sin*sp*0.6 - 0.4), sp 0.8~2.6 → speed 48~156 + y bias -24
+#    lifetime 1.4~2.3, r 24~46, grav -0.005 → -18
 func _spawn_impact_burst() -> void:
 	if _impact_made:
 		return
 	_impact_made = true
-	if is_instance_valid(_gpu_trail): _gpu_trail.emitting = false
 	var b := _target + Vector2(0.0, -40.0)
-	# heart 26 (crimson + rose)
-	var heart_crim := _Helpers.make_emitter({
-		"count": _pcount(12), "lifetime": 2.2, "color": COL_CRIMSON,
-		"speed_min": 150.0, "speed_max": 540.0,
-		"direction": Vector2.UP, "spread": 180.0,
-		"gravity": -43.2, "damping": 3.0,
-		"size_min": 14.0, "size_max": 30.0,
-		"additive": false,
-		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
-	})
-	heart_crim.position = b
-	add_child(heart_crim)
+	# heart rose (55% = 14)
 	var heart_rose := _Helpers.make_emitter({
-		"count": _pcount(14), "lifetime": 2.2, "color": COL_RED,
+		"count": _pcount(14), "lifetime": 1.8, "color": COL_RED,
 		"speed_min": 150.0, "speed_max": 540.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -43.2, "damping": 3.0,
 		"size_min": 14.0, "size_max": 30.0,
+		"size_base": 32.0,
+		"angle_min": -180.0, "angle_max": 180.0,
+		"angular_velocity_min": -34.0, "angular_velocity_max": 34.0,
+		"texture": _Helpers.heart_tex(),
 		"additive": false,
 		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 	heart_rose.position = b
 	add_child(heart_rose)
-	# petal 40 — feather_tex 회전
+	# heart crimson (45% = 12)
+	var heart_crim := _Helpers.make_emitter({
+		"count": _pcount(12), "lifetime": 1.8, "color": COL_CRIMSON,
+		"speed_min": 150.0, "speed_max": 540.0,
+		"direction": Vector2.UP, "spread": 180.0,
+		"gravity": -43.2, "damping": 3.0,
+		"size_min": 14.0, "size_max": 30.0,
+		"size_base": 32.0,
+		"angle_min": -180.0, "angle_max": 180.0,
+		"angular_velocity_min": -34.0, "angular_velocity_max": 34.0,
+		"texture": _Helpers.heart_tex(),
+		"additive": false,
+		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
+	})
+	heart_crim.position = b
+	add_child(heart_crim)
+	# petal 40 — 핑크빨강 타원, 회전
 	var petal := _Helpers.make_emitter({
-		"count": _pcount(40), "lifetime": 2.6, "color": COL_PETAL,
+		"count": _pcount(40), "lifetime": 2.1, "color": COL_PETAL,
 		"speed_min": 90.0, "speed_max": 330.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 72.0, "damping": 3.0,
@@ -90,15 +73,15 @@ func _spawn_impact_burst() -> void:
 		"size_base": 30.0,
 		"angle_min": -180.0, "angle_max": 180.0,
 		"angular_velocity_min": -275.0, "angular_velocity_max": 275.0,
+		"texture": _Helpers.petal_tex(),
 		"additive": false,
-		"texture": _Helpers.feather_tex(),
-		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
+		"start_alpha": 0.92, "mid_alpha": 0.46, "end_alpha": 0.0,
 	})
 	petal.position = b
 	add_child(petal)
-	# sparkle 60
-	var sparkle := _Helpers.make_emitter({
-		"count": _pcount(60), "lifetime": 1.7, "color": COL_HOT,
+	# sparkle 60 — 분홍빛 (rose 50% / crimson 50%)
+	var sparkle_rose := _Helpers.make_emitter({
+		"count": _pcount(30), "lifetime": 1.35, "color": Color(1.0, 0.835, 0.835),
 		"speed_min": 90.0, "speed_max": 450.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 36.0, "damping": 3.0,
@@ -107,18 +90,98 @@ func _spawn_impact_burst() -> void:
 		"texture": _Helpers.sparkle_tex(),
 		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
-	sparkle.position = b
-	add_child(sparkle)
-	# smoke 22 — 빨강
+	sparkle_rose.position = b
+	add_child(sparkle_rose)
+	var sparkle_crim := _Helpers.make_emitter({
+		"count": _pcount(30), "lifetime": 1.35, "color": Color(1.0, 0.620, 0.620),
+		"speed_min": 90.0, "speed_max": 450.0,
+		"direction": Vector2.UP, "spread": 180.0,
+		"gravity": 36.0, "damping": 3.0,
+		"size_min": 1.0, "size_max": 2.4,
+		"size_base": 4.0,
+		"texture": _Helpers.sparkle_tex(),
+		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
+	})
+	sparkle_crim.position = b
+	add_child(sparkle_crim)
+	# smoke 22 — 핏빛 연기 (원본 Color(1.0, 0.420, 0.500))
 	var smoke := _Helpers.make_emitter({
-		"count": _pcount(22), "lifetime": 2.3, "color": COL_DARK,
+		"count": _pcount(22), "lifetime": 1.85, "color": Color(1.0, 0.420, 0.500),
 		"speed_min": 48.0, "speed_max": 156.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -18.0, "damping": 3.0,
 		"size_min": 24.0, "size_max": 46.0,
 		"additive": false,
-		"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,
+		"start_alpha": 0.35, "mid_alpha": 0.17, "end_alpha": 0.0,
 	})
 	smoke.position = b
 	smoke.z_index = -1
 	add_child(smoke)
+
+# ── ambient (BUFF_TIME 동안 매 프레임) ──
+# 원본:
+#  - heart_small 0.5 확률 × 60 = 30/s × lifetime 1.9 ≈ 57 동시.
+#    pos = target + (0, -30) + (±50, -10~30), vel (±0.3, -0.5~-1.2)*60, lifetime 1.4~2.4, r 6~11.
+#    tint crimson 40% / rose 60%.
+#  - sparkle 0.3 확률 × 60 = 18/s × lifetime 1.7 ≈ 31 동시.
+#    pos = target + (0, -30) + (±55, ±20), vel (±0.4, -0.3~-0.8)*60, lifetime 1.2~2.2, r 1~2.
+func _spawn_ambient() -> void:
+	if _amb_made:
+		return
+	_amb_made = true
+	var ctr := _target + Vector2(0.0, -30.0)
+	# heart_small rose (60% = 34)
+	_gpu_amb_heart_rose = _Helpers.make_emitter({
+		"count": int(34 * _scale()), "lifetime": 1.9, "color": COL_RED,
+		"speed_min": 30.0, "speed_max": 78.0,
+		"direction": Vector2.UP, "spread": 18.0,
+		"gravity": 0.0, "damping": 3.0,
+		"size_min": 6.0, "size_max": 11.0,
+		"size_base": 32.0,
+		"angle_min": -180.0, "angle_max": 180.0,
+		"angular_velocity_min": -20.0, "angular_velocity_max": 20.0,
+		"texture": _Helpers.heart_tex(),
+		"additive": false,
+		"emission_shape": "box", "emission_box": Vector2(50.0, 20.0),
+		"one_shot": false, "explosiveness": 0.0,
+		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
+	})
+	_gpu_amb_heart_rose.position = ctr + Vector2(0.0, 10.0)
+	add_child(_gpu_amb_heart_rose)
+	# heart_small crimson (40% = 23)
+	_gpu_amb_heart_crim = _Helpers.make_emitter({
+		"count": int(23 * _scale()), "lifetime": 1.9, "color": COL_CRIMSON,
+		"speed_min": 30.0, "speed_max": 78.0,
+		"direction": Vector2.UP, "spread": 18.0,
+		"gravity": 0.0, "damping": 3.0,
+		"size_min": 6.0, "size_max": 11.0,
+		"size_base": 32.0,
+		"angle_min": -180.0, "angle_max": 180.0,
+		"angular_velocity_min": -20.0, "angular_velocity_max": 20.0,
+		"texture": _Helpers.heart_tex(),
+		"additive": false,
+		"emission_shape": "box", "emission_box": Vector2(50.0, 20.0),
+		"one_shot": false, "explosiveness": 0.0,
+		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
+	})
+	_gpu_amb_heart_crim.position = ctr + Vector2(0.0, 10.0)
+	add_child(_gpu_amb_heart_crim)
+	# sparkle 31 동시 (분홍빛)
+	_gpu_amb_sparkle = _Helpers.make_emitter({
+		"count": int(31 * _scale()), "lifetime": 1.7, "color": Color(1.0, 0.835, 0.835),
+		"speed_min": 24.0, "speed_max": 54.0,
+		"direction": Vector2.UP, "spread": 25.0,
+		"gravity": 0.0, "damping": 3.0,
+		"size_min": 1.0, "size_max": 2.0,
+		"size_base": 4.0,
+		"texture": _Helpers.sparkle_tex(),
+		"emission_shape": "box", "emission_box": Vector2(55.0, 20.0),
+		"one_shot": false, "explosiveness": 0.0,
+		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
+	})
+	_gpu_amb_sparkle.position = ctr
+	add_child(_gpu_amb_sparkle)
+	get_tree().create_timer(BUFF_TIME).timeout.connect(func() -> void:
+		if is_instance_valid(_gpu_amb_heart_rose): _gpu_amb_heart_rose.emitting = false
+		if is_instance_valid(_gpu_amb_heart_crim): _gpu_amb_heart_crim.emitting = false
+		if is_instance_valid(_gpu_amb_sparkle): _gpu_amb_sparkle.emitting = false)
