@@ -127,8 +127,12 @@ func _run() -> void:
 	if is_inside_tree():
 		queue_free()
 
+func _foot_spawn_pos() -> Vector2:
+	# 별가루/깃털 spawn 기준 — 발바닥 (set_ground_anchor 로 주입). fallback target + 30.
+	return _ground_pos if _has_ground else _target + Vector2(0.0, 30.0)
+
 func _spawn_burst() -> void:
-	var ctr := _target + Vector2(0.0, -30.0)
+	var ctr := _foot_spawn_pos()
 	# feather burst (일반 블렌드) — 텍스처 자체 색 + modulate WHITE.
 	# 원본: vel=(cos*sp, sin*sp-0.8), sp=1~4 → speed_min=60 speed_max=240, direction up bias.
 	# grav 0.01*PSPEED=0.6 px/frame/s → 36 px/s². rot 초기 ±0.6rad=±34°. spin ±0.05rad×60=±172°/s.
@@ -173,7 +177,7 @@ func _spawn_burst() -> void:
 	add_child(_mote_burst)  # 마지막 = 빛기둥 위
 
 func _spawn_rising() -> void:
-	var ctr := _target + Vector2(0.0, -30.0)
+	var ctr := _foot_spawn_pos()
 	# feather rising — 0.2 확률/frame × 60fps = 12/s × lifetime 2.05 = ~25 동시.
 	# vel.x=±0.3*60=±18, vel.y -36~-78. lifetime 2.05.
 	# spin ±0.04*60=±138°/s.

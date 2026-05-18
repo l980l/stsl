@@ -130,9 +130,13 @@ func _mk(pos: Vector2, vel: Vector2, max_life: float, r: float, kind: String,
 	return {"pos": pos, "vel": vel, "life": 0.0, "max_life": max_life, "r": r,
 		"kind": kind, "grav": grav, "rot": rot, "spin": spin}
 
+func _foot_spawn_pos() -> Vector2:
+	# 별가루/깃털 spawn 기준 — 발바닥 (set_ground_anchor 로 주입). fallback target + 30.
+	return _ground_pos if _has_ground else _target + Vector2(0.0, 30.0)
+
 # 발동 순간 — mote 25 + feather 10 폭발
 func _spawn_burst() -> void:
-	var ctr := _target + Vector2(0.0, -30.0)
+	var ctr := _foot_spawn_pos()
 	for _i in range(_pcount(25)):
 		var a := randf() * TAU
 		var sp := 2.0 + randf() * 5.0
@@ -147,7 +151,7 @@ func _spawn_burst() -> void:
 
 # BUFF_TIME 동안 매 프레임 — 기둥 형태로 위로 솟구침
 func _spawn_rising() -> void:
-	var ctr := _target + Vector2(0.0, -30.0)
+	var ctr := _foot_spawn_pos()
 	for _i in range(_pcount(2)):
 		_particles.append(_mk(ctr + Vector2(randf_range(-60.0, 60.0), 10.0),
 			Vector2(randf_range(-0.3, 0.3), -1.0 - randf() * 1.2),
