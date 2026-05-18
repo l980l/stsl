@@ -16,18 +16,27 @@ var _gpu_amb_heart_crim: GPUParticles2D
 var _gpu_amb_sparkle: GPUParticles2D
 var _amb_made: bool = false
 
-# trail emitters — 5 hearts 각각 1 emitter (heart_small). sparkle 은 super CPU 유지.
-var _gpu_trail_emitters: Array[GPUParticles2D] = []
+# trail emitters — 5 hearts 각각 heart + sparkle emitter (총 10).
+var _gpu_trail_emitters: Array[GPUParticles2D] = []      # heart_small × 5
+var _gpu_trail_sparkles: Array[GPUParticles2D] = []      # sparkle × 5
 var _trail_setup: bool = false
 
 func _setup_trail_emitters() -> void:
 	if _trail_setup:
 		return
 	_trail_setup = true
-	# heart_small: 1/frame × 60 × lifetime 0.95 ≈ 57 동시 per heart.
-	# vel (±0.4, -0.3~-0.8)*60, size 5~9. tint: fan i%2==1 crimson, big rose. → 0,2,4 rose / 1,3 crimson.
+	# heart tint: fan i%2==1 crimson, big rose. → 0,2,4 rose / 1,3 crimson.
 	var colors := [COL_RED, COL_CRIMSON, COL_RED, COL_CRIMSON, COL_RED]
+	# sparkle 색 (tint 별 — _draw_glow_pass 의 sparkle 색 매핑)
+	var sparkle_colors := [
+		Color(1.0, 0.835, 0.835),  # rose
+		Color(1.0, 0.620, 0.620),  # crimson
+		Color(1.0, 0.835, 0.835),
+		Color(1.0, 0.620, 0.620),
+		Color(1.0, 0.835, 0.835),
+	]
 	for i in 5:
+		# heart_small: 1/frame × 60 × lifetime 0.95 ≈ 57 동시 per heart.
 		var em := _Helpers.make_emitter({
 			"count": int(57 * _scale()), "lifetime": 0.95,
 			"color": colors[i],
@@ -45,12 +54,27 @@ func _setup_trail_emitters() -> void:
 		em.emitting = false
 		add_child(em)
 		_gpu_trail_emitters.append(em)
+		# sparkle: 0.4 확률 × 60 = 24/s × lifetime 0.85 ≈ 20 동시 per heart.
+		# vel (±1, ±1-0.2)*60 → speed magnitude 0~84 + y bias -12. spread 180.
+		var sp := _Helpers.make_emitter({
+			"count": int(20 * _scale()), "lifetime": 0.85,
+			"color": sparkle_colors[i],
+			"speed_min": 24.0, "speed_max": 84.0,
+			"direction": Vector2.UP, "spread": 180.0,
+			"gravity": -12.0, "damping": 3.0,
+			"size_min": 1.2, "size_max": 2.2,
+			"size_base": 4.0,
+			"texture": _Helpers.sparkle_tex(),
+			"one_shot": false, "explosiveness": 0.0,
+			"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
+		})
+		sp.emitting = false
+		add_child(sp)
+		_gpu_trail_sparkles.append(sp)
 
-# super 의 _spawn_trail override — heart_small 부분은 GPU (외부 _process), sparkle 만 CPU.
-func _spawn_trail(pos: Vector2, tint: String) -> void:
-	if randf() < 0.4 * _scale():
-		_particles.append(_mk(pos, Vector2(randf_range(-1, 1), randf_range(-1, 1) - 0.2),
-			0.6 + randf() * 0.5, 1.2 + randf() * 1.0, "sparkle", 0.0, 0.0, 0.0, tint))
+# super 의 _spawn_trail override — heart_small + sparkle 모두 GPU. super CPU _particles 안 채움.
+func _spawn_trail(_pos: Vector2, _tint: String) -> void:
+	pass
 
 func _process(delta: float) -> void:
 	super._process(delta)
@@ -69,15 +93,20 @@ func _process(delta: float) -> void:
 		if idx >= 0:
 			active_indices.append(idx)
 			var em: GPUParticles2D = _gpu_trail_emitters[idx]
+			var sp: GPUParticles2D = _gpu_trail_sparkles[idx]
 			if h["delay"] > 0.0:
 				em.emitting = false
+				sp.emitting = false
 			else:
 				em.emitting = true
 				em.position = h["pos"]
+				sp.emitting = true
+				sp.position = h["pos"]
 	# 비활성 emitter (현재 _hearts 에 없는) 끄기
 	for i in 5:
 		if not active_indices.has(i):
 			_gpu_trail_emitters[i].emitting = false
+			_gpu_trail_sparkles[i].emitting = false
 
 # ── impact burst ──
 # 원본:
