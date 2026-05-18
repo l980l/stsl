@@ -254,16 +254,16 @@ func _draw_word(canvas: CanvasItem, ga: float) -> void:
 	if theme_font == null:
 		theme_font = ThemeDB.fallback_font
 	var text := "Attention!"
-	var base_fsize: int = int(30 * _scale())
+	# 텍스트·흔들림은 파티클 갯수 옵션과 무관 — _scale() 곱셈 X (그래픽 옵션이 글씨 크기 줄이면 버그)
+	var base_fsize: int = 30
 	var origin := _caster + Vector2(0.0, WORD_OFFSET_Y)
-	var s: float = _scale()
 	for inst in _word_inst:
 		var fsize: int = int(base_fsize * float(inst["scale"]))
 		var size_v: Vector2 = theme_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize)
 		var rot: float = float(inst["rot"])
-		# 흔들림 (각 인스턴스 다른 phase) — 진폭 2~3px
-		var shake_x: float = sin(word_age * 90.0 + float(inst["shake_phase_x"])) * 2.5 * s
-		var shake_y: float = cos(word_age * 110.0 + float(inst["shake_phase_y"])) * 2.0 * s
+		# 흔들림 (각 인스턴스 다른 phase) — 진폭 2~3px 고정
+		var shake_x: float = sin(word_age * 90.0 + float(inst["shake_phase_x"])) * 2.5
+		var shake_y: float = cos(word_age * 110.0 + float(inst["shake_phase_y"])) * 2.0
 		var center: Vector2 = origin + inst["offset"] + Vector2(shake_x, shake_y)
 		# 회전 적용 — canvas 변환 사용
 		canvas.draw_set_transform(center, rot, Vector2.ONE)
