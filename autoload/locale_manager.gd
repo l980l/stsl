@@ -2,7 +2,7 @@
 extends Node
 
 const SETTINGS_PATH := "user://settings.cfg"
-const LOCALES: Array[String] = ["el", "en", "es", "fr", "it", "ja", "ko", "zh", "zh_TW"]
+const LOCALES: Array[String] = ["de", "el", "en", "es", "fr", "it", "ja", "ko", "pl", "pt", "ru", "zh", "zh_TW"]
 const DISPLAY_NAMES := {
 	"ko":    "한국어",
 	"en":    "English",
@@ -13,6 +13,10 @@ const DISPLAY_NAMES := {
 	"el":    "Ελληνικά",
 	"zh":    "简体中文",
 	"zh_TW": "繁體中文",
+	"ru":    "Русский",
+	"pt":    "Português",
+	"pl":    "Polski",
+	"de":    "Deutsch",
 }
 
 signal locale_changed(new_locale: String)

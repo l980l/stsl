@@ -1249,6 +1249,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 배경 시스템 v1 (M7.5) | PR #117·#119. SceneBackground 컴포넌트 (parallax 5 레이어 sky/far/mid/near/fg) + 6 신화 × 3 Act = 18 환경 팔레트 + EnvSpec (time_of_day × weather) + 6 신화 SVG 오브젝트 풀 (large/medium/small/pillars) + SceneCritters (새) + weather_particles (비·눈) — battle 씬 적용 |
 | 🟢 장기 | 배경 시스템 v2 — 잔여 (M7.5+) | DOF 셰이더 (거리 기반 blur, filmic 깊이감) + Light2D (어두운 배경 광원·그림자). 현 시점 분위기 충분 — "한 단계 더" 영역. event/rest/shop 은 별도 이미지로 이미 세팅·map 은 의도적으로 배경 없음 |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
+| ✅ 완료 | i18n 4 언어 인프라 + 7 csv 번역 (M8.5-3) | PR #XXX. ru/pt/pl/de 추가 (9→13 언어). LocaleManager LOCALES + DISPLAY_NAMES + project.godot 117 entry + test 13개로 갱신. 7/9 csv 직접 번역 (hero 15·synergy 30·status 45·relic 90·battle 137·ui 159·enemy 195 = 671행 × 4 언어). card 755·event 280 은 영어 fallback 으로 import 정상화 — 별도 PR 에서 진짜 번역. **1462 통과 / 0 fail** |
 | ✅ 완료 | 이벤트 BGM (M7-6) | 6 카테고리 모두 재생 가능. dark_3 → dark_1 rename + AudioManager variant 탐색 gap 허용으로 수정 (1~9 중 존재하는 것만 모음) |
 | 🟢 장기 | 비주얼 (M7-1~7-5) 캐릭터·카드 아트, 이펙트 | 몰입감 |
 | 🟢 장기 | 모바일 최적화 (M8-1~8-5) | 해상도·세이브·성능 |

@@ -2,14 +2,14 @@
 
 importer="csv_translation"
 type="Translation"
-uid="uid://bcard000001"
+uid="uid://dgftlf8ewo62r"
 
 [deps]
 
-files=["res://resources/translations/strings_card.ko.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.fr.translation", "res://resources/translations/strings_card.it.translation", "res://resources/translations/strings_card.es.translation", "res://resources/translations/strings_card.ja.translation", "res://resources/translations/strings_card.el.translation", "res://resources/translations/strings_card.zh.translation", "res://resources/translations/strings_card.zh_TW.translation"]
+files=["res://resources/translations/strings_card.ko.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.fr.translation", "res://resources/translations/strings_card.it.translation", "res://resources/translations/strings_card.es.translation", "res://resources/translations/strings_card.ja.translation", "res://resources/translations/strings_card.el.translation", "res://resources/translations/strings_card.zh.translation", "res://resources/translations/strings_card.zh_TW.translation", "res://resources/translations/strings_card.ru.translation", "res://resources/translations/strings_card.pt.translation", "res://resources/translations/strings_card.pl.translation", "res://resources/translations/strings_card.de.translation"]
 
 source_file="res://resources/translations/strings_card.csv"
-dest_files=["res://resources/translations/strings_card.ko.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.fr.translation", "res://resources/translations/strings_card.it.translation", "res://resources/translations/strings_card.es.translation", "res://resources/translations/strings_card.ja.translation", "res://resources/translations/strings_card.el.translation", "res://resources/translations/strings_card.zh.translation", "res://resources/translations/strings_card.zh_TW.translation"]
+dest_files=["res://resources/translations/strings_card.ko.translation", "res://resources/translations/strings_card.en.translation", "res://resources/translations/strings_card.fr.translation", "res://resources/translations/strings_card.it.translation", "res://resources/translations/strings_card.es.translation", "res://resources/translations/strings_card.ja.translation", "res://resources/translations/strings_card.el.translation", "res://resources/translations/strings_card.zh.translation", "res://resources/translations/strings_card.zh_TW.translation", "res://resources/translations/strings_card.ru.translation", "res://resources/translations/strings_card.pt.translation", "res://resources/translations/strings_card.pl.translation", "res://resources/translations/strings_card.de.translation"]
 
 [params]
 
