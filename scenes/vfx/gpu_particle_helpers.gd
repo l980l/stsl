@@ -48,54 +48,57 @@ static func sparkle_tex() -> Texture2D:
 	if _sparkle_tex == null:
 		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
 		img.fill(Color.TRANSPARENT)
-		# 코어 원 — 반경 12, 부드러운 페이드
+		# 코어 원 반경 4 (size_base=4) — solid + AA. size_min/max=픽셀반경 → scale = size/4.
+		# size 1.5 → scale 0.375 → 코어 직경 8*0.375=3, 막대 양쪽 20*0.375=7.5 (원본 pr*2.5 매칭).
 		for y in 64:
 			for x in 64:
-				var dx: float = float(x) - 32.0
-				var dy: float = float(y) - 32.0
+				var dx: float = float(x) - 31.5
+				var dy: float = float(y) - 31.5
 				var d: float = sqrt(dx * dx + dy * dy)
-				if d <= 12.0:
-					var a: float = 1.0 - (d / 12.0) * 0.5  # 가장자리 0.5 페이드
-					img.set_pixel(x, y, Color(1, 1, 1, a))
-		# 가로 막대 — y=30~33 (두께 4), x 8~56 (길이 48), 알파 가장자리 페이드
-		for x in range(4, 60):
-			var t: float = 1.0 - abs(float(x) - 32.0) / 28.0
-			t = clampf(t, 0.0, 1.0)
-			for dy in range(-2, 3):
+				if d <= 4.0:
+					img.set_pixel(x, y, Color.WHITE)
+				elif d <= 5.0:
+					img.set_pixel(x, y, Color(1, 1, 1, 1.0 - (d - 4.0)))
+		# 가로 막대 — y 30~33 (두께 4), x 12~52 (길이 40 = 양쪽 20)
+		for x in range(12, 52):
+			var t_len: float = clampf(1.0 - abs(float(x) - 32.0) / 20.0, 0.0, 1.0)
+			for dy in range(-2, 2):
 				var py: int = 32 + dy
-				if py >= 0 and py < 64:
-					var existing: Color = img.get_pixel(x, py)
-					var new_a: float = maxf(existing.a, t * (1.0 - abs(float(dy)) / 2.5))
-					img.set_pixel(x, py, Color(1, 1, 1, new_a))
-		# 세로 막대 — x=30~33 (두께 4), y 8~56 (길이 48)
-		for y in range(4, 60):
-			var t: float = 1.0 - abs(float(y) - 32.0) / 28.0
-			t = clampf(t, 0.0, 1.0)
-			for dx in range(-2, 3):
+				var t_thick: float = 1.0 - abs(float(dy) + 0.5) / 2.0
+				var new_a: float = clampf(t_len * t_thick, 0.0, 1.0)
+				var existing: Color = img.get_pixel(x, py)
+				img.set_pixel(x, py, Color(1, 1, 1, maxf(existing.a, new_a)))
+		# 세로 막대 — x 30~33 (두께 4), y 12~52 (길이 40)
+		for y in range(12, 52):
+			var t_len: float = clampf(1.0 - abs(float(y) - 32.0) / 20.0, 0.0, 1.0)
+			for dx in range(-2, 2):
 				var px: int = 32 + dx
-				if px >= 0 and px < 64:
-					var existing: Color = img.get_pixel(px, y)
-					var new_a: float = maxf(existing.a, t * (1.0 - abs(float(dx)) / 2.5))
-					img.set_pixel(px, y, Color(1, 1, 1, new_a))
+				var t_thick: float = 1.0 - abs(float(dx) + 0.5) / 2.0
+				var new_a: float = clampf(t_len * t_thick, 0.0, 1.0)
+				var existing: Color = img.get_pixel(px, y)
+				img.set_pixel(px, y, Color(1, 1, 1, maxf(existing.a, new_a)))
 		_sparkle_tex = ImageTexture.create_from_image(img)
 	return _sparkle_tex
 
-# 깃털 — 길쭉한 타원 (가로:세로 = 14:30) + 가운데 음영 살짝. 원본 holy_buff feather 와 동일 형태.
-# 회전은 GPUParticles2D 의 angle/angular_velocity 로 처리.
+# 깃털 — 외곽 타원 (가로 14, 세로 30, COL_FEATHER) + 내부 음영 (가로 5, 세로 16, y=-10, COL_HOT).
+# 원본 holy_buff feather 의 두 폴리곤 정확 매핑. 텍스처 자체에 색 미리 그림 — modulate Color.WHITE.
+# 회전은 GPUParticles2D angle/angular_velocity (disable_z=true 필수).
 static func feather_tex() -> Texture2D:
 	if _feather_tex == null:
 		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
 		img.fill(Color.TRANSPARENT)
-		# 외곽 타원 (가로 14, 세로 30)
+		var col_outer := Color(1.0, 0.902, 0.627)  # COL_FEATHER
+		var col_inner := Color(1.0, 0.965, 0.776)  # COL_HOT (내부 음영 — 더 밝음)
+		# 외곽 타원 — alpha 0.9 base
 		for y in 64:
 			for x in 64:
 				var dx: float = (float(x) - 32.0) / 14.0
 				var dy: float = (float(y) - 32.0) / 30.0
 				var d: float = dx * dx + dy * dy
 				if d <= 1.0:
-					var a: float = clampf(1.0 - d * d, 0.0, 1.0)  # 부드러운 가장자리
-					img.set_pixel(x, y, Color(1, 1, 1, a * 0.9))
-		# 내부 음영 — 작은 타원 (가로 5, 세로 16), y 약간 위
+					var a: float = clampf(1.0 - d * d, 0.0, 1.0) * 0.9
+					img.set_pixel(x, y, Color(col_outer.r, col_outer.g, col_outer.b, a))
+		# 내부 작은 타원 (위쪽 y=22) — COL_HOT, 외곽 alpha 와 곱해서 덮어쓰기
 		for y in 64:
 			for x in 64:
 				var dx: float = (float(x) - 32.0) / 5.0
@@ -104,8 +107,10 @@ static func feather_tex() -> Texture2D:
 				if d <= 1.0:
 					var existing: Color = img.get_pixel(x, y)
 					if existing.a > 0.0:
-						var new_a: float = minf(1.0, existing.a + (1.0 - d) * 0.3)
-						img.set_pixel(x, y, Color(1, 1, 1, new_a))
+						# 원본: draw_colored_polygon(inner, Color(COL_HOT, 0.7 * a)). a = outer alpha.
+						var inner_a: float = existing.a * 0.7 + (1.0 - d) * 0.2
+						inner_a = clampf(inner_a, existing.a, 1.0)
+						img.set_pixel(x, y, Color(col_inner.r, col_inner.g, col_inner.b, inner_a))
 		_feather_tex = ImageTexture.create_from_image(img)
 	return _feather_tex
 

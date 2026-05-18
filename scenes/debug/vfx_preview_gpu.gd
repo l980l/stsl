@@ -4,9 +4,9 @@
 extends Node2D
 
 # 같은 VFX 의 GPU/CPU 버전 페어 — 토글로 전환 비교
-# holy_buff 는 GPU 변환 시각 불일치 너무 큼 → 폐기. CPU 만 사용.
 const VFX_PAIRS := [
 	{"name": "warrior_buff", "gpu": "res://scenes/vfx/warrior_buff_gpu.gd", "cpu": "res://scenes/vfx/warrior_buff.gd"},
+	{"name": "holy_buff",    "gpu": "res://scenes/vfx/holy_buff_gpu.gd",    "cpu": "res://scenes/vfx/holy_buff.gd"},
 	{"name": "boss_death",   "gpu": "res://scenes/vfx/boss_death_gpu.gd",   "cpu": "res://scenes/vfx/boss_death.gd"},
 	{"name": "sig_ragnarok", "gpu": "res://scenes/vfx/sig_ragnarok_gpu.gd", "cpu": "res://scenes/vfx/sig_ragnarok.gd"},
 	{"name": "fire_blast",   "gpu": "res://scenes/vfx/fire_blast_gpu.gd",   "cpu": "res://scenes/vfx/fire_blast.gd"},
@@ -19,7 +19,7 @@ const _SPRITE_H := 192.0
 const _CHAR_FOOT_Y_OFFSET := 96.0
 
 # caster 무시 / 타겟 위치 발치 anchor 사용하는 VFX (vfx_preview.gd 의 분기와 동일)
-const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff"]
+const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff", "holy_buff"]
 
 var _caster_pos := Vector2(420, 540)
 var _target_pos := Vector2(1500, 540)
@@ -70,7 +70,7 @@ func _ready() -> void:
 	vfx_lbl.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
 	panel.add_child(vfx_lbl)
 	var grid := GridContainer.new()
-	grid.columns = 4
+	grid.columns = 5
 	panel.add_child(grid)
 	for entry in VFX_PAIRS:
 		var b := Button.new()
