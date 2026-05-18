@@ -60,7 +60,7 @@ func play(_caster_pos: Vector2, target_pos: Vector2) -> void:
 	var foot: Vector2 = _foot_pos()
 	var spawn_pos := Vector2(foot.x, foot.y + RECT_BOT_OFFSET)
 	_ember_emitter = _Helpers.make_emitter({
-		"count": _pcount(130),
+		"count": _pcount(220),
 		"lifetime": 1.8,
 		"color": COL_EMBER,
 		"speed_min": 72.0, "speed_max": 168.0,

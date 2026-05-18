@@ -23,7 +23,7 @@ func _scale() -> float:
 const COL_HOT   := Color(1.0, 0.949, 0.753)
 const COL_MID   := Color(1.0, 0.706, 0.329)
 const COL_DEEP  := Color(1.0, 0.353, 0.122)
-const COL_SMOKE := Color(0.156, 0.110, 0.086)
+const COL_SMOKE := Color(0.35, 0.30, 0.27)  # 원본보다 밝게 (덜 검게)
 
 const ORB_CHARGE_START := 0.12
 const ORB_CHARGE_FULL  := 0.36

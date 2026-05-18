@@ -251,6 +251,7 @@ static func make_dust_emitter(color: Color, count: int, lifetime: float,
 	})
 
 # 갈색 chunk (회전 파편 — warrior_buff, boss_death)
+# size_min/max 는 원본 draw_colored_polygon 의 한 변 픽셀 (size_base 64).
 static func make_chunk_emitter(color: Color, count: int, lifetime: float,
 		speed_min: float, speed_max: float, gravity: float = 220.0,
 		size_min: float = 0.5, size_max: float = 1.2) -> GPUParticles2D:
@@ -258,6 +259,7 @@ static func make_chunk_emitter(color: Color, count: int, lifetime: float,
 		"count": count, "lifetime": lifetime, "color": color,
 		"speed_min": speed_min, "speed_max": speed_max, "gravity": gravity,
 		"size_min": size_min, "size_max": size_max,
+		"size_base": 64.0,  # square_tex 한 변 64px = size 픽셀 값 그대로
 		"additive": false, "texture": square_tex(),
 		"angle_min": -180.0, "angle_max": 180.0,
 		"angular_velocity_min": -360.0, "angular_velocity_max": 360.0,

@@ -27,14 +27,16 @@ func _spawn_ember() -> void:
 		return
 	_gpu_ember_made = true
 	var ctr: Vector2 = _blast_pos()
+	# 원본 ember 색: COL_BRASS (0.956, 0.862, 0.627) 황금. COL_FIRE 아님.
+	# 0.2 확률/frame * 60 * lifetime 2 ≈ 24 동시. 60 으로 키워서 더 풍성하게.
 	_gpu_ember = _Helpers.make_emitter({
-		"count": int(28 * _scale()),
+		"count": int(60 * _scale()),
 		"lifetime": 2.0,
-		"color": COL_FIRE,
+		"color": Color(0.956, 0.862, 0.627),  # COL_BRASS
 		"speed_min": 90.0, "speed_max": 210.0,
-		"direction": Vector2.UP, "spread": 12.0,  # 좁게 위로만
+		"direction": Vector2.UP, "spread": 12.0,
 		"gravity": 0.0, "damping": 3.0,
-		"size_min": 1.8, "size_max": 3.8,  # 원본 그대로
+		"size_min": 1.8, "size_max": 3.8,
 		"emission_shape": "box", "emission_box": Vector2(100.0, 40.0),
 		"one_shot": false, "explosiveness": 0.0,
 	})
