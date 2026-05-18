@@ -37,9 +37,11 @@ func _init() -> void:
 
 	var f := FileAccess.open(OUT_PATH, FileAccess.WRITE)
 	if f == null:
-		push_error("Cannot open output: %s" % OUT_PATH)
+		push_error("Cannot open output: %s — 파일이 다른 프로그램 (Excel 등) 에 열려있는지 확인" % OUT_PATH)
 		quit(1)
 		return
+	# UTF-8 BOM — Excel 등 Windows 도구에서 한글 인코딩 자동 인식
+	f.store_buffer(PackedByteArray([0xEF, 0xBB, 0xBF]))
 	for line in lines:
 		f.store_line(line)
 	f.close()

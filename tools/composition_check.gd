@@ -35,12 +35,12 @@ const COMMON_STATUS := ["poison", "weak", "vulnerable", "charm", "strength", "ta
 var _decks: Dictionary = {}
 # WARN / FAIL 카운트
 var _summary: Dictionary = {}
-# archetype 키 (예: card.cleopatra.poison_seed.archetype) → 한글 archetype 명 ("독살" 등)
-var _archetype_ko: Dictionary = {}
+# i18n 한글 매핑 (card.X.Y.archetype / card.X.Y.name / status.X.name 등 키 → ko)
+var _ko: Dictionary = {}
 
 func _initialize() -> void:
 	_load_all_cards()
-	_load_archetype_translations()
+	_load_translations(["res://resources/translations/strings_card.csv", "res://resources/translations/strings_status.csv"])
 	print("══════════════════════════════════════════════")
 	print("  STSL Card Composition Check")
 	print("══════════════════════════════════════════════\n")
@@ -70,29 +70,31 @@ func _load_all_cards() -> void:
 			"pool": HeroCards.pool(),
 		}
 
-# strings_card.csv 직접 파싱해서 archetype 키 → 한글 명 매핑.
+# csv 들에서 ko 컬럼을 읽어 _ko 딕셔너리에 누적.
 # 헤드리스 환경에서 TranslationServer 로드가 불완전할 수 있어 csv 직접 읽음.
-func _load_archetype_translations() -> void:
-	var f := FileAccess.open("res://resources/translations/strings_card.csv", FileAccess.READ)
-	if f == null:
-		push_error("strings_card.csv 로드 실패")
-		return
-	var header := f.get_csv_line()
-	var ko_idx := -1
-	for i in range(header.size()):
-		if header[i] == "ko":
-			ko_idx = i
-			break
-	if ko_idx < 0:
-		push_error("strings_card.csv 에 ko 컬럼 없음")
-		return
-	while not f.eof_reached():
-		var row := f.get_csv_line()
-		if row.size() <= ko_idx:
+func _load_translations(paths: Array) -> void:
+	for path in paths:
+		var f := FileAccess.open(path, FileAccess.READ)
+		if f == null:
+			push_error("로드 실패: " + path)
 			continue
-		var key: String = row[0]
-		if key.ends_with(".archetype"):
-			_archetype_ko[key] = row[ko_idx]
+		var header := f.get_csv_line()
+		var ko_idx := -1
+		for i in range(header.size()):
+			if header[i] == "ko":
+				ko_idx = i
+				break
+		if ko_idx < 0:
+			continue
+		while not f.eof_reached():
+			var row := f.get_csv_line()
+			if row.size() <= ko_idx:
+				continue
+			_ko[row[0]] = row[ko_idx]
+
+# 키 → 한글 (없으면 fallback)
+func _t(key: String, fallback: String = "") -> String:
+	return _ko.get(key, fallback if fallback != "" else key)
 
 # 영웅별 pool 카드 (검토 대부분 pool 기준 — starter 는 strike/defend 위주라 분포 왜곡)
 func _pool(hero: String) -> Array:
@@ -260,14 +262,15 @@ func _check_status_types() -> void:
 		if hero_use == 1:
 			mark = "  ⚠ 공통 status 인데 1 영웅 전용 (다양성 부족)"
 			warn += 1
-		print("     %-20s ×%d  (사용 영웅 %d/6)%s" % [k, global_count[k], hero_use, mark])
+		var label: String = _t("status.%s.name" % k, k)
+		print("     %-12s (%-10s) ×%d  (사용 영웅 %d/6)%s" % [label, k, global_count[k], hero_use, mark])
 	print("  -- 고유 power/condition (영웅 고유 메커니즘 — 정상) --")
 	for k in other_keys:
 		var hero_use: int = 0
 		for hero in _hero_names():
 			if hero_types[hero].has(k):
 				hero_use += 1
-		print("     %-32s ×%d  (사용 영웅 %d/6)" % [k, global_count[k], hero_use])
+		print("     %-36s ×%d  (사용 영웅 %d/6)" % [k, global_count[k], hero_use])
 	_summary["status_type"] = {"warn": warn, "fail": 0}
 	print("")
 
@@ -286,7 +289,7 @@ func _check_archetype_diff() -> void:
 			var arche_key: String = card.archetype
 			if arche_key == "":
 				continue
-			var arche: String = _archetype_ko.get(arche_key, arche_key)
+			var arche: String = _t(arche_key, arche_key)
 			if not arche_sets.has(arche):
 				arche_sets[arche] = {}
 				arche_counts[arche] = 0
@@ -362,7 +365,7 @@ func _check_starter_deck() -> void:
 		keys.sort()
 		for id in keys:
 			var n: int = by_id[id]
-			parts.append("%s×%d" % [_card_short(id), n])
+			parts.append("%s×%d" % [_t(id, _card_short(id)), n])
 			if id.ends_with(".strike.name") or id.ends_with(".defend.name"):
 				basic += n
 			else:

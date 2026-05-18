@@ -1,4 +1,4 @@
-mythology,enc_idx,difficulty_label,monster_count,total_hp,cycle_damage,attack_count,t1_count,t2t3_count,death_rattle,sigs_enabled,risk_score,monsters,mechanisms
+﻿mythology,enc_idx,difficulty_label,monster_count,total_hp,cycle_damage,attack_count,t1_count,t2t3_count,death_rattle,sigs_enabled,risk_score,monsters,mechanisms
 greek,0,매우약함,1,220,110,2,0,0,0,1 disabled,1,fly_harpy,-
 greek,1,약함,2,500,420,6,0,0,0,2 disabled,7,myrmidon|myrmidon,-
 greek,2,약함,1,350,160,2,0,0,0,1 disabled,3,satyr,-
@@ -25,7 +25,7 @@ egyptian,2,약함,1,350,240,3,0,0,0,1 disabled,4,sphinx_cub,-
 egyptian,3,보통,2,730,320,4,1,0,1,all,22,desert_scorpion|sand_wraith,DEATH_RATTLE|PHASE_TRIGGER
 egyptian,4,보통,3,840,450,6,0,0,0,all,17,sand_rat|sand_rat|sand_rat,-
 egyptian,5,다소강함,3,1070,510,6,1,1,0,all,33,anubis_guard|sand_scout|nile_crocodile,BUFF_ALLY|PHASE_TRIGGER
-egyptian,6,강함,3,1210,710,3,0,2,0,all,42,clay_soldier|clay_soldier|sand_ifrit,BUFF_ALLY
+egyptian,6,강함,3,1210,560,3,0,2,0,all,39,clay_soldier|clay_soldier|sand_ifrit,BUFF_ALLY
 egyptian,7,강함,4,1230,475,7,0,2,2,all,45,tomb_wraith|khopesh_warrior|jackal_priest|desert_ghoul,DEATH_RATTLE|BUFF_ALLY|HEAL_ALLY
 egyptian,8,매우강함,3,1450,880,6,2,0,0,all,41,mummy_warrior|sobek_spawn|ammit_cub,PHASE_TRIGGER
 egyptian,9,최강,2,1400,1050,6,1,1,0,all,48,sphinx_adult|pyramid_golem,PHASE_TRIGGER|BUFF_ALLY
@@ -58,4 +58,4 @@ japanese,5,다소강함,3,850,295,5,1,1,2,all,34,yamabiko|ittan_momen|azuki_wash
 japanese,6,강함,3,1270,840,7,3,0,0,all,43,oni|oni|samurai_ghost,PHASE_TRIGGER
 japanese,7,강함,4,1260,530,7,2,1,1,all,44,river_kappa|snow_woman|cursed_scroll|tatami_monster,HEAL_ALLY|PHASE_TRIGGER|DEATH_RATTLE
 japanese,8,매우강함,3,1370,890,7,2,1,0,all,48,ronin_ghost|yamabushi_ghost|dragon_serpent,PHASE_TRIGGER|BUFF_ALLY
-japanese,9,최강,2,1380,1060,5,0,2,0,all,50,oni_king|hannya,WARD
+japanese,9,최강,2,1380,920,4,0,2,0,all,47,oni_king|hannya,WARD

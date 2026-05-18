@@ -1,0 +1,176 @@
+Godot Engine v4.6.2.stable.official.71f334935 - https://godotengine.org
+
+══════════════════════════════════════════════
+  STSL Card Composition Check
+══════════════════════════════════════════════
+
+[1/8] Cost Curve (pool 기준, 영웅별 0/1/2/3+ 코스트 분포)
+  영웅               0코   1코   2코   3+   평균
+  cleopatra         1   17   12    1   1.42
+  napoleon          2   21    8    0   1.19
+  yi_sun_sin        0   18   13    0   1.42
+  joan_of_arc       0   18   12    1   1.45
+  genghis_khan      2   18   11    0   1.29
+  musashi           4   17   10    0   1.19 ⚠ 0코 4 장 — 권장 ≤ 3
+
+[2/8] Card Type 분포 (pool 기준 — ATTACK/SKILL/POWER)
+  영웅             ATTACK  SKILL  POWER   ATTACK 비율
+  cleopatra          11     15      5   35%
+  napoleon           14     12      5   45%
+  yi_sun_sin         11     15      5   35%
+  joan_of_arc        10     15      6   32%
+  genghis_khan       14     12      5   45%
+  musashi            17     10      4   54%
+
+[3/8] EffectType 커버리지 (enum 전체 중 어떤 카드도 안 쓰는 것)
+  사용: 37 / 42  |  미사용: 5 종
+  ❌ 미사용 EffectType (정의됐으나 카드 0장):
+     - DAMAGE_PER_DEAD_ALLY
+     - DOUBLE_NEXT_DAMAGE
+     - DAMAGE_PER_HAND_SIZE
+     - HEAL_PER_DEAD_ALLY
+     - ENERGY_TO_DAMAGE
+
+[4/8] damage_type 다양성 (DAMAGE 계열 effect.damage_type 분포, 영웅별 집합)
+  cleopatra       curse×6, poison×8
+  napoleon        blunt×12, explosive×4
+  yi_sun_sin      blunt×6, explosive×3, slash×4
+  joan_of_arc     holy_blunt×3, holy_bolt×1, holy_fire×1, holy_strike×5
+  genghis_khan    blunt×7, projectile×2, slash×5
+  musashi         holy_slash×3, slash×14
+
+[5/8] status_type 다양성 (APPLY_STATUS·POISON_BURST 등의 status_type 분포)
+  cleopatra       poison×9, power.block_per_turn×1, power.charm_double_apply×1, power.charm_threshold_minus×1, power.debuff_amplify×1, power.on_enthrall_strength×1, power.poison_per_turn×1, power.spend_all_energy_poison_double×1, vulnerable×3, weak×4
+  napoleon        has_morale×1, has_morale_2×1, power.block_per_turn×1, power.draw_per_turn×1, power.morale_per_turn×2, vulnerable×1, weak×1
+  yi_sun_sin      low_hp×3, power.block_per_turn×2, power.draw_per_turn×1, power.every_nth_attack_bonus×1, power.morale_per_turn×1, very_low_hp×1
+  joan_of_arc     block×1, power.block_per_turn×1, power.heal_team_per_turn×3, power.sacrifice_bank×1, power.strength_player×2, taunt×1, vulnerable×3, weak×2
+  genghis_khan    enemy_hp_below_30×1, power.block_per_turn×1, power.draw_per_turn×1, power.on_kill_energy×1, power.summon_per_turn×1, power.token_bonus_dmg×1, vulnerable×1
+  musashi         duel_lock×1, enemy_count_1×6, hand_size_0×3, poison×1, power.bonus_per_hit×1, power.echo_next_attack×1, power.every_nth_attack_bonus×1, power.speed_buff×1, power.strength_player×2, vulnerable×3, weak×2
+  -- 공통 status 사용 빈도 (정해진 표준 디버프·버프) --
+     취약           (vulnerable) ×11  (사용 영웅 5/6)
+     독            (poison    ) ×10  (사용 영웅 2/6)
+     약화           (weak      ) ×9  (사용 영웅 4/6)
+     도발           (taunt     ) ×1  (사용 영웅 1/6)  ⚠ 공통 status 인데 1 영웅 전용 (다양성 부족)
+     block        (block     ) ×1  (사용 영웅 1/6)  ⚠ 공통 status 인데 1 영웅 전용 (다양성 부족)
+  -- 고유 power/condition (영웅 고유 메커니즘 — 정상) --
+     power.block_per_turn                 ×6  (사용 영웅 5/6)
+     enemy_count_1                        ×6  (사용 영웅 1/6)
+     power.strength_player                ×4  (사용 영웅 2/6)
+     power.heal_team_per_turn             ×3  (사용 영웅 1/6)
+     hand_size_0                          ×3  (사용 영웅 1/6)
+     power.morale_per_turn                ×3  (사용 영웅 2/6)
+     low_hp                               ×3  (사용 영웅 1/6)
+     power.draw_per_turn                  ×3  (사용 영웅 3/6)
+     power.every_nth_attack_bonus         ×2  (사용 영웅 2/6)
+     power.summon_per_turn                ×1  (사용 영웅 1/6)
+     power.token_bonus_dmg                ×1  (사용 영웅 1/6)
+     enemy_hp_below_30                    ×1  (사용 영웅 1/6)
+     power.on_kill_energy                 ×1  (사용 영웅 1/6)
+     power.bonus_per_hit                  ×1  (사용 영웅 1/6)
+     duel_lock                            ×1  (사용 영웅 1/6)
+     power.echo_next_attack               ×1  (사용 영웅 1/6)
+     power.speed_buff                     ×1  (사용 영웅 1/6)
+     power.sacrifice_bank                 ×1  (사용 영웅 1/6)
+     very_low_hp                          ×1  (사용 영웅 1/6)
+     has_morale_2                         ×1  (사용 영웅 1/6)
+     has_morale                           ×1  (사용 영웅 1/6)
+     power.on_enthrall_strength           ×1  (사용 영웅 1/6)
+     power.charm_double_apply             ×1  (사용 영웅 1/6)
+     power.charm_threshold_minus          ×1  (사용 영웅 1/6)
+     power.debuff_amplify                 ×1  (사용 영웅 1/6)
+     power.spend_all_energy_poison_double ×1  (사용 영웅 1/6)
+     power.poison_per_turn                ×1  (사용 영웅 1/6)
+
+[6/8] Archetype 차별성 (영웅별 archetype 그룹의 effect_type set Jaccard 유사도)
+  각 카드의 archetype 키는 한글 번역으로 그룹화 (예: '독살', '저주', '조종').
+  유사도 = effect_type 집합의 Jaccard. > 0.40 면 메커니즘 중복으로 WARN.
+
+  cleopatra — 독살(12장), 저주(10장), 조종(9장)
+    독살 vs 저주: 0.22
+    독살 vs 조종: 0.17
+    저주 vs 조종: 0.22
+
+  napoleon — 군단(12장), 돌격(11장), 사기(1장), 지휘(7장)
+    군단 vs 돌격: 0.38
+    군단 vs 사기: 0.00
+    군단 vs 지휘: 0.45  ⚠ effect 패턴 중복 높음
+    돌격 vs 사기: 0.10
+    돌격 vs 지휘: 0.45  ⚠ effect 패턴 중복 높음
+    사기 vs 지휘: 0.13
+
+  yi_sun_sin — 거북선(10장), 필사즉생(10장), 학익진(11장)
+    거북선 vs 필사즉생: 0.25
+    거북선 vs 학익진: 0.23
+    필사즉생 vs 학익진: 0.31
+
+  joan_of_arc — 깃발(1장), 부활(4장), 성전(2장), 순교(9장), 신성(3장), 신성공격(6장), 정화(1장), 축복(5장)
+    깃발 vs 부활: 0.20
+    깃발 vs 성전: 0.00
+    깃발 vs 순교: 0.29
+    깃발 vs 신성: 0.00
+    깃발 vs 신성공격: 0.20
+    깃발 vs 정화: 0.33
+    깃발 vs 축복: 0.17
+    부활 vs 성전: 0.00
+    부활 vs 순교: 0.22
+    부활 vs 신성: 0.14
+    부활 vs 신성공격: 0.33
+    부활 vs 정화: 0.20
+    부활 vs 축복: 0.29
+    성전 vs 순교: 0.14
+    성전 vs 신성: 0.00
+    성전 vs 신성공격: 0.25
+    성전 vs 정화: 0.00
+    성전 vs 축복: 0.00
+    순교 vs 신성: 0.38
+    순교 vs 신성공격: 0.57  ⚠ effect 패턴 중복 높음
+    순교 vs 정화: 0.13
+    순교 vs 축복: 0.33
+    신성 vs 신성공격: 0.33
+    신성 vs 정화: 0.00
+    신성 vs 축복: 0.50  ⚠ effect 패턴 중복 높음
+    신성공격 vs 정화: 0.20
+    신성공격 vs 축복: 0.29
+    정화 vs 축복: 0.17
+
+  genghis_khan — 기동(13장), 몽골 기병(10장), 약탈(8장)
+    기동 vs 몽골 기병: 0.19
+    기동 vs 약탈: 0.43  ⚠ effect 패턴 중복 높음
+    몽골 기병 vs 약탈: 0.21
+
+  musashi — 결투(10장), 무심(11장), 이도류(10장)
+    결투 vs 무심: 0.38
+    결투 vs 이도류: 0.25
+    무심 vs 이도류: 0.30
+
+[7/8] 태그 분포 (pool 기준 — exhaust/ethereal/retain/innate)
+  영웅              exhaust  ethereal  retain  innate
+  cleopatra             3         0       0       0
+  napoleon              3         0       1       1
+  yi_sun_sin            1         0       1       1
+  joan_of_arc           4         0       0       0
+  genghis_khan          4         0       0       0
+  musashi               6         1       0       0
+
+[8/8] Starter Deck 구성 (각 영웅 starter_deck() 10장)
+  cleopatra      10장: 디펜드×4, 왕실 방어×1, 스트라이크×4, 독침×1
+  napoleon       10장: 디펜드×4, 스트라이크×4, 신속 행군×1, 전투 나팔×1
+  yi_sun_sin     10장: 역공×1, 디펜드×4, 방패×1, 스트라이크×4
+  joan_of_arc    10장: 디펜드×4, 신성 강타×1, 방패 기도×1, 스트라이크×4
+  genghis_khan   10장: 디펜드×4, 기마 돌격×1, 기마 소환×1, 스트라이크×4
+  musashi        10장: 디펜드×4, 방어 자세×1, 이도 입문×1, 스트라이크×4
+
+══════════════════════════════════════════════
+SUMMARY
+  cost_curve         1 WARN
+  card_type          OK
+  effect_coverage    5 FAIL
+  damage_type        OK
+  status_type        2 WARN
+  archetype_diff     5 WARN
+  tags               OK
+  starter_deck       OK
+
+  Outlier 총: 5 FAIL / 8 WARN — 별도 PR 에서 수정 결정
+══════════════════════════════════════════════
+[Locale] boot → ko
