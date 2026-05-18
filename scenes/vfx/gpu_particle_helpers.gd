@@ -10,6 +10,7 @@ static var _circle_tex: Texture2D
 static var _square_tex: Texture2D
 static var _sparkle_tex: Texture2D
 static var _feather_tex: Texture2D
+static var _heart_tex: Texture2D
 
 # 100% 솔리드 원 + 가장자리 1px 안티앨리어싱.
 # CPU draw_circle(pos, r, col) 과 거의 동일 — 가장자리 페이드 없음.
@@ -79,6 +80,57 @@ static func sparkle_tex() -> Texture2D:
 				img.set_pixel(px, y, Color(1, 1, 1, maxf(existing.a, new_a)))
 		_sparkle_tex = ImageTexture.create_from_image(img)
 	return _sparkle_tex
+
+# 하트 — charm_kiss heart_unit() 의 32점 베지어 폴리곤 fill.
+# 64×64, 중심 (31.5, 31.5), unit size 32 → 텍스처 폭 거의 전체 사용 → size_base = 16.
+# size 14 → scale 0.875 → 28px (원본 heart size 와 매칭).
+static func heart_tex() -> Texture2D:
+	if _heart_tex == null:
+		var pts := _heart_unit_pts()
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		for y in 64:
+			for x in 64:
+				var p := Vector2(float(x) - 31.5, float(y) - 31.5)
+				if _point_in_polygon(p, pts):
+					img.set_pixel(x, y, Color.WHITE)
+		_heart_tex = ImageTexture.create_from_image(img)
+	return _heart_tex
+
+# charm_kiss.heart_unit() 와 동일 — 32점 베지어 (4 큐빅 × 8샘플)
+static func _heart_unit_pts() -> PackedVector2Array:
+	var ctrl := [
+		Vector2(0, 12), Vector2(-14, 4), Vector2(-18, -6), Vector2(-12, -12),
+		Vector2(-12, -12), Vector2(-6, -18), Vector2(0, -14), Vector2(0, -8),
+		Vector2(0, -8), Vector2(0, -14), Vector2(6, -18), Vector2(12, -12),
+		Vector2(12, -12), Vector2(18, -6), Vector2(14, 4), Vector2(0, 12),
+	]
+	var p := PackedVector2Array()
+	for seg in range(4):
+		var a: Vector2 = ctrl[seg * 4]
+		var b: Vector2 = ctrl[seg * 4 + 1]
+		var c: Vector2 = ctrl[seg * 4 + 2]
+		var d: Vector2 = ctrl[seg * 4 + 3]
+		for i in range(8):
+			var t := float(i) / 8.0
+			var u := 1.0 - t
+			p.append(u * u * u * a + 3.0 * u * u * t * b + 3.0 * u * t * t * c + t * t * t * d)
+	return p
+
+# 폴리곤 안쪽 검사 (ray casting). pts 는 단위 중심 (0,0) 기준.
+static func _point_in_polygon(p: Vector2, pts: PackedVector2Array) -> bool:
+	var inside := false
+	var n := pts.size()
+	var j := n - 1
+	for i in range(n):
+		var pi: Vector2 = pts[i]
+		var pj: Vector2 = pts[j]
+		if ((pi.y > p.y) != (pj.y > p.y)):
+			var x_intersect = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x
+			if p.x < x_intersect:
+				inside = not inside
+		j = i
+	return inside
 
 # 깃털 — 외곽 타원 (가로 14, 세로 30, COL_FEATHER) + 내부 음영 (가로 5, 세로 16, y=-10, COL_HOT).
 # 원본 holy_buff feather 의 두 폴리곤 정확 매핑. 텍스처 자체에 색 미리 그림 — modulate Color.WHITE.
