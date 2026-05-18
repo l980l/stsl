@@ -116,7 +116,7 @@ func _make_trail_emitters() -> void:
 	_trail_smoke.z_index = -1
 	add_child(_trail_smoke)
 	_trail_flame = _Helpers.make_emitter({
-		"count": int(420 * _scale()), "lifetime": 0.4, "color": COL_HOT,
+		"count": int(900 * _scale()), "lifetime": 0.4, "color": COL_HOT,
 		"speed_min": 36.0, "speed_max": 90.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -72.0, "size_min": 3.0, "size_max": 8.0,
@@ -124,7 +124,7 @@ func _make_trail_emitters() -> void:
 	})
 	add_child(_trail_flame)
 	_trail_ember = _Helpers.make_emitter({
-		"count": int(480 * _scale()), "lifetime": 0.9, "color": COL_DEEP,
+		"count": int(120 * _scale()), "lifetime": 0.9, "color": COL_DEEP,
 		"speed_min": 60.0, "speed_max": 210.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 72.0, "size_min": 1.4, "size_max": 2.6,
