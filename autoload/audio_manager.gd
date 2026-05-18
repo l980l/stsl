@@ -169,26 +169,21 @@ func play_bgm_dynamic(category: String, identifier: String, phase: int = 0) -> v
 	else:
 		base_key = "bgm_" + category + "_" + identifier
 
-	# variant 탐색 (base_key_1, _2, ... 랜덤 선택)
+	# variant 탐색 (base_key_1, _2, ... 1~9 중 존재하는 것 모두 — gap 허용)
 	var resolved_key := base_key
-	var variant_num := 0
+	var available_variants: Array[int] = []
 	for i in range(1, 10):
 		var candidate := _BGM_BASE + base_key + "_" + str(i)
-		var found := false
 		for ext: String in [".ogg", ".wav", ".mp3"]:
 			if ResourceLoader.exists(candidate + ext):
-				found = true
+				available_variants.append(i)
 				break
-		if found:
-			variant_num = i
-		else:
-			break
 
 	if base_key == _bgm_base_key and _bgm_players[_bgm_cur].playing:
 		return
 
-	if variant_num > 0:
-		resolved_key = base_key + "_" + str(randi() % variant_num + 1)
+	if not available_variants.is_empty():
+		resolved_key = base_key + "_" + str(available_variants[randi() % available_variants.size()])
 
 	_bgm_base_key = base_key
 	_bgm_category = category
