@@ -157,16 +157,16 @@ func _draw_shock_pass(canvas: CanvasItem) -> void:
 	if ga <= 0.0 or not _impact_emitted:
 		return
 	var shock_age: float = _age - IMPACT_DELAY
-	var s: float = _scale()
+	# 비주얼 크기는 파티클 갯수 옵션과 무관 — s=1.0 고정 전달
 	# 3 concentric shockwave (s1: red strong / s2: burn / s3: brass) — 빠르게 (duration 1/3)
-	_draw_one_shock(canvas, shock_age, 0.0, 0.32, COL_TAUNT, 3.0, ga, s)
-	_draw_one_shock(canvas, shock_age, 0.05, 0.38, COL_BURN, 2.2, ga * 0.85, s)
-	_draw_one_shock(canvas, shock_age, 0.10, 0.44, COL_BRASS, 1.6, ga * 0.7, s)
+	_draw_one_shock(canvas, shock_age, 0.0, 0.32, COL_TAUNT, 3.0, ga, 1.0)
+	_draw_one_shock(canvas, shock_age, 0.05, 0.38, COL_BURN, 2.2, ga * 0.85, 1.0)
+	_draw_one_shock(canvas, shock_age, 0.10, 0.44, COL_BRASS, 1.6, ga * 0.7, 1.0)
 	# chest flash (interior burst)
 	if shock_age < 0.35:
 		var k: float = shock_age / 0.35
 		var alpha: float = (1.0 - k) * ga
-		var r: float = CHEST_R * (0.3 + k * 2.0) * s
+		var r: float = CHEST_R * (0.3 + k * 2.0)
 		canvas.draw_circle(_caster + Vector2(0.0, -50.0), r, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha * 0.9))
 		canvas.draw_circle(_caster + Vector2(0.0, -50.0), r * 0.55, Color(COL_BURN.r, COL_BURN.g, COL_BURN.b, alpha))
 
@@ -313,7 +313,7 @@ func _draw_suction_line(canvas: CanvasItem, ga: float) -> void:
 	while t < effective_dist:
 		var a_pos: Vector2 = p_target + dir * t
 		var b_pos: Vector2 = p_target + dir * min(t + dash_len, effective_dist)
-		canvas.draw_line(a_pos, b_pos, col, 1.8 * _scale(), true)
+		canvas.draw_line(a_pos, b_pos, col, 1.8, true)
 		t += step
 
 # ── 블렌드 분리 레이어 ──
