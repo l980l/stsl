@@ -134,14 +134,15 @@ func _spawn_burst() -> void:
 	})
 	ember_burst.position = ctr
 	add_child(ember_burst)
-	# dust — COL_DUST alpha (1-k)*0.5 fade. 원본은 mid alpha ≈ 0.5 라 더 밝게.
+	# dust — 원본 alpha = (1-k)*0.5 linear: start 0.5, mid 0.25, end 0
 	var dust_burst := _Helpers.make_emitter({
 		"count": _pcount(14), "lifetime": 1.95, "color": COL_DUST,
 		"speed_min": 120.0, "speed_max": 360.0,
 		"direction": Vector2.UP, "spread": 75.0,
 		"gravity": -18.0, "damping": 4.0,
 		"size_min": 22.0, "size_max": 40.0,
-		"additive": false, "mid_alpha": 0.5,
+		"additive": false,
+		"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,
 	})
 	dust_burst.position = floor_y
 	add_child(dust_burst)

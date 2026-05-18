@@ -30,7 +30,7 @@ func _spawn_ember() -> void:
 	# 원본 ember 색: COL_BRASS (0.956, 0.862, 0.627) 황금. COL_FIRE 아님.
 	# 0.2 확률/frame * 60 * lifetime 2 ≈ 24 동시. 60 으로 키워서 더 풍성하게.
 	_gpu_ember = _Helpers.make_emitter({
-		"count": int(60 * _scale()),
+		"count": int(110 * _scale()),
 		"lifetime": 2.0,
 		"color": Color(0.956, 0.862, 0.627),  # COL_BRASS
 		"speed_min": 90.0, "speed_max": 210.0,

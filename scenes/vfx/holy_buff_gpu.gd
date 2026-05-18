@@ -126,7 +126,7 @@ func _spawn_burst() -> void:
 		"color": Color(1.0, 235.0/255.0, 170.0/255.0),
 		"speed_min": 120.0, "speed_max": 420.0,
 		"size_min": 1.5, "size_max": 3.1,
-		"size_base": 6.0,
+		"size_base": 9.0,  # sparkle 코어 반경 매핑 — 코어 직경 ≈ 원본 r 매칭
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 90.0,
 		"damping": 5.0,
@@ -151,7 +151,8 @@ func _spawn_burst() -> void:
 		"gravity": 36.0,
 		"damping": 5.0,
 		"angle_min": -180.0, "angle_max": 180.0,
-		"angular_velocity_min": -6.0, "angular_velocity_max": 6.0,  # ±3 deg/s 근처
+		# 원본 spin ±0.05 rad/frame × 60fps = ±3 rad/s = ±172 deg/s (빠른 회전, 다양)
+		"angular_velocity_min": -172.0, "angular_velocity_max": 172.0,
 		"additive": false,
 		"texture": _Helpers.feather_tex(),
 	})
@@ -168,7 +169,7 @@ func _spawn_rising() -> void:
 		"color": Color(1.0, 235.0/255.0, 170.0/255.0),
 		"speed_min": 60.0, "speed_max": 192.0,
 		"size_min": 1.4, "size_max": 3.0,
-		"size_base": 6.0,
+		"size_base": 9.0,  # sparkle 코어 반경 매핑 — 코어 직경 ≈ 원본 r 매칭
 		"direction": Vector2.UP, "spread": 18.0,
 		"emission_shape": "box",
 		"emission_box": Vector2(60.0, 10.0),
@@ -193,7 +194,8 @@ func _spawn_rising() -> void:
 		"emission_shape": "box",
 		"emission_box": Vector2(50.0, 5.0),
 		"angle_min": -180.0, "angle_max": 180.0,
-		"angular_velocity_min": -6.0, "angular_velocity_max": 6.0,
+		# 원본 spin ±0.04 × 60 = ±2.4 rad/s = ±138 deg/s
+		"angular_velocity_min": -138.0, "angular_velocity_max": 138.0,
 		"additive": false,
 		"one_shot": false, "explosiveness": 0.0,
 		"texture": _Helpers.feather_tex(),

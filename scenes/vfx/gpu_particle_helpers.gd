@@ -109,14 +109,16 @@ static func feather_tex() -> Texture2D:
 		_feather_tex = ImageTexture.create_from_image(img)
 	return _feather_tex
 
-# 단색 alpha 페이드 ramp (life 0 → 1: alpha 1 → 0). mid_alpha 로 중간 알파 조절.
-static func make_fade_ramp(color: Color, mid_alpha: float = 0.7) -> GradientTexture1D:
+# 단색 alpha 페이드 ramp. start_alpha (life 0) / mid_alpha (life 0.5) / end_alpha (life 1) 명시.
+# 원본 CPU 의 `alpha = (1-k)*N` linear fade 매핑 위해 start_alpha 옵션 필수.
+static func make_fade_ramp(color: Color, mid_alpha: float = 0.7,
+		start_alpha: float = 1.0, end_alpha: float = 0.0) -> GradientTexture1D:
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
 	g.colors = PackedColorArray([
-		Color(color.r, color.g, color.b, 1.0),
+		Color(color.r, color.g, color.b, start_alpha),
 		Color(color.r, color.g, color.b, mid_alpha),
-		Color(color.r, color.g, color.b, 0.0),
+		Color(color.r, color.g, color.b, end_alpha),
 	])
 	var t := GradientTexture1D.new()
 	t.gradient = g
@@ -199,7 +201,10 @@ static func make_emitter(opts: Dictionary) -> GPUParticles2D:
 	if opts.has("color_ramp"):
 		mat.color_ramp = opts["color_ramp"]
 	else:
-		mat.color_ramp = make_fade_ramp(col, float(opts.get("mid_alpha", 0.7)))
+		mat.color_ramp = make_fade_ramp(col,
+			float(opts.get("mid_alpha", 0.7)),
+			float(opts.get("start_alpha", 1.0)),
+			float(opts.get("end_alpha", 0.0)))
 	# 회전 (chunk)
 	if opts.has("angle_min") and opts.has("angle_max"):
 		mat.angle_min = float(opts["angle_min"])

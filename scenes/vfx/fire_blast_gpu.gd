@@ -23,7 +23,7 @@ func _scale() -> float:
 const COL_HOT   := Color(1.0, 0.949, 0.753)
 const COL_MID   := Color(1.0, 0.706, 0.329)
 const COL_DEEP  := Color(1.0, 0.353, 0.122)
-const COL_SMOKE := Color(0.35, 0.30, 0.27)  # 원본보다 밝게 (덜 검게)
+const COL_SMOKE := Color(0.156, 0.110, 0.086)  # 원본 그대로. alpha 로 덜 진하게 조절.
 
 const ORB_CHARGE_START := 0.12
 const ORB_CHARGE_FULL  := 0.36
@@ -100,20 +100,23 @@ func _run() -> void:
 		queue_free()
 
 # 비행 중 따라가는 trail (POINT spawn at 매 프레임 갱신 position)
-# smoke 가장 먼저 add_child = 가장 뒤. flame/ember 가 위.
+# 원본: smoke 8/frame, flame 6/frame, ember 3/frame (PROJ_FLIGHT 0.45s 동안).
+# 60fps 가정 → smoke 8*60*0.6lifetime ≈ 290 동시, flame 6*60*0.4 ≈ 144, ember 3*60*0.9 ≈ 162.
+# smoke 먼저 add_child = 가장 뒤. flame/ember 가 위.
 func _make_trail_emitters() -> void:
 	_trail_smoke = _Helpers.make_emitter({
-		"count": int(80 * _scale()), "lifetime": 0.6, "color": COL_SMOKE,
+		"count": int(280 * _scale()), "lifetime": 0.6, "color": COL_SMOKE,
 		"speed_min": 18.0, "speed_max": 54.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -18.0, "size_min": 8.0, "size_max": 24.0,
-		"additive": false, "mid_alpha": 0.18,
+		"additive": false,
+		"start_alpha": 0.35, "mid_alpha": 0.18, "end_alpha": 0.0,
 		"one_shot": false, "explosiveness": 0.0,
 	})
 	_trail_smoke.z_index = -1
 	add_child(_trail_smoke)
 	_trail_flame = _Helpers.make_emitter({
-		"count": int(60 * _scale()), "lifetime": 0.4, "color": COL_HOT,
+		"count": int(140 * _scale()), "lifetime": 0.4, "color": COL_HOT,
 		"speed_min": 36.0, "speed_max": 90.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -72.0, "size_min": 3.0, "size_max": 8.0,
@@ -121,7 +124,7 @@ func _make_trail_emitters() -> void:
 	})
 	add_child(_trail_flame)
 	_trail_ember = _Helpers.make_emitter({
-		"count": int(30 * _scale()), "lifetime": 0.9, "color": COL_DEEP,
+		"count": int(160 * _scale()), "lifetime": 0.9, "color": COL_DEEP,
 		"speed_min": 60.0, "speed_max": 210.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 72.0, "size_min": 1.4, "size_max": 2.6,
@@ -160,14 +163,15 @@ func _on_impact() -> void:
 	screen_effect.emit()
 
 func _spawn_explosion(pos: Vector2) -> void:
-	# smoke 먼저 add_child — 불 이펙트보다 뒤로. 색 연하게 (alpha 0.18 mid).
+	# smoke 먼저 add_child — 불 이펙트보다 뒤. 원본 alpha (1-k)*0.35 linear.
 	var smoke := _Helpers.make_emitter({
 		"count": _pcount(40), "lifetime": 1.85, "color": COL_SMOKE,
 		"speed_min": 36.0, "speed_max": 132.0,
 		"direction": Vector2.UP, "spread": 50.0,
 		"gravity": -36.0, "damping": 4.0,
 		"size_min": 26.0, "size_max": 56.0,
-		"additive": false, "mid_alpha": 0.18,
+		"additive": false,
+		"start_alpha": 0.35, "mid_alpha": 0.17, "end_alpha": 0.0,
 		"emission_shape": "box", "emission_box": Vector2(30.0, 20.0),
 	})
 	smoke.position = pos
