@@ -1,6 +1,6 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-18 v19)
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-18 v20)
 > 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
@@ -1024,6 +1024,41 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - 🔲 Godot 로그 수집 또는 Sentry SDK 통합
 - 🔲 사용자 옵트인 UI (개인정보 동의)
 
+### 8-8. 플랫폼 SDK 통합 (Steam + Google Play Games Services)
+
+> **원칙:** 단일 프로젝트에 PC/모바일 SDK 둘 다 설치. 브랜치 분리 X (머지 지옥). Godot 의 export preset 이 플랫폼별로 필요한 네이티브 라이브러리만 자동 포함하므로 런타임 충돌 0.
+
+**플랫폼 추상화 레이어**
+- 🔲 `autoload/platform_services.gd` 신규 — 업적·클라우드 세이브·리더보드 추상화 (호출부는 platform-agnostic)
+  - `unlock_achievement(id)` / `submit_score(id, value)` / `save_to_cloud()` / `load_from_cloud()`
+  - 내부 분기: `OS.get_name()` → `Steam.*` 또는 `PlayGamesServices.*` 호출
+  - `Engine.has_singleton(...)` 가드로 SDK 미설치 환경 (개발 빌드) 안전 fallback
+
+**Steam (Windows / Linux / macOS)**
+- 🔲 [GodotSteam](https://github.com/GodotSteam/GodotSteam) addon 설치 (`addons/GodotSteam/`)
+- 🔲 Steamworks SDK 다운로드 + Steamworks 파트너 계정 등록 ($100 Steam Direct)
+- 🔲 `steam_appid.txt` 추가 (gitignore 등록 — App ID 노출 방지는 아니지만 환경별 분리)
+- 🔲 업적 정의 (예: `first_win` / `chapter_1_clear` / `all_heroes_unlock` / `no_relic_run` 등 10~20종)
+- 🔲 Steam Cloud 세이브 동기화 (`SaveManager` 의 `user://progress.json` 자동 동기화)
+- 🔲 `steamcmd` CLI — CI 자동 빌드 업로드 (GitHub Actions 에서 SteamPipe)
+
+**Google Play Games Services (Android)**
+- 🔲 [godot-play-games-services](https://github.com/Iakobs/godot-play-games-services) (또는 동등 플러그인) `.aar` 통합
+- 🔲 Google Play Console 에서 Games Services 프로젝트 생성
+- 🔲 OAuth2 client 등록 + SHA-1 fingerprint 등록 (debug + release keystore 각각)
+- 🔲 업적 정의 동기화 (Steam 과 같은 ID·이름·설명 — 유저가 양 플랫폼 같은 게임으로 인식)
+- 🔲 Google Play 클라우드 세이브 (snapshots API)
+
+**iOS (M8-3 진행 시)**
+- 🔲 GameKit (Apple Game Center) — 업적·리더보드
+- 🔲 iCloud Key-Value Storage — 세이브 동기화
+- 🔲 `platform_services.gd` 분기에 iOS 추가
+
+**비목표 (M8-8 범위 밖)**
+- 결제 SDK (Steam Wallet / Google Play Billing / Apple IAP) — STSL 은 유료 게임 단판 판매 모델, IAP 없음
+- 광고 SDK (AdMob 등) — 광고 X
+- 멀티플레이·매치메이킹 — 싱글플레이 게임
+
 ---
 
 ## Milestone 8.5 — 다국어 지원 (현지화)
@@ -1231,7 +1266,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-05-18 v19. PR #140·#142·#143·#144 반영 — 신화 시그너처 cinematic VFX 6종 + card_exhaust + boss_death (M6.15) / i18n 9→13 언어 확장 (ru/pt/pl/de, 22,113 셀 모두 채워짐) / locale fallback ko→en + ru 디자인 폰트 매핑. **1467 통과 / 0 fail**.
+> 최종 갱신: 2026-05-18 v20. M8-8 플랫폼 SDK 통합 (Steam + Google Play Games Services) 신규 항목 — 단일 프로젝트에 양 SDK 설치, `platform_services.gd` 추상화 레이어로 호출부 platform-agnostic. PR #140·#142·#143·#144 반영분 v19 와 동일.
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -1280,6 +1315,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | 🟢 장기 | 접근성 (M8.6) | 색맹·자막·폰트 크기. 스팀 권장, 모바일 의무화 추세 |
 | 🔵 출시 직전 | 밸런싱 / 튜토리얼 / 업적 / QA (M9-1~9-4) | 품질 보증 |
 | 🔵 출시 직전 | 빌드 파이프라인 (M8-6) | export_presets·서명·CI + **Script Encryption** (커스텀 export template + AES-256 키). 현재 미구축, 스토어 제출 전 필수. 개발 워크플로우 영향 X |
+| 🔵 출시 직전 | 플랫폼 SDK 통합 (M8-8) | Steam (GodotSteam) + Google Play Games Services 단일 프로젝트 통합. `platform_services.gd` autoload 로 업적·클라우드 세이브 추상화 — 호출부 platform-agnostic. 브랜치 분리 X (export preset 단위로 플랫폼별 라이브러리 자동 포함). IAP·광고 미사용 |
 | 🔵 출시 직전 | 법무 문서 (M9-5) | 개인정보처리방침·라이선스 고지. 모바일 스토어 등재 조건 |
 | 🔵 출시 직전 | 마케팅·커뮤니티 (M9-6) | 프레스 킷·소셜·베타 테스터 |
 | 🔵 출시 | 스토어 출시 (M10) | Steam·Google Play·App Store 각 플랫폼 제출 |
