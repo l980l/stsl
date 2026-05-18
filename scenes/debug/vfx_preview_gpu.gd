@@ -17,6 +17,12 @@ const VFX_PAIRS := [
 	{"name": "holy_fire",   "gpu": "res://scenes/vfx/holy_fire_gpu.gd",   "cpu": "res://scenes/vfx/holy_fire.gd"},
 	{"name": "holy_slash",  "gpu": "res://scenes/vfx/holy_slash_gpu.gd",  "cpu": "res://scenes/vfx/holy_slash.gd"},
 	{"name": "holy_blunt",  "gpu": "res://scenes/vfx/holy_blunt_gpu.gd",  "cpu": "res://scenes/vfx/holy_blunt.gd"},
+	# Phase 3 — 일반 데미지 5종
+	{"name": "lightning_beam",   "gpu": "res://scenes/vfx/lightning_beam_gpu.gd",   "cpu": "res://scenes/vfx/lightning_beam.gd"},
+	{"name": "ice_shards",       "gpu": "res://scenes/vfx/ice_shards_gpu.gd",       "cpu": "res://scenes/vfx/ice_shards.gd"},
+	{"name": "explosion_blast",  "gpu": "res://scenes/vfx/explosion_blast_gpu.gd",  "cpu": "res://scenes/vfx/explosion_blast.gd"},
+	{"name": "blunt_smash",      "gpu": "res://scenes/vfx/blunt_smash_gpu.gd",      "cpu": "res://scenes/vfx/blunt_smash.gd"},
+	{"name": "bullet_shot",      "gpu": "res://scenes/vfx/bullet_shot_gpu.gd",      "cpu": "res://scenes/vfx/bullet_shot.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
