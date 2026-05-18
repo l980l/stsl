@@ -4,10 +4,11 @@ const EventRes  = preload("res://resources/event_resource.gd")
 const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
+	# _cosmic_remnant 제거 — ADD_HERO 이벤트. 영입은 Act1 trigger 로 일원화.
 	return [
 		_peach_of_immortality(), _immortal_duel(), _jade_scripture(),
 		_celestial_feast(), _heavenly_bazaar(), _dragon_palace_summons(),
-		_dao_purification(), _cosmic_remnant(), _elixir_garden(),
+		_dao_purification(), _elixir_garden(),
 		_vermilion_rebirth(), _eight_immortals(),
 	]
 
@@ -111,20 +112,6 @@ static func _dao_purification() -> Resource:
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.daoist.dao_purification.choice_2"
 	# 거절 — 도사가 작은 사례금 줌
 	cb.effect_type = ChoiceRes.EffectType.GOLD; cb.value = 20
-	e.choices = [ca, cb]; return e
-
-static func _cosmic_remnant() -> Resource:
-	# 다양화: ADD_HERO 단일 → MULTI (영웅 + ADD_RELIC). 우주의 잔영 — 영웅과 유물을 동시에.
-	var e: Resource = EventRes.new()
-	e.event_name = "event.daoist.cosmic_remnant.name"
-	e.description = "event.daoist.cosmic_remnant.desc"
-	e.bgm_type = "encounter"
-	var ca: Resource = ChoiceRes.new(); ca.label = "event.daoist.cosmic_remnant.choice_1"
-	ca.effect_type = ChoiceRes.EffectType.ADD_HERO
-	ca.secondary_effect_type = ChoiceRes.EffectType.ADD_RELIC
-	ca.cost_hp = 30  # 잔영을 받아내려면 대가 필요
-	var cb: Resource = ChoiceRes.new(); cb.label = "event.daoist.cosmic_remnant.choice_2"
-	cb.effect_type = ChoiceRes.EffectType.GOLD; cb.value = 50
 	e.choices = [ca, cb]; return e
 
 static func _elixir_garden() -> Resource:

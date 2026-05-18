@@ -219,7 +219,7 @@ func test_gold_with_cost_hp_structure() -> void:
 func test_pool_has_eleven_events() -> void:
 	print("[TestEvent] test_pool_has_eleven_events")
 	var pool := _build_pool()
-	_assert(pool.size() == 11, "이벤트 풀 11종")
+	_assert(pool.size() == 11, "이벤트 풀 11종")  # _build_pool 은 mock data — 실제 EventsAct1 과 무관
 
 func test_prometheus_event_exists() -> void:
 	print("[TestEvent] test_prometheus_event_exists")
@@ -279,7 +279,8 @@ func test_hermes_event_has_two_choices() -> void:
 func test_act2_pool_size_ten() -> void:
 	print("[TestEvent] test_act2_pool_size_ten")
 	var pool := EventsAct2.build_pool()
-	_assert(pool.size() == 11, "Act2 이벤트 풀 11종")  # Phase 4: +sphinx_gate
+	# _ra_sunboat 제거 (ADD_HERO) → 10종
+	_assert(pool.size() == 10, "Act2 이벤트 풀 10종 (ra_sunboat 제거)")
 
 func test_act2_book_of_the_dead() -> void:
 	print("[TestEvent] test_act2_book_of_the_dead")
@@ -307,15 +308,15 @@ func test_act2_pharaoh_tomb_relic() -> void:
 	_assert(found, "파라오의 무덤 이벤트 존재")
 
 func test_act2_ra_sunboat_add_hero() -> void:
-	print("[TestEvent] test_act2_ra_sunboat_add_hero")
-	var ChoiceRes = load("res://resources/event_choice_resource.gd")
+	# 폐기 — _ra_sunboat 이벤트 제거됨 (Act1 영입 trigger 로 일원화). 검증 의의 X.
+	# pool 에 ra_sunboat 가 없는지 확인하는 negative test 로 전환.
+	print("[TestEvent] test_act2_ra_sunboat_add_hero (negative)")
 	var pool := EventsAct2.build_pool()
 	var found := false
 	for e in pool:
 		if e.event_name == "event.act2.ra_sunboat.name":
 			found = true
-			_assert(e.choices[0].effect_type == ChoiceRes.EffectType.ADD_HERO, "선택 A: ADD_HERO")
-	_assert(found, "라의 태양선 이벤트 존재")
+	_assert(not found, "ra_sunboat 이벤트 제거됨 (Act1 영입 trigger 로 일원화)")
 
 func test_act2_mummy_curse_gamble() -> void:
 	print("[TestEvent] test_act2_mummy_curse_gamble")
@@ -356,7 +357,8 @@ func test_buddhist_event_pool_size() -> void:
 	print("[TestEvent] test_buddhist_event_pool_size")
 	var BuddhistEvents = load("res://resources/events/events_buddhist.gd")
 	var pool: Array = BuddhistEvents.build_pool()
-	_assert(pool.size() == 11, "불교 이벤트 풀 11종")  # Phase 4: +bodhi_tree
+	# _arhat_joins 제거 (ADD_HERO) → 10종
+	_assert(pool.size() == 10, "불교 이벤트 풀 10종 (arhat_joins 제거)")
 
 func test_buddhist_yama_toll_event() -> void:
 	print("[TestEvent] test_buddhist_yama_toll_event")
@@ -389,7 +391,8 @@ func test_daoist_event_pool_size() -> void:
 	print("[TestEvent] test_daoist_event_pool_size")
 	var DaoistEvents = load("res://resources/events/events_daoist.gd")
 	var pool: Array = DaoistEvents.build_pool()
-	_assert(pool.size() == 11, "도교 이벤트 풀 11종")  # Phase 4: +eight_immortals
+	# _cosmic_remnant 제거 (ADD_HERO) → 10종
+	_assert(pool.size() == 10, "도교 이벤트 풀 10종 (cosmic_remnant 제거)")
 
 func test_daoist_peach_of_immortality_event() -> void:
 	print("[TestEvent] test_daoist_peach_of_immortality_event")
@@ -410,7 +413,8 @@ func test_japanese_event_pool_size() -> void:
 	print("[TestEvent] test_japanese_event_pool_size")
 	var JapaneseEvents = load("res://resources/events/events_japanese.gd")
 	var pool: Array = JapaneseEvents.build_pool()
-	_assert(pool.size() == 11, "일본 이벤트 풀 11종")  # Phase 4: +kitsune_kit
+	# _shuten_doji_feast 제거 (ADD_HERO) → 10종
+	_assert(pool.size() == 10, "일본 이벤트 풀 10종 (shuten_doji_feast 제거)")
 
 func test_japanese_ise_shrine_event() -> void:
 	print("[TestEvent] test_japanese_ise_shrine_event")

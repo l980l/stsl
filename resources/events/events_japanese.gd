@@ -4,10 +4,11 @@ const EventRes  = preload("res://resources/event_resource.gd")
 const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
+	# _shuten_doji_feast 제거 — ADD_HERO 이벤트. 영입은 Act1 trigger 로 일원화.
 	return [
 		_ise_shrine_blessing(), _oni_shogi(), _yuki_onna_blizzard(),
 		_tengu_training(), _shrine_omamori(), _tanuki_illusion(),
-		_kappa_river_crossing(), _shuten_doji_feast(), _fujisan_spirit(),
+		_kappa_river_crossing(), _fujisan_spirit(),
 		_amaterasu_return(), _kitsune_kit(),
 	]
 
@@ -111,23 +112,6 @@ static func _kappa_river_crossing() -> Resource:
 	# 우회 (다리 통행료) — gold cost + HEAL 소량
 	cb.effect_type = ChoiceRes.EffectType.HEAL; cb.value = 15; cb.cost_gold = 30
 	e.choices = [ca, cb]; return e
-
-static func _shuten_doji_feast() -> Resource:
-	# 재설계: 1번 영웅 영입 cost_hp, 2번 GOLD, 3번 TRIGGER_BATTLE (오니 무리 처치 → 렐릭)
-	var e: Resource = EventRes.new()
-	e.event_name = "event.japanese.shuten_doji_feast.name"
-	e.description = "event.japanese.shuten_doji_feast.desc"
-	e.bgm_type = "encounter"
-	var ca: Resource = ChoiceRes.new(); ca.label = "event.japanese.shuten_doji_feast.choice_1"
-	ca.effect_type = ChoiceRes.EffectType.ADD_HERO; ca.cost_hp = 30
-	var cb: Resource = ChoiceRes.new(); cb.label = "event.japanese.shuten_doji_feast.choice_2"
-	cb.effect_type = ChoiceRes.EffectType.GOLD; cb.value = 70
-	var cc: Resource = ChoiceRes.new(); cc.label = "event.japanese.shuten_doji_feast.choice_3"
-	# 오니 무리 습격 — TRIGGER_BATTLE 엘리트, 승리 시 렐릭
-	cc.effect_type = ChoiceRes.EffectType.TRIGGER_BATTLE
-	cc.encounter_tier = 1
-	cc.reward_effect_type = ChoiceRes.EffectType.ADD_RELIC
-	e.choices = [ca, cb, cc]; return e
 
 static func _fujisan_spirit() -> Resource:
 	var e: Resource = EventRes.new()

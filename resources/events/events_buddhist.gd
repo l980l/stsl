@@ -4,10 +4,11 @@ const EventRes  = preload("res://resources/event_resource.gd")
 const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
+	# _arhat_joins 제거 — ADD_HERO 이벤트. 영입은 Act1 trigger 로 일원화.
 	return [
 		_yama_toll(), _dharma_wheel(), _mara_illusion(),
 		_monk_blessing(), _guanyin_mercy(), _buddha_prophecy(),
-		_temple_trial(), _naga_king_test(), _arhat_joins(),
+		_temple_trial(), _naga_king_test(),
 		_nirvana_gate(), _bodhi_tree(),
 	]
 
@@ -121,20 +122,6 @@ static func _naga_king_test() -> Resource:
 	cc.success_chance = 60
 	cc.alt_effect_type = ChoiceRes.EffectType.NONE
 	e.choices = [ca, cb, cc]; return e
-
-static func _arhat_joins() -> Resource:
-	# 재설계: 1번 영입, 2번 거절 → 아라한 가르침 (REMOVE_CARD + HEAL MULTI)
-	var e: Resource = EventRes.new()
-	e.event_name = "event.buddhist.arhat_joins.name"
-	e.description = "event.buddhist.arhat_joins.desc"
-	e.bgm_type = "encounter"
-	var ca: Resource = ChoiceRes.new(); ca.label = "event.buddhist.arhat_joins.choice_1"
-	ca.effect_type = ChoiceRes.EffectType.ADD_HERO
-	var cb: Resource = ChoiceRes.new(); cb.label = "event.buddhist.arhat_joins.choice_2"
-	# 거절 — 아라한의 가르침: REMOVE_CARD + HEAL
-	cb.effect_type = ChoiceRes.EffectType.REMOVE_CARD; cb.value = 1
-	cb.secondary_effect_type = ChoiceRes.EffectType.HEAL; cb.secondary_value = 20
-	e.choices = [ca, cb]; return e
 
 static func _nirvana_gate() -> Resource:
 	# 다양화: 1번 열반 진입 MULTI(REMOVE_CARD + HEAL, cost_hp), 2번 열반 옆에서 명상 (HEAL, 소량)
