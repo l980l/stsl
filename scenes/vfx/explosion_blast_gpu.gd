@@ -61,12 +61,12 @@ func _spawn_fireball(pos: Vector2) -> void:
 	})
 	ember.position = pos
 	add_child(ember)
-	# dust 35 — 흙먼지, lifetime 2.8, 옆으로 넓게
+	# dust 35 — 바닥 흙먼지, 옆으로 강조 + damping 강해 천천히 멈춤
 	var dust := _Helpers.make_emitter({
 		"count": _pcount(35), "lifetime": 2.8, "color": COL_DUST,
 		"speed_min": 120.0 * bs, "speed_max": 420.0 * bs,
-		"direction": Vector2.UP, "spread": 130.0,
-		"gravity": -18.0 * bs, "damping": 3.0,
+		"direction": Vector2.UP, "spread": 80.0,
+		"gravity": -18.0 * bs, "damping": 40.0,
 		"size_min": 24.0 * bs, "size_max": 46.0 * bs,
 		"additive": false,
 		"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,
@@ -75,6 +75,19 @@ func _spawn_fireball(pos: Vector2) -> void:
 	dust.position = pos + Vector2(0.0, 20.0 * bs)
 	dust.z_index = -1
 	add_child(dust)
+	# dust_cloud 50 — 사방으로 퍼지는 큰 흙먼지 안개 (사용자 요청)
+	var dust_cloud := _Helpers.make_emitter({
+		"count": _pcount(50), "lifetime": 2.6, "color": COL_DUST,
+		"speed_min": 60.0 * bs, "speed_max": 240.0 * bs,
+		"direction": Vector2.UP, "spread": 180.0,  # 사방
+		"gravity": -12.0 * bs, "damping": 30.0,
+		"size_min": 32.0 * bs, "size_max": 64.0 * bs,
+		"additive": false,
+		"start_alpha": 0.45, "mid_alpha": 0.22, "end_alpha": 0.0,
+	})
+	dust_cloud.position = pos + Vector2(0.0, 10.0 * bs)
+	dust_cloud.z_index = -1
+	add_child(dust_cloud)
 	# smoke 25 — 위로 솟는 연기 (버섯구름)
 	var smoke := _Helpers.make_emitter({
 		"count": _pcount(25), "lifetime": 3.7, "color": COL_SMOKE,

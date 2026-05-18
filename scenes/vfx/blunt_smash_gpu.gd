@@ -12,20 +12,20 @@ func _spawn_impact_dust() -> void:
 		return
 	_impact_made = true
 	var gy: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 80.0)
-	# dust 80 — 바닥 먼지 옆으로
+	# dust 80 — 바닥 옆으로 퍼지는 흙먼지. 원본 vel sin*0.25 (옆 강조) + damping 강해 천천히 멈춤.
 	var dust := _Helpers.make_emitter({
 		"count": _pcount(80), "lifetime": 2.0, "color": COL_DUST_MID,
 		"speed_min": 120.0 * DUST_SCALE, "speed_max": 420.0 * DUST_SCALE,
-		"direction": Vector2.UP, "spread": 130.0,
-		"gravity": -18.0 * DUST_SCALE, "damping": 3.0,
+		"direction": Vector2.UP, "spread": 60.0,  # 옆으로 강조 (원본 sin*0.25)
+		"gravity": -18.0 * DUST_SCALE, "damping": 40.0,  # 원본 multiplicative 매칭 (빠른 감속)
 		"size_min": 20.0 * DUST_SCALE, "size_max": 42.0 * DUST_SCALE,
 		"additive": false,
 		"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,
 	})
 	dust.position = gy
 	add_child(dust)
-	# chunk 24 — 회전 파편
-	var chunk := _Helpers.make_chunk_emitter(COL_CHUNK, _pcount(24), 1.5,
+	# chunk 24 — 회전 파편. 원본 COL_CHUNK 어두워서 흙색에 가깝게 밝게 보정.
+	var chunk := _Helpers.make_chunk_emitter(Color(0.62, 0.50, 0.32), _pcount(24), 1.5,
 		180.0, 600.0, 1080.0, 3.0, 7.0)
 	chunk.position = gy
 	add_child(chunk)
