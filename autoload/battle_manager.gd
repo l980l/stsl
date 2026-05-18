@@ -1762,12 +1762,11 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 		await _await_vfx_impact(_VFX_WARRIOR_BUFF.IMPACT_DELAY + 0.5)
 		if not is_battle_active:
 			return
-	for stype: String in ["weak", "vulnerable", "taunt"]:
+	# weak/vulnerable: 자기 턴 시작 시 -1 (즉시 본인 행동에 영향 없음 — 표준 디버프 decay)
+	# taunt: 부여 시점부터 N turn 유지가 자연스러우므로 turn 종료 시점에 decay (아래 turn_ended 직전)
+	for stype: String in ["weak", "vulnerable"]:
 		if _enemy_status[i].get(stype, 0) > 0:
 			_enemy_status[i][stype] -= 1
-			# 도발이 0 되면 source 도 정리
-			if stype == "taunt" and _enemy_status[i][stype] == 0 and _enemy_status[i].has("taunt_source"):
-				_enemy_status[i].erase("taunt_source")
 	# speed_bonus / speed_penalty — Array of {value, dur}. 각 instance dur -1, dur<=0 제거
 	for key in ["speed_bonus", "speed_penalty"]:
 		var arr_e: Array = _enemy_status[i].get(key, [])
@@ -1836,6 +1835,14 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 				_enemy_status[i].erase("_charge_block_advance")
 			else:
 				_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
+	# 적 turn 종료 시 도발 decay — 부여 시점부터 N turn 유지 보장 (시작 decay 대신).
+	if i < _enemy_status.size():
+		var t_cur: int = _enemy_status[i].get("taunt", 0)
+		if t_cur > 0:
+			_enemy_status[i]["taunt"] = t_cur - 1
+			if _enemy_status[i]["taunt"] == 0 and _enemy_status[i].has("taunt_source"):
+				_enemy_status[i].erase("taunt_source")
+				status_applied.emit("enemy_%d" % i, "taunt", 0)
 	if not legacy:
 		if is_battle_active:
 			_advance_turn_counter(_current_actor_id)
@@ -1846,15 +1853,16 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 	# 단일 타겟 인텐트는 시그널 emit 전에 영웅 타겟 미리 결정 — battle_scene 이 정확한 영웅 위치에 VFX 표시
 	var pre_target_id: String = ""
 	if intent.target != IntentRes.TargetType.ALL:
+		# 영웅 공격성 인텐트 모두 action_type 전달 → _pick_hero_target 의 도발 우회 작동
 		match intent.action_type:
 			IntentRes.ActionType.ATTACK:
 				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 			IntentRes.ActionType.DEBUFF:
-				pre_target_id = _pick_hero_target(intent.target, enemy_index)
+				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.DEBUFF)
 			IntentRes.ActionType.MARK_TARGET:
-				pre_target_id = _pick_hero_target(intent.target, enemy_index)
+				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.MARK_TARGET)
 			IntentRes.ActionType.MIMIC:
-				pre_target_id = _pick_hero_target(intent.target, enemy_index)
+				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.MIMIC)
 	# VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생
 	intent_vfx_charge_start.emit(enemy_index, intent, pre_target_id)
 	var _delay := _intent_vfx_impact_delay(intent)
@@ -1934,7 +1942,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			else:
 				var target_id: String = pre_target_id
 				if target_id == "" or (team_mgr and not team_mgr.is_alive(target_id)):
-					target_id = _pick_hero_target(intent.target, enemy_index)
+					target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.DEBUFF)
 				if target_id != "":
 					if _is_speed:
 						var _ds_aid2: String = "hero:" + target_id
@@ -1994,7 +2002,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			_enemy_status[enemy_index]["counter_pool"] = 0
 		IntentRes.ActionType.MARK_TARGET:
 			# T3-MARK: 한 영웅 마킹 — 마킹 동안 그 enemy의 ATTACK +50% 데미지
-			var mark_target: String = _pick_hero_target(intent.target, enemy_index)
+			var mark_target: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.MARK_TARGET)
 			if mark_target != "" and team_mgr:
 				if not _hero_status.has(mark_target):
 					_hero_status[mark_target] = {}
@@ -2139,9 +2147,13 @@ func _pick_hero_target(target_type: int, enemy_index: int, action_type: int = -1
 	var living: Array = team_mgr.get_living_heroes()
 	if living.is_empty():
 		return ""
-	# 도발 우회: ATTACK 인텐트이고 이 적이 영웅에게 도발당했으면 → 그 시전 영웅 강제 타겟
-	# (시전 영웅이 살아있을 때만. 죽으면 source cleanup 이 처리하지만 안전 폴백)
-	if action_type == IntentRes.ActionType.ATTACK and enemy_index >= 0 and enemy_index < _enemy_status.size():
+	# 도발 우회: 영웅 공격성 인텐트 (ATTACK / DEBUFF / MARK_TARGET / MIMIC) 가 영웅에게 도발당했으면
+	# → 그 시전 영웅 강제 타겟. ALLY 타겟 (HEAL_ALLY / BUFF_ALLY) 은 도발 무관 (적간 효과).
+	var is_hero_offensive: bool = action_type == IntentRes.ActionType.ATTACK \
+		or action_type == IntentRes.ActionType.DEBUFF \
+		or action_type == IntentRes.ActionType.MARK_TARGET \
+		or action_type == IntentRes.ActionType.MIMIC
+	if is_hero_offensive and enemy_index >= 0 and enemy_index < _enemy_status.size():
 		var taunt_v: int = _enemy_status[enemy_index].get("taunt", 0)
 		var src_hid: String = _enemy_status[enemy_index].get("taunt_source", "")
 		if taunt_v > 0 and src_hid != "" and team_mgr.is_alive(src_hid):
