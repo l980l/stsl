@@ -1012,6 +1012,13 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - 🔲 iOS Apple Developer 인증서·provisioning profile (Mac + Xcode 필요)
 - 🔲 GitHub Actions CI — 헤드리스 테스트 자동 실행 (현재 `.github/workflows/` 없음)
 - 🔲 릴리스 태그 기반 자동 빌드 배포
+- 🔲 **Script Encryption 적용** (PCK AES-256, casual reverse engineering 차단)
+  - 32바이트 AES-256 키 생성 + 영구 보관 (분실 시 기존 빌드 패치 불가)
+  - Godot 엔진 소스 git clone → `SCRIPT_AES256_ENCRYPTION_KEY=...` 환경변수 + SCons 로 커스텀 export template 빌드 (플랫폼별 각각)
+  - `export_presets.cfg` 에 동일 키 등록
+  - CI secret 에 키 저장 (GitHub Actions encrypted secret)
+  - **개발 영향 없음** — 평소 에디터/F5 그대로. export 시점에만 적용
+  - 빌드 파이프라인 셋업과 동시에 1회 작업 권장 (지금 별도 적용 X)
 
 ### 8-7. 크래시 리포트·원격 로그
 - 🔲 Godot 로그 수집 또는 Sentry SDK 통합
@@ -1245,7 +1252,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | 🟢 장기 | 모바일 최적화 (M8-1~8-5) | 해상도·세이브·성능 |
 | 🟢 장기 | 접근성 (M8.6) | 색맹·자막·폰트 크기. 스팀 권장, 모바일 의무화 추세 |
 | 🔵 출시 직전 | 밸런싱 / 튜토리얼 / 업적 / QA (M9-1~9-4) | 품질 보증 |
-| 🔵 출시 직전 | 빌드 파이프라인 (M8-6) | export_presets·서명·CI. 현재 미구축, 스토어 제출 전 필수 |
+| 🔵 출시 직전 | 빌드 파이프라인 (M8-6) | export_presets·서명·CI + **Script Encryption** (커스텀 export template + AES-256 키). 현재 미구축, 스토어 제출 전 필수. 개발 워크플로우 영향 X |
 | 🔵 출시 직전 | 법무 문서 (M9-5) | 개인정보처리방침·라이선스 고지. 모바일 스토어 등재 조건 |
 | 🔵 출시 직전 | 마케팅·커뮤니티 (M9-6) | 프레스 킷·소셜·베타 테스터 |
 | 🔵 출시 | 스토어 출시 (M10) | Steam·Google Play·App Store 각 플랫폼 제출 |
