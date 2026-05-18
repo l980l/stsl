@@ -102,7 +102,7 @@ static func _royal_guard() -> Resource:
 	c.card_name = "card.cleopatra.royal_guard.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = ["card.cleopatra.royal_guard.archetype"]
+	c.archetype = ["card.cleopatra.royal_guard.archetype", "card.cleopatra.strike.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
 	ea.value = 80; ea.base_value = 80
@@ -361,7 +361,7 @@ static func _curse_brand() -> Resource:
 	c.card_name = "card.cleopatra.curse_brand.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = ["card.cleopatra.curse_brand.archetype"]
+	c.archetype = ["card.cleopatra.curse_brand.archetype", "card.cleopatra.strike.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 40; ea.base_value = 40; ea.target = "SINGLE"
@@ -508,7 +508,7 @@ static func _charm_execution() -> Resource:
 	c.card_name = "card.cleopatra.charm_execution.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = ["card.cleopatra.charm_execution.archetype"]
+	c.archetype = ["card.cleopatra.charm_execution.archetype", "card.cleopatra.defend.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CHARM_TO_DAMAGE
 	e.bonus_value = 5; e.base_bonus_value = 5; e.target = "SINGLE"
@@ -533,7 +533,7 @@ static func _golden_throne() -> Resource:
 	c.card_name = "card.cleopatra.golden_throne.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = ["card.cleopatra.golden_throne.archetype"]
+	c.archetype = ["card.cleopatra.golden_throne.archetype", "card.cleopatra.defend.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE

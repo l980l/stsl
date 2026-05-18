@@ -206,7 +206,7 @@ static func _red_horizon() -> Resource:
 	c.card_name = "card.genghis_khan.red_horizon.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = ["card.genghis_khan.red_horizon.archetype"]
+	c.archetype = ["card.genghis_khan.red_horizon.archetype", "card.genghis_khan.loot.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE

@@ -90,7 +90,8 @@ func test_yi_sun_sin_archetype_distribution() -> void:
 				archetypes[a] += 1
 	_assert(archetypes["거북선"] == 10, "이순신 거북선 10장 (실제: %d)" % archetypes["거북선"])
 	_assert(archetypes["학익진"] == 11, "이순신 학익진 11장 (실제: %d)" % archetypes["학익진"])
-	_assert(archetypes["필사즉생"] == 10, "이순신 필사즉생 10장 (실제: %d)" % archetypes["필사즉생"])
+	# 필사즉생 10 + fleet_command 다중 archetype (학익진+필사즉생) = 11
+	_assert(archetypes["필사즉생"] == 11, "이순신 필사즉생 11장 (실제: %d)" % archetypes["필사즉생"])
 
 func test_cleopatra_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_cleopatra_rarity_distribution")
@@ -121,8 +122,11 @@ func test_cleopatra_archetype_distribution() -> void:
 			var a: String = TranslationServer.translate(a_key)
 			if a in archetypes:
 				archetypes[a] += 1
-	_assert(archetypes["독살"] == 12, "클레오파트라 독살 12장 (실제: %d)" % archetypes["독살"])
-	_assert(archetypes["저주"] == 10, "클레오파트라 저주 10장 (실제: %d)" % archetypes["저주"])
+	# 다중 archetype 적용:
+	# 독살 12 + curse_brand(저주→+독살) = 13
+	# 저주 10 + charm_execution(조종→+저주) + golden_throne(조종→+저주) = 12
+	_assert(archetypes["독살"] == 13, "클레오파트라 독살 13장 (실제: %d)" % archetypes["독살"])
+	_assert(archetypes["저주"] == 12, "클레오파트라 저주 12장 (실제: %d)" % archetypes["저주"])
 	_assert(archetypes["조종"] == 9, "클레오파트라 조종 9장 (실제: %d)" % archetypes["조종"])
 
 func test_joan_rarity_distribution() -> void:
@@ -153,9 +157,10 @@ func test_joan_archetype_distribution() -> void:
 			var a: String = TranslationServer.translate(a_key)
 			if a in archetypes:
 				archetypes[a] += 1
+	# 순교 9 + divine_punishment(신성공격→+순교) + oracle_light(신성→+순교) = 11
 	_assert(archetypes["신성"] == 3, "잔다르크 신성 3장 (실제: %d)" % archetypes["신성"])
 	_assert(archetypes["부활"] == 4, "잔다르크 부활 4장 (실제: %d)" % archetypes["부활"])
-	_assert(archetypes["순교"] == 9, "잔다르크 순교 9장 (실제: %d)" % archetypes["순교"])
+	_assert(archetypes["순교"] == 11, "잔다르크 순교 11장 (실제: %d)" % archetypes["순교"])
 
 func test_genghis_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_genghis_rarity_distribution")
@@ -185,9 +190,10 @@ func test_genghis_archetype_distribution() -> void:
 			var a: String = TranslationServer.translate(a_key)
 			if a in archetypes:
 				archetypes[a] += 1
+	# 약탈 8 + red_horizon(기동→+약탈) = 9
 	_assert(archetypes["기동"] == 13, "칭기즈칸 기동 13장 (실제: %d)" % archetypes["기동"])
 	_assert(archetypes["몽골 기병"] == 10, "칭기즈칸 몽골 기병 10장 (실제: %d)" % archetypes["몽골 기병"])
-	_assert(archetypes["약탈"] == 8, "칭기즈칸 약탈 8장 (실제: %d)" % archetypes["약탈"])
+	_assert(archetypes["약탈"] == 9, "칭기즈칸 약탈 9장 (실제: %d)" % archetypes["약탈"])
 
 func test_musashi_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_musashi_rarity_distribution")

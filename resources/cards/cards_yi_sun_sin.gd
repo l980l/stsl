@@ -292,7 +292,7 @@ static func _fleet_command() -> Resource:
 	c.card_name = "card.yi_sun_sin.fleet_command.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = ["card.yi_sun_sin.fleet_command.archetype"]
+	c.archetype = ["card.yi_sun_sin.fleet_command.archetype", "card.yi_sun_sin.miraculous_recovery.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.draw_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"

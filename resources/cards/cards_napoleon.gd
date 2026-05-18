@@ -90,7 +90,7 @@ static func _war_bugle() -> Resource:
 	c.card_name = "card.napoleon.war_bugle.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = ["card.napoleon.war_bugle.archetype"]
+	c.archetype = ["card.napoleon.war_bugle.archetype", "card.napoleon.glory_shout.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW
 	ea.value = 1; ea.base_value = 1
@@ -105,7 +105,7 @@ static func _swift_march() -> Resource:
 	c.card_name = "card.napoleon.swift_march.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = ["card.napoleon.swift_march.archetype"]
+	c.archetype = ["card.napoleon.swift_march.archetype", "card.napoleon.glory_shout.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 60; ea.base_value = 60; ea.target = "SINGLE"
@@ -154,7 +154,7 @@ static func _hussar_charge() -> Resource:
 	c.card_name = "card.napoleon.hussar_charge.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = ["card.napoleon.hussar_charge.archetype"]
+	c.archetype = ["card.napoleon.hussar_charge.archetype", "card.napoleon.glory_shout.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 70; ea.base_value = 70; ea.target = "SINGLE"
@@ -243,7 +243,7 @@ static func _borodino_bombardment() -> Resource:
 	c.card_name = "card.napoleon.borodino_bombardment.name"; c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = ["card.napoleon.borodino_bombardment.archetype"]
+	c.archetype = ["card.napoleon.borodino_bombardment.archetype", "card.napoleon.glory_shout.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 140; e.base_value = 140
@@ -259,7 +259,7 @@ static func _emperors_command() -> Resource:
 	c.card_name = "card.napoleon.emperors_command.name"; c.owner_id = "napoleon"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = ["card.napoleon.emperors_command.archetype"]
+	c.archetype = ["card.napoleon.emperors_command.archetype", "card.napoleon.glory_shout.archetype"]
 	c.is_innate = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
@@ -298,7 +298,7 @@ static func _trench_construction() -> Resource:
 	c.card_name = "card.napoleon.trench_construction.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = ["card.napoleon.trench_construction.archetype"]
+	c.archetype = ["card.napoleon.trench_construction.archetype", "card.napoleon.glory_shout.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
 	ea.value = 80; ea.base_value = 80; ea.target = "SELF"
@@ -327,7 +327,7 @@ static func _charge_bugle() -> Resource:
 	c.card_name = "card.napoleon.charge_bugle.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = ["card.napoleon.charge_bugle.archetype"]
+	c.archetype = ["card.napoleon.charge_bugle.archetype", "card.napoleon.glory_shout.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.GAIN_MORALE
 	ea.value = 2; ea.base_value = 2
@@ -434,7 +434,7 @@ static func _austerlitz_maneuver() -> Resource:
 	c.card_name = "card.napoleon.austerlitz_maneuver.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = ["card.napoleon.austerlitz_maneuver.archetype"]
+	c.archetype = ["card.napoleon.austerlitz_maneuver.archetype", "card.napoleon.glory_shout.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 50; ea.base_value = 50; ea.target = "SINGLE"
@@ -600,7 +600,7 @@ static func _emperors_power() -> Resource:
 	c.card_name = "card.napoleon.emperors_power.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = ["card.napoleon.emperors_power.archetype"]
+	c.archetype = ["card.napoleon.emperors_power.archetype", "card.napoleon.glory_shout.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.morale_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
@@ -643,7 +643,7 @@ static func _emperors_legion() -> Resource:
 	c.card_name = "card.napoleon.emperors_legion.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = ["card.napoleon.emperors_legion.archetype"]
+	c.archetype = ["card.napoleon.emperors_legion.archetype", "card.napoleon.glory_shout.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.morale_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
