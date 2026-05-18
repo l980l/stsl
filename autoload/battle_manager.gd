@@ -2149,14 +2149,17 @@ func _pick_hero_target(target_type: int, enemy_index: int, action_type: int = -1
 		return ""
 	# 도발 우회: 영웅 공격성 인텐트 (ATTACK / DEBUFF / MARK_TARGET / MIMIC) 가 영웅에게 도발당했으면
 	# → 그 시전 영웅 강제 타겟. ALLY 타겟 (HEAL_ALLY / BUFF_ALLY) 은 도발 무관 (적간 효과).
+	# 단 매혹/반함 (charm 또는 enthrall) 이 우선 — 매혹된 적은 도발 시전자에게 끌리지 않음.
 	var is_hero_offensive: bool = action_type == IntentRes.ActionType.ATTACK \
 		or action_type == IntentRes.ActionType.DEBUFF \
 		or action_type == IntentRes.ActionType.MARK_TARGET \
 		or action_type == IntentRes.ActionType.MIMIC
 	if is_hero_offensive and enemy_index >= 0 and enemy_index < _enemy_status.size():
+		var has_charm_cc: bool = _enemy_status[enemy_index].get("charm", 0) > 0 \
+			or _enemy_status[enemy_index].get("enthrall", 0) > 0
 		var taunt_v: int = _enemy_status[enemy_index].get("taunt", 0)
 		var src_hid: String = _enemy_status[enemy_index].get("taunt_source", "")
-		if taunt_v > 0 and src_hid != "" and team_mgr.is_alive(src_hid):
+		if taunt_v > 0 and src_hid != "" and team_mgr.is_alive(src_hid) and not has_charm_cc:
 			return src_hid
 	match target_type:
 		IntentRes.TargetType.RANDOM:
