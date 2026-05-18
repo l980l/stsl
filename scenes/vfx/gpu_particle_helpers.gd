@@ -82,18 +82,47 @@ static func sparkle_tex() -> Texture2D:
 	return _sparkle_tex
 
 # 하트 — charm_kiss heart_unit() 의 32점 베지어 폴리곤 fill.
-# 64×64, 중심 (31.5, 31.5), unit size 32 → 텍스처 폭 거의 전체 사용 → size_base = 16.
-# size 14 → scale 0.875 → 28px (원본 heart size 와 매칭).
+# 64×64, 중심 (31.5, 31.5). 텍스처 자체에 원본 색 미리 (modulate WHITE 사용).
+# 내부 COL_MID 솔리드 + 외곽 2px COL_HOT 흰분홍 outline (원본 _draw 의 polyline 1.2px 매칭).
+# size_base = 32 매핑 (size 8 → scale 0.25 → 16px 직경, 원본 1.125*size = 9px 와 비슷).
 static func heart_tex() -> Texture2D:
 	if _heart_tex == null:
 		var pts := _heart_unit_pts()
+		# charm_kiss 색 hardcode (helper 는 charm_kiss 안 import — modulate WHITE 사용 위해)
+		var col_inner := Color(1.0, 0.604, 0.831)   # COL_MID
+		var col_outline := Color(1.0, 0.949, 0.976) # COL_HOT
 		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
 		img.fill(Color.TRANSPARENT)
+		# 1차: 내부 모두 COL_MID
+		var inside_mask: PackedByteArray = PackedByteArray()
+		inside_mask.resize(64 * 64)
 		for y in 64:
 			for x in 64:
 				var p := Vector2(float(x) - 31.5, float(y) - 31.5)
 				if _point_in_polygon(p, pts):
-					img.set_pixel(x, y, Color.WHITE)
+					inside_mask[y * 64 + x] = 1
+					img.set_pixel(x, y, col_inner)
+		# 2차: 외곽 2px outline (안쪽인데 인접 ±2 픽셀 중 바깥 있으면 외곽)
+		for y in 64:
+			for x in 64:
+				if inside_mask[y * 64 + x] == 0:
+					continue
+				var is_edge := false
+				for dy in range(-2, 3):
+					for dx in range(-2, 3):
+						if dx == 0 and dy == 0:
+							continue
+						var nx := x + dx
+						var ny := y + dy
+						if nx < 0 or nx >= 64 or ny < 0 or ny >= 64:
+							continue
+						if inside_mask[ny * 64 + nx] == 0:
+							is_edge = true
+							break
+					if is_edge:
+						break
+				if is_edge:
+					img.set_pixel(x, y, col_outline)
 		_heart_tex = ImageTexture.create_from_image(img)
 	return _heart_tex
 
