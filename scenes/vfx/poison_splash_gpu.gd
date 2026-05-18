@@ -6,6 +6,10 @@ extends "res://scenes/vfx/poison_splash.gd"
 
 const _Helpers = preload("res://scenes/vfx/gpu_particle_helpers.gd")
 
+# 사용자 피드백 — 더 연한 녹색.
+const _COL_GAS_LIGHT := Color(0.80, 1.0, 0.55)
+const _COL_SPARK_LIGHT := Color(0.92, 1.0, 0.72)
+
 # trail emitters
 var _gpu_trail_drip: GPUParticles2D
 var _gpu_trail_gas: GPUParticles2D
@@ -30,12 +34,14 @@ func _spawn_trail(pos: Vector2) -> void:
 		# drip 60/s × lifetime 0.95 ≈ 57 동시. 떨어짐 (vel.y +).
 		_gpu_trail_drip = _Helpers.make_emitter({
 			"count": int(57 * _scale()), "lifetime": 0.95,
-			"color": COL_DRIP,
+			"color": Color.WHITE,
 			"speed_min": 12.0, "speed_max": 36.0,
 			"direction": Vector2.DOWN, "spread": 25.0,
 			"gravity": 144.0, "damping": 3.0,  # 0.04 * 60²
 			"size_min": 4.0, "size_max": 9.0,
-			"additive": false,
+			"size_base": 23.0,
+		"texture": _Helpers.drip_tex(),
+		"additive": false,
 			"emission_shape": "box", "emission_box": Vector2(3.0, 3.0),
 			"one_shot": false, "explosiveness": 0.0,
 			"start_alpha": 0.9, "mid_alpha": 0.45, "end_alpha": 0.0,
@@ -44,7 +50,7 @@ func _spawn_trail(pos: Vector2) -> void:
 		# gas 42/s × lifetime 1.15 ≈ 48 동시. 위로 살짝.
 		_gpu_trail_gas = _Helpers.make_emitter({
 			"count": int(48 * _scale()), "lifetime": 1.15,
-			"color": COL_GAS,
+			"color": _COL_GAS_LIGHT,
 			"speed_min": 12.0, "speed_max": 30.0,
 			"direction": Vector2.UP, "spread": 25.0,
 			"gravity": -18.0, "damping": 3.0,  # -0.005 * 60²
@@ -76,11 +82,13 @@ func _spawn_splash(pos: Vector2) -> void:
 	if is_instance_valid(_gpu_trail_gas): _gpu_trail_gas.emitting = false
 	# drip 40 burst
 	var drip := _Helpers.make_emitter({
-		"count": _pcount(40), "lifetime": 1.1, "color": COL_DRIP,
+		"count": _pcount(40), "lifetime": 1.1, "color": Color.WHITE,
 		"speed_min": 60.0, "speed_max": 300.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 216.0, "damping": 3.0,  # 0.06 * 60²
 		"size_min": 3.0, "size_max": 8.0,
+		"size_base": 23.0,
+		"texture": _Helpers.drip_tex(),
 		"additive": false,
 		"start_alpha": 0.9, "mid_alpha": 0.45, "end_alpha": 0.0,
 	})
@@ -88,7 +96,7 @@ func _spawn_splash(pos: Vector2) -> void:
 	add_child(drip)
 	# gas 50 burst — 큰 안개
 	var gas := _Helpers.make_emitter({
-		"count": _pcount(50), "lifetime": 1.85, "color": COL_GAS,
+		"count": _pcount(50), "lifetime": 1.85, "color": _COL_GAS_LIGHT,
 		"speed_min": 36.0, "speed_max": 186.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -28.8, "damping": 3.0,  # -0.008 * 60²
@@ -100,7 +108,7 @@ func _spawn_splash(pos: Vector2) -> void:
 	add_child(gas)
 	# spark 24 — 불씨 (가산)
 	var spark := _Helpers.make_emitter({
-		"count": _pcount(24), "lifetime": 1.35, "color": COL_SPARK,
+		"count": _pcount(24), "lifetime": 1.35, "color": _COL_SPARK_LIGHT,
 		"speed_min": 60.0, "speed_max": 240.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 0.0, "damping": 3.0,
@@ -122,7 +130,7 @@ func _spawn_ambient() -> void:
 	_amb_made = true
 	# gas 42/s × lifetime 2.0 ≈ 84 동시. 위쪽으로.
 	_gpu_amb_gas = _Helpers.make_emitter({
-		"count": int(84 * _scale()), "lifetime": 2.0, "color": COL_GAS,
+		"count": int(84 * _scale()), "lifetime": 2.0, "color": _COL_GAS_LIGHT,
 		"speed_min": 24.0, "speed_max": 54.0,
 		"direction": Vector2.UP, "spread": 18.0,
 		"gravity": -18.0, "damping": 3.0,
@@ -136,7 +144,7 @@ func _spawn_ambient() -> void:
 	add_child(_gpu_amb_gas)
 	# bubble 18/s × lifetime 1.15 ≈ 21 동시. 위로 빠르게.
 	_gpu_amb_bubble = _Helpers.make_emitter({
-		"count": int(21 * _scale()), "lifetime": 1.15, "color": COL_DRIP,
+		"count": int(21 * _scale()), "lifetime": 1.15, "color": Color.WHITE,  # bubble_tex 자체 색
 		"speed_min": 36.0, "speed_max": 78.0,
 		"direction": Vector2.UP, "spread": 12.0,
 		"gravity": 0.0, "damping": 3.0,
@@ -152,11 +160,13 @@ func _spawn_ambient() -> void:
 	add_child(_gpu_amb_bubble)
 	# drip 12/s × lifetime 1.1 ≈ 13 동시. 떨어짐.
 	_gpu_amb_drip = _Helpers.make_emitter({
-		"count": int(13 * _scale()), "lifetime": 1.1, "color": COL_DRIP,
+		"count": int(13 * _scale()), "lifetime": 1.1, "color": Color.WHITE,
 		"speed_min": 30.0, "speed_max": 54.0,
 		"direction": Vector2.DOWN, "spread": 12.0,
 		"gravity": 180.0, "damping": 3.0,  # 0.05 * 60²
 		"size_min": 2.4, "size_max": 4.2,
+		"size_base": 23.0,
+		"texture": _Helpers.drip_tex(),
 		"additive": false,
 		"emission_shape": "box", "emission_box": Vector2(30.0, 15.0),
 		"one_shot": false, "explosiveness": 0.0,

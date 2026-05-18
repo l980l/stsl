@@ -12,6 +12,7 @@ static var _sparkle_tex: Texture2D
 static var _feather_tex: Texture2D
 static var _heart_tex: Texture2D
 static var _bubble_tex: Texture2D
+static var _drip_tex: Texture2D
 
 # 100% 솔리드 원 + 가장자리 1px 안티앨리어싱.
 # CPU draw_circle(pos, r, col) 과 거의 동일 — 가장자리 페이드 없음.
@@ -82,10 +83,48 @@ static func sparkle_tex() -> Texture2D:
 		_sparkle_tex = ImageTexture.create_from_image(img)
 	return _sparkle_tex
 
-# 거품 — 가운데 약한 채움 + 외곽 ring + 좌상단 하이라이트 (poison_splash bubble).
-# 64×64, 외곽 반경 28 (size_base 28 매핑).
+# 독액 방울 — 본체 큰 원 + 작은 빛반사 원 (poison_splash drip).
+# 텍스처 자체에 연한 녹색 미리. 64×64, 본체 반경 23 (size_base 23).
+# 원본: draw_circle(r*0.85, COL_DRIP) + draw_circle(offset, r*0.3, COL_DRIP_HL).
+static func drip_tex() -> Texture2D:
+	if _drip_tex == null:
+		var col_body := Color(0.65, 0.92, 0.35)    # 연한 독성 녹
+		var col_hl := Color(0.92, 1.0, 0.75)        # 매우 연한 하이라이트
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		var cx := 31.5
+		var cy := 31.5
+		# 본체 — 반경 23 솔리드 (alpha 0.9)
+		for y in 64:
+			for x in 64:
+				var dx := float(x) - cx
+				var dy := float(y) - cy
+				var d := sqrt(dx * dx + dy * dy)
+				if d <= 22.0:
+					img.set_pixel(x, y, Color(col_body.r, col_body.g, col_body.b, 0.9))
+				elif d <= 23.0:
+					img.set_pixel(x, y, Color(col_body.r, col_body.g, col_body.b, 0.9 * (23.0 - d)))
+		# 빛반사 작은 원 — 좌상단 offset (-23*0.2, -23*0.4) = (-4.6, -9.2), 반경 6.9
+		for y in 64:
+			for x in 64:
+				var dx := float(x) - (cx - 4.6)
+				var dy := float(y) - (cy - 9.2)
+				var d := sqrt(dx * dx + dy * dy)
+				if d <= 6.5:
+					img.set_pixel(x, y, Color(col_hl.r, col_hl.g, col_hl.b, 0.7))
+				elif d <= 7.5:
+					var existing: Color = img.get_pixel(x, y)
+					img.set_pixel(x, y, Color(col_hl.r, col_hl.g, col_hl.b, maxf(existing.a, 0.7 * (7.5 - d))))
+		_drip_tex = ImageTexture.create_from_image(img)
+	return _drip_tex
+
+# 거품 — 두꺼운 외곽 ring + 안쪽 작은 ring (2중 원) + 빛반사 작은 원.
+# 사용자 피드백: 안쪽에 동그라미 하나 더 + 선 더 두껍게.
+# 64×64, 외곽 반경 28 (size_base 28).
 static func bubble_tex() -> Texture2D:
 	if _bubble_tex == null:
+		var col_body := Color(0.65, 0.92, 0.35)    # 연한 독성 녹
+		var col_hl := Color(0.92, 1.0, 0.75)
 		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
 		img.fill(Color.TRANSPARENT)
 		var cx := 31.5
@@ -95,23 +134,26 @@ static func bubble_tex() -> Texture2D:
 				var dx := float(x) - cx
 				var dy := float(y) - cy
 				var d := sqrt(dx * dx + dy * dy)
-				# 내부 약한 채움 (alpha 0.25)
-				if d <= 28.0:
-					img.set_pixel(x, y, Color(1, 1, 1, 0.25))
-				# 외곽 ring (반경 27~29, 두께 2) — alpha 0.7
-				if d >= 27.0 and d <= 29.0:
-					var existing: Color = img.get_pixel(x, y)
-					img.set_pixel(x, y, Color(1, 1, 1, maxf(existing.a, 0.7)))
-		# 좌상단 흰 하이라이트 (offset -10, -10, 반경 5)
+				# 외곽 ring — 반경 25~28 (두께 4, 더 두껍게)
+				if d >= 25.0 and d <= 28.0:
+					img.set_pixel(x, y, Color(col_body.r, col_body.g, col_body.b, 0.85))
+				# 안쪽 작은 ring — 반경 14~16 (두께 3)
+				elif d >= 14.0 and d <= 16.0:
+					img.set_pixel(x, y, Color(col_body.r, col_body.g, col_body.b, 0.85))
+				# 내부 매우 약한 채움
+				elif d < 25.0:
+					img.set_pixel(x, y, Color(col_body.r, col_body.g, col_body.b, 0.15))
+		# 좌상단 빛반사 작은 원 (외곽 ring 위에)
 		for y in 64:
 			for x in 64:
-				var dx := float(x) - (cx - 10.0)
-				var dy := float(y) - (cy - 10.0)
+				var dx := float(x) - (cx - 12.0)
+				var dy := float(y) - (cy - 12.0)
 				var d := sqrt(dx * dx + dy * dy)
-				if d <= 5.0:
+				if d <= 4.5:
+					img.set_pixel(x, y, Color(col_hl.r, col_hl.g, col_hl.b, 0.8))
+				elif d <= 5.5:
 					var existing: Color = img.get_pixel(x, y)
-					var a := 1.0 - (d / 5.0) * 0.3
-					img.set_pixel(x, y, Color(1, 1, 1, maxf(existing.a, a * 0.7)))
+					img.set_pixel(x, y, Color(col_hl.r, col_hl.g, col_hl.b, maxf(existing.a, 0.8 * (5.5 - d))))
 		_bubble_tex = ImageTexture.create_from_image(img)
 	return _bubble_tex
 
