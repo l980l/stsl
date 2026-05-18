@@ -5,11 +5,18 @@ extends Node2D
 
 # 같은 VFX 의 GPU/CPU 버전 페어 — 토글로 전환 비교
 const VFX_PAIRS := [
+	# Phase 1
 	{"name": "warrior_buff", "gpu": "res://scenes/vfx/warrior_buff_gpu.gd", "cpu": "res://scenes/vfx/warrior_buff.gd"},
 	{"name": "holy_buff",    "gpu": "res://scenes/vfx/holy_buff_gpu.gd",    "cpu": "res://scenes/vfx/holy_buff.gd"},
 	{"name": "boss_death",   "gpu": "res://scenes/vfx/boss_death_gpu.gd",   "cpu": "res://scenes/vfx/boss_death.gd"},
 	{"name": "sig_ragnarok", "gpu": "res://scenes/vfx/sig_ragnarok_gpu.gd", "cpu": "res://scenes/vfx/sig_ragnarok.gd"},
 	{"name": "fire_blast",   "gpu": "res://scenes/vfx/fire_blast_gpu.gd",   "cpu": "res://scenes/vfx/fire_blast.gd"},
+	# Phase 2 — 잔다르크 holy 공격 5종
+	{"name": "holy_strike", "gpu": "res://scenes/vfx/holy_strike_gpu.gd", "cpu": "res://scenes/vfx/holy_strike.gd"},
+	{"name": "holy_arrow",  "gpu": "res://scenes/vfx/holy_arrow_gpu.gd",  "cpu": "res://scenes/vfx/holy_arrow.gd"},
+	{"name": "holy_fire",   "gpu": "res://scenes/vfx/holy_fire_gpu.gd",   "cpu": "res://scenes/vfx/holy_fire.gd"},
+	{"name": "holy_slash",  "gpu": "res://scenes/vfx/holy_slash_gpu.gd",  "cpu": "res://scenes/vfx/holy_slash.gd"},
+	{"name": "holy_blunt",  "gpu": "res://scenes/vfx/holy_blunt_gpu.gd",  "cpu": "res://scenes/vfx/holy_blunt.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
@@ -70,7 +77,7 @@ func _ready() -> void:
 	vfx_lbl.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
 	panel.add_child(vfx_lbl)
 	var grid := GridContainer.new()
-	grid.columns = 5
+	grid.columns = 5  # 5/5 = Phase1/Phase2
 	panel.add_child(grid)
 	for entry in VFX_PAIRS:
 		var b := Button.new()
