@@ -42,6 +42,16 @@ const PURGE_STATUS := preload("res://scenes/vfx/purge_status.gd")
 const MORALE_BOOST := preload("res://scenes/vfx/morale_boost.gd")
 const PREPARE := preload("res://scenes/vfx/prepare.gd")
 const BOSS_PHASE := preload("res://scenes/vfx/boss_phase_changed.gd")
+const SIG_HUBRIS := preload("res://scenes/vfx/sig_hubris.gd")
+const SIG_RAGNAROK := preload("res://scenes/vfx/sig_ragnarok.gd")
+const SIG_KARMA := preload("res://scenes/vfx/sig_karma.gd")
+const SIG_YIN_YANG := preload("res://scenes/vfx/sig_yin_yang.gd")
+const SIG_EGYPTIAN_CURSE := preload("res://scenes/vfx/sig_egyptian_curse.gd")
+const SIG_KEKKAI := preload("res://scenes/vfx/sig_kekkai.gd")
+const CARD_EXHAUST := preload("res://scenes/vfx/card_exhaust.gd")
+const BOSS_DEATH := preload("res://scenes/vfx/boss_death.gd")
+const _CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const _CardResourceClass := preload("res://resources/card_resource.gd")
 
 # kind: "impact"=피격 버스트(타겟 위치) / "self"=자기 버프 버스트 / "beam"=시전자→타겟 빔
 # 현재버전 — 게임에서 실제 사용 중
@@ -86,6 +96,14 @@ const VFX_CURRENT := [
 	{"name": "morale_boost",   "kind": "beam",   "path": "res://scenes/vfx/morale_boost.gd"},
 	{"name": "prepare",        "kind": "beam",   "path": "res://scenes/vfx/prepare.gd"},
 	{"name": "boss_phase",     "kind": "beam",   "path": "res://scenes/vfx/boss_phase_changed.gd"},
+	{"name": "sig_hubris",         "kind": "beam", "path": "res://scenes/vfx/sig_hubris.gd"},
+	{"name": "sig_ragnarok",       "kind": "beam", "path": "res://scenes/vfx/sig_ragnarok.gd"},
+	{"name": "sig_karma",          "kind": "beam", "path": "res://scenes/vfx/sig_karma.gd"},
+	{"name": "sig_yin_yang",       "kind": "beam", "path": "res://scenes/vfx/sig_yin_yang.gd"},
+	{"name": "sig_egyptian_curse", "kind": "beam", "path": "res://scenes/vfx/sig_egyptian_curse.gd"},
+	{"name": "sig_kekkai",         "kind": "beam", "path": "res://scenes/vfx/sig_kekkai.gd"},
+	{"name": "card_exhaust",       "kind": "beam", "path": "res://scenes/vfx/card_exhaust.gd"},
+	{"name": "boss_death",         "kind": "beam", "path": "res://scenes/vfx/boss_death.gd"},
 ]
 
 # 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.
@@ -131,7 +149,7 @@ func _ready() -> void:
 	current_lbl.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
 	panel.add_child(current_lbl)
 	var grid_current := GridContainer.new()
-	grid_current.columns = 9
+	grid_current.columns = 15
 	panel.add_child(grid_current)
 	for entry in VFX_CURRENT:
 		var b := Button.new()
@@ -146,7 +164,7 @@ func _ready() -> void:
 	legacy_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	panel.add_child(legacy_lbl)
 	var grid_legacy := GridContainer.new()
-	grid_legacy.columns = 9
+	grid_legacy.columns = 15
 	panel.add_child(grid_legacy)
 	for entry in VFX_LEGACY:
 		var b := Button.new()
@@ -395,6 +413,46 @@ func _update_info() -> void:
 				BOSS_PHASE.RING_RADIUS, BOSS_PHASE.AURA_R, BOSS_PHASE.CORE_R]
 			s += "build %.2fs · erupt %.2fs · hold %.2fs · fade %.2fs (큰 폭발 + 4겹 shockwave + 화면 flash·shake)" % [
 				BOSS_PHASE.BUILD_TIME, BOSS_PHASE.IMPACT_DELAY, BOSS_PHASE.HOLD_TIME, BOSS_PHASE.FADE_TIME]
+		"sig_hubris":
+			s += "그리스 휴브리스 — halo 반경 %.0f · rage ring %.0f · head offset %.0f\n" % [
+				SIG_HUBRIS.HALO_R, SIG_HUBRIS.RAGE_R, SIG_HUBRIS.HEAD_OFFSET]
+			s += "strike %.2fs · rage %.2fs · hold %.2fs · fade %.2fs (적 25+ 피해 → 황금 halo + zigzag 번개)" % [
+				SIG_HUBRIS.IMPACT_DELAY, SIG_HUBRIS.RAGE_DELAY, SIG_HUBRIS.HOLD_TIME, SIG_HUBRIS.FADE_TIME]
+		"sig_ragnarok":
+			s += "북유럽 라그나로크 — ember spawn 반경 %.0f (화면 broadcast)\n" % SIG_RAGNAROK.SPAWN_W
+			s += "impact %.2fs · hold %.2fs · fade %.2fs (HP 30% 미만 → 바닥 ember 상승만)" % [
+				SIG_RAGNAROK.IMPACT_DELAY, SIG_RAGNAROK.HOLD_TIME, SIG_RAGNAROK.FADE_TIME]
+		"sig_karma":
+			s += "불교 인과응보 — lotus 반경 %.0f · ring %.0f · halo %.0f\n" % [
+				SIG_KARMA.LOTUS_R, SIG_KARMA.RING_R, SIG_KARMA.HALO_R]
+			s += "bloom %.2fs · rings %.2fs · beams %.2fs · hold %.2fs · fade %.2fs (시체→영웅 다중 빔)" % [
+				SIG_KARMA.BLOOM_DELAY, SIG_KARMA.RINGS_DELAY, SIG_KARMA.BEAMS_DELAY, SIG_KARMA.HOLD_TIME, SIG_KARMA.FADE_TIME]
+		"sig_yin_yang":
+			s += "도교 음양 — 태극 반경 %.0f · head offset %.0f\n" % [
+				SIG_YIN_YANG.TAIJI_R, SIG_YIN_YANG.HEAD_OFFSET]
+			s += "spin %.2fs · hold %.2fs · fade %.2fs (매 턴 발동 — 회전 태극 glyph, SFX 없음)" % [
+				SIG_YIN_YANG.IMPACT_DELAY, SIG_YIN_YANG.HOLD_TIME, SIG_YIN_YANG.FADE_TIME]
+		"sig_egyptian_curse":
+			s += "이집트 저주 — horus %.0fx%.0f · head offset %.0f\n" % [
+				SIG_EGYPTIAN_CURSE.HORUS_W, SIG_EGYPTIAN_CURSE.HORUS_H, SIG_EGYPTIAN_CURSE.HEAD_OFFSET]
+			s += "stamp %.2fs · hold %.2fs · fade %.2fs (모든 공격 적중 — 호루스 눈 + 상형문자)" % [
+				SIG_EGYPTIAN_CURSE.STAMP_DELAY, SIG_EGYPTIAN_CURSE.HOLD_TIME, SIG_EGYPTIAN_CURSE.FADE_TIME]
+		"sig_kekkai":
+			s += "일본 결계 — hex 반경 %.0f · ofuda %.0fx%.0f × 4 (NWSE)\n" % [
+				SIG_KEKKAI.HEX_R, SIG_KEKKAI.OFUDA_W, SIG_KEKKAI.OFUDA_H]
+			s += "ofuda %.2fs · barrier %.2fs · kanji %.2fs · hold %.2fs · fade %.2fs (매 5턴 — 4 부적 + 6각 결계)" % [
+				SIG_KEKKAI.OFUDA_DELAY, SIG_KEKKAI.BARRIER_DELAY, SIG_KEKKAI.KANJI_DELAY, SIG_KEKKAI.HOLD_TIME, SIG_KEKKAI.FADE_TIME]
+		"card_exhaust":
+			s += "카드 소진 — 카드 %.0fx%.0f · sweep %.2fs (위→아래 ember line + 잿불 + 회색 재)\n" % [
+				CARD_EXHAUST.CARD_W, CARD_EXHAUST.CARD_H, CARD_EXHAUST.SWEEP_TIME]
+			s += "impact %.2fs · hold %.2fs · fade %.2fs (preview 에선 더미 카드 표시 → fade out)" % [
+				CARD_EXHAUST.IMPACT_DELAY, CARD_EXHAUST.HOLD_TIME, CARD_EXHAUST.FADE_TIME]
+		"boss_death":
+			s += "보스 사망 — boss %.0fx%.0f · shock %.2fs · pillar %.2fs\n" % [
+				BOSS_DEATH.BOSS_W, BOSS_DEATH.BOSS_H, BOSS_DEATH.SHOCK_TIME, BOSS_DEATH.PILLAR_TIME]
+			s += "crack 0s → inhale %.2fs → impact %.2fs → crown %.2fs → slate %.2fs · hold %.2fs · fade %.2fs" % [
+				BOSS_DEATH.INHALE_DELAY, BOSS_DEATH.IMPACT_DELAY, BOSS_DEATH.CROWN_DELAY,
+				BOSS_DEATH.SLATE_DELAY, BOSS_DEATH.HOLD_TIME, BOSS_DEATH.FADE_TIME]
 		_:
 			s += "시전자 마커는 beam 전용 — impact/self는 타겟 위치에서 재생"
 	# IMPACT_DELAY 한 줄 자동 추가 — VFX 스크립트에 노출돼 있으면 표시 (battle_manager 가 동기화에 사용)
@@ -437,7 +495,7 @@ func _play(entry: Dictionary) -> void:
 					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
 					var c_pos: Vector2 = _caster_pos + Vector2(x_offsets[i], 0.0)
 					# 시전자 마커 무시, 타겟 위치를 중심·발치로
-					if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase"]:
+					if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "boss_death"]:
 						c_pos = t_pos
 						if fx_n.has_method("set_ground_anchor"):
 							fx_n.set_ground_anchor(t_pos)
@@ -463,8 +521,25 @@ func _play(entry: Dictionary) -> void:
 						_target_pos,
 						_target_pos + Vector2(130.0, 0.0),
 					])
+				# card_exhaust — 실제 게임 CardScene + CardResource 표시 (타겟 위치) + VFX 위에. 카드는 fade out.
+				if entry["name"] == "card_exhaust":
+					var dummy := _make_dummy_card(_target_pos)
+					add_child(dummy)
+					var card_size: Vector2 = dummy.size
+					if card_size == Vector2.ZERO:
+						card_size = Vector2(180.0, 250.0)
+					dummy.position = _target_pos - card_size * 0.5
+					if fx.has_method("set_card_size"):
+						fx.set_card_size(card_size)
+					fx.play(_target_pos, _target_pos)
+					# IMPACT_DELAY 후 카드 alpha tween (sweep 따라 fade)
+					var tw := create_tween()
+					tw.tween_interval(CARD_EXHAUST.IMPACT_DELAY)
+					tw.tween_property(dummy, "modulate:a", 0.0, CARD_EXHAUST.SWEEP_TIME)
+					tw.tween_callback(dummy.queue_free)
+					return
 				# 시전자 마커 무시, 타겟 위치를 중심·발치로
-				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase"]:
+				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "boss_death"]:
 					if fx.has_method("set_ground_anchor"):
 						fx.set_ground_anchor(_target_pos)
 					fx.play(_target_pos, _target_pos)
@@ -608,3 +683,20 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	draw_string(font, _caster_pos + Vector2(-22.0, -22.0), "시전자", HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 	draw_string(font, _target_pos + Vector2(-16.0, -22.0), "타겟", HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
+
+# card_exhaust preview 용 — 실제 게임 CardScene + CardResource 인스턴스 (게임 프레임 그대로)
+func _make_dummy_card(center: Vector2) -> Control:
+	var card_res = _CardResourceClass.new()
+	card_res.card_name = "card.napoleon.strike"   # 번역 키 — 폴백으로 키 표시
+	card_res.cost = 2
+	card_res.card_type = _CardResourceClass.CardType.ATTACK
+	card_res.rarity = _CardResourceClass.Rarity.RARE
+	card_res.is_exhaust = true
+	card_res.description = "EXHAUST 데모"
+	card_res.owner_id = "napoleon"
+	var card: Control = _CARD_SCENE.instantiate()
+	card.setup(card_res, CardScene.Mode.HAND)
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 위치는 호출자에서 size 확인 후 재조정
+	card.position = center
+	return card

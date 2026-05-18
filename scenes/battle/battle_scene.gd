@@ -1002,6 +1002,8 @@ func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	tw.tween_callback(toast.queue_free)
 	# 적 위치에 색상 플래시 (시그니처 색상)
 	_burst_signature_at_enemy(enemy_index, color)
+	# 신화별 cinematic VFX spawn
+	_spawn_signature_vfx(enemy_index, signature_name)
 
 # 적 SPECIAL 인텐트가 카드를 이번 전투 동안 exhaust 시켰을 때 — 토스트 알림
 func _on_cards_exhausted_by_enemy(card_names: Array) -> void:
@@ -1887,6 +1889,9 @@ func _on_energy_changed(new_energy: int) -> void:
 func _on_card_played(card: Resource) -> void:
 	call_deferred("_refresh_all_hero_ui")
 	_cam_on_card_played()  # VFX 재생 상태 진입 (이미 줌아웃 — VFX 끝나면 영웅 복귀)
+	# EXHAUST 카드 (POWER 카드 포함 — DeckManager 와 동일 조건) → 카드 위치에 burn VFX
+	if card != null and (card.get("is_exhaust") == true or card.get("card_type") == 2):
+		_spawn_card_exhaust_for(card)
 	# VFX (DAMAGE/BLOCK/HEAL/APPLY_STATUS) 는 BattleManager.card_vfx_charge_start → _on_card_vfx_start 가 처리.
 	# 여기서는 영웅 attack 애니메이션만 (anim_speed_multiplier 적용).
 	var owner_id: String = card.get("owner_id") if card.get("owner_id") != null else ""
@@ -2246,6 +2251,14 @@ const _VFX_PURGE_STATUS := preload("res://scenes/vfx/purge_status.gd")
 const _VFX_MORALE_BOOST := preload("res://scenes/vfx/morale_boost.gd")
 const _VFX_PREPARE := preload("res://scenes/vfx/prepare.gd")
 const _VFX_BOSS_PHASE := preload("res://scenes/vfx/boss_phase_changed.gd")
+const _VFX_SIG_HUBRIS := preload("res://scenes/vfx/sig_hubris.gd")
+const _VFX_SIG_RAGNAROK := preload("res://scenes/vfx/sig_ragnarok.gd")
+const _VFX_SIG_KARMA := preload("res://scenes/vfx/sig_karma.gd")
+const _VFX_SIG_YIN_YANG := preload("res://scenes/vfx/sig_yin_yang.gd")
+const _VFX_SIG_EGYPTIAN_CURSE := preload("res://scenes/vfx/sig_egyptian_curse.gd")
+const _VFX_SIG_KEKKAI := preload("res://scenes/vfx/sig_kekkai.gd")
+const _VFX_CARD_EXHAUST := preload("res://scenes/vfx/card_exhaust.gd")
+const _VFX_BOSS_DEATH := preload("res://scenes/vfx/boss_death.gd")
 
 # lightning으로 죽는 적/영웅 — 사망 연출을 빔 임팩트 시점까지 지연하기 위한 빔 참조
 # key: "enemy_%d" 또는 hero_id → lightning_beam 인스턴스
@@ -2321,6 +2334,39 @@ func _spawn_death_dissolve(pos: Vector2) -> void:
 	fx.set_ground_anchor(pos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
 	fx.play(pos, pos)
 
+# 보스 전용 사망 VFX — 거대 폭발 cinematic + 왕관 추락 + slate
+func _spawn_boss_death(pos: Vector2, foot_pos: Vector2) -> void:
+	var fx: Node2D = _VFX_BOSS_DEATH.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		_play_screen_shake()
+		AudioManager.play_sfx("impact_explosive")
+	)
+	fx.play(pos, pos)
+
+# 카드 EXHAUST VFX — 카드 노드 위에 burn sweep + 잿불 + 재 + EXHAUST stamp
+func _spawn_card_exhaust_for(card: Resource) -> void:
+	var card_node: Control = null
+	for n in _card_buttons:
+		if is_instance_valid(n) and n.get_meta("_card_res", null) == card:
+			card_node = n
+			break
+	if card_node == null:
+		return
+	var center: Vector2 = card_node.global_position + card_node.size * 0.5
+	var fx: Node2D = _VFX_CARD_EXHAUST.new()
+	_ui_add(fx)  # CanvasLayer (카드와 같은 좌표계)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if fx.has_method("set_card_size"):
+		fx.set_card_size(card_node.size)
+	fx.play(center, center)
+
 # 부활 VFX — 부활 대상 위치에 빛기둥·고리·빛 입자
 func _spawn_revive_blessing(pos: Vector2) -> void:
 	var fx := _VFX_REVIVE_BLESSING.new()
@@ -2390,6 +2436,17 @@ func _first_living_hero_pos() -> Vector2:
 		var hnode: Node2D = _hero_char_nodes.get(hid)
 		if hnode:
 			return hnode.global_position
+	return Vector2.ZERO
+
+# 첫 살아있는 영웅의 발치 좌표 — egyptian_curse ground anchor 용
+func _first_living_hero_foot() -> Vector2:
+	for entry in _hero_nodes:
+		var hid: String = entry["hero_id"]
+		if hid == "" or not TeamManager.is_alive(hid):
+			continue
+		var hnode: Node2D = _hero_char_nodes.get(hid)
+		if hnode:
+			return _foot_pos(hnode)
 	return Vector2.ZERO
 
 # 모든 살아있는 영웅의 char_node 좌표
@@ -3286,6 +3343,120 @@ func _spawn_power_up(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> v
 	)
 	fx.play(caster_pos, caster_pos)
 
+# 신화 시그너처 VFX 디스패치 — _on_signature_fired 가 호출.
+# 신화별 spawn 위치·SFX·screen effect 분기.
+func _spawn_signature_vfx(enemy_index: int, signature_name: String) -> void:
+	var caster_node: Node2D = null
+	if enemy_index >= 0 and enemy_index < _enemy_char_nodes.size():
+		caster_node = _enemy_char_nodes[enemy_index]
+	var caster_pos: Vector2 = caster_node.global_position if caster_node else Vector2(WINDOW_W / 2.0, WINDOW_H / 2.0)
+	var foot_pos: Vector2 = _foot_pos(caster_node) if caster_node else caster_pos + Vector2(0.0, 60.0)
+	match signature_name:
+		"hubris": _spawn_sig_hubris(caster_pos, foot_pos)
+		"ragnarok": _spawn_sig_ragnarok()
+		"karma": _spawn_sig_karma(caster_pos, foot_pos)
+		"yin_yang": _spawn_sig_yin_yang(caster_pos, foot_pos)
+		"egyptian_curse": _spawn_sig_egyptian_curse(_first_living_hero_pos(), _first_living_hero_foot())
+		"kekkai": _spawn_sig_kekkai(caster_pos, foot_pos)
+
+# 그리스 휴브리스 — 적 위치에 황금 halo + zigzag 번개
+func _spawn_sig_hubris(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_SIG_HUBRIS.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_lightning")
+	)
+	fx.play(target_pos, target_pos)
+
+# 북유럽 라그나로크 — 살아있는 모든 적 위치에 각자 좁은 범위 ember + 그라데이션 spawn
+func _spawn_sig_ragnarok() -> void:
+	var first := true
+	for i in range(_enemy_char_nodes.size()):
+		if not BattleManager.is_enemy_alive(i):
+			continue
+		var node: Node2D = _enemy_char_nodes[i]
+		if node == null:
+			continue
+		var pos: Vector2 = node.global_position
+		var foot: Vector2 = _foot_pos(node)
+		var fx: Node2D = _VFX_SIG_RAGNAROK.new()
+		add_child(fx)
+		fx.z_index = 1300
+		fx.position = Vector2.ZERO
+		fx.set_ground_anchor(foot)
+		# screen flash/shake/SFX 는 첫 인스턴스만 — 중복 방지
+		if first:
+			first = false
+			fx.screen_effect.connect(func() -> void:
+				_play_screen_flash()
+				_play_screen_shake()
+				AudioManager.play_sfx("impact_explosive")
+			)
+		fx.play(pos, pos)
+
+# 불교 인과응보 — 시체(적)→모든 영웅 다중 빔
+func _spawn_sig_karma(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_SIG_KARMA.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	var heroes: Array = _all_living_hero_positions()
+	if heroes.is_empty():
+		heroes = [_first_living_hero_pos()]
+	fx.set_hero_positions(heroes)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_divine")
+	)
+	fx.play(caster_pos, heroes[0])
+
+# 도교 음양 — 적 위치 머리 위 회전 태극 (짧고 가벼움, SFX 없음 — 매 턴 발동)
+func _spawn_sig_yin_yang(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_SIG_YIN_YANG.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.play(target_pos, target_pos)
+
+# 이집트 저주 — 피해 입은 영웅 머리 위 호루스의 눈 stamp.
+# 3연발은 VFX 내부 (STAMP_COUNT) — screen_effect 가 stamp 마다 emit 되어 SFX 도 3번.
+func _spawn_sig_egyptian_curse(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	if target_pos == Vector2.ZERO:
+		return
+	var fx: Node2D = _VFX_SIG_EGYPTIAN_CURSE.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void:
+		AudioManager.play_sfx("impact_curse")
+	)
+	fx.play(target_pos, target_pos)
+
+# 일본 결계 — 적 위치에 4 ofuda + 6각 hex barrier + 結 kanji
+func _spawn_sig_kekkai(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_SIG_KEKKAI.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_divine")
+	)
+	fx.play(target_pos, target_pos)
+
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	# VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 이미 차지 시작.
 	# 데미지 시그널은 임팩트 시점이므로 — 피격 피드백 즉시 (UI·팝업·플래시·틴트·hurt 애니).
@@ -3903,11 +4074,16 @@ func _run_or_defer_death(key: String, death_fx: Callable) -> void:
 
 func _on_enemy_died(index: int) -> void:
 	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
+	var enemy_res: Resource = BattleManager.get_enemy(index)
+	var is_boss: bool = enemy_res != null and enemy_res.grade == EnemyResource.Grade.BOSS
 	var death_fx := func() -> void:
 		AudioManager.play_sfx("enemy_death")
 		_update_enemy_ui(index)
 		if char_node:
-			_spawn_death_dissolve(char_node.global_position)
+			if is_boss:
+				_spawn_boss_death(char_node.global_position, _foot_pos(char_node))
+			else:
+				_spawn_death_dissolve(char_node.global_position)
 			if char_node.has_node("AnimationPlayer"):
 				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
 				if ap.has_animation("death"):
