@@ -117,7 +117,6 @@ func _make_trail_emitters() -> void:
 		"speed_min": 36.0, "speed_max": 90.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -72.0, "size_min": 3.0, "size_max": 8.0,
-		"texture": _Helpers.glow_circle_tex(),
 		"one_shot": false, "explosiveness": 0.0,
 	})
 	add_child(_trail_flame)
@@ -126,7 +125,6 @@ func _make_trail_emitters() -> void:
 		"speed_min": 60.0, "speed_max": 210.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 72.0, "size_min": 1.4, "size_max": 2.6,
-		"texture": _Helpers.glow_circle_tex(),
 		"one_shot": false, "explosiveness": 0.0,
 	})
 	add_child(_trail_ember)
@@ -182,7 +180,6 @@ func _spawn_explosion(pos: Vector2) -> void:
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -54.0, "damping": 5.0,
 		"size_min": 14.0, "size_max": 36.0,
-		"texture": _Helpers.glow_circle_tex(),
 		"color_ramp": _Helpers.make_color_ramp(
 			Color(1.0, 0.961, 0.824),
 			Color(1.0, 0.667, 0.275),
@@ -198,7 +195,6 @@ func _spawn_explosion(pos: Vector2) -> void:
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 162.0, "damping": 5.0,
 		"size_min": 1.6, "size_max": 3.2,
-		"texture": _Helpers.glow_circle_tex(),
 		"color_ramp": _Helpers.make_color_ramp(
 			Color(1.0, 0.784, 0.392),
 			Color(1.0, 0.549, 0.235),
@@ -216,7 +212,6 @@ func _make_burn_emitters() -> void:
 		"direction": Vector2.UP, "spread": 18.0,
 		"gravity": -72.0, "damping": 4.0,
 		"size_min": 4.0, "size_max": 11.0,
-		"texture": _Helpers.glow_circle_tex(),
 		"emission_shape": "box", "emission_box": Vector2(20.0, 5.0),
 		"one_shot": false, "explosiveness": 0.0,
 		"color_ramp": _Helpers.make_color_ramp(
@@ -233,7 +228,6 @@ func _make_burn_emitters() -> void:
 		"direction": Vector2.UP, "spread": 25.0,
 		"gravity": 36.0, "damping": 4.0,
 		"size_min": 1.2, "size_max": 2.2,
-		"texture": _Helpers.glow_circle_tex(),
 		"emission_shape": "box", "emission_box": Vector2(18.0, 4.0),
 		"one_shot": false, "explosiveness": 0.0,
 		"color_ramp": _Helpers.make_color_ramp(

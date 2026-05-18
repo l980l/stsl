@@ -20,24 +20,21 @@ func _spawn_debris_burst() -> void:
 	_gpu_debris.position = ctr
 	add_child(_gpu_debris)
 
-# 원본: _particles.append × 0.2 확률/frame ≈ 12/sec * lifetime 2 ≈ 24 동시.
-# GPU: 첫 호출 시 continuous emitter 만들고 이후 noop. HOLD_TIME 후 자동 off.
+# 원본: pos ctr + (±100x, ±40y), vel (±0.5, -1.5~-3.5) → 위로 좁게 솟구치는 잔불.
+# GPU: continuous box emitter. spread 좁게 (위로만), size 원본 그대로.
 func _spawn_ember() -> void:
 	if _gpu_ember_made:
 		return
 	_gpu_ember_made = true
 	var ctr: Vector2 = _blast_pos()
-	# 원본은 draw_circle(글로우 size*1.8 alpha 0.45) + draw_circle(코어 size alpha 1) 2단.
-	# GPU 는 glow_circle_tex 1 텍스처로 근사.
 	_gpu_ember = _Helpers.make_emitter({
 		"count": int(28 * _scale()),
 		"lifetime": 2.0,
 		"color": COL_FIRE,
-		"speed_min": 90.0, "speed_max": 240.0,
-		"direction": Vector2.UP, "spread": 90.0,
-		"gravity": 36.0, "damping": 4.0,
-		"size_min": 3.2, "size_max": 6.8,  # 원본 코어 + 글로우 매칭 (size*1.8)
-		"texture": _Helpers.glow_circle_tex(),
+		"speed_min": 90.0, "speed_max": 210.0,
+		"direction": Vector2.UP, "spread": 12.0,  # 좁게 위로만
+		"gravity": 0.0, "damping": 3.0,
+		"size_min": 1.8, "size_max": 3.8,  # 원본 그대로
 		"emission_shape": "box", "emission_box": Vector2(100.0, 40.0),
 		"one_shot": false, "explosiveness": 0.0,
 	})

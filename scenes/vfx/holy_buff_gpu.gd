@@ -119,13 +119,15 @@ func _run() -> void:
 # 발동 순간 — mote 25 + feather 10 폭발 (one_shot, explosive)
 func _spawn_burst() -> void:
 	var ctr := _target + Vector2(0.0, -30.0)
-	# mote — 별가루 sparkle 텍스처 (원본 draw_circle + draw_rect 십자)
+	# mote — sparkle 텍스처 (원본 draw_circle + 십자 막대). size_base 6 = sparkle 코어 반경.
+	# 원본 mote r=1.5~3.1 → scale 0.25~0.52 → 막대 길이 12~25px (원본 5*r 7.5~15.5 비슷).
 	_mote_burst = _Helpers.make_emitter({
 		"count": _pcount(25),
 		"lifetime": 1.55,
 		"color": COL_MID,
 		"speed_min": 120.0, "speed_max": 420.0,
 		"size_min": 1.5, "size_max": 3.1,
+		"size_base": 6.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 90.0,
 		"damping": 5.0,
@@ -133,18 +135,19 @@ func _spawn_burst() -> void:
 	})
 	_mote_burst.position = ctr
 	add_child(_mote_burst)
-	# feather — 깃털 텍스처 (길쭉 타원) + 회전
+	# feather — 깃털 텍스처 (긴축 30) + 회전 강화 (lifetime 1.85 동안 1바퀴 = 360/1.85 ≈ 195 deg/s)
 	_feather_burst = _Helpers.make_emitter({
 		"count": _pcount(10),
 		"lifetime": 1.85,
 		"color": COL_FEATHER,
 		"speed_min": 60.0, "speed_max": 240.0,
 		"size_min": 10.0, "size_max": 20.0,
+		"size_base": 30.0,  # feather_tex 긴축 반경 30
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 36.0,
 		"damping": 5.0,
 		"angle_min": -180.0, "angle_max": 180.0,
-		"angular_velocity_min": -180.0, "angular_velocity_max": 180.0,
+		"angular_velocity_min": -360.0, "angular_velocity_max": 360.0,
 		"additive": false,
 		"texture": _Helpers.feather_tex(),
 	})
@@ -161,6 +164,7 @@ func _spawn_rising() -> void:
 		"color": COL_MID,
 		"speed_min": 60.0, "speed_max": 192.0,
 		"size_min": 1.4, "size_max": 3.0,
+		"size_base": 6.0,
 		"direction": Vector2.UP, "spread": 18.0,
 		"emission_shape": "box",
 		"emission_box": Vector2(60.0, 10.0),
@@ -175,11 +179,12 @@ func _spawn_rising() -> void:
 		"color": COL_FEATHER,
 		"speed_min": 36.0, "speed_max": 138.0,
 		"size_min": 8.0, "size_max": 16.0,
+		"size_base": 30.0,
 		"direction": Vector2.UP, "spread": 25.0,
 		"emission_shape": "box",
 		"emission_box": Vector2(50.0, 5.0),
 		"angle_min": -180.0, "angle_max": 180.0,
-		"angular_velocity_min": -90.0, "angular_velocity_max": 90.0,
+		"angular_velocity_min": -270.0, "angular_velocity_max": 270.0,
 		"additive": false,
 		"one_shot": false, "explosiveness": 0.0,
 		"texture": _Helpers.feather_tex(),

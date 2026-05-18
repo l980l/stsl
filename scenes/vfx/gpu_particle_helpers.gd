@@ -8,29 +8,26 @@ extends Object
 # ── 텍스처 캐시 (한 번 생성 후 재사용) ──
 static var _circle_tex: Texture2D
 static var _square_tex: Texture2D
-static var _glow_circle_tex: Texture2D
 static var _sparkle_tex: Texture2D
 static var _feather_tex: Texture2D
 
-# 솔리드 원 + 살짝 부드러운 가장자리 (CPU draw_circle 와 거의 동일)
-# 원본 draw_circle 은 가장자리까지 솔리드 → GPU 텍스처도 95% 솔리드, 마지막 5% 만 페이드.
+# 100% 솔리드 원 + 가장자리 1px 안티앨리어싱.
+# CPU draw_circle(pos, r, col) 과 거의 동일 — 가장자리 페이드 없음.
+# 64×64, 솔리드 반경 31 → size_min/max 는 픽셀 반경 (helper / 32 매핑).
 static func circle_tex() -> Texture2D:
 	if _circle_tex == null:
-		var grad := Gradient.new()
-		grad.offsets = PackedFloat32Array([0.0, 0.92, 1.0])
-		grad.colors = PackedColorArray([
-			Color(1, 1, 1, 1),
-			Color(1, 1, 1, 1),
-			Color(1, 1, 1, 0),
-		])
-		var tex := GradientTexture2D.new()
-		tex.gradient = grad
-		tex.fill = GradientTexture2D.FILL_RADIAL
-		tex.fill_from = Vector2(0.5, 0.5)
-		tex.fill_to = Vector2(1.0, 0.5)
-		tex.width = 64
-		tex.height = 64
-		_circle_tex = tex
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		for y in 64:
+			for x in 64:
+				var dx: float = float(x) - 31.5
+				var dy: float = float(y) - 31.5
+				var d: float = sqrt(dx * dx + dy * dy)
+				if d <= 31.0:
+					img.set_pixel(x, y, Color.WHITE)
+				elif d <= 32.0:
+					img.set_pixel(x, y, Color(1, 1, 1, 1.0 - (d - 31.0)))
+		_circle_tex = ImageTexture.create_from_image(img)
 	return _circle_tex
 
 # 균일 사각형 64×64 (chunk/debris 회전용 — size 매핑 일관)
@@ -41,26 +38,9 @@ static func square_tex() -> Texture2D:
 		_square_tex = ImageTexture.create_from_image(img)
 	return _square_tex
 
-# 글로우 원 (ember/flame/fireball 용 — radial gradient 40% 솔리드 + 60% 페이드)
-# 원본 CPU 의 draw_circle(글로우) + draw_circle(코어) 2단 효과를 1 텍스처로 근사.
-static func glow_circle_tex() -> Texture2D:
-	if _glow_circle_tex == null:
-		var grad := Gradient.new()
-		grad.offsets = PackedFloat32Array([0.0, 0.4, 1.0])
-		grad.colors = PackedColorArray([
-			Color(1, 1, 1, 1),
-			Color(1, 1, 1, 0.55),
-			Color(1, 1, 1, 0),
-		])
-		var tex := GradientTexture2D.new()
-		tex.gradient = grad
-		tex.fill = GradientTexture2D.FILL_RADIAL
-		tex.fill_from = Vector2(0.5, 0.5)
-		tex.fill_to = Vector2(1.0, 0.5)
-		tex.width = 64
-		tex.height = 64
-		_glow_circle_tex = tex
-	return _glow_circle_tex
+# glow_circle_tex 폐기 — 원본 CPU 어디서도 그라데이션 텍스처 안 씀.
+# 원본의 글로우 효과는 "큰 alpha 낮은 원 + 작은 alpha 높은 원" 두 번 draw_circle.
+# 필요 시 호출자가 두 emitter (큰/작은) 동시 spawn 으로 표현.
 
 # 별가루 (sparkle) — 코어 원 + 가로/세로 막대 십자 (반짝이). 원본 holy_buff mote 와 동일 모양.
 # draw_circle(pos, pr) + draw_rect 가로/세로 (5pr × 0.6) 십자.
@@ -203,10 +183,11 @@ static func make_emitter(opts: Dictionary) -> GPUParticles2D:
 	if opts.has("damping"):
 		mat.damping_min = float(opts["damping"])
 		mat.damping_max = float(opts["damping"])
-	# 크기 — 픽셀 반경으로 받고 GPU scale 로 변환. circle_tex 64px → scale = px / 32.
-	# 원본 CPU draw_circle(pos, r=1.5) 와 1:1 매핑 (글로우 포함).
-	mat.scale_min = float(opts.get("size_min", 1.0)) / 32.0
-	mat.scale_max = float(opts.get("size_max", 2.0)) / 32.0
+	# 크기 — 픽셀 반경으로 받고 GPU scale 로 변환. 기본 size_base 32 (circle_tex 64×64 솔리드 반경).
+	# 다른 텍스처 사용 시 size_base 옵션으로 base 변경 가능 (예: sparkle 코어 반경 6 → size_base 6).
+	var size_base: float = float(opts.get("size_base", 32.0))
+	mat.scale_min = float(opts.get("size_min", 1.0)) / size_base
+	mat.scale_max = float(opts.get("size_max", 2.0)) / size_base
 	if opts.has("scale_curve"):
 		var sc := CurveTexture.new()
 		sc.curve = opts["scale_curve"]
