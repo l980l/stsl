@@ -41,16 +41,18 @@ const STAMP_DELAY  := WINDUP_TIME + 0.32        # 0.64s — TAUNTED stamp
 const HOLD_TIME    := 0.9
 const FADE_TIME    := 0.7
 
-# 기하
-const SHOCK_BASE_R := 30.0
-const SHOCK_MAX_R  := 540.0
-const CHEST_R      := 16.0
-const GLYPH_R      := 36.0
-const WORD_OFFSET_Y := -120.0     # caster 위
-const GLYPH_OFFSET_Y := -86.0
-const CRACK_OFFSET_Y := 56.0      # 발치 아래
+# 기하 — 캐릭터 sprite (64~80px) 대비 적정 비율로 축소
+const SHOCK_BASE_R := 16.0
+const SHOCK_MAX_R  := 200.0
+const CHEST_R      := 12.0
+const GLYPH_R      := 24.0
+const WORD_OFFSET_Y := -100.0     # caster 위
+const GLYPH_OFFSET_Y := -70.0
+const CRACK_OFFSET_Y := 48.0      # 발치 아래
+const STAMP_OFFSET_Y := -64.0     # 영웅 머리 위
 
 var _caster := Vector2.ZERO
+var _target := Vector2.ZERO      # 도발 대상 영웅 (화살표 + stamp 표시용). ZERO 면 미표시.
 var _ground_pos := Vector2.ZERO
 var _has_ground: bool = false
 
@@ -89,8 +91,11 @@ func _ready() -> void:
 	add_child(_glow_layer)
 	_glow_layer.set_meta("pass", "glow")
 
-func play(caster_pos: Vector2, _target_pos: Vector2) -> void:
+func play(caster_pos: Vector2, target_pos: Vector2) -> void:
 	_caster = caster_pos
+	# target_pos == caster 면 영웅 화살표 X (시전자 본인 자기 대상 케이스)
+	if target_pos != Vector2.ZERO and target_pos != caster_pos:
+		_target = target_pos
 	_age = 0.0
 	set_process(true)
 	var total: float = IMPACT_DELAY + 0.32 + HOLD_TIME + FADE_TIME + 0.1
@@ -287,6 +292,12 @@ func _draw_glow_pass(canvas: CanvasItem) -> void:
 	# word "도발" — 큰 텍스트 (Cinzel/SacredTheme 폰트 사용 — 한글은 NotoSans fallback)
 	if _impact_emitted:
 		_draw_word(canvas, ga)
+	# 시전자 → 영웅 화살표 (pre dashed white-grey → post solid red, ARROW_DELAY 부터 전환)
+	if _target != Vector2.ZERO:
+		_draw_aggro_arrow(canvas, ga)
+		# 영웅 머리 위 TAUNTED stamp (STAMP_DELAY 부터)
+		if _age >= STAMP_DELAY:
+			_draw_taunted_stamp(canvas, ga)
 
 func _draw_glyph(canvas: CanvasItem, ga: float) -> void:
 	var glyph_age: float = _age - IMPACT_DELAY
@@ -363,6 +374,101 @@ func _draw_word(canvas: CanvasItem, ga: float) -> void:
 	canvas.draw_string(theme_font, draw_pos + Vector2(0.0, 4.0), text,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_DEEP.r, COL_DEEP.g, COL_DEEP.b, alpha * 0.9))
 	# 본체 (흰)
+	canvas.draw_string(theme_font, draw_pos, text,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha))
+
+# ── 시전자 → 영웅 화살표 (pre: dashed 회색 / post: solid 빨강) ──
+# HTML 의 aggro 화살표 재현 — 흔들리는 dashed pre 가 thump 시점에 solid red 로 snap.
+func _draw_aggro_arrow(canvas: CanvasItem, ga: float) -> void:
+	# windup 단계: dashed 회색 (caster → target, 흐림)
+	# ARROW_DELAY (windup+0.14s) 부터: solid red 빨간 화살표
+	var to_post: float = clampf((_age - ARROW_DELAY) / 0.25, 0.0, 1.0)
+	var alpha: float = ga
+	var dir := (_target - _caster).normalized()
+	var dist: float = _caster.distance_to(_target)
+	if dist < 1.0:
+		return
+	# 화살표 시작·끝 — caster 가슴 ↔ target 머리
+	var p0 := _caster + Vector2(0.0, -50.0)
+	var p1 := _target + Vector2(0.0, -30.0)
+	# pre dashed (회색) — fade out 시 post 와 cross fade
+	if to_post < 1.0:
+		var pre_alpha: float = alpha * (1.0 - to_post) * 0.6
+		_draw_dashed_line(canvas, p0, p1, Color(0.7, 0.78, 0.86, pre_alpha), 1.5, 6.0, 4.0)
+	# post solid (빨강)
+	if to_post > 0.0:
+		var post_alpha: float = alpha * to_post
+		var col := Color(1.0, 0.31, 0.38, post_alpha)
+		canvas.draw_line(p0, p1, col, 2.4, true)
+		# 화살촉 (target 쪽 삼각형)
+		var head_size: float = 10.0
+		var perp := Vector2(-dir.y, dir.x)
+		var tip := p1
+		var base := p1 - dir * head_size
+		var pts := PackedVector2Array([
+			tip,
+			base + perp * head_size * 0.5,
+			base - perp * head_size * 0.5,
+		])
+		canvas.draw_colored_polygon(pts, col)
+
+# dashed line — 단순 구현 (각 dash 마다 draw_line)
+func _draw_dashed_line(canvas: CanvasItem, p0: Vector2, p1: Vector2, col: Color, width: float, dash_len: float, gap_len: float) -> void:
+	var dir := (p1 - p0).normalized()
+	var total: float = p0.distance_to(p1)
+	var step: float = dash_len + gap_len
+	var t: float = 0.0
+	while t < total:
+		var a: Vector2 = p0 + dir * t
+		var b: Vector2 = p0 + dir * min(t + dash_len, total)
+		canvas.draw_line(a, b, col, width, true)
+		t += step
+
+# 영웅 머리 위 "TAUNTED" / "도발됨" 스탬프 — 짧은 pop + 회전
+func _draw_taunted_stamp(canvas: CanvasItem, ga: float) -> void:
+	var stamp_age: float = _age - STAMP_DELAY
+	var pop_t: float = clampf(stamp_age / 0.25, 0.0, 1.0)
+	var alpha: float = ga * pop_t
+	# 마지막 페이드
+	var stamp_end: float = HOLD_TIME
+	if stamp_age > stamp_end:
+		alpha *= clampf(1.0 - (stamp_age - stamp_end) / 0.4, 0.0, 1.0)
+	if alpha <= 0.01:
+		return
+	var theme_font: Font = null
+	var sacred = get_node_or_null("/root/SacredTheme")
+	if sacred and sacred.theme != null:
+		theme_font = sacred.theme.default_font
+	if theme_font == null:
+		theme_font = ThemeDB.fallback_font
+	var text := "도발됨"
+	var fsize: int = int(14 * _scale())
+	var size_v: Vector2 = theme_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize)
+	var pad: Vector2 = Vector2(8.0, 5.0) * _scale()
+	var box_size: Vector2 = size_v + pad * 2.0
+	var ctr := _target + Vector2(0.0, STAMP_OFFSET_Y)
+	# scale pop: 1.6 → 0.96 → 1.0
+	var scale_st: float = 1.0
+	if pop_t < 0.6:
+		scale_st = 1.6 - (pop_t / 0.6) * 0.64
+	else:
+		scale_st = 0.96 + ((pop_t - 0.6) / 0.4) * 0.04
+	# 약간 기울임 (rotate -2deg)
+	var rot := -0.035
+	var half: Vector2 = box_size * scale_st * 0.5
+	# 배경 박스 (붉음)
+	var rect_pts := PackedVector2Array([
+		ctr + Vector2(-half.x, -half.y).rotated(rot),
+		ctr + Vector2( half.x, -half.y).rotated(rot),
+		ctr + Vector2( half.x,  half.y).rotated(rot),
+		ctr + Vector2(-half.x,  half.y).rotated(rot),
+	])
+	canvas.draw_colored_polygon(rect_pts, Color(COL_TAUNT.r, COL_TAUNT.g, COL_TAUNT.b, alpha * 0.92))
+	# 외곽 황금 테두리
+	canvas.draw_polyline(rect_pts + PackedVector2Array([rect_pts[0]]),
+		Color(COL_BRASS.r, COL_BRASS.g, COL_BRASS.b, alpha * 0.55), 1.5, true)
+	# 텍스트 (흰)
+	var draw_pos: Vector2 = ctr - size_v.rotated(rot) * 0.5
 	canvas.draw_string(theme_font, draw_pos, text,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha))
 

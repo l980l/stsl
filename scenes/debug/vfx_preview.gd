@@ -546,10 +546,15 @@ func _play(entry: Dictionary) -> void:
 					tw.tween_callback(dummy.queue_free)
 					return
 				# 시전자 마커 무시, 타겟 위치를 중심·발치로
-				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "taunt", "boss_death"]:
+				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "boss_death"]:
 					if fx.has_method("set_ground_anchor"):
 						fx.set_ground_anchor(_target_pos)
 					fx.play(_target_pos, _target_pos)
+				elif entry["name"] == "taunt":
+					# 도발은 caster→target 둘 다 사용 + caster 발치 anchor
+					if fx.has_method("set_ground_anchor"):
+						fx.set_ground_anchor(_caster_pos)
+					fx.play(_caster_pos, _target_pos)
 				else:
 					# target_marking / mimic / steal_card 은 caster→target 둘 다 사용 — 타겟 발치만 anchor
 					if entry["name"] in ["target_marking", "mimic", "steal_card"] and fx.has_method("set_ground_anchor"):

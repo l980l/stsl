@@ -2553,8 +2553,13 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: St
 					if hpos2 != Vector2.ZERO:
 						_spawn_slow_debuff(hpos2, hpos2 + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
 			elif stype == "taunt":
-				# 도발 — 시전 적 위치에 chest impact + shockwave + 글리프 + 한글 word + 파티클
-				_spawn_taunt(caster_pos, caster_foot)
+				# 도발 — 시전 적 위치에 chest impact + 영웅 화살표 + stamp
+				if intent.target == ir.TargetType.ALL:
+					for hpos_t in _all_living_hero_positions():
+						_spawn_taunt(caster_pos, caster_foot, hpos_t)
+				else:
+					var thpos: Vector2 = _hero_pos_or_first(target_hero_id)
+					_spawn_taunt(caster_pos, caster_foot, thpos)
 			else:
 				var fx_script: GDScript = _debuff_script_for_status(stype)
 				if fx_script:
@@ -3462,8 +3467,9 @@ func _spawn_sig_kekkai(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) ->
 	fx.play(target_pos, target_pos)
 
 # 도발 VFX — 시전 적 가슴에서 chest impact + shockwave + glyph + 한글 word + 파티클.
-# foot_pos 는 ground crack + dust 위치 anchor (정확한 발 위치).
-func _spawn_taunt(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+# foot_pos: ground crack + dust 위치 anchor (정확한 발 위치).
+# target_pos: 도발 대상 영웅 위치 — 시전자→영웅 화살표 + 영웅 머리 위 stamp.
+func _spawn_taunt(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO, target_pos: Vector2 = Vector2.ZERO) -> void:
 	var fx: Node2D = _VFX_TAUNT.new()
 	add_child(fx)
 	fx.z_index = 1280
@@ -3474,7 +3480,7 @@ func _spawn_taunt(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void
 		_play_screen_flash()
 		AudioManager.play_sfx("impact_blunt")
 	)
-	fx.play(caster_pos, caster_pos)
+	fx.play(caster_pos, target_pos)
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	# VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 이미 차지 시작.
