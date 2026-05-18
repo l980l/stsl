@@ -1,4 +1,4 @@
-mythology,enc_idx,result,turns_taken,hero_hp_remaining,total_enemy_hp,first_turn_dps,monsters
+﻿mythology,enc_idx,result,turns_taken,hero_hp_remaining,total_enemy_hp,first_turn_dps,monsters
 greek,0,WIN,1,3000,220,55,fly_harpy
 greek,1,WIN,3,2976,500,104,myrmidon|myrmidon
 greek,2,WIN,2,3000,350,80,satyr
@@ -58,4 +58,4 @@ japanese,5,WIN,4,2939,850,97,yamabiko|ittan_momen|azuki_washer
 japanese,6,WIN,6,2534,1270,242,oni|oni|samurai_ghost
 japanese,7,WIN,6,2765,1260,176,river_kappa|snow_woman|cursed_scroll|tatami_monster
 japanese,8,WIN,7,2398,1370,257,ronin_ghost|yamabushi_ghost|dragon_serpent
-japanese,9,WIN,7,2049,1380,307,oni_king|hannya
+japanese,9,WIN,7,2154,1380,272,oni_king|hannya

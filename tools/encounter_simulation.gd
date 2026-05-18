@@ -42,6 +42,8 @@ func _init() -> void:
 		push_error("Cannot open: %s" % OUT_PATH)
 		quit(1)
 		return
+	# UTF-8 BOM — Excel 호환
+	f.store_buffer(PackedByteArray([0xEF, 0xBB, 0xBF]))
 	for line in lines:
 		f.store_line(line)
 	f.close()
