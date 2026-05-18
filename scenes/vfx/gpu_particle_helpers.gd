@@ -11,6 +11,7 @@ static var _square_tex: Texture2D
 static var _sparkle_tex: Texture2D
 static var _feather_tex: Texture2D
 static var _heart_tex: Texture2D
+static var _bubble_tex: Texture2D
 
 # 100% 솔리드 원 + 가장자리 1px 안티앨리어싱.
 # CPU draw_circle(pos, r, col) 과 거의 동일 — 가장자리 페이드 없음.
@@ -80,6 +81,39 @@ static func sparkle_tex() -> Texture2D:
 				img.set_pixel(px, y, Color(1, 1, 1, maxf(existing.a, new_a)))
 		_sparkle_tex = ImageTexture.create_from_image(img)
 	return _sparkle_tex
+
+# 거품 — 가운데 약한 채움 + 외곽 ring + 좌상단 하이라이트 (poison_splash bubble).
+# 64×64, 외곽 반경 28 (size_base 28 매핑).
+static func bubble_tex() -> Texture2D:
+	if _bubble_tex == null:
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		var cx := 31.5
+		var cy := 31.5
+		for y in 64:
+			for x in 64:
+				var dx := float(x) - cx
+				var dy := float(y) - cy
+				var d := sqrt(dx * dx + dy * dy)
+				# 내부 약한 채움 (alpha 0.25)
+				if d <= 28.0:
+					img.set_pixel(x, y, Color(1, 1, 1, 0.25))
+				# 외곽 ring (반경 27~29, 두께 2) — alpha 0.7
+				if d >= 27.0 and d <= 29.0:
+					var existing: Color = img.get_pixel(x, y)
+					img.set_pixel(x, y, Color(1, 1, 1, maxf(existing.a, 0.7)))
+		# 좌상단 흰 하이라이트 (offset -10, -10, 반경 5)
+		for y in 64:
+			for x in 64:
+				var dx := float(x) - (cx - 10.0)
+				var dy := float(y) - (cy - 10.0)
+				var d := sqrt(dx * dx + dy * dy)
+				if d <= 5.0:
+					var existing: Color = img.get_pixel(x, y)
+					var a := 1.0 - (d / 5.0) * 0.3
+					img.set_pixel(x, y, Color(1, 1, 1, maxf(existing.a, a * 0.7)))
+		_bubble_tex = ImageTexture.create_from_image(img)
+	return _bubble_tex
 
 # 하트 — charm_kiss heart_unit() 의 32점 베지어 폴리곤 fill.
 # 64×64, 중심 (31.5, 31.5). 텍스처 자체에 원본 색 미리 (modulate WHITE 사용).
