@@ -28,12 +28,12 @@ func _spawn_muzzle() -> void:
 	})
 	spark.position = _caster
 	add_child(spark)
-	# smoke 14 — 머즐 연기 (cone 더 넓게)
+	# smoke 14 — 머즐 연기. 베이지 < 더 흰색.
 	var smoke := _Helpers.make_emitter({
 		"count": _pcount(14), "lifetime": 2.0,
-		"color": COL_SMOKE,
+		"color": Color(0.85, 0.85, 0.87),
 		"speed_min": 36.0, "speed_max": 132.0,
-		"direction": dir, "spread": 45.8,  # ±0.8 rad
+		"direction": dir, "spread": 45.8,
 		"gravity": -18.0, "damping": 3.0,
 		"size_min": 9.0, "size_max": 19.0,
 		"additive": false,
@@ -68,10 +68,10 @@ func _spawn_impact(pos: Vector2, ang: float) -> void:
 	})
 	spark.position = pos
 	add_child(spark)
-	# dust 18
+	# dust 18 — 베이지 어두움 → 더 흰색
 	var dust := _Helpers.make_emitter({
 		"count": _pcount(18), "lifetime": 1.2,
-		"color": COL_DUST,
+		"color": Color(0.85, 0.82, 0.78),
 		"speed_min": 24.0, "speed_max": 156.0,
 		"direction": bounce_dir, "spread": 30.0,
 		"gravity": -28.8, "damping": 3.0,

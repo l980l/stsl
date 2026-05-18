@@ -15,36 +15,36 @@ func _spawn_fireball(pos: Vector2) -> void:
 		return
 	_fireball_made = true
 	var bs := BLAST_SCALE
-	# core 10 — 흰 코어, lifetime 0.4
+	# core 10 — 흰 코어. 30% 크게. 색 mid = 흰주황 (초반 흰색 유지).
 	var core := _Helpers.make_emitter({
 		"count": _pcount(10), "lifetime": 0.4, "color": COL_HOT,
 		"speed_min": 60.0 * bs, "speed_max": 240.0 * bs,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -36.0 * bs, "damping": 3.0,
-		"size_min": 18.0 * bs, "size_max": 34.0 * bs,
-		"color_ramp": _Helpers.make_color_ramp(COL_HOT, COL_MID, COL_DEEP, 0.95, 0.7, 0.0),
+		"size_min": 23.0 * bs, "size_max": 44.0 * bs,
+		"color_ramp": _Helpers.make_color_ramp(COL_HOT, Color(1.0, 0.85, 0.55), COL_MID, 0.95, 0.8, 0.0),
 	})
 	core.position = pos
 	add_child(core)
-	# fireball 50 — 주황, lifetime 1.4
+	# fireball 50 — 30% 크게. 초반 흰색 유지 (mid 흰주황).
 	var fireball := _Helpers.make_emitter({
-		"count": _pcount(50), "lifetime": 1.4, "color": COL_MID,
+		"count": _pcount(50), "lifetime": 1.4, "color": COL_HOT,
 		"speed_min": 120.0 * bs, "speed_max": 540.0 * bs,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -90.0 * bs, "damping": 3.0,
-		"size_min": 18.0 * bs, "size_max": 48.0 * bs,
-		"color_ramp": _Helpers.make_color_ramp(COL_HOT, COL_MID, COL_DEEP, 0.9, 0.7, 0.0),
+		"size_min": 23.0 * bs, "size_max": 62.0 * bs,
+		"color_ramp": _Helpers.make_color_ramp(COL_HOT, Color(1.0, 0.85, 0.5), COL_DEEP, 0.95, 0.75, 0.0),
 	})
 	fireball.position = pos
 	add_child(fireball)
-	# flame 30 — 작은 불꽃, lifetime 0.9
+	# flame 30 — 30% 크게. 초반 흰색.
 	var flame := _Helpers.make_emitter({
 		"count": _pcount(30), "lifetime": 0.9, "color": COL_HOT,
 		"speed_min": 240.0 * bs, "speed_max": 720.0 * bs,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -54.0 * bs, "damping": 3.0,
-		"size_min": 8.0 * bs, "size_max": 22.0 * bs,
-		"color_ramp": _Helpers.make_color_ramp(COL_HOT, COL_MID, COL_DEEP, 0.9, 0.7, 0.0),
+		"size_min": 10.0 * bs, "size_max": 29.0 * bs,
+		"color_ramp": _Helpers.make_color_ramp(COL_HOT, Color(1.0, 0.85, 0.5), COL_DEEP, 0.95, 0.75, 0.0),
 	})
 	flame.position = pos
 	add_child(flame)
@@ -61,29 +61,29 @@ func _spawn_fireball(pos: Vector2) -> void:
 	})
 	ember.position = pos
 	add_child(ember)
-	# dust 35 — 바닥 흙먼지, 옆으로 강조 + damping 강해 천천히 멈춤
+	# dust 35 — 바닥 흙먼지. 30% 크게, 더 밝게, 천천히 이동 (damping 약하게).
 	var dust := _Helpers.make_emitter({
-		"count": _pcount(35), "lifetime": 2.8, "color": COL_DUST,
-		"speed_min": 120.0 * bs, "speed_max": 420.0 * bs,
+		"count": _pcount(35), "lifetime": 2.8, "color": Color(0.82, 0.65, 0.45),
+		"speed_min": 60.0 * bs, "speed_max": 180.0 * bs,
 		"direction": Vector2.UP, "spread": 80.0,
-		"gravity": -18.0 * bs, "damping": 40.0,
-		"size_min": 24.0 * bs, "size_max": 46.0 * bs,
+		"gravity": -12.0 * bs, "damping": 8.0,
+		"size_min": 31.0 * bs, "size_max": 60.0 * bs,
 		"additive": false,
-		"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,
+		"start_alpha": 0.55, "mid_alpha": 0.3, "end_alpha": 0.0,
 		"emission_shape": "box", "emission_box": Vector2(15.0 * bs, 4.0 * bs),
 	})
 	dust.position = pos + Vector2(0.0, 20.0 * bs)
 	dust.z_index = -1
 	add_child(dust)
-	# dust_cloud 50 — 사방으로 퍼지는 큰 흙먼지 안개 (사용자 요청)
+	# dust_cloud 50 — 사방 큰 흙먼지 안개. 30% 크게, 더 밝게, 천천히 이동.
 	var dust_cloud := _Helpers.make_emitter({
-		"count": _pcount(50), "lifetime": 2.6, "color": COL_DUST,
-		"speed_min": 60.0 * bs, "speed_max": 240.0 * bs,
-		"direction": Vector2.UP, "spread": 180.0,  # 사방
-		"gravity": -12.0 * bs, "damping": 30.0,
-		"size_min": 32.0 * bs, "size_max": 64.0 * bs,
+		"count": _pcount(50), "lifetime": 2.6, "color": Color(0.82, 0.65, 0.45),
+		"speed_min": 30.0 * bs, "speed_max": 120.0 * bs,
+		"direction": Vector2.UP, "spread": 180.0,
+		"gravity": -6.0 * bs, "damping": 5.0,
+		"size_min": 42.0 * bs, "size_max": 83.0 * bs,
 		"additive": false,
-		"start_alpha": 0.45, "mid_alpha": 0.22, "end_alpha": 0.0,
+		"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,
 	})
 	dust_cloud.position = pos + Vector2(0.0, 10.0 * bs)
 	dust_cloud.z_index = -1

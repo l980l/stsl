@@ -12,13 +12,13 @@ func _spawn_impact_dust() -> void:
 		return
 	_impact_made = true
 	var gy: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 80.0)
-	# dust 80 — 바닥 옆으로 퍼지는 흙먼지. 원본 vel sin*0.25 (옆 강조) + damping 강해 천천히 멈춤.
+	# dust 80 — 옆으로 퍼지는 흙먼지. 30% 크게 + 더 흰색.
 	var dust := _Helpers.make_emitter({
-		"count": _pcount(80), "lifetime": 2.0, "color": COL_DUST_MID,
+		"count": _pcount(80), "lifetime": 2.0, "color": Color(0.88, 0.84, 0.74),
 		"speed_min": 120.0 * DUST_SCALE, "speed_max": 420.0 * DUST_SCALE,
-		"direction": Vector2.UP, "spread": 60.0,  # 옆으로 강조 (원본 sin*0.25)
-		"gravity": -18.0 * DUST_SCALE, "damping": 40.0,  # 원본 multiplicative 매칭 (빠른 감속)
-		"size_min": 20.0 * DUST_SCALE, "size_max": 42.0 * DUST_SCALE,
+		"direction": Vector2.UP, "spread": 60.0,
+		"gravity": -18.0 * DUST_SCALE, "damping": 40.0,
+		"size_min": 26.0 * DUST_SCALE, "size_max": 55.0 * DUST_SCALE,
 		"additive": false,
 		"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,
 	})
@@ -41,13 +41,13 @@ func _spawn_impact_dust() -> void:
 	})
 	spark.position = gy + Vector2(0.0, -10.0)
 	add_child(spark)
-	# dust_rise 24 — 위로 솟는 먼지 기둥
+	# dust_rise 24 — 위로 솟는 먼지 기둥. 30% 크게 + 더 흰색.
 	var dust_rise := _Helpers.make_emitter({
-		"count": _pcount(24), "lifetime": 1.9, "color": COL_DUST_MID,
+		"count": _pcount(24), "lifetime": 1.9, "color": Color(0.88, 0.84, 0.74),
 		"speed_min": 180.0 * DUST_SCALE, "speed_max": 360.0 * DUST_SCALE,
 		"direction": Vector2.UP, "spread": 12.0,
 		"gravity": -18.0 * DUST_SCALE, "damping": 3.0,
-		"size_min": 16.0 * DUST_SCALE, "size_max": 32.0 * DUST_SCALE,
+		"size_min": 21.0 * DUST_SCALE, "size_max": 42.0 * DUST_SCALE,
 		"additive": false,
 		"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,
 		"emission_shape": "box", "emission_box": Vector2(20.0 * DUST_SCALE, 1.0),
