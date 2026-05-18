@@ -41,8 +41,8 @@ const FADE_TIME    := 0.5
 
 # 기하 — 캐릭터 sprite (64~80px) 대비 적정 비율
 const SHOCK_BASE_R := 16.0
-const SHOCK_MAX_R  := 160.0
-const CHEST_R      := 12.0
+const SHOCK_MAX_R  := 320.0       # 더 크게 (요청)
+const CHEST_R      := 14.0
 const WORD_OFFSET_Y := -80.0      # 타겟 머리 위
 const CRACK_OFFSET_Y := 48.0      # (미사용 — anchor 호환만)
 
@@ -117,50 +117,9 @@ func _global_alpha() -> float:
 	var t: float = (_age - end_phase) / FADE_TIME
 	return clampf(1.0 - t, 0.0, 1.0)
 
-# ── 파티클 ──
+# ── 파티클 ── (제거됨 — 사용자 피드백: 모든 파티클 제거)
 func _spawn_impact_particles() -> void:
-	var s: float = _scale()
-	# 외향 sparks (HTML: 70개, 스케일 적용)
-	for _i in range(_pcount(50)):
-		var a: float = randf() * TAU
-		var sp: float = (60.0 + randf() * 180.0) * s
-		_particles.append({
-			"x": _caster.x, "y": _caster.y - 50.0,
-			"vx": cos(a) * sp, "vy": sin(a) * sp,
-			"life": 0.0, "max_life": 0.7 + randf() * 0.5,
-			"size": (1.2 + randf() * 1.8) * s, "kind": "spark", "grav": 25.0,
-		})
-	# 위로 ember (HTML: 18개)
-	for _i in range(_pcount(14)):
-		var a2: float = randf() * TAU
-		_particles.append({
-			"x": _caster.x + (randf() - 0.5) * 30.0,
-			"y": _caster.y - 50.0 + (randf() - 0.5) * 30.0,
-			"vx": (randf() - 0.5) * 30.0, "vy": -10.0 - randf() * 30.0,
-			"life": 0.0, "max_life": 1.4 + randf() * 0.8,
-			"size": (1.6 + randf() * 1.4) * s, "kind": "ember", "grav": -4.0,
-		})
-	# 발치 dust (HTML: 30개) — 정확한 발 위치 사용
-	var foot := _foot_pos()
-	for _i in range(_pcount(20)):
-		var a3: float = (randf() - 0.5) * 1.8
-		var sp3: float = 50.0 + randf() * 120.0
-		_particles.append({
-			"x": foot.x + (randf() - 0.5) * 80.0, "y": foot.y,
-			"vx": cos(a3) * sp3, "vy": -(15.0 + randf() * 35.0),
-			"life": 0.0, "max_life": 1.0 + randf() * 0.7,
-			"size": (16.0 + randf() * 14.0) * s, "kind": "dust", "grav": 12.0,
-		})
-	# smoke (HTML: 24개)
-	for _i in range(_pcount(16)):
-		var a4: float = randf() * TAU
-		var sp4: float = 25.0 + randf() * 70.0
-		_particles.append({
-			"x": _caster.x, "y": _caster.y - 50.0,
-			"vx": cos(a4) * sp4, "vy": sin(a4) * sp4 * 0.6 - 12.0,
-			"life": 0.0, "max_life": 0.9 + randf() * 0.7,
-			"size": (18.0 + randf() * 16.0) * s, "kind": "smoke", "grav": -6.0,
-		})
+	pass
 
 func _update_particles(delta: float) -> void:
 	for i in range(_particles.size() - 1, -1, -1):
@@ -295,18 +254,21 @@ func _draw_word(canvas: CanvasItem, ga: float) -> void:
 	canvas.draw_string(theme_font, draw_pos, text,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha))
 
-# ── 타겟 → 시전자 흡입 점선 ──
-# 타겟 위에서 시작한 점선이 시전자 쪽으로 빨려들어가는 느낌.
-# 점선이 시간에 따라 시전자 방향으로 흐름 (offset 이동) + 점선 길이가 점차 줄어듦.
+# ── 타겟 → 시전자 점선 (성장) ──
+# 점선이 타겟 위에서 시작해 시전자 방향으로 점차 길어지며 이어지는 느낌.
+# 0~grow_dur: 점선 끝점이 0 → dist 로 자라남 (시전자에 닿음)
+# grow_dur~hold_dur: 100% 유지 (정적 dash, 약간 흐름)
+# hold_dur~end: fade out
 func _draw_suction_line(canvas: CanvasItem, ga: float) -> void:
 	var line_age: float = _age - IMPACT_DELAY
 	if line_age < 0.0:
 		return
-	# 0~0.5s: 흐름 활성 / 0.5s 이후 페이드
-	var active_dur := 0.6
+	var grow_dur := 0.35
+	var hold_dur := 0.5
+	var fade_dur := 0.3
 	var alpha: float = ga
-	if line_age > active_dur:
-		alpha *= clampf(1.0 - (line_age - active_dur) / 0.3, 0.0, 1.0)
+	if line_age > grow_dur + hold_dur:
+		alpha *= clampf(1.0 - (line_age - grow_dur - hold_dur) / fade_dur, 0.0, 1.0)
 	if alpha <= 0.01:
 		return
 	var p_target := _target + Vector2(0.0, -30.0)
@@ -315,24 +277,21 @@ func _draw_suction_line(canvas: CanvasItem, ga: float) -> void:
 	var dist: float = p_target.distance_to(p_caster)
 	if dist < 1.0:
 		return
-	# 흐르는 점선: 매 dash 가 시전자 쪽으로 이동 (flow_offset 시간 따라 증가)
-	var flow_speed: float = 240.0   # px/s
-	var flow_offset: float = fmod(line_age * flow_speed, 16.0)  # dash+gap = 16
+	# 성장 진행도: 0 → 1
+	var grow_t: float = clampf(line_age / grow_dur, 0.0, 1.0)
+	# ease out — 빠르게 자라다가 천천히
+	grow_t = 1.0 - pow(1.0 - grow_t, 2.0)
+	var effective_dist: float = dist * grow_t
+	# 정적 점선 (흐름 X) — 타겟에서 dash 시작
 	var dash_len: float = 8.0
 	var gap_len: float = 8.0
 	var step: float = dash_len + gap_len
-	# 점선이 점차 짧아짐 — 빨려들어가는 인상 (active_dur 동안 100% → 30%)
-	var shrink: float = 1.0 - clampf(line_age / active_dur, 0.0, 1.0) * 0.7
-	var effective_dist: float = dist * shrink
 	var col := Color(COL_BURN.r, COL_BURN.g, COL_BURN.b, alpha * 0.85)
-	var t: float = -flow_offset
+	var t: float = 0.0
 	while t < effective_dist:
-		var a_t: float = max(0.0, t)
-		var b_t: float = min(t + dash_len, effective_dist)
-		if b_t > a_t:
-			var a_pos: Vector2 = p_target + dir * a_t
-			var b_pos: Vector2 = p_target + dir * b_t
-			canvas.draw_line(a_pos, b_pos, col, 1.6 * _scale(), true)
+		var a_pos: Vector2 = p_target + dir * t
+		var b_pos: Vector2 = p_target + dir * min(t + dash_len, effective_dist)
+		canvas.draw_line(a_pos, b_pos, col, 1.8 * _scale(), true)
 		t += step
 
 # ── 블렌드 분리 레이어 ──
