@@ -37,9 +37,9 @@ func _setup_trail_emitters() -> void:
 		Color(1.0, 0.835, 0.835),
 	]
 	for i in 5:
-		# heart_small: 5배 (이전 114 → 570 동시 per heart)
+		# heart_small: count 57 (1/10), lifetime 0.2 (짧게) → spawn rate 285/s (원본 5배 자주)
 		var em := _Helpers.make_emitter({
-			"count": int(570 * _scale()), "lifetime": 0.95,
+			"count": int(57 * _scale()), "lifetime": 0.2,
 			"color": colors[i],
 			"speed_min": 24.0, "speed_max": 48.0,
 			"direction": Vector2.UP, "spread": 25.0,
