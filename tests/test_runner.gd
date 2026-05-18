@@ -23,7 +23,6 @@ var TestEffectDisplayText = preload("res://tests/test_effect_display_text.gd")
 var TestPowerCards = preload("res://tests/test_power_cards.gd")
 var TestEnemyCounters = preload("res://tests/test_enemy_counters.gd")
 var TestRevive = preload("res://tests/test_revive.gd")
-var TestTaunt = preload("res://tests/test_taunt.gd")
 var TestTauntSystem = preload("res://tests/test_taunt_system.gd")
 var TestSecretRoom = preload("res://tests/test_secret_room.gd")
 var TestEncounterWeighting = preload("res://tests/test_encounter_weighting.gd")
@@ -71,7 +70,6 @@ func _init() -> void:
 		TestPowerCards.new(),
 		TestEnemyCounters.new(),
 		TestRevive.new(),
-		TestTaunt.new(),
 		TestTauntSystem.new(),
 		TestSecretRoom.new(),
 		TestEncounterWeighting.new(),

@@ -397,7 +397,8 @@ static func _holy_purification() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _knights_oath() -> Resource:
-	# [C] 기사단의 맹세 — UNCOMMON, 1코, SKILL: APPLY_STATUS taunt=2 SELF + BLOCK 50 SELF
+	# [C] 기사단의 맹세 — UNCOMMON, 1코, SKILL: 단일 적에게 도발 2턴 + BLOCK 50 SELF
+	# 도발 = 그 적의 ATTACK 이 시전 영웅(잔다르크)을 강제 타겟.
 	var c := CardRes.new()
 	c.card_name = "card.joan_of_arc.knights_oath.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
@@ -405,7 +406,7 @@ static func _knights_oath() -> Resource:
 	c.archetype = ["card.joan_of_arc.knights_oath.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
-	ea.status_type = "taunt"; ea.value = 2; ea.base_value = 2; ea.target = "SELF"
+	ea.status_type = "taunt"; ea.value = 2; ea.base_value = 2; ea.target = "SINGLE"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.BLOCK
 	eb.value = 50; eb.base_value = 50; eb.target = "SELF"

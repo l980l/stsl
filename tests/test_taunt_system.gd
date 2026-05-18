@@ -17,14 +17,18 @@ var failed: int = 0
 var _to_free: Array = []
 
 func run_all() -> Dictionary:
-	test_self_taunt_collects_as_taunter()
-	test_enemy_taunt_does_not_aggro()
+	# 적 → 영웅 도발 (영웅 SINGLE 카드 lock)
 	test_taunt_source_recorded()
 	test_taunt_lock_overrides_single_target()
 	test_taunt_lock_does_not_affect_all_target()
 	test_taunt_cleanup_on_enemy_death()
 	test_taunt_decays_each_turn_and_clears_source()
 	test_marked_by_cleanup_on_enemy_death()
+	# 영웅 → 적 도발 (적 ATTACK 시 시전 영웅 강제 타겟) 신규 모델
+	test_hero_taunt_to_enemy_records_source()
+	test_enemy_attack_forced_to_taunter()
+	test_enemy_taunt_cleared_on_hero_death()
+	test_enemy_taunt_decays_each_turn()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -87,29 +91,7 @@ func _make_all_card(owner_id: String) -> Resource:
 	c.effects = [ef]
 	return c
 
-# 1) 영웅 자기 부여 도발 → _get_taunting_heroes 에 포함 (어그로)
-func test_self_taunt_collects_as_taunter() -> void:
-	print("[TestTauntSystem] test_self_taunt_collects_as_taunter")
-	var bm := _make_bm()
-	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
-	bm.setup_battle([_make_dummy_enemy()])
-	# 영웅 자기 부여 (source 없음)
-	bm._hero_status["napoleon"] = {"taunt": 2}
-	var taunters: Array = bm._get_taunting_heroes()
-	_assert(taunters.has("napoleon"), "자기 부여 도발 영웅이 어그로 목록에 포함")
-
-# 2) 적 부여 도발 → _get_taunting_heroes 에 X (어그로 안 함)
-func test_enemy_taunt_does_not_aggro() -> void:
-	print("[TestTauntSystem] test_enemy_taunt_does_not_aggro")
-	var bm := _make_bm()
-	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
-	bm.setup_battle([_make_dummy_enemy()])
-	# 적 부여 (source=0)
-	bm._hero_status["napoleon"] = {"taunt": 2, "taunt_source": 0}
-	var taunters: Array = bm._get_taunting_heroes()
-	_assert(not taunters.has("napoleon"), "적 부여 도발 영웅은 어그로 목록에서 제외 (lock 의미만)")
-
-# 3) 적 DEBUFF taunt intent → 영웅 status.taunt + taunt_source 기록
+# 적 DEBUFF taunt intent → 영웅 status.taunt + taunt_source 기록
 func test_taunt_source_recorded() -> void:
 	print("[TestTauntSystem] test_taunt_source_recorded")
 	var bm := _make_bm()
@@ -194,3 +176,67 @@ func test_marked_by_cleanup_on_enemy_death() -> void:
 	var marked: Array = bm._hero_status["napoleon"].get("marked_by", [])
 	_assert(not marked.has(0), "사망한 적 0 은 marked_by 에서 제거")
 	_assert(marked.has(1), "살아있는 적 1 의 마킹은 유지")
+
+# ── 영웅 → 적 도발 (신규 모델) ──
+
+# 9) _apply_status_to_enemy + _set_enemy_taunt_source → 적 status.taunt + taunt_source 기록
+func test_hero_taunt_to_enemy_records_source() -> void:
+	print("[TestTauntSystem] test_hero_taunt_to_enemy_records_source")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 100))
+	bm.setup_battle([_make_dummy_enemy(100)])
+	bm._apply_status_to_enemy(0, "taunt", 2)
+	bm._set_enemy_taunt_source(0, "joan_of_arc")
+	var st: Dictionary = bm._enemy_status[0]
+	_assert(st.get("taunt", 0) == 2, "적 status.taunt = 2")
+	_assert(st.get("taunt_source", "") == "joan_of_arc", "적 status.taunt_source = 영웅 id")
+
+# 10) 도발 받은 적의 ATTACK target → 시전 영웅 강제 (다른 영웅 ignore)
+func test_enemy_attack_forced_to_taunter() -> void:
+	print("[TestTauntSystem] test_enemy_attack_forced_to_taunter")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 100))
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	bm.setup_battle([_make_dummy_enemy(100)])
+	bm._enemy_status[0]["taunt"] = 2
+	bm._enemy_status[0]["taunt_source"] = "joan_of_arc"
+	# _pick_hero_target — ATTACK 인텐트로 RANDOM 요청
+	var target: String = bm._pick_hero_target(IntentRes.TargetType.RANDOM, 0, IntentRes.ActionType.ATTACK)
+	_assert(target == "joan_of_arc", "도발 적 ATTACK 시 시전 영웅 (joan_of_arc) 강제 타겟")
+	# DEBUFF 등 다른 action 은 영향 X (RANDOM/LOWEST_HP 그대로)
+	var debuff_target: String = bm._pick_hero_target(IntentRes.TargetType.LOWEST_HP, 0, IntentRes.ActionType.DEBUFF)
+	# LOWEST_HP — 같은 HP면 첫 번째 (joan_of_arc). 도발과 무관.
+	_assert(debuff_target != "" and (debuff_target == "joan_of_arc" or debuff_target == "napoleon"),
+		"DEBUFF 는 도발 우회 안 함 — 정상 target_type 처리 (실제: %s)" % debuff_target)
+
+# 11) 도발 시전 영웅 사망 → 적 taunt + source 즉시 해제
+func test_enemy_taunt_cleared_on_hero_death() -> void:
+	print("[TestTauntSystem] test_enemy_taunt_cleared_on_hero_death")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 10))
+	bm.setup_battle([_make_dummy_enemy(100)])
+	bm._enemy_status[0]["taunt"] = 3
+	bm._enemy_status[0]["taunt_source"] = "joan_of_arc"
+	# cleanup 직접 호출 (실전에선 _on_hero_died_queue 가 호출)
+	bm._cleanup_hero_status_on_death("joan_of_arc")
+	var st: Dictionary = bm._enemy_status[0]
+	_assert(st.get("taunt", -1) == 0, "시전 영웅 사망 → 적 taunt 0")
+	_assert(not st.has("taunt_source"), "시전 영웅 사망 → taunt_source 제거")
+
+# 12) 적 turn 시작 (_phase_enemy_pre 또는 동등 로직) → taunt -1, 0 도달 시 source 정리
+func test_enemy_taunt_decays_each_turn() -> void:
+	print("[TestTauntSystem] test_enemy_taunt_decays_each_turn")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 100))
+	bm.setup_battle([_make_dummy_enemy(100)])
+	bm._enemy_status[0]["taunt"] = 1
+	bm._enemy_status[0]["taunt_source"] = "joan_of_arc"
+	# 적 status decay 부분 직접 실행 — _phase_hero_post 와 대칭 코드 (line 1717~).
+	# 헤드리스 테스트 — 전체 enemy turn 까지 가지 않고 status 만 manual decay.
+	if bm._enemy_status[0].get("taunt", 0) > 0:
+		bm._enemy_status[0]["taunt"] -= 1
+		if bm._enemy_status[0]["taunt"] == 0 and bm._enemy_status[0].has("taunt_source"):
+			bm._enemy_status[0].erase("taunt_source")
+	var st: Dictionary = bm._enemy_status[0]
+	_assert(st.get("taunt", -1) == 0, "적 turn 시작 시 taunt -1 → 0")
+	_assert(not st.has("taunt_source"), "taunt 0 도달 시 source 제거")

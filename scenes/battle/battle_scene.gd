@@ -2700,7 +2700,18 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, target_hero_id:
 						did_buff = true
 						spawned_this = true
 				else:
-					if not did_debuff:
+					# 도발 — 시전 영웅(caster_pos) 에서 chest impact + 영웅→적 화살표
+					if effect.status_type == "taunt":
+						if not did_debuff:
+							did_debuff = true
+							spawned_this = true
+							if effect.target == "ALL":
+								for i in range(_enemy_char_nodes.size()):
+									if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
+										_spawn_taunt(caster_pos, caster_foot, _enemy_char_nodes[i].global_position)
+							elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
+								_spawn_taunt(caster_pos, caster_foot, _enemy_char_nodes[target_enemy_index].global_position)
+					elif not did_debuff:
 						var fx_script: GDScript = _debuff_script_for_status(effect.status_type)
 						if fx_script:
 							did_debuff = true
@@ -4322,6 +4333,15 @@ func _get_enemy_name_for_tooltip(enemy_index: int) -> String:
 	var name_key: String = er.enemy_name
 	return tr(name_key) if name_key != "" else "?"
 
+# 영웅 hero_id → 한글 영웅 이름 (tooltip 표시용).
+func _get_hero_name_for_tooltip(hero_id: String) -> String:
+	if TeamManager == null:
+		return hero_id
+	for hero in TeamManager.heroes:
+		if hero.hero_id == hero_id:
+			return tr(hero.name) if hero.name != "" else hero_id
+	return hero_id
+
 func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	var tex: Texture2D = IconUtils.get_status_icon(key)
 	var tooltip: String = _trf("status.%s.desc" % key, val)
@@ -4332,15 +4352,21 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 		for ins in status[key]:
 			lines.append("%s%d / %d턴" % [sign_str, int(ins.get("value", 0)), int(ins.get("dur", 0))])
 		tooltip = "%s\n  " % _trf("status.%s.desc" % key, val) + "\n  ".join(lines)
-	# taunt — 부여자에 따라 desc 분기. taunt_source >= 0: 적 부여 (그 적만 공격 가능)
-	# / < 0 or 미설정: 영웅 자기 부여 (어그로).
+	# taunt — 부여자(source) 에 따라 tooltip 의 이름 분기.
+	# - 영웅 status 에 적용: source = enemy_index (int) → 적 이름 표시
+	# - 적 status 에 적용: source = hero_id (string) → 영웅 이름 표시
+	# 양쪽 다 "X 의 도발 — 시전자만 공격 가능" 의미. 게이머 UI 통일.
 	elif key == "taunt":
-		var src: int = status.get("taunt_source", -1)
-		if src >= 0:
-			var enemy_name: String = _get_enemy_name_for_tooltip(src)
-			tooltip = tr("status.taunt.desc.locked") % enemy_name
+		var src = status.get("taunt_source", null)
+		var src_name: String = ""
+		if typeof(src) == TYPE_STRING and src != "":
+			src_name = _get_hero_name_for_tooltip(src)
+		elif typeof(src) == TYPE_INT and src >= 0:
+			src_name = _get_enemy_name_for_tooltip(src)
+		if src_name != "":
+			tooltip = tr("status.taunt.desc.locked") % src_name
 		else:
-			tooltip = tr("status.taunt.desc.self")
+			tooltip = tr("status.taunt.desc")
 
 	if tex != null:
 		var hbox := HBoxContainer.new()
