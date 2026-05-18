@@ -37,9 +37,9 @@ func _setup_trail_emitters() -> void:
 		Color(1.0, 0.835, 0.835),
 	]
 	for i in 5:
-		# heart_small: 2/frame × 60 × lifetime 0.95 ≈ 114 동시 per heart (사용자 요청 2배).
+		# heart_small: 5배 (이전 114 → 570 동시 per heart)
 		var em := _Helpers.make_emitter({
-			"count": int(114 * _scale()), "lifetime": 0.95,
+			"count": int(570 * _scale()), "lifetime": 0.95,
 			"color": colors[i],
 			"speed_min": 24.0, "speed_max": 48.0,
 			"direction": Vector2.UP, "spread": 25.0,
