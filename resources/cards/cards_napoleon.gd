@@ -36,7 +36,7 @@ static func pool() -> Array:
 		_emperors_will(), _glory_shout(),                               # A
 		_emperors_command(), _victory_proclamation(),                   # P
 		_emperors_encirclement(),                                       # C
-		_reconnaissance(),                                              # Chaos
+		_reconnaissance(),                                              # Chaos (정찰 = 마킹)
 		# speed buff (돌격 추가)
 		_blitz_advance(),
 	]
@@ -664,14 +664,17 @@ static func _emperors_will() -> Resource:
 	c.effects = [e]; return c
 
 static func _reconnaissance() -> Resource:
-	# 정찰 — COMMON, 1코, SKILL, 지휘 [Chaos]: DRAW 2, EXHAUST
+	# 정찰 — COMMON, 1코, SKILL, 지휘 [Chaos]: 적 1마리 마킹 + 사기 1
+	# 마킹된 적: 모든 영웅 공격 치명타 확률 +30%
 	var c := CardRes.new()
 	c.card_name = "card.napoleon.reconnaissance.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
 	c.archetype = ["card.napoleon.reconnaissance.archetype"]
-	c.is_exhaust = true
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.DRAW
-	e.value = 2; e.base_value = 2
-	c.effects = [e]; return c
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.MARK_ENEMY
+	ea.target = "SINGLE"
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.GAIN_MORALE
+	eb.value = 1; eb.base_value = 1
+	c.effects = [ea, eb]; return c

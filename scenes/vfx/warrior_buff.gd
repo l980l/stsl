@@ -36,7 +36,7 @@ const IMPACT_DELAY     := CHARGE_TIME  # battle_manager 동기화용
 const BUFF_TIME        := 1.5
 const RING_SQUASH      := 0.34
 const RING_RADIUS      := 130.0
-const AURA_HEIGHT      := 180.0
+const AURA_HEIGHT      := 260.0
 const AURA_WIDTH       := 80.0
 const SHOCK_TIME       := 0.55
 const PSPEED           := 60.0
@@ -263,8 +263,9 @@ func _draw_aura(canvas: CanvasItem) -> void:
 		return
 	var flicker: float = 0.85 + sin(_aura_age * (TAU / 0.25)) * 0.10
 	var alpha: float = grow * fade * flicker
-	var bottom_y := _target.y
-	var top_y := _target.y - AURA_HEIGHT * grow
+	# 오라 시작은 발바닥 (set_ground_anchor 로 주입). fallback: target 위치.
+	var bottom_y: float = _ground_pos.y if _has_ground else _target.y
+	var top_y := bottom_y - AURA_HEIGHT * grow
 	var w_b := AURA_WIDTH * grow
 	var w_t := AURA_WIDTH * 0.4 * grow
 	canvas.draw_colored_polygon(PackedVector2Array([

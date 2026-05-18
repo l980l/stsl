@@ -48,6 +48,7 @@ func _assert(condition: bool, msg: String) -> void:
 
 func _make_bm() -> BattleManagerClass:
 	var bm := BattleManagerClass.new()
+	bm._test_disable_crit = true  # 테스트 — 정확 데미지 검증
 	bm.team_mgr = TeamManagerClass.new()
 	bm.deck_mgr = DeckManagerClass.new()
 	_to_free.append(bm)

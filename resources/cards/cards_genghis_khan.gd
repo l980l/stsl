@@ -31,7 +31,7 @@ static func pool() -> Array:
 		_cavalry_retreat(), _cavalry_encirclement(),                        # C
 		_plunderers_instinct(),                                             # Chaos
 		# ── 약탈 8 (F×3 / A×1 / P×1 / C×2 / Chaos×1) ──
-		_plunder(), _hunters_bow(), _spoils_collection(),                   # F
+		_plunder(), _hunters_bow(), _spoils_collection(),                   # F (노획 = 마킹)
 		_executioners_bounty(),                                             # A
 		_massacre_khan(),                                                   # P
 		_khans_treasury(), _war_tribute(),                                  # C
@@ -404,15 +404,16 @@ static func _plunderers_instinct() -> Resource:
 # ─────────────────────────────────────────
 
 static func _plunder() -> Resource:
-	# [F] 노획 — COMMON, 1코, ATTACK: DMG 35 + DRAW 1
+	# [F] 노획 — COMMON, 1코, SKILL: 적 1마리 마킹 + DRAW 1
+	# 마킹된 적: 모든 영웅 공격 치명타 확률 +30%
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.loot.name"; c.owner_id = "genghis_khan"
-	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
 	c.archetype = ["card.genghis_khan.loot.archetype"]
 	var ea := EffRes.new()
-	ea.effect_type = EffRes.EffectType.DAMAGE
-	ea.value = 35; ea.base_value = 35; ea.target = "SINGLE"; ea.damage_type = "slash"
+	ea.effect_type = EffRes.EffectType.MARK_ENEMY
+	ea.target = "SINGLE"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.DRAW; eb.value = 1; eb.base_value = 1
 	c.effects = [ea, eb]; return c

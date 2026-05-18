@@ -81,6 +81,7 @@ func _assert(condition: bool, msg: String) -> void:
 
 func _make_bm() -> BattleManagerClass:
 	var bm := BattleManagerClass.new()
+	bm._test_disable_crit = true  # 테스트 — 정확 데미지 검증
 	bm.team_mgr = TeamManagerClass.new()
 	bm.deck_mgr = DeckManagerClass.new()
 	_to_free.append(bm)
@@ -476,6 +477,8 @@ func test_counter_pool_clears_on_attack() -> void:
 
 # MARK_TARGET → 마킹된 영웅 공격 시 +50%
 func test_mark_target_increases_attack_damage() -> void:
+	# 변경: 기존 +50% boost → 치명타 확률 +30% 시스템 (시드 무관 — 데미지 검증 X)
+	# marked_by 부여 자체 + base dmg 적용 (최소 40 데미지) 만 검증.
 	print("[TestEnemyMechanics] test_mark_target_increases_attack_damage")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
@@ -489,8 +492,9 @@ func test_mark_target_increases_attack_damage() -> void:
 	bm.start_player_turn()
 	bm.end_player_turn()  # MARK 발동
 	_assert(bm._hero_status.get("napoleon", {}).get("marked_by", []).has(0), "napoleon에 marked_by[0] 추가")
-	bm.end_player_turn()  # ATTACK 40 × 1.5 = 60 → napoleon HP 140
-	_assert(bm.team_mgr.get_current_hp("napoleon") == 140, "마킹된 영웅 공격 → 40 × 1.5 = 60 데미지")
+	bm.end_player_turn()  # ATTACK — base 40 또는 crit 80
+	var dmg_taken: int = 200 - bm.team_mgr.get_current_hp("napoleon")
+	_assert(dmg_taken == 40 or dmg_taken == 80, "마킹된 영웅 공격 — 40 (base) 또는 80 (crit) 데미지 (실제: %d)" % dmg_taken)
 
 # 마킹 안 된 영웅엔 보너스 미적용
 func test_mark_target_does_not_affect_unmarked_hero() -> void:

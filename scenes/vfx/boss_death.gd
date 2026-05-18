@@ -229,8 +229,10 @@ func _draw_pillar(canvas: CanvasItem, ga: float) -> void:
 	else:
 		alpha = 1.0 - (t - 0.2) / 0.8
 	alpha *= ga
-	var ctr: Vector2 = _blast_pos()
-	var bot_y: float = ctr.y + 30.0
+	# pillar 만 발바닥에서 시작 (다른 effect 들은 보스 몸 중앙 기준 유지)
+	var foot: Vector2 = _foot_pos()
+	var ctr: Vector2 = Vector2(_blast_pos().x, foot.y)
+	var bot_y: float = foot.y
 	var h: float = 340.0 * rise
 	var top_y: float = bot_y - h
 	var w_bot: float = lerpf(80.0, 180.0, t)

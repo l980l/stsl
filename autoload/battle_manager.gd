@@ -43,6 +43,11 @@ const TOKEN_DMG_PER_STACK: int = 25
 const TOKEN_MAX_STACK: int = 6
 const CHARM_THRESHOLD_BASE: int = 100
 
+# 치명타 시스템 — 기본 확률 5%, 마킹(marked_by) 시 +30% (총 35%), 발동 시 데미지 ×2
+const CRIT_BASE_RATE: float = 0.05
+const CRIT_MARK_BONUS: float = 0.30
+const CRIT_MULTIPLIER: float = 2.0
+
 # 의존성 주입 — 프로덕션: BattleScene이 설정, 테스트: 직접 할당
 var team_mgr = null
 var deck_mgr = null
@@ -112,8 +117,9 @@ signal turn_ended(actor_id: String)
 @warning_ignore("unused_signal")
 signal turn_queue_changed(preview: Array)  # 다음 N차례 미리보기 (UI 갱신)
 signal enemy_died(enemy_index: int)
-signal enemy_damaged(enemy_index: int, amount: int, damage_type: String)
-signal hero_damaged(hero_id: String, amount: int, damage_type: String)
+# is_crit: 치명타 여부 (UI popup 차별 표시용). 기본 false — 기존 호출처 호환.
+signal enemy_damaged(enemy_index: int, amount: int, damage_type: String, is_crit: bool)
+signal hero_damaged(hero_id: String, amount: int, damage_type: String, is_crit: bool)
 signal hero_block_gained(hero_id: String, amount: int)
 signal status_applied(target: String, status_type: String, stacks: int)
 signal morale_changed(hero_id: String, new_value: int)
@@ -1005,13 +1011,18 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if effect.target == "ALL":
 						for i in range(_enemies.size()):
 							if _enemy_alive[i]:
-								_deal_damage_to_enemy(i, dmg, effect.damage_type)
+								# 치명타 — 적 status.marked_by 비어있지 않으면 +30%
+								var _all_hm: bool = not _enemy_status[i].get("marked_by", []).is_empty()
+								var _all_cr: Dictionary = _roll_crit_damage(dmg, _all_hm)
+								_deal_damage_to_enemy(i, _all_cr["dmg"], effect.damage_type, _all_cr["is_crit"])
 								if _bph > 0:
 									_deal_damage_to_enemy(i, _bph, effect.damage_type)
 								_last_attacker[i] = card.owner_id
 					else:
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-							_deal_damage_to_enemy(target_enemy_index, dmg, effect.damage_type)
+							var _hm: bool = not _enemy_status[target_enemy_index].get("marked_by", []).is_empty()
+							var _cr: Dictionary = _roll_crit_damage(dmg, _hm)
+							_deal_damage_to_enemy(target_enemy_index, _cr["dmg"], effect.damage_type, _cr["is_crit"])
 							if _bph > 0:
 								_deal_damage_to_enemy(target_enemy_index, _bph, effect.damage_type)
 							_last_attacker[target_enemy_index] = card.owner_id
@@ -1499,6 +1510,17 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_enemy_status[_ds_ei]["speed_penalty"].append({"value": effect.value, "dur": effect.bonus_value})
 					_adjust_turn_queue_for_speed_change(_ds_aid, _ds_old_sp)
 					status_applied.emit("enemy_%d" % _ds_ei, "speed_penalty", effect.value)
+			EffectRes.EffectType.MARK_ENEMY:
+				# 영웅이 적 마킹 — 모든 영웅의 그 적 공격 치명타 확률 +30%.
+				# target SINGLE 만 지원. 같은 영웅이 같은 적 중복 마킹 시 noop.
+				if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
+					if not _enemy_status[target_enemy_index].has("marked_by"):
+						_enemy_status[target_enemy_index]["marked_by"] = []
+					var _me_arr: Array = _enemy_status[target_enemy_index]["marked_by"]
+					if not _me_arr.has(card.owner_id):
+						_me_arr.append(card.owner_id)
+						_enemy_status[target_enemy_index]["marked_by"] = _me_arr
+						status_applied.emit("enemy_%d" % target_enemy_index, "marked_by", _me_arr.size())
 	# power.echo_next_attack: 이 ATTACK 카드 효과 전체를 1회 재시전 (재진입 가드)
 	if not _in_echo_replay and card.card_type == CardRes.CardType.ATTACK:
 		var _echo_key: String = "power.echo_next_attack:" + card.owner_id
@@ -1534,12 +1556,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			_in_echo_replay = false
 	_apply_synergy_bonus(card, target_enemy_index)
 
-func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "") -> void:
+func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "", is_crit: bool = false) -> void:
 	if not _enemy_alive[enemy_index]:
 		return
 	# T3-WARD: invuln 활성화 시 모든 데미지 무시
 	if _enemy_status[enemy_index].get("invuln", 0) > 0:
-		enemy_damaged.emit(enemy_index, 0, damage_type)
+		enemy_damaged.emit(enemy_index, 0, damage_type, false)
 		return
 	amount = _consume_double_next_damage(amount)
 	if _enemy_status[enemy_index].get("vulnerable", 0) > 0:
@@ -1548,7 +1570,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	_enemy_block[enemy_index] -= absorbed
 	amount -= absorbed
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - amount)
-	enemy_damaged.emit(enemy_index, amount, damage_type)
+	enemy_damaged.emit(enemy_index, amount, damage_type, is_crit)
 	# T3-MIMIC: 플레이어 턴 동안 가한 데미지 누적 (MIMIC 인텐트가 비율로 반사)
 	if amount > 0 and _in_player_turn:
 		_player_damage_this_turn += amount
@@ -1577,7 +1599,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	_check_phase_transition(enemy_index)
 	_check_win_condition()
 
-func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = "") -> void:
+func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = "", is_crit: bool = false) -> void:
 	if debug_hero_invincible:
 		return
 	if team_mgr == null or not team_mgr.is_alive(hero_id):
@@ -1596,7 +1618,7 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 		if _gm_hd and _gm_hd.is_inside_tree():
 			_gm_hd.trigger_relics(RelicRes.TriggerType.ON_HERO_DAMAGED,
 				{"hero_id": hero_id, "amount": amount})
-	hero_damaged.emit(hero_id, amount, damage_type)
+	hero_damaged.emit(hero_id, amount, damage_type, is_crit)
 	# 영웅 사망 시 보유 토큰 전멸
 	if not team_mgr.is_alive(hero_id) and _hero_status.has(hero_id):
 		_hero_status[hero_id]["tokens"] = 0
@@ -1691,7 +1713,7 @@ func _tick_hero_poison(hero_id: String) -> void:
 	var tick_amt: int = dmg * POISON_DMG_PER_STACK
 	team_mgr.take_damage(hero_id, tick_amt)
 	# 데미지 popup 표시용 — battle_scene._on_hero_damaged 가 popup·VFX 처리 (_tick_enemy_poison 대칭)
-	hero_damaged.emit(hero_id, tick_amt, "poison")
+	hero_damaged.emit(hero_id, tick_amt, "poison", false)
 	poison_tick_applied.emit(hero_id, tick_amt)
 	dur -= 1
 	if dur <= 0:
@@ -1707,7 +1729,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 		return
 	var tick_dmg: int = _consume_double_next_damage(dmg * POISON_DMG_PER_STACK)
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - tick_dmg)
-	enemy_damaged.emit(enemy_index, tick_dmg, "poison")
+	enemy_damaged.emit(enemy_index, tick_dmg, "poison", false)
 	poison_tick_applied.emit("enemy_%d" % enemy_index, tick_dmg)
 	dur -= 1
 	if dur <= 0:
@@ -1893,7 +1915,10 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			if intent.target == IntentRes.TargetType.ALL:
 				if team_mgr:
 					for hero in team_mgr.get_living_heroes():
-						_deal_damage_to_hero(hero.hero_id, dmg, intent.damage_type)
+						# 치명타: 영웅 status.marked_by 비어있지 않으면 +30%
+						var _all_hm: bool = not _hero_status.get(hero.hero_id, {}).get("marked_by", []).is_empty()
+						var _all_crit: Dictionary = _roll_crit_damage(dmg, _all_hm)
+						_deal_damage_to_hero(hero.hero_id, _all_crit["dmg"], intent.damage_type, _all_crit["is_crit"])
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
 				# 미리 결정된 타겟 사용 (사망 시 fallback 으로 재결정)
@@ -1901,11 +1926,10 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				if target_id == "" or (team_mgr and not team_mgr.is_alive(target_id)):
 					target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 				if target_id != "":
-					# T3-MARK: 마킹한 영웅 공격 시 데미지 +50%
-					var marked_by: Array = _hero_status.get(target_id, {}).get("marked_by", [])
-					if marked_by.has(enemy_index):
-						dmg = int(dmg * 1.5)
-					_deal_damage_to_hero(target_id, dmg, intent.damage_type)
+					# 치명타: 영웅 status.marked_by 비어있지 않으면 +30% (마킹한 적 한정 X — 모든 적)
+					var has_mark: bool = not _hero_status.get(target_id, {}).get("marked_by", []).is_empty()
+					var crit_result: Dictionary = _roll_crit_damage(dmg, has_mark)
+					_deal_damage_to_hero(target_id, crit_result["dmg"], intent.damage_type, crit_result["is_crit"])
 					# 시그니처 hook: 적의 단일 타겟 공격 (이집트 저주 누적)
 					SignatureSys.on_enemy_attack(self, enemy_index, target_id)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": target_id})
@@ -2017,7 +2041,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			var hp_cost: int = intent.value * 10
 			_enemy_hp[enemy_index] = max(1, _enemy_hp[enemy_index] - hp_cost)
 			_apply_status_to_enemy(enemy_index, "strength", intent.value)
-			enemy_damaged.emit(enemy_index, hp_cost, "")
+			enemy_damaged.emit(enemy_index, hp_cost, "", false)
 		IntentRes.ActionType.WARD:
 			# T3-WARD: N턴(intent.value) 동안 자기 invuln (모든 데미지 무시)
 			_enemy_status[enemy_index]["invuln"] = intent.value
@@ -2121,8 +2145,9 @@ func _cleanup_enemy_status_on_death(enemy_index: int) -> void:
 			status["marked_by"] = marked
 			status_applied.emit(hid, "marked_by", marked.size())
 
-# 영웅 사망 시 그 영웅이 부여한 적 status 정리 (taunt_source).
+# 영웅 사망 시 그 영웅이 부여한 적 status 정리 (taunt_source, marked_by).
 # 영웅이 부여한 도발은 그 영웅이 죽으면 강제 타겟이 없어지므로 해제.
+# 마킹도 같이 — 그 영웅이 부여한 마크는 영웅 사망 시 의미 없음.
 func _cleanup_hero_status_on_death(hero_id: String) -> void:
 	for i in range(_enemy_status.size()):
 		var status: Dictionary = _enemy_status[i]
@@ -2130,6 +2155,23 @@ func _cleanup_hero_status_on_death(hero_id: String) -> void:
 			status["taunt"] = 0
 			status.erase("taunt_source")
 			status_applied.emit("enemy_%d" % i, "taunt", 0)
+		var marked: Array = status.get("marked_by", [])
+		if marked.has(hero_id):
+			marked.erase(hero_id)
+			status["marked_by"] = marked
+			status_applied.emit("enemy_%d" % i, "marked_by", marked.size())
+
+var _test_disable_crit: bool = false  # 테스트 환경 — 정확한 데미지 검증 위해 crit 비활성
+
+# 치명타 굴림 — 기본 5% + marked_by 보유 시 +30%. 발동 시 dmg × 2.
+# 반환: {dmg, is_crit}
+func _roll_crit_damage(base_dmg: int, has_mark: bool) -> Dictionary:
+	if _test_disable_crit:
+		return {"dmg": base_dmg, "is_crit": false}
+	var rate: float = CRIT_BASE_RATE + (CRIT_MARK_BONUS if has_mark else 0.0)
+	var is_crit: bool = randf() < rate
+	var dmg: int = int(base_dmg * CRIT_MULTIPLIER) if is_crit else base_dmg
+	return {"dmg": dmg, "is_crit": is_crit}
 
 func _pick_highest_hp(hero_ids: Array) -> String:
 	if hero_ids.is_empty():
@@ -2390,7 +2432,7 @@ func _check_phase_transition(enemy_index: int) -> void:
 			var heal_ratio: float = enemy.phase_heal_ratios[current_phase]
 			if heal_ratio > 0.0:
 				_enemy_hp[enemy_index] = int(enemy.max_hp * heal_ratio)
-				enemy_damaged.emit(enemy_index, _enemy_hp[enemy_index], "")
+				enemy_damaged.emit(enemy_index, _enemy_hp[enemy_index], "", false)
 		# Phase 전환 시 자동 status 부여 (광폭화·디스트레스 등)
 		if enemy.get("phase_buffs") != null and current_phase < enemy.phase_buffs.size():
 			var buffs: Array = enemy.phase_buffs[current_phase]
@@ -2585,5 +2627,5 @@ func debug_set_enemy_hp(index: int, hp: int) -> void:
 		_check_win_condition()
 	elif hp > 0 and not _enemy_alive[index]:
 		_enemy_alive[index] = true
-	enemy_damaged.emit(index, 0, "")
+	enemy_damaged.emit(index, 0, "", false)
 	_check_phase_transition(index)
