@@ -75,7 +75,7 @@ func _spawn_fireball(pos: Vector2) -> void:
 	dust.position = pos + Vector2(0.0, 20.0 * bs)
 	dust.z_index = -1
 	add_child(dust)
-	# smoke 25 — 위로 솟는 연기, lifetime 3.7
+	# smoke 25 — 위로 솟는 연기 (버섯구름)
 	var smoke := _Helpers.make_emitter({
 		"count": _pcount(25), "lifetime": 3.7, "color": COL_SMOKE,
 		"speed_min": 72.0 * bs, "speed_max": 252.0 * bs,
@@ -89,6 +89,19 @@ func _spawn_fireball(pos: Vector2) -> void:
 	smoke.position = pos + Vector2(0.0, -10.0 * bs)
 	smoke.z_index = -2
 	add_child(smoke)
+	# smoke_radial 30 — 사방으로 퍼지는 연기 (충격파 따라)
+	var smoke_radial := _Helpers.make_emitter({
+		"count": _pcount(30), "lifetime": 2.6, "color": COL_SMOKE,
+		"speed_min": 120.0 * bs, "speed_max": 360.0 * bs,
+		"direction": Vector2.UP, "spread": 180.0,  # 사방
+		"gravity": -24.0 * bs, "damping": 3.0,
+		"size_min": 22.0 * bs, "size_max": 44.0 * bs,
+		"additive": false,
+		"start_alpha": 0.4, "mid_alpha": 0.2, "end_alpha": 0.0,
+	})
+	smoke_radial.position = pos
+	smoke_radial.z_index = -2
+	add_child(smoke_radial)
 	# chunk 15 — 회전 파편, lifetime 2.0, gravity 강하게 ↓
 	var chunk := _Helpers.make_chunk_emitter(COL_CHUNK, _pcount(15), 2.0,
 		240.0 * bs, 720.0 * bs, 1260.0 * bs, 3.0 * bs, 8.0 * bs)

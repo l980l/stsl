@@ -81,7 +81,7 @@ func _spawn_impact(pos: Vector2, ang: float) -> void:
 	})
 	dust.position = pos
 	add_child(dust)
-	# chip 8 (회전 파편)
-	var chip := _Helpers.make_chunk_emitter(COL_DUST, _pcount(8), 1.3, 180.0, 480.0, 1080.0, 2.0, 4.0)
+	# chip 8 (회전 파편) — 회색
+	var chip := _Helpers.make_chunk_emitter(Color(0.5, 0.5, 0.52), _pcount(8), 1.3, 180.0, 480.0, 1080.0, 2.0, 4.0)
 	chip.position = pos
 	add_child(chip)

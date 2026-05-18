@@ -29,15 +29,14 @@ func _spawn_impact_dust() -> void:
 		180.0, 600.0, 1080.0, 3.0, 7.0)
 	chunk.position = gy
 	add_child(chunk)
-	# spark 30 — 스파크
+	# spark 30 — 단순 원 점 (sparkle 별가루 X), 흙색
 	var spark := _Helpers.make_emitter({
-		"count": _pcount(30), "lifetime": 1.0, "color": COL_HOT,
+		"count": _pcount(30), "lifetime": 1.0, "color": COL_DUST_DEEP,
 		"speed_min": 120.0, "speed_max": 480.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 540.0, "damping": 3.0,
 		"size_min": 1.0, "size_max": 2.4,
-		"size_base": 4.0,
-		"texture": _Helpers.sparkle_tex(),
+		"texture": _Helpers.circle_tex(),
 		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 	spark.position = gy + Vector2(0.0, -10.0)
