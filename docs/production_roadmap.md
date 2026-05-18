@@ -1,6 +1,6 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-18 v20)
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-19 v21)
 > 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
@@ -1266,7 +1266,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-05-18 v20. M8-8 플랫폼 SDK 통합 (Steam + Google Play Games Services) 신규 항목 — 단일 프로젝트에 양 SDK 설치, `platform_services.gd` 추상화 레이어로 호출부 platform-agnostic. PR #140·#142·#143·#144 반영분 v19 와 동일.
+> 최종 갱신: 2026-05-19 v21. PR #147·#148·#149 반영 — 카드 풀 검토 도구 (composition_check) + ELITE/BOSS dump 도구 + 강화 시스템 1강 통일 + 다중 archetype 지원 (23 카드 하이브리드) + 도발 시스템 재설계 (양방향 타겟 lock + Attention! VFX). **1478 통과 / 0 fail**.
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -1303,6 +1303,9 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 적 intent·카드 effect 전반 신규 VFX 13종 + CHARGE_UP·stun (M6.14) | PR #137. power_up·summon_circle·speed_buff·slow_debuff·target_marking·mimic·sacrifice·counter_prepare·steal_card·purge_status·morale_boost·prepare·boss_phase_changed (cinematic letterbox + PHASE 타이틀 + inflow + 6겹 shockwave) + CHARGE_UP IntentResource (charge_turns·payoff_intents·한 턴 다중 intent 가로 표시) + stun status (hero_turn_skipped + stun.svg) + 적 6마리 (kronos·surtr·yamata·hannya·medusa·troll_warrior) + intent UI 이모지만 + STATUS_POPUP 4종 추가. **1462 통과 / 0 fail** |
 | ✅ 완료 | 영웅 해금 조건 버그 수정 (M5 fix) | PR #138. 칭기즈칸 `flag:kill_boss:oshiris` → `enemy.egyptian.osiris` (오타 + full key) / 무사시 `elite_solo_kills>=5` → `elite_kills_total>=10` (1:1 조건 무의미·완화) + `_last_elite_solo` dead code 정리 |
 | ✅ 완료 | 신화 시그너처 cinematic VFX 6종 + card_exhaust + boss_death (M6.15) | PR #140. 6 신화 시그너처 VFX (휴브리스 황금 halo+zigzag 번개 / 라그나로크 발밑 원기둥+ember area broadcast / 인과응보 시체→영웅 다중 빔+연꽃 / 음양 태극 90도 snap+후광+scale fade / 저주 호루스 눈 0.1s 3 stamp+상형문자 / 결계 4 ofuda+6각 hex+結 kanji) + card_exhaust (ember sweep + 잿불 + 재, `_on_card_played` 의 `is_exhaust` hook) + boss_death (5단계 cinematic — cracks/inhale/explosion/debris/pillar/shock/왕관 추락/Fallen burgundy slate, `_on_enemy_died` boss 분기) + vfx_preview 등록 (실제 CardScene 더미 + 버튼 columns 15). **1451 통과 / 0 fail** |
+| ✅ 완료 | 카드 풀 검토 도구 + ELITE/BOSS dump + 강화 1강 통일 (M6.16) | PR #147. `tools/composition_check.gd` 신규 (8 영역: cost curve / card type / EffectType 커버리지 / damage·status type / archetype 차별성 / 태그 / starter deck) + `dump_normal_enemies.gd` + `dump_act_enemies.gd` (ELITE 55+BOSS 18) + balance csv 도구 UTF-8 BOM. **강화 시스템 단순화**: LEGENDARY·DIVINE 2강 → 모든 등급 1강 통일 (단계별 unique 효과 미구현 상태였음, COMMON 8% / UNCOMMON 10% / RARE 12% / LEGENDARY 14% / DIVINE 16% rate). **1476 통과 / 0 fail** |
+| ✅ 완료 | 다중 archetype 지원 + 23 카드 하이브리드 (M6.17) | PR #148. `CardResource.archetype` String → Array[String] (다중 archetype 데이터 모델). 216 카드 일괄 변환 + 효과상 명백한 23 카드에 부 archetype 추가 (cleopatra 4 / napoleon 10 — '사기' 1→11 확장 / yi_sun_sin 1 / joan_of_arc 7 / genghis_khan 1). catalog 에 `아키타입` 컬럼 추가 (다중 시 "X, Y" join). 새 분포: cleopatra 독살13/저주12/조종9, napoleon 군단12/돌격11/사기9/지휘7 등. **1474 통과 / 0 fail** |
+| ✅ 완료 | 도발 시스템 재설계 + Attention! VFX (M6.18) | PR #149. 어그로 모델 → **타겟 lock 통일** (양방향 대칭). 영웅→적 도발 (knights_oath SELF→SINGLE, 그 적 ATTACK·DEBUFF가 시전 영웅 강제 타겟) + 적→영웅 도발 (fenrir_cub 신규, 영웅 SINGLE 카드 lock). `_apply_taunt_to_enemy/hero` 누적·덮어쓰기 룰 (같은 시전자 +, 다른 시전자 덮어쓰기). 매혹/반함이 도발 이김 (charm/enthrall 보유 시 우회 비활성). decay 위치 turn 시작 → 종료. VFX taunt.gd 신규 (chest impact + shockwave 3중 + 타겟→시전자 점선 성장 + "Attention!" 3 인스턴스 랜덤). i18n 13 언어 desc 통일. 영웅 poison tick popup 누락 fix. **1478 통과 / 0 fail** |
 | ✅ 완료 | 배경 시스템 v1 (M7.5) | PR #117·#119. SceneBackground 컴포넌트 (parallax 5 레이어 sky/far/mid/near/fg) + 6 신화 × 3 Act = 18 환경 팔레트 + EnvSpec (time_of_day × weather) + 6 신화 SVG 오브젝트 풀 (large/medium/small/pillars) + SceneCritters (새) + weather_particles (비·눈) — battle 씬 적용 |
 | 🟢 장기 | 배경 시스템 v2 — 잔여 (M7.5+) | DOF 셰이더 (거리 기반 blur, filmic 깊이감) + Light2D (어두운 배경 광원·그림자). 현 시점 분위기 충분 — "한 단계 더" 영역. event/rest/shop 은 별도 이미지로 이미 세팅·map 은 의도적으로 배경 없음 |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
