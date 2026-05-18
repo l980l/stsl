@@ -1,6 +1,6 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-18 v17)
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-18 v18)
 > 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
@@ -1209,7 +1209,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-05-18 v17. PR #131~#138 반영 — 적 speed buff/debuff intent + 병사 토큰 동적 모션 + 휴식 신화별 일러스트 + 카드 순차 VFX·passive BUFF VFX·speed 다중 인스턴스 + 병사 소환·CHARGE_UP·stun·MARK_TARGET·MIMIC·SACRIFICE·COUNTER_PREPARE·SPECIAL remove_card·PURGE_STATUS·GAIN_MORALE·PREPARE·boss_phase 등 신규 VFX 14종 + 영웅 해금 조건 버그 수정. **1462 통과 / 0 fail**.
+> 최종 갱신: 2026-05-18 v18. PR #131~#138 반영 + 우선순위 표 정합성 점검 — 병사 토큰 (M6-1) · 카드 효과 타입 참조 (M6-5c) · 배경 시스템 v1 (M7.5) 3 항목이 이미 구현된 상태였음에도 ❌·🟡 로 남아있던 것 ✅ 로 정정. 배경 v2 (DOF·Light2D·다른 씬 확산) 신규 항목 분리. 이벤트 BGM 잔여 정확화 (dark_1/2·encounter_2·fortune_2). **1462 통과 / 0 fail**.
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -1217,10 +1217,10 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 영웅 해금 시스템 (M4-3/4-4) | PR #53 완료. ProgressManager + hero_registry + 토스트 |
 | ✅ 완료 | 챕터 2 중·일 신화 (M4-2) | PR #58~#60 완료. 렐릭 풀 40종, 919 테스트 통과 |
 | ✅ 완료 | 카드 v2 확장 (영웅당 40장, M5) | PR #63~#66 완료. 978 테스트 통과 |
-| 🟡 중기 | 병사 토큰 시스템 (M6-1) | 나폴레옹 군단 아키타입 완성 |
+| ✅ 완료 | 병사 토큰 시스템 (M6-1) | PR #38~#42 + #133 동적 모션 (영구 그리드 폐기·영웅→슬롯 tween·발사 후 복귀) + #136 소환 VFX |
 | ✅ 완료 | 권능(POWER) 카드 시스템 정립 (M6-5a) | 명칭·동작·UI·신규 3장 추가 (Plan 26). 245장, 1090 테스트 통과 |
 | ✅ 완료 | 적 카드 타입 카운터 메카닉 (M6-5b) | 크로노스·저승 판관·반고. repeat 재발동 버그 수정, 툴팁 번역키화, 상태 아이콘 통합. 1145 테스트 통과 (PR #73) |
-| 🟡 중기 | 카드 효과 타입 참조 (M6-5c) | DAMAGE_PER_ATTACK 등 신규 EffectType + 카드 5~10장 |
+| ✅ 완료 | 카드 효과 타입 참조 (M6-5c) | DAMAGE_PER_BLOCK · MULTI_HIT_RANDOM · DAMAGE_PER_STATUS_TYPE 신규 EffectType 구현 (effect_resource.gd) |
 | ✅ 완료 | 시스템 완성 M6 (덱뷰어·부활·도발·비밀룸 4종 엔진 구현) | Plan 28, PR #73 완료. 게임 루프 깊이 |
 | ✅ 완료 | 번역 인프라 구축 (M8.5-1) | PR #73. CSV 9종·locale_manager·폰트 fallback |
 | ✅ 완료 | 전투 UX 기반 폴리싱 (M7 전 단계) | PR #79~#81. 핸드 부채꼴·드래그 화살표·슬롯 Marker2D화 |
@@ -1245,9 +1245,10 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | passive BUFF VFX + 카드 순차 VFX + speed 다중 인스턴스 + 병사 소환 VFX (M6.13) | PR #135·#136. phase_buffs/signature 자동 BUFF VFX + 카드 효과 순차 spawn (0.25s 간격) + status_applied 다중 BUFF 동기 + speed_bonus·penalty Array of {value, dur} 누적·툴팁 + nile_mist poison VFX 누락 수정 + BUFF_SPEED/DEBUFF_SPEED 드래그 화살표 + Shift+A 카드 추가 hand 직접 반영 + 병사 소환 VFX (HTML callRing + spawnPillar + 병사 등장 모션) |
 | ✅ 완료 | 적 intent·카드 effect 전반 신규 VFX 13종 + CHARGE_UP·stun (M6.14) | PR #137. power_up·summon_circle·speed_buff·slow_debuff·target_marking·mimic·sacrifice·counter_prepare·steal_card·purge_status·morale_boost·prepare·boss_phase_changed (cinematic letterbox + PHASE 타이틀 + inflow + 6겹 shockwave) + CHARGE_UP IntentResource (charge_turns·payoff_intents·한 턴 다중 intent 가로 표시) + stun status (hero_turn_skipped + stun.svg) + 적 6마리 (kronos·surtr·yamata·hannya·medusa·troll_warrior) + intent UI 이모지만 + STATUS_POPUP 4종 추가. **1462 통과 / 0 fail** |
 | ✅ 완료 | 영웅 해금 조건 버그 수정 (M5 fix) | PR #138. 칭기즈칸 `flag:kill_boss:oshiris` → `enemy.egyptian.osiris` (오타 + full key) / 무사시 `elite_solo_kills>=5` → `elite_kills_total>=10` (1:1 조건 무의미·완화) + `_last_elite_solo` dead code 정리 |
-| 🔴 즉시 | 배경 시스템 v1 (M7.5) | parallax 다중 레이어 + DOF 셰이더 + Light2D + SVG 식생/오브젝트. 옥토퍼스/Tunic/Hades 류 깊이감 (작업량 1/5 로 80% 효과) |
+| ✅ 완료 | 배경 시스템 v1 (M7.5) | PR #117·#119. SceneBackground 컴포넌트 (parallax 5 레이어 sky/far/mid/near/fg) + 6 신화 × 3 Act = 18 환경 팔레트 + EnvSpec (time_of_day × weather) + 6 신화 SVG 오브젝트 풀 (large/medium/small/pillars) + SceneCritters (새) + weather_particles (비·눈) — battle 씬 적용 |
+| 🟡 중기 | 배경 시스템 v2 — 잔여 (M7.5+) | DOF 셰이더 + Light2D + 다른 씬 (map/event/rest/shop) 배경 확산 + 사용자 옵션 (on/off) |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
-| 🟡 중기 | 이벤트 BGM 나머지 생성 (M7-6) | dark×3·encounter×2·fortune×2 미생성분 |
+| 🟡 중기 | 이벤트 BGM 나머지 생성 (M7-6) | dark_1/2·encounter_2·fortune_2 미생성 (mysterious 3종·dark_3·encounter_1·fortune_1 완성) |
 | 🟢 장기 | 비주얼 (M7-1~7-5) 캐릭터·카드 아트, 이펙트 | 몰입감 |
 | 🟢 장기 | 모바일 최적화 (M8-1~8-5) | 해상도·세이브·성능 |
 | 🟢 장기 | 접근성 (M8.6) | 색맹·자막·폰트 크기. 스팀 권장, 모바일 의무화 추세 |
