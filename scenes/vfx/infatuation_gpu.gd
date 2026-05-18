@@ -37,9 +37,10 @@ func _setup_trail_emitters() -> void:
 		Color(1.0, 0.835, 0.835),
 	]
 	for i in 5:
-		# heart_small: count 57 (1/10), lifetime 0.2 (짧게) → spawn rate 285/s (원본 5배 자주)
+		# heart_small: lifetime 원본 (0.95) + count 200 → spawn rate 210/s (원본 60/s 의 3.5배)
+		# Godot GPUParticles2D 는 spawn 주기 = lifetime/amount — amount 키워야 자주 spawn.
 		var em := _Helpers.make_emitter({
-			"count": int(57 * _scale()), "lifetime": 0.2,
+			"count": int(200 * _scale()), "lifetime": 0.95,
 			"color": colors[i],
 			"speed_min": 24.0, "speed_max": 48.0,
 			"direction": Vector2.UP, "spread": 25.0,
