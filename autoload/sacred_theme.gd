@@ -61,6 +61,14 @@ const _LOCALE_FONTS := {
 		"mono":    "el/JetBrainsMono-Regular.ttf",
 		"italic":  "el/EBGaramond-Italic.ttf",
 	},
+	# ru: 키릴 — el/ 폰트들이 키릴도 포함하므로 path 재사용 (디스크 중복 회피)
+	# pt/pl/de: 라틴 Ext — _LATIN_FONTS 가 모두 지원하므로 별도 매핑 불필요 (자동 fallback)
+	"ru": {
+		"display": "el/CormorantGaramond-Bold.ttf",
+		# ui: Inter 재사용 (이미 Cyrillic 글리프 포함)
+		"mono":    "el/JetBrainsMono-Regular.ttf",
+		"italic":  "el/EBGaramond-Italic.ttf",
+	},
 }
 
 var theme: Theme
