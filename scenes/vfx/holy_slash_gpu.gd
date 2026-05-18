@@ -4,6 +4,9 @@
 extends "res://scenes/vfx/holy_slash.gd"
 
 const _Helpers = preload("res://scenes/vfx/gpu_particle_helpers.gd")
+# Holy 시리즈 — 더 흰색에 가까운 mote/haze 색 (사용자 피드백)
+const _COL_MOTE_WHITE := Color(1.0, 0.97, 0.88)
+const _COL_HAZE_WHITE := Color(1.0, 0.98, 0.93)
 
 var _gpu_channel: GPUParticles2D
 var _channel_made: bool = false
@@ -17,10 +20,10 @@ func _spawn_channel_mote() -> void:
 	_gpu_channel = _Helpers.make_emitter({
 		"count": int(50 * _scale()),
 		"lifetime": 1.2,
-		"color": COL_MID,
+		"color": _COL_MOTE_WHITE,
 		"speed_min": 24.0, "speed_max": 60.0,
 		"direction": Vector2.UP, "spread": 25.0,
-		"gravity": -18.0, "damping": 60.0,
+		"gravity": -18.0, "damping": 3.0,
 		"size_min": 1.4, "size_max": 2.8,
 		"size_base": 4.0,
 		"emission_shape": "box", "emission_box": Vector2(11.0, 8.0),
@@ -57,7 +60,7 @@ func _spawn_basic_slash_and_feathers() -> void:
 		"color": Color.WHITE,  # 텍스처 색 (COL_FEATHER 매칭은 sparkle 와 비슷 — 일단 white)
 		"speed_min": 90.0, "speed_max": 330.0,
 		"direction": dir, "spread": 40.0,  # ±0.7 rad ≈ 40°
-		"gravity": 43.2, "damping": 60.0,  # 0.012 * 60²
+		"gravity": 43.2, "damping": 3.0,  # 0.012 * 60²
 		"size_min": 8.0, "size_max": 16.0,
 		"size_base": 30.0,
 		"angle_min": -34.4, "angle_max": 34.4,

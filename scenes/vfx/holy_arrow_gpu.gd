@@ -4,6 +4,9 @@
 extends "res://scenes/vfx/holy_arrow.gd"
 
 const _Helpers = preload("res://scenes/vfx/gpu_particle_helpers.gd")
+# Holy 시리즈 — 더 흰색에 가까운 mote/haze 색 (사용자 피드백)
+const _COL_MOTE_WHITE := Color(1.0, 0.97, 0.88)
+const _COL_HAZE_WHITE := Color(1.0, 0.98, 0.93)
 
 var _gpu_channel: GPUParticles2D
 var _channel_made: bool = false
@@ -18,10 +21,10 @@ func _spawn_channel_mote() -> void:
 	_gpu_channel = _Helpers.make_emitter({
 		"count": int(50 * _scale()),
 		"lifetime": 1.2,
-		"color": COL_MID,
+		"color": _COL_MOTE_WHITE,
 		"speed_min": 24.0, "speed_max": 60.0,
 		"direction": Vector2.UP, "spread": 25.0,
-		"gravity": -18.0, "damping": 60.0,
+		"gravity": -18.0, "damping": 3.0,
 		"size_min": 1.4, "size_max": 2.8,
 		"size_base": 4.0,
 		"emission_shape": "box", "emission_box": Vector2(11.0, 8.0),
@@ -42,10 +45,10 @@ func _spawn_muzzle() -> void:
 	var dir := (_target - _caster).normalized()
 	var emitter := _Helpers.make_emitter({
 		"count": _pcount(14), "lifetime": 0.48,
-		"color": COL_MID,
+		"color": _COL_MOTE_WHITE,
 		"speed_min": 240.0, "speed_max": 660.0,  # 4~11 * 60
 		"direction": dir, "spread": 14.3,  # ±0.25 rad
-		"gravity": 144.0, "damping": 60.0,
+		"gravity": 144.0, "damping": 3.0,
 		"size_min": 1.2, "size_max": 2.6,
 		"size_base": 4.0,
 		"texture": _Helpers.sparkle_tex(),
@@ -63,10 +66,10 @@ func _spawn_impact(pos: Vector2, ang: float) -> void:
 	var bounce_dir := Vector2(cos(ang + PI), sin(ang + PI))
 	var spark := _Helpers.make_emitter({
 		"count": _pcount(20), "lifetime": 0.8,
-		"color": COL_MID,
+		"color": _COL_MOTE_WHITE,
 		"speed_min": 120.0, "speed_max": 480.0,
 		"direction": bounce_dir, "spread": 40.0,
-		"gravity": 648.0, "damping": 60.0,  # 0.18*60²
+		"gravity": 648.0, "damping": 3.0,  # 0.18*60²
 		"size_min": 1.0, "size_max": 2.3,
 		"size_base": 4.0,
 		"texture": _Helpers.sparkle_tex(),
@@ -77,10 +80,10 @@ func _spawn_impact(pos: Vector2, ang: float) -> void:
 	# haze 14 — 사방 안개
 	var haze := _Helpers.make_emitter({
 		"count": _pcount(14), "lifetime": 1.9,
-		"color": COL_HAZE,
+		"color": _COL_HAZE_WHITE,
 		"speed_min": 30.0, "speed_max": 96.0,
 		"direction": Vector2.UP, "spread": 180.0,
-		"gravity": -28.8, "damping": 60.0,
+		"gravity": -28.8, "damping": 3.0,
 		"size_min": 11.0, "size_max": 20.0,
 		"additive": false,
 		"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,

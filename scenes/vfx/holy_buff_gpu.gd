@@ -142,7 +142,7 @@ func _spawn_burst() -> void:
 		"color": Color.WHITE,  # 텍스처 색 그대로
 		"speed_min": 60.0, "speed_max": 240.0,
 		"direction": Vector2.UP, "spread": 180.0,
-		"gravity": 36.0, "damping": 60.0,
+		"gravity": 36.0, "damping": 3.0,
 		"size_min": 10.0, "size_max": 20.0,
 		"size_base": 30.0,  # feather_tex 긴축 반경
 		"angle_min": -34.4, "angle_max": 34.4,
@@ -160,17 +160,17 @@ func _spawn_burst() -> void:
 	_mote_burst = _Helpers.make_emitter({
 		"count": _pcount(25),
 		"lifetime": 1.55,
-		"color": Color(1.0, 235.0/255.0, 170.0/255.0),
+		"color": Color(1.0, 245.0/255.0, 215.0/255.0),
 		"speed_min": 120.0, "speed_max": 420.0,
 		"direction": Vector2.UP, "spread": 180.0,
-		"gravity": 90.0, "damping": 60.0,
+		"gravity": 90.0, "damping": 3.0,
 		"size_min": 1.5, "size_max": 3.1,
 		"size_base": 4.0,  # sparkle 코어 반경
 		"texture": _Helpers.sparkle_tex(),
 		"color_ramp": _Helpers.make_color_ramp(
-			Color(1.0, 235.0/255.0, 170.0/255.0),   # k=0
-			Color(1.0, 225.0/255.0, 185.0/255.0),   # k=0.5
-			Color(1.0, 215.0/255.0, 200.0/255.0),   # k=1
+			Color(1.0, 245.0/255.0, 215.0/255.0),   # k=0
+			Color(1.0, 240.0/255.0, 220.0/255.0),   # k=0.5
+			Color(1.0, 235.0/255.0, 225.0/255.0),   # k=1
 			1.0, 0.5, 0.0),  # alpha linear (1-k)
 	})
 	_mote_burst.position = ctr
@@ -187,7 +187,7 @@ func _spawn_rising() -> void:
 		"color": Color.WHITE,
 		"speed_min": 36.0, "speed_max": 84.0,
 		"direction": Vector2.UP, "spread": 30.0,
-		"gravity": 0.0, "damping": 60.0,
+		"gravity": 0.0, "damping": 3.0,
 		"size_min": 8.0, "size_max": 16.0,
 		"size_base": 30.0,
 		"angle_min": -22.9, "angle_max": 22.9,
@@ -206,19 +206,19 @@ func _spawn_rising() -> void:
 	_mote_rising = _Helpers.make_emitter({
 		"count": int(222 * _scale()),
 		"lifetime": 1.85,
-		"color": Color(1.0, 235.0/255.0, 170.0/255.0),
+		"color": Color(1.0, 245.0/255.0, 215.0/255.0),
 		"speed_min": 60.0, "speed_max": 192.0,
 		"direction": Vector2.UP, "spread": 18.0,
-		"gravity": 0.0, "damping": 60.0,
+		"gravity": 0.0, "damping": 3.0,
 		"size_min": 1.4, "size_max": 3.0,
 		"size_base": 4.0,
 		"emission_shape": "box", "emission_box": Vector2(60.0, 10.0),
 		"texture": _Helpers.sparkle_tex(),
 		"one_shot": false, "explosiveness": 0.0,
 		"color_ramp": _Helpers.make_color_ramp(
-			Color(1.0, 235.0/255.0, 170.0/255.0),
-			Color(1.0, 225.0/255.0, 185.0/255.0),
-			Color(1.0, 215.0/255.0, 200.0/255.0),
+			Color(1.0, 245.0/255.0, 215.0/255.0),
+			Color(1.0, 240.0/255.0, 220.0/255.0),
+			Color(1.0, 235.0/255.0, 225.0/255.0),
 			1.0, 0.5, 0.0),
 	})
 	_mote_rising.position = ctr
