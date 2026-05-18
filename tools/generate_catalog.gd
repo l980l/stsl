@@ -131,6 +131,18 @@ func _card_type_name(t: int) -> String:
 		CardRes.CardType.POWER:  return "권능"
 	return "?"
 
+func _format_archetypes(card: Resource) -> String:
+	# 다중 archetype 지원 — 한글 번역으로 변환 후 ", " 로 join. 빈 배열 = 공백.
+	var arr: Array = card.archetype if card.archetype != null else []
+	if arr.is_empty():
+		return ""
+	var parts: Array = []
+	for key in arr:
+		if key == "":
+			continue
+		parts.append(tr(key))
+	return ", ".join(parts)
+
 func _action_type_name(t: int) -> String:
 	match t:
 		IntentRes.ActionType.ATTACK: return "ATK"
@@ -238,7 +250,7 @@ func _generate_cards() -> void:
 	md += "> 이 파일은 `tools/generate_catalog.gd`로 자동 생성됩니다. 직접 수정 금지.\n"
 	md += "> 재생성: `godot --headless -s tools/generate_catalog.gd`\n\n"
 
-	var csv_rows: Array = [["영웅", "이름", "코스트", "타입", "희귀도", "최대강화", "효과_0강", "효과_1강"]]
+	var csv_rows: Array = [["영웅", "이름", "코스트", "타입", "희귀도", "아키타입", "최대강화", "효과_0강", "효과_1강"]]
 
 	for hero in heroes:
 		var cls = hero["cls"]
@@ -267,29 +279,33 @@ func _generate_cards() -> void:
 				hero["id"], tr(card.card_name), card.cost,
 				_card_type_name(card.card_type),
 				_rarity_name(card.rarity),
+				_format_archetypes(card),
 				max_lv, eff0, eff1 if max_lv >= 1 else ""
 			])
 
 		# 카드 풀
 		var pool: Array = cls.pool()
 		md += "### 카드 풀 (%d종)\n\n" % pool.size()
-		md += "| 이름 | 코스트 | 타입 | 희귀도 | 0강 | 1강 |\n"
-		md += "|------|--------|------|--------|-----|-----|\n"
+		md += "| 이름 | 코스트 | 타입 | 희귀도 | 아키타입 | 0강 | 1강 |\n"
+		md += "|------|--------|------|--------|----------|-----|-----|\n"
 
 		for card in pool:
 			var max_lv: int = card.max_upgrade_level()
 			var eff0: String = _format_effects(card)
 			var eff1: String = "—" if max_lv < 1 else _format_effects(_apply_upgrade(card, 1))
-			md += "| %s | %d | %s | %s | %s | %s |\n" % [
+			var arche_text: String = _format_archetypes(card)
+			md += "| %s | %d | %s | %s | %s | %s | %s |\n" % [
 				tr(card.card_name), card.cost,
 				_card_type_name(card.card_type),
 				_rarity_name(card.rarity),
+				arche_text,
 				eff0, eff1
 			]
 			csv_rows.append([
 				hero["id"], tr(card.card_name), card.cost,
 				_card_type_name(card.card_type),
 				_rarity_name(card.rarity),
+				arche_text,
 				max_lv, eff0, eff1 if max_lv >= 1 else ""
 			])
 		md += "\n"

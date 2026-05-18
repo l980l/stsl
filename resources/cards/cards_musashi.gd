@@ -46,7 +46,7 @@ static func _swift_blade() -> Resource:
 	c.card_name = "card.musashi.swift_blade.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.musashi.meditation.archetype"  # 무심
+	c.archetype = ["card.musashi.meditation.archetype"]  # 무심
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.speed_buff"
@@ -63,7 +63,7 @@ static func _strike() -> Resource:
 	c.card_name = "card.musashi.strike.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.strike.archetype"
+	c.archetype = ["card.musashi.strike.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
@@ -75,7 +75,7 @@ static func _defend() -> Resource:
 	c.card_name = "card.musashi.defend.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.defend.archetype"
+	c.archetype = ["card.musashi.defend.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 125; e.base_value = 125; e.target = "SELF"
@@ -87,7 +87,7 @@ static func _niten_starter() -> Resource:
 	c.card_name = "card.musashi.niten_starter.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.niten_starter.archetype"
+	c.archetype = ["card.musashi.niten_starter.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 50; e.base_value = 50; e.target = "SINGLE"; e.hit_count = 2
@@ -100,7 +100,7 @@ static func _guard_stance() -> Resource:
 	c.card_name = "card.musashi.guard_stance.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.guard_stance.archetype"
+	c.archetype = ["card.musashi.guard_stance.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
 	ea.value = 75; ea.base_value = 75; ea.target = "SELF"
@@ -119,7 +119,7 @@ static func _niten_slash() -> Resource:
 	c.card_name = "card.musashi.niten_slash.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.niten_slash.archetype"
+	c.archetype = ["card.musashi.niten_slash.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 60; e.base_value = 60; e.target = "SINGLE"; e.hit_count = 2
@@ -132,7 +132,7 @@ static func _whirlwind_cut() -> Resource:
 	c.card_name = "card.musashi.whirlwind_cut.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.whirlwind_cut.archetype"
+	c.archetype = ["card.musashi.whirlwind_cut.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 40; ea.base_value = 40; ea.target = "SINGLE"; ea.hit_count = 2
@@ -148,7 +148,7 @@ static func _twin_blades_basic() -> Resource:
 	c.card_name = "card.musashi.twin_blades_basic.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.twin_blades_basic.archetype"
+	c.archetype = ["card.musashi.twin_blades_basic.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 50; ea.base_value = 50; ea.target = "SINGLE"; ea.hit_count = 2
@@ -164,7 +164,7 @@ static func _twin_sword_power() -> Resource:
 	c.card_name = "card.musashi.twin_sword_power.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.twin_sword_power.archetype"
+	c.archetype = ["card.musashi.twin_sword_power.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.bonus_per_hit"; e.value = 15; e.base_value = 15; e.target = "SELF"
@@ -176,7 +176,7 @@ static func _rhythm_of_strikes() -> Resource:
 	c.card_name = "card.musashi.rhythm_of_strikes.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.musashi.rhythm_of_strikes.archetype"
+	c.archetype = ["card.musashi.rhythm_of_strikes.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.every_nth_attack_bonus"; e.value = 120; e.base_value = 120; e.target = "SELF"
@@ -189,7 +189,7 @@ static func _flying_swallow() -> Resource:
 	c.card_name = "card.musashi.flying_swallow.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.flying_swallow.archetype"
+	c.archetype = ["card.musashi.flying_swallow.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 30; ea.base_value = 30; ea.target = "SINGLE"; ea.hit_count = 2
@@ -205,7 +205,7 @@ static func _five_rings_sword() -> Resource:
 	c.card_name = "card.musashi.five_rings_sword.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = "card.musashi.five_rings_sword.archetype"
+	c.archetype = ["card.musashi.five_rings_sword.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 120; e.base_value = 120; e.target = "SINGLE"; e.hit_count = 2
@@ -218,7 +218,7 @@ static func _twin_dragon() -> Resource:
 	c.card_name = "card.musashi.twin_dragon.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.musashi.twin_dragon.archetype"
+	c.archetype = ["card.musashi.twin_dragon.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"; ea.hit_count = 2
@@ -234,7 +234,7 @@ static func _steel_strike() -> Resource:
 	c.card_name = "card.musashi.steel_strike.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.steel_strike.archetype"
+	c.archetype = ["card.musashi.steel_strike.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_BLOCK
 	e.value = 120; e.base_value = 120; e.target = "SINGLE"
@@ -247,7 +247,7 @@ static func _demon_swordsman() -> Resource:
 	c.card_name = "card.musashi.demon_swordsman.name"; c.owner_id = "musashi"
 	c.cost = 0; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.musashi.demon_swordsman.archetype"
+	c.archetype = ["card.musashi.demon_swordsman.archetype"]
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.MULTI_HIT_RANDOM
@@ -265,7 +265,7 @@ static func _blood_path() -> Resource:
 	c.card_name = "card.musashi.blood_path.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.blood_path.archetype"
+	c.archetype = ["card.musashi.blood_path.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 100; e.base_value = 100
@@ -280,7 +280,7 @@ static func _peak_aim() -> Resource:
 	c.card_name = "card.musashi.peak_aim.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.peak_aim.archetype"
+	c.archetype = ["card.musashi.peak_aim.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 90; e.base_value = 90
@@ -295,7 +295,7 @@ static func _courage() -> Resource:
 	c.card_name = "card.musashi.courage.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.courage.archetype"
+	c.archetype = ["card.musashi.courage.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 115; e.base_value = 115; e.target = "SELF"
@@ -307,7 +307,7 @@ static func _swordsmans_resolve() -> Resource:
 	c.card_name = "card.musashi.swordsmans_resolve.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.swordsmans_resolve.archetype"
+	c.archetype = ["card.musashi.swordsmans_resolve.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.strength_player"; e.value = 2; e.base_value = 2; e.target = "SELF"
@@ -319,7 +319,7 @@ static func _blade_polish() -> Resource:
 	c.card_name = "card.musashi.blade_polish.name"; c.owner_id = "musashi"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.blade_polish.archetype"
+	c.archetype = ["card.musashi.blade_polish.archetype"]
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
@@ -334,7 +334,7 @@ static func _single_cut() -> Resource:
 	c.card_name = "card.musashi.single_cut.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.musashi.single_cut.archetype"
+	c.archetype = ["card.musashi.single_cut.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 160; e.base_value = 160
@@ -349,7 +349,7 @@ static func _final_duel() -> Resource:
 	c.card_name = "card.musashi.final_duel.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.musashi.final_duel.archetype"
+	c.archetype = ["card.musashi.final_duel.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CONDITIONAL_DMG
@@ -369,7 +369,7 @@ static func _torrent() -> Resource:
 	c.card_name = "card.musashi.torrent.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.torrent.archetype"
+	c.archetype = ["card.musashi.torrent.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	ea.value = 100; ea.base_value = 100
@@ -388,7 +388,7 @@ static func _peerless_cut() -> Resource:
 	c.card_name = "card.musashi.peerless_cut.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.musashi.peerless_cut.archetype"
+	c.archetype = ["card.musashi.peerless_cut.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	ea.value = 90; ea.base_value = 90
@@ -407,7 +407,7 @@ static func _fate_duel() -> Resource:
 	c.card_name = "card.musashi.fate_duel.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.musashi.fate_duel.archetype"
+	c.archetype = ["card.musashi.fate_duel.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "duel_lock"; e.value = 3; e.base_value = 3; e.target = "SINGLE"
@@ -423,7 +423,7 @@ static func _meditation() -> Resource:
 	c.card_name = "card.musashi.meditation.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.meditation.archetype"
+	c.archetype = ["card.musashi.meditation.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW
 	ea.value = 1; ea.base_value = 1
@@ -438,7 +438,7 @@ static func _empty_state() -> Resource:
 	c.card_name = "card.musashi.empty_state.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.musashi.empty_state.archetype"
+	c.archetype = ["card.musashi.empty_state.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
 	ea.value = 70; ea.base_value = 70; ea.target = "SELF"
@@ -454,7 +454,7 @@ static func _void_sword() -> Resource:
 	c.card_name = "card.musashi.void_sword.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.musashi.void_sword.archetype"
+	c.archetype = ["card.musashi.void_sword.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 75; e.base_value = 75
@@ -469,7 +469,7 @@ static func _mushin_power() -> Resource:
 	c.card_name = "card.musashi.mushin_power.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.musashi.mushin_power.archetype"
+	c.archetype = ["card.musashi.mushin_power.archetype"]
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
@@ -482,7 +482,7 @@ static func _empty_guard() -> Resource:
 	c.card_name = "card.musashi.empty_guard.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.empty_guard.archetype"
+	c.archetype = ["card.musashi.empty_guard.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
 	ea.value = 75; ea.base_value = 75; ea.target = "SELF"
@@ -497,7 +497,7 @@ static func _mushin_blade() -> Resource:
 	c.card_name = "card.musashi.mushin_blade.name"; c.owner_id = "musashi"
 	c.cost = 0; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "attack"
-	c.archetype = "card.musashi.mushin_blade.archetype"
+	c.archetype = ["card.musashi.mushin_blade.archetype"]
 	c.is_ethereal = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
@@ -513,7 +513,7 @@ static func _clear_wind() -> Resource:
 	c.card_name = "card.musashi.clear_wind.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.musashi.clear_wind.archetype"
+	c.archetype = ["card.musashi.clear_wind.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	ea.value = 120; ea.base_value = 120
@@ -532,7 +532,7 @@ static func _mushin_burst() -> Resource:
 	c.card_name = "card.musashi.mushin_burst.name"; c.owner_id = "musashi"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.mushin_burst.archetype"
+	c.archetype = ["card.musashi.mushin_burst.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
@@ -548,7 +548,7 @@ static func _void_guard() -> Resource:
 	c.card_name = "card.musashi.void_guard.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.musashi.void_guard.archetype"
+	c.archetype = ["card.musashi.void_guard.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.PURGE_STATUS; ea.target = "SELF"
 	var eb := EffRes.new()
@@ -561,7 +561,7 @@ static func _five_rings_realm() -> Resource:
 	c.card_name = "card.musashi.five_rings_realm.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.musashi.five_rings_realm.archetype"
+	c.archetype = ["card.musashi.five_rings_realm.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.COST_ZERO_TURN

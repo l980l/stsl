@@ -45,7 +45,7 @@ static func _seductive_stillness() -> Resource:
 	c.card_name = "card.cleopatra.seductive_stillness.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.temptation.archetype"  # 조종
+	c.archetype = ["card.cleopatra.temptation.archetype"]  # 조종
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DEBUFF_SPEED
 	e.value = 5; e.base_value = 5
@@ -62,7 +62,7 @@ static func _strike() -> Resource:
 	c.card_name = "card.cleopatra.strike.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.strike.archetype"
+	c.archetype = ["card.cleopatra.strike.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
@@ -74,7 +74,7 @@ static func _defend() -> Resource:
 	c.card_name = "card.cleopatra.defend.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.defend.archetype"
+	c.archetype = ["card.cleopatra.defend.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 125; e.base_value = 125; e.target = "SELF"
@@ -86,7 +86,7 @@ static func _venom_needle() -> Resource:
 	c.card_name = "card.cleopatra.venom_needle.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.venom_needle.archetype"
+	c.archetype = ["card.cleopatra.venom_needle.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 60; ea.base_value = 60; ea.target = "SINGLE"
@@ -102,7 +102,7 @@ static func _royal_guard() -> Resource:
 	c.card_name = "card.cleopatra.royal_guard.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.royal_guard.archetype"
+	c.archetype = ["card.cleopatra.royal_guard.archetype", "card.cleopatra.strike.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
 	ea.value = 80; ea.base_value = 80
@@ -121,7 +121,7 @@ static func _poison_seed() -> Resource:
 	c.card_name = "card.cleopatra.poison_seed.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.poison_seed.archetype"
+	c.archetype = ["card.cleopatra.poison_seed.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 20; ea.base_value = 20; ea.target = "SINGLE"
@@ -137,7 +137,7 @@ static func _asp_fang() -> Resource:
 	c.card_name = "card.cleopatra.asp_fang.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.asp_fang.archetype"
+	c.archetype = ["card.cleopatra.asp_fang.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "poison"; e.value = 3; e.base_value = 3; e.target = "SINGLE"
@@ -149,7 +149,7 @@ static func _nile_mist() -> Resource:
 	c.card_name = "card.cleopatra.nile_mist.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.nile_mist.archetype"
+	c.archetype = ["card.cleopatra.nile_mist.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
 	ea.status_type = "poison"; ea.value = 1; ea.base_value = 1; ea.target = "ALL"
@@ -164,7 +164,7 @@ static func _poison_feast() -> Resource:
 	c.card_name = "card.cleopatra.poison_feast.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.poison_feast.archetype"
+	c.archetype = ["card.cleopatra.poison_feast.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 20; ea.base_value = 20; ea.target = "SINGLE"
@@ -180,7 +180,7 @@ static func _serpent_power() -> Resource:
 	c.card_name = "card.cleopatra.serpent_power.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.serpent_power.archetype"
+	c.archetype = ["card.cleopatra.serpent_power.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.poison_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
@@ -192,7 +192,7 @@ static func _pharaoh_venom() -> Resource:
 	c.card_name = "card.cleopatra.pharaoh_venom.name"; c.owner_id = "cleopatra"
 	c.cost = 0; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.pharaoh_venom.archetype"
+	c.archetype = ["card.cleopatra.pharaoh_venom.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.spend_all_energy_poison_double"; e.value = 0; e.base_value = 0; e.target = "SELF"
@@ -204,7 +204,7 @@ static func _poison_ritual() -> Resource:
 	c.card_name = "card.cleopatra.poison_ritual.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.poison_ritual.archetype"
+	c.archetype = ["card.cleopatra.poison_ritual.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.POISON_BURST
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
@@ -217,7 +217,7 @@ static func _pharaohs_plague() -> Resource:
 	c.card_name = "card.cleopatra.pharaohs_plague.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.pharaohs_plague.archetype"
+	c.archetype = ["card.cleopatra.pharaohs_plague.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.POISON_BURST
 	e.value = 100; e.base_value = 100; e.target = "ALL"
@@ -230,7 +230,7 @@ static func _poison_throne() -> Resource:
 	c.card_name = "card.cleopatra.poison_throne.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.poison_throne.archetype"
+	c.archetype = ["card.cleopatra.poison_throne.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_STATUS_TYPE
 	e.value = 130; e.base_value = 130; e.target = "SINGLE"
@@ -243,7 +243,7 @@ static func _poison_party() -> Resource:
 	c.card_name = "card.cleopatra.poison_party.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.poison_party.archetype"
+	c.archetype = ["card.cleopatra.poison_party.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "ALL"
@@ -259,7 +259,7 @@ static func _poison_purge() -> Resource:
 	c.card_name = "card.cleopatra.poison_purge.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.poison_purge.archetype"
+	c.archetype = ["card.cleopatra.poison_purge.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.PURGE_STATUS
 	ea.target = "SELF"
@@ -274,7 +274,7 @@ static func _nile_fury() -> Resource:
 	c.card_name = "card.cleopatra.nile_fury.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.nile_fury.archetype"
+	c.archetype = ["card.cleopatra.nile_fury.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.MULTI_HIT_RANDOM
 	ea.value = 65; ea.base_value = 65; ea.hit_count = 5
@@ -294,7 +294,7 @@ static func _cursed_gaze() -> Resource:
 	c.card_name = "card.cleopatra.cursed_gaze.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.cursed_gaze.archetype"
+	c.archetype = ["card.cleopatra.cursed_gaze.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
 	ea.status_type = "weak"; ea.value = 1; ea.base_value = 1; ea.target = "ALL"
@@ -309,7 +309,7 @@ static func _sandstorm() -> Resource:
 	c.card_name = "card.cleopatra.sandstorm.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.sandstorm.archetype"
+	c.archetype = ["card.cleopatra.sandstorm.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 30; ea.base_value = 30; ea.target = "ALL"
@@ -325,7 +325,7 @@ static func _snake_gaze() -> Resource:
 	c.card_name = "card.cleopatra.snake_gaze.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.snake_gaze.archetype"
+	c.archetype = ["card.cleopatra.snake_gaze.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "vulnerable"; e.value = 3; e.base_value = 3; e.target = "SINGLE"
@@ -337,7 +337,7 @@ static func _ramesses_shield() -> Resource:
 	c.card_name = "card.cleopatra.ramesses_shield.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.ramesses_shield.archetype"
+	c.archetype = ["card.cleopatra.ramesses_shield.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.block_per_turn"; e.value = 45; e.base_value = 45; e.target = "SELF"
@@ -349,7 +349,7 @@ static func _isis_wrath() -> Resource:
 	c.card_name = "card.cleopatra.isis_wrath.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.isis_wrath.archetype"
+	c.archetype = ["card.cleopatra.isis_wrath.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.debuff_amplify"; e.value = 1; e.base_value = 1; e.target = "SELF"
@@ -361,7 +361,7 @@ static func _curse_brand() -> Resource:
 	c.card_name = "card.cleopatra.curse_brand.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.curse_brand.archetype"
+	c.archetype = ["card.cleopatra.curse_brand.archetype", "card.cleopatra.strike.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 40; ea.base_value = 40; ea.target = "SINGLE"
@@ -383,7 +383,7 @@ static func _isis_judgment() -> Resource:
 	c.card_name = "card.cleopatra.isis_judgment.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.isis_judgment.archetype"
+	c.archetype = ["card.cleopatra.isis_judgment.archetype"]
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.STATUS_DOUBLE
@@ -396,7 +396,7 @@ static func _desert_recipe() -> Resource:
 	c.card_name = "card.cleopatra.desert_recipe.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.desert_recipe.archetype"
+	c.archetype = ["card.cleopatra.desert_recipe.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DISCARD_PICK_DRAW
 	e.value = 2; e.base_value = 2
@@ -408,7 +408,7 @@ static func _pharaoh_fury() -> Resource:
 	c.card_name = "card.cleopatra.pharaoh_fury.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.pharaoh_fury.archetype"
+	c.archetype = ["card.cleopatra.pharaoh_fury.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "ALL"
@@ -424,7 +424,7 @@ static func _venom_bloom() -> Resource:
 	c.card_name = "card.cleopatra.venom_bloom.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.venom_bloom.archetype"
+	c.archetype = ["card.cleopatra.venom_bloom.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 40; ea.base_value = 40; ea.target = "ALL"
@@ -444,7 +444,7 @@ static func _temptation() -> Resource:
 	c.card_name = "card.cleopatra.temptation.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.temptation.archetype"
+	c.archetype = ["card.cleopatra.temptation.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CHARM
 	e.value = 30; e.base_value = 30; e.target = "SINGLE"
@@ -456,7 +456,7 @@ static func _nile_whisper() -> Resource:
 	c.card_name = "card.cleopatra.nile_whisper.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.nile_whisper.archetype"
+	c.archetype = ["card.cleopatra.nile_whisper.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CHARM
 	e.value = 25; e.base_value = 25; e.target = "ALL"
@@ -468,7 +468,7 @@ static func _cleopatras_kiss() -> Resource:
 	c.card_name = "card.cleopatra.cleopatras_kiss.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.cleopatras_kiss.archetype"
+	c.archetype = ["card.cleopatra.cleopatras_kiss.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CHARM
 	ea.value = 60; ea.base_value = 60; ea.target = "SINGLE"
@@ -483,7 +483,7 @@ static func _queens_dignity() -> Resource:
 	c.card_name = "card.cleopatra.queens_dignity.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.queens_dignity.archetype"
+	c.archetype = ["card.cleopatra.queens_dignity.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.charm_threshold_minus"; e.value = 40; e.base_value = 40; e.target = "SELF"
@@ -495,7 +495,7 @@ static func _charming_perfume() -> Resource:
 	c.card_name = "card.cleopatra.charming_perfume.name"; c.owner_id = "cleopatra"
 	c.cost = 3; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.charming_perfume.archetype"
+	c.archetype = ["card.cleopatra.charming_perfume.archetype"]
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
@@ -508,7 +508,7 @@ static func _charm_execution() -> Resource:
 	c.card_name = "card.cleopatra.charm_execution.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.charm_execution.archetype"
+	c.archetype = ["card.cleopatra.charm_execution.archetype", "card.cleopatra.defend.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CHARM_TO_DAMAGE
 	e.bonus_value = 5; e.base_bonus_value = 5; e.target = "SINGLE"
@@ -521,7 +521,7 @@ static func _serpent_ritual() -> Resource:
 	c.card_name = "card.cleopatra.serpent_ritual.name"; c.owner_id = "cleopatra"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.cleopatra.serpent_ritual.archetype"
+	c.archetype = ["card.cleopatra.serpent_ritual.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.on_enthrall_strength"; e.value = 20; e.base_value = 20; e.target = "SELF"
@@ -533,7 +533,7 @@ static func _golden_throne() -> Resource:
 	c.card_name = "card.cleopatra.golden_throne.name"; c.owner_id = "cleopatra"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = "card.cleopatra.golden_throne.archetype"
+	c.archetype = ["card.cleopatra.golden_throne.archetype", "card.cleopatra.defend.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
