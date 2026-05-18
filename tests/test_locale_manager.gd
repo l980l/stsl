@@ -10,7 +10,7 @@ var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	print("--- TestLocaleManager ---")
-	test_locales_list_contains_all_eight()
+	test_locales_list_contains_all_thirteen()
 	test_display_names_for_all_locales()
 	test_set_locale_valid_updates_current()
 	test_set_locale_invalid_rejected()
@@ -35,11 +35,15 @@ func _make_lm() -> LocaleManagerClass:
 	_to_free.append(lm)
 	return lm
 
-func test_locales_list_contains_all_eight() -> void:
+func test_locales_list_contains_all_thirteen() -> void:
 	var lm := _make_lm()
-	_assert(lm.LOCALES.size() == 9, "LOCALES 9개 (el en es fr it ja ko zh zh_TW)")
+	_assert(lm.LOCALES.size() == 13, "LOCALES 13개 (de el en es fr it ja ko pl pt ru zh zh_TW)")
 	_assert("ko" in lm.LOCALES, "ko 포함")
 	_assert("es" in lm.LOCALES, "es(스페인어) 포함")
+	_assert("ru" in lm.LOCALES, "ru(러시아어) 포함")
+	_assert("pt" in lm.LOCALES, "pt(포르투갈어) 포함")
+	_assert("pl" in lm.LOCALES, "pl(폴란드어) 포함")
+	_assert("de" in lm.LOCALES, "de(독일어) 포함")
 	_assert(not "ar" in lm.LOCALES, "ar(아랍어) 미지원 — RTL 미구현")
 
 func test_display_names_for_all_locales() -> void:
@@ -65,6 +69,8 @@ func test_get_display_name_known() -> void:
 	_assert(lm.get_display_name("ko") == "한국어", "ko → 한국어")
 	_assert(lm.get_display_name("es") == "Español", "es → Español")
 	_assert(lm.get_display_name("ja") == "日本語", "ja → 日本語")
+	_assert(lm.get_display_name("ru") == "Русский", "ru → Русский")
+	_assert(lm.get_display_name("de") == "Deutsch", "de → Deutsch")
 
 func test_get_display_name_unknown_returns_code() -> void:
 	var lm := _make_lm()
