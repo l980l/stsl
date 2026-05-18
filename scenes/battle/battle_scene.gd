@@ -4289,6 +4289,14 @@ func _format_death_rattle_tooltip(dt: Resource) -> String:
 		_:
 			return tr("status.death_rattle.desc")
 
+# 적 enemy_index → 한글 적 이름 (tooltip 표시용). 적이 사망/이상 시 "?" 폴백.
+func _get_enemy_name_for_tooltip(enemy_index: int) -> String:
+	var er: Resource = BattleManager.get_enemy(enemy_index)
+	if er == null:
+		return "?"
+	var name_key: String = er.enemy_name
+	return tr(name_key) if name_key != "" else "?"
+
 func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	var tex: Texture2D = IconUtils.get_status_icon(key)
 	var tooltip: String = _trf("status.%s.desc" % key, val)
@@ -4299,6 +4307,15 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 		for ins in status[key]:
 			lines.append("%s%d / %d턴" % [sign_str, int(ins.get("value", 0)), int(ins.get("dur", 0))])
 		tooltip = "%s\n  " % _trf("status.%s.desc" % key, val) + "\n  ".join(lines)
+	# taunt — 부여자에 따라 desc 분기. taunt_source >= 0: 적 부여 (그 적만 공격 가능)
+	# / < 0 or 미설정: 영웅 자기 부여 (어그로).
+	elif key == "taunt":
+		var src: int = status.get("taunt_source", -1)
+		if src >= 0:
+			var enemy_name: String = _get_enemy_name_for_tooltip(src)
+			tooltip = tr("status.taunt.desc.locked") % enemy_name
+		else:
+			tooltip = tr("status.taunt.desc.self")
 
 	if tex != null:
 		var hbox := HBoxContainer.new()
