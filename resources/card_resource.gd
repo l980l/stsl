@@ -22,7 +22,7 @@ enum Rarity {
 @export var description: String = ""
 @export var art: Texture2D
 @export var play_animation: String = ""
-@export var archetype: String = ""
+@export var archetype: Array[String] = []  # 다중 archetype 지원. 빈 배열 = 무소속.
 @export var is_exhaust: bool = false   # 사용 후 소멸
 @export var is_ethereal: bool = false  # 턴 끝 손에 있으면 소멸
 @export var is_retain: bool = false    # 턴 끝 손에 남음

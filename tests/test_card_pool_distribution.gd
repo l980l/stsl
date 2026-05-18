@@ -83,10 +83,11 @@ func test_yi_sun_sin_archetype_distribution() -> void:
 	var pool: Array = gm._yi_sun_sin_card_pool()
 	var archetypes := {"거북선": 0, "학익진": 0, "필사즉생": 0}
 	for c in pool:
-		var a_key: String = c.get("archetype") if c.get("archetype") != null else ""
-		var a: String = TranslationServer.translate(a_key) if a_key != "" else ""
-		if a in archetypes:
-			archetypes[a] += 1
+		var arr: Array = c.get("archetype") if c.get("archetype") != null else []
+		for a_key in arr:
+			var a: String = TranslationServer.translate(a_key)
+			if a in archetypes:
+				archetypes[a] += 1
 	_assert(archetypes["거북선"] == 10, "이순신 거북선 10장 (실제: %d)" % archetypes["거북선"])
 	_assert(archetypes["학익진"] == 11, "이순신 학익진 11장 (실제: %d)" % archetypes["학익진"])
 	_assert(archetypes["필사즉생"] == 10, "이순신 필사즉생 10장 (실제: %d)" % archetypes["필사즉생"])
@@ -115,10 +116,11 @@ func test_cleopatra_archetype_distribution() -> void:
 	var pool: Array = gm._cleopatra_card_pool()
 	var archetypes := {"독살": 0, "저주": 0, "조종": 0}
 	for c in pool:
-		var a_key: String = c.get("archetype") if c.get("archetype") != null else ""
-		var a: String = TranslationServer.translate(a_key) if a_key != "" else ""
-		if a in archetypes:
-			archetypes[a] += 1
+		var arr: Array = c.get("archetype") if c.get("archetype") != null else []
+		for a_key in arr:
+			var a: String = TranslationServer.translate(a_key)
+			if a in archetypes:
+				archetypes[a] += 1
 	_assert(archetypes["독살"] == 12, "클레오파트라 독살 12장 (실제: %d)" % archetypes["독살"])
 	_assert(archetypes["저주"] == 10, "클레오파트라 저주 10장 (실제: %d)" % archetypes["저주"])
 	_assert(archetypes["조종"] == 9, "클레오파트라 조종 9장 (실제: %d)" % archetypes["조종"])
@@ -146,10 +148,11 @@ func test_joan_archetype_distribution() -> void:
 	var pool: Array = JoanCards.pool()
 	var archetypes := {"신성": 0, "부활": 0, "순교": 0}
 	for c in pool:
-		var a_key: String = c.get("archetype") if c.get("archetype") != null else ""
-		var a: String = TranslationServer.translate(a_key) if a_key != "" else ""
-		if a in archetypes:
-			archetypes[a] += 1
+		var arr: Array = c.get("archetype") if c.get("archetype") != null else []
+		for a_key in arr:
+			var a: String = TranslationServer.translate(a_key)
+			if a in archetypes:
+				archetypes[a] += 1
 	_assert(archetypes["신성"] == 3, "잔다르크 신성 3장 (실제: %d)" % archetypes["신성"])
 	_assert(archetypes["부활"] == 4, "잔다르크 부활 4장 (실제: %d)" % archetypes["부활"])
 	_assert(archetypes["순교"] == 9, "잔다르크 순교 9장 (실제: %d)" % archetypes["순교"])
@@ -177,10 +180,11 @@ func test_genghis_archetype_distribution() -> void:
 	var pool: Array = GhisCards.pool()
 	var archetypes := {"기동": 0, "몽골 기병": 0, "약탈": 0}
 	for c in pool:
-		var a_key: String = c.get("archetype") if c.get("archetype") != null else ""
-		var a: String = TranslationServer.translate(a_key) if a_key != "" else ""
-		if a in archetypes:
-			archetypes[a] += 1
+		var arr: Array = c.get("archetype") if c.get("archetype") != null else []
+		for a_key in arr:
+			var a: String = TranslationServer.translate(a_key)
+			if a in archetypes:
+				archetypes[a] += 1
 	_assert(archetypes["기동"] == 13, "칭기즈칸 기동 13장 (실제: %d)" % archetypes["기동"])
 	_assert(archetypes["몽골 기병"] == 10, "칭기즈칸 몽골 기병 10장 (실제: %d)" % archetypes["몽골 기병"])
 	_assert(archetypes["약탈"] == 8, "칭기즈칸 약탈 8장 (실제: %d)" % archetypes["약탈"])
@@ -203,10 +207,11 @@ func test_musashi_archetype_distribution() -> void:
 	var pool: Array = MusaCards.pool()
 	var archetypes := {"이도류": 0, "결투": 0, "무심": 0}
 	for c in pool:
-		var a_key: String = c.get("archetype") if c.get("archetype") != null else ""
-		var a: String = TranslationServer.translate(a_key) if a_key != "" else ""
-		if a in archetypes:
-			archetypes[a] += 1
+		var arr: Array = c.get("archetype") if c.get("archetype") != null else []
+		for a_key in arr:
+			var a: String = TranslationServer.translate(a_key)
+			if a in archetypes:
+				archetypes[a] += 1
 	_assert(archetypes["이도류"] == 10, "무사시 이도류 10장 (실제: %d)" % archetypes["이도류"])
 	_assert(archetypes["결투"] == 10, "무사시 결투 10장 (실제: %d)" % archetypes["결투"])
 	_assert(archetypes["무심"] == 11, "무사시 무심 11장 (실제: %d)" % archetypes["무심"])

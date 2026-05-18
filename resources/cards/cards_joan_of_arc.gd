@@ -46,7 +46,7 @@ static func _grace_of_spirit() -> Resource:
 	c.card_name = "card.joan_of_arc.grace_of_spirit.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.holy_touch.archetype"  # 축복
+	c.archetype = ["card.joan_of_arc.holy_touch.archetype"]  # 축복
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BUFF_SPEED
 	e.value = 4; e.base_value = 4
@@ -63,7 +63,7 @@ static func _strike() -> Resource:
 	c.card_name = "card.joan_of_arc.strike.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.strike.archetype"
+	c.archetype = ["card.joan_of_arc.strike.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"
@@ -75,7 +75,7 @@ static func _defend() -> Resource:
 	c.card_name = "card.joan_of_arc.defend.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.defend.archetype"
+	c.archetype = ["card.joan_of_arc.defend.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 125; e.base_value = 125; e.target = "SELF"
@@ -87,7 +87,7 @@ static func _holy_smite() -> Resource:
 	c.card_name = "card.joan_of_arc.holy_smite.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.holy_smite.archetype"
+	c.archetype = ["card.joan_of_arc.holy_smite.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 80; ea.base_value = 80; ea.target = "SINGLE"
@@ -103,7 +103,7 @@ static func _shield_prayer() -> Resource:
 	c.card_name = "card.joan_of_arc.shield_prayer.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.shield_prayer.archetype"
+	c.archetype = ["card.joan_of_arc.shield_prayer.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
 	ea.value = 80; ea.base_value = 80; ea.target = "SELF"
@@ -122,7 +122,7 @@ static func _holy_bolt() -> Resource:
 	c.card_name = "card.joan_of_arc.holy_bolt.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.holy_bolt.archetype"
+	c.archetype = ["card.joan_of_arc.holy_bolt.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 70; ea.base_value = 70; ea.target = "SINGLE"
@@ -138,7 +138,7 @@ static func _orleans_charge() -> Resource:
 	c.card_name = "card.joan_of_arc.orleans_charge.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.orleans_charge.archetype"
+	c.archetype = ["card.joan_of_arc.orleans_charge.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 110; e.base_value = 110; e.target = "SINGLE"
@@ -151,7 +151,7 @@ static func _holy_wave() -> Resource:
 	c.card_name = "card.joan_of_arc.holy_wave.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.holy_wave.archetype"
+	c.archetype = ["card.joan_of_arc.holy_wave.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 65; e.base_value = 65; e.target = "ALL"
@@ -164,7 +164,7 @@ static func _holy_fury() -> Resource:
 	c.card_name = "card.joan_of_arc.holy_fury.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.holy_fury.archetype"
+	c.archetype = ["card.joan_of_arc.holy_fury.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 140; e.base_value = 140; e.target = "ALL"
@@ -177,7 +177,7 @@ static func _crusaders_faith() -> Resource:
 	c.card_name = "card.joan_of_arc.crusaders_faith.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.crusaders_faith.archetype"
+	c.archetype = ["card.joan_of_arc.crusaders_faith.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.strength_player"; e.value = 2; e.base_value = 2; e.target = "SELF"
@@ -191,7 +191,7 @@ static func _divine_echo() -> Resource:
 	c.card_name = "card.joan_of_arc.divine_echo.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.divine_echo.archetype"
+	c.archetype = ["card.joan_of_arc.divine_echo.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
 	ea.status_type = "power.block_per_turn"; ea.value = 50; ea.base_value = 50; ea.target = "SELF"
@@ -206,7 +206,7 @@ static func _archangels_wrath() -> Resource:
 	c.card_name = "card.joan_of_arc.archangels_wrath.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.archangels_wrath.archetype"
+	c.archetype = ["card.joan_of_arc.archangels_wrath.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 120; ea.base_value = 120; ea.target = "ALL"
@@ -222,7 +222,7 @@ static func _divine_punishment() -> Resource:
 	c.card_name = "card.joan_of_arc.divine_punishment.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.divine_punishment.archetype"
+	c.archetype = ["card.joan_of_arc.divine_punishment.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
 	ea.value = 100; ea.base_value = 100
@@ -241,7 +241,7 @@ static func _crusade() -> Resource:
 	c.card_name = "card.joan_of_arc.crusade.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.crusade.archetype"
+	c.archetype = ["card.joan_of_arc.crusade.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 82; ea.base_value = 82; ea.target = "ALL"
@@ -257,7 +257,7 @@ static func _holy_judge() -> Resource:
 	c.card_name = "card.joan_of_arc.holy_judge.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.holy_judge.archetype"
+	c.archetype = ["card.joan_of_arc.holy_judge.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
@@ -276,7 +276,7 @@ static func _oracle_light() -> Resource:
 	c.card_name = "card.joan_of_arc.oracle_light.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.oracle_light.archetype"
+	c.archetype = ["card.joan_of_arc.oracle_light.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
@@ -296,7 +296,7 @@ static func _holy_touch() -> Resource:
 	c.card_name = "card.joan_of_arc.holy_touch.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.holy_touch.archetype"
+	c.archetype = ["card.joan_of_arc.holy_touch.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.HEAL
 	e.value = 77; e.base_value = 77; e.target = "SELF"
@@ -308,7 +308,7 @@ static func _communion() -> Resource:
 	c.card_name = "card.joan_of_arc.communion.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.communion.archetype"
+	c.archetype = ["card.joan_of_arc.communion.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.HEAL
 	ea.value = 20; ea.base_value = 20; ea.target = "SELF"
@@ -323,7 +323,7 @@ static func _hymn() -> Resource:
 	c.card_name = "card.joan_of_arc.hymn.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.hymn.archetype"
+	c.archetype = ["card.joan_of_arc.hymn.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.HEAL_ALL
 	e.value = 55; e.base_value = 55
@@ -335,7 +335,7 @@ static func _guardian_angel() -> Resource:
 	c.card_name = "card.joan_of_arc.guardian_angel.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.guardian_angel.archetype"
+	c.archetype = ["card.joan_of_arc.guardian_angel.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.heal_team_per_turn"; e.value = 20; e.base_value = 20; e.target = "SELF"
@@ -347,7 +347,7 @@ static func _angel_wings() -> Resource:
 	c.card_name = "card.joan_of_arc.angel_wings.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.angel_wings.archetype"
+	c.archetype = ["card.joan_of_arc.angel_wings.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.heal_team_per_turn"; e.value = 40; e.base_value = 40; e.target = "SELF"
@@ -359,7 +359,7 @@ static func _miracle_revive() -> Resource:
 	c.card_name = "card.joan_of_arc.miracle_revive.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.miracle_revive.archetype"
+	c.archetype = ["card.joan_of_arc.miracle_revive.archetype"]
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.REVIVE
@@ -372,7 +372,7 @@ static func _joan_return() -> Resource:
 	c.card_name = "card.joan_of_arc.joan_return.name"; c.owner_id = "joan_of_arc"
 	c.cost = 3; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.joan_return.archetype"
+	c.archetype = ["card.joan_of_arc.joan_return.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.REVIVE
 	ea.value = 100; ea.base_value = 100
@@ -387,7 +387,7 @@ static func _holy_purification() -> Resource:
 	c.card_name = "card.joan_of_arc.holy_purification.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.holy_purification.archetype"
+	c.archetype = ["card.joan_of_arc.holy_purification.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.PURGE_STATUS
 	ea.target = "ALL"
@@ -402,7 +402,7 @@ static func _knights_oath() -> Resource:
 	c.card_name = "card.joan_of_arc.knights_oath.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.knights_oath.archetype"
+	c.archetype = ["card.joan_of_arc.knights_oath.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
 	ea.status_type = "taunt"; ea.value = 2; ea.base_value = 2; ea.target = "SELF"
@@ -417,7 +417,7 @@ static func _flag_of_orleans() -> Resource:
 	c.card_name = "card.joan_of_arc.flag_of_orleans.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.flag_of_orleans.archetype"
+	c.archetype = ["card.joan_of_arc.flag_of_orleans.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.HEAL_ALL
 	ea.value = 80; ea.base_value = 80
@@ -436,7 +436,7 @@ static func _martyrs_will() -> Resource:
 	c.card_name = "card.joan_of_arc.martyrs_will.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.martyrs_will.archetype"
+	c.archetype = ["card.joan_of_arc.martyrs_will.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
 	ea.value = 50; ea.base_value = 50
@@ -451,7 +451,7 @@ static func _altar_flame() -> Resource:
 	c.card_name = "card.joan_of_arc.altar_flame.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.altar_flame.archetype"
+	c.archetype = ["card.joan_of_arc.altar_flame.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
 	ea.value = 50; ea.base_value = 50
@@ -466,7 +466,7 @@ static func _martyrdom_steps() -> Resource:
 	c.card_name = "card.joan_of_arc.martyrdom_steps.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.martyrdom_steps.archetype"
+	c.archetype = ["card.joan_of_arc.martyrdom_steps.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
 	ea.value = 100; ea.base_value = 100
@@ -481,7 +481,7 @@ static func _passion_power() -> Resource:
 	c.card_name = "card.joan_of_arc.passion_power.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.passion_power.archetype"
+	c.archetype = ["card.joan_of_arc.passion_power.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.sacrifice_bank"; e.value = 0; e.base_value = 0; e.target = "SELF"
@@ -493,7 +493,7 @@ static func _martyr_strength() -> Resource:
 	c.card_name = "card.joan_of_arc.martyr_strength.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.martyr_strength.archetype"
+	c.archetype = ["card.joan_of_arc.martyr_strength.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP; ea.value = 50; ea.base_value = 50
 	var eb := EffRes.new()
@@ -507,7 +507,7 @@ static func _saints_revelation() -> Resource:
 	c.card_name = "card.joan_of_arc.saints_revelation.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.saints_revelation.archetype"
+	c.archetype = ["card.joan_of_arc.saints_revelation.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.SACRIFICE_PAYOFF
 	e.value = 20; e.base_value = 20; e.target = "ALL"
@@ -520,7 +520,7 @@ static func _martyrs_light() -> Resource:
 	c.card_name = "card.joan_of_arc.martyrs_light.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.martyrs_light.archetype"
+	c.archetype = ["card.joan_of_arc.martyrs_light.archetype"]
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.SACRIFICE_PAYOFF
@@ -533,7 +533,7 @@ static func _last_shield() -> Resource:
 	c.card_name = "card.joan_of_arc.last_shield.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.joan_of_arc.last_shield.archetype"
+	c.archetype = ["card.joan_of_arc.last_shield.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
 	ea.value = 100; ea.base_value = 100
@@ -548,7 +548,7 @@ static func _saints_flame() -> Resource:
 	c.card_name = "card.joan_of_arc.saints_flame.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "attack"
-	c.archetype = "card.joan_of_arc.saints_flame.archetype"
+	c.archetype = ["card.joan_of_arc.saints_flame.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP

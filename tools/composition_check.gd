@@ -286,16 +286,17 @@ func _check_archetype_diff() -> void:
 		var arche_sets: Dictionary = {}
 		var arche_counts: Dictionary = {}
 		for card in _pool(hero):
-			var arche_key: String = card.archetype
-			if arche_key == "":
-				continue
-			var arche: String = _t(arche_key, arche_key)
-			if not arche_sets.has(arche):
-				arche_sets[arche] = {}
-				arche_counts[arche] = 0
-			for eff in card.effects:
-				arche_sets[arche][eff.effect_type] = true
-			arche_counts[arche] += 1
+			# 다중 archetype: 카드가 여러 archetype 에 속하면 각각에 카운트·effect 집합 추가
+			for arche_key in card.archetype:
+				if arche_key == "":
+					continue
+				var arche: String = _t(arche_key, arche_key)
+				if not arche_sets.has(arche):
+					arche_sets[arche] = {}
+					arche_counts[arche] = 0
+				for eff in card.effects:
+					arche_sets[arche][eff.effect_type] = true
+				arche_counts[arche] += 1
 		var keys: Array = arche_sets.keys()
 		keys.sort()
 		var summary: Array = []

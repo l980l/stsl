@@ -46,7 +46,7 @@ static func _cavalry_charge_speed() -> Resource:
 	c.card_name = "card.genghis_khan.cavalry_charge_speed.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.horse_charge.archetype"  # 기동
+	c.archetype = ["card.genghis_khan.horse_charge.archetype"]  # 기동
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BUFF_SPEED
 	e.value = 6; e.base_value = 6
@@ -63,7 +63,7 @@ static func _strike() -> Resource:
 	c.card_name = "card.genghis_khan.strike.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.strike.archetype"
+	c.archetype = ["card.genghis_khan.strike.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 100; e.base_value = 100; e.target = "SINGLE"; e.damage_type = "slash"
@@ -74,7 +74,7 @@ static func _defend() -> Resource:
 	c.card_name = "card.genghis_khan.defend.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.defend.archetype"
+	c.archetype = ["card.genghis_khan.defend.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK
 	e.value = 125; e.base_value = 125; e.target = "SELF"
@@ -86,7 +86,7 @@ static func _horse_thrust() -> Resource:
 	c.card_name = "card.genghis_khan.horse_thrust.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.horse_thrust.archetype"
+	c.archetype = ["card.genghis_khan.horse_thrust.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 60; ea.base_value = 60; ea.target = "SINGLE"; ea.damage_type = "slash"
@@ -101,7 +101,7 @@ static func _rider_call() -> Resource:
 	c.card_name = "card.genghis_khan.rider_call.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.rider_call.archetype"
+	c.archetype = ["card.genghis_khan.rider_call.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.SUMMON_TOKEN
 	e.value = 1; e.base_value = 1
@@ -117,7 +117,7 @@ static func _quick_strike() -> Resource:
 	c.card_name = "card.genghis_khan.swift_raid.name"; c.owner_id = "genghis_khan"
 	c.cost = 0; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.swift_raid.archetype"
+	c.archetype = ["card.genghis_khan.swift_raid.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 20; e.base_value = 20; e.target = "SINGLE"; e.damage_type = "slash"
@@ -129,7 +129,7 @@ static func _sprint() -> Resource:
 	c.card_name = "card.genghis_khan.cavalry_crossing.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.cavalry_crossing.archetype"
+	c.archetype = ["card.genghis_khan.cavalry_crossing.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 2; ea.base_value = 2
 	var eb := EffRes.new()
@@ -142,7 +142,7 @@ static func _horse_charge() -> Resource:
 	c.card_name = "card.genghis_khan.horse_charge.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.horse_charge.archetype"
+	c.archetype = ["card.genghis_khan.horse_charge.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 50; ea.base_value = 50; ea.target = "SINGLE"; ea.damage_type = "blunt"
@@ -156,7 +156,7 @@ static func _desert_cavalry() -> Resource:
 	c.card_name = "card.genghis_khan.desert_cavalry.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.desert_cavalry.archetype"
+	c.archetype = ["card.genghis_khan.desert_cavalry.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.PER_DRAW_DMG
 	e.value = 25; e.base_value = 25; e.target = "SINGLE"; e.damage_type = "blunt"
@@ -168,7 +168,7 @@ static func _khans_fury() -> Resource:
 	c.card_name = "card.genghis_khan.khans_fury.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.khans_fury.archetype"
+	c.archetype = ["card.genghis_khan.khans_fury.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.draw_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
@@ -182,7 +182,7 @@ static func _mobility_power() -> Resource:
 	c.card_name = "card.genghis_khan.mobility_power.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.mobility_power.archetype"
+	c.archetype = ["card.genghis_khan.mobility_power.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.block_per_turn"; e.value = 55; e.base_value = 55; e.target = "SELF"
@@ -194,7 +194,7 @@ static func _endless_march() -> Resource:
 	c.card_name = "card.genghis_khan.long_march.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.long_march.archetype"
+	c.archetype = ["card.genghis_khan.long_march.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK_PER_CARDS_PLAYED
 	e.value = 75; e.base_value = 75
@@ -206,7 +206,7 @@ static func _red_horizon() -> Resource:
 	c.card_name = "card.genghis_khan.red_horizon.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.red_horizon.archetype"
+	c.archetype = ["card.genghis_khan.red_horizon.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
@@ -222,7 +222,7 @@ static func _great_decree() -> Resource:
 	c.card_name = "card.genghis_khan.great_khans_command.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.great_khans_command.archetype"
+	c.archetype = ["card.genghis_khan.great_khans_command.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.COST_ZERO_TURN
 	c.effects = [e]; return c
@@ -233,7 +233,7 @@ static func _signal_horn() -> Resource:
 	c.card_name = "card.genghis_khan.signal_horn.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.signal_horn.archetype"
+	c.archetype = ["card.genghis_khan.signal_horn.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 2; ea.base_value = 2
 	var eb := EffRes.new()
@@ -246,7 +246,7 @@ static func _flanking() -> Resource:
 	c.card_name = "card.genghis_khan.flanking.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.flanking.archetype"
+	c.archetype = ["card.genghis_khan.flanking.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 35; ea.base_value = 35; ea.target = "ALL"; ea.damage_type = "blunt"
@@ -261,7 +261,7 @@ static func _genghis_fury() -> Resource:
 	c.card_name = "card.genghis_khan.genghis_fury.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.genghis_fury.archetype"
+	c.archetype = ["card.genghis_khan.genghis_fury.archetype"]
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
@@ -278,7 +278,7 @@ static func _cavalry_summon() -> Resource:
 	c.card_name = "card.genghis_khan.cavalry_summon.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.cavalry_summon.archetype"
+	c.archetype = ["card.genghis_khan.cavalry_summon.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SUMMON_TOKEN; ea.value = 1; ea.base_value = 1
 	var eb := EffRes.new()
@@ -291,7 +291,7 @@ static func _arrow_shower() -> Resource:
 	c.card_name = "card.genghis_khan.arrow_volley.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.arrow_volley.archetype"
+	c.archetype = ["card.genghis_khan.arrow_volley.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE
 	e.value = 60; e.base_value = 60; e.target = "ALL"; e.damage_type = "projectile"
@@ -303,7 +303,7 @@ static func _horde_advance() -> Resource:
 	c.card_name = "card.genghis_khan.horde_advance.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.horde_advance.archetype"
+	c.archetype = ["card.genghis_khan.horde_advance.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 25; ea.base_value = 25; ea.target = "ALL"; ea.damage_type = "blunt"
@@ -317,7 +317,7 @@ static func _war_horse_power() -> Resource:
 	c.card_name = "card.genghis_khan.war_horse_power.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.war_horse_power.archetype"
+	c.archetype = ["card.genghis_khan.war_horse_power.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.summon_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
@@ -331,7 +331,7 @@ static func _khans_banner() -> Resource:
 	c.card_name = "card.genghis_khan.khans_banner.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.khans_banner.archetype"
+	c.archetype = ["card.genghis_khan.khans_banner.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.token_bonus_dmg"; e.value = 8; e.base_value = 8; e.target = "SELF"
@@ -343,7 +343,7 @@ static func _horde_volley() -> Resource:
 	c.card_name = "card.genghis_khan.horde_volley.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.horde_volley.archetype"
+	c.archetype = ["card.genghis_khan.horde_volley.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_TOKEN
 	e.value = 50; e.base_value = 50; e.target = "ALL"; e.damage_type = "projectile"
@@ -355,7 +355,7 @@ static func _ten_thousand_army() -> Resource:
 	c.card_name = "card.genghis_khan.ten_thousand_army.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.ten_thousand_army.archetype"
+	c.archetype = ["card.genghis_khan.ten_thousand_army.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SUMMON_TOKEN; ea.value = 3; ea.base_value = 3
 	var eb := EffRes.new()
@@ -368,7 +368,7 @@ static func _cavalry_retreat() -> Resource:
 	c.card_name = "card.genghis_khan.cavalry_retreat.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.cavalry_retreat.archetype"
+	c.archetype = ["card.genghis_khan.cavalry_retreat.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK_ALL; e.value = 85; e.base_value = 85
 	c.effects = [e]; return c
@@ -379,7 +379,7 @@ static func _cavalry_encirclement() -> Resource:
 	c.card_name = "card.genghis_khan.cavalry_encirclement.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.cavalry_encirclement.archetype"
+	c.archetype = ["card.genghis_khan.cavalry_encirclement.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK_ALL; ea.value = 35; ea.base_value = 35
 	var eb := EffRes.new()
@@ -392,7 +392,7 @@ static func _plunderers_instinct() -> Resource:
 	c.card_name = "card.genghis_khan.plunderers_instinct.name"; c.owner_id = "genghis_khan"
 	c.cost = 0; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.plunderers_instinct.archetype"
+	c.archetype = ["card.genghis_khan.plunderers_instinct.archetype"]
 	c.is_exhaust = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.MULTI_HIT_RANDOM
@@ -409,7 +409,7 @@ static func _plunder() -> Resource:
 	c.card_name = "card.genghis_khan.loot.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.loot.archetype"
+	c.archetype = ["card.genghis_khan.loot.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 35; ea.base_value = 35; ea.target = "SINGLE"; ea.damage_type = "slash"
@@ -423,7 +423,7 @@ static func _hunters_bow() -> Resource:
 	c.card_name = "card.genghis_khan.execution_ground.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.execution_ground.archetype"
+	c.archetype = ["card.genghis_khan.execution_ground.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 80; e.base_value = 80; e.bonus_value = 170; e.base_bonus_value = 170
@@ -436,7 +436,7 @@ static func _spoils_collection() -> Resource:
 	c.card_name = "card.genghis_khan.spoils_distribution.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.spoils_distribution.archetype"
+	c.archetype = ["card.genghis_khan.spoils_distribution.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 1; ea.base_value = 1
 	var eb := EffRes.new()
@@ -449,7 +449,7 @@ static func _executioners_bounty() -> Resource:
 	c.card_name = "card.genghis_khan.executioners_bounty.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.executioners_bounty.archetype"
+	c.archetype = ["card.genghis_khan.executioners_bounty.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.on_kill_energy"; e.value = 1; e.base_value = 1; e.target = "SELF"
@@ -461,7 +461,7 @@ static func _massacre_khan() -> Resource:
 	c.card_name = "card.genghis_khan.massacre_khan.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.massacre_khan.archetype"
+	c.archetype = ["card.genghis_khan.massacre_khan.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 160; ea.base_value = 160; ea.target = "SINGLE"; ea.damage_type = "slash"
@@ -475,7 +475,7 @@ static func _khans_treasury() -> Resource:
 	c.card_name = "card.genghis_khan.khans_treasury.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.khans_treasury.archetype"
+	c.archetype = ["card.genghis_khan.khans_treasury.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.GAIN_MORALE; ea.value = 2; ea.base_value = 2
 	var eb := EffRes.new()
@@ -488,7 +488,7 @@ static func _war_tribute() -> Resource:
 	c.card_name = "card.genghis_khan.war_tribute.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.genghis_khan.war_tribute.archetype"
+	c.archetype = ["card.genghis_khan.war_tribute.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE
 	ea.value = 70; ea.base_value = 70; ea.target = "ALL"; ea.damage_type = "blunt"
@@ -502,7 +502,7 @@ static func _khans_gamble() -> Resource:
 	c.card_name = "card.genghis_khan.khans_gamble.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.genghis_khan.khans_gamble.archetype"
+	c.archetype = ["card.genghis_khan.khans_gamble.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 3; ea.base_value = 3

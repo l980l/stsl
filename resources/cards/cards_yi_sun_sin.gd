@@ -46,7 +46,7 @@ static func _turtleship_drill() -> Resource:
 	c.card_name = "card.yi_sun_sin.turtleship_drill.name"; c.owner_id = "yi_sun_sin"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.formation_bond.archetype"  # 학익진
+	c.archetype = ["card.yi_sun_sin.formation_bond.archetype"]  # 학익진
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BUFF_SPEED
 	e.value = 4; e.base_value = 4
@@ -63,7 +63,7 @@ static func _strike() -> Resource:
 	c.card_name = "card.yi_sun_sin.strike.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.strike.archetype"
+	c.archetype = ["card.yi_sun_sin.strike.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE; e.value = 100; e.base_value = 100; e.target = "SINGLE"
 	e.damage_type = "slash"
@@ -74,7 +74,7 @@ static func _defend() -> Resource:
 	c.card_name = "card.yi_sun_sin.defend.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.defend.archetype"
+	c.archetype = ["card.yi_sun_sin.defend.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK; e.value = 125; e.base_value = 125; e.target = "SELF"
 	c.effects = [e]; return c
@@ -85,7 +85,7 @@ static func _shield() -> Resource:
 	c.card_name = "card.yi_sun_sin.shield.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.shield.archetype"
+	c.archetype = ["card.yi_sun_sin.shield.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK; ea.value = 45; ea.base_value = 45
 	var eb := EffRes.new()
@@ -98,7 +98,7 @@ static func _counter_strike() -> Resource:
 	c.card_name = "card.yi_sun_sin.counter_strike.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.counter_strike.archetype"
+	c.archetype = ["card.yi_sun_sin.counter_strike.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK; ea.value = 50; ea.base_value = 50
 	var eb := EffRes.new()
@@ -116,7 +116,7 @@ static func _turtle_shield() -> Resource:
 	c.card_name = "card.yi_sun_sin.turtle_shield.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.turtle_shield.archetype"
+	c.archetype = ["card.yi_sun_sin.turtle_shield.archetype"]
 	c.is_retain = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BLOCK; e.value = 80; e.base_value = 80
@@ -128,7 +128,7 @@ static func _turtle_ship_charge() -> Resource:
 	c.card_name = "card.yi_sun_sin.turtle_ship_charge.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.turtle_ship_charge.archetype"
+	c.archetype = ["card.yi_sun_sin.turtle_ship_charge.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE; ea.value = 170; ea.base_value = 170; ea.target = "SINGLE"
 	ea.damage_type = "blunt"
@@ -143,7 +143,7 @@ static func _counter() -> Resource:
 	c.card_name = "card.yi_sun_sin.counter.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.counter.archetype"
+	c.archetype = ["card.yi_sun_sin.counter.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.COUNTER_BLOCK; ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
 	ea.damage_type = "blunt"
@@ -157,7 +157,7 @@ static func _turtle_power() -> Resource:
 	c.card_name = "card.yi_sun_sin.turtle_power.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.turtle_power.archetype"
+	c.archetype = ["card.yi_sun_sin.turtle_power.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.block_per_turn"; e.value = 60; e.base_value = 60; e.target = "SELF"
@@ -169,7 +169,7 @@ static func _cannon_rhythm() -> Resource:
 	c.card_name = "card.yi_sun_sin.cannon_rhythm.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.cannon_rhythm.archetype"
+	c.archetype = ["card.yi_sun_sin.cannon_rhythm.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.every_nth_attack_bonus"; e.value = 160; e.base_value = 160; e.target = "SELF"
@@ -182,7 +182,7 @@ static func _volley_fire() -> Resource:
 	c.card_name = "card.yi_sun_sin.volley_fire.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.volley_fire.archetype"
+	c.archetype = ["card.yi_sun_sin.volley_fire.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE; ea.value = 85; ea.base_value = 85; ea.target = "ALL"
 	ea.damage_type = "explosive"
@@ -196,7 +196,7 @@ static func _fleet_fire() -> Resource:
 	c.card_name = "card.yi_sun_sin.fleet_fire.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.fleet_fire.archetype"
+	c.archetype = ["card.yi_sun_sin.fleet_fire.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_TOKEN
 	e.value = 45; e.base_value = 45; e.target = "ALL"
@@ -209,7 +209,7 @@ static func _consecutive_defense() -> Resource:
 	c.card_name = "card.yi_sun_sin.consecutive_defense.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.consecutive_defense.archetype"
+	c.archetype = ["card.yi_sun_sin.consecutive_defense.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK; ea.value = 60; ea.base_value = 60
 	var eb := EffRes.new()
@@ -222,7 +222,7 @@ static func _charge_stance() -> Resource:
 	c.card_name = "card.yi_sun_sin.charge_stance.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.charge_stance.archetype"
+	c.archetype = ["card.yi_sun_sin.charge_stance.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE; ea.value = 100; ea.base_value = 100; ea.target = "SINGLE"
 	ea.damage_type = "blunt"
@@ -237,7 +237,7 @@ static func _iron_ram() -> Resource:
 	c.card_name = "card.yi_sun_sin.iron_ram.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.iron_ram.archetype"
+	c.archetype = ["card.yi_sun_sin.iron_ram.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DAMAGE; ea.value = 150; ea.base_value = 150; ea.target = "ALL"
@@ -256,7 +256,7 @@ static func _formation_bond() -> Resource:
 	c.card_name = "card.yi_sun_sin.formation_bond.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.formation_bond.archetype"
+	c.archetype = ["card.yi_sun_sin.formation_bond.archetype"]
 	c.is_innate = true
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 45; e.base_value = 45
@@ -268,7 +268,7 @@ static func _formation_boost() -> Resource:
 	c.card_name = "card.yi_sun_sin.formation_boost.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.formation_boost.archetype"
+	c.archetype = ["card.yi_sun_sin.formation_boost.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.FORMATION_BLOCK; e.value = 70; e.base_value = 70
 	c.effects = [e]; return c
@@ -279,7 +279,7 @@ static func _discipline() -> Resource:
 	c.card_name = "card.yi_sun_sin.discipline.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.discipline.archetype"
+	c.archetype = ["card.yi_sun_sin.discipline.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.GAIN_MORALE; ea.value = 2; ea.base_value = 2
 	var eb := EffRes.new()
@@ -292,7 +292,7 @@ static func _fleet_command() -> Resource:
 	c.card_name = "card.yi_sun_sin.fleet_command.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.fleet_command.archetype"
+	c.archetype = ["card.yi_sun_sin.fleet_command.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.draw_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
@@ -306,7 +306,7 @@ static func _formation_strength() -> Resource:
 	c.card_name = "card.yi_sun_sin.formation_strength.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.formation_strength.archetype"
+	c.archetype = ["card.yi_sun_sin.formation_strength.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.block_per_turn"; e.value = 100; e.base_value = 100; e.target = "SELF"
@@ -318,7 +318,7 @@ static func _hold_formation() -> Resource:
 	c.card_name = "card.yi_sun_sin.hold_formation.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.hold_formation.archetype"
+	c.archetype = ["card.yi_sun_sin.hold_formation.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK_ALL; ea.value = 120; ea.base_value = 120
 	var eb := EffRes.new()
@@ -332,7 +332,7 @@ static func _command_instinct() -> Resource:
 	c.card_name = "card.yi_sun_sin.command_instinct.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.command_instinct.archetype"
+	c.archetype = ["card.yi_sun_sin.command_instinct.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.FORMATION_BLOCK; ea.value = 125; ea.base_value = 125
 	var eb := EffRes.new()
@@ -345,7 +345,7 @@ static func _naval_training() -> Resource:
 	c.card_name = "card.yi_sun_sin.naval_training.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.naval_training.archetype"
+	c.archetype = ["card.yi_sun_sin.naval_training.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 1; ea.base_value = 1
 	var eb := EffRes.new()
@@ -358,7 +358,7 @@ static func _regroup() -> Resource:
 	c.card_name = "card.yi_sun_sin.regroup.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.regroup.archetype"
+	c.archetype = ["card.yi_sun_sin.regroup.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.HEAL_ALL; ea.value = 30; ea.base_value = 30
 	var eb := EffRes.new()
@@ -371,7 +371,7 @@ static func _strict_training() -> Resource:
 	c.card_name = "card.yi_sun_sin.strict_training.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.strict_training.archetype"
+	c.archetype = ["card.yi_sun_sin.strict_training.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.DRAW; ea.value = 2; ea.base_value = 2
 	var eb := EffRes.new()
@@ -388,7 +388,7 @@ static func _miraculous_recovery() -> Resource:
 	c.card_name = "card.yi_sun_sin.miraculous_recovery.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.miraculous_recovery.archetype"
+	c.archetype = ["card.yi_sun_sin.miraculous_recovery.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.HEAL; e.value = 75; e.base_value = 75; e.target = "SELF"
 	c.effects = [e]; return c
@@ -399,7 +399,7 @@ static func _all_in() -> Resource:
 	c.card_name = "card.yi_sun_sin.all_in.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.all_in.archetype"
+	c.archetype = ["card.yi_sun_sin.all_in.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP; ea.value = 60; ea.base_value = 60; ea.target = "SELF"
 	var eb := EffRes.new()
@@ -413,7 +413,7 @@ static func _last_stand() -> Resource:
 	c.card_name = "card.yi_sun_sin.last_stand.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.last_stand.archetype"
+	c.archetype = ["card.yi_sun_sin.last_stand.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP; ea.value = 80; ea.base_value = 80; ea.target = "SELF"
 	var eb := EffRes.new()
@@ -426,7 +426,7 @@ static func _death_resolve() -> Resource:
 	c.card_name = "card.yi_sun_sin.death_resolve.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.death_resolve.archetype"
+	c.archetype = ["card.yi_sun_sin.death_resolve.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.morale_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
@@ -440,7 +440,7 @@ static func _fighting_spirit() -> Resource:
 	c.card_name = "card.yi_sun_sin.fighting_spirit.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.fighting_spirit.archetype"
+	c.archetype = ["card.yi_sun_sin.fighting_spirit.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.MORALE_TO_BLOCK; e.value = 50; e.base_value = 50
 	c.effects = [e]; return c
@@ -451,7 +451,7 @@ static func _death_or_glory() -> Resource:
 	c.card_name = "card.yi_sun_sin.death_or_glory.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.death_or_glory.archetype"
+	c.archetype = ["card.yi_sun_sin.death_or_glory.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 100; e.base_value = 100
@@ -466,7 +466,7 @@ static func _crisis_breakthrough() -> Resource:
 	c.card_name = "card.yi_sun_sin.crisis_breakthrough.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.crisis_breakthrough.archetype"
+	c.archetype = ["card.yi_sun_sin.crisis_breakthrough.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 120; e.base_value = 120
@@ -481,7 +481,7 @@ static func _decisive_strike() -> Resource:
 	c.card_name = "card.yi_sun_sin.decisive_strike.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.decisive_strike.archetype"
+	c.archetype = ["card.yi_sun_sin.decisive_strike.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	e.value = 80; e.base_value = 80
@@ -496,7 +496,7 @@ static func _bloody_battle() -> Resource:
 	c.card_name = "card.yi_sun_sin.bloody_battle.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
-	c.archetype = "card.yi_sun_sin.bloody_battle.archetype"
+	c.archetype = ["card.yi_sun_sin.bloody_battle.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.CONDITIONAL_DMG
 	ea.value = 70; ea.base_value = 70
@@ -513,7 +513,7 @@ static func _phoenix() -> Resource:
 	c.card_name = "card.yi_sun_sin.phoenix.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = "card.yi_sun_sin.phoenix.archetype"
+	c.archetype = ["card.yi_sun_sin.phoenix.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.HEAL; ea.value = 140; ea.base_value = 140; ea.target = "SELF"
 	var eb := EffRes.new()
