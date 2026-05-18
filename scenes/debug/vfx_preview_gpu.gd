@@ -29,6 +29,8 @@ var _info: Label
 var _impact_label: Label
 var _compare_4way: bool = false
 var _mode: String = "gpu"  # "gpu" or "cpu" — 토글로 전환
+var _both_mode: bool = false  # true 면 한 번 클릭 시 GPU(좌) + CPU(우) 동시 spawn
+const _BOTH_X_OFFSET := 320.0  # both 모드 좌/우 offset
 
 func _ready() -> void:
 	var bg := ColorRect.new()
@@ -103,6 +105,11 @@ func _ready() -> void:
 	cmp_btn.toggled.connect(func(on: bool) -> void: _compare_4way = on)
 	panel.add_child(cmp_btn)
 
+	var both_btn := CheckBox.new()
+	both_btn.text = "Both 비교 (좌: GPU | 우: CPU 동시 spawn)"
+	both_btn.toggled.connect(func(on: bool) -> void: _both_mode = on)
+	panel.add_child(both_btn)
+
 	_info = Label.new()
 	panel.add_child(_info)
 	_update_info()
@@ -143,6 +150,11 @@ func _select_and_play(entry: Dictionary) -> void:
 	_play(entry)
 
 func _play(entry: Dictionary) -> void:
+	# Both 비교 모드 — 4-way 무시. 좌 (GPU, -X offset) / 우 (CPU, +X offset) 동시 spawn.
+	if _both_mode:
+		_spawn_single(entry, "gpu", Vector2(-_BOTH_X_OFFSET, 0.0), true)
+		_spawn_single(entry, "cpu", Vector2(_BOTH_X_OFFSET, 0.0), false)
+		return
 	var path: String = entry.get(_mode, "")
 	if path == "":
 		return
@@ -181,6 +193,28 @@ func _play(entry: Dictionary) -> void:
 		else:
 			_apply_ground_anchor(fx, _caster_pos, _target_pos)
 			fx.play(_caster_pos, _target_pos)
+
+# Both 모드 단일 spawn — 모드 (gpu/cpu) 별로 offset 적용. show_marker=true 면 impact label 부착.
+func _spawn_single(entry: Dictionary, mode: String, offset: Vector2, show_marker: bool) -> void:
+	var path: String = entry.get(mode, "")
+	if path == "":
+		return
+	var script: GDScript = load(path) as GDScript
+	var fx: Node2D = script.new()
+	add_child(fx)
+	fx.position = Vector2.ZERO
+	var label := "%s [%s]" % [entry["name"], mode.to_upper()]
+	if show_marker and fx.has_signal("screen_effect"):
+		fx.screen_effect.connect(_preview_flash)
+		fx.screen_effect.connect(_show_impact_marker.bind(label))
+	var t_pos: Vector2 = _target_pos + offset
+	var c_pos: Vector2 = _caster_pos + offset
+	if entry["name"] in _TARGET_ONLY_VFX:
+		c_pos = t_pos
+	_apply_ground_anchor(fx, c_pos, t_pos)
+	fx.play(c_pos, t_pos)
+	# 화면에 좌/우 라벨
+	_spawn_compare_label(t_pos, mode.to_upper())
 
 func _apply_ground_anchor(fx: Node2D, _c_center: Vector2, t_center: Vector2) -> void:
 	if not fx.has_method("set_ground_anchor"):
