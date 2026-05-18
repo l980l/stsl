@@ -5,10 +5,7 @@
 extends "res://scenes/vfx/poison_splash.gd"
 
 const _Helpers = preload("res://scenes/vfx/gpu_particle_helpers.gd")
-
-# 사용자 피드백 — 더 연한 녹색.
-const _COL_GAS_LIGHT := Color(0.80, 1.0, 0.55)
-const _COL_SPARK_LIGHT := Color(0.92, 1.0, 0.72)
+# COL_GAS / COL_SPARK / COL_DRIP 등 super 상수 그대로 사용 (원본 색).
 
 # trail emitters
 var _gpu_trail_drip: GPUParticles2D
@@ -50,7 +47,7 @@ func _spawn_trail(pos: Vector2) -> void:
 		# gas 42/s × lifetime 1.15 ≈ 48 동시. 위로 살짝.
 		_gpu_trail_gas = _Helpers.make_emitter({
 			"count": int(48 * _scale()), "lifetime": 1.15,
-			"color": _COL_GAS_LIGHT,
+			"color": COL_GAS,
 			"speed_min": 12.0, "speed_max": 30.0,
 			"direction": Vector2.UP, "spread": 25.0,
 			"gravity": -18.0, "damping": 3.0,  # -0.005 * 60²
@@ -96,7 +93,7 @@ func _spawn_splash(pos: Vector2) -> void:
 	add_child(drip)
 	# gas 50 burst — 큰 안개
 	var gas := _Helpers.make_emitter({
-		"count": _pcount(50), "lifetime": 1.85, "color": _COL_GAS_LIGHT,
+		"count": _pcount(50), "lifetime": 1.85, "color": COL_GAS,
 		"speed_min": 36.0, "speed_max": 186.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -28.8, "damping": 3.0,  # -0.008 * 60²
@@ -108,7 +105,7 @@ func _spawn_splash(pos: Vector2) -> void:
 	add_child(gas)
 	# spark 24 — 불씨 (가산)
 	var spark := _Helpers.make_emitter({
-		"count": _pcount(24), "lifetime": 1.35, "color": _COL_SPARK_LIGHT,
+		"count": _pcount(24), "lifetime": 1.35, "color": COL_SPARK,
 		"speed_min": 60.0, "speed_max": 240.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 0.0, "damping": 3.0,
@@ -130,7 +127,7 @@ func _spawn_ambient() -> void:
 	_amb_made = true
 	# gas 42/s × lifetime 2.0 ≈ 84 동시. 위쪽으로.
 	_gpu_amb_gas = _Helpers.make_emitter({
-		"count": int(84 * _scale()), "lifetime": 2.0, "color": _COL_GAS_LIGHT,
+		"count": int(84 * _scale()), "lifetime": 2.0, "color": COL_GAS,
 		"speed_min": 24.0, "speed_max": 54.0,
 		"direction": Vector2.UP, "spread": 18.0,
 		"gravity": -18.0, "damping": 3.0,

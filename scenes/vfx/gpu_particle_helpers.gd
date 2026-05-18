@@ -88,8 +88,8 @@ static func sparkle_tex() -> Texture2D:
 # 원본: draw_circle(r*0.85, COL_DRIP) + draw_circle(offset, r*0.3, COL_DRIP_HL).
 static func drip_tex() -> Texture2D:
 	if _drip_tex == null:
-		var col_body := Color(0.65, 0.92, 0.35)    # 연한 독성 녹
-		var col_hl := Color(0.92, 1.0, 0.75)        # 매우 연한 하이라이트
+		var col_body := Color(0.549, 0.824, 0.196)  # 원본 COL_DRIP
+		var col_hl := Color(0.863, 1.0, 0.627)       # 원본 COL_DRIP_HL
 		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
 		img.fill(Color.TRANSPARENT)
 		var cx := 31.5
@@ -123,8 +123,8 @@ static func drip_tex() -> Texture2D:
 # 64×64, 외곽 반경 28 (size_base 28).
 static func bubble_tex() -> Texture2D:
 	if _bubble_tex == null:
-		var col_body := Color(0.65, 0.92, 0.35)    # 연한 독성 녹
-		var col_hl := Color(0.92, 1.0, 0.75)
+		var col_body := Color(0.549, 0.824, 0.196)  # 원본 COL_DRIP
+		var col_hl := Color(0.863, 1.0, 0.627)       # 원본 COL_DRIP_HL
 		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
 		img.fill(Color.TRANSPARENT)
 		var cx := 31.5
