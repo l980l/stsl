@@ -10,9 +10,11 @@ static func fenrir_cub(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.norse.fenrir_cub"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.5]
-	# 페이즈0: strength 버프 후 공격 (매 루프 강해짐)
+	# 페이즈0: strength 버프 → 도발 (LOWEST_HP lock) → 공격 (매 루프 강해짐 + lock 강제)
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.BUFF; p0i1.status_type = "strength"; p0i1.value = 8
+	var p0i_taunt := IntentRes.new()
+	p0i_taunt.action_type = IntentRes.ActionType.DEBUFF; p0i_taunt.status_type = "taunt"; p0i_taunt.value = 2; p0i_taunt.target = IntentRes.TargetType.LOWEST_HP
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 170; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "slash"
 	# 페이즈1: 2연타
@@ -20,7 +22,7 @@ static func fenrir_cub(scene: PackedScene) -> Resource:
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "slash"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 200; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "slash"
-	e.phase_patterns = [[p0i1, p0i2], [p1i1, p1i2]]
+	e.phase_patterns = [[p0i1, p0i_taunt, p0i2], [p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
 	return e
 

@@ -147,7 +147,8 @@ const STATUS_INTERNAL_KEYS := [
 	"poison_dur", "counter_ratio", "damage_taken",
 	"greek_hubris_pending", "norse_ragnarok_fired",
 	"daoist_stance", "japanese_turn_count",
-	"charge_remaining", "_charge_block_advance"
+	"charge_remaining", "_charge_block_advance",
+	"taunt_source"  # 도발 시전자 추적용 — UI 표시 X (tooltip 에서만 사용)
 ]
 
 func _trf(key: String, args) -> String:
@@ -2257,6 +2258,7 @@ const _VFX_SIG_KARMA := preload("res://scenes/vfx/sig_karma.gd")
 const _VFX_SIG_YIN_YANG := preload("res://scenes/vfx/sig_yin_yang.gd")
 const _VFX_SIG_EGYPTIAN_CURSE := preload("res://scenes/vfx/sig_egyptian_curse.gd")
 const _VFX_SIG_KEKKAI := preload("res://scenes/vfx/sig_kekkai.gd")
+const _VFX_TAUNT := preload("res://scenes/vfx/taunt.gd")
 const _VFX_CARD_EXHAUST := preload("res://scenes/vfx/card_exhaust.gd")
 const _VFX_BOSS_DEATH := preload("res://scenes/vfx/boss_death.gd")
 
@@ -2551,6 +2553,14 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: St
 					var hpos2: Vector2 = _hero_pos_or_first(target_hero_id)
 					if hpos2 != Vector2.ZERO:
 						_spawn_slow_debuff(hpos2, hpos2 + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+			elif stype == "taunt":
+				# 도발 — 시전 적 위치에 chest impact + 영웅 화살표 + stamp
+				if intent.target == ir.TargetType.ALL:
+					for hpos_t in _all_living_hero_positions():
+						_spawn_taunt(caster_pos, caster_foot, hpos_t)
+				else:
+					var thpos: Vector2 = _hero_pos_or_first(target_hero_id)
+					_spawn_taunt(caster_pos, caster_foot, thpos)
 			else:
 				var fx_script: GDScript = _debuff_script_for_status(stype)
 				if fx_script:
@@ -2691,7 +2701,18 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, target_hero_id:
 						did_buff = true
 						spawned_this = true
 				else:
-					if not did_debuff:
+					# 도발 — 시전 영웅(caster_pos) 에서 chest impact + 영웅→적 화살표
+					if effect.status_type == "taunt":
+						if not did_debuff:
+							did_debuff = true
+							spawned_this = true
+							if effect.target == "ALL":
+								for i in range(_enemy_char_nodes.size()):
+									if BattleManager.is_enemy_alive(i) and _enemy_char_nodes[i]:
+										_spawn_taunt(caster_pos, caster_foot, _enemy_char_nodes[i].global_position)
+							elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
+								_spawn_taunt(caster_pos, caster_foot, _enemy_char_nodes[target_enemy_index].global_position)
+					elif not did_debuff:
 						var fx_script: GDScript = _debuff_script_for_status(effect.status_type)
 						if fx_script:
 							did_debuff = true
@@ -3456,6 +3477,22 @@ func _spawn_sig_kekkai(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) ->
 		AudioManager.play_sfx("impact_divine")
 	)
 	fx.play(target_pos, target_pos)
+
+# 도발 VFX — 시전 적 가슴에서 chest impact + shockwave + glyph + 한글 word + 파티클.
+# foot_pos: ground crack + dust 위치 anchor (정확한 발 위치).
+# target_pos: 도발 대상 영웅 위치 — 시전자→영웅 화살표 + 영웅 머리 위 stamp.
+func _spawn_taunt(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO, target_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_TAUNT.new()
+	add_child(fx)
+	fx.z_index = 1280
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		AudioManager.play_sfx("impact_blunt")
+	)
+	fx.play(caster_pos, target_pos)
 
 func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 	# VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 이미 차지 시작.
@@ -4289,6 +4326,23 @@ func _format_death_rattle_tooltip(dt: Resource) -> String:
 		_:
 			return tr("status.death_rattle.desc")
 
+# 적 enemy_index → 한글 적 이름 (tooltip 표시용). 적이 사망/이상 시 "?" 폴백.
+func _get_enemy_name_for_tooltip(enemy_index: int) -> String:
+	var er: Resource = BattleManager.get_enemy(enemy_index)
+	if er == null:
+		return "?"
+	var name_key: String = er.enemy_name
+	return tr(name_key) if name_key != "" else "?"
+
+# 영웅 hero_id → 한글 영웅 이름 (tooltip 표시용).
+func _get_hero_name_for_tooltip(hero_id: String) -> String:
+	if TeamManager == null:
+		return hero_id
+	for hero in TeamManager.heroes:
+		if hero.hero_id == hero_id:
+			return tr(hero.hero_name) if hero.hero_name != "" else hero_id
+	return hero_id
+
 func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	var tex: Texture2D = IconUtils.get_status_icon(key)
 	var tooltip: String = _trf("status.%s.desc" % key, val)
@@ -4299,6 +4353,21 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 		for ins in status[key]:
 			lines.append("%s%d / %d턴" % [sign_str, int(ins.get("value", 0)), int(ins.get("dur", 0))])
 		tooltip = "%s\n  " % _trf("status.%s.desc" % key, val) + "\n  ".join(lines)
+	# taunt — 부여자(source) 에 따라 tooltip 의 이름 분기.
+	# - 영웅 status 에 적용: source = enemy_index (int) → 적 이름 표시
+	# - 적 status 에 적용: source = hero_id (string) → 영웅 이름 표시
+	# 양쪽 다 "X 의 도발 — 시전자만 공격 가능" 의미. 게이머 UI 통일.
+	elif key == "taunt":
+		var src = status.get("taunt_source", null)
+		var src_name: String = ""
+		if typeof(src) == TYPE_STRING and src != "":
+			src_name = _get_hero_name_for_tooltip(src)
+		elif typeof(src) == TYPE_INT and src >= 0:
+			src_name = _get_enemy_name_for_tooltip(src)
+		if src_name != "":
+			tooltip = tr("status.taunt.desc.locked") % src_name
+		else:
+			tooltip = tr("status.taunt.desc")
 
 	if tex != null:
 		var hbox := HBoxContainer.new()

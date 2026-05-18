@@ -698,6 +698,9 @@ func _phase_hero_post(hid: String) -> bool:
 			if not _hero_status.has(hid):
 				_hero_status[hid] = {}
 			_hero_status[hid][stype] = cur - 1
+			# 도발 0 도달 시 taunt_source 도 정리 (적 부여 도발의 lock 해제)
+			if stype == "taunt" and _hero_status[hid][stype] == 0 and _hero_status[hid].has("taunt_source"):
+				_hero_status[hid].erase("taunt_source")
 			did_work = true
 	# speed_bonus / speed_penalty — Array of {value, dur}. 각 instance dur -1, dur<=0 인 인스턴스 제거
 	for key in ["speed_bonus", "speed_penalty"]:
@@ -719,6 +722,11 @@ func _phase_hero_post(hid: String) -> bool:
 func play_card(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> bool:
 	if not is_player_turn or not is_battle_active:
 		return false
+	# 적 부여 도발 lock — 시전 영웅이 적이 부여한 taunt 상태면 SINGLE 효과 타겟을 그 적으로 강제.
+	# ALL 타겟 카드는 영향 X (자연스럽게 모든 적 포함). 도발 적이 이미 사망했으면 lock 해제 (cleanup 이 처리).
+	var lock_idx: int = _get_taunt_lock_target(card.owner_id)
+	if lock_idx >= 0 and _card_has_single_target(card):
+		target_enemy_index = lock_idx
 	# ATTACK 카드 단일 타겟 — 사망 예정(앞 카드 누적으로 effective_hp 0) 적 거부
 	if target_enemy_index >= 0 and is_enemy_doomed(target_enemy_index) and _card_has_damage(card):
 		return false
@@ -728,6 +736,38 @@ func play_card(card: Resource, target_enemy_index: int, target_hero_id: String =
 	_track_card_type_counters(card)
 	_start_card_effects(card, target_enemy_index, target_hero_id)  # fire-and-forget
 	return true
+
+# 시전 영웅이 적 부여 도발 상태면 lock 대상 적 index 반환. 아니면 -1.
+# 도발 적이 이미 사망했으면 cleanup 이 source 를 지운 상태이므로 -1.
+func _get_taunt_lock_target(owner_id: String) -> int:
+	var status: Dictionary = _hero_status.get(owner_id, {})
+	if status.get("taunt", 0) <= 0:
+		return -1
+	var src: int = status.get("taunt_source", -1)
+	if src < 0 or src >= _enemy_status.size():
+		return -1
+	# 적이 살아있나? 죽었으면 cleanup hook 이 곧 정리하지만 그 전에 사용 시 안전.
+	if team_mgr == null or _is_enemy_dead(src):
+		return -1
+	return src
+
+# 카드의 효과 중 SINGLE 타겟이 하나라도 있으면 true. 모두 SELF/ALL/SELF면 false.
+func _card_has_single_target(card: Resource) -> bool:
+	for eff in card.effects:
+		if eff.target == "SINGLE":
+			return true
+	return false
+
+# 적 사망 여부 (battle_manager 가 자체 추적). _enemy_hp_remaining 또는 _enemy_block 등 활용 어렵다면
+# team_mgr 의 적 시스템 통해 확인. 가장 안전: _enemy_max_hp 와 누적 데미지 비교 대신,
+# 이미 battle_scene 이 enemy_died 시 panel.queue_free 하므로 _enemy_status 가 비어있으면 죽음.
+func _is_enemy_dead(enemy_index: int) -> bool:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return true
+	# _enemy_status 는 사망 시 클리어되지 않음 — 별도 alive 마커 필요. 안전한 폴백: hp 0 여부.
+	if _enemy_hp.size() > enemy_index and _enemy_hp[enemy_index] <= 0:
+		return true
+	return false
 
 # play_card 를 동기로 유지하면서 _apply_card_effects 의 await 패턴을 흡수.
 func _start_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String) -> void:
@@ -1019,7 +1059,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					if effect.target == "ALL":
 						for i in range(_enemies.size()):
 							if _enemy_alive[i]:
-								_apply_status_to_enemy(i, effect.status_type, _as_stacks)
+								if effect.status_type == "taunt":
+									_apply_taunt_to_enemy(i, _as_stacks, card.owner_id)
+								else:
+									_apply_status_to_enemy(i, effect.status_type, _as_stacks)
 					elif effect.target == "SELF":
 						_apply_status_to_hero(card.owner_id, effect.status_type, _as_stacks)
 					elif effect.target == "ALL_ALLIES":
@@ -1031,7 +1074,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						_apply_status_to_hero(ally_id, effect.status_type, _as_stacks)
 					else:
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-							_apply_status_to_enemy(target_enemy_index, effect.status_type, _as_stacks)
+							if effect.status_type == "taunt":
+								_apply_taunt_to_enemy(target_enemy_index, _as_stacks, card.owner_id)
+							else:
+								_apply_status_to_enemy(target_enemy_index, effect.status_type, _as_stacks)
 			EffectRes.EffectType.DRAW:
 				if deck_mgr:
 					deck_mgr.draw_cards(effect.value)
@@ -1521,6 +1567,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 		_fire_death_trigger(enemy_index)
 		# 시그니처 hook: 사망 (불교 인과응보)
 		SignatureSys.on_enemy_death(self, enemy_index)
+		_cleanup_enemy_status_on_death(enemy_index)
 		enemy_died.emit(enemy_index)
 		for _pke in _active_powers:
 			if _pke.split(":")[0] == "power.on_kill_energy":
@@ -1560,6 +1607,11 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 	if status_type == "poison":
 		_enemy_status[enemy_index]["poison_dmg"] = _enemy_status[enemy_index].get("poison_dmg", 0) + stacks
 		_enemy_status[enemy_index]["poison_dur"] = 3
+	elif status_type == "taunt":
+		# 도발 — source 는 _apply_taunt_to_enemy 가 별도로 처리하므로 여기서는 단순 max 만.
+		# (직접 호출 시 fallback. 일반 흐름에선 _apply_taunt_to_enemy 사용.)
+		var cur: int = _enemy_status[enemy_index].get("taunt", 0)
+		_enemy_status[enemy_index]["taunt"] = max(cur, stacks)
 	elif status_type == "charm":
 		var new_charm: int = _enemy_status[enemy_index].get("charm", 0) + stacks
 		# power.charm_threshold_minus: 임계치 하향 (모든 영웅의 합산)
@@ -1581,6 +1633,43 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 		_enemy_status[enemy_index][status_type] = _enemy_status[enemy_index].get(status_type, 0) + stacks
 	status_applied.emit("enemy_%d" % enemy_index, status_type, stacks)
 
+# 영웅이 적에게 도발 부여 — source 비교로 누적/덮어쓰기 결정.
+# - 같은 source (이미 그 영웅이 도발 중) → 지속 시간 합산 (스택 누적)
+# - 다른 source → 기존 덮어쓰기 (max 가 아니라 value 로 강제 갱신) + source 교체
+# - 신규 → value 설정 + source 등록
+func _apply_taunt_to_enemy(enemy_index: int, value: int, source_hero_id: String) -> void:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return
+	var cur_src: String = _enemy_status[enemy_index].get("taunt_source", "")
+	var cur_val: int = _enemy_status[enemy_index].get("taunt", 0)
+	if cur_src == source_hero_id and cur_val > 0:
+		# 같은 시전자 — 누적
+		_enemy_status[enemy_index]["taunt"] = cur_val + value
+	else:
+		# 다른 시전자 또는 신규 — 덮어쓰기 + source 교체
+		_enemy_status[enemy_index]["taunt"] = value
+		_enemy_status[enemy_index]["taunt_source"] = source_hero_id
+	status_applied.emit("enemy_%d" % enemy_index, "taunt", _enemy_status[enemy_index]["taunt"])
+
+# 적이 영웅에게 도발 부여 — 대칭 로직.
+func _apply_taunt_to_hero(hero_id: String, value: int, source_enemy_index: int) -> void:
+	if not _hero_status.has(hero_id):
+		_hero_status[hero_id] = {}
+	var cur_src: int = _hero_status[hero_id].get("taunt_source", -1)
+	var cur_val: int = _hero_status[hero_id].get("taunt", 0)
+	if cur_src == source_enemy_index and cur_val > 0:
+		_hero_status[hero_id]["taunt"] = cur_val + value
+	else:
+		_hero_status[hero_id]["taunt"] = value
+		_hero_status[hero_id]["taunt_source"] = source_enemy_index
+	status_applied.emit(hero_id, "taunt", _hero_status[hero_id]["taunt"])
+
+# Legacy 호환 (테스트가 직접 호출). 신규 코드는 _apply_taunt_to_enemy 사용 권장.
+func _set_enemy_taunt_source(enemy_index: int, hero_id: String) -> void:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return
+	_enemy_status[enemy_index]["taunt_source"] = hero_id
+
 func _apply_status_to_hero(hero_id: String, status_type: String, stacks: int) -> void:
 	if not _hero_status.has(hero_id):
 		_hero_status[hero_id] = {}
@@ -1601,6 +1690,8 @@ func _tick_hero_poison(hero_id: String) -> void:
 		return
 	var tick_amt: int = dmg * POISON_DMG_PER_STACK
 	team_mgr.take_damage(hero_id, tick_amt)
+	# 데미지 popup 표시용 — battle_scene._on_hero_damaged 가 popup·VFX 처리 (_tick_enemy_poison 대칭)
+	hero_damaged.emit(hero_id, tick_amt, "poison")
 	poison_tick_applied.emit(hero_id, tick_amt)
 	dur -= 1
 	if dur <= 0:
@@ -1628,6 +1719,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 		_enemy_alive[enemy_index] = false
 		_remove_from_queue(_actor_id_for_enemy(enemy_index))
 		_fire_death_trigger(enemy_index)
+		_cleanup_enemy_status_on_death(enemy_index)
 		enemy_died.emit(enemy_index)
 		_check_win_condition()
 
@@ -1672,6 +1764,8 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 		await _await_vfx_impact(_VFX_WARRIOR_BUFF.IMPACT_DELAY + 0.5)
 		if not is_battle_active:
 			return
+	# weak/vulnerable: 자기 턴 시작 시 -1 (즉시 본인 행동에 영향 없음 — 표준 디버프 decay)
+	# taunt: 부여 시점부터 N turn 유지가 자연스러우므로 turn 종료 시점에 decay (아래 turn_ended 직전)
 	for stype: String in ["weak", "vulnerable"]:
 		if _enemy_status[i].get(stype, 0) > 0:
 			_enemy_status[i][stype] -= 1
@@ -1743,6 +1837,14 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 				_enemy_status[i].erase("_charge_block_advance")
 			else:
 				_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
+	# 적 turn 종료 시 도발 decay — 부여 시점부터 N turn 유지 보장 (시작 decay 대신).
+	if i < _enemy_status.size():
+		var t_cur: int = _enemy_status[i].get("taunt", 0)
+		if t_cur > 0:
+			_enemy_status[i]["taunt"] = t_cur - 1
+			if _enemy_status[i]["taunt"] == 0 and _enemy_status[i].has("taunt_source"):
+				_enemy_status[i].erase("taunt_source")
+				status_applied.emit("enemy_%d" % i, "taunt", 0)
 	if not legacy:
 		if is_battle_active:
 			_advance_turn_counter(_current_actor_id)
@@ -1753,15 +1855,16 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 	# 단일 타겟 인텐트는 시그널 emit 전에 영웅 타겟 미리 결정 — battle_scene 이 정확한 영웅 위치에 VFX 표시
 	var pre_target_id: String = ""
 	if intent.target != IntentRes.TargetType.ALL:
+		# 영웅 공격성 인텐트 모두 action_type 전달 → _pick_hero_target 의 도발 우회 작동
 		match intent.action_type:
 			IntentRes.ActionType.ATTACK:
 				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 			IntentRes.ActionType.DEBUFF:
-				pre_target_id = _pick_hero_target(intent.target, enemy_index)
+				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.DEBUFF)
 			IntentRes.ActionType.MARK_TARGET:
-				pre_target_id = _pick_hero_target(intent.target, enemy_index)
+				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.MARK_TARGET)
 			IntentRes.ActionType.MIMIC:
-				pre_target_id = _pick_hero_target(intent.target, enemy_index)
+				pre_target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.MIMIC)
 	# VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생
 	intent_vfx_charge_start.emit(enemy_index, intent, pre_target_id)
 	var _delay := _intent_vfx_impact_delay(intent)
@@ -1841,7 +1944,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			else:
 				var target_id: String = pre_target_id
 				if target_id == "" or (team_mgr and not team_mgr.is_alive(target_id)):
-					target_id = _pick_hero_target(intent.target, enemy_index)
+					target_id = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.DEBUFF)
 				if target_id != "":
 					if _is_speed:
 						var _ds_aid2: String = "hero:" + target_id
@@ -1853,6 +1956,9 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 						_hero_status[target_id][stype].append({"value": intent.value, "dur": max(1, intent.duration)})
 						_adjust_turn_queue_for_speed_change(_ds_aid2, _ds_old_sp2)
 						status_applied.emit(target_id, stype, intent.value)
+					elif stype == "taunt":
+						# 적 부여 도발 — 같은 적 추가 부여 시 누적, 다른 적이면 덮어쓰기.
+						_apply_taunt_to_hero(target_id, intent.value, enemy_index)
 					else:
 						_apply_status_to_hero(target_id, stype, intent.value)
 		IntentRes.ActionType.SPECIAL:
@@ -1898,7 +2004,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			_enemy_status[enemy_index]["counter_pool"] = 0
 		IntentRes.ActionType.MARK_TARGET:
 			# T3-MARK: 한 영웅 마킹 — 마킹 동안 그 enemy의 ATTACK +50% 데미지
-			var mark_target: String = _pick_hero_target(intent.target, enemy_index)
+			var mark_target: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.MARK_TARGET)
 			if mark_target != "" and team_mgr:
 				if not _hero_status.has(mark_target):
 					_hero_status[mark_target] = {}
@@ -1998,15 +2104,32 @@ func _execute_special(_enemy_index: int, intent: Resource) -> void:
 		_:
 			push_warning("[battle_manager] 알 수 없는 SPECIAL variant: %s" % variant)
 
-func _get_taunting_heroes() -> Array:
-	var result: Array = []
-	if team_mgr == null:
-		return result
-	for hero in team_mgr.get_living_heroes():
-		var status: Dictionary = _hero_status.get(hero.hero_id, {})
-		if status.get("taunt", 0) > 0:
-			result.append(hero.hero_id)
-	return result
+# 적 사망 시 그 적이 부여한 영웅 status 정리 (taunt_source, marked_by).
+# enemy_died.emit 전에 호출 — UI 가 갱신된 status 를 읽도록.
+func _cleanup_enemy_status_on_death(enemy_index: int) -> void:
+	for hid in _hero_status.keys():
+		var status: Dictionary = _hero_status[hid]
+		# 도발: source 가 이 적이면 즉시 해제
+		if status.get("taunt_source", -1) == enemy_index:
+			status["taunt"] = 0
+			status.erase("taunt_source")
+			status_applied.emit(hid, "taunt", 0)
+		# marked_by: 이 적이 Array 에 있으면 제거 (다른 적이 부여한 마크는 유지)
+		var marked: Array = status.get("marked_by", [])
+		if marked.has(enemy_index):
+			marked.erase(enemy_index)
+			status["marked_by"] = marked
+			status_applied.emit(hid, "marked_by", marked.size())
+
+# 영웅 사망 시 그 영웅이 부여한 적 status 정리 (taunt_source).
+# 영웅이 부여한 도발은 그 영웅이 죽으면 강제 타겟이 없어지므로 해제.
+func _cleanup_hero_status_on_death(hero_id: String) -> void:
+	for i in range(_enemy_status.size()):
+		var status: Dictionary = _enemy_status[i]
+		if status.get("taunt_source", "") == hero_id:
+			status["taunt"] = 0
+			status.erase("taunt_source")
+			status_applied.emit("enemy_%d" % i, "taunt", 0)
 
 func _pick_highest_hp(hero_ids: Array) -> String:
 	if hero_ids.is_empty():
@@ -2026,11 +2149,20 @@ func _pick_hero_target(target_type: int, enemy_index: int, action_type: int = -1
 	var living: Array = team_mgr.get_living_heroes()
 	if living.is_empty():
 		return ""
-	# 도발 우회: ATTACK 인텐트이면 도발 영웅 강제 선택
-	if action_type == IntentRes.ActionType.ATTACK:
-		var taunters: Array = _get_taunting_heroes()
-		if taunters.size() > 0:
-			return _pick_highest_hp(taunters)
+	# 도발 우회: 영웅 공격성 인텐트 (ATTACK / DEBUFF / MARK_TARGET / MIMIC) 가 영웅에게 도발당했으면
+	# → 그 시전 영웅 강제 타겟. ALLY 타겟 (HEAL_ALLY / BUFF_ALLY) 은 도발 무관 (적간 효과).
+	# 단 매혹/반함 (charm 또는 enthrall) 이 우선 — 매혹된 적은 도발 시전자에게 끌리지 않음.
+	var is_hero_offensive: bool = action_type == IntentRes.ActionType.ATTACK \
+		or action_type == IntentRes.ActionType.DEBUFF \
+		or action_type == IntentRes.ActionType.MARK_TARGET \
+		or action_type == IntentRes.ActionType.MIMIC
+	if is_hero_offensive and enemy_index >= 0 and enemy_index < _enemy_status.size():
+		var has_charm_cc: bool = _enemy_status[enemy_index].get("charm", 0) > 0 \
+			or _enemy_status[enemy_index].get("enthrall", 0) > 0
+		var taunt_v: int = _enemy_status[enemy_index].get("taunt", 0)
+		var src_hid: String = _enemy_status[enemy_index].get("taunt_source", "")
+		if taunt_v > 0 and src_hid != "" and team_mgr.is_alive(src_hid) and not has_charm_cc:
+			return src_hid
 	match target_type:
 		IntentRes.TargetType.RANDOM:
 			return living[randi() % living.size()].hero_id
@@ -2054,6 +2186,7 @@ func debug_instant_win() -> void:
 		if _enemy_alive[i]:
 			_enemy_hp[i] = 0
 			_enemy_alive[i] = false
+			_cleanup_enemy_status_on_death(i)
 			enemy_died.emit(i)
 	is_battle_active = false
 	_restore_stolen_cards()
@@ -2206,6 +2339,7 @@ func _on_hero_revived_clear_state(hero_id: String) -> void:
 
 func _on_hero_died_queue(hero_id: String) -> void:
 	_remove_from_queue(_actor_id_for_hero(hero_id))
+	_cleanup_hero_status_on_death(hero_id)
 
 func _evaluate_condition(cond: String, _card: Resource) -> bool:
 	match cond:
@@ -2446,6 +2580,7 @@ func debug_set_enemy_hp(index: int, hp: int) -> void:
 	if hp == 0 and _enemy_alive[index]:
 		_enemy_alive[index] = false
 		_remove_from_queue(_actor_id_for_enemy(index))
+		_cleanup_enemy_status_on_death(index)
 		enemy_died.emit(index)
 		_check_win_condition()
 	elif hp > 0 and not _enemy_alive[index]:
