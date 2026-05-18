@@ -28,9 +28,9 @@ var _amb_made: bool = false
 func _spawn_trail(pos: Vector2) -> void:
 	if not _trail_made:
 		_trail_made = true
-		# drip 60/s × lifetime 0.95 ≈ 57 동시. 떨어짐 (vel.y +).
+		# drip — spawn 3배 (사용자 요청). count 57→171, lifetime 동일.
 		_gpu_trail_drip = _Helpers.make_emitter({
-			"count": int(57 * _scale()), "lifetime": 0.95,
+			"count": int(171 * _scale()), "lifetime": 0.95,
 			"color": Color.WHITE,
 			"speed_min": 12.0, "speed_max": 36.0,
 			"direction": Vector2.DOWN, "spread": 25.0,
@@ -44,9 +44,9 @@ func _spawn_trail(pos: Vector2) -> void:
 			"start_alpha": 0.9, "mid_alpha": 0.45, "end_alpha": 0.0,
 		})
 		add_child(_gpu_trail_drip)
-		# gas 42/s × lifetime 1.15 ≈ 48 동시. 위로 살짝. 색 splash 와 통일.
+		# gas — spawn 3배. count 48→144.
 		_gpu_trail_gas = _Helpers.make_emitter({
-			"count": int(48 * _scale()), "lifetime": 1.15,
+			"count": int(144 * _scale()), "lifetime": 1.15,
 			"color": COL_HOT,
 			"speed_min": 12.0, "speed_max": 30.0,
 			"direction": Vector2.UP, "spread": 25.0,
