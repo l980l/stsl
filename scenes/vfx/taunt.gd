@@ -50,6 +50,8 @@ var _caster := Vector2.ZERO
 var _target := Vector2.ZERO      # 도발 대상 영웅 (화살표 + stamp 표시용). ZERO 면 미표시.
 var _ground_pos := Vector2.ZERO
 var _has_ground: bool = false
+# "Attention!" 텍스트 3개의 랜덤 속성 (rotation/scale/offset). _ready 에서 한 번 결정.
+var _word_inst: Array = []
 
 func set_ground_anchor(pos: Vector2) -> void:
 	_ground_pos = pos
@@ -69,6 +71,14 @@ var _smoke_layer: Node2D # smoke/dust particles (normal blend)
 
 func _ready() -> void:
 	set_process(false)
+	# Attention! 3개 — 각각 랜덤 회전 (-60~60도) · 크기 (0.7~1.0) · 위치 오프셋
+	_word_inst.clear()
+	for _i in range(3):
+		_word_inst.append({
+			"rot": deg_to_rad(randf_range(-60.0, 60.0)),
+			"scale": randf_range(0.7, 1.0),
+			"offset": Vector2(randf_range(-50.0, 50.0), randf_range(-20.0, 20.0)),
+		})
 	_bg_layer = _DrawLayer.new()
 	_bg_layer.setup(self, false)  # ground crack — normal blend
 	add_child(_bg_layer)
@@ -215,15 +225,15 @@ func _draw_glow_pass(canvas: CanvasItem) -> void:
 		else:
 			col = Color(1.0, (140.0 - 60.0 * k) / 255.0, (80.0 - 40.0 * k) / 255.0, a * 0.9)
 			canvas.draw_circle(Vector2(p["x"], p["y"]), float(p["size"]), col)
-	# word "TAUNT" — 타겟 머리 위 (target_pos 있을 때만)
-	if _impact_emitted and _target != Vector2.ZERO:
+	# "Attention!" 3개 — 시전자 머리 위, 랜덤 회전·크기·오프셋
+	if _impact_emitted:
 		_draw_word(canvas, ga)
 	# 타겟 → 시전자 점선 흡입 (방향 반전)
 	if _target != Vector2.ZERO:
 		_draw_suction_line(canvas, ga)
 
 func _draw_word(canvas: CanvasItem, ga: float) -> void:
-	# "TAUNT" 영문 — 타겟 머리 위
+	# "Attention!" 3개 — 시전자 머리 위, 각 인스턴스마다 랜덤 회전·크기·오프셋
 	var word_age: float = _age - IMPACT_DELAY
 	if word_age < 0.0:
 		return
@@ -240,19 +250,24 @@ func _draw_word(canvas: CanvasItem, ga: float) -> void:
 		theme_font = sacred.theme.default_font
 	if theme_font == null:
 		theme_font = ThemeDB.fallback_font
-	var text := "TAUNT"
-	var fsize: int = int(36 * _scale())
-	var shake_x: float = sin(word_age * 90.0) * 1.5 * _scale()
-	var shake_y: float = cos(word_age * 110.0) * 1.0 * _scale()
-	var pos := _target + Vector2(shake_x, WORD_OFFSET_Y + shake_y)
-	var size_v: Vector2 = theme_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize)
-	var draw_pos: Vector2 = pos - Vector2(size_v.x * 0.5, 0.0)
-	# 그림자 (붉음)
-	canvas.draw_string(theme_font, draw_pos + Vector2(0.0, 3.0), text,
-		HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_DEEP.r, COL_DEEP.g, COL_DEEP.b, alpha * 0.9))
-	# 본체 (흰)
-	canvas.draw_string(theme_font, draw_pos, text,
-		HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha))
+	var text := "Attention!"
+	var base_fsize: int = int(30 * _scale())
+	var origin := _caster + Vector2(0.0, WORD_OFFSET_Y)
+	for inst in _word_inst:
+		var fsize: int = int(base_fsize * float(inst["scale"]))
+		var size_v: Vector2 = theme_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize)
+		var rot: float = float(inst["rot"])
+		var center: Vector2 = origin + inst["offset"]
+		# 회전 적용 — canvas 변환 사용
+		canvas.draw_set_transform(center, rot, Vector2.ONE)
+		var draw_pos := Vector2(-size_v.x * 0.5, 0.0)
+		# 그림자 (붉음)
+		canvas.draw_string(theme_font, draw_pos + Vector2(0.0, 3.0), text,
+			HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_DEEP.r, COL_DEEP.g, COL_DEEP.b, alpha * 0.9))
+		# 본체 (흰)
+		canvas.draw_string(theme_font, draw_pos, text,
+			HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha))
+	canvas.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 # ── 타겟 → 시전자 점선 (성장) ──
 # 점선이 타겟 위에서 시작해 시전자 방향으로 점차 길어지며 이어지는 느낌.
