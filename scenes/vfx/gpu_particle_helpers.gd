@@ -161,6 +161,8 @@ static func make_emitter(opts: Dictionary) -> GPUParticles2D:
 	ps.local_coords = false  # 부모(_target 따라가지 않음 — 발화 시점 좌표 고정)
 
 	var mat := ParticleProcessMaterial.new()
+	# 2D 모드 명시 — z-축 disable. 안 하면 angular_velocity 가 3D 회전이라 2D 평면에서 안 보일 수 있음.
+	mat.particle_flag_disable_z = true
 	# emission shape
 	var shape: String = opts.get("emission_shape", "point")
 	match shape:
