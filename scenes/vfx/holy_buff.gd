@@ -237,8 +237,9 @@ func _draw_pillar(canvas: CanvasItem) -> void:
 		return
 	var pulse: float = 0.85 + sin(_pillar_age * (TAU / 1.4)) * 0.10
 	var alpha: float = grow * fade * pulse
-	var bottom_y := _target.y
-	var top_y := _target.y - PILLAR_HEIGHT * grow
+	# 빛기둥 시작은 발바닥 (set_ground_anchor 로 주입). fallback: target 위치.
+	var bottom_y: float = _ground_pos.y if _has_ground else _target.y
+	var top_y := bottom_y - PILLAR_HEIGHT * grow
 	var w_bottom := PILLAR_WIDTH * grow
 	var w_top := PILLAR_WIDTH * 0.3 * grow
 	canvas.draw_colored_polygon(PackedVector2Array([

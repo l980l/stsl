@@ -1162,13 +1162,13 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 				if relic.owner_hero_id != "":
 					var k_ph: String = "power.bonus_per_hit:" + relic.owner_hero_id
 					var cur_ph: int = bm_rs._active_powers.get(k_ph, {}).get("value", 0)
-					bm_rs._active_powers[k_ph] = {"value": cur_ph + amount}
+					bm_rs._active_powers[k_ph] = {"value": cur_ph + amount, "owner_id": relic.owner_hero_id, "params": {}}
 			else:
 				# 영웅 전체 데미지 보너스
 				for hero in tm.heroes:
 					var k_sp: String = "power.strength_player:" + hero.hero_id
 					var cur_sp: int = bm_rs._active_powers.get(k_sp, {}).get("value", 0)
-					bm_rs._active_powers[k_sp] = {"value": cur_sp + amount}
+					bm_rs._active_powers[k_sp] = {"value": cur_sp + amount, "owner_id": hero.hero_id, "params": {}}
 
 func _build_relic_pool() -> Array:
 	return _RelicData.build_pool()

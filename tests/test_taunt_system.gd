@@ -29,6 +29,11 @@ func run_all() -> Dictionary:
 	test_enemy_attack_forced_to_taunter()
 	test_enemy_taunt_cleared_on_hero_death()
 	test_enemy_taunt_decays_each_turn()
+	# 마킹 (영웅 → 적) + 치명타 시스템
+	test_crit_roll_base_rate_no_mark()
+	test_crit_roll_higher_rate_with_mark()
+	test_crit_doubles_damage_when_triggered()
+	test_enemy_marked_by_cleared_on_hero_death()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -222,6 +227,65 @@ func test_enemy_taunt_cleared_on_hero_death() -> void:
 	var st: Dictionary = bm._enemy_status[0]
 	_assert(st.get("taunt", -1) == 0, "시전 영웅 사망 → 적 taunt 0")
 	_assert(not st.has("taunt_source"), "시전 영웅 사망 → taunt_source 제거")
+
+# ── 마킹 (영웅 → 적) + 치명타 시스템 ──
+
+# 13) _roll_crit_damage 기본 확률 ~5% (1000회 굴림)
+func test_crit_roll_base_rate_no_mark() -> void:
+	print("[TestTauntSystem] test_crit_roll_base_rate_no_mark")
+	var bm := _make_bm()
+	var crits := 0
+	for _i in range(1000):
+		var r: Dictionary = bm._roll_crit_damage(100, false)
+		if r["is_crit"]:
+			crits += 1
+	# 5% 기본 → 1000회 ≈ 50 (±25 허용)
+	_assert(crits >= 20 and crits <= 80, "기본 5%% crit rate ≈ 50/1000 (실제: %d)" % crits)
+
+# 14) _roll_crit_damage with mark → ~35% rate
+func test_crit_roll_higher_rate_with_mark() -> void:
+	print("[TestTauntSystem] test_crit_roll_higher_rate_with_mark")
+	var bm := _make_bm()
+	var crits := 0
+	for _i in range(1000):
+		var r: Dictionary = bm._roll_crit_damage(100, true)
+		if r["is_crit"]:
+			crits += 1
+	# 35% (5% + 30% mark bonus) → 1000회 ≈ 350 (±50 허용)
+	_assert(crits >= 280 and crits <= 420, "마킹 35%% crit rate ≈ 350/1000 (실제: %d)" % crits)
+
+# 15) is_crit 시 데미지 ×2
+func test_crit_doubles_damage_when_triggered() -> void:
+	print("[TestTauntSystem] test_crit_doubles_damage_when_triggered")
+	var bm := _make_bm()
+	# 시드 굴리지 않고 결과 자체 검증 — 100회 굴려서 crit 결과만 모음
+	var saw_crit: bool = false
+	var saw_normal: bool = false
+	for _i in range(100):
+		var r: Dictionary = bm._roll_crit_damage(100, true)
+		if r["is_crit"]:
+			saw_crit = true
+			_assert(r["dmg"] == 200, "crit 시 dmg 100 → 200")
+			if saw_normal: break
+		else:
+			saw_normal = true
+			_assert(r["dmg"] == 100, "non-crit 시 dmg 100 그대로")
+			if saw_crit: break
+	_assert(saw_crit and saw_normal, "100회 굴림으로 crit + non-crit 모두 관찰")
+
+# 16) 영웅 사망 시 적 status.marked_by 의 그 영웅 ID 제거
+func test_enemy_marked_by_cleared_on_hero_death() -> void:
+	print("[TestTauntSystem] test_enemy_marked_by_cleared_on_hero_death")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 10))
+	bm.team_mgr.add_hero(_make_hero("genghis_khan", 100))
+	bm.setup_battle([_make_dummy_enemy(100)])
+	# 두 영웅 모두 적 마킹
+	bm._enemy_status[0]["marked_by"] = ["napoleon", "genghis_khan"]
+	bm._cleanup_hero_status_on_death("napoleon")
+	var arr: Array = bm._enemy_status[0].get("marked_by", [])
+	_assert(not arr.has("napoleon"), "사망 영웅 napoleon 마킹 제거")
+	_assert(arr.has("genghis_khan"), "살아있는 영웅 genghis_khan 마킹 유지")
 
 # 12) 적 turn 시작 (_phase_enemy_pre 또는 동등 로직) → taunt -1, 0 도달 시 source 정리
 func test_enemy_taunt_decays_each_turn() -> void:

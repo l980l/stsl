@@ -49,9 +49,9 @@ func test_napoleon_rarity_distribution() -> void:
 	var pool: Array = gm._napoleon_card_pool()
 	_assert(pool.size() == 31, "나폴레옹 풀 31장 (H6 재설계 + speed)")
 	var counts: Dictionary = _count_rarities(pool)
-	# COMMON 4: 기병위협, 참호구축, 전열재편, 진격나팔
+	# COMMON 5: 기병위협, 참호구축, 전열재편, 진격나팔, 정찰(마킹)
 	_assert(counts["COMMON"] == 5, "나폴레옹 COMMON 5장 (실제: %d)" % counts["COMMON"])
-	# UNCOMMON 10: 경기병돌격, 황제의권능, 근위대돌격, 포병집결, 황실포병대, 군단진격, 그랑다르메방패, 황제의의지, 영광의함성, 전격진군 (정찰 → COMMON 이동)
+	# UNCOMMON 10
 	_assert(counts["UNCOMMON"] == 10, "나폴레옹 UNCOMMON 10장 (실제: %d)" % counts["UNCOMMON"])
 	# RARE 12: 아우스터리츠기동, 정복칙령, 일기당천, 아르콜레돌파, 알프스횡단, 제국보병소집, 황제군단, 포병일제사격, 보로디노포격, 독수리군기, 승리포고, 황제포위령
 	_assert(counts["RARE"] == 12, "나폴레옹 RARE 12장 (실제: %d)" % counts["RARE"])
@@ -168,9 +168,9 @@ func test_genghis_rarity_distribution() -> void:
 	var pool: Array = GhisCards.pool()
 	_assert(pool.size() == 31, "칭기즈칸 풀 31장 (H5 재설계 + speed)")
 	var counts: Dictionary = _count_rarities(pool)
-	# COMMON 5: 급습, 기마도하, 기병소집, 화살세례, 노획
+	# COMMON 5: 급습, 기마도하, 기병소집, 화살세례, 노획(마킹)
 	_assert(counts["COMMON"] == 5, "칭기즈칸 COMMON 5장 (실제: %d)" % counts["COMMON"])
-	# UNCOMMON 12: 돌격, 사막기마, 칸의분노, 신호나팔, 측면우회, 호드진군, 기병후퇴, 기병포위망, 처형대, 전리품배분, 칸의보고, 전쟁의대가
+	# UNCOMMON 12
 	_assert(counts["UNCOMMON"] == 12, "칭기즈칸 UNCOMMON 12장 (실제: %d)" % counts["UNCOMMON"])
 	# RARE 12: 기동의권능, 만리원정, 붉은지평선, 칭기즈광기, 군마의권능, 칸의깃발, 토큰일제사격, 천만의군세, 약탈자의본능, 칸의도박, 처형현상금, 기마돌격 (speed)
 	_assert(counts["RARE"] == 12, "칭기즈칸 RARE 12장 (실제: %d)" % counts["RARE"])

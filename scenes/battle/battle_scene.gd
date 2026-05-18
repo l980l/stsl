@@ -1082,10 +1082,11 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 		char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
 		char_node.scale = Vector2(-1.44, 2.4)
 		char_node.z_index = int(slot_pos.y + SLOT_H)
-		# 발 그림자
+		# 발 그림자 — char_node 메타에 저장 (사망 시 제거)
 		var foot_pos := Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + SLOT_H - 4)
-		_add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
+		var sh_node := _add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
 		add_child(char_node)
+		char_node.set_meta("ground_shadow", sh_node)
 		_enemy_char_nodes[enemy_index] = char_node
 	else:
 		var placeholder := ColorRect.new()
@@ -1218,10 +1219,11 @@ func _setup_heroes() -> void:
 			char_node.scale = Vector2(1.44, 2.4)
 			# 발 위치(=panel 발) 기준 z_index — fg sprite 와 동일 규칙
 			char_node.z_index = int(slot_pos.y + SLOT_H)
-			# 발 그림자 — 캐릭터 z 보다 1 작음 (캐릭터 아래, fg/bg 위)
+			# 발 그림자 — 캐릭터 z 보다 1 작음 (캐릭터 아래, fg/bg 위) — char_node 메타에 저장
 			var foot_pos := Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + SLOT_H - 4)
-			_add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
+			var sh_hero := _add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
 			add_child(char_node)
+			char_node.set_meta("ground_shadow", sh_hero)
 			_hero_char_nodes[hero.hero_id] = char_node
 
 		_hero_status_containers[hero.hero_id] = entry["status_box"]
@@ -1275,10 +1277,11 @@ func _setup_enemies() -> void:
 			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
 			char_node.scale = Vector2(-1.44, 2.4)
 			char_node.z_index = int(slot_pos.y + SLOT_H)
-			# 발 그림자
+			# 발 그림자 — char_node 메타에 저장 (사망 시 제거)
 			var foot_pos := Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + SLOT_H - 4)
-			_add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
+			var sh_enemy := _add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
 			add_child(char_node)
+			char_node.set_meta("ground_shadow", sh_enemy)
 			_enemy_char_nodes[i] = char_node
 		else:
 			var placeholder := ColorRect.new()
@@ -2723,6 +2726,12 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, target_hero_id:
 										_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[i].global_position, effect.status_type, _foot_pos(_enemy_char_nodes[i]))
 							elif target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
 								_spawn_debuff_beam_simple(fx_script, caster_pos, _enemy_char_nodes[target_enemy_index].global_position, effect.status_type, _foot_pos(_enemy_char_nodes[target_enemy_index]))
+			elif et == EffectResource.EffectType.MARK_ENEMY:
+				# 마킹 — 시전 영웅(caster) → 적(target) 방향 target_marking VFX 재활용
+				if target_enemy_index >= 0 and target_enemy_index < _enemy_char_nodes.size() and BattleManager.is_enemy_alive(target_enemy_index):
+					var _me_pos: Vector2 = _enemy_char_nodes[target_enemy_index].global_position
+					_spawn_target_marking(caster_pos, _me_pos, _me_pos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+					spawned_this = true
 			elif et == EffectResource.EffectType.CHARM:
 				if not did_debuff:
 					did_debuff = true
@@ -3494,7 +3503,7 @@ func _spawn_taunt(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO, target_
 	)
 	fx.play(caster_pos, target_pos)
 
-func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
+func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "", is_crit: bool = false) -> void:
 	# VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 이미 차지 시작.
 	# 데미지 시그널은 임팩트 시점이므로 — 피격 피드백 즉시 (UI·팝업·플래시·틴트·hurt 애니).
 	# 빔이 없는 dtype (slash 등 impact-only) 은 별도 _spawn_impact_particles.
@@ -3503,7 +3512,11 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "") -> void:
 		if entry["hero_id"] == hero_id and entry["panel"].visible:
 			var panel: ColorRect = entry["panel"]
 			var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
-			_spawn_damage_popup(popup_pos, amount, amount == 0, hero_id)
+			if is_crit and amount > 0:
+				# 치명타 popup — 노랑/오렌지 + "CRIT" 텍스트 + 큰 폰트
+				_spawn_popup(popup_pos, "CRIT %d" % amount, Color(1.0, 0.85, 0.3), 48, hero_id)
+			else:
+				_spawn_damage_popup(popup_pos, amount, amount == 0, hero_id)
 			break
 	var char_node = _hero_char_nodes.get(hero_id)
 	if char_node:
@@ -3572,12 +3585,15 @@ func _on_token_attack_fired(hero_id: String, token_index: int, enemy_index: int)
 	tw.tween_property(soldier, "position", hero_node.position, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tw.tween_callback(soldier.queue_free)
 
-func _on_enemy_damaged(index: int, amount: int, dtype: String = "") -> void:
+func _on_enemy_damaged(index: int, amount: int, dtype: String = "", is_crit: bool = false) -> void:
 	_update_enemy_ui(index)
 	if index < _enemy_nodes.size() and _enemy_nodes[index]["panel"].visible:
 		var panel: ColorRect = _enemy_nodes[index]["panel"]
 		var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
-		_spawn_damage_popup(popup_pos, amount, amount == 0, "enemy_%d" % index)
+		if is_crit and amount > 0:
+			_spawn_popup(popup_pos, "CRIT %d" % amount, Color(1.0, 0.85, 0.3), 48, "enemy_%d" % index)
+		else:
+			_spawn_damage_popup(popup_pos, amount, amount == 0, "enemy_%d" % index)
 	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
 	if char_node:
 		_play_hit_flash(char_node)
@@ -4031,8 +4047,8 @@ func _spawn_tree_part(path: String, anchor: Vector2, sc: float, tint: Color, z_i
 		spr.material = mat
 	add_child(spr)
 
-# 타원 그림자 (Polygon2D 24각형). target 의 자식으로 추가.
-func _add_ground_shadow(target: Node, pos: Vector2, rx: float, ry: float, alpha: float, z_idx: int) -> void:
+# 타원 그림자 (Polygon2D 24각형). target 의 자식으로 추가. 생성된 노드 반환 (캐릭터 사망 시 제거용).
+func _add_ground_shadow(target: Node, pos: Vector2, rx: float, ry: float, alpha: float, z_idx: int) -> Polygon2D:
 	var shadow := Polygon2D.new()
 	shadow.color = Color(0, 0, 0, alpha)
 	var pts := PackedVector2Array()
@@ -4042,6 +4058,7 @@ func _add_ground_shadow(target: Node, pos: Vector2, rx: float, ry: float, alpha:
 	shadow.polygon = pts
 	shadow.z_index = z_idx
 	target.add_child(shadow)
+	return shadow
 
 
 # 현재 act 의 신화 키 (parallax 배경 팔레트용)
@@ -4109,6 +4126,17 @@ func _run_or_defer_death(key: String, death_fx: Callable) -> void:
 	else:
 		death_fx.call()
 
+func _fade_out_ground_shadow(char_node: Node) -> void:
+	if char_node == null or not char_node.has_meta("ground_shadow"):
+		return
+	var sh: Node = char_node.get_meta("ground_shadow")
+	if not is_instance_valid(sh):
+		return
+	var tw := create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	tw.tween_property(sh, "modulate:a", 0.0, 0.4)
+	tw.tween_callback(sh.queue_free)
+	char_node.remove_meta("ground_shadow")
+
 func _on_enemy_died(index: int) -> void:
 	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
 	var enemy_res: Resource = BattleManager.get_enemy(index)
@@ -4116,6 +4144,7 @@ func _on_enemy_died(index: int) -> void:
 	var death_fx := func() -> void:
 		AudioManager.play_sfx("enemy_death")
 		_update_enemy_ui(index)
+		_fade_out_ground_shadow(char_node)
 		if char_node:
 			if is_boss:
 				_spawn_boss_death(char_node.global_position, _foot_pos(char_node))
@@ -4150,6 +4179,7 @@ func _on_hero_died(hero_id: String) -> void:
 		# 스프라이트: death 애니메이션 없으면 코드 페이드아웃
 		var char_node = _hero_char_nodes.get(hero_id)
 		if char_node:
+			_fade_out_ground_shadow(char_node)
 			_spawn_death_dissolve(char_node.global_position)
 			# 영웅 사망 순간 킬캠 (옵션 켜져있으면)
 			_play_kill_cam(char_node.global_position)
@@ -4368,6 +4398,18 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 			tooltip = tr("status.taunt.desc.locked") % src_name
 		else:
 			tooltip = tr("status.taunt.desc")
+	# marked_by — Array. 적용 대상 (영웅/적) 으로 desc 분기.
+	# - 영웅 status: Array of enemy_index → 적 공격이 그 영웅에 치명타 +30%
+	# - 적 status: Array of hero_id → 모든 영웅 공격이 그 적에 치명타 +30%
+	elif key == "marked_by":
+		var arr_m: Array = status.get("marked_by", [])
+		if arr_m.size() > 0:
+			# arr 원소 타입으로 판단 — int (영웅 status) vs string (적 status)
+			var first = arr_m[0]
+			if typeof(first) == TYPE_STRING:
+				tooltip = tr("status.marked_by.desc.on_enemy")
+			else:
+				tooltip = tr("status.marked_by.desc.on_hero")
 
 	if tex != null:
 		var hbox := HBoxContainer.new()
@@ -4493,8 +4535,12 @@ func _refresh_status_icons_enemy(index: int) -> void:
 			var sig_lbl: Control = _make_status_label(sig_key, 1, {})
 			SacredTheme.attach_tooltip(sig_lbl, _trf("signature.%s.desc" % enemy_res.mythology, 0))
 			box.add_child(sig_lbl)
+	# marked_by — Array (영웅 ID list). 비어있지 않으면 아이콘 + 부여 영웅 수 표시.
+	var marked_by_arr: Array = status.get("marked_by", [])
+	if marked_by_arr.size() > 0:
+		box.add_child(_make_status_label("marked_by", marked_by_arr.size(), status))
 	for key in status:
-		if key in STATUS_INTERNAL_KEYS:
+		if key in STATUS_INTERNAL_KEYS or key == "marked_by":
 			continue
 		# speed_bonus / speed_penalty — Array 합산
 		if key in ["speed_bonus", "speed_penalty"] and typeof(status[key]) == TYPE_ARRAY:
@@ -5150,6 +5196,9 @@ func _card_target_type(card: Resource) -> String:
 				if effect.target == "SINGLE":
 					return "enemy"
 			EffectRes.EffectType.CHARM:
+				if effect.target == "SINGLE":
+					return "enemy"
+			EffectRes.EffectType.MARK_ENEMY:
 				if effect.target == "SINGLE":
 					return "enemy"
 			EffectRes.EffectType.COUNTER_BLOCK, \

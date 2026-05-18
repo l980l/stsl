@@ -120,6 +120,13 @@ const VFX_LEGACY := [
 
 const VFX_LIST := VFX_CURRENT + VFX_LEGACY  # 호환성 유지 (다른 코드가 참조 시)
 
+# 인게임 캐릭터 sprite 영역 — battle_scene SLOT_W=240 / SLOT_H=280 / _CHAR_FOOT_Y_OFFSET=96 기준
+# 시각화는 1:2 사각형 (가로:세로 = 96:192) — 캐릭터 노드 global_position 이 사각형 center,
+# 발 (foot) 은 center + (0, _CHAR_FOOT_Y_OFFSET).
+const _SPRITE_W := 96.0
+const _SPRITE_H := 192.0
+const _CHAR_FOOT_Y_OFFSET := 96.0  # battle_scene 과 동일 (SLOT_H 280 - 184)
+
 var _caster_pos := Vector2(420, 540)
 var _target_pos := Vector2(1500, 540)
 var _dragging: int = -1  # 0=시전자, 1=타겟, -1=없음
@@ -503,11 +510,7 @@ func _play(entry: Dictionary) -> void:
 					# 시전자 마커 무시, 타겟 위치를 중심·발치로
 					if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "taunt", "boss_death"]:
 						c_pos = t_pos
-						if fx_n.has_method("set_ground_anchor"):
-							fx_n.set_ground_anchor(t_pos)
-					# target_marking / mimic / steal_card 은 caster→target 둘 다 사용 — 타겟 발치만 anchor
-					elif entry["name"] in ["target_marking", "mimic", "steal_card"] and fx_n.has_method("set_ground_anchor"):
-						fx_n.set_ground_anchor(t_pos)
+					_apply_ground_anchor(fx_n, entry["name"], c_pos, t_pos)
 					if i == 2:
 						# x0.5 인스턴스만 임팩트 마커 (4개가 거의 동시 발동 — 라벨은 1개)
 						fx_n.screen_effect.connect(_preview_flash)
@@ -546,18 +549,11 @@ func _play(entry: Dictionary) -> void:
 					return
 				# 시전자 마커 무시, 타겟 위치를 중심·발치로
 				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "boss_death"]:
-					if fx.has_method("set_ground_anchor"):
-						fx.set_ground_anchor(_target_pos)
+					_apply_ground_anchor(fx, entry["name"], _target_pos, _target_pos)
 					fx.play(_target_pos, _target_pos)
-				elif entry["name"] == "taunt":
-					# 도발은 caster→target 둘 다 사용 + caster 발치 anchor
-					if fx.has_method("set_ground_anchor"):
-						fx.set_ground_anchor(_caster_pos)
-					fx.play(_caster_pos, _target_pos)
 				else:
-					# target_marking / mimic / steal_card 은 caster→target 둘 다 사용 — 타겟 발치만 anchor
-					if entry["name"] in ["target_marking", "mimic", "steal_card"] and fx.has_method("set_ground_anchor"):
-						fx.set_ground_anchor(_target_pos)
+					# caster→target 둘 다 사용 — 발치 anchor 는 entry 종류에 맞춰 자동 결정
+					_apply_ground_anchor(fx, entry["name"], _caster_pos, _target_pos)
 					fx.play(_caster_pos, _target_pos)
 		"impact":
 			var packed := load(entry["path"]) as PackedScene
@@ -665,15 +661,30 @@ func _preview_flash() -> void:
 	tw.tween_property(r, "modulate:a", 0.0, 0.3)
 	tw.tween_callback(r.queue_free)
 
+func _sprite_rect(center: Vector2) -> Rect2:
+	return Rect2(center - Vector2(_SPRITE_W * 0.5, _SPRITE_H * 0.5), Vector2(_SPRITE_W, _SPRITE_H))
+
+func _foot_pos(center: Vector2) -> Vector2:
+	return center + Vector2(0.0, _CHAR_FOOT_Y_OFFSET)
+
+# 인게임과 동일하게 발 위치 anchor 주입. set_ground_anchor 지원 VFX 전부 대상.
+# 대부분 target 발 anchor — 단 taunt 는 caster 발에서 발화하므로 예외.
+func _apply_ground_anchor(fx: Node2D, vfx_name: String, c_center: Vector2, t_center: Vector2) -> void:
+	if not fx.has_method("set_ground_anchor"):
+		return
+	var anchor: Vector2 = _foot_pos(c_center) if vfx_name == "taunt" else _foot_pos(t_center)
+	fx.set_ground_anchor(anchor)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_SPACE:
 		_play(_selected)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			var m := get_global_mouse_position()
-			if m.distance_to(_caster_pos) < 30.0:
+			# 사각형 내부 클릭으로 drag 판정 (인게임 sprite 영역과 동일)
+			if _sprite_rect(_caster_pos).has_point(m):
 				_dragging = 0
-			elif m.distance_to(_target_pos) < 30.0:
+			elif _sprite_rect(_target_pos).has_point(m):
 				_dragging = 1
 			else:
 				_target_pos = m
@@ -689,11 +700,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		queue_redraw()
 
 func _draw() -> void:
-	draw_circle(_caster_pos, 14.0, Color(1.0, 0.8, 0.3, 0.9))
-	draw_circle(_target_pos, 14.0, Color(1.0, 0.4, 0.4, 0.9))
+	# 인게임 캐릭터 sprite 영역 (1:2 사각형) — center=pos, bottom 중앙=foot
+	_draw_actor(_caster_pos, Color(1.0, 0.8, 0.3, 0.9), "시전자")
+	_draw_actor(_target_pos, Color(1.0, 0.4, 0.4, 0.9), "타겟")
+
+func _draw_actor(center: Vector2, col: Color, label: String) -> void:
+	var rect := _sprite_rect(center)
+	# 사각형 외곽 + 반투명 fill
+	draw_rect(rect, Color(col.r, col.g, col.b, 0.10), true)
+	draw_rect(rect, col, false, 1.5)
+	# 중심 (=인게임 노드 global_position 기준점)
+	draw_circle(center, 4.0, col)
+	# 발 위치 (=set_ground_anchor 로 주입되는 점) — 십자가 표시
+	var foot := _foot_pos(center)
+	var foot_col := Color(col.r, col.g, col.b, 1.0)
+	draw_line(foot - Vector2(8.0, 0.0), foot + Vector2(8.0, 0.0), foot_col, 2.0)
+	draw_line(foot - Vector2(0.0, 4.0), foot + Vector2(0.0, 4.0), foot_col, 2.0)
 	var font := ThemeDB.fallback_font
-	draw_string(font, _caster_pos + Vector2(-22.0, -22.0), "시전자", HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
-	draw_string(font, _target_pos + Vector2(-16.0, -22.0), "타겟", HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
+	draw_string(font, rect.position + Vector2(-2.0, -6.0), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+	draw_string(font, foot + Vector2(10.0, 4.0), "foot", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(col.r, col.g, col.b, 0.7))
 
 # card_exhaust preview 용 — 실제 게임 CardScene + CardResource 인스턴스 (게임 프레임 그대로)
 func _make_dummy_card(center: Vector2) -> Control:
