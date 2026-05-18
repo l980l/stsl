@@ -238,7 +238,7 @@ func _generate_cards() -> void:
 	md += "> 이 파일은 `tools/generate_catalog.gd`로 자동 생성됩니다. 직접 수정 금지.\n"
 	md += "> 재생성: `godot --headless -s tools/generate_catalog.gd`\n\n"
 
-	var csv_rows: Array = [["영웅", "이름", "코스트", "타입", "희귀도", "최대강화", "효과_0강", "효과_1강", "효과_2강"]]
+	var csv_rows: Array = [["영웅", "이름", "코스트", "타입", "희귀도", "최대강화", "효과_0강", "효과_1강"]]
 
 	for hero in heroes:
 		var cls = hero["cls"]
@@ -263,36 +263,34 @@ func _generate_cards() -> void:
 			var max_lv: int = card.max_upgrade_level()
 			var eff0: String = _format_effects(card)
 			var eff1: String = "—" if max_lv < 1 else _format_effects(_apply_upgrade(card, 1))
-			var eff2: String = "—" if max_lv < 2 else _format_effects(_apply_upgrade(card, 2))
 			csv_rows.append([
 				hero["id"], tr(card.card_name), card.cost,
 				_card_type_name(card.card_type),
 				_rarity_name(card.rarity),
-				max_lv, eff0, eff1 if max_lv >= 1 else "", eff2 if max_lv >= 2 else ""
+				max_lv, eff0, eff1 if max_lv >= 1 else ""
 			])
 
 		# 카드 풀
 		var pool: Array = cls.pool()
 		md += "### 카드 풀 (%d종)\n\n" % pool.size()
-		md += "| 이름 | 코스트 | 타입 | 희귀도 | 0강 | 1강 | 2강 |\n"
-		md += "|------|--------|------|--------|-----|-----|-----|\n"
+		md += "| 이름 | 코스트 | 타입 | 희귀도 | 0강 | 1강 |\n"
+		md += "|------|--------|------|--------|-----|-----|\n"
 
 		for card in pool:
 			var max_lv: int = card.max_upgrade_level()
 			var eff0: String = _format_effects(card)
 			var eff1: String = "—" if max_lv < 1 else _format_effects(_apply_upgrade(card, 1))
-			var eff2: String = "—" if max_lv < 2 else _format_effects(_apply_upgrade(card, 2))
-			md += "| %s | %d | %s | %s | %s | %s | %s |\n" % [
+			md += "| %s | %d | %s | %s | %s | %s |\n" % [
 				tr(card.card_name), card.cost,
 				_card_type_name(card.card_type),
 				_rarity_name(card.rarity),
-				eff0, eff1, eff2
+				eff0, eff1
 			]
 			csv_rows.append([
 				hero["id"], tr(card.card_name), card.cost,
 				_card_type_name(card.card_type),
 				_rarity_name(card.rarity),
-				max_lv, eff0, eff1 if max_lv >= 1 else "", eff2 if max_lv >= 2 else ""
+				max_lv, eff0, eff1 if max_lv >= 1 else ""
 			])
 		md += "\n"
 
@@ -623,7 +621,7 @@ func _write_readme() -> void:
 	md += "## 수정 금지\n\n이 폴더의 `.md`/`.csv` 파일은 자동 생성됩니다. 직접 수정하지 마세요.\n"
 	md += "내용을 바꾸려면 원본(`resources/cards/`, `resources/enemies/`, `resources/events/`, `resources/relics/`)을 수정한 뒤 재생성하세요.\n\n"
 	md += "## 파일 구성\n\n"
-	md += "- `cards.md` / `cards.csv` — 영웅별 카드 (나폴레옹/클레오파트라/이순신/잔다르크/칭기즈칸/무사시), 강화 0/1/2강\n"
+	md += "- `cards.md` / `cards.csv` — 영웅별 카드 (나폴레옹/클레오파트라/이순신/잔다르크/칭기즈칸/무사시), 강화 0/1강\n"
 	md += "- `enemies.md` / `enemies.csv` — 신화별 적 (그리스/북유럽/이집트/한국/중국/일본, 일반/엘리트/보스), 인텐트 전수\n"
 	md += "- `relics.md` / `relics.csv` — 공용 렐릭 풀, 저주 penalty 포함\n"
 	md += "- `events.md` / `events.csv` — Act별 이벤트, 선택지 전수\n"

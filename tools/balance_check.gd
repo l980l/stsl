@@ -30,8 +30,8 @@ const RETAIN_B    := 0.4
 const SACR_PER_10 := -0.04
 
 const RARITY_MULT  := [1.0, 1.1, 1.2, 1.3, 1.4]
-# rarity 인덱스 → game_manager.upgrade_card의 rate (COMMON=0 변화 없음)
-const UPGRADE_RATE := [0.0, 0.10, 0.12, 0.14, 0.16]
+# rarity 인덱스 → game_manager.upgrade_card 의 rate
+const UPGRADE_RATE := [0.08, 0.10, 0.12, 0.14, 0.16]
 const UPGRADE_CP_STEP := 0.15  # 강화 1회당 기대 CP 증가율
 
 const AVG_HAND          := 4.0

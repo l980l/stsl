@@ -538,6 +538,7 @@ func upgrade_card(card: Resource) -> void:
 
 	var rate: float = 0.0
 	match card.rarity:
+		CardRes.Rarity.COMMON:     rate = 0.08
 		CardRes.Rarity.UNCOMMON:   rate = 0.10
 		CardRes.Rarity.RARE:       rate = 0.12
 		CardRes.Rarity.LEGENDARY:  rate = 0.14
