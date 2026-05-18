@@ -36,7 +36,7 @@ func _spawn_trail(pos: Vector2) -> void:
 			"direction": Vector2.UP, "spread": 25.0,
 			"gravity": 0.0, "damping": 3.0,
 			"size_min": 8.0, "size_max": 16.0,
-			"size_base": 16.0,  # heart_tex 단위 반경
+			"size_base": 32.0,  # heart_unit size 32 매핑 (원본 _heart_polygon(s = size/32))  # heart_tex 단위 반경
 			"angle_min": -180.0, "angle_max": 180.0,
 			"angular_velocity_min": -18.0, "angular_velocity_max": 18.0,
 			"texture": _Helpers.heart_tex(),
@@ -103,7 +103,7 @@ func _spawn_impact_burst(pos: Vector2) -> void:
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -43.2, "damping": 3.0,  # 0.012 * 60²
 		"size_min": 14.0, "size_max": 30.0,
-		"size_base": 16.0,
+		"size_base": 32.0,  # heart_unit size 32 매핑 (원본 _heart_polygon(s = size/32))
 		"angle_min": -180.0, "angle_max": 180.0,
 		"angular_velocity_min": -24.0, "angular_velocity_max": 24.0,
 		"texture": _Helpers.heart_tex(),
@@ -112,13 +112,15 @@ func _spawn_impact_burst(pos: Vector2) -> void:
 	})
 	heart_rose.position = pos
 	add_child(heart_rose)
+	# 원본: heart 솔리드는 tint 무관 항상 COL_MID. violet 은 가산 헤일로만 영향.
+	# 두번째 heart emitter — 같은 COL_MID 솔리드 (violet 분량 8개를 다른 spawn 으로).
 	var heart_violet := _Helpers.make_emitter({
-		"count": _pcount(8), "lifetime": 1.8, "color": COL_VIOLET,
+		"count": _pcount(8), "lifetime": 1.8, "color": COL_MID,
 		"speed_min": 90.0, "speed_max": 360.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -43.2, "damping": 3.0,
 		"size_min": 14.0, "size_max": 30.0,
-		"size_base": 16.0,
+		"size_base": 32.0,
 		"angle_min": -180.0, "angle_max": 180.0,
 		"angular_velocity_min": -24.0, "angular_velocity_max": 24.0,
 		"texture": _Helpers.heart_tex(),
@@ -127,6 +129,21 @@ func _spawn_impact_burst(pos: Vector2) -> void:
 	})
 	heart_violet.position = pos
 	add_child(heart_violet)
+	# violet 헤일로 가산 (원본 _draw_glow_pass 의 _tint_color(tint) alpha 0.11)
+	# size*1.4 (원본), 8개 (violet tint 분량)
+	var halo_violet := _Helpers.make_emitter({
+		"count": _pcount(8), "lifetime": 1.8, "color": COL_VIOLET,
+		"speed_min": 90.0, "speed_max": 360.0,
+		"direction": Vector2.UP, "spread": 180.0,
+		"gravity": -43.2, "damping": 3.0,
+		"size_min": 14.0 * 1.4, "size_max": 30.0 * 1.4,
+		"angle_min": -180.0, "angle_max": 180.0,
+		"angular_velocity_min": -24.0, "angular_velocity_max": 24.0,
+		"texture": _Helpers.circle_tex(),
+		"start_alpha": 0.11, "mid_alpha": 0.055, "end_alpha": 0.0,
+	})
+	halo_violet.position = pos
+	add_child(halo_violet)
 	# petal 40 — circle_tex (작은 원형 폴리곤), 회전. COL_MID 핑크.
 	var petal := _Helpers.make_emitter({
 		"count": _pcount(40), "lifetime": 2.05, "color": COL_MID,
@@ -185,7 +202,7 @@ func _spawn_ambient() -> void:
 		"direction": Vector2.UP, "spread": 25.0,
 		"gravity": 0.0, "damping": 3.0,
 		"size_min": 8.0, "size_max": 18.0,
-		"size_base": 16.0,
+		"size_base": 32.0,  # heart_unit size 32 매핑 (원본 _heart_polygon(s = size/32))
 		"angle_min": -180.0, "angle_max": 180.0,
 		"angular_velocity_min": -15.0, "angular_velocity_max": 15.0,
 		"texture": _Helpers.heart_tex(),
@@ -196,13 +213,14 @@ func _spawn_ambient() -> void:
 	})
 	_gpu_amb_heart_rose.position = _target + Vector2(0.0, 20.0)
 	add_child(_gpu_amb_heart_rose)
+	# violet ambient heart 도 솔리드는 COL_MID (원본).
 	_gpu_amb_heart_violet = _Helpers.make_emitter({
-		"count": int(19 * _scale()), "lifetime": 2.05, "color": COL_VIOLET,
+		"count": int(19 * _scale()), "lifetime": 2.05, "color": COL_MID,
 		"speed_min": 30.0, "speed_max": 72.0,
 		"direction": Vector2.UP, "spread": 25.0,
 		"gravity": 0.0, "damping": 3.0,
 		"size_min": 8.0, "size_max": 18.0,
-		"size_base": 16.0,
+		"size_base": 32.0,
 		"angle_min": -180.0, "angle_max": 180.0,
 		"angular_velocity_min": -15.0, "angular_velocity_max": 15.0,
 		"texture": _Helpers.heart_tex(),
