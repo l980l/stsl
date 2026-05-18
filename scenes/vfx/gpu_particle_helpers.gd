@@ -87,8 +87,8 @@ static func feather_tex() -> Texture2D:
 	if _feather_tex == null:
 		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
 		img.fill(Color.TRANSPARENT)
-		var col_outer := Color(1.0, 0.902, 0.627)  # COL_FEATHER
-		var col_inner := Color(1.0, 0.965, 0.776)  # COL_HOT (내부 음영 — 더 밝음)
+		var col_outer := Color(1.0, 0.96, 0.86)   # COL_FEATHER (원본 0.9, 0.63 보다 더 흰색)
+		var col_inner := Color(1.0, 0.99, 0.95)   # COL_HOT (거의 흰색)
 		# 외곽 타원 — alpha 0.9 base
 		for y in 64:
 			for x in 64:
