@@ -50,9 +50,17 @@ const WORD_OFFSET_Y := -120.0     # caster 위
 const GLYPH_OFFSET_Y := -86.0
 const CRACK_OFFSET_Y := 56.0      # 발치 아래
 
-signal _dummy_unused  # GDScript signal X — placeholder. signal screen_effect 위쪽에 이미 있음
-
 var _caster := Vector2.ZERO
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+
+func _foot_pos() -> Vector2:
+	return _ground_pos if _has_ground else _caster + Vector2(0.0, CRACK_OFFSET_Y)
+
 var _age := -1.0
 var _impact_emitted := false
 var _particles: Array = []
@@ -132,12 +140,13 @@ func _spawn_impact_particles() -> void:
 			"life": 0.0, "max_life": 1.4 + randf() * 0.8,
 			"size": (1.6 + randf() * 1.4) * s, "kind": "ember", "grav": -4.0,
 		})
-	# 발치 dust (HTML: 30개)
+	# 발치 dust (HTML: 30개) — 정확한 발 위치 사용
+	var foot := _foot_pos()
 	for _i in range(_pcount(20)):
 		var a3: float = (randf() - 0.5) * 1.8
 		var sp3: float = 50.0 + randf() * 120.0
 		_particles.append({
-			"x": _caster.x + (randf() - 0.5) * 80.0, "y": _caster.y + CRACK_OFFSET_Y,
+			"x": foot.x + (randf() - 0.5) * 80.0, "y": foot.y,
 			"vx": cos(a3) * sp3, "vy": -(15.0 + randf() * 35.0),
 			"life": 0.0, "max_life": 1.0 + randf() * 0.7,
 			"size": (16.0 + randf() * 14.0) * s, "kind": "dust", "grav": 12.0,
@@ -171,11 +180,11 @@ func _draw_bg_pass(canvas: CanvasItem) -> void:
 	var ga: float = _global_alpha()
 	if ga <= 0.0 or _age < IMPACT_DELAY:
 		return
-	# ground crack — 발치 짧은 zigzag 4 path
+	# ground crack — 정확한 발 위치 (foot anchor) 사용
 	var crack_age: float = _age - IMPACT_DELAY
 	var crack_in: float = clampf(crack_age / 0.3, 0.0, 1.0)
 	var crack_alpha: float = crack_in * ga * 0.8
-	var foot := _caster + Vector2(0.0, CRACK_OFFSET_Y)
+	var foot := _foot_pos()
 	var s: float = _scale()
 	var col := Color(COL_BURN.r, COL_BURN.g, COL_BURN.b, crack_alpha)
 	# 메인 zigzag

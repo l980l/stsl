@@ -48,6 +48,7 @@ const SIG_KARMA := preload("res://scenes/vfx/sig_karma.gd")
 const SIG_YIN_YANG := preload("res://scenes/vfx/sig_yin_yang.gd")
 const SIG_EGYPTIAN_CURSE := preload("res://scenes/vfx/sig_egyptian_curse.gd")
 const SIG_KEKKAI := preload("res://scenes/vfx/sig_kekkai.gd")
+const TAUNT_VFX := preload("res://scenes/vfx/taunt.gd")
 const CARD_EXHAUST := preload("res://scenes/vfx/card_exhaust.gd")
 const BOSS_DEATH := preload("res://scenes/vfx/boss_death.gd")
 const _CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
@@ -102,6 +103,7 @@ const VFX_CURRENT := [
 	{"name": "sig_yin_yang",       "kind": "beam", "path": "res://scenes/vfx/sig_yin_yang.gd"},
 	{"name": "sig_egyptian_curse", "kind": "beam", "path": "res://scenes/vfx/sig_egyptian_curse.gd"},
 	{"name": "sig_kekkai",         "kind": "beam", "path": "res://scenes/vfx/sig_kekkai.gd"},
+	{"name": "taunt",              "kind": "beam", "path": "res://scenes/vfx/taunt.gd"},
 	{"name": "card_exhaust",       "kind": "beam", "path": "res://scenes/vfx/card_exhaust.gd"},
 	{"name": "boss_death",         "kind": "beam", "path": "res://scenes/vfx/boss_death.gd"},
 ]
@@ -442,6 +444,11 @@ func _update_info() -> void:
 				SIG_KEKKAI.HEX_R, SIG_KEKKAI.OFUDA_W, SIG_KEKKAI.OFUDA_H]
 			s += "ofuda %.2fs · barrier %.2fs · kanji %.2fs · hold %.2fs · fade %.2fs (매 5턴 — 4 부적 + 6각 결계)" % [
 				SIG_KEKKAI.OFUDA_DELAY, SIG_KEKKAI.BARRIER_DELAY, SIG_KEKKAI.KANJI_DELAY, SIG_KEKKAI.HOLD_TIME, SIG_KEKKAI.FADE_TIME]
+		"taunt":
+			s += "도발 — shockwave 3중 · glyph 반경 %.0f · word offset Y %.0f\n" % [
+				TAUNT_VFX.GLYPH_R, TAUNT_VFX.WORD_OFFSET_Y]
+			s += "windup %.2fs · impact %.2fs · hold %.2fs · fade %.2fs (적 DEBUFF taunt → 영웅 SINGLE 카드 lock, 발치 anchor 적용)" % [
+				TAUNT_VFX.WINDUP_TIME, TAUNT_VFX.IMPACT_DELAY, TAUNT_VFX.HOLD_TIME, TAUNT_VFX.FADE_TIME]
 		"card_exhaust":
 			s += "카드 소진 — 카드 %.0fx%.0f · sweep %.2fs (위→아래 ember line + 잿불 + 회색 재)\n" % [
 				CARD_EXHAUST.CARD_W, CARD_EXHAUST.CARD_H, CARD_EXHAUST.SWEEP_TIME]
@@ -495,7 +502,7 @@ func _play(entry: Dictionary) -> void:
 					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
 					var c_pos: Vector2 = _caster_pos + Vector2(x_offsets[i], 0.0)
 					# 시전자 마커 무시, 타겟 위치를 중심·발치로
-					if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "boss_death"]:
+					if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "taunt", "boss_death"]:
 						c_pos = t_pos
 						if fx_n.has_method("set_ground_anchor"):
 							fx_n.set_ground_anchor(t_pos)
@@ -539,7 +546,7 @@ func _play(entry: Dictionary) -> void:
 					tw.tween_callback(dummy.queue_free)
 					return
 				# 시전자 마커 무시, 타겟 위치를 중심·발치로
-				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "boss_death"]:
+				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "taunt", "boss_death"]:
 					if fx.has_method("set_ground_anchor"):
 						fx.set_ground_anchor(_target_pos)
 					fx.play(_target_pos, _target_pos)

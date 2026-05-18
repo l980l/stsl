@@ -3462,12 +3462,14 @@ func _spawn_sig_kekkai(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) ->
 	fx.play(target_pos, target_pos)
 
 # 도발 VFX — 시전 적 가슴에서 chest impact + shockwave + glyph + 한글 word + 파티클.
-# foot_pos 는 미사용 (caster 본인 중심 효과).
-func _spawn_taunt(caster_pos: Vector2, _foot_pos: Vector2 = Vector2.ZERO) -> void:
+# foot_pos 는 ground crack + dust 위치 anchor (정확한 발 위치).
+func _spawn_taunt(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
 	var fx: Node2D = _VFX_TAUNT.new()
 	add_child(fx)
 	fx.z_index = 1280
 	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		AudioManager.play_sfx("impact_blunt")
