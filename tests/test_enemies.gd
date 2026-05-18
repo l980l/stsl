@@ -488,7 +488,8 @@ func test_act3_event_pool_shape() -> void:
 	print("[TestEnemies] test_act3_event_pool_shape")
 	var EventsAct3 = load("res://resources/events/events_act3.gd")
 	var pool: Array = EventsAct3.build_pool()
-	assert(pool.size() == 11, "Act 3 이벤트는 11종이어야 함")
+	# _valhalla_invitation 제거 (ADD_HERO) → 10종
+	assert(pool.size() == 10, "Act 3 이벤트는 10종이어야 함 (valhalla_invitation 제거)")
 	for ev in pool:
 		assert(ev.event_name != "", "이벤트 이름 비어있으면 안 됨")
 		assert(ev.choices.size() >= 2, "선택지 최소 2개")

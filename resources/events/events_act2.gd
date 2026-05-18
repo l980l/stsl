@@ -3,11 +3,12 @@ const EventRes  = preload("res://resources/event_resource.gd")
 const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
+	# _ra_sunboat 제거 — ADD_HERO 이벤트. 영입은 Act1 trigger 로 일원화.
 	return [
 		_book_of_the_dead(), _anubis_judgment(), _scarab_beetle(),
 		_pharaoh_tomb(), _nile_flood(), _thoth_wisdom(),
 		_bastet_cats(), _oasis_merchant(), _mummy_curse(),
-		_ra_sunboat(), _sphinx_gate(),
+		_sphinx_gate(),
 	]
 
 static func _book_of_the_dead() -> Resource:
@@ -130,16 +131,6 @@ static func _mummy_curse() -> Resource:
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.act2.mummy_curse.choice_2"
 	# 저주받은 카드를 석관에 봉인 — 덱 압축
 	cb.effect_type = ChoiceRes.EffectType.REMOVE_CARD; cb.value = 1
-	e.choices = [ca, cb]; return e
-
-static func _ra_sunboat() -> Resource:
-	var e: Resource = EventRes.new()
-	e.event_name = "event.act2.ra_sunboat.name"; e.description = "event.act2.ra_sunboat.desc"
-	e.bgm_type = "encounter"
-	var ca: Resource = ChoiceRes.new(); ca.label = "event.act2.ra_sunboat.choice_1"
-	ca.effect_type = ChoiceRes.EffectType.ADD_HERO
-	var cb: Resource = ChoiceRes.new(); cb.label = "event.act2.ra_sunboat.choice_2"
-	cb.effect_type = ChoiceRes.EffectType.GOLD; cb.value = 20
 	e.choices = [ca, cb]; return e
 
 # Phase 4 신규: 스핑크스의 수수께끼 (확률 + 다중 효과)

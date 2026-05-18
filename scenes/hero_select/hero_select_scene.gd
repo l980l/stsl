@@ -12,7 +12,8 @@ func _ready() -> void:
 
 func _build_ui() -> void:
 	var P := SacredPalette
-	var is_recruit: bool = GameManager.pending_boss_recruit
+	# 영입 모드: Act1 보스 영입 또는 첫 ELITE 영입 — 둘 다 RECRUIT 모드로 표시
+	var is_recruit: bool = GameManager.pending_boss_recruit or GameManager.first_elite_recruit_pending
 	var pm = get_node_or_null("/root/ProgressManager")
 
 	var owned_ids: Array = []
@@ -205,7 +206,8 @@ func _on_back() -> void:
 	SceneTransition.go("res://scenes/chapter_select/chapter_select_scene.tscn")
 
 func _on_hero_selected(hero_id: String) -> void:
-	if GameManager.pending_boss_recruit:
+	# 영입 trigger 두 가지: 첫 ELITE 영입 / Act1 보스 영입. 둘 다 complete_hero_recruit 가 처리.
+	if GameManager.pending_boss_recruit or GameManager.first_elite_recruit_pending:
 		GameManager.complete_hero_recruit(hero_id)
 	else:
 		GameManager.start_run(hero_id, GameManager.current_chapter)

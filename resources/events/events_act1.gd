@@ -3,9 +3,10 @@ const EventRes  = preload("res://resources/event_resource.gd")
 const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
+	# _companion_encounter 제거 — 영입은 첫 ELITE 전투 승리 / Act1 보스 클리어 trigger 로 일원화
 	return [
 		_golden_chest(), _wounded_warrior(), _ancient_library(),
-		_cursed_altar(), _companion_encounter(), _prometheus_fire(),
+		_cursed_altar(), _prometheus_fire(),
 		_heracles_trial(), _circe_magic(), _hades_contract(),
 		_hermes_gamble(), _devils_deal(),
 	]
@@ -61,19 +62,6 @@ static func _cursed_altar() -> Resource:
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.act1.cursed_altar.choice_2"
 	# 봉헌물 강탈 — 큰 골드 + 저주 (cost_hp)
 	cb.effect_type = ChoiceRes.EffectType.GOLD; cb.value = 40; cb.cost_hp = 15
-	e.choices = [ca, cb]; return e
-
-static func _companion_encounter() -> Resource:
-	# 재설계: 거절 → 동료가 떠나며 작별 선물 (GOLD + HEAL MULTI)
-	var e: Resource = EventRes.new()
-	e.event_name = "event.act1.companion_encounter.name"; e.description = "event.act1.companion_encounter.desc"
-	e.bgm_type = "encounter"
-	var ca: Resource = ChoiceRes.new(); ca.label = "event.act1.companion_encounter.choice_1"
-	ca.effect_type = ChoiceRes.EffectType.ADD_HERO
-	var cb: Resource = ChoiceRes.new(); cb.label = "event.act1.companion_encounter.choice_2"
-	# 동료가 떠나며 자기 물자 줌 — GOLD + HEAL
-	cb.effect_type = ChoiceRes.EffectType.GOLD; cb.value = 30
-	cb.secondary_effect_type = ChoiceRes.EffectType.HEAL; cb.secondary_value = 15
 	e.choices = [ca, cb]; return e
 
 static func _prometheus_fire() -> Resource:

@@ -3,9 +3,10 @@ const EventRes  = preload("res://resources/event_resource.gd")
 const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
+	# _valhalla_invitation 제거 — ADD_HERO 이벤트. 영입은 Act1 trigger 로 일원화.
 	return [
 		_odin_ravens(), _yggdrasil_fruit(), _ragnarok_prophecy(),
-		_valhalla_invitation(), _mimirs_well(), _dragon_gold(),
+		_mimirs_well(), _dragon_gold(),
 		_rune_stone(), _thor_hammer_mark(), _frost_giant_corpse(),
 		_freyja_tears(), _ymir_blood(),
 	]
@@ -48,16 +49,6 @@ static func _ragnarok_prophecy() -> Resource:
 	var cb: Resource = ChoiceRes.new(); cb.label = "event.act3.ragnarok_prophecy.choice_2"
 	# 회피 — 프레이야 위안 (HEAL, 두려움에 cost_hp 일부)
 	cb.effect_type = ChoiceRes.EffectType.HEAL; cb.value = 25; cb.cost_hp = 15
-	e.choices = [ca, cb]; return e
-
-static func _valhalla_invitation() -> Resource:
-	var e: Resource = EventRes.new()
-	e.event_name = "event.act3.valhalla_invitation.name"; e.description = "event.act3.valhalla_invitation.desc"
-	e.bgm_type = "encounter"
-	var ca: Resource = ChoiceRes.new(); ca.label = "event.act3.valhalla_invitation.choice_1"
-	ca.effect_type = ChoiceRes.EffectType.ADD_HERO
-	var cb: Resource = ChoiceRes.new(); cb.label = "event.act3.valhalla_invitation.choice_2"
-	cb.effect_type = ChoiceRes.EffectType.GOLD; cb.value = 25
 	e.choices = [ca, cb]; return e
 
 static func _mimirs_well() -> Resource:

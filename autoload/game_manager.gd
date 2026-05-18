@@ -71,7 +71,9 @@ var pending_event: Resource = null  # 현재 이벤트 데이터 (EventResource)
 var pending_event_battle_reward: Dictionary = {}
 var card_rewards_pick_count: int = 1  # 카드픽 화면에서 선택 가능한 카드 수
 var pending_boss_upgrade: bool = false  # 보스 후 카드 강화 대기 여부
-var pending_boss_recruit: bool = false  # 보스 후 영웅 영입 대기 여부
+var pending_boss_recruit: bool = false  # 보스 후 영웅 영입 대기 여부 (Act1 한정)
+var first_elite_recruit_pending: bool = false  # 첫 ELITE 클리어 후 영입 대기 (run 내 1회)
+var first_elite_recruit_done: bool = false      # 첫 ELITE 영입 발동 여부 (run 내 1회 제한)
 var _last_boss_enemy_id: String = ""    # 직전 보스 enemy_id (해금 훅용)
 # 보상 씬 TALLY 표시용 — complete_battle에서 채워짐
 var last_battle_turns: int = 0
@@ -171,6 +173,8 @@ func reset() -> void:
 	card_rewards_pick_count = 1
 	pending_boss_upgrade = false
 	pending_boss_recruit = false
+	first_elite_recruit_pending = false
+	first_elite_recruit_done = false
 	act_mythologies = _get_chapter_mythology_pool(current_chapter)
 	act_mythologies.shuffle()
 
@@ -300,6 +304,12 @@ func complete_battle(won: bool) -> void:
 					if pm:
 						pm.increment_flag("elite_kills_total")
 						pm.check_unlock_conditions()
+					# 첫 ELITE 클리어 — Act1 안에서 두 번째 영웅 영입 trigger (run 내 1회).
+					# Act 무관 (방어용) — 보통 Act1 첫 ELITE 에서 발동. team 이 이미 3인이거나 풀이 비면 skip.
+					if not first_elite_recruit_done and current_act == 1:
+						var _tm := _get_tm()
+						if _tm and _tm.heroes.size() < 3 and not _recruit_hero_pool().is_empty():
+							first_elite_recruit_pending = true
 				_MapNodeRes.RoomType.BOSS:
 					card_rewards_pick_count = 2
 					last_battle_gold = 40
@@ -346,6 +356,12 @@ func complete_card_pick() -> void:
 		pending_boss_upgrade = true
 		change_state(GameState.CARD_UPGRADE)
 		_request_scene("res://scenes/card_upgrade/card_upgrade_scene.tscn")
+		return
+	# 첫 ELITE 클리어 후 카드 픽 완료 → 영웅 영입 진입 (run 내 1회).
+	# flag clear 는 complete_hero_recruit 에서 처리 (hero_select_scene UI 분기용).
+	if first_elite_recruit_pending and not first_elite_recruit_done:
+		change_state(GameState.HERO_RECRUIT)
+		_request_scene("res://scenes/hero_select/hero_select_scene.tscn")
 		return
 	change_state(GameState.MAP)
 	_request_scene("res://scenes/map/map_scene.tscn")
@@ -470,8 +486,10 @@ func enter_card_upgrade() -> void:
 func complete_card_upgrade() -> void:
 	if pending_boss_upgrade:
 		pending_boss_upgrade = false
+		# 보스 영입 — Act1 한정 (Act2·Act3 보스 클리어 후 영입 trigger X).
+		# Act1 보스 = 챕터의 마지막 영웅 영입 기회.
 		var pool := _recruit_hero_pool()
-		if not pool.is_empty():
+		if not pool.is_empty() and current_act == 1:
 			pending_boss_recruit = true
 			change_state(GameState.HERO_RECRUIT)
 			_request_scene("res://scenes/hero_select/hero_select_scene.tscn")
@@ -485,7 +503,13 @@ func complete_card_upgrade() -> void:
 	_request_scene("res://scenes/map/map_scene.tscn")
 
 func complete_hero_recruit(hero_id: String) -> void:
+	# 두 trigger 모두 처리: pending_boss_recruit (Act1 보스 후) / first_elite_recruit_pending (Act1 첫 ELITE 후)
+	var was_boss_recruit: bool = pending_boss_recruit
+	var was_first_elite_recruit: bool = first_elite_recruit_pending
 	pending_boss_recruit = false
+	if was_first_elite_recruit:
+		first_elite_recruit_pending = false
+		first_elite_recruit_done = true
 	var tm := _get_tm()
 	if tm:
 		for h in tm.heroes:
@@ -495,10 +519,16 @@ func complete_hero_recruit(hero_id: String) -> void:
 	if tm:
 		tm.add_hero(hero)
 	_add_initial_deck_for(hero)
-	if current_act < MAX_ACTS:
-		_start_next_act()
+	# 영입 후 다음 흐름: 보스 영입이면 다음 Act 진입, 첫 ELITE 영입이면 맵으로 복귀.
+	if was_boss_recruit:
+		if current_act < MAX_ACTS:
+			_start_next_act()
+		else:
+			_end_run_won()
 	else:
-		_end_run_won()
+		# 첫 ELITE 영입 — Act 진행 중이므로 맵 복귀
+		change_state(GameState.MAP)
+		_request_scene("res://scenes/map/map_scene.tscn")
 
 func _start_next_act() -> void:
 	current_act += 1
@@ -506,6 +536,8 @@ func _start_next_act() -> void:
 	current_node_id = -1
 	pending_boss_upgrade = false
 	pending_boss_recruit = false
+	first_elite_recruit_pending = false
+	# first_elite_recruit_done 는 reset 유지 (런 전체에 1회 — Act 진행 후에도 다시 trigger X)
 	var MapGen = load("res://autoload/map_generator.gd")
 	run_map = MapGen.generate(current_act)
 	available_node_ids = []
