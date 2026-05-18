@@ -362,7 +362,8 @@ func _draw_aura(canvas: CanvasItem) -> void:
 		return
 	var pulse: float = 0.7 + sin(_aura_age * (TAU / 1.4)) * 0.15
 	var alpha: float = grow * fade * pulse
-	var rc := _target + Vector2(0.0, 60.0)
+	# 사용자 변경: 발 아래 (+60) → 머리 위 (-60), 만다라와 같은 위치에 겹침.
+	var rc := _target + Vector2(0.0, -60.0)
 	canvas.draw_arc(rc, 80.0 * grow, 0.0, TAU, 48,
 		Color(COL_RED, 0.5 * alpha), 14.0 * grow, true)
 	canvas.draw_arc(rc, 60.0 * grow, 0.0, TAU, 36,
