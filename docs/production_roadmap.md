@@ -1,6 +1,6 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-19 v21)
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-19 v22)
 > 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
@@ -1266,7 +1266,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-05-19 v21. PR #147·#148·#149 반영 — 카드 풀 검토 도구 (composition_check) + ELITE/BOSS dump 도구 + 강화 시스템 1강 통일 + 다중 archetype 지원 (23 카드 하이브리드) + 도발 시스템 재설계 (양방향 타겟 lock + Attention! VFX). **1478 통과 / 0 fail**.
+> 최종 갱신: 2026-05-19 v22. PR #147·#148·#149 + 영입 시스템 재설계 (M6.19) 반영 — Act1 안에서 3인 모두 모음 (첫 ELITE 영입 + Act1 보스 영입), 동료 영입 이벤트 6 종 제거, Act2·Act3 보스 영입 X. **1473 통과 / 0 fail**.
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -1306,6 +1306,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 카드 풀 검토 도구 + ELITE/BOSS dump + 강화 1강 통일 (M6.16) | PR #147. `tools/composition_check.gd` 신규 (8 영역: cost curve / card type / EffectType 커버리지 / damage·status type / archetype 차별성 / 태그 / starter deck) + `dump_normal_enemies.gd` + `dump_act_enemies.gd` (ELITE 55+BOSS 18) + balance csv 도구 UTF-8 BOM. **강화 시스템 단순화**: LEGENDARY·DIVINE 2강 → 모든 등급 1강 통일 (단계별 unique 효과 미구현 상태였음, COMMON 8% / UNCOMMON 10% / RARE 12% / LEGENDARY 14% / DIVINE 16% rate). **1476 통과 / 0 fail** |
 | ✅ 완료 | 다중 archetype 지원 + 23 카드 하이브리드 (M6.17) | PR #148. `CardResource.archetype` String → Array[String] (다중 archetype 데이터 모델). 216 카드 일괄 변환 + 효과상 명백한 23 카드에 부 archetype 추가 (cleopatra 4 / napoleon 10 — '사기' 1→11 확장 / yi_sun_sin 1 / joan_of_arc 7 / genghis_khan 1). catalog 에 `아키타입` 컬럼 추가 (다중 시 "X, Y" join). 새 분포: cleopatra 독살13/저주12/조종9, napoleon 군단12/돌격11/사기9/지휘7 등. **1474 통과 / 0 fail** |
 | ✅ 완료 | 도발 시스템 재설계 + Attention! VFX (M6.18) | PR #149. 어그로 모델 → **타겟 lock 통일** (양방향 대칭). 영웅→적 도발 (knights_oath SELF→SINGLE, 그 적 ATTACK·DEBUFF가 시전 영웅 강제 타겟) + 적→영웅 도발 (fenrir_cub 신규, 영웅 SINGLE 카드 lock). `_apply_taunt_to_enemy/hero` 누적·덮어쓰기 룰 (같은 시전자 +, 다른 시전자 덮어쓰기). 매혹/반함이 도발 이김 (charm/enthrall 보유 시 우회 비활성). decay 위치 turn 시작 → 종료. VFX taunt.gd 신규 (chest impact + shockwave 3중 + 타겟→시전자 점선 성장 + "Attention!" 3 인스턴스 랜덤). i18n 13 언어 desc 통일. 영웅 poison tick popup 누락 fix. **1478 통과 / 0 fail** |
+| ✅ 완료 | 영입 시스템 재설계 — Act1 안에서 3인 (M6.19) | PR (현재 브랜치). 기존: 1인 시작 → Act1 보스 영입 → Act2 보스 영입 (3인 모이려면 Act2 끝까지) → 변경: **Act1 안에서 3인 모두 모음**. 1인 시작 → Act1 첫 ELITE 클리어 + 카드 픽 후 영입 (`first_elite_recruit_pending/done` flag, run 내 1회) → Act1 보스 클리어 후 영입 (Act1 한정 — `current_act == 1` 가드). Act2·Act3 보스 영입 X. 동료 영입 이벤트 6 종 모두 제거 (companion_encounter / ra_sunboat / valhalla_invitation / arhat_joins / cosmic_remnant / shuten_doji_feast). 신규 4 시나리오 테스트 (`test_recruit_system.gd`). **1473 통과 / 0 fail** |
 | ✅ 완료 | 배경 시스템 v1 (M7.5) | PR #117·#119. SceneBackground 컴포넌트 (parallax 5 레이어 sky/far/mid/near/fg) + 6 신화 × 3 Act = 18 환경 팔레트 + EnvSpec (time_of_day × weather) + 6 신화 SVG 오브젝트 풀 (large/medium/small/pillars) + SceneCritters (새) + weather_particles (비·눈) — battle 씬 적용 |
 | 🟢 장기 | 배경 시스템 v2 — 잔여 (M7.5+) | DOF 셰이더 (거리 기반 blur, filmic 깊이감) + Light2D (어두운 배경 광원·그림자). 현 시점 분위기 충분 — "한 단계 더" 영역. event/rest/shop 은 별도 이미지로 이미 세팅·map 은 의도적으로 배경 없음 |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
