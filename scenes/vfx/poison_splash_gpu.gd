@@ -91,15 +91,15 @@ func _spawn_splash(pos: Vector2) -> void:
 	})
 	drip.position = pos
 	add_child(drip)
-	# gas 50 burst — 큰 안개
+	# gas 50 burst — 사방 퍼지는 큰 안개. size 2배 + 더 밝게 (사용자 피드백).
 	var gas := _Helpers.make_emitter({
 		"count": _pcount(50), "lifetime": 1.85, "color": COL_GAS,
 		"speed_min": 36.0, "speed_max": 186.0,
 		"direction": Vector2.UP, "spread": 180.0,
-		"gravity": -28.8, "damping": 3.0,  # -0.008 * 60²
-		"size_min": 18.0, "size_max": 38.0,
+		"gravity": -28.8, "damping": 3.0,
+		"size_min": 36.0, "size_max": 76.0,
 		"additive": false,
-		"start_alpha": 0.4, "mid_alpha": 0.2, "end_alpha": 0.0,
+		"start_alpha": 0.7, "mid_alpha": 0.4, "end_alpha": 0.0,
 	})
 	gas.position = pos
 	add_child(gas)
