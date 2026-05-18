@@ -3,19 +3,13 @@
 # 단 신규 `*_gpu.gd` 5 개만 등록. 기존 vfx_preview.tscn 과 별개로 F6 실행해서 시각 비교.
 extends Node2D
 
-const WARRIOR_BUFF_GPU  := preload("res://scenes/vfx/warrior_buff_gpu.gd")
-const HOLY_BUFF_GPU     := preload("res://scenes/vfx/holy_buff_gpu.gd")
-const BOSS_DEATH_GPU    := preload("res://scenes/vfx/boss_death_gpu.gd")
-const SIG_RAGNAROK_GPU  := preload("res://scenes/vfx/sig_ragnarok_gpu.gd")
-const FIRE_BLAST_GPU    := preload("res://scenes/vfx/fire_blast_gpu.gd")
-
-# Phase 1 등록 VFX (사용자 결정: 5 개 무거운 것)
-const VFX_GPU := [
-	{"name": "warrior_buff_gpu", "kind": "beam", "path": "res://scenes/vfx/warrior_buff_gpu.gd"},
-	{"name": "holy_buff_gpu",    "kind": "beam", "path": "res://scenes/vfx/holy_buff_gpu.gd"},
-	{"name": "boss_death_gpu",   "kind": "beam", "path": "res://scenes/vfx/boss_death_gpu.gd"},
-	{"name": "sig_ragnarok_gpu", "kind": "beam", "path": "res://scenes/vfx/sig_ragnarok_gpu.gd"},
-	{"name": "fire_blast_gpu",   "kind": "beam", "path": "res://scenes/vfx/fire_blast_gpu.gd"},
+# 같은 VFX 의 GPU/CPU 버전 페어 — 토글로 전환 비교
+const VFX_PAIRS := [
+	{"name": "warrior_buff", "gpu": "res://scenes/vfx/warrior_buff_gpu.gd", "cpu": "res://scenes/vfx/warrior_buff.gd"},
+	{"name": "holy_buff",    "gpu": "res://scenes/vfx/holy_buff_gpu.gd",    "cpu": "res://scenes/vfx/holy_buff.gd"},
+	{"name": "boss_death",   "gpu": "res://scenes/vfx/boss_death_gpu.gd",   "cpu": "res://scenes/vfx/boss_death.gd"},
+	{"name": "sig_ragnarok", "gpu": "res://scenes/vfx/sig_ragnarok_gpu.gd", "cpu": "res://scenes/vfx/sig_ragnarok.gd"},
+	{"name": "fire_blast",   "gpu": "res://scenes/vfx/fire_blast_gpu.gd",   "cpu": "res://scenes/vfx/fire_blast.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 (vfx_preview.gd 와 동일)
@@ -24,16 +18,17 @@ const _SPRITE_H := 192.0
 const _CHAR_FOOT_Y_OFFSET := 96.0
 
 # caster 무시 / 타겟 위치 발치 anchor 사용하는 VFX (vfx_preview.gd 의 분기와 동일)
-const _TARGET_ONLY_VFX := ["boss_death_gpu", "sig_ragnarok_gpu", "warrior_buff_gpu", "holy_buff_gpu"]
+const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff", "holy_buff"]
 
 var _caster_pos := Vector2(420, 540)
 var _target_pos := Vector2(1500, 540)
 var _dragging: int = -1
 var _auto := false
-var _selected: Dictionary = VFX_GPU[0]
+var _selected: Dictionary = VFX_PAIRS[0]
 var _info: Label
 var _impact_label: Label
 var _compare_4way: bool = false
+var _mode: String = "gpu"  # "gpu" or "cpu" — 토글로 전환
 
 func _ready() -> void:
 	var bg := ColorRect.new()
@@ -50,14 +45,31 @@ func _ready() -> void:
 	title.text = "GPU 하이브리드 VFX 프리뷰 — 버튼 선택 → 빈 곳 클릭으로 타겟 이동+재생 / [Space] 재생"
 	panel.add_child(title)
 
-	var gpu_lbl := Label.new()
-	gpu_lbl.text = "── GPU 하이브리드 (Phase 1: 5 개) ──"
-	gpu_lbl.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
-	panel.add_child(gpu_lbl)
+	# 모드 토글 — GPU/CPU
+	var mode_lbl := Label.new()
+	mode_lbl.text = "── 모드 (현재: GPU) ──"
+	mode_lbl.add_theme_color_override("font_color", Color(1.0, 1.0, 0.6))
+	panel.add_child(mode_lbl)
+	var mode_box := HBoxContainer.new()
+	panel.add_child(mode_box)
+	for m in ["gpu", "cpu"]:
+		var mb := Button.new()
+		mb.text = m.to_upper()
+		mb.custom_minimum_size = Vector2(120, 0)
+		mb.pressed.connect(func() -> void:
+			_mode = m
+			mode_lbl.text = "── 모드 (현재: %s) ──" % _mode.to_upper()
+			_update_info())
+		mode_box.add_child(mb)
+
+	var vfx_lbl := Label.new()
+	vfx_lbl.text = "── VFX (Phase 1: 5 개 — GPU/CPU 토글로 같은 위치 비교) ──"
+	vfx_lbl.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	panel.add_child(vfx_lbl)
 	var grid := GridContainer.new()
 	grid.columns = 5
 	panel.add_child(grid)
-	for entry in VFX_GPU:
+	for entry in VFX_PAIRS:
 		var b := Button.new()
 		b.text = entry["name"]
 		b.custom_minimum_size = Vector2(180.0, 0.0)
@@ -115,11 +127,12 @@ func _ready() -> void:
 	queue_redraw()
 
 func _update_info() -> void:
-	var s := "선택: %s (%s)\n" % [_selected["name"], _selected["kind"]]
+	var s := "선택: %s (모드: %s)\n" % [_selected["name"], _mode.to_upper()]
 	s += "GPU 하이브리드 — 표준 파티클은 GPUParticles2D, 폴리곤 effect 는 CPU 유지.\n"
-	s += "기존 vfx_preview 와 비교하려면 F6 으로 vfx_preview.tscn 따로 실행."
-	if _selected.get("kind", "") == "beam":
-		var script: GDScript = load(_selected["path"]) as GDScript
+	s += "모드 토글로 같은 VFX 의 GPU/CPU 버전 비교 가능."
+	var path: String = _selected.get(_mode, "")
+	if path != "":
+		var script: GDScript = load(path) as GDScript
 		if script and "IMPACT_DELAY" in script:
 			s += "\n임팩트 시점: %.2fs" % script.IMPACT_DELAY
 	_info.text = s
@@ -130,7 +143,11 @@ func _select_and_play(entry: Dictionary) -> void:
 	_play(entry)
 
 func _play(entry: Dictionary) -> void:
-	var script: GDScript = load(entry["path"]) as GDScript
+	var path: String = entry.get(_mode, "")
+	if path == "":
+		return
+	var script: GDScript = load(path) as GDScript
+	var label := "%s [%s]" % [entry["name"], _mode.to_upper()]
 	if _compare_4way:
 		var x_offsets := [-540.0, -180.0, 180.0, 540.0]
 		var scales    := [0.1, 0.25, 0.5, 1.0]
@@ -148,7 +165,7 @@ func _play(entry: Dictionary) -> void:
 			if i == 2:
 				if fx_n.has_signal("screen_effect"):
 					fx_n.screen_effect.connect(_preview_flash)
-					fx_n.screen_effect.connect(_show_impact_marker.bind("%s — 4way" % entry["name"]))
+					fx_n.screen_effect.connect(_show_impact_marker.bind("%s — 4way" % label))
 			fx_n.play(c_pos, t_pos)
 			_spawn_compare_label(t_pos, "x" + str(scales[i]))
 	else:
@@ -157,7 +174,7 @@ func _play(entry: Dictionary) -> void:
 		fx.position = Vector2.ZERO
 		if fx.has_signal("screen_effect"):
 			fx.screen_effect.connect(_preview_flash)
-			fx.screen_effect.connect(_show_impact_marker.bind(entry["name"]))
+			fx.screen_effect.connect(_show_impact_marker.bind(label))
 		if entry["name"] in _TARGET_ONLY_VFX:
 			_apply_ground_anchor(fx, _target_pos, _target_pos)
 			fx.play(_target_pos, _target_pos)

@@ -9,14 +9,15 @@ extends Object
 static var _circle_tex: Texture2D
 static var _square_tex: Texture2D
 
-# 부드러운 원 (radial 그라데이션) — mote/ember/dust/flame 공용
+# 솔리드 원 + 살짝 부드러운 가장자리 (CPU draw_circle 와 거의 동일)
+# 원본 draw_circle 은 가장자리까지 솔리드 → GPU 텍스처도 95% 솔리드, 마지막 5% 만 페이드.
 static func circle_tex() -> Texture2D:
 	if _circle_tex == null:
 		var grad := Gradient.new()
-		grad.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
+		grad.offsets = PackedFloat32Array([0.0, 0.92, 1.0])
 		grad.colors = PackedColorArray([
 			Color(1, 1, 1, 1),
-			Color(1, 1, 1, 0.55),
+			Color(1, 1, 1, 1),
 			Color(1, 1, 1, 0),
 		])
 		var tex := GradientTexture2D.new()
@@ -37,7 +38,7 @@ static func square_tex() -> Texture2D:
 		_square_tex = ImageTexture.create_from_image(img)
 	return _square_tex
 
-# 색 → 알파 페이드 ramp (life 0 → 1: alpha 1 → 0)
+# 단색 alpha 페이드 ramp (life 0 → 1: alpha 1 → 0). mid_alpha 로 중간 알파 조절.
 static func make_fade_ramp(color: Color, mid_alpha: float = 0.7) -> GradientTexture1D:
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
@@ -45,6 +46,22 @@ static func make_fade_ramp(color: Color, mid_alpha: float = 0.7) -> GradientText
 		Color(color.r, color.g, color.b, 1.0),
 		Color(color.r, color.g, color.b, mid_alpha),
 		Color(color.r, color.g, color.b, 0.0),
+	])
+	var t := GradientTexture1D.new()
+	t.gradient = g
+	t.width = 64
+	return t
+
+# 다색 ramp — life 0 → mid → 1 에 따라 색·알파 모두 변화 (원본 CPU 의 시간별 색 매핑용).
+# 예: ember `rgba(255, 200, 90)` → `rgba(255, 80, 10, 0)`.
+static func make_color_ramp(start_color: Color, mid_color: Color, end_color: Color,
+		start_alpha: float = 1.0, mid_alpha: float = 0.85, end_alpha: float = 0.0) -> GradientTexture1D:
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	g.colors = PackedColorArray([
+		Color(start_color.r, start_color.g, start_color.b, start_alpha),
+		Color(mid_color.r, mid_color.g, mid_color.b, mid_alpha),
+		Color(end_color.r, end_color.g, end_color.b, end_alpha),
 	])
 	var t := GradientTexture1D.new()
 	t.gradient = g
@@ -106,7 +123,11 @@ static func make_emitter(opts: Dictionary) -> GPUParticles2D:
 	# 색 + 페이드
 	var col: Color = opts.get("color", Color.WHITE)
 	mat.color = col
-	mat.color_ramp = make_fade_ramp(col, float(opts.get("mid_alpha", 0.7)))
+	# color_ramp 직접 주입 가능 — 원본 CPU 의 시간별 색 변화 재현용 (start/mid/end 색 다름)
+	if opts.has("color_ramp"):
+		mat.color_ramp = opts["color_ramp"]
+	else:
+		mat.color_ramp = make_fade_ramp(col, float(opts.get("mid_alpha", 0.7)))
 	# 회전 (chunk)
 	if opts.has("angle_min") and opts.has("angle_max"):
 		mat.angle_min = float(opts["angle_min"])

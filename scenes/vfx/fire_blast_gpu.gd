@@ -158,41 +158,51 @@ func _on_impact() -> void:
 	screen_effect.emit()
 
 func _spawn_explosion(pos: Vector2) -> void:
-	# fireball 70 burst
+	# fireball — 원본 3단계: 흰노랑(0.9) → 주황(0.75) → 진홍(0.55)
 	var fireball := _Helpers.make_emitter({
 		"count": _pcount(70), "lifetime": 0.75, "color": COL_MID,
 		"speed_min": 60.0, "speed_max": 360.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -54.0, "damping": 5.0,
 		"size_min": 14.0, "size_max": 36.0,
+		"color_ramp": _Helpers.make_color_ramp(
+			Color(1.0, 0.961, 0.824),    # 흰노랑
+			Color(1.0, 0.667, 0.275),    # 주황
+			Color(0.863, 0.235, 0.078),  # 진홍
+			0.9, 0.75, 0.0),
 	})
 	fireball.position = pos
 	add_child(fireball)
-	# ember 80 burst
+	# ember — 원본: rgba(255, 200-120k, 100-80k, 1-k)
 	var ember := _Helpers.make_emitter({
 		"count": _pcount(80), "lifetime": 1.05, "color": COL_HOT,
 		"speed_min": 120.0, "speed_max": 540.0,
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 162.0, "damping": 5.0,
 		"size_min": 1.6, "size_max": 3.2,
+		"color_ramp": _Helpers.make_color_ramp(
+			Color(1.0, 0.784, 0.392),
+			Color(1.0, 0.549, 0.235),
+			Color(1.0, 0.313, 0.078),
+			1.0, 0.6, 0.0),
 	})
 	ember.position = pos
 	add_child(ember)
-	# smoke 40 burst (위로 살짝)
+	# smoke — COL_SMOKE alpha fade
 	var smoke := _Helpers.make_emitter({
 		"count": _pcount(40), "lifetime": 1.85, "color": COL_SMOKE,
 		"speed_min": 36.0, "speed_max": 132.0,
 		"direction": Vector2.UP, "spread": 50.0,
 		"gravity": -36.0, "damping": 4.0,
 		"size_min": 26.0, "size_max": 56.0,
-		"additive": false, "mid_alpha": 0.25,
+		"additive": false, "mid_alpha": 0.22,
 		"emission_shape": "box", "emission_box": Vector2(30.0, 20.0),
 	})
 	smoke.position = pos
 	add_child(smoke)
 
 func _make_burn_emitters() -> void:
-	# flame 0.7 확률/frame * 60 ≈ 42/sec * lifetime 0.6 = 25 동시
+	# flame 잔불 — flame 색 변화 (흰노랑→주황→진홍)
 	_burn_flame = _Helpers.make_emitter({
 		"count": int(25 * _scale()), "lifetime": 0.6, "color": COL_HOT,
 		"speed_min": 24.0, "speed_max": 66.0,
@@ -201,10 +211,14 @@ func _make_burn_emitters() -> void:
 		"size_min": 4.0, "size_max": 11.0,
 		"emission_shape": "box", "emission_box": Vector2(20.0, 5.0),
 		"one_shot": false, "explosiveness": 0.0,
+		"color_ramp": _Helpers.make_color_ramp(
+			Color(1.0, 0.922, 0.706),
+			Color(1.0, 0.549, 0.196),
+			Color(0.706, 0.157, 0.059),
+			0.9, 0.7, 0.0),
 	})
 	_burn_flame.position = _target
 	add_child(_burn_flame)
-	# ember 0.4 확률/frame * 60 ≈ 24/sec * lifetime 0.85 = 20 동시
 	_burn_ember = _Helpers.make_emitter({
 		"count": int(20 * _scale()), "lifetime": 0.85, "color": COL_MID,
 		"speed_min": 48.0, "speed_max": 102.0,
@@ -213,6 +227,11 @@ func _make_burn_emitters() -> void:
 		"size_min": 1.2, "size_max": 2.2,
 		"emission_shape": "box", "emission_box": Vector2(18.0, 4.0),
 		"one_shot": false, "explosiveness": 0.0,
+		"color_ramp": _Helpers.make_color_ramp(
+			Color(1.0, 0.784, 0.392),
+			Color(1.0, 0.549, 0.235),
+			Color(1.0, 0.313, 0.078),
+			1.0, 0.6, 0.0),
 	})
 	_burn_ember.position = _target
 	add_child(_burn_ember)

@@ -119,34 +119,40 @@ func _run() -> void:
 func _spawn_burst() -> void:
 	var ctr := _target + Vector2(0.0, -30.0)
 	var floor_y: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 30.0)
-	# ember 30 at ctr — speed 120~480, y -120 bias (UP spread), lifetime 1.5, size 1.5~3.1, gravity 144 (down)
+	# ember — 원본 색: rgba(255, 200-120k, 90-80k, 1-k) — 흰주황 → 진홍 + alpha fade
 	var ember_burst := _Helpers.make_emitter({
-		"count": _pcount(30), "lifetime": 1.5, "color": COL_MID,
+		"count": _pcount(30), "lifetime": 1.5, "color": Color(1.0, 200.0/255.0, 90.0/255.0),
 		"speed_min": 120.0, "speed_max": 480.0,
 		"direction": Vector2.UP, "spread": 90.0,
 		"gravity": 144.0, "damping": 5.0,
 		"size_min": 1.5, "size_max": 3.1,
+		"color_ramp": _Helpers.make_color_ramp(
+			Color(1.0, 200.0/255.0, 90.0/255.0),     # start
+			Color(1.0, 140.0/255.0, 50.0/255.0),     # mid
+			Color(1.0, 80.0/255.0,  10.0/255.0),     # end
+			1.0, 0.7, 0.0),
 	})
 	ember_burst.position = ctr
 	add_child(ember_burst)
-	# dust 14 at floor — speed 120~360, mostly horizontal (sin*0.3), upward bias, large 22~40, slight up gentle
+	# dust — COL_DUST alpha 0 → 0.5 → 0 (원본은 alpha 가 (1-k)*0.5 fade)
 	var dust_burst := _Helpers.make_emitter({
 		"count": _pcount(14), "lifetime": 1.95, "color": COL_DUST,
 		"speed_min": 120.0, "speed_max": 360.0,
 		"direction": Vector2.UP, "spread": 75.0,
 		"gravity": -18.0, "damping": 4.0,
 		"size_min": 22.0, "size_max": 40.0,
-		"additive": false, "mid_alpha": 0.3,
+		"additive": false, "mid_alpha": 0.25,
 	})
 	dust_burst.position = floor_y
 	add_child(dust_burst)
-	# flame 10 at ctr — speed 120~360, upward, lifetime 0.85, size 14~28, up gentle
+	# flame — 원본 3단계: k<0.25 COL_HOT 0.85 / k<0.55 COL_MID 0.7 / else COL_DEEP 0.5
 	var flame_burst := _Helpers.make_emitter({
 		"count": _pcount(10), "lifetime": 0.85, "color": COL_HOT,
 		"speed_min": 120.0, "speed_max": 360.0,
 		"direction": Vector2.UP, "spread": 90.0,
 		"gravity": -72.0, "damping": 4.0,
 		"size_min": 14.0, "size_max": 28.0,
+		"color_ramp": _Helpers.make_color_ramp(COL_HOT, COL_MID, COL_DEEP, 0.85, 0.7, 0.0),
 	})
 	flame_burst.position = ctr
 	add_child(flame_burst)
@@ -157,19 +163,22 @@ func _spawn_burst() -> void:
 
 func _spawn_rising() -> void:
 	var floor_y: float = _ground_pos.y if _has_ground else _target.y + 30.0
-	# ember 2/frame * 60fps * 1.5s * lifetime 1.65 ≈ 198 동시. spawn box (75, 5)
 	_ember_rising = _Helpers.make_emitter({
-		"count": int(198 * _scale()), "lifetime": 1.65, "color": COL_MID,
+		"count": int(198 * _scale()), "lifetime": 1.65, "color": Color(1.0, 200.0/255.0, 90.0/255.0),
 		"speed_min": 72.0, "speed_max": 162.0,
 		"direction": Vector2.UP, "spread": 18.0,
 		"gravity": 72.0, "damping": 4.0,
 		"size_min": 1.6, "size_max": 3.2,
 		"emission_shape": "box", "emission_box": Vector2(75.0, 5.0),
 		"one_shot": false, "explosiveness": 0.0,
+		"color_ramp": _Helpers.make_color_ramp(
+			Color(1.0, 200.0/255.0, 90.0/255.0),
+			Color(1.0, 140.0/255.0, 50.0/255.0),
+			Color(1.0, 80.0/255.0,  10.0/255.0),
+			1.0, 0.7, 0.0),
 	})
 	_ember_rising.position = Vector2(_target.x, floor_y)
 	add_child(_ember_rising)
-	# flame 0.4 확률/frame * 60 = 24/sec * lifetime 0.95 ≈ 23 동시
 	_flame_rising = _Helpers.make_emitter({
 		"count": int(23 * _scale()), "lifetime": 0.95, "color": COL_HOT,
 		"speed_min": 90.0, "speed_max": 150.0,
@@ -178,6 +187,7 @@ func _spawn_rising() -> void:
 		"size_min": 8.0, "size_max": 18.0,
 		"emission_shape": "box", "emission_box": Vector2(50.0, 3.0),
 		"one_shot": false, "explosiveness": 0.0,
+		"color_ramp": _Helpers.make_color_ramp(COL_HOT, COL_MID, COL_DEEP, 0.85, 0.7, 0.0),
 	})
 	_flame_rising.position = Vector2(_target.x, floor_y - 5.0)
 	add_child(_flame_rising)
