@@ -147,7 +147,8 @@ const STATUS_INTERNAL_KEYS := [
 	"poison_dur", "counter_ratio", "damage_taken",
 	"greek_hubris_pending", "norse_ragnarok_fired",
 	"daoist_stance", "japanese_turn_count",
-	"charge_remaining", "_charge_block_advance"
+	"charge_remaining", "_charge_block_advance",
+	"taunt_source"  # 도발 시전자 추적용 — UI 표시 X (tooltip 에서만 사용)
 ]
 
 func _trf(key: String, args) -> String:
