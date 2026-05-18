@@ -1690,6 +1690,8 @@ func _tick_hero_poison(hero_id: String) -> void:
 		return
 	var tick_amt: int = dmg * POISON_DMG_PER_STACK
 	team_mgr.take_damage(hero_id, tick_amt)
+	# 데미지 popup 표시용 — battle_scene._on_hero_damaged 가 popup·VFX 처리 (_tick_enemy_poison 대칭)
+	hero_damaged.emit(hero_id, tick_amt, "poison")
 	poison_tick_applied.emit(hero_id, tick_amt)
 	dur -= 1
 	if dur <= 0:
