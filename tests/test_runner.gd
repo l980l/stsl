@@ -28,6 +28,7 @@ var TestRecruitSystem = preload("res://tests/test_recruit_system.gd")
 var TestSecretRoom = preload("res://tests/test_secret_room.gd")
 var TestEncounterWeighting = preload("res://tests/test_encounter_weighting.gd")
 var TestEnemyMechanics = preload("res://tests/test_enemy_mechanics.gd")
+var TestEnemyPatternsV2 = preload("res://tests/test_enemy_patterns_v2.gd")
 var TestEventIntegration = preload("res://tests/test_event_integration.gd")
 var TestLightningBeam = preload("res://tests/test_lightning_beam.gd")
 var TestIceShards = preload("res://tests/test_ice_shards.gd")
@@ -76,6 +77,7 @@ func _init() -> void:
 		TestSecretRoom.new(),
 		TestEncounterWeighting.new(),
 		TestEnemyMechanics.new(),
+		TestEnemyPatternsV2.new(),
 		TestEventIntegration.new(),
 		TestLightningBeam.new(),
 		TestIceShards.new(),
