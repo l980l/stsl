@@ -6,8 +6,8 @@ extends "res://scenes/vfx/debuff_hex.gd"
 
 const _Helpers = preload("res://scenes/vfx/gpu_particle_helpers.gd")
 
-const _COL_LILAC := Color(0.784, 0.635, 0.784)  # #C8A2C8 라일락 (연한 보라핑크)
-const _COL_GRASS := Color(0.486, 0.776, 0.184)  # #7BC62F 풀 색 (밝은 잔디)
+const _COL_LILAC := Color(0.85, 0.65, 0.95)   # 연보라 라벤더 (보라 위주, 회색X)
+const _COL_GRASS := Color(0.49, 0.99, 0.0)    # #7CFC00 lawn green (밝은 잔디)
 
 var _impact_made: bool = false
 var _gpu_amb_miasma: GPUParticles2D
