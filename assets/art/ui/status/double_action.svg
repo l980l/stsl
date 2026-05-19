@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <filter id="da-glow">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="da-arrow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd96a"/>
+      <stop offset="100%" stop-color="#c97b1a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 외곽 링 -->
+  <circle cx="128" cy="128" r="112" fill="#140804" stroke="#c9a84c" stroke-width="7"/>
+
+  <!-- 방사선 광채 -->
+  <line x1="128" y1="128" x2="128" y2="22" stroke="#c9a84c" stroke-width="3" stroke-linecap="round" opacity="0.4" transform="rotate(0 128 128)"/>
+  <line x1="128" y1="128" x2="128" y2="22" stroke="#c9a84c" stroke-width="3" stroke-linecap="round" opacity="0.4" transform="rotate(90 128 128)"/>
+  <line x1="128" y1="128" x2="128" y2="22" stroke="#c9a84c" stroke-width="3" stroke-linecap="round" opacity="0.4" transform="rotate(180 128 128)"/>
+  <line x1="128" y1="128" x2="128" y2="22" stroke="#c9a84c" stroke-width="3" stroke-linecap="round" opacity="0.4" transform="rotate(270 128 128)"/>
+
+  <!-- 좌측 화살표 (위→아래) -->
+  <g filter="url(#da-glow)">
+    <path d="M 78,70 L 102,70 L 102,160 L 122,160 L 90,200 L 58,160 L 78,160 Z"
+          fill="url(#da-arrow)" stroke="#fff2b0" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 우측 화살표 (아래→위) -->
+  <g filter="url(#da-glow)">
+    <path d="M 178,186 L 154,186 L 154,96 L 134,96 L 166,56 L 198,96 L 178,96 Z"
+          fill="url(#da-arrow)" stroke="#fff2b0" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 중앙 ×2 표식 -->
+  <circle cx="128" cy="128" r="22" fill="#140804" stroke="#c9a84c" stroke-width="3"/>
+  <text x="128" y="138" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="26" fill="#ffd96a">×2</text>
+</svg>

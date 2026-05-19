@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <filter id="hb-glow">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="hb-cross" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff6677"/>
+      <stop offset="100%" stop-color="#882233"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 외곽 링 -->
+  <circle cx="128" cy="128" r="112" fill="#140404" stroke="#c9a84c" stroke-width="7"/>
+
+  <!-- 회복 십자 (붉은 색 — 차단됨) -->
+  <g filter="url(#hb-glow)">
+    <rect x="100" y="60" width="56" height="136" rx="8" fill="url(#hb-cross)" stroke="#ffcccc" stroke-width="3"/>
+    <rect x="60" y="100" width="136" height="56" rx="8" fill="url(#hb-cross)" stroke="#ffcccc" stroke-width="3"/>
+  </g>
+
+  <!-- 금지 사선 (좌상 → 우하) -->
+  <line x1="50" y1="50" x2="206" y2="206" stroke="#ff3344" stroke-width="14" stroke-linecap="round" opacity="0.95"/>
+  <line x1="50" y1="50" x2="206" y2="206" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+</svg>

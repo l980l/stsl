@@ -148,7 +148,10 @@ const STATUS_INTERNAL_KEYS := [
 	"greek_hubris_pending", "norse_ragnarok_fired",
 	"daoist_stance", "japanese_turn_count",
 	"charge_remaining", "_charge_block_advance",
-	"taunt_source"  # 도발 시전자 추적용 — UI 표시 X (tooltip 에서만 사용)
+	"taunt_source",  # 도발 시전자 추적용 — UI 표시 X (tooltip 에서만 사용)
+	# 신규 적 메커니즘 internal — 별도 UI 표시 (현재 mode/affinity/weakness 는 weakness_alert/intent 라벨)
+	"current_mode_index", "current_mode", "current_affinity", "current_weakness",
+	"exiled"  # 영웅 노드 자체가 숨겨짐 — status 아이콘 표시 불필요
 ]
 
 func _trf(key: String, args) -> String:
@@ -2118,6 +2121,9 @@ const _STATUS_POPUP_INFO := {
 	"stun":          ["Stun",          Color(1.00, 0.85, 0.45)],   # rgba(255,217,115) 부드러운 황금 (마비 별)
 	"tokens":        ["Soldiers",      Color(0.85, 0.78, 1.00)],   # rgba(217,199,255) 부드러운 라일락 (소환)
 	"counter_pending": ["Counter Ready", Color(1.00, 0.85, 0.30)], # rgba(255,217,77)  황금 — 카운터 대기
+	"double_action": ["Double Action", Color(1.00, 0.82, 0.40)],   # rgba(255,209,102) 풍부한 골드 — 2회 행동
+	"heal_block":    ["Heal Block",    Color(1.00, 0.45, 0.55)],   # rgba(255,115,140) 강한 핑크 — 회복 차단
+	"silence":       ["Silence",       Color(0.65, 0.70, 0.90)],   # rgba(166,179,230) 차분한 보라 — 침묵
 }
 
 func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int, stack_key: String) -> void:
