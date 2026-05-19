@@ -15,7 +15,7 @@ func _spawn_impact_cloud(pos: Vector2) -> void:
 	if _impact_made:
 		return
 	_impact_made = true
-	# miasma 55 (보라 안개)
+	# miasma 55 (보라 안개 — COL_MIASMA, non-add)
 	var miasma := _Helpers.make_emitter({
 		"count": _pcount(55), "lifetime": 2.1, "color": COL_MIASMA,
 		"speed_min": 48.0, "speed_max": 228.0,
@@ -23,20 +23,20 @@ func _spawn_impact_cloud(pos: Vector2) -> void:
 		"gravity": -28.8, "damping": 3.0,
 		"size_min": 18.0, "size_max": 40.0,
 		"additive": false,
-		"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,
+		"start_alpha": 0.4, "mid_alpha": 0.25, "end_alpha": 0.0,
 	})
 	miasma.position = pos
 	add_child(miasma)
-	# drip 18 (독액 방울)
+	# drip 18 (작은 원형 녹색 방울 — circle_tex, non-add, COL_DRIP × 0.9)
+	# size_base default 32 → size r*0.9 매핑. drip_tex 의 poison 색 곱셈 회피.
 	var drip := _Helpers.make_emitter({
 		"count": _pcount(18), "lifetime": 2.0, "color": COL_DRIP,
 		"speed_min": 60.0, "speed_max": 240.0,
 		"direction": Vector2.UP, "spread": 160.0,
 		"gravity": 180.0, "damping": 3.0,
-		"size_min": 3.0, "size_max": 7.0,
-		"size_base": 7.0,
-		"texture": _Helpers.drip_tex(),
-		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
+		"size_min": 2.7, "size_max": 6.3,  # 원본 r=3.0~7.0 × 0.9 매칭
+		"additive": false,
+		"start_alpha": 0.9, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 	drip.position = pos
 	add_child(drip)
@@ -61,7 +61,7 @@ func _spawn_ambient() -> void:
 			"additive": false,
 			"emission_shape": "box", "emission_box": Vector2(50.0, 10.0),
 			"one_shot": false, "explosiveness": 0.0,
-			"start_alpha": 0.5, "mid_alpha": 0.25, "end_alpha": 0.0,
+			"start_alpha": 0.4, "mid_alpha": 0.25, "end_alpha": 0.0,
 		})
 		_gpu_amb_miasma.position = _target + Vector2(0.0, 30.0)
 		add_child(_gpu_amb_miasma)
