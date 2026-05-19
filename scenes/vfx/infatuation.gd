@@ -454,13 +454,15 @@ func _draw_shock(canvas: CanvasItem) -> void:
 	else:
 		oa = 1.0 - (t - 0.2) / 0.8
 	var rc := _target + Vector2(0.0, -40.0)
-	var thick: float = maxf(1.0, 4.0 - 3.0 * t)
+	# 사용자 요청 — 선 더 두껍게.
+	var thick: float = maxf(2.0, 8.0 - 6.0 * t)
 	# 로즈 + 바이올렛 두 겹
 	for tier in [["rose", COL_RED, sc],
 				 ["crimson", COL_CRIMSON, sc * 0.85]]:
 		var col: Color = tier[1]
 		var sci: float = tier[2]
-		var size: float = 16.0 * sci
+		# 사용자 요청 — 더 크게 (16 → 28).
+		var size: float = 28.0 * sci
 		var poly := PackedVector2Array()
 		for v in _heart_pts:
 			poly.append(rc + v * size)
