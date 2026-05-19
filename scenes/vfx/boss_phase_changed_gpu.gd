@@ -28,10 +28,10 @@ static func _dust_scale_curve() -> Curve:
 
 func _make_inflow(col: Color, count: int) -> GPUParticles2D:
 	return _Helpers.make_emitter({
-		"count": count, "lifetime": 0.35, "color": col,
+		"count": count, "lifetime": 0.25, "color": col,
 		"speed_min": 0.0, "speed_max": 0.0,
-		"emission_shape": "sphere", "emission_radius": 450.0,  # 더 넓게
-		"radial_accel_min": -3000.0, "radial_accel_max": -2200.0,  # 더 빠르게
+		"emission_shape": "sphere", "emission_radius": 700.0,  # 훨씬 넓게
+		"radial_accel_min": -6000.0, "radial_accel_max": -4500.0,  # 훨씬 빠르게
 		"size_min": 1.4, "size_max": 2.8,
 		"size_base": 16.0,
 		"texture": _Helpers.mote_halo_tex(),
@@ -46,10 +46,10 @@ func _spawn_inflow(_intensity: int) -> void:
 	_inflow_made = true
 	var ctr: Vector2 = _target + Vector2(0.0, -40.0)
 	# intensity 평균 3/frame × 60 = 180/s × lifetime 0.5 = 90 동시
-	# count 1.8배 증가 — 더 많이
-	_gpu_inflow_blood = _make_inflow(COL_BLOOD, int(49 * _scale()))
-	_gpu_inflow_hot = _make_inflow(COL_HOT, int(32 * _scale()))
-	_gpu_inflow_rim = _make_inflow(COL_RIM_HOT, int(81 * _scale()))
+	# count 추가 증가 — 훨씬 많이
+	_gpu_inflow_blood = _make_inflow(COL_BLOOD, int(90 * _scale()))
+	_gpu_inflow_hot = _make_inflow(COL_HOT, int(60 * _scale()))
+	_gpu_inflow_rim = _make_inflow(COL_RIM_HOT, int(150 * _scale()))
 	_gpu_inflow_blood.position = ctr
 	_gpu_inflow_hot.position = ctr
 	_gpu_inflow_rim.position = ctr
