@@ -15,6 +15,7 @@ static var _bubble_tex: Texture2D
 static var _drip_tex: Texture2D
 static var _petal_tex: Texture2D
 static var _halo_tex: Texture2D
+static var _mote_halo_tex: Texture2D
 
 # 100% 솔리드 원 + 가장자리 1px 안티앨리어싱.
 # CPU draw_circle(pos, r, col) 과 거의 동일 — 가장자리 페이드 없음.
@@ -34,6 +35,29 @@ static func circle_tex() -> Texture2D:
 					img.set_pixel(x, y, Color(1, 1, 1, 1.0 - (d - 31.0)))
 		_circle_tex = ImageTexture.create_from_image(img)
 	return _circle_tex
+
+# mote 헤일로 — 코어 원 + 큰 헤일로 원 합성 (원본 _draw_glow_pass mote 와 동일).
+# 원본: draw_circle(pos, pr, col) + draw_circle(pos, pr*1.8, col*0.5).
+# 코어 반경 16 (alpha 1.0) + 헤일로 반경 28.8 (alpha 0.5). size_base=16 매핑 → size 1.4 → 코어 1.4px.
+static func mote_halo_tex() -> Texture2D:
+	if _mote_halo_tex == null:
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		for y in 64:
+			for x in 64:
+				var dx: float = float(x) - 31.5
+				var dy: float = float(y) - 31.5
+				var d: float = sqrt(dx * dx + dy * dy)
+				if d <= 16.0:
+					img.set_pixel(x, y, Color.WHITE)  # 코어 alpha 1.0
+				elif d <= 17.0:
+					img.set_pixel(x, y, Color(1, 1, 1, 0.5 + 0.5 * (17.0 - d)))  # 코어 AA
+				elif d <= 28.8:
+					img.set_pixel(x, y, Color(1, 1, 1, 0.5))  # 헤일로 alpha 0.5
+				elif d <= 29.8:
+					img.set_pixel(x, y, Color(1, 1, 1, 0.5 * (29.8 - d)))  # 헤일로 AA
+		_mote_halo_tex = ImageTexture.create_from_image(img)
+	return _mote_halo_tex
 
 # 직사각형 48×64 (1:1.33 비율, chunk/debris 회전 시각화용 — 정사각형이면 회전 안 보임)
 static func square_tex() -> Texture2D:
@@ -358,9 +382,6 @@ static func make_emitter(opts: Dictionary) -> GPUParticles2D:
 	ps.lifetime = float(opts.get("lifetime", 1.0))
 	ps.one_shot = bool(opts.get("one_shot", true))
 	ps.explosiveness = float(opts.get("explosiveness", 1.0))
-	# 입자 죽는 시점 분산 — 동시 spawn + 동시 죽음 = "틱" 효과 방지.
-	# 원본 CPU 의 max_life = base + randf()*0.5~0.7 패턴 매칭. default 0.4 → 60%~100% lifetime.
-	ps.lifetime_randomness = float(opts.get("lifetime_randomness", 0.4))
 	ps.emitting = true
 	ps.texture = opts.get("texture", circle_tex())
 	ps.local_coords = false  # 부모(_target 따라가지 않음 — 발화 시점 좌표 고정)
@@ -368,6 +389,9 @@ static func make_emitter(opts: Dictionary) -> GPUParticles2D:
 	var mat := ParticleProcessMaterial.new()
 	# 2D 모드 명시 — z-축 disable. 안 하면 angular_velocity 가 3D 회전이라 2D 평면에서 안 보일 수 있음.
 	mat.particle_flag_disable_z = true
+	# 입자 죽는 시점 분산 — 동시 spawn + 동시 죽음 = "틱" 효과 방지.
+	# 원본 CPU 의 max_life = base + randf()*0.5~0.7 패턴 매칭. default 0.4 → 60%~100% lifetime.
+	mat.lifetime_randomness = float(opts.get("lifetime_randomness", 0.4))
 	# emission shape
 	var shape: String = opts.get("emission_shape", "point")
 	match shape:

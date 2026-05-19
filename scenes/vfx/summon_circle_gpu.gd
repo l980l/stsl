@@ -25,8 +25,8 @@ func _make_rising_emitter(col: Color, count_total: int, foot: Vector2) -> GPUPar
 		"direction": Vector2.UP, "spread": 12.0,
 		"gravity": 0.0, "damping": 3.0,
 		"size_min": 1.4, "size_max": 2.8,
-		"size_base": 4.0,
-		"texture": _Helpers.sparkle_tex(),
+		"size_base": 16.0,
+		"texture": _Helpers.mote_halo_tex(),
 		"emission_shape": "box", "emission_box": Vector2(CIRCLE_R * 0.7, CIRCLE_R * 0.3 * RING_SQUASH),
 		"one_shot": false, "explosiveness": 0.0,
 		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
@@ -80,8 +80,8 @@ func _spawn_peak_burst() -> void:
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 64.8, "damping": 3.0,
 		"size_min": 1.4, "size_max": 2.8,
-		"size_base": 4.0,
-		"texture": _Helpers.sparkle_tex(),
+		"size_base": 16.0,
+		"texture": _Helpers.mote_halo_tex(),
 		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 	mote_v.position = Vector2(foot.x, foot.y - 30.0)
@@ -92,8 +92,8 @@ func _spawn_peak_burst() -> void:
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 64.8, "damping": 3.0,
 		"size_min": 1.4, "size_max": 2.8,
-		"size_base": 4.0,
-		"texture": _Helpers.sparkle_tex(),
+		"size_base": 16.0,
+		"texture": _Helpers.mote_halo_tex(),
 		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 	mote_c.position = Vector2(foot.x, foot.y - 30.0)
@@ -104,8 +104,8 @@ func _spawn_peak_burst() -> void:
 		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": 64.8, "damping": 3.0,
 		"size_min": 1.4, "size_max": 2.8,
-		"size_base": 4.0,
-		"texture": _Helpers.sparkle_tex(),
+		"size_base": 16.0,
+		"texture": _Helpers.mote_halo_tex(),
 		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 	mote_m.position = Vector2(foot.x, foot.y - 30.0)
