@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <filter id="sl-glow">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="sl-card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#9aa6cc"/>
+      <stop offset="100%" stop-color="#3a4070"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 외곽 링 -->
+  <circle cx="128" cy="128" r="112" fill="#0a0a18" stroke="#c9a84c" stroke-width="7"/>
+
+  <!-- 카드 모양 (회색 — 사용 불가) -->
+  <g filter="url(#sl-glow)">
+    <rect x="86" y="70" width="84" height="116" rx="10" fill="url(#sl-card)" stroke="#d0d8f0" stroke-width="3"/>
+    <line x1="100" y1="100" x2="156" y2="100" stroke="#d0d8f0" stroke-width="3" opacity="0.6"/>
+    <line x1="100" y1="118" x2="148" y2="118" stroke="#d0d8f0" stroke-width="2.5" opacity="0.45"/>
+    <line x1="100" y1="136" x2="144" y2="136" stroke="#d0d8f0" stroke-width="2.5" opacity="0.35"/>
+  </g>
+
+  <!-- 금지 사선 -->
+  <line x1="50" y1="50" x2="206" y2="206" stroke="#ff3344" stroke-width="14" stroke-linecap="round" opacity="0.95"/>
+  <line x1="50" y1="50" x2="206" y2="206" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+</svg>

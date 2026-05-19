@@ -148,7 +148,10 @@ const STATUS_INTERNAL_KEYS := [
 	"greek_hubris_pending", "norse_ragnarok_fired",
 	"daoist_stance", "japanese_turn_count",
 	"charge_remaining", "_charge_block_advance",
-	"taunt_source"  # 도발 시전자 추적용 — UI 표시 X (tooltip 에서만 사용)
+	"taunt_source",  # 도발 시전자 추적용 — UI 표시 X (tooltip 에서만 사용)
+	# 신규 적 메커니즘 internal — 별도 UI 표시 (현재 mode/affinity/weakness 는 weakness_alert/intent 라벨)
+	"current_mode_index", "current_mode", "current_affinity", "current_weakness",
+	"exiled"  # 영웅 노드 자체가 숨겨짐 — status 아이콘 표시 불필요
 ]
 
 func _trf(key: String, args) -> String:
@@ -2117,6 +2120,10 @@ const _STATUS_POPUP_INFO := {
 	"speed_penalty": ["Slow",          Color(0.65, 0.72, 0.85)],   # rgba(166,184,217) 차분한 청회 (둔화)
 	"stun":          ["Stun",          Color(1.00, 0.85, 0.45)],   # rgba(255,217,115) 부드러운 황금 (마비 별)
 	"tokens":        ["Soldiers",      Color(0.85, 0.78, 1.00)],   # rgba(217,199,255) 부드러운 라일락 (소환)
+	"counter_pending": ["Counter Ready", Color(1.00, 0.85, 0.30)], # rgba(255,217,77)  황금 — 카운터 대기
+	"double_action": ["Double Action", Color(1.00, 0.82, 0.40)],   # rgba(255,209,102) 풍부한 골드 — 2회 행동
+	"heal_block":    ["Heal Block",    Color(1.00, 0.45, 0.55)],   # rgba(255,115,140) 강한 핑크 — 회복 차단
+	"silence":       ["Silence",       Color(0.65, 0.70, 0.90)],   # rgba(166,179,230) 차분한 보라 — 침묵
 }
 
 func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int, stack_key: String) -> void:
@@ -2400,7 +2407,7 @@ func _spawn_card_exhaust_for(card: Resource) -> void:
 	var center: Vector2 = card_node.global_position + card_node.size * 0.5
 	var fx: Node2D = _VFX_CARD_EXHAUST.new()
 	_ui_add(fx)  # CanvasLayer (카드와 같은 좌표계)
-	fx.z_index = 1300
+	fx.z_index = 1600  # 카드 (1500+i) 위에 표시
 	fx.position = Vector2.ZERO
 	if fx.has_method("set_card_size"):
 		fx.set_card_size(card_node.size)
@@ -3153,8 +3160,8 @@ func _spawn_boss_phase_change(target_pos: Vector2, foot_pos: Vector2, phase_num:
 		await get_tree().create_timer(0.1).timeout
 		if is_inside_tree():
 			_play_screen_shake()
-	# cinematic letterbox + title toast
-	_spawn_boss_phase_cinematic(phase_num)
+	# cinematic letterbox + title toast — 사용자 요청으로 제거
+	# _spawn_boss_phase_cinematic(phase_num)
 
 # cinematic letterbox bars + "PHASE %d" 큰 텍스트 (페이드인/아웃)
 func _spawn_boss_phase_cinematic(phase_num: int) -> void:
@@ -4679,6 +4686,16 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 		var char_node: Node2D = _hero_char_nodes.get(target)
 		if flash_color != Color.WHITE:
 			_play_status_flash(char_node, flash_color)
+		# counter_pending 부여 시 영웅 위치에 counter_prepare VFX 발동
+		if status_type == "counter_pending" and _stacks > 0 and char_node != null:
+			var cp_scene = load("res://scenes/vfx/counter_prepare.gd")
+			if cp_scene != null:
+				var fx: Node2D = cp_scene.new()
+				add_child(fx)
+				fx.position = Vector2.ZERO
+				fx.z_as_relative = false
+				fx.z_index = char_node.z_index + 1  # 영웅 sprite 위에 표시
+				fx.play(char_node.global_position, char_node.global_position)
 	# weak/vulnerable/charm/enthrall VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 차지 시작.
 	# 여기서는 상태 아이콘 갱신·status_popup·tint flash 만 (임팩트 시점 동기).
 	# 카드 데미지 표시는 hero strength/weak (자기) + 적 vulnerable (드래그 호버 시) 반영.
