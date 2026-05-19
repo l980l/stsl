@@ -1572,6 +1572,10 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	# FORM_SWITCH defense — turn_modes 의 index 0 = defense 모드. 받는 damage 50%.
 	if _is_enemy_in_defense_mode(enemy_index):
 		amount = int(amount * 0.5)
+	# dynamic_resistance (Kunino Quad-Converge 영감) — current_weakness 와 damage_type 불일치 시 0.2배
+	var _cur_weak: String = _enemy_status[enemy_index].get("current_weakness", "")
+	if _cur_weak != "" and damage_type != "" and damage_type != _cur_weak:
+		amount = int(amount * 0.2)
 	var absorbed: int = min(_enemy_block[enemy_index], amount)
 	_enemy_block[enemy_index] -= absorbed
 	amount -= absorbed
@@ -1825,6 +1829,15 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 		if not is_battle_active:
 			return
 	_enemy_block[i] = 0
+	# time_limit (Okumura 영감) — turn_count 초과 시 광폭화 strength +5/turn 누적
+	var _tlsrc: Resource = _enemies[i]
+	var _tlturns: int = int(_tlsrc.get("time_limit_turns")) if _tlsrc.get("time_limit_turns") != null else 0
+	if _tlturns > 0 and turn_count >= _tlturns:
+		_apply_status_to_enemy(i, "strength", 5)
+	# dynamic_resistance (Kunino Quad-Converge 영감) — 매 enemy turn 시작 시 풀에서 1개 픽
+	var _drpool: Array = _tlsrc.get("dynamic_resistance_pool") if _tlsrc.get("dynamic_resistance_pool") != null else []
+	if not _drpool.is_empty():
+		_enemy_status[i]["current_weakness"] = _drpool[randi() % _drpool.size()]
 	# 시그니처 hook: 턴 시작 (휴브리스 pending 처리, 도교 음양, 일본 결계)
 	# emit 된 passive_buff_applied 횟수만큼 VFX impact 대기 — 후속 intent VFX 와 순차 처리
 	var _sig_buffs: int = SignatureSys.on_enemy_turn_start(self, i)

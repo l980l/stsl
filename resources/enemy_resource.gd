@@ -41,3 +41,12 @@ enum Grade { NORMAL, ELITE, BOSS }
 # CHANGE_AFFINITY 시 랜덤 풀. 빈 배열 = 기본 4 속성 (불/얼음/번개/바람).
 # 예: ["holy_fire", "holy_strike", "holy_arrow"] — kronos act3 페이즈 2 진입 시 매 턴 변경.
 @export var dynamic_affinity_pool: Array = []
+
+# time_limit (Okumura 영감) — turn_count >= time_limit_turns 시 매 enemy turn 시작 시 광폭화 strength +5.
+# 0 = 비활성.
+@export var time_limit_turns: int = 0
+
+# dynamic_resistance (Kunino-sagiri Quad-Converge 영감) — 매 enemy turn 시작 시 풀에서 1개 픽.
+# 영웅 damage_type 이 current_weakness 와 일치 시 정상 damage, 불일치 시 0.2배 (80% reduction).
+# 빈 배열 = 비활성.
+@export var dynamic_resistance_pool: Array = []
