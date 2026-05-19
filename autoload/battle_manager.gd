@@ -2485,6 +2485,9 @@ func get_enemy_current_intents(index: int) -> Array:
 				return out
 	return [intent] if intent != null else []
 
+func get_enemy_count() -> int:
+	return _enemies.size()
+
 func get_enemy(index: int) -> Resource:
 	if index < 0 or index >= _enemies.size():
 		return null

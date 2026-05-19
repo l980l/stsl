@@ -1508,6 +1508,34 @@ func _apply_card_state(node: CardScene, card_res: Resource) -> void:
 	else:
 		node.set_owner_dead(false)
 		node.set_disabled(not DeckManager.can_play(card_res))
+	# 카운터 카드 빛남 — counter_window 활성 + 차지 중 적 존재 시 황금 glow
+	if _is_counter_card(card_res) and _any_counter_window_charging():
+		node.set_glow_color(Color(1.0, 0.85, 0.3))
+		node.show_glow(1.0)
+	else:
+		node.hide_glow()
+
+func _is_counter_card(card_res: Resource) -> bool:
+	for eff in card_res.effects:
+		if eff.effect_type == EffectRes.EffectType.COUNTER_REFLECT:
+			return true
+	return false
+
+func _any_counter_window_charging() -> bool:
+	# 어떤 적이든 counter_window_intent.enabled = true + charge_remaining > 0 이면 true
+	for i in range(BattleManager.get_enemy_count()):
+		if not BattleManager.is_enemy_alive(i):
+			continue
+		var enemy: Resource = BattleManager.get_enemy(i)
+		if enemy == null:
+			continue
+		var window: Dictionary = enemy.get("counter_window_intent") if enemy.get("counter_window_intent") != null else {}
+		if not bool(window.get("enabled", false)):
+			continue
+		var st: Dictionary = BattleManager.get_enemy_status(i)
+		if st.get("charge_remaining", 0) > 0:
+			return true
+	return false
 
 ## ── 좌상단 Turn Queue 미리보기 (ATB 큐) ──
 func _build_turn_queue_widget() -> void:
