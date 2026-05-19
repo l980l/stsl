@@ -604,6 +604,7 @@ func _rarity_color(r: int) -> Color:
 
 func _collect_party_card_pools() -> Array:
 	var results: Array = []
+	var common := load("res://resources/cards/cards_common.gd")
 	for hero in TeamManager.heroes:
 		var path := "res://resources/cards/cards_%s.gd" % hero.hero_id
 		if not ResourceLoader.exists(path):
@@ -615,6 +616,12 @@ func _collect_party_card_pools() -> Array:
 			var fx := _effect_summary(card)
 			var label := "[%s] %s  C%d  |  %s" % [hero.hero_id, tr(card.card_name), card.cost, fx]
 			results.append([label, card, _rarity_color(card.rarity)])
+		# universal 카드 (counter) — 영웅별 owner_id 로 추가
+		if common != null and common.has_method("counter"):
+			var ccard: Resource = common.counter(hero.hero_id)
+			var cfx := _effect_summary(ccard)
+			var clabel := "[%s] %s  C%d  |  %s" % [hero.hero_id, tr(ccard.card_name), ccard.cost, cfx]
+			results.append([clabel, ccard, _rarity_color(ccard.rarity)])
 	return _sort_card_opts(results)
 
 func _sort_card_opts(opts: Array) -> Array:
