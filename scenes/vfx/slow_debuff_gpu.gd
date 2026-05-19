@@ -39,10 +39,10 @@ func _spawn_peak_burst() -> void:
 	# 원본 vx = cos(a)×sp, vy = sin(a)×sp×0.2 — x:y = 2.3:1 가로 위주.
 	# damping 60 (CPU exponential 0.992^60 ≈ 1초 후 0.62× 매칭, linear 근사).
 	var mist := _Helpers.make_emitter({
-		"count": _pcount(14), "lifetime": 1.5, "color": COL_MID,
-		"speed_min": 60.0, "speed_max": 180.0,
-		"direction": Vector2.RIGHT, "spread": 90.0,  # 좌우 ±90° spread (FLATness 대체)
-		"gravity": -18.0, "damping": 60.0,
+		"count": _pcount(14), "lifetime": 1.5, "color": COL_HOT,
+		"speed_min": 5.0, "speed_max": 20.0,  # 거의 제자리
+		"direction": Vector2.RIGHT, "spread": 90.0,
+		"gravity": -18.0, "damping": 200.0,
 		"size_min": 12.0, "size_max": 24.0,
 		"scale_curve": _mist_scale_curve(),
 		"lifetime_randomness": 0.2,
@@ -52,10 +52,10 @@ func _spawn_peak_burst() -> void:
 	add_child(mist)
 	# 좌측 7 입자 별도 emitter (direction RIGHT 만으론 좌측 안 감, 양방향 합성)
 	var mist_l := _Helpers.make_emitter({
-		"count": _pcount(7), "lifetime": 1.5, "color": COL_MID,
-		"speed_min": 60.0, "speed_max": 180.0,
+		"count": _pcount(7), "lifetime": 1.5, "color": COL_HOT,
+		"speed_min": 5.0, "speed_max": 20.0,
 		"direction": Vector2.LEFT, "spread": 90.0,
-		"gravity": -18.0, "damping": 60.0,
+		"gravity": -18.0, "damping": 200.0,
 		"size_min": 12.0, "size_max": 24.0,
 		"scale_curve": _mist_scale_curve(),
 		"lifetime_randomness": 0.2,
@@ -103,10 +103,10 @@ func _spawn_ambient() -> void:
 	# mist ambient: 0.5/frame × 60 × lifetime 1.7 ≈ 51 동시. ground additive, COL_MID, alpha 0.4.
 	# damping 60 + lifetime_randomness 0.2 — peak 와 동일 패턴.
 	_gpu_amb_mist = _Helpers.make_emitter({
-		"count": int(51 * _scale()), "lifetime": 1.7, "color": COL_MID,
-		"speed_min": 12.0, "speed_max": 30.0,
+		"count": int(51 * _scale()), "lifetime": 1.7, "color": COL_HOT,
+		"speed_min": 5.0, "speed_max": 15.0,
 		"direction": Vector2.UP, "spread": 60.0,
-		"gravity": -10.8, "damping": 60.0,
+		"gravity": -10.8, "damping": 200.0,
 		"size_min": 12.0, "size_max": 22.0,
 		"scale_curve": _mist_scale_curve(),
 		"lifetime_randomness": 0.2,
