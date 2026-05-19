@@ -63,22 +63,22 @@ func _spawn_peak_burst() -> void:
 	})
 	mist_l.position = foot
 	add_child(mist_l)
-	# spiral 20 CPU (외곽→target 나선 수렴 — GPU 표준 파티클 불가)
-	for _i in range(_pcount(20)):
-		var ang := randf() * TAU
-		var dist := 110.0 + randf() * 50.0
-		var sx := _target.x + cos(ang) * dist
-		var sy := _target.y + sin(ang) * dist * 0.4 - 30.0
-		_particles.append({
-			"pos": Vector2(sx, sy),
-			"vel": Vector2.ZERO,
-			"life": 0.0,
-			"max_life": 0.8 + randf() * 0.4,
-			"size": 1.4 + randf() * 1.2,
-			"kind": "spiral",
-			"start_ang": ang,
-			"start_dist": dist,
-		})
+	# spiral 20 GPU — sphere emission radius 135 + orbit_velocity 회전 + radial_accel 중심 끌림.
+	# 원본 1.5π 회전 / lifetime 1.0 = 4.71 rad/s. dist 110→0 in 1s → 평균 accel -220.
+	var spiral := _Helpers.make_emitter({
+		"count": _pcount(20), "lifetime": 1.0, "color": COL_HOT,
+		"speed_min": 0.0, "speed_max": 0.0,  # initial vel 0 — orbit + radial 만
+		"direction": Vector2.RIGHT, "spread": 0.0,
+		"emission_shape": "sphere", "emission_radius": 135.0,
+		"radial_accel_min": -260.0, "radial_accel_max": -180.0,
+		"orbit_velocity_min": 0.7, "orbit_velocity_max": 1.2,  # Godot orbit 단위 = rotation/s, π*0.5≈1
+		"size_min": 1.4, "size_max": 2.6,
+		"size_base": 16.0,
+		"texture": _Helpers.mote_halo_tex(),
+		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
+	})
+	spiral.position = _target + Vector2(0.0, -30.0)
+	add_child(spiral)
 
 # _spawn_ambient: drip + mist + bubble GPU continuous
 func _spawn_ambient() -> void:

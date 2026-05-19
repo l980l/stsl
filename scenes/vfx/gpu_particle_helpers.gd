@@ -445,6 +445,14 @@ static func make_emitter(opts: Dictionary) -> GPUParticles2D:
 	if opts.has("angular_velocity_min") and opts.has("angular_velocity_max"):
 		mat.angular_velocity_min = float(opts["angular_velocity_min"])
 		mat.angular_velocity_max = float(opts["angular_velocity_max"])
+	# 중심 끌림 (음수) / 발산 (양수) — spiral 수렴, explosion radial 등
+	if opts.has("radial_accel_min") and opts.has("radial_accel_max"):
+		mat.radial_accel_min = float(opts["radial_accel_min"])
+		mat.radial_accel_max = float(opts["radial_accel_max"])
+	# 공전 (emission center 주위 회전, rad/s) — spiral 회전
+	if opts.has("orbit_velocity_min") and opts.has("orbit_velocity_max"):
+		mat.orbit_velocity_min = float(opts["orbit_velocity_min"])
+		mat.orbit_velocity_max = float(opts["orbit_velocity_max"])
 	ps.process_material = mat
 
 	# 가산 블렌드 (default true — ember/flame/mote)
