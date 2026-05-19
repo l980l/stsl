@@ -1838,6 +1838,7 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 	var _drpool: Array = _tlsrc.get("dynamic_resistance_pool") if _tlsrc.get("dynamic_resistance_pool") != null else []
 	if not _drpool.is_empty():
 		_enemy_status[i]["current_weakness"] = _drpool[randi() % _drpool.size()]
+		status_applied.emit("enemy_%d" % i, "current_weakness", 1)
 	# 시그니처 hook: 턴 시작 (휴브리스 pending 처리, 도교 음양, 일본 결계)
 	# emit 된 passive_buff_applied 횟수만큼 VFX impact 대기 — 후속 intent VFX 와 순차 처리
 	var _sig_buffs: int = SignatureSys.on_enemy_turn_start(self, i)

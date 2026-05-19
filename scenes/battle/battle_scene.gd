@@ -4521,6 +4521,17 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		hbox.add_child(lbl)
 		box.add_child(hbox)
 	var status: Dictionary = BattleManager.get_enemy_status(index)
+	# dynamic_resistance — current_weakness 가 설정된 적은 이번 턴 통하는 약점 속성 표시
+	var cur_weak: String = status.get("current_weakness", "")
+	if cur_weak != "":
+		var weak_lbl := Label.new()
+		weak_lbl.text = "약점: %s" % cur_weak
+		weak_lbl.add_theme_font_size_override("font_size", 12)
+		weak_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		weak_lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+		weak_lbl.modulate = Color(1.0, 0.85, 0.3)  # 황금색 — 강조
+		SacredTheme.attach_tooltip(weak_lbl, "이번 턴 이 속성 공격만 정상 데미지, 나머지 80% 감소")
+		box.add_child(weak_lbl)
 	# DEATH-RATTLE 보유 + 신화 시그니처 활성 표시 (살아있을 때만)
 	var enemy_res: Resource = BattleManager.get_enemy(index)
 	if enemy_res != null and BattleManager.is_enemy_alive(index):
