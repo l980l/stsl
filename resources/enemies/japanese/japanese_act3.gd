@@ -103,10 +103,20 @@ static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 220; p2i4.target = IntentRes.TargetType.ALL; p2i4.damage_type = "fire"
 	var p2i5 := IntentRes.new()
 	p2i5.action_type = IntentRes.ActionType.BUFF; p2i5.value = 3; p2i5.status_type = "strength"
+	# yamata_no_orochi (8 머리 뱀) — turn_modes [head1, head2, head3] 3-mode 순환 (8 머리 추상).
+	# 각 모드 다른 공격 의미. + INFLICT_WEAKNESS weakness_fire (스사노오 전설 — 화살 약점).
+	e.turn_modes = ["head1", "head2", "head3"]
+	var p1i_switch := IntentRes.new()
+	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"
+	var p2i_switch := IntentRes.new()
+	p2i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p2i_switch.play_animation = "buff"
+	var p2i_curse := IntentRes.new()
+	p2i_curse.action_type = IntentRes.ActionType.INFLICT_WEAKNESS; p2i_curse.value = 3; p2i_curse.status_type = "weakness_fire"
+	p2i_curse.target = IntentRes.TargetType.ALL; p2i_curse.play_animation = "debuff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4, p0i5],
-		[p1i1, p1i2, p1i3, p1i4, p1i5],
-		[p2i1, p2i2, p2i3, p2i4, p2i5]
+		[p1i_switch, p1i1, p1i2, p1i3, p1i4, p1i5],
+		[p2i_switch, p2i_curse, p2i1, p2i2, p2i3, p2i4, p2i5]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

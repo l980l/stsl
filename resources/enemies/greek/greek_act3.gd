@@ -97,10 +97,16 @@ static func kronos(scene: PackedScene) -> Resource:
 	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 280; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "holy_fire"
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 320; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "holy_arrow"
+	# kronos (시간의 신) — 시간의 변천: 페이즈 1, 2 에서 CHANGE_AFFINITY (신성 속성 동적 변경).
+	e.dynamic_affinity_pool = ["holy_strike", "holy_fire", "holy_arrow", "holy_slash"]
+	var p1i_aff := IntentRes.new()
+	p1i_aff.action_type = IntentRes.ActionType.CHANGE_AFFINITY; p1i_aff.play_animation = "buff"
+	var p2i_aff := IntentRes.new()
+	p2i_aff.action_type = IntentRes.ActionType.CHANGE_AFFINITY; p2i_aff.play_animation = "buff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4],
-		[p1i1, p1i2, p1i3, p1i4],
-		[p2i1, p2i2, p2i3]
+		[p1i_aff, p1i1, p1i2, p1i3, p1i4],
+		[p2i_aff, p2i1, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	# 카드 타입 카운터: 기술 카드 5장마다 영웅 전체에 취약 +2 부여

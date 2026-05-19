@@ -103,10 +103,16 @@ static func ra_horakhty(scene: PackedScene) -> Resource:
 	p2i3.target = IntentRes.TargetType.ALL
 	var p2i4 := IntentRes.new()
 	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 300; p2i4.target = IntentRes.TargetType.LOWEST_HP; p2i4.damage_type = "holy_arrow"
+	# ra_horakhty (태양신) — 매번 신성 형태 변화: CHANGE_AFFINITY 페이즈 1,2 (불/태양/별빛).
+	e.dynamic_affinity_pool = ["holy_fire", "holy_strike", "holy_arrow", "fire"]
+	var p1i_aff := IntentRes.new()
+	p1i_aff.action_type = IntentRes.ActionType.CHANGE_AFFINITY; p1i_aff.play_animation = "buff"
+	var p2i_aff := IntentRes.new()
+	p2i_aff.action_type = IntentRes.ActionType.CHANGE_AFFINITY; p2i_aff.play_animation = "buff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4],
-		[p1i1, p1i2, p1i3, p1i4],
-		[p2i1, p2i2, p2i3, p2i4]
+		[p1i_aff, p1i1, p1i2, p1i3, p1i4],
+		[p2i_aff, p2i1, p2i2, p2i3, p2i4]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	return e
