@@ -130,6 +130,7 @@ signal boss_phase_changed(enemy_index: int, new_phase: int)
 signal enemy_spawned(enemy_index: int)  # T3-SUMMON: 런타임 적 추가 알림 (UI 갱신용)
 @warning_ignore("unused_signal")
 signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시그니처 발동 알림 (UI 토스트용)
+signal counter_triggered(hero_id: String, enemy_index: int, is_major: bool)  # 카운터 발동 — VFX 트리거 (major = charge 보스 무효)
 signal token_attack_fired(hero_id: String, token_index: int, enemy_index: int)  # 토큰 (병사) 발사 — VFX/SFX 시각 처리용
 signal passive_buff_applied(enemy_index: int, status_type: String, value: int)  # phase_buffs / 시그너처 등 intent 외 자동 BUFF — battle_scene 이 VFX spawn 용도
 signal hero_turn_skipped(hero_id: String)  # 스턴 등으로 영웅 차례 자동 종료 — 토스트·VFX 용
@@ -1525,19 +1526,24 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						_enemy_status[target_enemy_index]["marked_by"] = _me_arr
 						status_applied.emit("enemy_%d" % target_enemy_index, "marked_by", _me_arr.size())
 			EffectRes.EffectType.COUNTER_REFLECT:
-				# 카운터 (universal starter). 두 모드 분기.
-				# A) 차지 보스 + counter_window 활성 → 즉시 차지 무효 + stun 1
+				# 카운터 (universal starter). 카드 자체는 타겟 미지정 — counter window 활성 적 자동 선택.
+				# A) counter window 활성 보스 → 즉시 차지 무효 + stun 1 (워닝 의도 표시 중에도 발동)
 				# B) 그 외 → 영웅에 counter_pending 부여 (다음 받는 공격에서 50% 반감 + 100% 반사)
+				var _cr_target: int = target_enemy_index
+				if _cr_target < 0 or not is_counter_window_active(_cr_target):
+					for _ci in range(_enemies.size()):
+						if is_counter_window_active(_ci):
+							_cr_target = _ci
+							break
 				var _cr_a_done: bool = false
-				if target_enemy_index >= 0 and target_enemy_index < _enemies.size() and _enemy_alive[target_enemy_index]:
-					var _cr_charge: int = _enemy_status[target_enemy_index].get("charge_remaining", 0)
-					var _cr_window: Dictionary = _enemies[target_enemy_index].get("counter_window_intent") if _enemies[target_enemy_index].get("counter_window_intent") != null else {}
-					var _cr_enabled: bool = bool(_cr_window.get("enabled", false))
-					if _cr_charge > 0 and _cr_enabled:
-						_enemy_status[target_enemy_index].erase("charge_remaining")
-						_apply_status_to_enemy(target_enemy_index, "stun", 1)
-						_enemy_status[target_enemy_index].erase("_charge_block_advance")
-						_cr_a_done = true
+				if is_counter_window_active(_cr_target):
+					_enemy_status[_cr_target].erase("charge_remaining")
+					_apply_status_to_enemy(_cr_target, "stun", 1)
+					_enemy_status[_cr_target].erase("_charge_block_advance")
+					# 패턴 사이클 reset — 차지업 + 후속 공격 (그 패턴 전체) 취소, 다음 사이클은 처음부터
+					_enemy_intent_index[_cr_target] = 0
+					counter_triggered.emit(card.owner_id, _cr_target, true)
+					_cr_a_done = true
 				if not _cr_a_done:
 					# 모드 B — 영웅에 counter_pending 부여
 					_apply_status_to_hero(card.owner_id, "counter_pending", 1)
@@ -1642,6 +1648,11 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 			_deal_damage_to_enemy(from_enemy_index, _reflect_amt, damage_type)
 		_hero_status[hero_id]["counter_pending"] = 0
 		status_applied.emit(hero_id, "counter_pending", 0)
+		# 적 공격 VFX 의 hit reaction 후 counter VFX 발동 (시각 분리)
+		var _ct_hid: String = hero_id
+		var _ct_ei: int = from_enemy_index
+		get_tree().create_timer(0.2).timeout.connect(func() -> void:
+			counter_triggered.emit(_ct_hid, _ct_ei, false))
 	var block: int = _hero_block.get(hero_id, 0)
 	var absorbed: int = min(block, amount)
 	_hero_block[hero_id] = block - absorbed
@@ -1773,6 +1784,9 @@ func _apply_status_to_hero(hero_id: String, status_type: String, stacks: int) ->
 	if status_type == "poison":
 		_hero_status[hero_id]["poison_dmg"] = _hero_status[hero_id].get("poison_dmg", 0) + stacks
 		_hero_status[hero_id]["poison_dur"] = 3
+	elif status_type == "counter_pending":
+		# 카운터 준비 — 중첩 X (binary). 항상 1 로 set.
+		_hero_status[hero_id][status_type] = 1
 	else:
 		_hero_status[hero_id][status_type] = _hero_status[hero_id].get(status_type, 0) + stacks
 	status_applied.emit(hero_id, status_type, stacks)
@@ -1932,6 +1946,14 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 		var charm_pat: Array = _get_active_pattern(i)
 		if not charm_pat.is_empty():
 			_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % charm_pat.size()
+	elif i < _enemy_status.size() and _enemy_status[i].get("stun", 0) > 0:
+		# 스턴 — 이번 turn skip + stun -1. intent advance 도 차단.
+		_enemy_status[i]["stun"] = max(0, _enemy_status[i]["stun"] - 1)
+		var _new_stun: int = _enemy_status[i]["stun"]
+		status_applied.emit("enemy_%d" % i, "stun", _new_stun)
+		# STUN popup 페이드 시간만큼 대기 (남은 스턴이 있을 때만 popup 표시됨)
+		if _new_stun > 0:
+			await get_tree().create_timer(0.9).timeout
 	else:
 		var pattern: Array = _get_active_pattern(i)
 		if not pattern.is_empty():
@@ -2396,6 +2418,12 @@ func _check_win_condition() -> void:
 	for alive in _enemy_alive:
 		if alive:
 			return
+	# 적 전멸 — 영웅도 전멸이면 패배 우선 (동시 KO 시 패배)
+	if team_mgr != null and team_mgr.get_living_heroes().is_empty():
+		is_battle_active = false
+		_restore_stolen_cards()
+		battle_lost.emit()
+		return
 	is_battle_active = false
 	_restore_stolen_cards()
 	battle_won.emit()
@@ -2466,6 +2494,21 @@ func get_enemy_current_intent(index: int) -> Resource:
 
 # 같은 턴에 동시 발동할 모든 intent (가로로 함께 표시되어야 하는 묶음).
 # CHARGE_UP 마지막 턴이면 payoff_intents 전체, 그 외엔 [현재 intent] 단일.
+# 카운터 윈도우 활성 — counter_window_intent.enabled + (이미 차지 중 OR 현재 의도가 CHARGE_UP).
+# 워닝 의도 표시 시점부터 카운터 사용 가능 (charge_remaining 부여 전이라도).
+func is_counter_window_active(index: int) -> bool:
+	if index < 0 or index >= _enemies.size() or not _enemy_alive[index]:
+		return false
+	var w: Dictionary = _enemies[index].get("counter_window_intent") if _enemies[index].get("counter_window_intent") != null else {}
+	if not bool(w.get("enabled", false)):
+		return false
+	if _enemy_status[index].get("charge_remaining", 0) > 0:
+		return true
+	for it in get_enemy_current_intents(index):
+		if it != null and it.action_type == IntentRes.ActionType.CHARGE_UP:
+			return true
+	return false
+
 func get_enemy_current_intents(index: int) -> Array:
 	if index < 0 or index >= _enemies.size():
 		return []
@@ -2591,7 +2634,8 @@ func _check_phase_transition(enemy_index: int) -> void:
 			var heal_ratio: float = enemy.phase_heal_ratios[current_phase]
 			if heal_ratio > 0.0:
 				_enemy_hp[enemy_index] = int(enemy.max_hp * heal_ratio)
-				enemy_damaged.emit(enemy_index, _enemy_hp[enemy_index], "", false)
+				# UI 갱신만 — enemy_damaged 는 데미지 popup 트리거하므로 사용 X.
+				pending_damage_changed.emit(enemy_index)
 		# Phase 전환 시 자동 status 부여 (광폭화·디스트레스 등)
 		if enemy.get("phase_buffs") != null and current_phase < enemy.phase_buffs.size():
 			var buffs: Array = enemy.phase_buffs[current_phase]
@@ -2786,5 +2830,6 @@ func debug_set_enemy_hp(index: int, hp: int) -> void:
 		_check_win_condition()
 	elif hp > 0 and not _enemy_alive[index]:
 		_enemy_alive[index] = true
-	enemy_damaged.emit(index, 0, "", false)
+	# UI 갱신만 — enemy_damaged 는 데미지 popup ("Block" 등) 트리거하므로 사용 X.
+	pending_damage_changed.emit(index)
 	_check_phase_transition(index)

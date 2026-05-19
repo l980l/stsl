@@ -516,11 +516,23 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 			toggle_state[0] = not toggle_state[0]
 			sa_btn.text = "전체 해제" if toggle_state[0] else "전체 선택"
 			for c in checks:
-				c.button_pressed = toggle_state[0]
+				if c.visible:
+					c.button_pressed = toggle_state[0]
 		)
 
+	# 검색 입력 — 한글/영문 대소문자 무관 substring 매칭. 항목 즉시 visibility 토글.
+	var search_row := HBoxContainer.new()
+	var search_lbl := Label.new()
+	search_lbl.text = "검색"
+	search_row.add_child(search_lbl)
+	var search_edit := LineEdit.new()
+	search_edit.placeholder_text = "이름·ID·효과 일부 입력 (자동 필터)"
+	search_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	search_row.add_child(search_edit)
+	outer.add_child(search_row)
+
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(860, 480)
+	scroll.custom_minimum_size = Vector2(860, 460)
 	var vbox := VBoxContainer.new()
 	scroll.add_child(vbox)
 
@@ -532,6 +544,15 @@ func _make_checkbox_dialog(title: String, options: Array, confirm_text: String, 
 			cb.add_theme_color_override("font_color", opt[2])
 		vbox.add_child(cb)
 		checks.append(cb)
+
+	search_edit.text_changed.connect(func(text: String) -> void:
+		var q := text.strip_edges().to_lower()
+		for c in checks:
+			if q.is_empty():
+				c.visible = true
+			else:
+				c.visible = c.text.to_lower().find(q) != -1
+	)
 
 	outer.add_child(scroll)
 	dlg.add_child(outer)

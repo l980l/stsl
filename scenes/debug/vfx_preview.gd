@@ -51,6 +51,9 @@ const SIG_KEKKAI := preload("res://scenes/vfx/sig_kekkai.gd")
 const TAUNT_VFX := preload("res://scenes/vfx/taunt.gd")
 const CARD_EXHAUST := preload("res://scenes/vfx/card_exhaust.gd")
 const BOSS_DEATH := preload("res://scenes/vfx/boss_death.gd")
+const DISPEL := preload("res://scenes/vfx/dispel.gd")
+const FORM_CHANGE := preload("res://scenes/vfx/form_change.gd")
+const COUNTER_VFX := preload("res://scenes/vfx/counter.gd")
 const _CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 const _CardResourceClass := preload("res://resources/card_resource.gd")
 
@@ -106,6 +109,10 @@ const VFX_CURRENT := [
 	{"name": "taunt",              "kind": "beam", "path": "res://scenes/vfx/taunt.gd"},
 	{"name": "card_exhaust",       "kind": "beam", "path": "res://scenes/vfx/card_exhaust.gd"},
 	{"name": "boss_death",         "kind": "beam", "path": "res://scenes/vfx/boss_death.gd"},
+	{"name": "dispel",             "kind": "beam", "path": "res://scenes/vfx/dispel.gd"},
+	{"name": "form_change",        "kind": "beam", "path": "res://scenes/vfx/form_change.gd"},
+	{"name": "counter",            "kind": "beam", "path": "res://scenes/vfx/counter.gd"},
+	{"name": "counter_major",      "kind": "beam", "path": "res://scenes/vfx/counter.gd"},
 ]
 
 # 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.
@@ -466,6 +473,20 @@ func _update_info() -> void:
 			s += "crack 0s → inhale %.2fs → impact %.2fs → crown %.2fs → slate %.2fs · hold %.2fs · fade %.2fs" % [
 				BOSS_DEATH.INHALE_DELAY, BOSS_DEATH.IMPACT_DELAY, BOSS_DEATH.CROWN_DELAY,
 				BOSS_DEATH.SLATE_DELAY, BOSS_DEATH.HOLD_TIME, BOSS_DEATH.FADE_TIME]
+		"dispel":
+			s += "버프 제거 — hook %d가닥 · windup %.2fs · stagger %.2fs · travel %.2fs · shatter %.2fs · fade %.2fs\n" % [
+				DISPEL.NUM_HOOKS, DISPEL.WINDUP_TIME, DISPEL.STAGGER, DISPEL.HOOK_TRAVEL, DISPEL.SHATTER_TIME, DISPEL.FADE_TIME]
+			s += "caster=적, target=영웅 — 빨간 hook tendril 이 황금 buff orb 부숨"
+		"form_change":
+			s += "폼 전환 — ring %.0f · halo %.0fx%.0f · pillar %.0fx%.0f · shock %.0f\n" % [
+				FORM_CHANGE.RING_RADIUS, FORM_CHANGE.HALO_W, FORM_CHANGE.HALO_H, FORM_CHANGE.PILLAR_W, FORM_CHANGE.PILLAR_H, FORM_CHANGE.SHOCK_R]
+			s += "charge %.2fs → pillar %.2fs → crack %.2fs → SHATTER → reveal %.2fs · hold %.2fs · fade %.2fs (시전자 마커 무시 — 타겟 위치)" % [
+				FORM_CHANGE.CHARGE_TIME, FORM_CHANGE.PILLAR_DELAY, FORM_CHANGE.CRACK_DELAY, FORM_CHANGE.REVEAL_TIME, FORM_CHANGE.HOLD_TIME, FORM_CHANGE.FADE_TIME]
+		"counter", "counter_major":
+			s += "카운터 — parry %.0f · shock %.0f · caster=영웅, target=적\n" % [
+				COUNTER_VFX.PARRY_R, COUNTER_VFX.SHOCK_R]
+			s += "parry %.2fs → streak → hit %.2fs · hold %.2fs · fade %.2fs (major = charge 보스 차지 무효 변형)" % [
+				COUNTER_VFX.PARRY_DELAY, COUNTER_VFX.HIT_DELAY, COUNTER_VFX.HOLD_TIME, COUNTER_VFX.FADE_TIME]
 		_:
 			s += "시전자 마커는 beam 전용 — impact/self는 타겟 위치에서 재생"
 	# IMPACT_DELAY 한 줄 자동 추가 — VFX 스크립트에 노출돼 있으면 표시 (battle_manager 가 동기화에 사용)
@@ -508,7 +529,7 @@ func _play(entry: Dictionary) -> void:
 					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
 					var c_pos: Vector2 = _caster_pos + Vector2(x_offsets[i], 0.0)
 					# 시전자 마커 무시, 타겟 위치를 중심·발치로
-					if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "taunt", "boss_death"]:
+					if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "taunt", "boss_death", "form_change"]:
 						c_pos = t_pos
 					_apply_ground_anchor(fx_n, entry["name"], c_pos, t_pos)
 					if i == 2:
@@ -530,6 +551,9 @@ func _play(entry: Dictionary) -> void:
 						_target_pos,
 						_target_pos + Vector2(130.0, 0.0),
 					])
+				# counter_major — counter VFX 의 major (charge 보스 무효) 변형
+				if entry["name"] == "counter_major" and fx.has_method("set_is_major"):
+					fx.set_is_major(true)
 				# card_exhaust — 실제 게임 CardScene + CardResource 표시 (타겟 위치) + VFX 위에. 카드는 fade out.
 				if entry["name"] == "card_exhaust":
 					var dummy := _make_dummy_card(_target_pos)
@@ -548,7 +572,7 @@ func _play(entry: Dictionary) -> void:
 					tw.tween_callback(dummy.queue_free)
 					return
 				# 시전자 마커 무시, 타겟 위치를 중심·발치로
-				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "boss_death"]:
+				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "boss_death", "form_change"]:
 					_apply_ground_anchor(fx, entry["name"], _target_pos, _target_pos)
 					fx.play(_target_pos, _target_pos)
 				else:
