@@ -37,6 +37,7 @@ static func charon(scene: PackedScene) -> Resource:
 	return e
 
 static func erinyes(scene: PackedScene) -> Resource:
+	# MIMIC: 복수의 여신 — 영웅 누적 데미지 40% 카르마 반사 (페이즈 2)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.greek.erinyes"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "greek"
@@ -50,9 +51,12 @@ static func erinyes(scene: PackedScene) -> Resource:
 	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 140; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "curse"
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "curse"
+	var p1i_mimic := IntentRes.new()
+	p1i_mimic.action_type = IntentRes.ActionType.MIMIC; p1i_mimic.value = 40; p1i_mimic.target = IntentRes.TargetType.LOWEST_HP
+	p1i_mimic.play_animation = "debuff"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 180; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "curse"
-	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i2]]
+	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i_mimic, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
 	return e
 

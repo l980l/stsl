@@ -45,9 +45,10 @@ static func twin_immortals(scene: PackedScene) -> Resource:
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 2; i3.status_type = "vulnerable"
 	i3.target = IntentRes.TargetType.RANDOM
+	# 쌍둥이 분신 모방 — 영웅 누적 데미지 35% 반사 (Yamabiko 영감, MIMIC 35%)
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.DEBUFF; i4.value = 1; i4.status_type = "vulnerable"
-	i4.target = IntentRes.TargetType.RANDOM
+	i4.action_type = IntentRes.ActionType.MIMIC; i4.value = 35; i4.target = IntentRes.TargetType.LOWEST_HP
+	i4.play_animation = "debuff"
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 160; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "slash"
 	var i6 := IntentRes.new()
