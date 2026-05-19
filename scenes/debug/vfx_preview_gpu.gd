@@ -41,6 +41,12 @@ const VFX_PAIRS := [
 	{"name": "purge_status",    "gpu": "res://scenes/vfx/purge_status_gpu.gd",    "cpu": "res://scenes/vfx/purge_status.gd"},
 	{"name": "debuff_hex",      "gpu": "res://scenes/vfx/debuff_hex_gpu.gd",      "cpu": "res://scenes/vfx/debuff_hex.gd"},
 	{"name": "target_marking",  "gpu": "res://scenes/vfx/target_marking_gpu.gd",  "cpu": "res://scenes/vfx/target_marking.gd"},
+	# Phase 7 — 기타 (sig 3종은 폴리곤 only 라 mimic/sacrifice/power_up/steal_card/card_exhaust 로 대체)
+	{"name": "mimic",        "gpu": "res://scenes/vfx/mimic_gpu.gd",        "cpu": "res://scenes/vfx/mimic.gd"},
+	{"name": "sacrifice",    "gpu": "res://scenes/vfx/sacrifice_gpu.gd",    "cpu": "res://scenes/vfx/sacrifice.gd"},
+	{"name": "power_up",     "gpu": "res://scenes/vfx/power_up_gpu.gd",     "cpu": "res://scenes/vfx/power_up.gd"},
+	{"name": "steal_card",   "gpu": "res://scenes/vfx/steal_card_gpu.gd",   "cpu": "res://scenes/vfx/steal_card.gd"},
+	{"name": "card_exhaust", "gpu": "res://scenes/vfx/card_exhaust_gpu.gd", "cpu": "res://scenes/vfx/card_exhaust.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
@@ -50,7 +56,9 @@ const _SPRITE_H := 192.0
 const _CHAR_FOOT_Y_OFFSET := 96.0
 
 # caster 무시 / 타겟 위치 발치 anchor 사용하는 VFX (vfx_preview.gd 의 분기와 동일)
-const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff", "holy_buff"]
+const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff", "holy_buff", "power_up"]
+# caster 만 사용하는 VFX — ground anchor 도 caster 발치로
+const _CASTER_ONLY_VFX: Array = []
 
 var _caster_pos := Vector2(420, 540)
 var _target_pos := Vector2(1500, 540)
@@ -248,10 +256,12 @@ func _spawn_single(entry: Dictionary, mode: String, offset: Vector2, show_marker
 	# 화면에 좌/우 라벨
 	_spawn_compare_label(t_pos, mode.to_upper())
 
-func _apply_ground_anchor(fx: Node2D, _c_center: Vector2, t_center: Vector2) -> void:
+func _apply_ground_anchor(fx: Node2D, c_center: Vector2, t_center: Vector2) -> void:
 	if not fx.has_method("set_ground_anchor"):
 		return
-	fx.set_ground_anchor(_foot_pos(t_center))
+	# caster_only VFX 는 caster 발치 기준
+	var anchor: Vector2 = c_center if _selected != null and _selected["name"] in _CASTER_ONLY_VFX else t_center
+	fx.set_ground_anchor(_foot_pos(anchor))
 
 func _sprite_rect(center: Vector2) -> Rect2:
 	return Rect2(center - Vector2(_SPRITE_W * 0.5, _SPRITE_H * 0.5), Vector2(_SPRITE_W, _SPRITE_H))
