@@ -6,20 +6,20 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 # ──── 엘리트 3종 ────
 
 static func apophis_serpent(scene: PackedScene) -> Resource:
+	# 저주의 뱀 — 영웅 1명에 heal_block 2턴 (회복 효과 차단)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.egyptian.apophis_serpent"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "egyptian"
-	# 4턴 순환: DEBUFF poison ALL / ATK RANDOM / ATK RANDOM / DEBUFF poison RANDOM
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.status_type = "poison"; i1.value = 5
 	i1.target = IntentRes.TargetType.ALL
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "poison"
+	i3.action_type = IntentRes.ActionType.DEBUFF; i3.status_type = "heal_block"; i3.value = 2
+	i3.target = IntentRes.TargetType.RANDOM
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.DEBUFF; i4.status_type = "poison"; i4.value = 3
-	i4.target = IntentRes.TargetType.RANDOM
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "poison"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 

@@ -19,11 +19,12 @@ static func yuki_onna(scene: PackedScene) -> Resource:
 	return e
 
 static func tengu(scene: PackedScene) -> Resource:
+	# 음양사 봉인 컨셉 — 영웅 1명에 silence 1턴 (카드 사용 불가)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.japanese.tengu"; e.max_hp = 320; e.character_scene = scene
 	e.mythology = "japanese"; e.signatures_enabled = false  # 인카운터 #2
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "weak"; i1.target = IntentRes.TargetType.RANDOM
+	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "silence"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()
