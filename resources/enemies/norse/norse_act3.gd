@@ -106,6 +106,8 @@ static func jormungandr(scene: PackedScene) -> Resource:
 	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 250; p2i4.target = IntentRes.TargetType.ALL; p2i4.damage_type = "poison"
 	# jormungandr (세계뱀) — turn_modes [coil, strike] FORM_SWITCH (똬리/공격 순환) + DISPEL.
 	# coil (똬리, 방어) / strike (공격) 사이클. 페이즈 2 에서 DISPEL ALL (영웅 buff 정화).
+	# time_limit 25턴 — 장기전 시 라그나로크 가속 (Okumura 영감, 매 turn strength +5 누적).
+	e.time_limit_turns = 25
 	e.turn_modes = ["coil", "strike"]
 	var p1i_switch := IntentRes.new()
 	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"
