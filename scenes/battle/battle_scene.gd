@@ -2404,14 +2404,22 @@ func _spawn_card_exhaust_for(card: Resource) -> void:
 			break
 	if card_node == null:
 		return
-	var center: Vector2 = card_node.global_position + card_node.size * 0.5
+	# 카드의 실제 변환(위치/회전/스케일) 추출 — 부채꼴 손패 회전 + hover 확대 반영
+	var card_xf: Transform2D = card_node.get_global_transform_with_canvas()
+	var pivot: Vector2 = card_node.pivot_offset
+	if pivot == Vector2.ZERO:
+		pivot = card_node.size * 0.5
+	var center: Vector2 = card_xf * pivot
+	var card_scale: Vector2 = card_xf.get_scale()
 	var fx: Node2D = _VFX_CARD_EXHAUST.new()
 	_ui_add(fx)  # CanvasLayer (카드와 같은 좌표계)
 	fx.z_index = 1600  # 카드 (1500+i) 위에 표시
-	fx.position = Vector2.ZERO
+	fx.position = center
+	fx.rotation = card_xf.get_rotation()
 	if fx.has_method("set_card_size"):
-		fx.set_card_size(card_node.size)
-	fx.play(center, center)
+		fx.set_card_size(card_node.size * card_scale)
+	# play() 의 target_pos 를 fx 의 local 원점(0,0)으로 — fx.position/rotation 이 변환 처리
+	fx.play(Vector2.ZERO, Vector2.ZERO)
 
 # 부활 VFX — 부활 대상 위치에 빛기둥·고리·빛 입자
 func _spawn_revive_blessing(pos: Vector2) -> void:
