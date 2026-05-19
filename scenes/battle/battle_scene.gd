@@ -2401,7 +2401,7 @@ func _spawn_card_exhaust_for(card: Resource) -> void:
 	var center: Vector2 = card_node.global_position + card_node.size * 0.5
 	var fx: Node2D = _VFX_CARD_EXHAUST.new()
 	_ui_add(fx)  # CanvasLayer (카드와 같은 좌표계)
-	fx.z_index = 1300
+	fx.z_index = 1600  # 카드 (1500+i) 위에 표시
 	fx.position = Vector2.ZERO
 	if fx.has_method("set_card_size"):
 		fx.set_card_size(card_node.size)
