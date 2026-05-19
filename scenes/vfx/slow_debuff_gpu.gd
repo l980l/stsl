@@ -1,6 +1,10 @@
 # scenes/vfx/slow_debuff_gpu.gd
 # 둔화 디버프 GPU 하이브리드 — slow_debuff.gd 상속.
-# mist + drip + bubble GPU. spiral (나선 수렴) 은 CPU 유지.
+# 원본 _draw_*_pass 한 줄씩 매칭:
+#   - mist: ground_layer (additive=true), Color(COL_MID, a) where a=(1-k)×0.4×ga, r=size×(1+k×1.3)
+#   - drip: glow_layer (additive=true), Color(COL_MID, 0.92×a), 세로 ellipse (cos×0.65, sin×1.4)
+#   - bubble: glow_layer (additive=true), 내부 Color(COL_MID, 0.3×a) + 외곽 ring Color(COL_HOT, 0.65×a)
+#   - spiral: glow_layer (additive=true), 외곽→target 수렴 — GPU 표준 파티클 불가 → CPU 유지
 extends "res://scenes/vfx/slow_debuff.gd"
 
 const _Helpers = preload("res://scenes/vfx/gpu_particle_helpers.gd")
@@ -18,24 +22,32 @@ func _process(delta: float) -> void:
 		if child is GPUParticles2D:
 			child.modulate.a = ga
 
-# mist GPU + spiral CPU (super 호출 X)
+# 시간 따라 크기 확장 Curve (mist 의 r = size × (1 + k × 1.3))
+static func _mist_scale_curve() -> Curve:
+	var c := Curve.new()
+	c.add_point(Vector2(0.0, 1.0))
+	c.add_point(Vector2(1.0, 2.3))
+	return c
+
+# _spawn_peak_burst: spiral 20 CPU (외곽→수렴) + mist 14 GPU
 func _spawn_peak_burst() -> void:
 	if _peak_made:
 		return
 	_peak_made = true
 	var foot: Vector2 = _foot_pos()
-	# 바닥 mist 14 (보라 안개 — 원본 ground_layer 가산 + COL_MID)
+	# mist 14 (ground additive, COL_MID, alpha (1-k)×0.4, 크기 1→2.3배 확장)
 	var mist := _Helpers.make_emitter({
 		"count": _pcount(14), "lifetime": 1.5, "color": COL_MID,
-		"speed_min": 60.0, "speed_max": 120.0,
-		"direction": Vector2.UP, "spread": 130.0,
+		"speed_min": 60.0, "speed_max": 180.0,  # 원본 sp 1~3 × PSPEED 60
+		"direction": Vector2.UP, "spread": 180.0,
 		"gravity": -18.0, "damping": 3.0,
 		"size_min": 12.0, "size_max": 24.0,
-		"start_alpha": 0.8, "mid_alpha": 0.5, "end_alpha": 0.0,
+		"scale_curve": _mist_scale_curve(),
+		"start_alpha": 0.4, "mid_alpha": 0.2, "end_alpha": 0.0,
 	})
 	mist.position = foot
 	add_child(mist)
-	# spiral CPU 20 — _process 의 spiral 위치 계산 필요
+	# spiral 20 CPU (외곽→target 나선 수렴 — GPU 표준 파티클 불가)
 	for _i in range(_pcount(20)):
 		var ang := randf() * TAU
 		var dist := 110.0 + randf() * 50.0
@@ -52,48 +64,52 @@ func _spawn_peak_burst() -> void:
 			"start_dist": dist,
 		})
 
-# ambient — drip + mist + bubble GPU continuous
+# _spawn_ambient: drip + mist + bubble GPU continuous
 func _spawn_ambient() -> void:
 	if _amb_made:
 		return
 	_amb_made = true
 	var foot: Vector2 = _foot_pos()
-	# drip 0.35/frame × 60 × lifetime 1.0 ≈ 21 동시 (보라 방울 — 작은 원형, 가산)
+	# drip: 0.35/frame × 60 × lifetime 1.0 ≈ 21 동시. glow additive, COL_MID, alpha 0.92.
+	# 원본 세로 ellipse (cos×0.65, sin×1.4) — GPU 단순 원으로 근사.
 	_gpu_amb_drip = _Helpers.make_emitter({
 		"count": int(21 * _scale()), "lifetime": 1.0, "color": COL_MID,
-		"speed_min": 24.0, "speed_max": 48.0,
+		"speed_min": 12.0, "speed_max": 36.0,  # 원본 vel 0.4~0.8 × PSPEED 60
 		"direction": Vector2.DOWN, "spread": 12.0,
-		"gravity": 108.0, "damping": 3.0,
+		"gravity": 108.0, "damping": 3.0,  # 원본 grav 0.03 × 3600 (PSPEED²)
 		"size_min": 2.4, "size_max": 3.8,
 		"emission_shape": "box", "emission_box": Vector2(70.0, 8.0),
 		"one_shot": false, "explosiveness": 0.0,
-		"start_alpha": 0.9, "mid_alpha": 0.5, "end_alpha": 0.0,
+		"start_alpha": 0.92, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 	_gpu_amb_drip.position = foot + Vector2(0.0, -18.0)
 	add_child(_gpu_amb_drip)
-	# mist 0.5/frame × 60 × lifetime 1.7 ≈ 51 동시 (가산 + COL_MID 밝은 보라)
+	# mist ambient: 0.5/frame × 60 × lifetime 1.7 ≈ 51 동시. ground additive, COL_MID, alpha 0.4.
 	_gpu_amb_mist = _Helpers.make_emitter({
 		"count": int(51 * _scale()), "lifetime": 1.7, "color": COL_MID,
-		"speed_min": 12.0, "speed_max": 30.0,
+		"speed_min": 12.0, "speed_max": 30.0,  # 원본 vel 0.2~0.5 × PSPEED
 		"direction": Vector2.UP, "spread": 60.0,
-		"gravity": -10.8, "damping": 3.0,
+		"gravity": -10.8, "damping": 3.0,  # 원본 grav -0.003
 		"size_min": 12.0, "size_max": 22.0,
+		"scale_curve": _mist_scale_curve(),
 		"emission_shape": "box", "emission_box": Vector2(80.0, 4.0),
 		"one_shot": false, "explosiveness": 0.0,
-		"start_alpha": 0.8, "mid_alpha": 0.5, "end_alpha": 0.0,
+		"start_alpha": 0.4, "mid_alpha": 0.2, "end_alpha": 0.0,
 	})
 	_gpu_amb_mist.position = foot + Vector2(0.0, -2.0)
 	add_child(_gpu_amb_mist)
-	# bubble 0.2/frame × 60 × lifetime 0.65 ≈ 8 동시 (가산, COL_MID 내부 흐릿 + COL_HOT 외곽)
+	# bubble: 0.2/frame × 60 × lifetime 0.65 ≈ 8 동시. glow additive.
+	# 원본 = 내부 COL_MID alpha 0.3 + 외곽 ring COL_HOT alpha 0.65. 2 색 합성 → 1 입자 매칭 불가.
+	# 가장 눈에 띄는 외곽 ring (COL_HOT, 0.65) 만 살림.
 	_gpu_amb_bubble = _Helpers.make_emitter({
-		"count": int(8 * _scale()), "lifetime": 0.65, "color": COL_MID,
-		"speed_min": 18.0, "speed_max": 30.0,
+		"count": int(8 * _scale()), "lifetime": 0.65, "color": COL_HOT,
+		"speed_min": 12.0, "speed_max": 30.0,
 		"direction": Vector2.UP, "spread": 12.0,
 		"gravity": 0.0, "damping": 3.0,
 		"size_min": 3.0, "size_max": 5.0,
 		"emission_shape": "box", "emission_box": Vector2(60.0, 2.0),
 		"one_shot": false, "explosiveness": 0.0,
-		"start_alpha": 0.5, "mid_alpha": 0.3, "end_alpha": 0.0,
+		"start_alpha": 0.65, "mid_alpha": 0.4, "end_alpha": 0.0,
 	})
 	_gpu_amb_bubble.position = foot + Vector2(0.0, -2.0)
 	add_child(_gpu_amb_bubble)
