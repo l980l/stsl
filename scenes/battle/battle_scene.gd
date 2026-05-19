@@ -4687,6 +4687,8 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 				var fx: Node2D = cp_scene.new()
 				add_child(fx)
 				fx.position = Vector2.ZERO
+				fx.z_as_relative = false
+				fx.z_index = char_node.z_index + 1  # 영웅 sprite 위에 표시
 				fx.play(char_node.global_position, char_node.global_position)
 	# weak/vulnerable/charm/enthrall VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 차지 시작.
 	# 여기서는 상태 아이콘 갱신·status_popup·tint flash 만 (임팩트 시점 동기).
