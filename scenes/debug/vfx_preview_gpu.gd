@@ -56,9 +56,9 @@ const _SPRITE_H := 192.0
 const _CHAR_FOOT_Y_OFFSET := 96.0
 
 # caster 무시 / 타겟 위치 발치 anchor 사용하는 VFX (vfx_preview.gd 의 분기와 동일)
-const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff", "holy_buff"]
+const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff", "holy_buff", "power_up"]
 # caster 만 사용하는 VFX — ground anchor 도 caster 발치로
-const _CASTER_ONLY_VFX := ["power_up"]
+const _CASTER_ONLY_VFX: Array = []
 
 var _caster_pos := Vector2(420, 540)
 var _target_pos := Vector2(1500, 540)
