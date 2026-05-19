@@ -83,9 +83,14 @@ static func fjorgynn(scene: PackedScene) -> Resource:
 	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 230; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "holy_fire"
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 260; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "holy_arrow"
+	# fjorgynn (대지의 어머니) — turn_modes 정의 + FORM_SWITCH intent 페이즈 1 에 추가.
+	# guardian (대지 방어 buff +block 30) / wrath (공격 모드) 순환.
+	e.turn_modes = ["guardian", "wrath"]
+	var p1i_switch := IntentRes.new()
+	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
-		[p1i1, p1i2, p1i3],
+		[p1i1, p1i_switch, p1i2, p1i3],
 		[p2i1, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]

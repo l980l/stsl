@@ -90,10 +90,14 @@ static func mahavairocana(scene: PackedScene) -> Resource:
 	var p2i5 := IntentRes.new()
 	p2i5.action_type = IntentRes.ActionType.DEBUFF; p2i5.value = 2; p2i5.status_type = "weak"
 	p2i5.target = IntentRes.TargetType.ALL
+	# mahavairocana (대일여래) — 정화의 빛: 페이즈 2 에서 영웅 전체 buff (strength + block) 제거.
+	var p2i_dispel := IntentRes.new()
+	p2i_dispel.action_type = IntentRes.ActionType.DISPEL
+	p2i_dispel.target = IntentRes.TargetType.ALL; p2i_dispel.play_animation = "debuff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4],
 		[p1i1, p1i2, p1i3, p1i4],
-		[p2i1, p2i2, p2i3, p2i4, p2i5]
+		[p2i1, p2i_dispel, p2i2, p2i3, p2i4, p2i5]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20
