@@ -20,6 +20,7 @@ const _ROOM_ICON_FILES := {
 
 const STATUS_FILE_ALIAS := {
 	"poison_dmg": "poison",
+	"counter_pending": "counter_block",  # 카운터 준비 — 방패 아이콘 재사용
 }
 
 var _cache: Dictionary = {}
