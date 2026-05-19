@@ -49,7 +49,7 @@ const VFX_PAIRS := [
 	{"name": "card_exhaust", "gpu": "res://scenes/vfx/card_exhaust_gpu.gd", "cpu": "res://scenes/vfx/card_exhaust.gd"},
 	# Phase 8 — 실해·한택
 	{"name": "arrow_shot",         "gpu": "res://scenes/vfx/arrow_shot_gpu.gd",         "cpu": "res://scenes/vfx/arrow_shot.gd"},
-	{"name": "blood_spray",        "gpu": "res://scenes/vfx/blood_spray_gpu.gd",        "cpu": "res://scenes/vfx/blood_spray.gd"},
+	# blood_spray 는 vel 방향 streak ↔ 원 동적 변화 → GPU 표준 파티클 불가, CPU 유지
 	{"name": "boss_phase_changed", "gpu": "res://scenes/vfx/boss_phase_changed_gpu.gd", "cpu": "res://scenes/vfx/boss_phase_changed.gd"},
 	{"name": "death_dissolve",     "gpu": "res://scenes/vfx/death_dissolve_gpu.gd",     "cpu": "res://scenes/vfx/death_dissolve.gd"},
 	{"name": "poison_tick",        "gpu": "res://scenes/vfx/poison_tick_gpu.gd",        "cpu": "res://scenes/vfx/poison_tick.gd"},
