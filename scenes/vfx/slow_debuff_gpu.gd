@@ -42,7 +42,7 @@ func _spawn_peak_burst() -> void:
 		"count": _pcount(14), "lifetime": 1.5, "color": COL_HOT,
 		"speed_min": 40.0, "speed_max": 120.0,
 		"direction": Vector2(1.0, -0.3).normalized(), "spread": 60.0,  # 가로 위주 + 위쪽, 아래로 안 감
-		"gravity": -18.0, "damping": 130.0,
+		"gravity": -18.0, "damping": 0.0,
 		"size_min": 12.0, "size_max": 24.0,
 		"scale_curve": _mist_scale_curve(),
 		"lifetime_randomness": 0.2,
@@ -55,7 +55,7 @@ func _spawn_peak_burst() -> void:
 		"count": _pcount(7), "lifetime": 1.5, "color": COL_HOT,
 		"speed_min": 40.0, "speed_max": 120.0,
 		"direction": Vector2(-1.0, -0.3).normalized(), "spread": 60.0,
-		"gravity": -18.0, "damping": 130.0,
+		"gravity": -18.0, "damping": 0.0,
 		"size_min": 12.0, "size_max": 24.0,
 		"scale_curve": _mist_scale_curve(),
 		"lifetime_randomness": 0.2,
@@ -106,7 +106,7 @@ func _spawn_ambient() -> void:
 		"count": int(51 * _scale()), "lifetime": 1.7, "color": COL_HOT,
 		"speed_min": 15.0, "speed_max": 35.0,
 		"direction": Vector2.UP, "spread": 60.0,  # 위쪽 ±30° — 아래로 안 감
-		"gravity": -10.8, "damping": 130.0,
+		"gravity": -10.8, "damping": 0.0,
 		"size_min": 12.0, "size_max": 22.0,
 		"scale_curve": _mist_scale_curve(),
 		"lifetime_randomness": 0.2,
