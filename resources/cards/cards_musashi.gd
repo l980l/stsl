@@ -5,6 +5,7 @@
 # 무심: hand_size_0 조건 + echo_next_attack Amplifier + 공허의 전환 Counter
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
+const CommonRes = preload("res://resources/cards/cards_common.gd")
 
 static func starter_deck() -> Array:
 	var cards: Array = []
@@ -14,6 +15,7 @@ static func starter_deck() -> Array:
 		cards.append(_defend())
 	cards.append(_niten_starter())
 	cards.append(_guard_stance())
+	cards.append(CommonRes.counter("musashi"))
 	return cards
 
 static func pool() -> Array:
@@ -38,20 +40,7 @@ static func pool() -> Array:
 		_five_rings_realm(),                                     # Chaos
 		# speed buff power (무심 추가)
 		_swift_blade(),
-		# 카운터 — 보스 차지 무효
-		_dual_blade_counter(),
-	]
-
-static func _dual_blade_counter() -> Resource:
-	# 이도류 카운터 — RARE, 1코, SKILL. 보스 CHARGE_UP 무효 + stun, 실패 시 50 dmg.
-	var c := CardRes.new()
-	c.card_name = "card.musashi.dual_blade_counter.name"; c.owner_id = "musashi"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.COUNTER_CHARGE
-	e.value = 50; e.base_value = 50
-	c.effects = [e]; return c
+		]
 
 static func _swift_blade() -> Resource:
 	# 신속의 검 — RARE, 2코, POWER, 무심: 전투 시작 시 본인 power.speed_buff +6 (전투 끝까지)

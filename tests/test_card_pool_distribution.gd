@@ -47,14 +47,14 @@ func test_napoleon_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_napoleon_rarity_distribution")
 	var gm = _load_gm()
 	var pool: Array = gm._napoleon_card_pool()
-	_assert(pool.size() == 32, "나폴레옹 풀 32장 (+counter)")
+	_assert(pool.size() == 31, "나폴레옹 풀 31장 (+speed)")
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 5: 기병위협, 참호구축, 전열재편, 진격나팔, 정찰(마킹)
 	_assert(counts["COMMON"] == 5, "나폴레옹 COMMON 5장 (실제: %d)" % counts["COMMON"])
 	# UNCOMMON 10
 	_assert(counts["UNCOMMON"] == 10, "나폴레옹 UNCOMMON 10장 (실제: %d)" % counts["UNCOMMON"])
 	# RARE 12: 아우스터리츠기동, 정복칙령, 일기당천, 아르콜레돌파, 알프스횡단, 제국보병소집, 황제군단, 포병일제사격, 보로디노포격, 독수리군기, 승리포고, 황제포위령
-	_assert(counts["RARE"] == 13, "나폴레옹 RARE 13장 (실제: %d)" % counts["RARE"])
+	_assert(counts["RARE"] == 12, "나폴레옹 RARE 12장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 2: 황제돌격, 황제명령
 	_assert(counts["LEGENDARY"] == 2, "나폴레옹 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
 	# DIVINE 2: 황제기개, 제국영광
@@ -64,14 +64,14 @@ func test_yi_sun_sin_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_yi_sun_sin_rarity_distribution")
 	var gm = _load_gm()
 	var pool: Array = gm._yi_sun_sin_card_pool()
-	_assert(pool.size() == 32, "이순신 풀 32장 (+counter)")
+	_assert(pool.size() == 31, "이순신 풀 31장 (+speed)")
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 4: 거북선방패, 진형결속, 군기진작, 기사회생
 	_assert(counts["COMMON"] == 4, "이순신 COMMON 4장 (실제: %d)" % counts["COMMON"])
 	# UNCOMMON 8: 거북선돌격, 반격, 연속방어, 진형강화, 수군훈련, 전열정비, 이판사판, 죽음의결의
 	_assert(counts["UNCOMMON"] == 8, "이순신 UNCOMMON 8장 (실제: %d)" % counts["UNCOMMON"])
 	# RARE 15: 거북의권능, 함대연합, 일제사격, 함포일제사, 돌격태세, 함대지휘, 진형의힘, 진형사수, 엄정한훈련, 배수진, 전사의각오, 위기돌파, 사지결단, 혈전, 거북선점호
-	_assert(counts["RARE"] == 16, "이순신 RARE 16장 (실제: %d)" % counts["RARE"])
+	_assert(counts["RARE"] == 15, "이순신 RARE 15장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 4: 귀선출항, 지휘본능, 필사즉생, 불사조
 	_assert(counts["LEGENDARY"] == 4, "이순신 LEGENDARY 4장 (실제: %d)" % counts["LEGENDARY"])
 	# DIVINE 0
@@ -97,14 +97,14 @@ func test_cleopatra_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_cleopatra_rarity_distribution")
 	var gm = _load_gm()
 	var pool: Array = gm._cleopatra_card_pool()
-	_assert(pool.size() == 32, "클레오파트라 풀 32장 (+counter)")
+	_assert(pool.size() == 31, "클레오파트라 풀 31장 (+speed)")
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 3: 독의씨앗, 모래폭풍, 뱀의눈빛
 	_assert(counts["COMMON"] == 3, "클레오파트라 COMMON 3장 (실제: %d)" % counts["COMMON"])
 	# UNCOMMON 9: 아스프독니, 독의향연, 독의잔치, 독의정화, 저주의시선, 사막의비책, 유혹, 나일의속삭임, 유혹의정체 (speed)
 	_assert(counts["UNCOMMON"] == 9, "클레오파트라 UNCOMMON 9장 (실제: %d)" % counts["UNCOMMON"])
 	# RARE 13: 나일안개, 독사권능, 파라오독력, 독살의식, 나일분노, 람세스방패, 이시스진노, 저주낙인, 파라오분노, 독꽃만개, 여왕위엄, 매혹향기, 매혹처형
-	_assert(counts["RARE"] == 14, "클레오파트라 RARE 14장 (실제: %d)" % counts["RARE"])
+	_assert(counts["RARE"] == 13, "클레오파트라 RARE 13장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 5: 나일천벌, 독의옥좌, 이시스심판, 뱀의의식, 황금왕좌
 	# (여왕포옹→황금왕좌 교체, 뱀의의식 신규 추가)
 	_assert(counts["LEGENDARY"] == 5, "클레오파트라 LEGENDARY 5장 (실제: %d)" % counts["LEGENDARY"])
@@ -133,14 +133,14 @@ func test_joan_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_joan_rarity_distribution")
 	var JoanCards = load("res://resources/cards/cards_joan_of_arc.gd")
 	var pool: Array = JoanCards.pool()
-	_assert(pool.size() == 32, "잔다르크 풀 32장 (+counter)")
+	_assert(pool.size() == 31, "잔다르크 풀 31장 (+speed)")
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 3: holy_bolt, holy_touch, communion
 	_assert(counts["COMMON"] == 3, "잔다르크 COMMON 3장 (실제: %d)" % counts["COMMON"])
 	# UNCOMMON 12: orleans,holy_wave,crusaders_faith,crusade,hymn,holy_purification,knights_oath,martyrs_will,altar_flame,martyrdom_steps,martyr_strength,grace_of_spirit (speed)
 	_assert(counts["UNCOMMON"] == 12, "잔다르크 UNCOMMON 12장 (실제: %d)" % counts["UNCOMMON"])
 	# RARE 11: holy_fury,divine_echo,archangels_wrath,holy_judge,oracle_light,guardian_angel,angel_wings,miracle_revive,passion_power,saints_revelation,last_shield
-	_assert(counts["RARE"] == 12, "잔다르크 RARE 12장 (실제: %d)" % counts["RARE"])
+	_assert(counts["RARE"] == 11, "잔다르크 RARE 11장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 4: divine_punishment,joan_return,flag_of_orleans,martyrs_light
 	_assert(counts["LEGENDARY"] == 4, "잔다르크 LEGENDARY 4장 (실제: %d)" % counts["LEGENDARY"])
 	# DIVINE 1: saints_flame
@@ -166,14 +166,14 @@ func test_genghis_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_genghis_rarity_distribution")
 	var GhisCards = load("res://resources/cards/cards_genghis_khan.gd")
 	var pool: Array = GhisCards.pool()
-	_assert(pool.size() == 32, "칭기즈칸 풀 32장 (+counter)")
+	_assert(pool.size() == 31, "칭기즈칸 풀 31장 (+speed)")
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 5: 급습, 기마도하, 기병소집, 화살세례, 노획(마킹)
 	_assert(counts["COMMON"] == 5, "칭기즈칸 COMMON 5장 (실제: %d)" % counts["COMMON"])
 	# UNCOMMON 12
 	_assert(counts["UNCOMMON"] == 12, "칭기즈칸 UNCOMMON 12장 (실제: %d)" % counts["UNCOMMON"])
 	# RARE 12: 기동의권능, 만리원정, 붉은지평선, 칭기즈광기, 군마의권능, 칸의깃발, 토큰일제사격, 천만의군세, 약탈자의본능, 칸의도박, 처형현상금, 기마돌격 (speed)
-	_assert(counts["RARE"] == 13, "칭기즈칸 RARE 13장 (실제: %d)" % counts["RARE"])
+	_assert(counts["RARE"] == 12, "칭기즈칸 RARE 12장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 2: 대칸의명령, 학살의칸
 	_assert(counts["LEGENDARY"] == 2, "칭기즈칸 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
 	# DIVINE 0
@@ -199,11 +199,11 @@ func test_musashi_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_musashi_rarity_distribution")
 	var MusaCards = load("res://resources/cards/cards_musashi.gd")
 	var pool: Array = MusaCards.pool()
-	_assert(pool.size() == 32, "무사시 풀 32장 (+counter)")
+	_assert(pool.size() == 31, "무사시 풀 31장 (+speed)")
 	var counts: Dictionary = _count_rarities(pool)
 	_assert(counts["COMMON"] == 5, "무사시 COMMON 5장 (실제: %d)" % counts["COMMON"])
 	_assert(counts["UNCOMMON"] == 12, "무사시 UNCOMMON 12장 (실제: %d)" % counts["UNCOMMON"])
-	_assert(counts["RARE"] == 12, "무사시 RARE 12장 (실제: %d)" % counts["RARE"])
+	_assert(counts["RARE"] == 11, "무사시 RARE 11장 (실제: %d)" % counts["RARE"])
 	_assert(counts["LEGENDARY"] == 2, "무사시 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
 	_assert(counts["DIVINE"] == 1, "무사시 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
 

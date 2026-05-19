@@ -5,6 +5,7 @@
 # 약탈: draw_per_turn + ON_KILL_DRAW Payoff
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
+const CommonRes = preload("res://resources/cards/cards_common.gd")
 
 static func starter_deck() -> Array:
 	var cards: Array = []
@@ -14,6 +15,7 @@ static func starter_deck() -> Array:
 		cards.append(_defend())
 	cards.append(_horse_thrust())
 	cards.append(_rider_call())
+	cards.append(CommonRes.counter("genghis_khan"))
 	return cards
 
 static func pool() -> Array:
@@ -38,20 +40,7 @@ static func pool() -> Array:
 		_khans_gamble(),                                                    # Chaos
 		# speed buff long (기동 추가)
 		_cavalry_charge_speed(),
-		# 카운터 — 보스 차지 무효
-		_conquerors_cry(),
-	]
-
-static func _conquerors_cry() -> Resource:
-	# 정복자의 일갈 — RARE, 1코, SKILL. 보스 CHARGE_UP 무효 + stun, 실패 시 50 dmg.
-	var c := CardRes.new()
-	c.card_name = "card.genghis_khan.conquerors_cry.name"; c.owner_id = "genghis_khan"
-	c.cost = 1; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.COUNTER_CHARGE
-	e.value = 50; e.base_value = 50
-	c.effects = [e]; return c
+		]
 
 static func _cavalry_charge_speed() -> Resource:
 	# 기마 돌격 — RARE, 1코, SKILL, 기동: 본인 speed +6 (3턴) — 나폴레옹 전격 진군 (+5/3턴) 의 RARE 상위

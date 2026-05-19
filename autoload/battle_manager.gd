@@ -1524,22 +1524,23 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						_me_arr.append(card.owner_id)
 						_enemy_status[target_enemy_index]["marked_by"] = _me_arr
 						status_applied.emit("enemy_%d" % target_enemy_index, "marked_by", _me_arr.size())
-			EffectRes.EffectType.COUNTER_CHARGE:
-				# Metaphor Louis 자세 시그널 영감 — 보스 CHARGE_UP 차지 중 + counter_window_intent.enabled 시
-				# charge 무효 + 1턴 stun. 그 외엔 fallback damage = effect.value.
+			EffectRes.EffectType.COUNTER_REFLECT:
+				# 카운터 (universal starter). 두 모드 분기.
+				# A) 차지 보스 + counter_window 활성 → 즉시 차지 무효 + stun 1
+				# B) 그 외 → 영웅에 counter_pending 부여 (다음 받는 공격에서 50% 반감 + 100% 반사)
+				var _cr_a_done: bool = false
 				if target_enemy_index >= 0 and target_enemy_index < _enemies.size() and _enemy_alive[target_enemy_index]:
-					var _cc_charge: int = _enemy_status[target_enemy_index].get("charge_remaining", 0)
-					var _cc_window: Dictionary = _enemies[target_enemy_index].get("counter_window_intent") if _enemies[target_enemy_index].get("counter_window_intent") != null else {}
-					var _cc_enabled: bool = bool(_cc_window.get("enabled", false))
-					if _cc_charge > 0 and _cc_enabled:
-						# charge 무효 — 다음 advance 시 정상 진행 + stun 1
+					var _cr_charge: int = _enemy_status[target_enemy_index].get("charge_remaining", 0)
+					var _cr_window: Dictionary = _enemies[target_enemy_index].get("counter_window_intent") if _enemies[target_enemy_index].get("counter_window_intent") != null else {}
+					var _cr_enabled: bool = bool(_cr_window.get("enabled", false))
+					if _cr_charge > 0 and _cr_enabled:
 						_enemy_status[target_enemy_index].erase("charge_remaining")
 						_apply_status_to_enemy(target_enemy_index, "stun", 1)
-						# 다음 intent advance 보장 (charge_block_advance 해제)
 						_enemy_status[target_enemy_index].erase("_charge_block_advance")
-					else:
-						# fallback — 일반 데미지
-						_deal_damage_to_enemy(target_enemy_index, effect.value, effect.damage_type)
+						_cr_a_done = true
+				if not _cr_a_done:
+					# 모드 B — 영웅에 counter_pending 부여
+					_apply_status_to_hero(card.owner_id, "counter_pending", 1)
 	# power.echo_next_attack: 이 ATTACK 카드 효과 전체를 1회 재시전 (재진입 가드)
 	if not _in_echo_replay and card.card_type == CardRes.CardType.ATTACK:
 		var _echo_key: String = "power.echo_next_attack:" + card.owner_id
@@ -1625,7 +1626,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	_check_phase_transition(enemy_index)
 	_check_win_condition()
 
-func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = "", is_crit: bool = false) -> void:
+func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = "", is_crit: bool = false, from_enemy_index: int = -1) -> void:
 	if debug_hero_invincible:
 		return
 	if team_mgr == null or not team_mgr.is_alive(hero_id):
@@ -1633,6 +1634,14 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 	var status: Dictionary = _hero_status.get(hero_id, {})
 	if status.get("vulnerable", 0) > 0:
 		amount = int(amount * 1.5)
+	# counter_pending — 다음 받는 공격 50% 반감 + 100% 반사. 1회 사용 후 소멸.
+	if status.get("counter_pending", 0) > 0 and from_enemy_index >= 0 and from_enemy_index < _enemies.size():
+		var _reflect_amt: int = amount
+		amount = int(amount * 0.5)
+		if _enemy_alive[from_enemy_index]:
+			_deal_damage_to_enemy(from_enemy_index, _reflect_amt, damage_type)
+		_hero_status[hero_id]["counter_pending"] = 0
+		status_applied.emit(hero_id, "counter_pending", 0)
 	var block: int = _hero_block.get(hero_id, 0)
 	var absorbed: int = min(block, amount)
 	_hero_block[hero_id] = block - absorbed
@@ -2013,7 +2022,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 						# 치명타: 영웅 status.marked_by 비어있지 않으면 +30%
 						var _all_hm: bool = not _hero_status.get(hero.hero_id, {}).get("marked_by", []).is_empty()
 						var _all_crit: Dictionary = _roll_crit_damage(dmg, _all_hm)
-						_deal_damage_to_hero(hero.hero_id, _all_crit["dmg"], resolved_dmg_type, _all_crit["is_crit"])
+						_deal_damage_to_hero(hero.hero_id, _all_crit["dmg"], resolved_dmg_type, _all_crit["is_crit"], enemy_index)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
 				# 미리 결정된 타겟 사용 (사망 시 fallback 으로 재결정)
@@ -2024,7 +2033,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 					# 치명타: 영웅 status.marked_by 비어있지 않으면 +30% (마킹한 적 한정 X — 모든 적)
 					var has_mark: bool = not _hero_status.get(target_id, {}).get("marked_by", []).is_empty()
 					var crit_result: Dictionary = _roll_crit_damage(dmg, has_mark)
-					_deal_damage_to_hero(target_id, crit_result["dmg"], resolved_dmg_type, crit_result["is_crit"])
+					_deal_damage_to_hero(target_id, crit_result["dmg"], resolved_dmg_type, crit_result["is_crit"], enemy_index)
 					# 시그니처 hook: 적의 단일 타겟 공격 (이집트 저주 누적)
 					SignatureSys.on_enemy_attack(self, enemy_index, target_id)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": target_id})
@@ -2162,7 +2171,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			if dmg > 0:
 				var target_id: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 				if target_id != "":
-					_deal_damage_to_hero(target_id, dmg, intent.damage_type)
+					_deal_damage_to_hero(target_id, dmg, intent.damage_type, false, enemy_index)
 		IntentRes.ActionType.DISPEL:
 			# 영웅 (또는 ALL) 의 status_type 키 제거 — Atlus Dekaja 영감.
 			# intent.status_type = 제거할 키 (예: "strength", "block"). 빈 문자열 = 기본 buff 셋 (strength + block).
