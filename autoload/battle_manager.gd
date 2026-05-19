@@ -1524,6 +1524,22 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						_me_arr.append(card.owner_id)
 						_enemy_status[target_enemy_index]["marked_by"] = _me_arr
 						status_applied.emit("enemy_%d" % target_enemy_index, "marked_by", _me_arr.size())
+			EffectRes.EffectType.COUNTER_CHARGE:
+				# Metaphor Louis 자세 시그널 영감 — 보스 CHARGE_UP 차지 중 + counter_window_intent.enabled 시
+				# charge 무효 + 1턴 stun. 그 외엔 fallback damage = effect.value.
+				if target_enemy_index >= 0 and target_enemy_index < _enemies.size() and _enemy_alive[target_enemy_index]:
+					var _cc_charge: int = _enemy_status[target_enemy_index].get("charge_remaining", 0)
+					var _cc_window: Dictionary = _enemies[target_enemy_index].get("counter_window_intent") if _enemies[target_enemy_index].get("counter_window_intent") != null else {}
+					var _cc_enabled: bool = bool(_cc_window.get("enabled", false))
+					if _cc_charge > 0 and _cc_enabled:
+						# charge 무효 — 다음 advance 시 정상 진행 + stun 1
+						_enemy_status[target_enemy_index].erase("charge_remaining")
+						_apply_status_to_enemy(target_enemy_index, "stun", 1)
+						# 다음 intent advance 보장 (charge_block_advance 해제)
+						_enemy_status[target_enemy_index].erase("_charge_block_advance")
+					else:
+						# fallback — 일반 데미지
+						_deal_damage_to_enemy(target_enemy_index, effect.value, effect.damage_type)
 	# power.echo_next_attack: 이 ATTACK 카드 효과 전체를 1회 재시전 (재진입 가드)
 	if not _in_echo_replay and card.card_type == CardRes.CardType.ATTACK:
 		var _echo_key: String = "power.echo_next_attack:" + card.owner_id

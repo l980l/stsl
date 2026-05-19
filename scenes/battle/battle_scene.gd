@@ -1402,7 +1402,13 @@ func _format_intent_label(enemy_index: int, intent: Resource) -> String:
 				"stun": return tr("battle.intent.debuff.stun")
 				_:      return tr("battle.intent.debuff")
 		IntentRes.ActionType.PREPARE:    return tr("battle.intent.prepare")
-		IntentRes.ActionType.CHARGE_UP:  return tr("battle.intent.charge_up")
+		IntentRes.ActionType.CHARGE_UP:
+			# counter_window_intent.enabled 보스 — ⚠ prefix 로 카운터 가능 신호
+			var _cw_enemy: Resource = BattleManager.get_enemy(enemy_index)
+			var _cw: Dictionary = _cw_enemy.get("counter_window_intent") if _cw_enemy != null and _cw_enemy.get("counter_window_intent") != null else {}
+			if bool(_cw.get("enabled", false)):
+				return "⚠ " + tr("battle.intent.charge_up")
+			return tr("battle.intent.charge_up")
 		IntentRes.ActionType.HEAL_ALLY:  return _trf("battle.intent.heal_ally", intent.value)
 		IntentRes.ActionType.BUFF_ALLY:  return _trf("battle.intent.buff_ally", intent.value)
 		IntentRes.ActionType.COUNTER_PREPARE: return _trf("battle.intent.counter_prepare", intent.value)
