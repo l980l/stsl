@@ -2521,7 +2521,7 @@ func _spawn_warrior_buff(pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
-		AudioManager.play_sfx("impact_blunt")
+		AudioManager.play_sfx("warrior_buff")
 	)
 	fx.play(pos, pos)
 
@@ -3224,8 +3224,10 @@ func _spawn_boss_phase_change(target_pos: Vector2, foot_pos: Vector2, phase_num:
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		_play_screen_shake()
-		AudioManager.play_sfx("impact_explosive")
+		AudioManager.play_sfx("boss_phase")
 	)
+	# build 단계 SFX — impact 전 긴장감 (심장 박동)
+	AudioManager.play_sfx("boss_phase_build")
 	fx.play(target_pos, target_pos)
 	# build 단계 rumble — 0.1s 간격으로 약한 shake 4회 (긴장감)
 	for i in range(4):
@@ -3349,7 +3351,7 @@ func _spawn_dispel(caster_pos: Vector2, target_pos: Vector2) -> void:
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_shake()
-		AudioManager.play_sfx("impact_curse")
+		AudioManager.play_sfx("card_steal")
 	)
 	fx.play(caster_pos, target_pos)
 
@@ -3368,7 +3370,7 @@ func _spawn_form_change(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		_play_screen_shake()
-		AudioManager.play_sfx("impact_divine")
+		AudioManager.play_sfx("form_change")
 	)
 	fx.play(target_pos, target_pos)
 
@@ -3400,7 +3402,7 @@ func _spawn_steal_card(caster_pos: Vector2, target_pos: Vector2) -> void:
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
-		AudioManager.play_sfx("impact_curse")
+		AudioManager.play_sfx("card_steal")
 	)
 	fx.play(caster_pos, target_pos)
 
@@ -4393,8 +4395,15 @@ func _on_battle_won() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	for entry in _enemy_nodes:
 		entry["btn"].disabled = true
-	# 마지막 적 사망 연출(death_dissolve)·VFX 임팩트·SFX 보여주고 종료 화면 전환
-	await get_tree().create_timer(1.5).timeout
+	# 마지막 적 사망 연출 — 보스면 boss_death VFX 전체 시퀀스(약 4.5s) 대기, 일반은 1.5s
+	var has_boss: bool = false
+	for i in range(BattleManager.get_enemy_count()):
+		var e: Resource = BattleManager.get_enemy(i)
+		if e != null and e.grade == EnemyResource.Grade.BOSS:
+			has_boss = true
+			break
+	var wait_t: float = 4.5 if has_boss else 1.5
+	await get_tree().create_timer(wait_t).timeout
 	if not is_inside_tree():
 		return
 	# 1.5s 대기 중 새 드래그 시도로 mouse HIDDEN 됐을 수 있음 — 씬 전환 직전 보험
@@ -4407,6 +4416,7 @@ func _on_battle_lost() -> void:
 	if _lose_played:
 		return
 	_lose_played = true
+	AudioManager.play_sfx("battle_lost")
 	# 드래그 중 전투 종료 시 마우스 hidden 잔존 방지
 	if _drag_card != null:
 		_cleanup_drag()
@@ -4563,6 +4573,10 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 			tooltip = tr("status.taunt.desc.locked") % src_name
 		else:
 			tooltip = tr("status.taunt.desc")
+	# charm_resistance — 저항값과 함께 동적으로 계산된 매혹 임계값 표시
+	elif key == "charm_resistance":
+		var threshold: int = BattleManager.CHARM_THRESHOLD_BASE + val
+		tooltip = tr("status.charm_resistance.desc") % [val, threshold]
 	# marked_by — Array. 적용 대상 (영웅/적) 으로 desc 분기.
 	# - 영웅 status: Array of enemy_index → 적 공격이 그 영웅에 치명타 +30%
 	# - 적 status: Array of hero_id → 모든 영웅 공격이 그 적에 치명타 +30%
@@ -4858,6 +4872,7 @@ func _maybe_strong_cc_popup(target: String, status_type: String, stacks: int) ->
 
 func _spawn_stun_stars(pos: Vector2) -> void:
 	# 일회성 burst (skip turn 토스트 등에서 사용)
+	AudioManager.play_sfx("stun")
 	var fx: Node2D = _VFX_STUN_STARS.new()
 	add_child(fx)
 	fx.z_index = 1300
@@ -4884,6 +4899,7 @@ func _update_persistent_stun_vfx(target: String, stacks: int) -> void:
 			node = _hero_char_nodes.get(target)
 		if node == null:
 			return
+		AudioManager.play_sfx("stun")
 		var fx: Node2D = _VFX_STUN_STARS.new()
 		add_child(fx)
 		fx.z_index = 1300
