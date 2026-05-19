@@ -38,7 +38,20 @@ static func pool() -> Array:
 		_saints_flame(),                                                # Chaos
 		# speed buff ally (축복 추가)
 		_grace_of_spirit(),
+		# 카운터 — 보스 차지 무효
+		_divine_shield(),
 	]
+
+static func _divine_shield() -> Resource:
+	# 신성한 방패 — RARE, 1코, SKILL. 보스 CHARGE_UP 무효 + stun, 실패 시 50 dmg.
+	var c := CardRes.new()
+	c.card_name = "card.joan_of_arc.divine_shield.name"; c.owner_id = "joan_of_arc"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.COUNTER_CHARGE
+	e.value = 50; e.base_value = 50
+	c.effects = [e]; return c
 
 static func _grace_of_spirit() -> Resource:
 	# 성령의 가호 — UNCOMMON, 1코, SKILL, 축복: 파티원 1명 speed +4 (3턴)

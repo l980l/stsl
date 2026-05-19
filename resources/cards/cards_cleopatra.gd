@@ -37,7 +37,20 @@ static func pool() -> Array:
 		_golden_throne(),                                            # Chaos
 		# speed debuff (조종 추가)
 		_seductive_stillness(),
+		# 카운터 — 보스 차지 무효
+		_charming_gaze(),
 	]
+
+static func _charming_gaze() -> Resource:
+	# 매혹의 시선 — RARE, 1코, SKILL. 보스 CHARGE_UP 무효 + stun, 실패 시 50 dmg.
+	var c := CardRes.new()
+	c.card_name = "card.cleopatra.charming_gaze.name"; c.owner_id = "cleopatra"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.COUNTER_CHARGE
+	e.value = 50; e.base_value = 50
+	c.effects = [e]; return c
 
 static func _seductive_stillness() -> Resource:
 	# 유혹의 정체 — UNCOMMON, 1코, SKILL, 조종: 적 1명 speed -5 (3턴)
