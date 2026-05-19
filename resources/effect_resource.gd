@@ -46,7 +46,7 @@ enum EffectType {
 	BUFF_SPEED,      # 영웅 speed +value, bonus_value 턴 일정 지속 (SELF/ALL_ALLIES/ALLY)
 	DEBUFF_SPEED,    # 적 speed -value, bonus_value 턴 일정 지속 (SINGLE/ALL)
 	MARK_ENEMY,      # 영웅이 적에게 마킹 — 적 status.marked_by 에 owner_id 추가. 모든 영웅 공격 치명타 확률 +30%.
-	COUNTER_CHARGE,  # 보스 CHARGE_UP 차지 중 + counter_window_intent 활성 시 charge 무효 + stun. 아니면 fallback damage = value.
+	COUNTER_REFLECT, # 보스 CHARGE_UP + counter_window 활성 → 차지 무효 + stun. 그 외 → counter_pending 부여 (다음 공격 50% 반감 + 100% 반사).
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
@@ -206,6 +206,6 @@ func display_text(override_value: int = -1) -> String:
 			return TranslationServer.translate(_dsk) % [value, bonus_value]
 		EffectType.MARK_ENEMY:
 			return TranslationServer.translate("effect.mark_enemy.text")
-		EffectType.COUNTER_CHARGE:
-			return "보스 차지 무효 (실패 시 %d dmg)" % v
+		EffectType.COUNTER_REFLECT:
+			return "다음 공격 50% 반감 + 100% 반사 (차지 보스 → 무효 + 기절)"
 	return ""
