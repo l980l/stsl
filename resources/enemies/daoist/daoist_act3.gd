@@ -99,10 +99,16 @@ static func jade_emperor(scene: PackedScene) -> Resource:
 	p2i6.target = IntentRes.TargetType.ALL
 	var p2i7 := IntentRes.new()
 	p2i7.action_type = IntentRes.ActionType.BUFF; p2i7.value = 3; p2i7.status_type = "strength"
+	# jade_emperor (옥황상제) — turn_modes [heaven, earth] FORM_SWITCH. 페이즈 1,2 천계/지상 모드 순환.
+	e.turn_modes = ["heaven", "earth"]
+	var p1i_switch := IntentRes.new()
+	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"
+	var p2i_switch := IntentRes.new()
+	p2i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p2i_switch.play_animation = "buff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4, p0i5],
-		[p1i1, p1i2, p1i3, p1i4, p1i5, p1i6],
-		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6, p2i7]
+		[p1i_switch, p1i1, p1i2, p1i3, p1i4, p1i5, p1i6],
+		[p2i_switch, p2i1, p2i2, p2i3, p2i4, p2i5, p2i6, p2i7]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

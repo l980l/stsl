@@ -104,10 +104,20 @@ static func jormungandr(scene: PackedScene) -> Resource:
 	p2i3.action_type = IntentRes.ActionType.BUFF; p2i3.status_type = "strength"; p2i3.value = 15
 	var p2i4 := IntentRes.new()
 	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 250; p2i4.target = IntentRes.TargetType.ALL; p2i4.damage_type = "poison"
+	# jormungandr (세계뱀) — turn_modes [coil, strike] FORM_SWITCH (똬리/공격 순환) + DISPEL.
+	# coil (똬리, 방어) / strike (공격) 사이클. 페이즈 2 에서 DISPEL ALL (영웅 buff 정화).
+	e.turn_modes = ["coil", "strike"]
+	var p1i_switch := IntentRes.new()
+	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"
+	var p2i_dispel := IntentRes.new()
+	p2i_dispel.action_type = IntentRes.ActionType.DISPEL
+	p2i_dispel.target = IntentRes.TargetType.ALL; p2i_dispel.play_animation = "debuff"
+	var p2i_switch := IntentRes.new()
+	p2i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p2i_switch.play_animation = "buff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
-		[p1i1, p1i2, p1i3],
-		[p2i1, p2i2, p2i3, p2i4]
+		[p1i_switch, p1i1, p1i2, p1i3],
+		[p2i_dispel, p2i1, p2i_switch, p2i2, p2i3, p2i4]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20
