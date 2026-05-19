@@ -1905,6 +1905,20 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 				_enemy_status[i].erase("_charge_block_advance")
 			else:
 				_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern.size()
+			# double_action (Renoir/Izanami Enrage 영감) — 적이 같은 turn 안 한 번 더 행동.
+			# 매 사용 시 1 decrement. 적 사망 시 skip.
+			if i < _enemy_status.size() and _enemy_alive[i] and _enemy_status[i].get("double_action", 0) > 0:
+				_enemy_status[i]["double_action"] -= 1
+				var pattern2: Array = _get_active_pattern(i)
+				if not pattern2.is_empty():
+					var intent2: Resource = pattern2[_enemy_intent_index[i]]
+					_vfx_caster = i
+					await _execute_intent(i, intent2)
+					_vfx_caster = null
+					if i < _enemy_status.size() and _enemy_status[i].get("_charge_block_advance", false):
+						_enemy_status[i].erase("_charge_block_advance")
+					else:
+						_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern2.size()
 	# 적 turn 종료 시 도발 decay — 부여 시점부터 N turn 유지 보장 (시작 decay 대신).
 	if i < _enemy_status.size():
 		var t_cur: int = _enemy_status[i].get("taunt", 0)

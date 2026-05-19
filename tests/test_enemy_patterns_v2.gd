@@ -37,6 +37,9 @@ func run_all() -> Dictionary:
 	test_offense_mode_boosts_outgoing_damage()
 	test_no_modes_no_damage_modifier()
 	test_change_affinity_overrides_damage_type()
+	# Phase A2-2
+	test_double_action_extra_intent()
+	test_double_action_decrements_each_use()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -337,6 +340,41 @@ func test_change_affinity_overrides_damage_type() -> void:
 	bm._enemy_status[0].erase("current_affinity")
 	resolved = bm._resolve_enemy_damage_type(0, "blunt")
 	_assert(resolved == "blunt", "current_affinity 미설정 → intent damage_type 사용")
+
+# Phase A2-2 — double_action
+
+# 20) double_action — 적이 한 turn 안에 intent 2번 실행
+func test_double_action_extra_intent() -> void:
+	print("[TestEnemyPatternsV2] test_double_action_extra_intent")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 100
+	var atk := _make_intent(IntentRes.ActionType.ATTACK, 20)
+	atk.target = IntentRes.TargetType.RANDOM
+	enemy.intent_pattern = [atk]
+	bm.setup_battle([enemy])
+	bm._apply_status_to_enemy(0, "double_action", 1)
+	bm.start_player_turn()
+	bm.end_player_turn()
+	# 20 + 20 = 40 → napoleon 1000 - 40 = 960
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 960, "double_action 1 → intent 2번 (20+20=40 dmg)")
+
+# 21) double_action decrement — 매 사용마다 -1
+func test_double_action_decrements_each_use() -> void:
+	print("[TestEnemyPatternsV2] test_double_action_decrements_each_use")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 100
+	var atk := _make_intent(IntentRes.ActionType.ATTACK, 10)
+	atk.target = IntentRes.TargetType.RANDOM
+	enemy.intent_pattern = [atk]
+	bm.setup_battle([enemy])
+	bm._apply_status_to_enemy(0, "double_action", 2)
+	bm.start_player_turn()
+	bm.end_player_turn()
+	_assert(bm._enemy_status[0].get("double_action", 0) == 1, "double_action 2 → 사용 후 1")
 
 # 10) INFLICT_WEAKNESS — 영웅에 status 부여
 func test_inflict_weakness_applies_to_hero() -> void:
