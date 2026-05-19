@@ -1569,6 +1569,9 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	amount = _consume_double_next_damage(amount)
 	if _enemy_status[enemy_index].get("vulnerable", 0) > 0:
 		amount = int(amount * 1.5)
+	# FORM_SWITCH defense — turn_modes 의 index 0 = defense 모드. 받는 damage 50%.
+	if _is_enemy_in_defense_mode(enemy_index):
+		amount = int(amount * 0.5)
 	var absorbed: int = min(_enemy_block[enemy_index], amount)
 	_enemy_block[enemy_index] -= absorbed
 	amount -= absorbed
@@ -1694,6 +1697,36 @@ func _set_enemy_taunt_source(enemy_index: int, hero_id: String) -> void:
 	if enemy_index < 0 or enemy_index >= _enemy_status.size():
 		return
 	_enemy_status[enemy_index]["taunt_source"] = hero_id
+
+# FORM_SWITCH helper: 현재 mode 가 turn_modes 의 첫 항목 (index 0) 이면 "defense" 로 간주.
+# defense 모드 보스: 받는 damage 50%. offense 모드: 주는 damage 1.5x (apply_offense_bonus).
+func _is_enemy_in_defense_mode(enemy_index: int) -> bool:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return false
+	var src: Resource = _enemies[enemy_index]
+	var modes: Array = src.get("turn_modes") if src.get("turn_modes") != null else []
+	if modes.is_empty():
+		return false
+	var cur_idx: int = _enemy_status[enemy_index].get("current_mode_index", 0)
+	return cur_idx == 0  # turn_modes[0] = defense (관습)
+
+# FORM_SWITCH offense 모드: 주는 damage 1.5x.
+func _is_enemy_in_offense_mode(enemy_index: int) -> bool:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return false
+	var src: Resource = _enemies[enemy_index]
+	var modes: Array = src.get("turn_modes") if src.get("turn_modes") != null else []
+	if modes.is_empty():
+		return false
+	var cur_idx: int = _enemy_status[enemy_index].get("current_mode_index", 0)
+	return cur_idx > 0  # index >= 1 = offense
+
+# CHANGE_AFFINITY override: 보스의 current_affinity 가 있으면 그것으로 damage_type 대체.
+func _resolve_enemy_damage_type(enemy_index: int, intent_damage_type: String) -> String:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return intent_damage_type
+	var override: String = _enemy_status[enemy_index].get("current_affinity", "")
+	return override if override != "" else intent_damage_type
 
 # heal 시 heal_block status 가 있으면 차단 (Dualliste Inverted 영감).
 # 반환: 실제 회복 적용 여부 (true) / 차단 (false).
@@ -1919,6 +1952,11 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				dmg = int(dmg * (1.0 + 0.1 * strength))
 			if _enemy_status[enemy_index].get("weak", 0) > 0:
 				dmg = int(dmg * 0.75)
+			# FORM_SWITCH offense — turn_modes index >= 1 = offense, 주는 damage 1.5x
+			if _is_enemy_in_offense_mode(enemy_index):
+				dmg = int(dmg * 1.5)
+			# CHANGE_AFFINITY override — intent.damage_type 대신 current_affinity 사용
+			var resolved_dmg_type: String = _resolve_enemy_damage_type(enemy_index, intent.damage_type)
 			# T3-COUNTER: 누적된 counter_pool 가산 후 소진
 			var counter_pool: int = _enemy_status[enemy_index].get("counter_pool", 0)
 			if counter_pool > 0:
@@ -1931,7 +1969,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 						# 치명타: 영웅 status.marked_by 비어있지 않으면 +30%
 						var _all_hm: bool = not _hero_status.get(hero.hero_id, {}).get("marked_by", []).is_empty()
 						var _all_crit: Dictionary = _roll_crit_damage(dmg, _all_hm)
-						_deal_damage_to_hero(hero.hero_id, _all_crit["dmg"], intent.damage_type, _all_crit["is_crit"])
+						_deal_damage_to_hero(hero.hero_id, _all_crit["dmg"], resolved_dmg_type, _all_crit["is_crit"])
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
 				# 미리 결정된 타겟 사용 (사망 시 fallback 으로 재결정)
@@ -1942,7 +1980,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 					# 치명타: 영웅 status.marked_by 비어있지 않으면 +30% (마킹한 적 한정 X — 모든 적)
 					var has_mark: bool = not _hero_status.get(target_id, {}).get("marked_by", []).is_empty()
 					var crit_result: Dictionary = _roll_crit_damage(dmg, has_mark)
-					_deal_damage_to_hero(target_id, crit_result["dmg"], intent.damage_type, crit_result["is_crit"])
+					_deal_damage_to_hero(target_id, crit_result["dmg"], resolved_dmg_type, crit_result["is_crit"])
 					# 시그니처 hook: 적의 단일 타겟 공격 (이집트 저주 누적)
 					SignatureSys.on_enemy_attack(self, enemy_index, target_id)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": target_id})
