@@ -2418,6 +2418,7 @@ func _spawn_card_exhaust_for(card: Resource) -> void:
 	fx.rotation = card_xf.get_rotation()
 	if fx.has_method("set_card_size"):
 		fx.set_card_size(card_node.size * card_scale)
+	AudioManager.play_sfx("card_exhaust")
 	# play() 의 target_pos 를 fx 의 local 원점(0,0)으로 — fx.position/rotation 이 변환 처리
 	fx.play(Vector2.ZERO, Vector2.ZERO)
 
@@ -2428,6 +2429,7 @@ func _spawn_revive_blessing(pos: Vector2) -> void:
 	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
 	fx.set_ground_anchor(pos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+	AudioManager.play_sfx("revive")
 	fx.play(pos, pos)
 
 # 회복 VFX — 회복 대상 위치에 나뭇잎·반짝임·고리·십자
@@ -2996,6 +2998,9 @@ func _spawn_caster_beam(beam_script: GDScript, caster_pos: Vector2, target_pos: 
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	# bullet 은 전용 SFX 파일이 없어 projectile SFX 로 폴백
 	var _sfx_key: String = "impact_projectile" if dtype == "bullet" else "impact_" + dtype
+	# projectile (활) 은 발사 시점에도 활시위 풀림 SFX 발동
+	if dtype == "projectile":
+		AudioManager.play_sfx("arrow_shot")
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		_play_screen_shake()
@@ -3126,7 +3131,7 @@ func _spawn_summon_burst(hero_id: String, caster_pos: Vector2, count: int) -> vo
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
-		AudioManager.play_sfx("impact_divine")
+		AudioManager.play_sfx("summon")
 		for i in range(effective_count):
 			_animate_soldier_summon_motion(hero_node, soldier_spawn_positions[i])
 	)
@@ -3372,7 +3377,7 @@ func _spawn_slow_debuff(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -
 		fx.set_ground_anchor(foot_pos)
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
-		AudioManager.play_sfx("impact_curse")
+		AudioManager.play_sfx("speed_penalty")
 	)
 	fx.play(target_pos, target_pos)
 
@@ -3387,7 +3392,7 @@ func _spawn_speed_buff(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) ->
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
-		AudioManager.play_sfx("impact_divine")
+		AudioManager.play_sfx("speed_bonus")
 	)
 	fx.play(target_pos, target_pos)
 
@@ -3402,7 +3407,7 @@ func _spawn_summon_circle(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO)
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
-		AudioManager.play_sfx("impact_divine")
+		AudioManager.play_sfx("summon")
 	)
 	fx.play(caster_pos, caster_pos)
 
@@ -3418,7 +3423,7 @@ func _spawn_power_up(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> v
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
-		AudioManager.play_sfx("impact_divine")
+		AudioManager.play_sfx("charge_up")
 	)
 	fx.play(caster_pos, caster_pos)
 
