@@ -35,6 +35,12 @@ const VFX_PAIRS := [
 	{"name": "summon_burst",    "gpu": "res://scenes/vfx/summon_burst_gpu.gd",    "cpu": "res://scenes/vfx/summon_burst.gd"},
 	{"name": "summon_circle",   "gpu": "res://scenes/vfx/summon_circle_gpu.gd",   "cpu": "res://scenes/vfx/summon_circle.gd"},
 	{"name": "morale_boost",    "gpu": "res://scenes/vfx/morale_boost_gpu.gd",    "cpu": "res://scenes/vfx/morale_boost.gd"},
+	# Phase 6 — 면역·이동 조종
+	{"name": "speed_buff",      "gpu": "res://scenes/vfx/speed_buff_gpu.gd",      "cpu": "res://scenes/vfx/speed_buff.gd"},
+	{"name": "slow_debuff",     "gpu": "res://scenes/vfx/slow_debuff_gpu.gd",     "cpu": "res://scenes/vfx/slow_debuff.gd"},
+	{"name": "purge_status",    "gpu": "res://scenes/vfx/purge_status_gpu.gd",    "cpu": "res://scenes/vfx/purge_status.gd"},
+	{"name": "debuff_hex",      "gpu": "res://scenes/vfx/debuff_hex_gpu.gd",      "cpu": "res://scenes/vfx/debuff_hex.gd"},
+	{"name": "target_marking",  "gpu": "res://scenes/vfx/target_marking_gpu.gd",  "cpu": "res://scenes/vfx/target_marking.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
