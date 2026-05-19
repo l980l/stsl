@@ -86,10 +86,16 @@ static func sekhmet(scene: PackedScene) -> Resource:
 	var p1i_curse := IntentRes.new()
 	p1i_curse.action_type = IntentRes.ActionType.INFLICT_WEAKNESS; p1i_curse.value = 3; p1i_curse.status_type = "weakness_fire"
 	p1i_curse.target = IntentRes.TargetType.ALL; p1i_curse.play_animation = "debuff"
+	# 페이즈 2 — 사자의 분노 차지업 (counter 가능): 2턴 후 220 ALL blunt 폭격
+	var p2_charge_atk := IntentRes.new()
+	p2_charge_atk.action_type = IntentRes.ActionType.ATTACK; p2_charge_atk.value = 220; p2_charge_atk.target = IntentRes.TargetType.ALL; p2_charge_atk.damage_type = "blunt"
+	var p2_charge := IntentRes.new()
+	p2_charge.action_type = IntentRes.ActionType.CHARGE_UP; p2_charge.charge_turns = 2; p2_charge.payoff_intents = [p2_charge_atk]
+	e.counter_window_intent = {"enabled": true}
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
 		[p1i_curse, p1i1, p1i2, p1i3],
-		[p2i1, p2i2, p2i3]
+		[p2i1, p2_charge, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

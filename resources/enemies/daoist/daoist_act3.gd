@@ -107,10 +107,16 @@ static func jade_emperor(scene: PackedScene) -> Resource:
 	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"
 	var p2i_switch := IntentRes.new()
 	p2i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p2i_switch.play_animation = "buff"
+	# 페이즈 2 — 천제의 의지 차지업 (counter 가능): 2턴 후 220 ALL holy_fire 천벌
+	var p2_charge_atk := IntentRes.new()
+	p2_charge_atk.action_type = IntentRes.ActionType.ATTACK; p2_charge_atk.value = 220; p2_charge_atk.target = IntentRes.TargetType.ALL; p2_charge_atk.damage_type = "holy_fire"
+	var p2_charge := IntentRes.new()
+	p2_charge.action_type = IntentRes.ActionType.CHARGE_UP; p2_charge.charge_turns = 2; p2_charge.payoff_intents = [p2_charge_atk]
+	e.counter_window_intent = {"enabled": true}
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4, p0i5],
 		[p1i_switch, p1i1, p1i2, p1i3, p1i4, p1i5, p1i6],
-		[p2i_switch, p2i1, p2i2, p2i3, p2i4, p2i5, p2i6, p2i7]
+		[p2i_switch, p2i1, p2_charge, p2i2, p2i3, p2i4, p2i5, p2i6, p2i7]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20
