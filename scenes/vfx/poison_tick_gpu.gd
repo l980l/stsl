@@ -14,6 +14,16 @@ var _gpu_gas: GPUParticles2D
 var _gpu_bubble: GPUParticles2D
 var _amb_made: bool = false
 
+# TICK_TIME 후 PUDDLE_FADE 동안 모든 GPU 입자 modulate.a 1→0 (서서히 사라짐).
+func _process(delta: float) -> void:
+	super._process(delta)
+	var ga: float = 1.0
+	if _puddle_age > TICK_TIME:
+		ga = clampf(1.0 - (_puddle_age - TICK_TIME) / PUDDLE_FADE, 0.0, 1.0)
+	for child in get_children():
+		if child is GPUParticles2D:
+			child.modulate.a = ga
+
 func _spawn_ambient() -> void:
 	if _amb_made:
 		return
