@@ -47,6 +47,12 @@ const VFX_PAIRS := [
 	{"name": "power_up",     "gpu": "res://scenes/vfx/power_up_gpu.gd",     "cpu": "res://scenes/vfx/power_up.gd"},
 	{"name": "steal_card",   "gpu": "res://scenes/vfx/steal_card_gpu.gd",   "cpu": "res://scenes/vfx/steal_card.gd"},
 	{"name": "card_exhaust", "gpu": "res://scenes/vfx/card_exhaust_gpu.gd", "cpu": "res://scenes/vfx/card_exhaust.gd"},
+	# Phase 8 — 실해·한택
+	{"name": "arrow_shot",         "gpu": "res://scenes/vfx/arrow_shot_gpu.gd",         "cpu": "res://scenes/vfx/arrow_shot.gd"},
+	{"name": "blood_spray",        "gpu": "res://scenes/vfx/blood_spray_gpu.gd",        "cpu": "res://scenes/vfx/blood_spray.gd"},
+	{"name": "boss_phase_changed", "gpu": "res://scenes/vfx/boss_phase_changed_gpu.gd", "cpu": "res://scenes/vfx/boss_phase_changed.gd"},
+	{"name": "death_dissolve",     "gpu": "res://scenes/vfx/death_dissolve_gpu.gd",     "cpu": "res://scenes/vfx/death_dissolve.gd"},
+	{"name": "poison_tick",        "gpu": "res://scenes/vfx/poison_tick_gpu.gd",        "cpu": "res://scenes/vfx/poison_tick.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
