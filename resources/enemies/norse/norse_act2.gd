@@ -94,10 +94,16 @@ static func surtr(scene: PackedScene) -> Resource:
 	p2i2.action_type = IntentRes.ActionType.CHARGE_UP; p2i2.charge_turns = 2; p2i2.payoff_intents = [p2_charge_atk, p2_charge_dbf]
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 300; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "fire"
+	# surtr (불의 거인) — turn_modes [smolder, blaze] FORM_SWITCH (충전/방출). 페이즈 1,2.
+	e.turn_modes = ["smolder", "blaze"]
+	var p1i_switch := IntentRes.new()
+	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"
+	var p2i_switch := IntentRes.new()
+	p2i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p2i_switch.play_animation = "buff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
-		[p1i1, p1i2, p1i3],
-		[p2i1, p2i2, p2i3]
+		[p1i1, p1i_switch, p1i2, p1i3],
+		[p2i1, p2i_switch, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

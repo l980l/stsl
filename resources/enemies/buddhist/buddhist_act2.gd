@@ -95,10 +95,16 @@ static func guanyin(scene: PackedScene) -> Resource:
 	p2i5.action_type = IntentRes.ActionType.ATTACK; p2i5.value = 200; p2i5.target = IntentRes.TargetType.ALL; p2i5.damage_type = "holy_fire"
 	var p2i6 := IntentRes.new()
 	p2i6.action_type = IntentRes.ActionType.BUFF; p2i6.value = 2; p2i6.status_type = "strength"
+	# guanyin (관세음보살) — 자비의 32 화신: CHANGE_AFFINITY 매 페이즈 (다양한 화신의 다른 속성).
+	e.dynamic_affinity_pool = ["holy_strike", "holy_arrow", "holy_fire", "poison"]
+	var p1i_aff := IntentRes.new()
+	p1i_aff.action_type = IntentRes.ActionType.CHANGE_AFFINITY; p1i_aff.play_animation = "buff"
+	var p2i_aff := IntentRes.new()
+	p2i_aff.action_type = IntentRes.ActionType.CHANGE_AFFINITY; p2i_aff.play_animation = "buff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4],
-		[p1i1, p1i2, p1i3, p1i4, p1i5],
-		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
+		[p1i_aff, p1i1, p1i2, p1i3, p1i4, p1i5],
+		[p2i_aff, p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

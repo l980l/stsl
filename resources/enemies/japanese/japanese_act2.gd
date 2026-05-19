@@ -99,10 +99,17 @@ static func shuten_doji(scene: PackedScene) -> Resource:
 	var p2i6 := IntentRes.new()
 	p2i6.action_type = IntentRes.ActionType.BUFF; p2i6.value = 5; p2i6.status_type = "speed_bonus"
 	p2i6.duration = 3
+	# shuten_doji (술 마시는 오니 두목) — 술의 저주: weakness_curse 3턴 (모든 공격 약점화).
+	var p1i_curse := IntentRes.new()
+	p1i_curse.action_type = IntentRes.ActionType.INFLICT_WEAKNESS; p1i_curse.value = 3; p1i_curse.status_type = "weakness_curse"
+	p1i_curse.target = IntentRes.TargetType.ALL; p1i_curse.play_animation = "debuff"
+	var p2i_curse := IntentRes.new()
+	p2i_curse.action_type = IntentRes.ActionType.INFLICT_WEAKNESS; p2i_curse.value = 3; p2i_curse.status_type = "weakness_curse"
+	p2i_curse.target = IntentRes.TargetType.ALL; p2i_curse.play_animation = "debuff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4],
-		[p1i1, p1i2, p1i3, p1i4, p1i5],
-		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
+		[p1i_curse, p1i1, p1i2, p1i3, p1i4, p1i5],
+		[p2i_curse, p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

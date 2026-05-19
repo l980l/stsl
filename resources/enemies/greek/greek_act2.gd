@@ -86,10 +86,17 @@ static func hades(scene: PackedScene) -> Resource:
 	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 90; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "curse"
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 260; p2i3.target = IntentRes.TargetType.ALL; p2i3.damage_type = "fire"
+	# hades (저승의 왕) — 영혼 정화: 페이즈 1, 2 에서 DISPEL ALL (영웅 strength/block 제거).
+	var p1i_dispel := IntentRes.new()
+	p1i_dispel.action_type = IntentRes.ActionType.DISPEL
+	p1i_dispel.target = IntentRes.TargetType.ALL; p1i_dispel.play_animation = "debuff"
+	var p2i_dispel := IntentRes.new()
+	p2i_dispel.action_type = IntentRes.ActionType.DISPEL
+	p2i_dispel.target = IntentRes.TargetType.ALL; p2i_dispel.play_animation = "debuff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
-		[p1i1, p1i2, p1i3],
-		[p2i1, p2i2, p2i3]
+		[p1i_dispel, p1i1, p1i2, p1i3],
+		[p2i1, p2i_dispel, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20
