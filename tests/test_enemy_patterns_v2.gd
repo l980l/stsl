@@ -32,6 +32,11 @@ func run_all() -> Dictionary:
 	test_silence_blocks_card_play()
 	test_silence_zero_allows_card_play()
 	test_exiled_hero_not_targeted()
+	# Phase A2-3
+	test_defense_mode_halves_incoming_damage()
+	test_offense_mode_boosts_outgoing_damage()
+	test_no_modes_no_damage_modifier()
+	test_change_affinity_overrides_damage_type()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -268,6 +273,70 @@ func test_exiled_hero_not_targeted() -> void:
 	for _i in range(5):
 		var pick: String = bm._pick_hero_target(IntentRes.TargetType.RANDOM, 0, IntentRes.ActionType.ATTACK)
 		_assert(pick == "jeanne", "exiled napoleon 제외 → jeanne 만 선택")
+
+# Phase A2-3 — FORM_SWITCH / CHANGE_AFFINITY 실효과
+
+# 16) defense 모드 — 받는 damage 50%
+func test_defense_mode_halves_incoming_damage() -> void:
+	print("[TestEnemyPatternsV2] test_defense_mode_halves_incoming_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 1000
+	enemy.turn_modes = ["defense", "offense"]
+	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.ATTACK, 10)]
+	bm.setup_battle([enemy])
+	# current_mode_index 0 = defense (default)
+	bm._deal_damage_to_enemy(0, 100)
+	_assert(bm._enemy_hp[0] == 950, "defense 모드 → 100 dmg × 0.5 = 50, hp 1000→950")
+
+# 17) offense 모드 — 주는 damage 1.5x
+func test_offense_mode_boosts_outgoing_damage() -> void:
+	print("[TestEnemyPatternsV2] test_offense_mode_boosts_outgoing_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 100
+	enemy.turn_modes = ["defense", "offense"]
+	var atk := _make_intent(IntentRes.ActionType.ATTACK, 10)
+	atk.target = IntentRes.TargetType.RANDOM
+	enemy.intent_pattern = [atk]
+	bm.setup_battle([enemy])
+	# 강제로 offense 모드 (index 1)
+	bm._enemy_status[0]["current_mode_index"] = 1
+	bm.start_player_turn()
+	bm.end_player_turn()
+	# 10 × 1.5 = 15 → napoleon 200 - 15 = 185
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 185, "offense 모드 → 10 dmg × 1.5 = 15, hp 200→185")
+
+# 18) turn_modes 없으면 modifier 미적용
+func test_no_modes_no_damage_modifier() -> void:
+	print("[TestEnemyPatternsV2] test_no_modes_no_damage_modifier")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 1000
+	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.ATTACK, 10)]
+	bm.setup_battle([enemy])
+	bm._deal_damage_to_enemy(0, 100)
+	_assert(bm._enemy_hp[0] == 900, "turn_modes 없음 → damage 1.0× = 100, hp 1000→900")
+
+# 19) CHANGE_AFFINITY — current_affinity 가 다음 ATTACK 의 damage_type override
+func test_change_affinity_overrides_damage_type() -> void:
+	print("[TestEnemyPatternsV2] test_change_affinity_overrides_damage_type")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 200))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 100
+	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.ATTACK, 10)]
+	bm.setup_battle([enemy])
+	bm._enemy_status[0]["current_affinity"] = "holy_fire"
+	var resolved: String = bm._resolve_enemy_damage_type(0, "blunt")
+	_assert(resolved == "holy_fire", "current_affinity 설정 → override")
+	# 미설정 시 intent damage_type
+	bm._enemy_status[0].erase("current_affinity")
+	resolved = bm._resolve_enemy_damage_type(0, "blunt")
+	_assert(resolved == "blunt", "current_affinity 미설정 → intent damage_type 사용")
 
 # 10) INFLICT_WEAKNESS — 영웅에 status 부여
 func test_inflict_weakness_applies_to_hero() -> void:
