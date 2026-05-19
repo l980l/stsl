@@ -35,10 +35,10 @@ static func _dust_scale_curve() -> Curve:
 
 func _make_inflow(col: Color, count: int) -> GPUParticles2D:
 	return _Helpers.make_emitter({
-		"count": count, "lifetime": 1.15, "color": col,
+		"count": count, "lifetime": 0.7, "color": col,
 		"speed_min": 0.0, "speed_max": 0.0,
 		"emission_shape": "sphere", "emission_radius": 300.0,
-		"radial_accel_min": -550.0, "radial_accel_max": -350.0,  # caster 로 강한 끌림
+		"radial_accel_min": -1500.0, "radial_accel_max": -900.0,  # caster 로 빠른 끌림
 		"size_min": 1.2, "size_max": 2.6,
 		"size_base": 16.0,
 		"texture": _Helpers.mote_halo_tex(),
