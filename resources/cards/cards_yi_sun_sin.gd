@@ -38,7 +38,20 @@ static func pool() -> Array:
 		_phoenix(),                                                       # Chaos
 		# speed buff team (학익진 추가)
 		_turtleship_drill(),
+		# 카운터 — 보스 차지 무효
+		_crane_formation_intercept(),
 	]
+
+static func _crane_formation_intercept() -> Resource:
+	# 학익진 차단 — RARE, 1코, SKILL. 보스 CHARGE_UP 무효 + stun, 실패 시 50 dmg.
+	var c := CardRes.new()
+	c.card_name = "card.yi_sun_sin.crane_formation_intercept.name"; c.owner_id = "yi_sun_sin"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.COUNTER_CHARGE
+	e.value = 50; e.base_value = 50
+	c.effects = [e]; return c
 
 static func _turtleship_drill() -> Resource:
 	# 거북선 점호 — RARE, 2코, SKILL, 학익진: 파티 전원 speed +4 (4턴)

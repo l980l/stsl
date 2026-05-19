@@ -39,7 +39,20 @@ static func pool() -> Array:
 		_reconnaissance(),                                              # Chaos (정찰 = 마킹)
 		# speed buff (돌격 추가)
 		_blitz_advance(),
+		# 카운터 — 보스 차지 무효
+		_tactical_block(),
 	]
+
+static func _tactical_block() -> Resource:
+	# 전술적 차단 — RARE, 1코, SKILL. 보스 CHARGE_UP 무효 + stun, 실패 시 50 dmg.
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.tactical_block.name"; c.owner_id = "napoleon"
+	c.cost = 1; c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.COUNTER_CHARGE
+	e.value = 50; e.base_value = 50
+	c.effects = [e]; return c
 
 static func _blitz_advance() -> Resource:
 	# 전격 진군 — UNCOMMON, 1코, SKILL, 돌격: 본인 speed +5 (3턴)
