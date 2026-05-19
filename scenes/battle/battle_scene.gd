@@ -2117,6 +2117,7 @@ const _STATUS_POPUP_INFO := {
 	"speed_penalty": ["Slow",          Color(0.65, 0.72, 0.85)],   # rgba(166,184,217) 차분한 청회 (둔화)
 	"stun":          ["Stun",          Color(1.00, 0.85, 0.45)],   # rgba(255,217,115) 부드러운 황금 (마비 별)
 	"tokens":        ["Soldiers",      Color(0.85, 0.78, 1.00)],   # rgba(217,199,255) 부드러운 라일락 (소환)
+	"counter_pending": ["Counter Ready", Color(1.00, 0.85, 0.30)], # rgba(255,217,77)  황금 — 카운터 대기
 }
 
 func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int, stack_key: String) -> void:
@@ -4679,6 +4680,14 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 		var char_node: Node2D = _hero_char_nodes.get(target)
 		if flash_color != Color.WHITE:
 			_play_status_flash(char_node, flash_color)
+		# counter_pending 부여 시 영웅 위치에 counter_prepare VFX 발동
+		if status_type == "counter_pending" and _stacks > 0 and char_node != null:
+			var cp_scene = load("res://scenes/vfx/counter_prepare.gd")
+			if cp_scene != null:
+				var fx: Node2D = cp_scene.new()
+				add_child(fx)
+				fx.position = Vector2.ZERO
+				fx.play(char_node.global_position, char_node.global_position)
 	# weak/vulnerable/charm/enthrall VFX 는 _on_intent_vfx_start / _on_card_vfx_start 가 차지 시작.
 	# 여기서는 상태 아이콘 갱신·status_popup·tint flash 만 (임팩트 시점 동기).
 	# 카드 데미지 표시는 hero strength/weak (자기) + 적 vulnerable (드래그 호버 시) 반영.
