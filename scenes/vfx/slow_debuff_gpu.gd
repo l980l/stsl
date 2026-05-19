@@ -36,17 +36,33 @@ func _spawn_peak_burst() -> void:
 	_peak_made = true
 	var foot: Vector2 = _foot_pos()
 	# mist 14 (ground additive, COL_MID, alpha (1-k)×0.4, 크기 1→2.3배 확장)
+	# 원본 vx = cos(a)×sp, vy = sin(a)×sp×0.2 — x:y = 2.3:1 가로 위주.
+	# damping 60 (CPU exponential 0.992^60 ≈ 1초 후 0.62× 매칭, linear 근사).
 	var mist := _Helpers.make_emitter({
 		"count": _pcount(14), "lifetime": 1.5, "color": COL_MID,
-		"speed_min": 60.0, "speed_max": 180.0,  # 원본 sp 1~3 × PSPEED 60
-		"direction": Vector2.UP, "spread": 180.0,
-		"gravity": -18.0, "damping": 3.0,
+		"speed_min": 60.0, "speed_max": 180.0,
+		"direction": Vector2.RIGHT, "spread": 90.0,  # 좌우 ±90° spread (FLATness 대체)
+		"gravity": -18.0, "damping": 60.0,
 		"size_min": 12.0, "size_max": 24.0,
 		"scale_curve": _mist_scale_curve(),
+		"lifetime_randomness": 0.2,
 		"start_alpha": 0.4, "mid_alpha": 0.2, "end_alpha": 0.0,
 	})
 	mist.position = foot
 	add_child(mist)
+	# 좌측 7 입자 별도 emitter (direction RIGHT 만으론 좌측 안 감, 양방향 합성)
+	var mist_l := _Helpers.make_emitter({
+		"count": _pcount(7), "lifetime": 1.5, "color": COL_MID,
+		"speed_min": 60.0, "speed_max": 180.0,
+		"direction": Vector2.LEFT, "spread": 90.0,
+		"gravity": -18.0, "damping": 60.0,
+		"size_min": 12.0, "size_max": 24.0,
+		"scale_curve": _mist_scale_curve(),
+		"lifetime_randomness": 0.2,
+		"start_alpha": 0.4, "mid_alpha": 0.2, "end_alpha": 0.0,
+	})
+	mist_l.position = foot
+	add_child(mist_l)
 	# spiral 20 CPU (외곽→target 나선 수렴 — GPU 표준 파티클 불가)
 	for _i in range(_pcount(20)):
 		var ang := randf() * TAU
@@ -85,13 +101,15 @@ func _spawn_ambient() -> void:
 	_gpu_amb_drip.position = foot + Vector2(0.0, -18.0)
 	add_child(_gpu_amb_drip)
 	# mist ambient: 0.5/frame × 60 × lifetime 1.7 ≈ 51 동시. ground additive, COL_MID, alpha 0.4.
+	# damping 60 + lifetime_randomness 0.2 — peak 와 동일 패턴.
 	_gpu_amb_mist = _Helpers.make_emitter({
 		"count": int(51 * _scale()), "lifetime": 1.7, "color": COL_MID,
-		"speed_min": 12.0, "speed_max": 30.0,  # 원본 vel 0.2~0.5 × PSPEED
+		"speed_min": 12.0, "speed_max": 30.0,
 		"direction": Vector2.UP, "spread": 60.0,
-		"gravity": -10.8, "damping": 3.0,  # 원본 grav -0.003
+		"gravity": -10.8, "damping": 60.0,
 		"size_min": 12.0, "size_max": 22.0,
 		"scale_curve": _mist_scale_curve(),
+		"lifetime_randomness": 0.2,
 		"emission_shape": "box", "emission_box": Vector2(80.0, 4.0),
 		"one_shot": false, "explosiveness": 0.0,
 		"start_alpha": 0.4, "mid_alpha": 0.2, "end_alpha": 0.0,
