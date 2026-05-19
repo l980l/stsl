@@ -29,6 +29,12 @@ const VFX_PAIRS := [
 	{"name": "charm_kiss",    "gpu": "res://scenes/vfx/charm_kiss_gpu.gd",    "cpu": "res://scenes/vfx/charm_kiss.gd"},
 	{"name": "poison_splash", "gpu": "res://scenes/vfx/poison_splash_gpu.gd", "cpu": "res://scenes/vfx/poison_splash.gd"},
 	{"name": "infatuation",   "gpu": "res://scenes/vfx/infatuation_gpu.gd",   "cpu": "res://scenes/vfx/infatuation.gd"},
+	# Phase 5 — 치유·소환·사기
+	{"name": "heal_blessing",   "gpu": "res://scenes/vfx/heal_blessing_gpu.gd",   "cpu": "res://scenes/vfx/heal_blessing.gd"},
+	{"name": "revive_blessing", "gpu": "res://scenes/vfx/revive_blessing_gpu.gd", "cpu": "res://scenes/vfx/revive_blessing.gd"},
+	{"name": "summon_burst",    "gpu": "res://scenes/vfx/summon_burst_gpu.gd",    "cpu": "res://scenes/vfx/summon_burst.gd"},
+	{"name": "summon_circle",   "gpu": "res://scenes/vfx/summon_circle_gpu.gd",   "cpu": "res://scenes/vfx/summon_circle.gd"},
+	{"name": "morale_boost",    "gpu": "res://scenes/vfx/morale_boost_gpu.gd",    "cpu": "res://scenes/vfx/morale_boost.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
