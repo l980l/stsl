@@ -29,6 +29,7 @@ func _spawn_impact_cloud(pos: Vector2) -> void:
 		"start_alpha": 0.4, "mid_alpha": 0.25, "end_alpha": 0.0,
 	})
 	miasma.position = pos
+	miasma.z_index = -1  # _smoke_layer 영역 — _hex_layer (sigil/rune) 보다 뒤
 	add_child(miasma)
 	# drip 18 (작은 원형 녹색 방울 — circle_tex, non-add, COL_DRIP × 0.9)
 	# size_base default 32 → size r*0.9 매핑. drip_tex 의 poison 색 곱셈 회피.
@@ -42,6 +43,7 @@ func _spawn_impact_cloud(pos: Vector2) -> void:
 		"start_alpha": 0.9, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 	drip.position = pos
+	drip.z_index = -1
 	add_child(drip)
 	# rune CPU 32 (회전 심볼 — GPU 표준 파티클로 표현 불가)
 	for _i in range(_pcount(32)):
@@ -67,6 +69,7 @@ func _spawn_ambient() -> void:
 			"start_alpha": 0.4, "mid_alpha": 0.25, "end_alpha": 0.0,
 		})
 		_gpu_amb_miasma.position = _target + Vector2(0.0, 30.0)
+		_gpu_amb_miasma.z_index = -1
 		add_child(_gpu_amb_miasma)
 		get_tree().create_timer(DEBUFF_TIME).timeout.connect(func() -> void:
 			if is_instance_valid(_gpu_amb_miasma): _gpu_amb_miasma.emitting = false)
