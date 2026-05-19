@@ -16,8 +16,15 @@ void fragment() {
 @onready var body: ColorRect = $Body
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
 
+const _HERO_ART_DIR := "res://assets/art/heroes/"
+# 캐릭터 sprite 영역 — placeholder Body ColorRect 와 동일 (80x80 local).
+# 일러스트는 이 영역 안에 비율 유지하며 맞춤.
+const _SPRITE_W := 80.0
+const _SPRITE_H := 80.0
+
 var _flash_mat: ShaderMaterial = null
 var _flash_tween: Tween = null
+var _illust_sprite: Sprite2D = null
 
 func _ready() -> void:
 	var shader := Shader.new()
@@ -25,6 +32,46 @@ func _ready() -> void:
 	_flash_mat = ShaderMaterial.new()
 	_flash_mat.shader = shader
 	body.material = _flash_mat
+	# 영웅 일러스트 — node.name ("Napoleon") → owner_id ("napoleon") → assets/art/heroes/{id}.png
+	var hero_id: String = name.to_snake_case()
+	var illust_path: String = _HERO_ART_DIR + hero_id + ".png"
+	if ResourceLoader.exists(illust_path):
+		_illust_sprite = Sprite2D.new()
+		var tex: Texture2D = load(illust_path)
+		_illust_sprite.texture = tex
+		var src_size: Vector2 = tex.get_size()
+		# 외부 char_node.scale 비균등 (1.44, 2.4) 으로 sprite 가 시각상 늘어남 →
+		# sprite.scale 을 외부 역수로 보정 (sx*ext_x = sy*ext_y) → 시각 비율 유지 (uniform).
+		var ext_x: float = absf(scale.x) if absf(scale.x) > 0.0001 else 1.0
+		var ext_y: float = absf(scale.y) if absf(scale.y) > 0.0001 else 1.0
+		var area_w: float = _SPRITE_W * ext_x  # 시각 영역 가로
+		var area_h: float = _SPRITE_H * ext_y  # 시각 영역 세로
+		# 시각상 cover (큰 쪽 기준) — 한쪽 일치 후 다른 쪽 영역 초과 region 잘림.
+		var a_w: float = area_w / src_size.x  # 시각상 가로 일치 시 common scale
+		var a_h: float = area_h / src_size.y  # 시각상 세로 일치 시 common scale
+		var a: float = max(a_w, a_h)
+		_illust_sprite.scale = Vector2(a / ext_x, a / ext_y)
+		# region 잘림 — 작은 쪽이 영역 초과
+		if a == a_w:
+			# 가로 일치, 세로 초과면 아래쪽 잘림
+			var max_src_h: float = area_h / a
+			if src_size.y > max_src_h:
+				_illust_sprite.region_enabled = true
+				_illust_sprite.region_rect = Rect2(0, 0, src_size.x, max_src_h)
+		else:
+			# 세로 일치, 가로 초과면 좌우 가운데 잘림
+			var max_src_w: float = area_w / a
+			if src_size.x > max_src_w:
+				_illust_sprite.region_enabled = true
+				var x_off: float = (src_size.x - max_src_w) / 2.0
+				_illust_sprite.region_rect = Rect2(x_off, 0, max_src_w, src_size.y)
+		_illust_sprite.position = Vector2.ZERO
+		add_child(_illust_sprite)
+		# placeholder ColorRect 숨김
+		body.color = Color(0, 0, 0, 0)
+		# flash shader 를 sprite 로 이동
+		_illust_sprite.material = _flash_mat
+		body.material = null
 	_build_animations()
 	anim_player.play("idle")
 

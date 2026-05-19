@@ -132,15 +132,21 @@ func _build_ui() -> void:
 		name_lbl.add_theme_font_override("font", SacredTheme.get_hero_font(hid))
 		name_lbl.text = "%s\nHP %d" % [tr(info.get("name", hid) as String), info.get("hp", 0) as int]
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_lbl.custom_minimum_size = Vector2(0, 70)
+		name_lbl.custom_minimum_size = Vector2(0, 45)  # name_lbl height 줄여서 아래 illust 위로 확장
 		if inactive:
 			name_lbl.modulate = Color(1, 1, 1, 0.45)
 		card_vbox.add_child(name_lbl)
 
 		var illust_path := "res://assets/art/heroes/%s.png" % hid
 		if ResourceLoader.exists(illust_path):
+			# 전신 일러스트 → 위 8% 건너뛰고 35% (얼굴/상체) 영역 crop 으로 표시 (스캔 영역 아래로)
+			var src_tex: Texture2D = load(illust_path)
+			var src_size: Vector2 = src_tex.get_size()
+			var atlas := AtlasTexture.new()
+			atlas.atlas = src_tex
+			atlas.region = Rect2(0, src_size.y * 0.03, src_size.x, src_size.y * 0.35)
 			var illust := TextureRect.new()
-			illust.texture = load(illust_path)
+			illust.texture = atlas
 			illust.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			illust.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 			illust.size_flags_vertical = Control.SIZE_EXPAND_FILL
