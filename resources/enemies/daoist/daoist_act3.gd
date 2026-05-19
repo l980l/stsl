@@ -113,10 +113,17 @@ static func jade_emperor(scene: PackedScene) -> Resource:
 	var p2_charge := IntentRes.new()
 	p2_charge.action_type = IntentRes.ActionType.CHARGE_UP; p2_charge.charge_turns = 2; p2_charge.payoff_intents = [p2_charge_atk]
 	e.counter_window_intent = {"enabled": true}
+	# 페이즈 1·2 — 천계 군단 SUMMON (celestial_lion 2마리, 각 페이즈 1회)
+	var p1i_summon := IntentRes.new()
+	p1i_summon.action_type = IntentRes.ActionType.SUMMON; p1i_summon.value = 2; p1i_summon.status_type = "celestial_lion"
+	p1i_summon.play_animation = "buff"
+	var p2i_summon := IntentRes.new()
+	p2i_summon.action_type = IntentRes.ActionType.SUMMON; p2i_summon.value = 2; p2i_summon.status_type = "celestial_lion"
+	p2i_summon.play_animation = "buff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4, p0i5],
-		[p1i_switch, p1i1, p1i2, p1i3, p1i4, p1i5, p1i6],
-		[p2i_switch, p2i1, p2_charge, p2i2, p2i3, p2i4, p2i5, p2i6, p2i7]
+		[p1i_switch, p1i1, p1i_summon, p1i2, p1i3, p1i4, p1i5, p1i6],
+		[p2i_switch, p2i1, p2_charge, p2i_summon, p2i2, p2i3, p2i4, p2i5, p2i6, p2i7]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

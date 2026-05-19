@@ -276,6 +276,7 @@ static func celestial_lion(scene: PackedScene) -> Resource:
 
 static func nine_tailed_spirit(scene: PackedScene) -> Resource:
 	# T2-DEATH-RATTLE: 죽을 때 구미호의 원한 — 동료 strength +3
+	# MIMIC: 여우 분신 — 영웅 누적 데미지 30% 반사 (분신 컨셉)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.nine_tailed_spirit"; e.max_hp = 450; e.character_scene = scene
 	e.mythology = "daoist"
@@ -284,7 +285,8 @@ static func nine_tailed_spirit(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 105; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "curse"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 105; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "curse"
+	i3.action_type = IntentRes.ActionType.MIMIC; i3.value = 30; i3.target = IntentRes.TargetType.LOWEST_HP
+	i3.play_animation = "debuff"
 	e.intent_pattern = [i1, i2, i3]
 	var dt := IntentRes.new()
 	dt.action_type = IntentRes.ActionType.BUFF_ALLY; dt.value = 3; dt.status_type = "strength"
