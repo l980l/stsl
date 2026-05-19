@@ -13,6 +13,16 @@ var _gpu_rising_magenta: GPUParticles2D
 var _rising_made: bool = false
 var _peak_made: bool = false
 
+# 원본 _draw_glow_pass: col.a = (1 - life/max_life) × _global_alpha().
+# GPU 입자 alpha 는 자기 lifetime 페이드 ((1-k)) 만 처리.
+# 전체 effect ga (등장 0→1, FADE_TIME 1→0) 는 emitter.modulate.a 곱셈으로 sync.
+func _process(delta: float) -> void:
+	super._process(delta)
+	var ga: float = _global_alpha()
+	for child in get_children():
+		if child is GPUParticles2D:
+			child.modulate.a = ga
+
 # 원본 tint 분포: violet 40% / cyan 30% / magenta 30% (super _spawn_rising 코드 참고).
 # rising 은 super 의 _process 마지막 phase 끝나면 호출 안 됨 — emitter off 별도 트리거 없이
 # 자연스럽게 spawn 중단 → 기존 입자 lifetime 동안 페이드 아웃.
