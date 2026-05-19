@@ -31,7 +31,7 @@ func _make_emitters() -> void:
 		Color(0.51, 0.51, 0.55), Color(0.43, 0.43, 0.47), Color(0.35, 0.35, 0.39),
 		0.85, 0.5, 0.0)
 	_gpu_ash = _Helpers.make_emitter({
-		"count": int(92 * _scale()), "lifetime": 2.2, "color": Color.WHITE,
+		"count": int(184 * _scale()), "lifetime": 2.2, "color": Color.WHITE,
 		"speed_min": 18.0, "speed_max": 60.0,
 		"direction": Vector2.UP, "spread": 30.0,
 		"gravity": -18.0, "damping": 0.0,
@@ -49,7 +49,7 @@ func _make_emitters() -> void:
 	add_child(_gpu_ash)
 	# soul: 0.5/frame × 60 × lifetime 2.5 ≈ 75 동시. 위로 + sway (GPU 단순화).
 	_gpu_soul = _Helpers.make_emitter({
-		"count": int(75 * _scale()), "lifetime": 2.5, "color": COL_SOUL_HOT,
+		"count": int(150 * _scale()), "lifetime": 2.5, "color": COL_SOUL_HOT,
 		"speed_min": 48.0, "speed_max": 96.0,
 		"direction": Vector2.UP, "spread": 12.0,
 		"gravity": -43.2, "damping": 0.0,  # grav -0.012 × PSPEED²
