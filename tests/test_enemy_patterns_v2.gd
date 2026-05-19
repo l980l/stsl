@@ -40,6 +40,9 @@ func run_all() -> Dictionary:
 	# Phase A2-2
 	test_double_action_extra_intent()
 	test_double_action_decrements_each_use()
+	test_dynamic_resistance_reduces_mismatch_damage()
+	test_dynamic_resistance_matching_full_damage()
+	test_time_limit_enrage_strength()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -375,6 +378,52 @@ func test_double_action_decrements_each_use() -> void:
 	bm.start_player_turn()
 	bm.end_player_turn()
 	_assert(bm._enemy_status[0].get("double_action", 0) == 1, "double_action 2 → 사용 후 1")
+
+# 22) dynamic_resistance — current_weakness 불일치 시 0.2배
+func test_dynamic_resistance_reduces_mismatch_damage() -> void:
+	print("[TestEnemyPatternsV2] test_dynamic_resistance_reduces_mismatch_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 1000
+	enemy.dynamic_resistance_pool = ["holy_fire"]
+	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.ATTACK, 5)]
+	bm.setup_battle([enemy])
+	bm._enemy_status[0]["current_weakness"] = "holy_fire"
+	bm._deal_damage_to_enemy(0, 100, "blunt")  # 불일치
+	_assert(bm._enemy_hp[0] == 980, "blunt vs holy_fire (불일치) → 100 × 0.2 = 20, hp 1000→980")
+
+# 23) dynamic_resistance — current_weakness 일치 시 정상 damage
+func test_dynamic_resistance_matching_full_damage() -> void:
+	print("[TestEnemyPatternsV2] test_dynamic_resistance_matching_full_damage")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 1000
+	enemy.dynamic_resistance_pool = ["holy_fire"]
+	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.ATTACK, 5)]
+	bm.setup_battle([enemy])
+	bm._enemy_status[0]["current_weakness"] = "holy_fire"
+	bm._deal_damage_to_enemy(0, 100, "holy_fire")  # 일치
+	_assert(bm._enemy_hp[0] == 900, "holy_fire vs holy_fire (일치) → 100 정상, hp 1000→900")
+
+# 24) time_limit — turn_count >= 임계 시 자기 strength +5/turn
+func test_time_limit_enrage_strength() -> void:
+	print("[TestEnemyPatternsV2] test_time_limit_enrage_strength")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 100
+	enemy.time_limit_turns = 3
+	var atk := _make_intent(IntentRes.ActionType.ATTACK, 5)
+	atk.target = IntentRes.TargetType.RANDOM
+	enemy.intent_pattern = [atk]
+	bm.setup_battle([enemy])
+	bm.turn_count = 3  # 임계 도달
+	bm.start_player_turn()
+	bm.end_player_turn()
+	# enemy turn 시작 시 광폭화 strength +5
+	_assert(bm._enemy_status[0].get("strength", 0) == 5, "time_limit 도달 → 자기 strength +5")
 
 # 10) INFLICT_WEAKNESS — 영웅에 status 부여
 func test_inflict_weakness_applies_to_hero() -> void:
