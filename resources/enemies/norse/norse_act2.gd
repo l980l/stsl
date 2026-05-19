@@ -95,6 +95,8 @@ static func surtr(scene: PackedScene) -> Resource:
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 300; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "fire"
 	# surtr (불의 거인) — turn_modes [smolder, blaze] FORM_SWITCH (충전/방출). 페이즈 1,2.
+	# counter_window_intent — 페이즈 2 의 CHARGE_UP 380 ALL 가 영웅 COUNTER_CHARGE 카드로 무효 가능.
+	e.counter_window_intent = {"enabled": true}
 	e.turn_modes = ["smolder", "blaze"]
 	var p1i_switch := IntentRes.new()
 	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"

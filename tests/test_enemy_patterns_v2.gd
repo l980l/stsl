@@ -43,6 +43,9 @@ func run_all() -> Dictionary:
 	test_dynamic_resistance_reduces_mismatch_damage()
 	test_dynamic_resistance_matching_full_damage()
 	test_time_limit_enrage_strength()
+	# Phase C1
+	test_counter_charge_negates_when_window_active()
+	test_counter_charge_fallback_damage_when_no_window()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -424,6 +427,56 @@ func test_time_limit_enrage_strength() -> void:
 	bm.end_player_turn()
 	# enemy turn 시작 시 광폭화 strength +5
 	_assert(bm._enemy_status[0].get("strength", 0) == 5, "time_limit 도달 → 자기 strength +5")
+
+const EffectRes = preload("res://resources/effect_resource.gd")
+const CardRes = preload("res://resources/card_resource.gd")
+
+# 25) COUNTER_CHARGE — counter_window 활성 + charge 중 시 charge 무효 + stun
+func test_counter_charge_negates_when_window_active() -> void:
+	print("[TestEnemyPatternsV2] test_counter_charge_negates_when_window_active")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 1000
+	enemy.counter_window_intent = {"enabled": true}
+	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.ATTACK, 5)]
+	bm.setup_battle([enemy])
+	# 보스가 charge 중 시뮬레이션
+	bm._enemy_status[0]["charge_remaining"] = 2
+	# 영웅 카드 — COUNTER_CHARGE effect
+	var card := CardRes.new()
+	card.owner_id = "napoleon"; card.cost = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.COUNTER_CHARGE
+	eff.value = 50  # fallback
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+	bm.start_player_turn()
+	bm.play_card(card, 0)
+	_assert(not bm._enemy_status[0].has("charge_remaining"), "charge_remaining 무효 (키 제거)")
+	_assert(bm._enemy_status[0].get("stun", 0) == 1, "stun 1 부여")
+	_assert(bm._enemy_hp[0] == 1000, "fallback damage X (charge 가 무효됨)")
+
+# 26) COUNTER_CHARGE — counter_window 미활성 시 fallback damage
+func test_counter_charge_fallback_damage_when_no_window() -> void:
+	print("[TestEnemyPatternsV2] test_counter_charge_fallback_damage_when_no_window")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 1000
+	# counter_window_intent 미설정
+	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.ATTACK, 5)]
+	bm.setup_battle([enemy])
+	var card := CardRes.new()
+	card.owner_id = "napoleon"; card.cost = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.COUNTER_CHARGE
+	eff.value = 50
+	card.effects = [eff]
+	bm.deck_mgr.hand.append(card)
+	bm.start_player_turn()
+	bm.play_card(card, 0)
+	_assert(bm._enemy_hp[0] == 950, "counter_window 미활성 → fallback 50 dmg, hp 1000→950")
 
 # 10) INFLICT_WEAKNESS — 영웅에 status 부여
 func test_inflict_weakness_applies_to_hero() -> void:
