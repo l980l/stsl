@@ -23,6 +23,12 @@ const VFX_PAIRS := [
 	{"name": "explosion_blast",  "gpu": "res://scenes/vfx/explosion_blast_gpu.gd",  "cpu": "res://scenes/vfx/explosion_blast.gd"},
 	{"name": "blunt_smash",      "gpu": "res://scenes/vfx/blunt_smash_gpu.gd",      "cpu": "res://scenes/vfx/blunt_smash.gd"},
 	{"name": "bullet_shot",      "gpu": "res://scenes/vfx/bullet_shot_gpu.gd",      "cpu": "res://scenes/vfx/bullet_shot.gd"},
+	# Phase 4 — 시그너처 2 + 클레오 조종 3
+	{"name": "sig_hubris",   "gpu": "res://scenes/vfx/sig_hubris_gpu.gd",   "cpu": "res://scenes/vfx/sig_hubris.gd"},
+	{"name": "sig_karma",    "gpu": "res://scenes/vfx/sig_karma_gpu.gd",    "cpu": "res://scenes/vfx/sig_karma.gd"},
+	{"name": "charm_kiss",    "gpu": "res://scenes/vfx/charm_kiss_gpu.gd",    "cpu": "res://scenes/vfx/charm_kiss.gd"},
+	{"name": "poison_splash", "gpu": "res://scenes/vfx/poison_splash_gpu.gd", "cpu": "res://scenes/vfx/poison_splash.gd"},
+	{"name": "infatuation",   "gpu": "res://scenes/vfx/infatuation_gpu.gd",   "cpu": "res://scenes/vfx/infatuation.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192

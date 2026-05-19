@@ -10,6 +10,11 @@ static var _circle_tex: Texture2D
 static var _square_tex: Texture2D
 static var _sparkle_tex: Texture2D
 static var _feather_tex: Texture2D
+static var _heart_tex: Texture2D
+static var _bubble_tex: Texture2D
+static var _drip_tex: Texture2D
+static var _petal_tex: Texture2D
+static var _halo_tex: Texture2D
 
 # 100% 솔리드 원 + 가장자리 1px 안티앨리어싱.
 # CPU draw_circle(pos, r, col) 과 거의 동일 — 가장자리 페이드 없음.
@@ -80,6 +85,197 @@ static func sparkle_tex() -> Texture2D:
 		_sparkle_tex = ImageTexture.create_from_image(img)
 	return _sparkle_tex
 
+# 비행 hearts halo — 2단 alpha (안쪽 0.5 + 바깥 0.3) 가산 글로우.
+# 원본 draw_circle(r*0.7, alpha 0.5) + draw_circle(r*1.4, alpha 0.3) 매핑.
+# 64×64, 안쪽 반경 16 (r*0.7 영역), 바깥 반경 32 (r*1.4). size_base ≈ 22.86 (32/1.4).
+static func halo_tex() -> Texture2D:
+	if _halo_tex == null:
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		var cx := 31.5
+		var cy := 31.5
+		for y in 64:
+			for x in 64:
+				var dx := float(x) - cx
+				var dy := float(y) - cy
+				var d := sqrt(dx * dx + dy * dy)
+				if d <= 16.0:
+					img.set_pixel(x, y, Color(1, 1, 1, 0.5))  # 안쪽 halo
+				elif d <= 32.0:
+					img.set_pixel(x, y, Color(1, 1, 1, 0.3))  # 바깥 halo
+		_halo_tex = ImageTexture.create_from_image(img)
+	return _halo_tex
+
+# 꽃잎 — 가로:세로 0.55:1 타원 (infatuation petal). 흰색 (modulate 로 색).
+# 64×64, 가로 반경 16.5, 세로 반경 30. size_base=30.
+static func petal_tex() -> Texture2D:
+	if _petal_tex == null:
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		for y in 64:
+			for x in 64:
+				var dx := (float(x) - 31.5) / 16.5
+				var dy := (float(y) - 31.5) / 30.0
+				var d := dx * dx + dy * dy
+				if d <= 1.0:
+					var a := clampf(1.0 - d * d, 0.0, 1.0)
+					img.set_pixel(x, y, Color(1, 1, 1, a))
+		_petal_tex = ImageTexture.create_from_image(img)
+	return _petal_tex
+
+# 독액 방울 — 본체 큰 원 + 작은 빛반사 원 (poison_splash drip).
+# 텍스처 자체에 연한 녹색 미리. 64×64, 본체 반경 23 (size_base 23).
+# 원본: draw_circle(r*0.85, COL_DRIP) + draw_circle(offset, r*0.3, COL_DRIP_HL).
+static func drip_tex() -> Texture2D:
+	if _drip_tex == null:
+		var col_body := Color(0.549, 0.824, 0.196)  # 원본 COL_DRIP
+		var col_hl := Color(0.863, 1.0, 0.627)       # 원본 COL_DRIP_HL
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		var cx := 31.5
+		var cy := 31.5
+		# 본체 — 반경 23 솔리드 (alpha 0.9)
+		for y in 64:
+			for x in 64:
+				var dx := float(x) - cx
+				var dy := float(y) - cy
+				var d := sqrt(dx * dx + dy * dy)
+				if d <= 22.0:
+					img.set_pixel(x, y, Color(col_body.r, col_body.g, col_body.b, 0.9))
+				elif d <= 23.0:
+					img.set_pixel(x, y, Color(col_body.r, col_body.g, col_body.b, 0.9 * (23.0 - d)))
+		# 빛반사 작은 원 — 좌상단 offset (-23*0.2, -23*0.4) = (-4.6, -9.2), 반경 6.9
+		for y in 64:
+			for x in 64:
+				var dx := float(x) - (cx - 4.6)
+				var dy := float(y) - (cy - 9.2)
+				var d := sqrt(dx * dx + dy * dy)
+				if d <= 6.5:
+					img.set_pixel(x, y, Color(col_hl.r, col_hl.g, col_hl.b, 0.7))
+				elif d <= 7.5:
+					var existing: Color = img.get_pixel(x, y)
+					img.set_pixel(x, y, Color(col_hl.r, col_hl.g, col_hl.b, maxf(existing.a, 0.7 * (7.5 - d))))
+		_drip_tex = ImageTexture.create_from_image(img)
+	return _drip_tex
+
+# 거품 — 원본 poison_splash bubble 정확 매핑:
+#  - 채움 (큰 원): COL_DRIP alpha 0.25 (약한 녹)
+#  - 외곽 ring (1px arc): COL_DRIP_HL alpha 0.7 (연녹)
+#  - 좌상단 흰 하이라이트 alpha 0.7
+# 64×64, 외곽 반경 28 (size_base 28).
+static func bubble_tex() -> Texture2D:
+	if _bubble_tex == null:
+		var col_fill := Color(0.549, 0.824, 0.196)  # COL_DRIP
+		var col_ring := Color(0.863, 1.0, 0.627)     # COL_DRIP_HL (연녹)
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		var cx := 31.5
+		var cy := 31.5
+		for y in 64:
+			for x in 64:
+				var dx := float(x) - cx
+				var dy := float(y) - cy
+				var d := sqrt(dx * dx + dy * dy)
+				# 외곽 ring — 반경 26~28 (두께 2, 원본 1px arc 매칭)
+				if d >= 26.0 and d <= 28.0:
+					img.set_pixel(x, y, Color(col_ring.r, col_ring.g, col_ring.b, 0.7))
+				# 내부 약한 채움
+				elif d < 26.0:
+					img.set_pixel(x, y, Color(col_fill.r, col_fill.g, col_fill.b, 0.25))
+		# 좌상단 흰 하이라이트 (offset -10, -10, 반경 5)
+		for y in 64:
+			for x in 64:
+				var dx := float(x) - (cx - 10.0)
+				var dy := float(y) - (cy - 10.0)
+				var d := sqrt(dx * dx + dy * dy)
+				if d <= 4.0:
+					img.set_pixel(x, y, Color(1, 1, 1, 0.7))
+				elif d <= 5.0:
+					var existing: Color = img.get_pixel(x, y)
+					img.set_pixel(x, y, Color(1, 1, 1, maxf(existing.a, 0.7 * (5.0 - d))))
+		_bubble_tex = ImageTexture.create_from_image(img)
+	return _bubble_tex
+
+# 하트 — charm_kiss heart_unit() 의 32점 베지어 폴리곤 fill.
+# 64×64, 중심 (31.5, 31.5). 텍스처 자체에 원본 색 미리 (modulate WHITE 사용).
+# 내부 COL_MID 솔리드 + 외곽 2px COL_HOT 흰분홍 outline (원본 _draw 의 polyline 1.2px 매칭).
+# size_base = 32 매핑 (size 8 → scale 0.25 → 16px 직경, 원본 1.125*size = 9px 와 비슷).
+static func heart_tex() -> Texture2D:
+	if _heart_tex == null:
+		var pts := _heart_unit_pts()
+		# charm_kiss 색 hardcode (helper 는 charm_kiss 안 import — modulate WHITE 사용 위해)
+		var col_inner := Color(1.0, 0.604, 0.831)   # COL_MID
+		var col_outline := Color(1.0, 0.949, 0.976) # COL_HOT
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		# 1차: 내부 모두 COL_MID
+		var inside_mask: PackedByteArray = PackedByteArray()
+		inside_mask.resize(64 * 64)
+		for y in 64:
+			for x in 64:
+				var p := Vector2(float(x) - 31.5, float(y) - 31.5)
+				if _point_in_polygon(p, pts):
+					inside_mask[y * 64 + x] = 1
+					img.set_pixel(x, y, col_inner)
+		# 2차: 외곽 2px outline (안쪽인데 인접 ±2 픽셀 중 바깥 있으면 외곽)
+		for y in 64:
+			for x in 64:
+				if inside_mask[y * 64 + x] == 0:
+					continue
+				var is_edge := false
+				for dy in range(-2, 3):
+					for dx in range(-2, 3):
+						if dx == 0 and dy == 0:
+							continue
+						var nx := x + dx
+						var ny := y + dy
+						if nx < 0 or nx >= 64 or ny < 0 or ny >= 64:
+							continue
+						if inside_mask[ny * 64 + nx] == 0:
+							is_edge = true
+							break
+					if is_edge:
+						break
+				if is_edge:
+					img.set_pixel(x, y, col_outline)
+		_heart_tex = ImageTexture.create_from_image(img)
+	return _heart_tex
+
+# charm_kiss.heart_unit() 와 동일 — 32점 베지어 (4 큐빅 × 8샘플)
+static func _heart_unit_pts() -> PackedVector2Array:
+	var ctrl := [
+		Vector2(0, 12), Vector2(-14, 4), Vector2(-18, -6), Vector2(-12, -12),
+		Vector2(-12, -12), Vector2(-6, -18), Vector2(0, -14), Vector2(0, -8),
+		Vector2(0, -8), Vector2(0, -14), Vector2(6, -18), Vector2(12, -12),
+		Vector2(12, -12), Vector2(18, -6), Vector2(14, 4), Vector2(0, 12),
+	]
+	var p := PackedVector2Array()
+	for seg in range(4):
+		var a: Vector2 = ctrl[seg * 4]
+		var b: Vector2 = ctrl[seg * 4 + 1]
+		var c: Vector2 = ctrl[seg * 4 + 2]
+		var d: Vector2 = ctrl[seg * 4 + 3]
+		for i in range(8):
+			var t := float(i) / 8.0
+			var u := 1.0 - t
+			p.append(u * u * u * a + 3.0 * u * u * t * b + 3.0 * u * t * t * c + t * t * t * d)
+	return p
+
+# 폴리곤 안쪽 검사 (ray casting). pts 는 단위 중심 (0,0) 기준.
+static func _point_in_polygon(p: Vector2, pts: PackedVector2Array) -> bool:
+	var inside := false
+	var n := pts.size()
+	var j := n - 1
+	for i in range(n):
+		var pi: Vector2 = pts[i]
+		var pj: Vector2 = pts[j]
+		if ((pi.y > p.y) != (pj.y > p.y)):
+			var x_intersect = (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x
+			if p.x < x_intersect:
+				inside = not inside
+		j = i
+	return inside
+
 # 깃털 — 외곽 타원 (가로 14, 세로 30, COL_FEATHER) + 내부 음영 (가로 5, 세로 16, y=-10, COL_HOT).
 # 원본 holy_buff feather 의 두 폴리곤 정확 매핑. 텍스처 자체에 색 미리 그림 — modulate Color.WHITE.
 # 회전은 GPUParticles2D angle/angular_velocity (disable_z=true 필수).
@@ -114,16 +310,17 @@ static func feather_tex() -> Texture2D:
 		_feather_tex = ImageTexture.create_from_image(img)
 	return _feather_tex
 
-# 단색 alpha 페이드 ramp. start_alpha (life 0) / mid_alpha (life 0.5) / end_alpha (life 1) 명시.
-# 원본 CPU 의 `alpha = (1-k)*N` linear fade 매핑 위해 start_alpha 옵션 필수.
-static func make_fade_ramp(color: Color, mid_alpha: float = 0.7,
+# 단색 alpha 페이드 ramp. start_alpha (life 0) / mid_alpha (life 0.5) / end_alpha (life 1).
+# RGB 는 항상 WHITE — mat.color 와 곱셈으로 색 중복 회피 (color² 어두워짐 방지).
+# color 인자는 시그니처 호환용으로 유지하되 무시.
+static func make_fade_ramp(_color: Color = Color.WHITE, mid_alpha: float = 0.7,
 		start_alpha: float = 1.0, end_alpha: float = 0.0) -> GradientTexture1D:
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
 	g.colors = PackedColorArray([
-		Color(color.r, color.g, color.b, start_alpha),
-		Color(color.r, color.g, color.b, mid_alpha),
-		Color(color.r, color.g, color.b, end_alpha),
+		Color(1, 1, 1, start_alpha),
+		Color(1, 1, 1, mid_alpha),
+		Color(1, 1, 1, end_alpha),
 	])
 	var t := GradientTexture1D.new()
 	t.gradient = g
@@ -204,8 +401,10 @@ static func make_emitter(opts: Dictionary) -> GPUParticles2D:
 	# 색 + 페이드
 	var col: Color = opts.get("color", Color.WHITE)
 	mat.color = col
-	# color_ramp 직접 주입 가능 — 원본 CPU 의 시간별 색 변화 재현용 (start/mid/end 색 다름)
+	# color_ramp 직접 주입 시 mat.color = WHITE 강제 (ramp 가 색 담당).
+	# 그렇지 않으면 mat.color × ramp.color 곱셈으로 색 어두워짐 (premultiplied 효과).
 	if opts.has("color_ramp"):
+		mat.color = Color.WHITE
 		mat.color_ramp = opts["color_ramp"]
 	else:
 		mat.color_ramp = make_fade_ramp(col,

@@ -362,7 +362,8 @@ func _draw_aura(canvas: CanvasItem) -> void:
 		return
 	var pulse: float = 0.7 + sin(_aura_age * (TAU / 1.4)) * 0.15
 	var alpha: float = grow * fade * pulse
-	var rc := _target + Vector2(0.0, 60.0)
+	# 사용자 변경: 타겟 중앙 (0, 0).
+	var rc := _target
 	canvas.draw_arc(rc, 80.0 * grow, 0.0, TAU, 48,
 		Color(COL_RED, 0.5 * alpha), 14.0 * grow, true)
 	canvas.draw_arc(rc, 60.0 * grow, 0.0, TAU, 36,
@@ -378,7 +379,8 @@ func _draw_mandala(canvas: CanvasItem) -> void:
 		return
 	var sc: float = lerpf(0.3, 1.0, grow)
 	var a: float = grow * fade
-	var rc := _target + Vector2(0.0, -60.0)
+	# 사용자 변경: 타겟 중앙 (0, 0).
+	var rc := _target
 	var rot: float = _spin_acc * (TAU / 6.0)
 	# 외곽 원
 	canvas.draw_arc(rc, 56.0 * sc, 0.0, TAU, 48, Color(COL_HOT, 0.7 * a), 1.5, true)
@@ -440,30 +442,31 @@ func _draw_chains(canvas: CanvasItem) -> void:
 			poly.append(hpos + (v * 9.0 * sc).rotated(ang + PI * 0.5))
 		canvas.draw_colored_polygon(poly, Color(COL_CRIMSON, a * 0.9))
 
-# 하트 모양 충격파 — 0.85s 동안 10배 확장 (윤곽선만)
+# 하트 모양 충격파 — 0.2초 간격 3번 (사용자 요청). 각 0.85s 동안 10배 확장.
 func _draw_shock(canvas: CanvasItem) -> void:
-	if _shock_age > 0.85:
-		return
-	var t: float = _shock_age / 0.85
-	var sc: float = lerpf(0.3, 10.0, t)
-	var oa: float
-	if t < 0.2:
-		oa = t / 0.2
-	else:
-		oa = 1.0 - (t - 0.2) / 0.8
-	var rc := _target + Vector2(0.0, -40.0)
-	var thick: float = maxf(1.0, 4.0 - 3.0 * t)
-	# 로즈 + 바이올렛 두 겹
-	for tier in [["rose", COL_RED, sc],
-				 ["crimson", COL_CRIMSON, sc * 0.85]]:
-		var col: Color = tier[1]
-		var sci: float = tier[2]
-		var size: float = 16.0 * sci
-		var poly := PackedVector2Array()
-		for v in _heart_pts:
-			poly.append(rc + v * size)
-		poly.append(poly[0])
-		canvas.draw_polyline(poly, Color(col, oa), thick, true)
+	for wave_i in 3:
+		var local_age: float = _shock_age - float(wave_i) * 0.2
+		if local_age < 0.0 or local_age > 0.85:
+			continue
+		var t: float = local_age / 0.85
+		var sc: float = lerpf(0.3, 10.0, t)
+		var oa: float
+		if t < 0.2:
+			oa = t / 0.2
+		else:
+			oa = 1.0 - (t - 0.2) / 0.8
+		var rc := _target + Vector2(0.0, -40.0)
+		var thick: float = maxf(2.0, 8.0 - 6.0 * t)
+		for tier in [["rose", COL_RED, sc],
+					 ["crimson", COL_CRIMSON, sc * 0.85]]:
+			var col: Color = tier[1]
+			var sci: float = tier[2]
+			var size: float = 28.0 * sci
+			var poly := PackedVector2Array()
+			for v in _heart_pts:
+				poly.append(rc + v * size)
+			poly.append(poly[0])
+			canvas.draw_polyline(poly, Color(col, oa), thick, true)
 
 # ── 블렌드 모드가 다른 두 그리기 레이어 ──
 class _DrawLayer:
