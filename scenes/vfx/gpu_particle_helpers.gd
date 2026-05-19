@@ -358,6 +358,9 @@ static func make_emitter(opts: Dictionary) -> GPUParticles2D:
 	ps.lifetime = float(opts.get("lifetime", 1.0))
 	ps.one_shot = bool(opts.get("one_shot", true))
 	ps.explosiveness = float(opts.get("explosiveness", 1.0))
+	# 입자 죽는 시점 분산 — 동시 spawn + 동시 죽음 = "틱" 효과 방지.
+	# 원본 CPU 의 max_life = base + randf()*0.5~0.7 패턴 매칭. default 0.4 → 60%~100% lifetime.
+	ps.lifetime_randomness = float(opts.get("lifetime_randomness", 0.4))
 	ps.emitting = true
 	ps.texture = opts.get("texture", circle_tex())
 	ps.local_coords = false  # 부모(_target 따라가지 않음 — 발화 시점 좌표 고정)
