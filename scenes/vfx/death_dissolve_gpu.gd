@@ -48,14 +48,16 @@ func _make_emitters() -> void:
 	_gpu_ash.position = _target + Vector2(0.0, -10.0)
 	add_child(_gpu_ash)
 	# soul: 0.5/frame × 60 × lifetime 2.5 ≈ 75 동시. 위로 + sway (GPU 단순화).
+	# soul_tex 3원 합성 (외곽 COL_SOUL alpha 0.2 + 중간 COL_SOUL_HOT alpha 0.32 + 코어 WHITE alpha 1.0).
+	# size_base=7 (원본 r 매핑) → 화면 외곽 r*4, 중간 r*2, 코어 r*0.8 매칭.
 	_gpu_soul = _Helpers.make_emitter({
-		"count": int(150 * _scale()), "lifetime": 2.5, "color": COL_SOUL_HOT,
+		"count": int(150 * _scale()), "lifetime": 2.5, "color": Color.WHITE,
 		"speed_min": 48.0, "speed_max": 96.0,
 		"direction": Vector2.UP, "spread": 12.0,
-		"gravity": -43.2, "damping": 0.0,  # grav -0.012 × PSPEED²
+		"gravity": -43.2, "damping": 0.0,
 		"size_min": 3.0, "size_max": 7.0,
-		"size_base": 16.0,
-		"texture": _Helpers.mote_halo_tex(),
+		"size_base": 7.0,
+		"texture": _Helpers.soul_tex(),
 		"emission_shape": "box", "emission_box": Vector2(15.0, 20.0),
 		"one_shot": false, "explosiveness": 0.0,
 		"start_alpha": 0.85, "mid_alpha": 0.45, "end_alpha": 0.0,

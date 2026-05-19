@@ -8,6 +8,7 @@
 extends "res://scenes/vfx/poison_tick.gd"
 
 const _Helpers = preload("res://scenes/vfx/gpu_particle_helpers.gd")
+const _COL_HOT_GREEN := Color(0.910, 1.0, 0.690)  # 흰연두 (poison_splash COL_HOT 와 동일)
 
 var _gpu_gas: GPUParticles2D
 var _gpu_bubble: GPUParticles2D
@@ -19,7 +20,7 @@ func _spawn_ambient() -> void:
 	_amb_made = true
 	# gas: COL_HOT 흰연두 (splash 매칭). 위로 천천히.
 	_gpu_gas = _Helpers.make_emitter({
-		"count": int(84 * _scale()), "lifetime": 2.0, "color": COL_HOT,
+		"count": int(84 * _scale()), "lifetime": 2.0, "color": _COL_HOT_GREEN,
 		"speed_min": 24.0, "speed_max": 54.0,
 		"direction": Vector2.UP, "spread": 18.0,
 		"gravity": -18.0, "damping": 3.0,

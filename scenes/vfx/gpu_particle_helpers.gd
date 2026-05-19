@@ -16,6 +16,7 @@ static var _drip_tex: Texture2D
 static var _petal_tex: Texture2D
 static var _halo_tex: Texture2D
 static var _mote_halo_tex: Texture2D
+static var _soul_tex: Texture2D
 
 # 100% 솔리드 원 + 가장자리 1px 안티앨리어싱.
 # CPU draw_circle(pos, r, col) 과 거의 동일 — 가장자리 페이드 없음.
@@ -58,6 +59,30 @@ static func mote_halo_tex() -> Texture2D:
 					img.set_pixel(x, y, Color(1, 1, 1, 0.5 * (29.8 - d)))  # 헤일로 AA
 		_mote_halo_tex = ImageTexture.create_from_image(img)
 	return _mote_halo_tex
+
+# 영혼 3원 합성 — 외곽 r*4 COL_SOUL alpha 0.2 + 중간 r*2 COL_SOUL_HOT alpha 0.32 + 코어 r*0.8 WHITE alpha 1.0.
+# death_dissolve soul 매칭. size_base=7 (원본 r 매핑). 텍스처 외곽 반경 28 → scale × r/7 → 화면 r*4.
+static func soul_tex() -> Texture2D:
+	if _soul_tex == null:
+		var col_outer := Color(0.549, 0.561, 0.596)   # COL_SOUL
+		var col_mid := Color(0.784, 0.792, 0.820)     # COL_SOUL_HOT
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.TRANSPARENT)
+		for y in 64:
+			for x in 64:
+				var dx: float = float(x) - 31.5
+				var dy: float = float(y) - 31.5
+				var d: float = sqrt(dx * dx + dy * dy)
+				if d <= 5.6:
+					img.set_pixel(x, y, Color(1, 1, 1, 1.0))  # 코어 WHITE alpha 1.0
+				elif d <= 14.0:
+					img.set_pixel(x, y, Color(col_mid.r, col_mid.g, col_mid.b, 0.32))  # 중간 COL_SOUL_HOT
+				elif d <= 28.0:
+					img.set_pixel(x, y, Color(col_outer.r, col_outer.g, col_outer.b, 0.2))  # 외곽 COL_SOUL
+				elif d <= 29.0:
+					img.set_pixel(x, y, Color(col_outer.r, col_outer.g, col_outer.b, 0.2 * (29.0 - d)))  # AA
+		_soul_tex = ImageTexture.create_from_image(img)
+	return _soul_tex
 
 # 직사각형 48×64 (1:1.33 비율, chunk/debris 회전 시각화용 — 정사각형이면 회전 안 보임)
 static func square_tex() -> Texture2D:
