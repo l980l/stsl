@@ -82,9 +82,13 @@ static func sekhmet(scene: PackedScene) -> Resource:
 	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 220; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "blunt"
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 260; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "blunt"
+	# sekhmet (사자 여신의 저주) — 페이즈 1 에서 영웅 전체에 weakness_fire 3턴 (사자의 화염).
+	var p1i_curse := IntentRes.new()
+	p1i_curse.action_type = IntentRes.ActionType.INFLICT_WEAKNESS; p1i_curse.value = 3; p1i_curse.status_type = "weakness_fire"
+	p1i_curse.target = IntentRes.TargetType.ALL; p1i_curse.play_animation = "debuff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
-		[p1i1, p1i2, p1i3],
+		[p1i_curse, p1i1, p1i2, p1i3],
 		[p2i1, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]

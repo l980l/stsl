@@ -142,9 +142,13 @@ static func hydra(scene: PackedScene) -> Resource:
 	var p2i6 := IntentRes.new()
 	p2i6.action_type = IntentRes.ActionType.BUFF; p2i6.value = 4; p2i6.status_type = "speed_bonus"
 	p2i6.duration = 3
+	# p1i5 — 9개 머리의 독니 표식: 영웅 전체에 weakness_poison 2턴 (다음 poison 공격이 더 아픔)
+	var p1i5 := IntentRes.new()
+	p1i5.action_type = IntentRes.ActionType.INFLICT_WEAKNESS; p1i5.value = 2; p1i5.status_type = "weakness_poison"
+	p1i5.target = IntentRes.TargetType.ALL; p1i5.play_animation = "debuff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
-		[p1i1, p1i2, p1i3, p1i4],
+		[p1i1, p1i5, p1i2, p1i3, p1i4],
 		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
 	]
 	e.intent_pattern = e.phase_patterns[0]

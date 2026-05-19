@@ -89,10 +89,16 @@ static func raijin(scene: PackedScene) -> Resource:
 	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 190; p2i3.target = IntentRes.TargetType.ALL; p2i3.damage_type = "lightning"
 	var p2i4 := IntentRes.new()
 	p2i4.action_type = IntentRes.ActionType.BUFF; p2i4.value = 3; p2i4.status_type = "strength"
+	# raijin (천둥신) — 충전(charge)/방전(discharge) 모드 순환. 페이즈 1 부터 FORM_SWITCH 활성.
+	e.turn_modes = ["charge", "discharge"]
+	var p1i_switch := IntentRes.new()
+	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"
+	var p2i_switch := IntentRes.new()
+	p2i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p2i_switch.play_animation = "buff"
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4],
-		[p1i1, p1i2, p1i3, p1i4],
-		[p2i1, p2i2, p2i3, p2i4]
+		[p1i_switch, p1i1, p1i2, p1i3, p1i4],
+		[p2i_switch, p2i1, p2i2, p2i3, p2i4]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20
