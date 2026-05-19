@@ -7,31 +7,52 @@ extends "res://scenes/vfx/summon_circle.gd"
 
 const _Helpers = preload("res://scenes/vfx/gpu_particle_helpers.gd")
 
-var _gpu_rising: GPUParticles2D
+var _gpu_rising_violet: GPUParticles2D
+var _gpu_rising_cyan: GPUParticles2D
+var _gpu_rising_magenta: GPUParticles2D
 var _rising_made: bool = false
 var _peak_made: bool = false
 
-# _spawn_rising override — mote 만 GPU (rune 은 super CPU)
+# 원본 tint 분포: violet 40% / cyan 30% / magenta 30% (super _spawn_rising 코드 참고).
+# rising 은 super 의 _process 마지막 phase 끝나면 호출 안 됨 — emitter off 별도 트리거 없이
+# 자연스럽게 spawn 중단 → 기존 입자 lifetime 동안 페이드 아웃.
+func _make_rising_emitter(col: Color, count_total: int, foot: Vector2) -> GPUParticles2D:
+	var em := _Helpers.make_emitter({
+		"count": count_total,
+		"lifetime": 1.7,  # 원본 max_life 1.0 + randf*0.7 = 평균 1.35, max 1.7
+		"color": col,
+		"speed_min": 60.0, "speed_max": 132.0,
+		"direction": Vector2.UP, "spread": 12.0,
+		"gravity": 0.0, "damping": 3.0,
+		"size_min": 1.4, "size_max": 2.8,
+		"size_base": 4.0,
+		"texture": _Helpers.sparkle_tex(),
+		"emission_shape": "box", "emission_box": Vector2(CIRCLE_R * 0.7, CIRCLE_R * 0.3 * RING_SQUASH),
+		"one_shot": false, "explosiveness": 0.0,
+		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
+	})
+	em.position = foot
+	return em
+
+# _spawn_rising override — mote 3 색 GPU 분리 + rune CPU
 func _spawn_rising(n: int) -> void:
 	if not _rising_made:
 		_rising_made = true
 		var foot: Vector2 = _foot_pos()
-		# mote n/frame × 60 × lifetime 1.35 ≈ 80*n 동시 (대략 평균 3 → 240)
-		_gpu_rising = _Helpers.make_emitter({
-			"count": int(240 * _scale()), "lifetime": 1.35,
-			"color": COL_VIOLET,
-			"speed_min": 60.0, "speed_max": 132.0,
-			"direction": Vector2.UP, "spread": 12.0,
-			"gravity": 0.0, "damping": 3.0,
-			"size_min": 1.4, "size_max": 2.8,
-			"size_base": 4.0,
-			"texture": _Helpers.sparkle_tex(),
-			"emission_shape": "box", "emission_box": Vector2(CIRCLE_R * 0.7, CIRCLE_R * 0.3 * RING_SQUASH),
-			"one_shot": false, "explosiveness": 0.0,
-			"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
-		})
-		_gpu_rising.position = foot
-		add_child(_gpu_rising)
+		# n/frame × 60 × lifetime 1.7 = 102*n 동시. 평균 n=3 → 306.
+		# violet 40%, cyan 30%, magenta 30%.
+		_gpu_rising_violet  = _make_rising_emitter(COL_VIOLET,  int(122 * _scale()), foot)
+		_gpu_rising_cyan    = _make_rising_emitter(COL_CYAN,    int(92 * _scale()), foot)
+		_gpu_rising_magenta = _make_rising_emitter(COL_MAGENTA, int(92 * _scale()), foot)
+		add_child(_gpu_rising_violet)
+		add_child(_gpu_rising_cyan)
+		add_child(_gpu_rising_magenta)
+		# spawn 중단 트리거 — super 의 rising phase 끝 (PEAK_DELAY+0.2 = 0.8s) 후 emit 정지.
+		# 기존 입자는 lifetime 1.7 동안 자연 페이드 아웃.
+		get_tree().create_timer(PEAK_DELAY + 0.2).timeout.connect(func() -> void:
+			if is_instance_valid(_gpu_rising_violet): _gpu_rising_violet.emitting = false
+			if is_instance_valid(_gpu_rising_cyan): _gpu_rising_cyan.emitting = false
+			if is_instance_valid(_gpu_rising_magenta): _gpu_rising_magenta.emitting = false)
 	# rune 은 super 호출 (CPU 텍스트 렌더링 필요)
 	if randf() < 0.4 * _scale():
 		var foot: Vector2 = _foot_pos()
