@@ -3154,8 +3154,8 @@ func _spawn_boss_phase_change(target_pos: Vector2, foot_pos: Vector2, phase_num:
 		await get_tree().create_timer(0.1).timeout
 		if is_inside_tree():
 			_play_screen_shake()
-	# cinematic letterbox + title toast
-	_spawn_boss_phase_cinematic(phase_num)
+	# cinematic letterbox + title toast — 사용자 요청으로 제거
+	# _spawn_boss_phase_cinematic(phase_num)
 
 # cinematic letterbox bars + "PHASE %d" 큰 텍스트 (페이드인/아웃)
 func _spawn_boss_phase_cinematic(phase_num: int) -> void:
