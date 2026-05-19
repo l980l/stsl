@@ -98,6 +98,8 @@ static func kronos(scene: PackedScene) -> Resource:
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 320; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "holy_arrow"
 	# kronos (시간의 신) — 시간의 변천: 페이즈 1, 2 에서 CHANGE_AFFINITY (신성 속성 동적 변경).
+	# 페이즈 2 진입 시 double_action 5 (Renoir Enrage 영감) — 가속화 시간.
+	e.phase_buffs = [[], [], [{"status": "double_action", "value": 5}]]
 	e.dynamic_affinity_pool = ["holy_strike", "holy_fire", "holy_arrow", "holy_slash"]
 	var p1i_aff := IntentRes.new()
 	p1i_aff.action_type = IntentRes.ActionType.CHANGE_AFFINITY; p1i_aff.play_animation = "buff"

@@ -100,6 +100,8 @@ static func jade_emperor(scene: PackedScene) -> Resource:
 	var p2i7 := IntentRes.new()
 	p2i7.action_type = IntentRes.ActionType.BUFF; p2i7.value = 3; p2i7.status_type = "strength"
 	# jade_emperor (옥황상제) — turn_modes [heaven, earth] FORM_SWITCH. 페이즈 1,2 천계/지상 모드 순환.
+	# dynamic_resistance_pool — 오행 면역 (Kunino Quad-Converge 영감, 매 enemy turn 1 속성만 통함).
+	e.dynamic_resistance_pool = ["holy_strike", "holy_arrow", "holy_fire", "holy_slash", "blunt"]
 	e.turn_modes = ["heaven", "earth"]
 	var p1i_switch := IntentRes.new()
 	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"
