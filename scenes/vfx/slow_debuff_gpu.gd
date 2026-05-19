@@ -31,7 +31,7 @@ func _spawn_peak_burst() -> void:
 		"direction": Vector2.UP, "spread": 130.0,
 		"gravity": -18.0, "damping": 3.0,
 		"size_min": 12.0, "size_max": 24.0,
-		"start_alpha": 0.4, "mid_alpha": 0.2, "end_alpha": 0.0,
+		"start_alpha": 0.8, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 	mist.position = foot
 	add_child(mist)
@@ -80,7 +80,7 @@ func _spawn_ambient() -> void:
 		"size_min": 12.0, "size_max": 22.0,
 		"emission_shape": "box", "emission_box": Vector2(80.0, 4.0),
 		"one_shot": false, "explosiveness": 0.0,
-		"start_alpha": 0.4, "mid_alpha": 0.2, "end_alpha": 0.0,
+		"start_alpha": 0.8, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 	_gpu_amb_mist.position = foot + Vector2(0.0, -2.0)
 	add_child(_gpu_amb_mist)
