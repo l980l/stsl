@@ -207,5 +207,5 @@ func display_text(override_value: int = -1) -> String:
 		EffectType.MARK_ENEMY:
 			return TranslationServer.translate("effect.mark_enemy.text")
 		EffectType.COUNTER_REFLECT:
-			return "다음 공격 50% 반감 + 100% 반사 (차지 보스 → 무효 + 기절)"
+			return TranslationServer.translate("effect.counter_reflect.text")
 	return ""

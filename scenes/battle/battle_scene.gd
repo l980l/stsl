@@ -481,7 +481,8 @@ func _make_hero_slot(index: int) -> Dictionary:
 	block_lbl.visible = false
 
 	var status_box := HBoxContainer.new()
-	status_box.position = Vector2(bar_x, pos.y + 42)
+	# HP 바 아래 — 기존 42 (너무 가까움) 와 56 (너무 멈) 의 중간
+	status_box.position = Vector2(bar_x, pos.y + 49)
 	status_box.size = Vector2(bar_w, 18)
 	status_box.z_index = 1
 	status_box.visible = false
@@ -943,6 +944,7 @@ func _connect_signals() -> void:
 	BattleManager.card_vfx_charge_start.connect(_on_card_vfx_start)
 	BattleManager.poison_tick_applied.connect(_on_poison_tick)
 	BattleManager.signature_fired.connect(_on_signature_fired)
+	BattleManager.counter_triggered.connect(_on_counter_triggered)
 	BattleManager.cards_exhausted_by_enemy.connect(_on_cards_exhausted_by_enemy)
 	BattleManager.pending_damage_changed.connect(_on_pending_damage_changed)
 
@@ -980,6 +982,18 @@ func _on_pending_damage_changed(enemy_index: int) -> void:
 	if _enemy_nodes[enemy_index].is_empty():
 		return
 	_update_enemy_ui(enemy_index)
+
+func _on_counter_triggered(hero_id: String, enemy_index: int, is_major: bool) -> void:
+	# 영웅 → 적 카운터 발동 VFX. 일반 = counter_pending 반사, major = charge 보스 차지 무효 + stun.
+	var hero_node: Node2D = _hero_char_nodes.get(hero_id)
+	if hero_node == null:
+		return
+	if enemy_index < 0 or enemy_index >= _enemy_char_nodes.size():
+		return
+	var enemy_node: Node2D = _enemy_char_nodes[enemy_index]
+	if enemy_node == null:
+		return
+	_spawn_counter(hero_node.global_position, enemy_node.global_position, is_major)
 
 func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	if _signatures_shown_this_turn.has(signature_name):
@@ -1366,22 +1380,34 @@ func _update_enemy_ui(index: int) -> void:
 		entry["panel"].modulate = Color.WHITE
 		# btn 의 enable 상태는 다른 경로(turn 변화 등)가 결정 — 사망 예정 해제 시는 유지
 
-	# 의도 표시 — CHARGE_UP 페이오프 등 한 턴에 여러 효과면 가로로 모두 표시
-	var intents: Array = BattleManager.get_enemy_current_intents(index)
-	if not intents.is_empty():
-		var label_parts: Array[String] = []
-		var tip_parts: Array[String] = []
-		for it in intents:
-			label_parts.append(_format_intent_label(index, it))
-			tip_parts.append(_format_intent_tooltip(index, it))
-		entry["intent_lbl"].text = "  ".join(label_parts)
-		entry["intent_lbl"].modulate = _intent_color(intents[0].action_type)  # 첫 intent 기준 색상
-		# 모든 인텐트에 tooltip 부착 (SPECIAL 도 자연스럽게 hover 유도)
-		# base 시: btn(SLOT_W x SLOT_H) 이 위에 있어 intent_lbl hover 차단 → btn 에도 동일 tooltip
-		# 사이드바 시: btn IGNORE 로 변경됨 → intent_lbl 가 직접 받음
-		var intent_tip: String = "\n".join(tip_parts)
-		SacredTheme.attach_tooltip(entry["intent_lbl"], intent_tip)
-		SacredTheme.attach_tooltip(entry["btn"], intent_tip)
+	# CC 상태 우선 — stun/charm/enthrall 등 행동 불가 상태면 기존 intent 대신 CC 라벨 표시
+	var cc_label: String = _cc_intent_label_for_enemy(index)
+	if cc_label != "":
+		entry["intent_lbl"].text = cc_label
+		entry["intent_lbl"].modulate = Color(1.0, 0.85, 0.45)
+		SacredTheme.attach_tooltip(entry["intent_lbl"], cc_label)
+		SacredTheme.attach_tooltip(entry["btn"], cc_label)
+	else:
+		# 의도 표시 — CHARGE_UP 페이오프 등 한 턴에 여러 효과면 가로로 모두 표시
+		var intents: Array = BattleManager.get_enemy_current_intents(index)
+		if not intents.is_empty():
+			var label_parts: Array[String] = []
+			var tip_parts: Array[String] = []
+			for it in intents:
+				label_parts.append(_format_intent_label(index, it))
+				tip_parts.append(_format_intent_tooltip(index, it))
+			var label_text: String = "  ".join(label_parts)
+			var intent_tip: String = "\n".join(tip_parts)
+			# counter window 활성 + charge 진행 중 (payoff 표시 시점) → 양 옆 ⚠️ 강조 + tooltip 교체
+			if BattleManager.is_counter_window_active(index):
+				var _ew_st: Dictionary = BattleManager.get_enemy_status(index)
+				if _ew_st.get("charge_remaining", 0) > 0:
+					label_text = "⚠️ " + label_text + " ⚠️"
+				intent_tip = tr("battle.intent.tooltip.counter_warning")
+			entry["intent_lbl"].text = label_text
+			entry["intent_lbl"].modulate = _intent_color(intents[0].action_type)
+			SacredTheme.attach_tooltip(entry["intent_lbl"], intent_tip)
+			SacredTheme.attach_tooltip(entry["btn"], intent_tip)
 
 	if not BattleManager.is_enemy_alive(index):
 		entry["panel"].modulate = Color(0.3, 0.3, 0.3)
@@ -1389,6 +1415,19 @@ func _update_enemy_ui(index: int) -> void:
 		entry["intent_lbl"].text = tr("battle.intent.dead")
 
 	_refresh_status_icons_enemy(index)
+
+# CC 상태일 때 intent 라벨 — 우선순위 stun > charm > enthrall > silence. 없으면 빈 문자열.
+func _cc_intent_label_for_enemy(enemy_index: int) -> String:
+	var st: Dictionary = BattleManager.get_enemy_status(enemy_index)
+	if st.get("stun", 0) > 0:
+		return tr("battle.cc.stunned")
+	if st.get("charm", 0) > 0:
+		return tr("battle.cc.charmed")
+	if st.get("enthrall", 0) > 0:
+		return tr("battle.cc.enthralled")
+	if st.get("silence", 0) > 0:
+		return tr("battle.cc.silenced")
+	return ""
 
 func _format_intent_label(enemy_index: int, intent: Resource) -> String:
 	# intent 1개의 라벨 문자열 (이모지 또는 ATTACK 수치 포함).
@@ -1406,11 +1445,11 @@ func _format_intent_label(enemy_index: int, intent: Resource) -> String:
 				_:      return tr("battle.intent.debuff")
 		IntentRes.ActionType.PREPARE:    return tr("battle.intent.prepare")
 		IntentRes.ActionType.CHARGE_UP:
-			# counter_window_intent.enabled 보스 — ⚠ prefix 로 카운터 가능 신호
+			# counter_window_intent.enabled 보스 — ⚠️ {💢} ⚠️ (강공격 표시와 통일된 양옆 ⚠️ 패턴)
 			var _cw_enemy: Resource = BattleManager.get_enemy(enemy_index)
 			var _cw: Dictionary = _cw_enemy.get("counter_window_intent") if _cw_enemy != null and _cw_enemy.get("counter_window_intent") != null else {}
 			if bool(_cw.get("enabled", false)):
-				return "⚠ " + tr("battle.intent.charge_up")
+				return "⚠️ " + tr("battle.intent.charge_up") + " ⚠️"
 			return tr("battle.intent.charge_up")
 		IntentRes.ActionType.HEAL_ALLY:  return _trf("battle.intent.heal_ally", intent.value)
 		IntentRes.ActionType.BUFF_ALLY:  return _trf("battle.intent.buff_ally", intent.value)
@@ -1511,11 +1550,12 @@ func _apply_card_state(node: CardScene, card_res: Resource) -> void:
 	else:
 		node.set_owner_dead(false)
 		node.set_disabled(not DeckManager.can_play(card_res))
-	# 카운터 카드 빛남 — counter_window 활성 + 차지 중 적 존재 시 황금 glow
+	# 카운터 카드 빛남 — counter_window 활성 시 황금↔파랑 펄스 (배경 대비 강조)
 	if _is_counter_card(card_res) and _any_counter_window_charging():
-		node.set_glow_color(Color(1.0, 0.85, 0.3))
+		node.start_glow_pulse(Color(1.0, 0.85, 0.3), Color(0.35, 0.65, 1.0), 1.2)
 		node.show_glow(1.0)
 	else:
+		node.stop_glow_pulse()
 		node.hide_glow()
 
 func _is_counter_card(card_res: Resource) -> bool:
@@ -1525,18 +1565,9 @@ func _is_counter_card(card_res: Resource) -> bool:
 	return false
 
 func _any_counter_window_charging() -> bool:
-	# 어떤 적이든 counter_window_intent.enabled = true + charge_remaining > 0 이면 true
+	# 어떤 적이든 counter window 활성이면 true — 워닝 의도 표시 시점부터 카드 빛남.
 	for i in range(BattleManager.get_enemy_count()):
-		if not BattleManager.is_enemy_alive(i):
-			continue
-		var enemy: Resource = BattleManager.get_enemy(i)
-		if enemy == null:
-			continue
-		var window: Dictionary = enemy.get("counter_window_intent") if enemy.get("counter_window_intent") != null else {}
-		if not bool(window.get("enabled", false)):
-			continue
-		var st: Dictionary = BattleManager.get_enemy_status(i)
-		if st.get("charge_remaining", 0) > 0:
+		if BattleManager.is_counter_window_active(i):
 			return true
 	return false
 
@@ -1663,7 +1694,6 @@ func _refresh_hand() -> void:
 		node.set_meta("_fan_title_pos", arc_pos + Vector2(0, -70.0 * BASE_CARD_SCALE).rotated(angle))
 		node.set_meta("_card_res", card)
 		node.setup(card, node.Mode.HAND)
-		_apply_card_state(node, card)
 		node.card_clicked.connect(_on_card_clicked)
 		node.card_drag_started.connect(_on_card_drag_started)
 		node.card_drag_moved.connect(_on_card_drag_moved)
@@ -1672,6 +1702,8 @@ func _refresh_hand() -> void:
 		node.card_hovered.connect(func(c: Resource): _on_card_hovered(c, captured_node))
 		node.card_unhovered.connect(_on_card_unhovered)
 		_ui_add(node)  # CanvasLayer 자식 — 카메라 zoom 영향 없음
+		# _apply_card_state 는 add_child 후 (_ready 발동 후) 호출 — _glow_mat 셋업 후 show_glow 가 작동
+		_apply_card_state(node, card)
 		_card_buttons.append(node)
 
 # ─────────────────────────────────────────────
@@ -2118,13 +2150,23 @@ const _STATUS_POPUP_INFO := {
 	"counter_block": ["Counter Block", Color(0.60, 0.85, 1.00)],   # rgba(153,217,255) 부드러운 하늘
 	"speed_bonus":   ["Haste",         Color(0.55, 0.88, 1.00)],   # rgba(140,225,255) 부드러운 청록 (가속)
 	"speed_penalty": ["Slow",          Color(0.65, 0.72, 0.85)],   # rgba(166,184,217) 차분한 청회 (둔화)
-	"stun":          ["Stun",          Color(1.00, 0.85, 0.45)],   # rgba(255,217,115) 부드러운 황금 (마비 별)
+	"stun":          ["STUN!",         Color(1.00, 0.85, 0.45), 64],  # rgba(255,217,115) 부드러운 황금 — 강조 큰 폰트
 	"tokens":        ["Soldiers",      Color(0.85, 0.78, 1.00)],   # rgba(217,199,255) 부드러운 라일락 (소환)
 	"counter_pending": ["Counter Ready", Color(1.00, 0.85, 0.30)], # rgba(255,217,77)  황금 — 카운터 대기
 	"double_action": ["Double Action", Color(1.00, 0.82, 0.40)],   # rgba(255,209,102) 풍부한 골드 — 2회 행동
 	"heal_block":    ["Heal Block",    Color(1.00, 0.45, 0.55)],   # rgba(255,115,140) 강한 핑크 — 회복 차단
 	"silence":       ["Silence",       Color(0.65, 0.70, 0.90)],   # rgba(166,179,230) 차분한 보라 — 침묵
 }
+
+# 강력 CC — 부여 시점에 머리 위 큰 한글 popup (기절! / 반함! 등). stacks 증가 시만 발동.
+const _STRONG_CC_LABELS := {
+	"charm":      "반함!",
+	"enthrall":   "매혹!",
+	"taunt":      "도발!",
+	"silence":    "침묵!",
+	"heal_block": "회복 차단!",
+}
+var _strong_cc_prev_stacks: Dictionary = {}  # key: "target:status", value: int
 
 func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int, stack_key: String) -> void:
 	var count: int = _popup_stack.get(stack_key, 0)
@@ -2180,11 +2222,12 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 	var container := Node2D.new()
 	container.z_index = 1800  # popup — 호버 카드(1700) 위, 토스트(2000) 아래
 	add_child(container)
-	_add_popup_halo(container, info[0], 32, status_color)
+	var fsize: int = int(info[2]) if info.size() >= 3 else 32
+	_add_popup_halo(container, info[0], fsize, status_color)
 	var lbl := Label.new()
 	lbl.text = info[0]
 	lbl.modulate = tint * 1.4
-	lbl.label_settings = _get_popup_main_ls(32)
+	lbl.label_settings = _get_popup_main_ls(fsize)
 	container.add_child(lbl)
 	lbl.reset_size()
 	lbl.position = -lbl.size / 2.0
@@ -2293,6 +2336,9 @@ const _VFX_SACRIFICE := preload("res://scenes/vfx/sacrifice_gpu.gd")
 const _VFX_COUNTER_PREPARE := preload("res://scenes/vfx/counter_prepare.gd")
 const _VFX_STEAL_CARD := preload("res://scenes/vfx/steal_card_gpu.gd")
 const _VFX_PURGE_STATUS := preload("res://scenes/vfx/purge_status_gpu.gd")
+const _VFX_DISPEL := preload("res://scenes/vfx/dispel.gd")
+const _VFX_FORM_CHANGE := preload("res://scenes/vfx/form_change.gd")
+const _VFX_COUNTER := preload("res://scenes/vfx/counter.gd")
 const _VFX_MORALE_BOOST := preload("res://scenes/vfx/morale_boost_gpu.gd")
 const _VFX_PREPARE := preload("res://scenes/vfx/prepare.gd")
 const _VFX_BOSS_PHASE := preload("res://scenes/vfx/boss_phase_changed_gpu.gd")
@@ -2629,6 +2675,19 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: St
 			_spawn_power_up(caster_pos, caster_foot)
 		ir.ActionType.SUMMON:
 			_spawn_summon_circle(caster_pos, caster_foot)
+		ir.ActionType.DISPEL:
+			# 적이 영웅 buff 제거 — caster(적) → target(영웅) hook tendril 3가닥
+			# ALL 이면 살아있는 영웅 전체에 spawn, SINGLE 이면 1명
+			if intent.target == ir.TargetType.ALL:
+				for hpos in _all_living_hero_positions():
+					_spawn_dispel(caster_pos, hpos)
+			else:
+				var dh_pos: Vector2 = _hero_pos_or_first(target_hero_id)
+				if dh_pos != Vector2.ZERO:
+					_spawn_dispel(caster_pos, dh_pos)
+		ir.ActionType.FORM_SWITCH:
+			# 폼 전환 — 시전자(적) 자기 위치에 변환 VFX (charge → shatter → reveal)
+			_spawn_form_change(caster_pos, caster_foot)
 		ir.ActionType.WARD:
 			# 1턴 무적 — defense_buff 재사용 + 청록 modulate (BUFF.block 파랑과 구분)
 			_spawn_ward_dome(caster_pos, caster_foot)
@@ -3279,6 +3338,58 @@ func _spawn_purge_status(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) 
 		AudioManager.play_sfx("impact_divine")
 	)
 	fx.play(target_pos, target_pos)
+
+# 적 DISPEL intent — caster(적) → target(영웅) hook tendril 로 buff orb 부숨.
+# screen_effect = windup 끝(impact). SFX = impact_curse (디버프 톤).
+func _spawn_dispel(caster_pos: Vector2, target_pos: Vector2) -> void:
+	var fx: Node2D = _VFX_DISPEL.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_shake()
+		AudioManager.play_sfx("impact_curse")
+	)
+	fx.play(caster_pos, target_pos)
+
+# 적 FORM_SWITCH intent — 시전자(적) 자기 위치에 폼 변환 VFX.
+# ground 레이어 = 캐릭터 발 뒤 (halo · ring · pillar 베이스 · dust)
+# glow 레이어 = 캐릭터 앞 (cracks · shock · shards · sparks)
+# screen_effect = SHATTER 시점 (charge 끝 + pillar + crack 후).
+func _spawn_form_change(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
+	var fx: Node2D = _VFX_FORM_CHANGE.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	if foot_pos != Vector2.ZERO:
+		fx.set_ground_anchor(foot_pos)
+	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_flash()
+		_play_screen_shake()
+		AudioManager.play_sfx("impact_divine")
+	)
+	fx.play(target_pos, target_pos)
+
+# 카운터 발동 VFX — 영웅(caster) → 적(target) parry flash + streak + hit burst.
+# is_major: charge_up 무효 변형 (더 큰 효과 + crimson vignette + steel chip).
+# 일반: counter_pending 반사. SFX = impact_slash / major = impact_divine + shake 강함.
+func _spawn_counter(caster_pos: Vector2, target_pos: Vector2, is_major: bool) -> void:
+	var fx: Node2D = _VFX_COUNTER.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	fx.set_is_major(is_major)
+	fx.screen_effect.connect(func() -> void:
+		if is_major:
+			_play_screen_flash()
+			_play_screen_shake()
+			AudioManager.play_sfx("impact_divine")
+		else:
+			AudioManager.play_sfx("impact_slash")
+	)
+	fx.play(caster_pos, target_pos)
 
 # 적 SPECIAL remove_card — 영웅 손 빨간 mark → 카드 비행 영웅→적 → 적 catch + hook sigil
 func _spawn_steal_card(caster_pos: Vector2, target_pos: Vector2) -> void:
@@ -4481,18 +4592,20 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		hbox.add_child(icon)
 
-		var lbl := Label.new()
-		if key == "poison_dmg":
-			var dur: int = status.get("poison_dur", 0)
-			lbl.text = "%d/%d" % [val * 10, dur]
-		else:
-			lbl.text = "%d" % val
-		lbl.theme_type_variation = "EyebrowLabel"
-		lbl.add_theme_font_size_override("font_size", 11)
-		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		hbox.add_child(lbl)
+		# counter_pending — 중첩 X binary status. 수치 표시 안 함.
+		if key != "counter_pending":
+			var lbl := Label.new()
+			if key == "poison_dmg":
+				var dur: int = status.get("poison_dur", 0)
+				lbl.text = "%d/%d" % [val * 10, dur]
+			else:
+				lbl.text = "%d" % val
+			lbl.theme_type_variation = "EyebrowLabel"
+			lbl.add_theme_font_size_override("font_size", 11)
+			lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			hbox.add_child(lbl)
 
 		return hbox
 
@@ -4683,7 +4796,7 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 		_refresh_status_icons_enemy(idx)
 		# strength/weak/counter_pool 등 변경 시 intent 표시값 갱신
 		_update_enemy_ui(idx)
-		if idx < _enemy_nodes.size() and _enemy_nodes[idx]["panel"].visible:
+		if idx < _enemy_nodes.size() and _enemy_nodes[idx]["panel"].visible and _stacks > 0:
 			var panel: ColorRect = _enemy_nodes[idx]["panel"]
 			_spawn_status_popup(panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0), status_type, target)
 		var char_node: Node2D = _enemy_char_nodes[idx] if idx < _enemy_char_nodes.size() else null
@@ -4692,7 +4805,7 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 	else:
 		_refresh_status_icons_hero(target)
 		for entry in _hero_nodes:
-			if entry["hero_id"] == target and entry["panel"].visible:
+			if entry["hero_id"] == target and entry["panel"].visible and _stacks > 0:
 				var panel: ColorRect = entry["panel"]
 				_spawn_status_popup(panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0), status_type, target)
 				break
@@ -4714,18 +4827,75 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 	# 카드 데미지 표시는 hero strength/weak (자기) + 적 vulnerable (드래그 호버 시) 반영.
 	if status_type in ["weak", "vulnerable", "strength"]:
 		_refresh_hand_card_damage()
-	# 스턴 — 영웅에게 부여 시 머리 위 별 즉발 (디버프 빔과 별개 — 임팩트 동기화 X)
-	if status_type == "stun" and not target.begins_with("enemy_"):
-		var hero_node: Node2D = _hero_char_nodes.get(target)
-		if hero_node:
-			_spawn_stun_stars(hero_node.global_position)
+	# 스턴 — 영웅/적 모두 stun stacks 동안 머리 위 별 지속 (해제 시 fade out)
+	if status_type == "stun":
+		_update_persistent_stun_vfx(target, _stacks)
+	# 강력 CC — 신규 부여 또는 stack 증가 시 큰 한글 popup
+	_maybe_strong_cc_popup(target, status_type, _stacks)
+
+func _maybe_strong_cc_popup(target: String, status_type: String, stacks: int) -> void:
+	if not _STRONG_CC_LABELS.has(status_type):
+		return
+	var key: String = "%s:%s" % [target, status_type]
+	var prev: int = _strong_cc_prev_stacks.get(key, 0)
+	_strong_cc_prev_stacks[key] = stacks
+	if stacks <= prev:
+		return  # 감소 또는 동일 — popup 없음 (재부여만 트리거)
+	var char_node: Node2D = null
+	if target.begins_with("enemy_"):
+		var idx: int = target.substr(6).to_int()
+		if idx >= 0 and idx < _enemy_char_nodes.size():
+			char_node = _enemy_char_nodes[idx]
+	else:
+		char_node = _hero_char_nodes.get(target)
+	if char_node == null:
+		return
+	var color: Color = Color(1.0, 0.85, 0.45)
+	if _STATUS_POPUP_INFO.has(status_type):
+		color = _STATUS_POPUP_INFO[status_type][1]
+	_spawn_popup(char_node.global_position + Vector2(0.0, -110.0),
+		_STRONG_CC_LABELS[status_type], color, 64, "strong_cc:%s" % target)
 
 func _spawn_stun_stars(pos: Vector2) -> void:
+	# 일회성 burst (skip turn 토스트 등에서 사용)
 	var fx: Node2D = _VFX_STUN_STARS.new()
 	add_child(fx)
 	fx.z_index = 1300
 	fx.position = Vector2.ZERO
 	fx.play(pos, pos)
+
+# 스턴 상태 지속 VFX — 노드를 따라다니며 stun 해제될 때까지 머리 위 별 표시.
+# stacks > 0 시 spawn (기존 vfx 있으면 무시), stacks <= 0 시 stop() fade out.
+var _stun_vfx_by_target: Dictionary = {}
+
+func _update_persistent_stun_vfx(target: String, stacks: int) -> void:
+	var existing: Node = _stun_vfx_by_target.get(target, null)
+	if stacks > 0:
+		if existing != null and is_instance_valid(existing):
+			return  # 이미 표시 중
+		var node: Node2D = null
+		var head_y: float = -120.0
+		if target.begins_with("enemy_"):
+			var idx: int = target.substr(6).to_int()
+			if idx >= 0 and idx < _enemy_char_nodes.size():
+				node = _enemy_char_nodes[idx]
+				head_y = -100.0
+		else:
+			node = _hero_char_nodes.get(target)
+		if node == null:
+			return
+		var fx: Node2D = _VFX_STUN_STARS.new()
+		add_child(fx)
+		fx.z_index = 1300
+		fx.position = Vector2.ZERO
+		fx.set_persistent(true)
+		fx.set_target_node(node, head_y)
+		fx.play(node.global_position, node.global_position)
+		_stun_vfx_by_target[target] = fx
+	else:
+		if existing != null and is_instance_valid(existing):
+			existing.stop()
+		_stun_vfx_by_target.erase(target)
 
 func _refresh_hand_card_damage() -> void:
 	for btn in _card_buttons:

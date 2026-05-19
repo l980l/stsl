@@ -103,8 +103,33 @@ func hide_glow() -> void:
 
 func set_glow_color(color: Color) -> void:
 	_glow_color = color
+	_pulse_period = 0.0  # 단일 색 설정 시 펄스 중단
 	if _glow_mat:
 		_glow_mat.set_shader_parameter("glow_color", Vector4(color.r, color.g, color.b, 1.0))
+
+# 두 색 사이를 sine 으로 부드럽게 순환 — 배경에 묻히지 않게 시각 강조
+# period 초당 1주기. start_glow_pulse(GOLD, BLUE) 같은 식.
+var _pulse_color_a: Color = Color.WHITE
+var _pulse_color_b: Color = Color.WHITE
+var _pulse_period: float = 0.0
+var _pulse_age: float = 0.0
+
+func start_glow_pulse(color_a: Color, color_b: Color, period: float = 1.2) -> void:
+	_pulse_color_a = color_a
+	_pulse_color_b = color_b
+	_pulse_period = period
+	_pulse_age = 0.0
+	set_process(true)
+
+func stop_glow_pulse() -> void:
+	_pulse_period = 0.0
+
+func _process(delta: float) -> void:
+	if _pulse_period > 0.0 and _glow_mat:
+		_pulse_age += delta
+		var t: float = (sin(_pulse_age * TAU / _pulse_period) + 1.0) * 0.5
+		var c: Color = _pulse_color_a.lerp(_pulse_color_b, t)
+		_glow_mat.set_shader_parameter("glow_color", Vector4(c.r, c.g, c.b, 1.0))
 
 func tween_glow(alpha: float, duration: float) -> void:
 	if not _glow_mat:
