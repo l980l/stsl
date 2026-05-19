@@ -728,6 +728,9 @@ func _phase_hero_post(hid: String) -> bool:
 func play_card(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> bool:
 	if not is_player_turn or not is_battle_active:
 		return false
+	# silence — 시전 영웅이 silence 상태면 카드 사용 불가 (Ameno-sagiri Foolish Whisper 영감).
+	if _hero_status.get(card.owner_id, {}).get("silence", 0) > 0:
+		return false
 	# 적 부여 도발 lock — 시전 영웅이 적이 부여한 taunt 상태면 SINGLE 효과 타겟을 그 적으로 강제.
 	# ALL 타겟 카드는 영향 X (자연스럽게 모든 적 포함). 도발 적이 이미 사망했으면 lock 해제 (cleanup 이 처리).
 	var lock_idx: int = _get_taunt_lock_target(card.owner_id)
@@ -892,7 +895,7 @@ func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
 			"power.heal_team_per_turn":
 				if phase == "player_turn_start" and team_mgr:
 					for hero in team_mgr.heroes:
-						team_mgr.heal(hero.hero_id, v)
+						_heal_hero_safe(hero.hero_id, v)
 			"power.draw_per_turn":
 				if phase == "player_turn_start" and deck_mgr:
 					# 본인 영웅에게 추가 드로우
@@ -1110,7 +1113,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								heal_id = hero.hero_id
 					else:
 						heal_id = target_hero_id if target_hero_id != "" else card.owner_id
-					team_mgr.heal(heal_id, effect.value)
+					_heal_hero_safe(heal_id, effect.value)
 			EffectRes.EffectType.GAIN_MORALE:
 				if not _hero_status.has(card.owner_id):
 					_hero_status[card.owner_id] = {}
@@ -1191,7 +1194,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					# 사망 영웅 제외 — 살아있는 영웅만 HEAL (REVIVE 는 별도 effect_type)
 					for hero in team_mgr.heroes:
 						if team_mgr.is_alive(hero.hero_id):
-							team_mgr.heal(hero.hero_id, heal_amt)
+							_heal_hero_safe(hero.hero_id, heal_amt)
 			EffectRes.EffectType.FORMATION_BLOCK:
 				if team_mgr:
 					var count: int = team_mgr.get_living_heroes().size()
@@ -1384,9 +1387,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						var heal_amt: int = dead_count * effect.value
 						if effect.target == "ALL":
 							for hero in team_mgr.heroes:
-								team_mgr.heal(hero.hero_id, heal_amt)
+								_heal_hero_safe(hero.hero_id, heal_amt)
 						else:
-							team_mgr.heal(card.owner_id, heal_amt)
+							_heal_hero_safe(card.owner_id, heal_amt)
 			EffectRes.EffectType.ENERGY_TO_DAMAGE:
 				# 본인 영웅의 현재 에너지 × value (모두 소비)
 				if target_enemy_index >= 0 and deck_mgr:
@@ -1691,6 +1694,16 @@ func _set_enemy_taunt_source(enemy_index: int, hero_id: String) -> void:
 	if enemy_index < 0 or enemy_index >= _enemy_status.size():
 		return
 	_enemy_status[enemy_index]["taunt_source"] = hero_id
+
+# heal 시 heal_block status 가 있으면 차단 (Dualliste Inverted 영감).
+# 반환: 실제 회복 적용 여부 (true) / 차단 (false).
+func _heal_hero_safe(hero_id: String, amount: int) -> bool:
+	if _hero_status.get(hero_id, {}).get("heal_block", 0) > 0:
+		return false
+	if team_mgr == null:
+		return false
+	team_mgr.heal(hero_id, amount)
+	return true
 
 func _apply_status_to_hero(hero_id: String, status_type: String, stacks: int) -> void:
 	if not _hero_status.has(hero_id):
@@ -2235,7 +2248,12 @@ func _pick_highest_hp(hero_ids: Array) -> String:
 func _pick_hero_target(target_type: int, enemy_index: int, action_type: int = -1) -> String:
 	if team_mgr == null:
 		return ""
-	var living: Array = team_mgr.get_living_heroes()
+	var living_all: Array = team_mgr.get_living_heroes()
+	# exiled 상태 영웅 제외 (Renoir Vanish 영감) — 적의 target select 에서 제외.
+	var living: Array = []
+	for h in living_all:
+		if _hero_status.get(h.hero_id, {}).get("exiled", 0) <= 0:
+			living.append(h)
 	if living.is_empty():
 		return ""
 	# 도발 우회: 영웅 공격성 인텐트 (ATTACK / DEBUFF / MARK_TARGET / MIMIC) 가 영웅에게 도발당했으면

@@ -26,6 +26,12 @@ func run_all() -> Dictionary:
 	test_change_affinity_picks_from_pool()
 	test_change_affinity_empty_pool_uses_default()
 	test_inflict_weakness_applies_to_hero()
+	# Phase A2-1
+	test_heal_block_prevents_heal()
+	test_heal_block_zero_allows_heal()
+	test_silence_blocks_card_play()
+	test_silence_zero_allows_card_play()
+	test_exiled_hero_not_targeted()
 	for n in _to_free:
 		if is_instance_valid(n):
 			n.free()
@@ -189,6 +195,79 @@ func test_change_affinity_empty_pool_uses_default() -> void:
 	bm.end_player_turn()
 	var chosen: String = bm._enemy_status[0].get("current_affinity", "")
 	_assert(chosen in ["holy_fire", "holy_strike", "holy_arrow", "holy_slash"], "빈 풀 → 기본 4 속성 중 하나")
+
+# Phase A2-1 — heal_block / silence / exiled
+
+# 11) heal_block — _heal_hero_safe 차단
+func test_heal_block_prevents_heal() -> void:
+	print("[TestEnemyPatternsV2] test_heal_block_prevents_heal")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	bm.team_mgr.take_damage("napoleon", 50)
+	bm._apply_status_to_hero("napoleon", "heal_block", 2)
+	var applied: bool = bm._heal_hero_safe("napoleon", 30)
+	_assert(not applied, "heal_block > 0 → 회복 차단 (false 반환)")
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 50, "HP 변동 없음")
+
+# 12) heal_block 0 — 정상 회복
+func test_heal_block_zero_allows_heal() -> void:
+	print("[TestEnemyPatternsV2] test_heal_block_zero_allows_heal")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	bm.team_mgr.take_damage("napoleon", 50)
+	var applied: bool = bm._heal_hero_safe("napoleon", 30)
+	_assert(applied, "heal_block 미설정 → 회복 적용 (true)")
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 80, "HP 50 + 30 = 80")
+
+# 13) silence — 카드 사용 차단
+func test_silence_blocks_card_play() -> void:
+	print("[TestEnemyPatternsV2] test_silence_blocks_card_play")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 30
+	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.ATTACK, 5)]
+	bm.setup_battle([enemy])
+	bm._apply_status_to_hero("napoleon", "silence", 1)
+	bm.start_player_turn()
+	# Card with owner_id = napoleon
+	var c := preload("res://resources/card_resource.gd").new()
+	c.owner_id = "napoleon"; c.cost = 0; c.effects = []
+	bm.deck_mgr.hand.append(c)
+	var ok: bool = bm.play_card(c, 0)
+	_assert(not ok, "silence > 0 → play_card false")
+
+# 14) silence 0 — 카드 사용 정상
+func test_silence_zero_allows_card_play() -> void:
+	print("[TestEnemyPatternsV2] test_silence_zero_allows_card_play")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 30
+	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.ATTACK, 5)]
+	bm.setup_battle([enemy])
+	bm.start_player_turn()
+	var c := preload("res://resources/card_resource.gd").new()
+	c.owner_id = "napoleon"; c.cost = 0; c.effects = []
+	bm.deck_mgr.hand.append(c)
+	var ok: bool = bm.play_card(c, 0)
+	_assert(ok, "silence 0 → play_card true")
+
+# 15) exiled — 영웅이 target select 에서 제외
+func test_exiled_hero_not_targeted() -> void:
+	print("[TestEnemyPatternsV2] test_exiled_hero_not_targeted")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
+	bm.team_mgr.add_hero(_make_hero("jeanne", 100))
+	var enemy := EnemyRes.new()
+	enemy.max_hp = 30
+	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.ATTACK, 5)]
+	bm.setup_battle([enemy])
+	bm._apply_status_to_hero("napoleon", "exiled", 1)
+	# RANDOM 타겟 5회 — napoleon 절대 안 뽑혀야
+	for _i in range(5):
+		var pick: String = bm._pick_hero_target(IntentRes.TargetType.RANDOM, 0, IntentRes.ActionType.ATTACK)
+		_assert(pick == "jeanne", "exiled napoleon 제외 → jeanne 만 선택")
 
 # 10) INFLICT_WEAKNESS — 영웅에 status 부여
 func test_inflict_weakness_applies_to_hero() -> void:
