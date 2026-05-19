@@ -19,11 +19,12 @@ static func child_immortal(scene: PackedScene) -> Resource:
 	return e
 
 static func dao_disciple(scene: PackedScene) -> Resource:
+	# 도교 부적 봉인 — 영웅 1명에 silence 1턴 (카드 사용 불가)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.daoist.dao_disciple"; e.max_hp = 300; e.character_scene = scene
 	e.mythology = "daoist"; e.signatures_enabled = false  # 인카운터 #2
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
+	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "silence"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 1; i2.status_type = "strength"
 	var i3 := IntentRes.new()

@@ -38,6 +38,7 @@ static func skoll(scene: PackedScene) -> Resource:
 	return e
 
 static func hrimthurs_scout(scene: PackedScene) -> Resource:
+	# Ymir 빙결 컨셉 — 페이즈 2 영웅 1명에 heal_block 2턴 (회복 효과 차단)
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.hrimthurs_scout"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "norse"
@@ -46,11 +47,14 @@ static func hrimthurs_scout(scene: PackedScene) -> Resource:
 	p0i1.action_type = IntentRes.ActionType.BUFF; p0i1.value = 50; p0i1.status_type = "block"
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 130; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "ice"
+	var p1i_freeze := IntentRes.new()
+	p1i_freeze.action_type = IntentRes.ActionType.DEBUFF; p1i_freeze.value = 2; p1i_freeze.status_type = "heal_block"
+	p1i_freeze.target = IntentRes.TargetType.RANDOM
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 170; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "ice"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 200; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "ice"
-	e.phase_patterns = [[p0i1, p0i2], [p1i1, p1i2]]
+	e.phase_patterns = [[p0i1, p0i2], [p1i_freeze, p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
 	return e
 
