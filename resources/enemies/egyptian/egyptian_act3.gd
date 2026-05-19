@@ -109,10 +109,19 @@ static func ra_horakhty(scene: PackedScene) -> Resource:
 	p1i_aff.action_type = IntentRes.ActionType.CHANGE_AFFINITY; p1i_aff.play_animation = "buff"
 	var p2i_aff := IntentRes.new()
 	p2i_aff.action_type = IntentRes.ActionType.CHANGE_AFFINITY; p2i_aff.play_animation = "buff"
+	# 페이즈 2 — 태양신의 심판 차지업 (counter 가능): 2턴 후 260 ALL fire + vulnerable 3 ALL
+	var p2_charge_atk := IntentRes.new()
+	p2_charge_atk.action_type = IntentRes.ActionType.ATTACK; p2_charge_atk.value = 260; p2_charge_atk.target = IntentRes.TargetType.ALL; p2_charge_atk.damage_type = "fire"
+	var p2_charge_dbf := IntentRes.new()
+	p2_charge_dbf.action_type = IntentRes.ActionType.DEBUFF; p2_charge_dbf.value = 3; p2_charge_dbf.status_type = "vulnerable"
+	p2_charge_dbf.target = IntentRes.TargetType.ALL
+	var p2_charge := IntentRes.new()
+	p2_charge.action_type = IntentRes.ActionType.CHARGE_UP; p2_charge.charge_turns = 2; p2_charge.payoff_intents = [p2_charge_atk, p2_charge_dbf]
+	e.counter_window_intent = {"enabled": true}
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3, p0i4],
 		[p1i_aff, p1i1, p1i2, p1i3, p1i4],
-		[p2i_aff, p2i1, p2i2, p2i3, p2i4]
+		[p2i_aff, p2i1, p2_charge, p2i2, p2i3, p2i4]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	return e

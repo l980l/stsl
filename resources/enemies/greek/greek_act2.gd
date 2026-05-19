@@ -93,10 +93,18 @@ static func hades(scene: PackedScene) -> Resource:
 	var p2i_dispel := IntentRes.new()
 	p2i_dispel.action_type = IntentRes.ActionType.DISPEL
 	p2i_dispel.target = IntentRes.TargetType.ALL; p2i_dispel.play_animation = "debuff"
+	# 페이즈 2 — 영혼 흡수 차지업 (counter 가능): 1턴 후 90 ALL curse + DISPEL 폭발
+	var p2_charge_atk := IntentRes.new()
+	p2_charge_atk.action_type = IntentRes.ActionType.ATTACK; p2_charge_atk.value = 90; p2_charge_atk.target = IntentRes.TargetType.ALL; p2_charge_atk.damage_type = "curse"
+	var p2_charge_dispel := IntentRes.new()
+	p2_charge_dispel.action_type = IntentRes.ActionType.DISPEL; p2_charge_dispel.target = IntentRes.TargetType.ALL
+	var p2_charge := IntentRes.new()
+	p2_charge.action_type = IntentRes.ActionType.CHARGE_UP; p2_charge.charge_turns = 1; p2_charge.payoff_intents = [p2_charge_atk, p2_charge_dispel]
+	e.counter_window_intent = {"enabled": true}
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
 		[p1i_dispel, p1i1, p1i2, p1i3],
-		[p2i1, p2i_dispel, p2i2, p2i3]
+		[p2i1, p2i_dispel, p2_charge, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

@@ -146,10 +146,19 @@ static func hydra(scene: PackedScene) -> Resource:
 	var p1i5 := IntentRes.new()
 	p1i5.action_type = IntentRes.ActionType.INFLICT_WEAKNESS; p1i5.value = 2; p1i5.status_type = "weakness_poison"
 	p1i5.target = IntentRes.TargetType.ALL; p1i5.play_animation = "debuff"
+	# 페이즈 2 — 9개 머리 일제 독숨 차지업 (counter 가능): 2턴 숨고르기 후 260 LOWEST_HP poison + poison 4 ALL
+	var p2_charge_atk := IntentRes.new()
+	p2_charge_atk.action_type = IntentRes.ActionType.ATTACK; p2_charge_atk.value = 260; p2_charge_atk.target = IntentRes.TargetType.LOWEST_HP; p2_charge_atk.damage_type = "poison"
+	var p2_charge_dbf := IntentRes.new()
+	p2_charge_dbf.action_type = IntentRes.ActionType.DEBUFF; p2_charge_dbf.value = 4; p2_charge_dbf.status_type = "poison"
+	p2_charge_dbf.target = IntentRes.TargetType.ALL
+	var p2_charge := IntentRes.new()
+	p2_charge.action_type = IntentRes.ActionType.CHARGE_UP; p2_charge.charge_turns = 2; p2_charge.payoff_intents = [p2_charge_atk, p2_charge_dbf]
+	e.counter_window_intent = {"enabled": true}
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
 		[p1i1, p1i5, p1i2, p1i3, p1i4],
-		[p2i1, p2i2, p2i3, p2i4, p2i5, p2i6]
+		[p2i1, p2i2, p2_charge, p2i3, p2i4, p2i5, p2i6]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20

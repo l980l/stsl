@@ -88,10 +88,16 @@ static func fjorgynn(scene: PackedScene) -> Resource:
 	e.turn_modes = ["guardian", "wrath"]
 	var p1i_switch := IntentRes.new()
 	p1i_switch.action_type = IntentRes.ActionType.FORM_SWITCH; p1i_switch.play_animation = "buff"
+	# 페이즈 2 — 대지의 분노 차지업 (counter 가능): 2턴 후 230 LOWEST_HP holy_fire 단일 폭격
+	var p2_charge_atk := IntentRes.new()
+	p2_charge_atk.action_type = IntentRes.ActionType.ATTACK; p2_charge_atk.value = 230; p2_charge_atk.target = IntentRes.TargetType.LOWEST_HP; p2_charge_atk.damage_type = "holy_fire"
+	var p2_charge := IntentRes.new()
+	p2_charge.action_type = IntentRes.ActionType.CHARGE_UP; p2_charge.charge_turns = 2; p2_charge.payoff_intents = [p2_charge_atk]
+	e.counter_window_intent = {"enabled": true}
 	e.phase_patterns = [
 		[p0i1, p0i2, p0i3],
 		[p1i1, p1i_switch, p1i2, p1i3],
-		[p2i1, p2i2, p2i3]
+		[p2i1, p2_charge, p2i2, p2i3]
 	]
 	e.intent_pattern = e.phase_patterns[0]
 	e.charm_resistance = 20
