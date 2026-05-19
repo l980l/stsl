@@ -41,6 +41,12 @@ const VFX_PAIRS := [
 	{"name": "purge_status",    "gpu": "res://scenes/vfx/purge_status_gpu.gd",    "cpu": "res://scenes/vfx/purge_status.gd"},
 	{"name": "debuff_hex",      "gpu": "res://scenes/vfx/debuff_hex_gpu.gd",      "cpu": "res://scenes/vfx/debuff_hex.gd"},
 	{"name": "target_marking",  "gpu": "res://scenes/vfx/target_marking_gpu.gd",  "cpu": "res://scenes/vfx/target_marking.gd"},
+	# Phase 7 — 기타 (sig 3종은 폴리곤 only 라 mimic/sacrifice/power_up/steal_card/card_exhaust 로 대체)
+	{"name": "mimic",        "gpu": "res://scenes/vfx/mimic_gpu.gd",        "cpu": "res://scenes/vfx/mimic.gd"},
+	{"name": "sacrifice",    "gpu": "res://scenes/vfx/sacrifice_gpu.gd",    "cpu": "res://scenes/vfx/sacrifice.gd"},
+	{"name": "power_up",     "gpu": "res://scenes/vfx/power_up_gpu.gd",     "cpu": "res://scenes/vfx/power_up.gd"},
+	{"name": "steal_card",   "gpu": "res://scenes/vfx/steal_card_gpu.gd",   "cpu": "res://scenes/vfx/steal_card.gd"},
+	{"name": "card_exhaust", "gpu": "res://scenes/vfx/card_exhaust_gpu.gd", "cpu": "res://scenes/vfx/card_exhaust.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
