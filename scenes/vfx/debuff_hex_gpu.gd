@@ -40,7 +40,7 @@ func _spawn_impact_cloud(pos: Vector2) -> void:
 		"gravity": 180.0, "damping": 3.0,
 		"size_min": 2.7, "size_max": 6.3,  # 원본 r=3.0~7.0 × 0.9 매칭
 		"additive": false,
-		"start_alpha": 0.9, "mid_alpha": 0.5, "end_alpha": 0.0,
+		"start_alpha": 0.7, "mid_alpha": 0.4, "end_alpha": 0.0,
 	})
 	drip.position = pos
 	drip.z_index = -1
