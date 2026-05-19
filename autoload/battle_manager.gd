@@ -2068,6 +2068,53 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				var target_id: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.ATTACK)
 				if target_id != "":
 					_deal_damage_to_hero(target_id, dmg, intent.damage_type)
+		IntentRes.ActionType.DISPEL:
+			# 영웅 (또는 ALL) 의 status_type 키 제거 — Atlus Dekaja 영감.
+			# intent.status_type = 제거할 키 (예: "strength", "block"). 빈 문자열 = 기본 buff 셋 (strength + block).
+			var keys_to_remove: Array = [intent.status_type] if intent.status_type != "" else ["strength", "block"]
+			var targets: Array = []
+			if intent.target == IntentRes.TargetType.ALL:
+				if team_mgr:
+					for hero in team_mgr.get_living_heroes():
+						targets.append(hero.hero_id)
+			else:
+				var tid: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.DEBUFF)
+				if tid != "":
+					targets.append(tid)
+			for tid in targets:
+				if _hero_status.has(tid):
+					for k in keys_to_remove:
+						_hero_status[tid][k] = 0
+						status_applied.emit(tid, k, 0)
+		IntentRes.ActionType.FORM_SWITCH:
+			# Form 전환 — turn_modes 순환. enemy.turn_modes = ["offense", "defense", ...] 면 status 의 current_mode_index +1.
+			# Melancholia Zorba 영감. 효과는 보스별 phase_patterns / damage 처리에서 mode 키 참조.
+			var src_enemy: Resource = _enemies[enemy_index]
+			var modes: Array = src_enemy.get("turn_modes") if src_enemy.get("turn_modes") != null else []
+			if not modes.is_empty():
+				var cur_idx: int = _enemy_status[enemy_index].get("current_mode_index", 0)
+				var new_idx: int = (cur_idx + 1) % modes.size()
+				_enemy_status[enemy_index]["current_mode_index"] = new_idx
+				_enemy_status[enemy_index]["current_mode"] = modes[new_idx]
+				status_applied.emit("enemy_%d" % enemy_index, "form_" + str(modes[new_idx]), 1)
+		IntentRes.ActionType.CHANGE_AFFINITY:
+			# 자기 공격 damage_type 동적 변경 — Louis Unlock Affinity 영감.
+			# dynamic_affinity_pool 에서 랜덤 1개 픽. 빈 풀이면 4 기본 속성.
+			var src_enemy2: Resource = _enemies[enemy_index]
+			var pool: Array = src_enemy2.get("dynamic_affinity_pool") if src_enemy2.get("dynamic_affinity_pool") != null else []
+			if pool.is_empty():
+				pool = ["holy_fire", "holy_strike", "holy_arrow", "holy_slash"]
+			var chosen: String = pool[randi() % pool.size()]
+			_enemy_status[enemy_index]["current_affinity"] = chosen
+			status_applied.emit("enemy_%d" % enemy_index, "affinity_" + chosen, 1)
+		IntentRes.ActionType.INFLICT_WEAKNESS:
+			# 적이 영웅에 사용 시: 일시적 약점 부여 (영웅이 자기 일시 약점 받음).
+			# 영웅 카드 측에서 적에게 사용하는 effect 는 카드 시스템에서 별도 처리.
+			# 단순 status 부여 — intent.status_type = 약점 type (예: "weak_fire"), value = N턴
+			var tid2: String = _pick_hero_target(intent.target, enemy_index, IntentRes.ActionType.DEBUFF)
+			if tid2 != "":
+				var st_key: String = intent.status_type if intent.status_type != "" else "weakness_inflicted"
+				_apply_status_to_hero(tid2, st_key, intent.value)
 
 # T3-SUMMON: 런타임에 적 1마리를 전투에 추가. 모든 _enemy_* 배열 동기화 + 시그널 발화.
 func _add_enemy_to_battle(enemy: Resource) -> void:

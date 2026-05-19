@@ -29,3 +29,15 @@ enum Grade { NORMAL, ELITE, BOSS }
 # DEATH-RATTLE: 사망 시 1회 실행할 인텐트 (T2 단말마)
 # IntentResource 1개. ATTACK ALL / DEBUFF ALL / BUFF_ALLY 등 사용 가능.
 @export var death_trigger: Resource = null
+
+# Form 전환 보스 — N턴마다 mode 순환. 빈 배열 = 비활성.
+# 예: ["offense", "defense", "offense"] — 3턴마다 순환. defense 모드 = damage 절반/면역 등 (구현 측에서 처리).
+@export var turn_modes: Array = []
+
+# Charge 카운터 윈도우 — CHARGE_UP intent 발동 시 영웅 INFLICT_WEAKNESS 카드로 무효화 가능 신호.
+# { "enabled": bool, "weakness_card_type": String, "stun_on_counter": int } — 빈 dict = 비활성.
+@export var counter_window_intent: Dictionary = {}
+
+# CHANGE_AFFINITY 시 랜덤 풀. 빈 배열 = 기본 4 속성 (불/얼음/번개/바람).
+# 예: ["holy_fire", "holy_strike", "holy_arrow"] — kronos act3 페이즈 2 진입 시 매 턴 변경.
+@export var dynamic_affinity_pool: Array = []
