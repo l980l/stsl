@@ -1747,8 +1747,9 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 		# 적 공격 VFX 의 hit reaction 후 counter VFX 발동 (시각 분리)
 		var _ct_hid: String = hero_id
 		var _ct_ei: int = from_enemy_index
-		get_tree().create_timer(0.2).timeout.connect(func() -> void:
-			counter_triggered.emit(_ct_hid, _ct_ei, false))
+		if is_inside_tree():
+			get_tree().create_timer(0.2).timeout.connect(func() -> void:
+				counter_triggered.emit(_ct_hid, _ct_ei, false))
 	# 독침 반격 (통제사×파라오): 파티원 피격 시 공격한 적에게 독 30 반격
 	if from_enemy_index >= 0 and from_enemy_index < _enemies.size() and _enemy_alive[from_enemy_index] and team_mgr.is_alive("yi_sun_sin") and team_mgr.is_alive("cleopatra"):
 		_apply_status_to_enemy(from_enemy_index, "poison", 30)
