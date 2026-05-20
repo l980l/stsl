@@ -45,12 +45,12 @@ static func desert_scorpion(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 4; i2.status_type = "poison"; i2.target = IntentRes.TargetType.RANDOM
+	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 40; i2.status_type = "poison"; i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "poison"
 	e.intent_pattern = [i1, i2, i3]
 	var dt := IntentRes.new()
-	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 2; dt.status_type = "poison"; dt.target = IntentRes.TargetType.ALL
+	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 20; dt.status_type = "poison"; dt.target = IntentRes.TargetType.ALL
 	e.death_trigger = dt
 	return e
 

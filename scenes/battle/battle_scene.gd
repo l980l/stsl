@@ -922,6 +922,8 @@ func _connect_signals() -> void:
 	BattleManager.enemy_spawned.connect(func(_idx: int): _refresh_turn_queue_widget())
 	BattleManager.hero_damaged.connect(_on_hero_damaged)
 	BattleManager.hero_block_gained.connect(_on_hero_block_gained)
+	BattleManager.hero_block_vfx.connect(_on_hero_block_vfx)
+	BattleManager.synergy_effect_vfx.connect(_on_synergy_effect_vfx)
 	BattleManager.enemy_damaged.connect(_on_enemy_damaged)
 	BattleManager.token_attack_fired.connect(_on_token_attack_fired)
 	TeamManager.hero_healed.connect(_on_hero_healed)
@@ -1014,9 +1016,9 @@ func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	toast.size = Vector2(400, 60)
 	add_child(toast)
 	var tw := create_tween()
-	tw.tween_property(toast, "modulate:a", 1.0, 0.15)
-	tw.tween_interval(1.0)
-	tw.tween_property(toast, "modulate:a", 0.0, 0.35)
+	tw.tween_property(toast, "modulate:a", 1.0, 0.225)
+	tw.tween_interval(1.5)
+	tw.tween_property(toast, "modulate:a", 0.0, 0.525)
 	tw.tween_callback(toast.queue_free)
 	# 적 위치에 색상 플래시 (시그니처 색상)
 	_burst_signature_at_enemy(enemy_index, color)
@@ -1040,9 +1042,9 @@ func _on_cards_exhausted_by_enemy(card_names: Array) -> void:
 	toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(toast)
 	var tw := create_tween()
-	tw.tween_property(toast, "modulate:a", 1.0, 0.15)
-	tw.tween_interval(2.0)
-	tw.tween_property(toast, "modulate:a", 0.0, 0.4)
+	tw.tween_property(toast, "modulate:a", 1.0, 0.225)
+	tw.tween_interval(3.0)
+	tw.tween_property(toast, "modulate:a", 0.0, 0.6)
 	tw.tween_callback(toast.queue_free)
 
 # 적 시그니처 발동 시 시각 강조 — 사용자 피드백으로 비활성 (큰 주황/보라 사각형이 어색).
@@ -1134,60 +1136,55 @@ func _start_battle() -> void:
 		_start_test_battle()  # GameManager 없이 단독 실행 시 폴백
 
 func _start_test_battle() -> void:
+	# 교차 영웅 시너지 테스트 전용 셋업 (battle_scene 단독 실행 시 폴백).
+	# 파티: 나폴레옹·이순신·클레오파트라 — 철벽 진군 / 혼란의 돌격 / 독침 반격 + 신규 교차 카드 검증용.
 	var HeroRes = load("res://resources/hero_resource.gd")
 	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var CardRes = load("res://resources/card_resource.gd")
+	var NapCards = load("res://resources/cards/cards_napoleon.gd")
+	var YiCards = load("res://resources/cards/cards_yi_sun_sin.gd")
+	var CleoCards = load("res://resources/cards/cards_cleopatra.gd")
 
-	# 영웅 설정
+	# 영웅 설정 — 3인 파티 (실제 스케일 HP 1000)
 	TeamManager.clear()
-	var napoleon = HeroRes.new()
-	napoleon.hero_id = "napoleon"
-	napoleon.hero_name = "hero.napoleon.name"
-	napoleon.max_hp = 70
-	napoleon.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
-	TeamManager.add_hero(napoleon)
+	for hid in ["napoleon", "yi_sun_sin", "cleopatra"]:
+		var hero = HeroRes.new()
+		hero.hero_id = hid
+		hero.hero_name = "hero.%s.name" % hid
+		hero.max_hp = 1000
+		hero.character_scene = load("res://characters/heroes/%s/%s.tscn" % [hid, hid])
+		TeamManager.add_hero(hero)
 
-	# 덱 설정 (스트라이크 3장 + 디펜드 2장)
+	# 덱 설정 — 시너지 발동 카드 중심
+	#  나폴레옹: GAIN_MORALE(철벽 진군)·CONSUME_MORALE(혼란의 돌격)·연합 포격(신규)
+	#  이순신:   DAMAGE(독침 반격)·연합 방벽(신규)
+	#  클레오:   POISON(독침 반격 세팅)
 	DeckManager.clear()
-	for _i in range(3):
-		var card = CardRes.new()
-		card.card_name = "card.napoleon.strike.name"
-		card.owner_id = "napoleon"
-		card.cost = 1
-		card.play_animation = "attack"
-		var eff = EffectRes.new()
-		eff.effect_type = EffectRes.EffectType.DAMAGE
-		eff.value = 6
-		eff.target = "SINGLE"
-		card.effects = [eff]
-		DeckManager.add_card_to_deck(card)
-	for _i in range(2):
-		var card = CardRes.new()
-		card.card_name = "card.napoleon.defend.name"
-		card.owner_id = "napoleon"
-		card.cost = 1
-		card.play_animation = "idle"
-		var eff = EffectRes.new()
-		eff.effect_type = EffectRes.EffectType.BLOCK
-		eff.value = 5
-		eff.target = "SELF"
-		card.effects = [eff]
+	var test_deck: Array = [
+		NapCards._war_bugle(), NapCards._swift_march(), NapCards._marshal_appointment(),
+		NapCards._one_man_army(), NapCards._allied_bombardment(),
+		NapCards._strike(), NapCards._defend(),
+		YiCards._strike(), YiCards._strike(), YiCards._counter_strike(),
+		YiCards._shield(), YiCards._united_bulwark(), YiCards._defend(),
+		CleoCards._venom_needle(), CleoCards._venom_needle(), CleoCards._asp_fang(),
+		CleoCards._strike(), CleoCards._defend(),
+	]
+	for card in test_deck:
 		DeckManager.add_card_to_deck(card)
 
-	# 적 설정
+	# 적 설정 — 시너지를 충분히 시험할 HP, 약한 공격
 	var IntentResClass = load("res://resources/intent_resource.gd")
-	var satyr = EnemyRes.new()
-	satyr.enemy_name = "enemy.greek.satyr"
-	satyr.max_hp = 30
-	satyr.character_scene = load("res://characters/enemies/satyr/satyr.tscn")
+	var dummy = EnemyRes.new()
+	dummy.enemy_name = "enemy.greek.satyr"
+	dummy.max_hp = 3000
+	dummy.character_scene = load("res://characters/enemies/satyr/satyr.tscn")
 	var intent = IntentResClass.new()
 	intent.action_type = IntentResClass.ActionType.ATTACK
-	intent.value = 6
+	intent.value = 30
 	intent.target = IntentResClass.TargetType.RANDOM
-	satyr.intent_pattern = [intent]
+	dummy.intent_pattern = [intent]
 
 	BattleManager.turn_interval = 0.4
-	BattleManager.setup_battle([satyr])
+	BattleManager.setup_battle([dummy])
 	_setup_heroes()
 	_setup_enemies()
 	await _play_battle_intro()
@@ -2144,7 +2141,7 @@ const _STATUS_POPUP_INFO := {
 	"poison":        ["Poison",        Color(0.71, 1.00, 0.35)],   # rgba(180,255,90)  라임
 	"strength":      ["Strength",      Color(1.00, 0.92, 0.62)],   # rgba(255,235,160) 따뜻한 골드
 	"charm":         ["Charm",         Color(1.00, 0.60, 0.85)],   # rgba(255,153,217) 로즈핑크
-	"enthrall":      ["Enthralled",    Color(0.70, 0.55, 1.00)],   # rgba(179,140,255) 라일락
+	"enthrall":      ["Enthralled",    Color(1.00, 0.30, 0.34)],   # rgba(255,77,87) 붉은 적색 — 매혹 폭주
 	"taunt":         ["Taunt",         Color(1.00, 0.62, 0.32)],   # rgba(255,158,82)  코랄
 	"morale":        ["Morale",        Color(1.00, 0.95, 0.65)],   # rgba(255,242,166) 옅은 골드
 	"counter_block": ["Counter Block", Color(0.60, 0.85, 1.00)],   # rgba(153,217,255) 부드러운 하늘
@@ -2160,8 +2157,6 @@ const _STATUS_POPUP_INFO := {
 
 # 강력 CC — 부여 시점에 머리 위 큰 한글 popup (기절! / 반함! 등). stacks 증가 시만 발동.
 const _STRONG_CC_LABELS := {
-	"charm":      "반함!",
-	"enthrall":   "매혹!",
 	"taunt":      "도발!",
 	"silence":    "침묵!",
 	"heal_block": "회복 차단!",
@@ -2191,12 +2186,12 @@ func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int,
 	container.scale = Vector2.ZERO
 	# scale punch + 등장 하이라이트 + 부동/페이드 (모두 container 의 property)
 	var tw := create_tween()
-	tw.tween_property(container, "scale", Vector2(1.3, 1.3), 0.10).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.chain().tween_property(container, "scale", Vector2(1.0, 1.0), 0.08)
+	tw.tween_property(container, "scale", Vector2(1.3, 1.3), 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.chain().tween_property(container, "scale", Vector2(1.0, 1.0), 0.12)
 	tw.chain().set_parallel(true)
-	tw.tween_property(lbl, "modulate", tint, 0.12)
-	tw.tween_property(container, "position:y", spawn_pos.y - 60.0, 0.7)
-	tw.tween_property(container, "modulate:a", 0.0, 0.7)
+	tw.tween_property(lbl, "modulate", tint, 0.18)
+	tw.tween_property(container, "position:y", spawn_pos.y - 60.0, 1.05)
+	tw.tween_property(container, "modulate:a", 0.0, 1.05)
 	tw.chain().tween_callback(func() -> void:
 		container.queue_free()
 		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
@@ -2205,6 +2200,7 @@ func _spawn_popup(base_pos: Vector2, text: String, color: Color, font_size: int,
 func _spawn_damage_popup(world_pos: Vector2, amount: int, fully_blocked: bool, stack_key: String) -> void:
 	if fully_blocked:
 		_spawn_popup(world_pos, "Block", Color(0.55, 0.78, 1.00), 36, stack_key)   # rgba(140,200,255)
+		AudioManager.play_sfx("block_hit")  # 데미지 완전 차단 — 방패 막기 SFX (방어도 획득 SFX "block" 과 별개)
 	else:
 		_spawn_popup(world_pos, str(amount), Color(1.00, 0.31, 0.31), 36, stack_key)  # rgba(255,80,80)
 
@@ -2235,12 +2231,12 @@ func _spawn_status_popup(world_pos: Vector2, status_type: String, stack_key: Str
 	container.position = spawn_pos
 	container.scale = Vector2.ZERO
 	var tw := create_tween()
-	tw.tween_property(container, "scale", Vector2(1.3, 1.3), 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.chain().tween_property(container, "scale", Vector2(1.0, 1.0), 0.08)
+	tw.tween_property(container, "scale", Vector2(1.3, 1.3), 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.chain().tween_property(container, "scale", Vector2(1.0, 1.0), 0.12)
 	tw.chain().set_parallel(true)
-	tw.tween_property(lbl, "modulate", tint, 0.12)
-	tw.tween_property(container, "position:y", spawn_pos.y - 55.0, 0.7)
-	tw.tween_property(container, "modulate:a", 0.0, 0.7)
+	tw.tween_property(lbl, "modulate", tint, 0.18)
+	tw.tween_property(container, "position:y", spawn_pos.y - 55.0, 1.05)
+	tw.tween_property(container, "modulate:a", 0.0, 1.05)
 	tw.chain().tween_callback(func() -> void:
 		container.queue_free()
 		_popup_stack[stack_key] = max(0, _popup_stack.get(stack_key, 1) - 1)
@@ -2326,6 +2322,7 @@ const _VFX_BLOCK: PackedScene = preload("res://scenes/vfx/block_particle.tscn")
 const _VFX_DEFENSE_BUFF := preload("res://scenes/vfx/defense_buff.gd")
 const _VFX_SUMMON_BURST := preload("res://scenes/vfx/summon_burst_gpu.gd")
 const _VFX_STUN_STARS := preload("res://scenes/vfx/stun_stars.gd")
+const _VFX_ENTHRALL_AURA := preload("res://scenes/vfx/enthrall_aura.gd")
 const _VFX_POWER_UP := preload("res://scenes/vfx/power_up_gpu.gd")
 const _VFX_SUMMON_CIRCLE := preload("res://scenes/vfx/summon_circle_gpu.gd")
 const _VFX_SPEED_BUFF := preload("res://scenes/vfx/speed_buff_gpu.gd")
@@ -2609,9 +2606,9 @@ func _on_hero_turn_skipped(hero_id: String) -> void:
 	toast.size = Vector2(500, 50)
 	add_child(toast)
 	var tw := create_tween()
-	tw.tween_property(toast, "modulate:a", 1.0, 0.15)
-	tw.tween_interval(0.8)
-	tw.tween_property(toast, "modulate:a", 0.0, 0.3)
+	tw.tween_property(toast, "modulate:a", 1.0, 0.225)
+	tw.tween_interval(1.2)
+	tw.tween_property(toast, "modulate:a", 0.0, 0.45)
 	tw.tween_callback(toast.queue_free)
 
 func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: String) -> void:
@@ -2858,7 +2855,7 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, target_hero_id:
 					_spawn_heal_blessing(caster_pos, caster_foot)
 					did_self_aoe = true
 					spawned_this = true
-			elif et == EffectResource.EffectType.BLOCK or et == EffectResource.EffectType.BLOCK_ALL:
+			elif et == EffectResource.EffectType.BLOCK:
 				if not did_self_aoe:
 					_spawn_defense_buff(caster_pos, caster_foot)
 					did_self_aoe = true
@@ -2976,7 +2973,7 @@ func _sfx_for_dtype(dtype: String) -> String:
 		"ice":         return "impact_ice"
 		"fire":        return "impact_fire"
 		"holy_fire":   return "impact_fire"
-		"poison":      return "impact_poison"
+		"poison":      return "poison_splash"
 		"projectile":  return "impact_projectile"
 		"holy_bolt":   return "impact_projectile"
 		"explosive":   return "impact_explosive"
@@ -2993,7 +2990,9 @@ func _sfx_for_dtype(dtype: String) -> String:
 func _sfx_for_status(stype: String) -> String:
 	match stype:
 		"weak", "vulnerable":   return "impact_curse"
-		"charm", "enthrall":    return "impact_divine"
+		"charm":                return "charm_kiss"
+		"enthrall":             return "infatuation"
+		"poison":               return "poison_splash"
 		_:                       return "impact_curse"
 
 # 단순 빔 spawn — screen_effect 시점에 SFX/flash/shake 발동
@@ -3137,6 +3136,26 @@ func _on_hero_block_gained(hero_id: String, _amount: int) -> void:
 	# defense_buff VFX 가 screen_effect 시점에 SFX 직접 발동 (이중 호출 방지)
 	# 단 UI 는 갱신해야 block_lbl 텍스트가 표시됨
 	_update_hero_ui(hero_id)
+
+# 시너지 등으로 영웅 방어도 획득 — defense_buff VFX (방어도 ↑ → block VFX 발동)
+func _on_hero_block_vfx(hero_id: String) -> void:
+	var node: Node2D = _hero_char_nodes.get(hero_id)
+	if node == null:
+		return
+	_spawn_defense_buff(node.global_position, _foot_pos(node))
+
+# 시너지 데미지/상태이상 — 지정 시전자 영웅에서 적에게 VFX 빔 발사
+func _on_synergy_effect_vfx(caster_hero_id: String, vfx_status: String, enemy_indices: Array) -> void:
+	var caster: Node2D = _hero_char_nodes.get(caster_hero_id)
+	if caster == null:
+		return
+	var beam: GDScript = _debuff_script_for_status(vfx_status)
+	if beam == null:
+		return
+	for idx in enemy_indices:
+		if idx >= 0 and idx < _enemy_char_nodes.size() and _enemy_char_nodes[idx] != null and BattleManager.is_enemy_alive(idx):
+			var enemy_node: Node2D = _enemy_char_nodes[idx]
+			_spawn_debuff_beam_simple(beam, caster.global_position, enemy_node.global_position, vfx_status, _foot_pos(enemy_node))
 
 # 방어도 버프 VFX — BLOCK 획득 시 6각 dome + barrier + 룬링
 # screen_effect 시점(차지 끝)에 block SFX 발동
@@ -4311,6 +4330,8 @@ func _on_enemy_died(index: int) -> void:
 	var death_fx := func() -> void:
 		AudioManager.play_sfx("enemy_death")
 		_update_enemy_ui(index)
+		_update_persistent_enthrall_vfx("enemy_%d" % index, 0)  # 반함 중 사망 — 하트 오라 정리
+		_update_persistent_stun_vfx("enemy_%d" % index, 0)  # 스턴 중 사망 — 별 정리
 		_fade_out_ground_shadow(char_node)
 		if char_node:
 			if is_boss:
@@ -4330,6 +4351,7 @@ func _on_hero_died(hero_id: String) -> void:
 	var death_fx := func() -> void:
 		AudioManager.play_sfx("hero_death")
 		_update_hero_ui(hero_id)
+		_update_persistent_stun_vfx(hero_id, 0)  # 스턴 중 사망 — 별 정리
 		var hand: Array = DeckManager.hand
 		for i in range(min(_card_buttons.size(), hand.size())):
 			if hand[i].owner_id == hero_id:
@@ -4844,6 +4866,9 @@ func _on_status_applied(target: String, status_type: String, _stacks: int) -> vo
 	# 스턴 — 영웅/적 모두 stun stacks 동안 머리 위 별 지속 (해제 시 fade out)
 	if status_type == "stun":
 		_update_persistent_stun_vfx(target, _stacks)
+	# 반함 — 적 enthrall stacks 동안 머리 위 하트 지속 (해제 시 fade out)
+	if status_type == "enthrall":
+		_update_persistent_enthrall_vfx(target, _stacks)
 	# 강력 CC — 신규 부여 또는 stack 증가 시 큰 한글 popup
 	_maybe_strong_cc_popup(target, status_type, _stacks)
 
@@ -4912,6 +4937,37 @@ func _update_persistent_stun_vfx(target: String, stacks: int) -> void:
 		if existing != null and is_instance_valid(existing):
 			existing.stop()
 		_stun_vfx_by_target.erase(target)
+
+# 반함 상태 지속 VFX — 노드를 따라다니며 enthrall 해제될 때까지 머리 위 하트 표시.
+# stacks > 0 시 spawn (기존 vfx 있으면 무시), stacks <= 0 시 stop() fade out.
+var _enthrall_vfx_by_target: Dictionary = {}
+
+func _update_persistent_enthrall_vfx(target: String, stacks: int) -> void:
+	var existing: Node = _enthrall_vfx_by_target.get(target, null)
+	if stacks > 0:
+		if existing != null and is_instance_valid(existing):
+			return  # 이미 표시 중
+		var node: Node2D = null
+		if target.begins_with("enemy_"):
+			var idx: int = target.substr(6).to_int()
+			if idx >= 0 and idx < _enemy_char_nodes.size():
+				node = _enemy_char_nodes[idx]
+		else:
+			node = _hero_char_nodes.get(target)
+		if node == null:
+			return
+		var fx: Node2D = _VFX_ENTHRALL_AURA.new()
+		add_child(fx)
+		fx.z_index = 1300
+		fx.position = Vector2.ZERO
+		fx.set_persistent(true)
+		fx.set_target_node(node, -100.0)
+		fx.play(node.global_position, node.global_position)
+		_enthrall_vfx_by_target[target] = fx
+	else:
+		if existing != null and is_instance_valid(existing):
+			existing.stop()
+		_enthrall_vfx_by_target.erase(target)
 
 func _refresh_hand_card_damage() -> void:
 	for btn in _card_buttons:
@@ -5470,7 +5526,9 @@ func _card_target_type(card: Resource) -> String:
 			EffectRes.EffectType.DAMAGE_PER_HAND_SIZE, \
 			EffectRes.EffectType.DAMAGE_PER_DEAD_ALLY, \
 			EffectRes.EffectType.ENERGY_TO_DAMAGE, \
-			EffectRes.EffectType.DAMAGE_PER_TOKEN:
+			EffectRes.EffectType.DAMAGE_PER_TOKEN, \
+				EffectRes.EffectType.DAMAGE_PER_TEAM_MORALE, \
+				EffectRes.EffectType.DAMAGE_PER_TEAM_TOKEN:
 				return "enemy"
 			EffectRes.EffectType.STATUS_DOUBLE:
 				if effect.target != "ALL":

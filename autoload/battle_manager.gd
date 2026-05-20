@@ -38,7 +38,6 @@ const _VFX_SACRIFICE      = preload("res://scenes/vfx/sacrifice_gpu.gd")
 const _VFX_COUNTER_PREPARE = preload("res://scenes/vfx/counter_prepare.gd")
 const _VFX_STEAL_CARD     = preload("res://scenes/vfx/steal_card_gpu.gd")
 
-const POISON_DMG_PER_STACK: int = 10
 const TOKEN_DMG_PER_STACK: int = 25
 const TOKEN_MAX_STACK: int = 6
 const CHARM_THRESHOLD_BASE: int = 100
@@ -134,6 +133,9 @@ signal counter_triggered(hero_id: String, enemy_index: int, is_major: bool)  # �
 signal token_attack_fired(hero_id: String, token_index: int, enemy_index: int)  # 토큰 (병사) 발사 — VFX/SFX 시각 처리용
 signal passive_buff_applied(enemy_index: int, status_type: String, value: int)  # phase_buffs / 시그너처 등 intent 외 자동 BUFF — battle_scene 이 VFX spawn 용도
 signal hero_turn_skipped(hero_id: String)  # 스턴 등으로 영웅 차례 자동 종료 — 토스트·VFX 용
+signal synergy_triggered(synergy_key: String, hero_id: String)  # 교차 영웅 시너지 발동 — battle_scene 토스트용
+signal hero_block_vfx(hero_id: String)  # 시너지 등으로 영웅 방어도 획득 — battle_scene defense_buff VFX용
+signal synergy_effect_vfx(caster_hero_id: String, vfx_status: String, enemy_indices: Array)  # 시너지 데미지/상태이상 — 지정 시전자에서 VFX 발사
 
 # VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생.
 # 차지(IMPACT_DELAY) 이후 데미지/상태 적용 + 기존 시그널 (hero_damaged 등) emit.
@@ -241,7 +243,7 @@ func _intent_vfx_impact_delay(intent: Resource) -> float:
 
 # 영웅 카드 차지 시간 — 첫 effect 기준
 # damage_type 이 명시된 effect 는 모두 ATTACK 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF 등)
-func _card_vfx_impact_delay(card: Resource) -> float:
+func _card_vfx_impact_delay(card: Resource, target_enemy_index: int = -1) -> float:
 	for effect in card.effects:
 		if effect.damage_type != "":
 			return _vfx_impact_delay_for_damage_type(effect.damage_type)
@@ -251,7 +253,9 @@ func _card_vfx_impact_delay(card: Resource) -> float:
 				if d > 0.0:
 					return d
 			EffectRes.EffectType.CHARM:
-				# CHARM effect_type — Cleopatra 매혹 카드 (charm_kiss 빔)
+				# CHARM effect_type — enthrall 발동 예정이면 infatuation 빔(긴 차지) 딜레이로 동기
+				if target_enemy_index >= 0 and will_enthrall_enemy(target_enemy_index, effect.value):
+					return _VFX_INFATUATION.IMPACT_DELAY * _vfx_speed_mul()
 				return _VFX_CHARM_KISS.IMPACT_DELAY * _vfx_speed_mul()
 			EffectRes.EffectType.HEAL, EffectRes.EffectType.HEAL_ALL, EffectRes.EffectType.HEAL_PER_DEAD_ALLY:
 				return _VFX_HEAL_BLESSING.IMPACT_DELAY * _vfx_speed_mul()
@@ -378,6 +382,22 @@ func _await_vfx_impact(fallback_timeout: float) -> void:
 	while not done[0]:
 		await get_tree().process_frame
 	# 시그널 한 번 더 오면 무시 — connect 가 ONE_SHOT 이라 자동 disconnect
+
+# 시너지 추가 효과 VFX 임팩트까지 대기 — 추가 데미지/상태이상 폰트를 빔 명중 시점에 동기화.
+# 테스트 환경(_vfx_speed_mul()==0)에서는 0 → await 스킵 → 동기 즉시 적용.
+func _await_synergy_impact(vfx_status: String) -> void:
+	var _d: float = _vfx_impact_delay_for_status(vfx_status)
+	if _d > 0.0:
+		await _await_vfx_impact(_d + 0.5)
+
+# 혼란의 돌격 시너지 — charm VFX 임팩트에 맞춰 charm 부여.
+# 카드의 나머지 효과(후속 데미지 등)를 막지 않도록 비대기 코루틴으로 분리.
+func _synergy_charm_deferred(target: int, owner_id: String) -> void:
+	synergy_effect_vfx.emit("cleopatra", "charm", [target])
+	await _await_synergy_impact("charm")
+	if target < _enemy_alive.size() and _enemy_alive[target]:
+		_apply_status_to_enemy(target, "charm", 2)
+		synergy_triggered.emit("synergy.napoleon_cleopatra.name", owner_id)
 
 func setup_battle(enemies: Array) -> void:
 	if deck_mgr != null:
@@ -681,13 +701,11 @@ func _phase_hero_pre(hid: String) -> bool:
 		did_work = true
 	return did_work
 
-# 본인 영웅 차례 메인 — 본인 block reset, 본인 power trigger, 본인 덱 시작
+# 본인 영웅 차례 메인 — power trigger·덱 시작. 방어구는 턴 넘어 유지(리셋 안 함)
 func _phase_hero_main(hid: String) -> void:
 	is_player_turn = true
 	_cards_played_this_turn = 0
 	_cards_drawn_this_turn = 0
-	# 본인 영웅 block 만 리셋
-	_hero_block[hid] = 0
 	_trigger_active_powers("player_turn_start", {"hero_id": hid})
 	if deck_mgr:
 		deck_mgr.start_hero_turn(hid)
@@ -980,7 +998,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 	var _pending_estimate := _estimate_card_damage(card, target_enemy_index)
 	for _ei in _pending_estimate:
 		_add_pending_dmg(_ei, _pending_estimate[_ei])
-	var _delay := _card_vfx_impact_delay(card)
+	var _delay := _card_vfx_impact_delay(card, target_enemy_index)
 	if _delay > 0.0:
 		# popup·SFX 동기화: fx.screen_effect 시점까지 대기 (fallback timer = _delay + 0.5s)
 		await _await_vfx_impact(_delay + 0.5)
@@ -1115,6 +1133,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					else:
 						heal_id = target_hero_id if target_hero_id != "" else card.owner_id
 					_heal_hero_safe(heal_id, effect.value)
+					# 성녀의 방패 (잔다르크×이순신): 잔다르크 힐 시 대상 방어구 +40
+					if card.owner_id == "joan_of_arc" and team_mgr.is_alive("yi_sun_sin"):
+						_hero_block[heal_id] = _hero_block.get(heal_id, 0) + 40
+						hero_block_gained.emit(heal_id, 40)
+						hero_block_vfx.emit(heal_id)
 			EffectRes.EffectType.GAIN_MORALE:
 				if not _hero_status.has(card.owner_id):
 					_hero_status[card.owner_id] = {}
@@ -1150,24 +1173,26 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					# 나폴레옹 × 클레오파트라 시너지: 소모 성공 시에만 charm 부여
 					if card.owner_id == "napoleon" and team_mgr and team_mgr.is_alive("cleopatra"):
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-							_apply_status_to_enemy(target_enemy_index, "charm", 1)
-					# 황제의 무도 (나폴레옹×무사시): 소모 성공 시 무사시 방어도 +8
+							_synergy_charm_deferred(target_enemy_index, card.owner_id)
+					# 황제의 무도 (나폴레옹×무사시): 소모 성공 시 무사시 방어도 +20
 					if card.owner_id == "napoleon" and team_mgr and team_mgr.is_alive("musashi"):
-						_hero_block["musashi"] = _hero_block.get("musashi", 0) + 8
+						_hero_block["musashi"] = _hero_block.get("musashi", 0) + 20
+						hero_block_vfx.emit("musashi")
+						synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
 			EffectRes.EffectType.POISON_BURST:
 				if effect.target == "ALL":
 					for _pbi in range(_enemies.size()):
 						if _enemy_alive[_pbi]:
 							var _pb_pdmg: int = _enemy_status[_pbi].get("poison_dmg", 0)
 							if _pb_pdmg > 0:
-								var _pb_dmg: int = _pb_pdmg * effect.value / 100 * POISON_DMG_PER_STACK
+								var _pb_dmg: int = _pb_pdmg * effect.value / 100
 								_deal_damage_to_enemy(_pbi, _pb_dmg, effect.damage_type)
 								_enemy_status[_pbi]["poison_dmg"] = 0
 								_enemy_status[_pbi]["poison_dur"] = 0
 				elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 					var pdmg: int = _enemy_status[target_enemy_index].get("poison_dmg", 0)
 					if pdmg > 0:
-						var burst_dmg: int = pdmg * effect.value / 100 * POISON_DMG_PER_STACK
+						var burst_dmg: int = pdmg * effect.value / 100
 						_deal_damage_to_enemy(target_enemy_index, burst_dmg, effect.damage_type)
 						_enemy_status[target_enemy_index]["poison_dmg"] = 0
 						_enemy_status[target_enemy_index]["poison_dur"] = 0
@@ -1183,6 +1208,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						if team_mgr.is_alive(hero.hero_id):
 							_hero_block[hero.hero_id] = _hero_block.get(hero.hero_id, 0) + effect.value
 							hero_block_gained.emit(hero.hero_id, effect.value)
+							hero_block_vfx.emit(hero.hero_id)
 			EffectRes.EffectType.HEAL_ALL:
 				if team_mgr:
 					var heal_amt: int = effect.value
@@ -1280,10 +1306,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.SACRIFICE_HP:
 				if team_mgr:
 					team_mgr.take_damage(card.owner_id, effect.value)
-					# power.sacrifice_bank: 전투 중 누적 희생 HP 추적
+					# 전투 중 누적 희생 HP 추적 — 첫 희생 시 자동 생성 (활성화 카드 불필요)
 					var _bank_key: String = "power.sacrifice_bank:" + card.owner_id
-					if _active_powers.has(_bank_key):
-						_active_powers[_bank_key]["value"] += effect.value
+					if not _active_powers.has(_bank_key):
+						_register_power("power.sacrifice_bank", card.owner_id, 0)
+					_active_powers[_bank_key]["value"] += effect.value
 					_check_lose_condition()
 			EffectRes.EffectType.COST_ZERO_TURN:
 				if deck_mgr:
@@ -1331,6 +1358,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							continue
 						for debuff in ["weak", "vulnerable", "poison_dmg", "charm"]:
 							_hero_status[h.hero_id].erase(debuff)
+					# 성스러운 독 (잔다르크×클레오파트라): 정화한 아군을 힐 100
+					if card.owner_id == "joan_of_arc" and team_mgr.is_alive("cleopatra"):
+						for _sv_h in heroes_to_purge:
+							_heal_hero_safe(_sv_h.hero_id, 100)
 			EffectRes.EffectType.PER_DRAW_DMG:
 				# 본인 영웅의 이번 차례 드로우 수 × value
 				var drawn: int = deck_mgr.get_draws_this_turn(card.owner_id) if deck_mgr else 0
@@ -1378,6 +1409,58 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								_deal_damage_to_enemy(i, _dpt_dmg, effect.damage_type)
 					elif target_enemy_index >= 0:
 						_deal_damage_to_enemy(target_enemy_index, _dpt_dmg, effect.damage_type)
+			EffectRes.EffectType.DAMAGE_PER_TEAM_MORALE:
+				# 교차 영웅: 생존 영웅 전원의 사기 합산 × value 피해
+				if team_mgr:
+					var _dptm_total: int = 0
+					for h in team_mgr.heroes:
+						if team_mgr.is_alive(h.hero_id):
+							_dptm_total += _hero_status.get(h.hero_id, {}).get("morale", 0)
+					if _dptm_total > 0:
+						var _dptm_dmg: int = _dptm_total * effect.value
+						if effect.target == "ALL":
+							for i in range(_enemies.size()):
+								if _enemy_alive[i]:
+									_deal_damage_to_enemy(i, _dptm_dmg, effect.damage_type)
+						elif target_enemy_index >= 0:
+							_deal_damage_to_enemy(target_enemy_index, _dptm_dmg, effect.damage_type)
+			EffectRes.EffectType.DAMAGE_PER_TEAM_TOKEN:
+				# 교차 영웅: 생존 영웅 전원의 토큰 합산 × value 피해
+				if team_mgr:
+					var _dptt_total: int = 0
+					for h in team_mgr.heroes:
+						if team_mgr.is_alive(h.hero_id):
+							_dptt_total += _hero_status.get(h.hero_id, {}).get("tokens", 0)
+					if _dptt_total > 0:
+						var _dptt_dmg: int = _dptt_total * effect.value
+						if effect.target == "ALL":
+							for i in range(_enemies.size()):
+								if _enemy_alive[i]:
+									_deal_damage_to_enemy(i, _dptt_dmg, effect.damage_type)
+						elif target_enemy_index >= 0:
+							_deal_damage_to_enemy(target_enemy_index, _dptt_dmg, effect.damage_type)
+			EffectRes.EffectType.CONSUME_TEAM_MORALE:
+				# 교차 영웅: 생존 영웅 각자 value 사기 소모 → 소모 총량 × bonus_value 만큼 팀 전체 방어
+				if team_mgr:
+					var _ctm_spent: int = 0
+					for h in team_mgr.heroes:
+						if not team_mgr.is_alive(h.hero_id):
+							continue
+						var _ctm_m: int = _hero_status.get(h.hero_id, {}).get("morale", 0)
+						var _ctm_take: int = min(_ctm_m, effect.value)
+						if _ctm_take > 0:
+							if not _hero_status.has(h.hero_id):
+								_hero_status[h.hero_id] = {}
+							_hero_status[h.hero_id]["morale"] = _ctm_m - _ctm_take
+							morale_changed.emit(h.hero_id, _ctm_m - _ctm_take)
+							_ctm_spent += _ctm_take
+					if _ctm_spent > 0:
+						var _ctm_block: int = _ctm_spent * effect.bonus_value
+						for h2 in team_mgr.heroes:
+							if team_mgr.is_alive(h2.hero_id):
+								_hero_block[h2.hero_id] = _hero_block.get(h2.hero_id, 0) + _ctm_block
+								hero_block_gained.emit(h2.hero_id, _ctm_block)
+								hero_block_vfx.emit(h2.hero_id)
 			EffectRes.EffectType.HEAL_PER_DEAD_ALLY:
 				if team_mgr:
 					var dead_count: int = 0
@@ -1580,7 +1663,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 										_deal_damage_to_enemy(target_enemy_index, _bph2, effect.damage_type)
 									_last_attacker[target_enemy_index] = card.owner_id
 			_in_echo_replay = false
-	_apply_synergy_bonus(card, target_enemy_index)
+	await _apply_synergy_bonus(card, target_enemy_index)
 
 func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "", is_crit: bool = false) -> void:
 	if not _enemy_alive[enemy_index]:
@@ -1799,7 +1882,7 @@ func _tick_hero_poison(hero_id: String) -> void:
 	var dur: int = status.get("poison_dur", 0)
 	if dmg <= 0 or dur <= 0:
 		return
-	var tick_amt: int = dmg * POISON_DMG_PER_STACK
+	var tick_amt: int = dmg
 	team_mgr.take_damage(hero_id, tick_amt)
 	# 데미지 popup 표시용 — battle_scene._on_hero_damaged 가 popup·VFX 처리 (_tick_enemy_poison 대칭)
 	hero_damaged.emit(hero_id, tick_amt, "poison", false)
@@ -1816,7 +1899,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 	var dur: int = _enemy_status[enemy_index].get("poison_dur", 0)
 	if dmg <= 0 or dur <= 0:
 		return
-	var tick_dmg: int = _consume_double_next_damage(dmg * POISON_DMG_PER_STACK)
+	var tick_dmg: int = _consume_double_next_damage(dmg)
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - tick_dmg)
 	enemy_damaged.emit(enemy_index, tick_dmg, "poison", false)
 	poison_tick_applied.emit("enemy_%d" % enemy_index, tick_dmg)
@@ -1867,7 +1950,6 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 			await get_tree().create_timer(turn_interval * 2.0 * _turn_interval_mul()).timeout
 		if not is_battle_active:
 			return
-	_enemy_block[i] = 0
 	# time_limit (Okumura 영감) — turn_count 초과 시 광폭화 strength +5/turn 누적
 	var _tlsrc: Resource = _enemies[i]
 	var _tlturns: int = int(_tlsrc.get("time_limit_turns")) if _tlsrc.get("time_limit_turns") != null else 0
@@ -1932,6 +2014,7 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 	var enthrall: int = _enemy_status[i].get("enthrall", 0)
 	if enthrall > 0:
 		_enemy_status[i]["enthrall"] = enthrall - 1
+		status_applied.emit("enemy_%d" % i, "enthrall", _enemy_status[i]["enthrall"])
 		var other_targets: Array = []
 		for j in range(_enemies.size()):
 			if j != i and _enemy_alive[j]:
@@ -2654,54 +2737,82 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 	for effect in card.effects:
 		match effect.effect_type:
 			EffectRes.EffectType.GAIN_MORALE:
-				# 철벽 진군 (나폴레옹×이순신)
+				# 철벽 진군 (나폴레옹×이순신) — 사기 획득 시 아군 전원 방어도 +(획득 사기×5)
 				if card_owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
-					_hero_block["yi_sun_sin"] = _hero_block.get("yi_sun_sin", 0) + 3
-				# 정복자의 기세 (나폴레옹×칭기즈칸)
+					for _iw_h in team_mgr.get_living_heroes():
+						_hero_block[_iw_h.hero_id] = _hero_block.get(_iw_h.hero_id, 0) + effect.value * 5
+						hero_block_vfx.emit(_iw_h.hero_id)
+					synergy_triggered.emit("synergy.napoleon_yi.name", card_owner)
+				# 정복자의 기세 (나폴레옹×칭기즈칸) — 사기 획득 카드 시 파트너도 동일 사기
+				var _cs_partner: String = ""
 				if card_owner == "napoleon" and team_mgr.is_alive("genghis_khan"):
-					deck_mgr.draw_cards(1)
-			EffectRes.EffectType.REVIVE:
-				# 성녀의 방패 (잔다르크×이순신)
-				if card_owner == "joan_of_arc" and team_mgr.is_alive("yi_sun_sin"):
-					_hero_block["yi_sun_sin"] = _hero_block.get("yi_sun_sin", 0) + 20
-			EffectRes.EffectType.PURGE_STATUS:
-				# 성스러운 독 (잔다르크×클레오파트라)
-				if card_owner == "joan_of_arc" and team_mgr.is_alive("cleopatra"):
-					var _alive_ei: Array = []
-					for ei in range(_enemies.size()):
-						if _enemy_alive[ei]:
-							_alive_ei.append(ei)
-					if not _alive_ei.is_empty():
-						_apply_status_to_enemy(_alive_ei[randi() % _alive_ei.size()], "poison", 3)
+					_cs_partner = "genghis_khan"
+				elif card_owner == "genghis_khan" and team_mgr.is_alive("napoleon"):
+					_cs_partner = "napoleon"
+				if _cs_partner != "":
+					if not _hero_status.has(_cs_partner):
+						_hero_status[_cs_partner] = {}
+					var _cs_m: int = _hero_status[_cs_partner].get("morale", 0) + effect.value
+					_hero_status[_cs_partner]["morale"] = _cs_m
+					morale_changed.emit(_cs_partner, _cs_m)
+					synergy_triggered.emit("synergy.napoleon_genghis.name", card_owner)
 			EffectRes.EffectType.SACRIFICE_HP:
-				# 희생의 칼날 (잔다르크×무사시)
+				# 희생의 칼날 (잔다르크×무사시) — 체력 희생 시 파티 전원 속도 +5 (3턴)
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("musashi"):
-					_hero_block["musashi"] = _hero_block.get("musashi", 0) + 10
+					for _bof_h in team_mgr.get_living_heroes():
+						var _bof_aid: String = "hero:" + _bof_h.hero_id
+						var _bof_old: int = _actor_speed(_bof_aid)
+						if not _hero_status.has(_bof_h.hero_id):
+							_hero_status[_bof_h.hero_id] = {}
+						if not _hero_status[_bof_h.hero_id].has("speed_bonus") or typeof(_hero_status[_bof_h.hero_id]["speed_bonus"]) != TYPE_ARRAY:
+							_hero_status[_bof_h.hero_id]["speed_bonus"] = []
+						_hero_status[_bof_h.hero_id]["speed_bonus"].append({"value": 5, "dur": 3})
+						_adjust_turn_queue_for_speed_change(_bof_aid, _bof_old)
+						status_applied.emit(_bof_h.hero_id, "speed_bonus", 5)
+					synergy_triggered.emit("synergy.joan_musashi.name", card_owner)
 			EffectRes.EffectType.DAMAGE:
-				# 독침 반격 (이순신×클레오파트라)
+				# 독침 반격 (이순신×클레오파트라) — 독 걸린 적에 추가 피해
 				if card_owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
 					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 						if _enemy_status[target_enemy_index].get("poison_dmg", 0) > 0:
-							_deal_damage_to_enemy(target_enemy_index, 4)
+							synergy_effect_vfx.emit("cleopatra", "poison", [target_enemy_index])
+							await _await_synergy_impact("poison")
+							_deal_damage_to_enemy(target_enemy_index, 25)
+							synergy_triggered.emit("synergy.yi_cleopatra.name", card_owner)
 				# 수륙 협공 (이순신×칭기즈칸): 전체 공격 시 드로우 +1
 				if card_owner == "yi_sun_sin" and effect.target == "ALL" and team_mgr.is_alive("genghis_khan"):
 					deck_mgr.draw_cards(1)
+					synergy_triggered.emit("synergy.yi_genghis.name", card_owner)
 				# 약탈과 독 (칭기즈칸×클레오파트라): 전체 공격 시 모든 적에 독 +2
 				if card_owner == "genghis_khan" and effect.target == "ALL" and team_mgr.is_alive("cleopatra"):
+					var _gc_tgts: Array = []
 					for ei in range(_enemies.size()):
 						if _enemy_alive[ei]:
-							_apply_status_to_enemy(ei, "poison", 2)
-				# 초원의 결투사 (칭기즈칸×무사시): 무사시 공격 시 칭기즈칸 방어도 +4
+							_gc_tgts.append(ei)
+					if not _gc_tgts.is_empty():
+						synergy_effect_vfx.emit("cleopatra", "poison", _gc_tgts)
+						await _await_synergy_impact("poison")
+						for ei in _gc_tgts:
+							_apply_status_to_enemy(ei, "poison", 20)
+						synergy_triggered.emit("synergy.genghis_cleopatra.name", card_owner)
+				# 초원의 결투사 (칭기즈칸×무사시): 무사시 공격 시 칭기즈칸 방어도 +15
 				if card_owner == "musashi" and team_mgr.is_alive("genghis_khan"):
-					_hero_block["genghis_khan"] = _hero_block.get("genghis_khan", 0) + 4
-				# 독날 (클레오파트라×무사시): 무사시 공격 시 대상 독 +1
+					_hero_block["genghis_khan"] = _hero_block.get("genghis_khan", 0) + 15
+					hero_block_vfx.emit("genghis_khan")
+					synergy_triggered.emit("synergy.genghis_musashi.name", card_owner)
+				# 독날 (클레오파트라×무사시): 무사시 공격 시 대상 독 +2
 				if card_owner == "musashi" and team_mgr.is_alive("cleopatra"):
 					if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
-						_apply_status_to_enemy(target_enemy_index, "poison", 1)
+						synergy_effect_vfx.emit("cleopatra", "poison", [target_enemy_index])
+						await _await_synergy_impact("poison")
+						_apply_status_to_enemy(target_enemy_index, "poison", 20)
+						synergy_triggered.emit("synergy.cleopatra_musashi.name", card_owner)
 			EffectRes.EffectType.CONDITIONAL_DMG:
 				# 검사의 약속 (무사시×이순신): enemy_count_1 조건 카드 시 이순신 BLOCK +15
 				if card_owner == "musashi" and effect.status_type == "enemy_count_1" and team_mgr.is_alive("yi_sun_sin"):
 					_hero_block["yi_sun_sin"] = _hero_block.get("yi_sun_sin", 0) + 15
+					hero_block_vfx.emit("yi_sun_sin")
+					synergy_triggered.emit("synergy.musashi_yi.name", card_owner)
 			EffectRes.EffectType.HEAL_ALL:
 				# 성전 (잔다르크×나폴레옹): HEAL_ALL 시 나폴레옹 MORALE +2
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("napoleon"):
@@ -2710,9 +2821,11 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 					var new_morale: int = _hero_status["napoleon"].get("morale", 0) + 2
 					_hero_status["napoleon"]["morale"] = new_morale
 					morale_changed.emit("napoleon", new_morale)
+					synergy_triggered.emit("synergy.joan_napoleon.name", card_owner)
 				# 신의 원정 (잔다르크×칭기즈칸): HEAL_ALL 시 드로우 +1
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("genghis_khan"):
 					deck_mgr.draw_cards(1)
+					synergy_triggered.emit("synergy.joan_genghis.name", card_owner)
 
 
 func get_active_synergies() -> Array:
@@ -2758,6 +2871,12 @@ func get_active_synergies() -> Array:
 	return synergies
 
 
+func _any_enemy_poisoned() -> bool:
+	for i in range(_enemy_status.size()):
+		if _enemy_alive[i] and _enemy_status[i].get("poison_dmg", 0) > 0:
+			return true
+	return false
+
 func has_synergy_bonus(card: Resource) -> bool:
 	if team_mgr == null:
 		return false
@@ -2768,7 +2887,7 @@ func has_synergy_bonus(card: Resource) -> bool:
 				if card_owner == "napoleon" and (team_mgr.is_alive("yi_sun_sin") or team_mgr.is_alive("genghis_khan")):
 					return true
 			EffectRes.EffectType.CONSUME_MORALE:
-				if card_owner == "napoleon" and (team_mgr.is_alive("cleopatra") or team_mgr.is_alive("musashi")):
+				if card_owner == "napoleon" and (team_mgr.is_alive("cleopatra") or team_mgr.is_alive("musashi")) and _hero_status.get("napoleon", {}).get("morale", 0) >= effect.value:
 					return true
 			EffectRes.EffectType.REVIVE:
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("yi_sun_sin"):
@@ -2780,7 +2899,7 @@ func has_synergy_bonus(card: Resource) -> bool:
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("musashi"):
 					return true
 			EffectRes.EffectType.DAMAGE:
-				if card_owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra"):
+				if card_owner == "yi_sun_sin" and team_mgr.is_alive("cleopatra") and _any_enemy_poisoned():
 					return true
 				if card_owner == "yi_sun_sin" and effect.target == "ALL" and team_mgr.is_alive("genghis_khan"):
 					return true
@@ -2793,6 +2912,14 @@ func has_synergy_bonus(card: Resource) -> bool:
 					return true
 			EffectRes.EffectType.HEAL_ALL:
 				if card_owner == "joan_of_arc" and (team_mgr.is_alive("napoleon") or team_mgr.is_alive("genghis_khan")):
+					return true
+			EffectRes.EffectType.DAMAGE_PER_TEAM_MORALE, EffectRes.EffectType.CONSUME_TEAM_MORALE, EffectRes.EffectType.DAMAGE_PER_TEAM_TOKEN:
+				# 교차 영웅 빌드 카드 — 생존 영웅 2명 이상(팀)이면 후광
+				var _team_n: int = 0
+				for h in team_mgr.heroes:
+					if team_mgr.is_alive(h.hero_id):
+						_team_n += 1
+				if _team_n >= 2:
 					return true
 	return false
 

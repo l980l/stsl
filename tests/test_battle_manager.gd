@@ -20,7 +20,7 @@ func run_all() -> Dictionary:
 	test_play_card_damage()
 	test_play_card_block()
 	test_block_absorbs_damage()
-	test_block_resets_on_player_turn()
+	test_block_persists_on_player_turn()
 	test_weak_reduces_damage()
 	test_vulnerable_increases_damage()
 	test_poison_tick_enemy()
@@ -169,8 +169,8 @@ func test_block_absorbs_damage() -> void:
 	_assert(bm._hero_block.get("napoleon", -1) == 0, "블록 10 전부 소진")
 	_assert(bm.team_mgr.get_current_hp("napoleon") == 65, "HP 70 → 65 (블록 10 흡수, 나머지 5 피해)")
 
-func test_block_resets_on_player_turn() -> void:
-	print("[TestBattleManager] test_block_resets_on_player_turn")
+func test_block_persists_on_player_turn() -> void:
+	print("[TestBattleManager] test_block_persists_on_player_turn")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("napoleon", 70))
 	bm.setup_battle([_make_enemy(30, [])])
@@ -178,7 +178,7 @@ func test_block_resets_on_player_turn() -> void:
 	bm.is_battle_active = true
 
 	bm.start_player_turn()
-	_assert(bm._hero_block.get("napoleon", -1) == 0, "턴 시작 시 블록 0으로 초기화")
+	_assert(bm._hero_block.get("napoleon", -1) == 5, "턴 시작 시 블록 유지 (리셋 안 함)")
 
 func test_weak_reduces_damage() -> void:
 	print("[TestBattleManager] test_weak_reduces_damage")
@@ -578,8 +578,10 @@ func test_synergy_napoleon_yisunsin() -> void:
 	bm.deck_mgr.hand.append(card)
 
 	bm.play_card(card, -1)
-	_assert(bm.get_hero_block("yi_sun_sin") == 3,
-		"철벽 진군: 나폴레옹 GAIN_MORALE → 이순신 BLOCK +3")
+	_assert(bm.get_hero_block("yi_sun_sin") == 5,
+		"철벽 진군: 나폴레옹 GAIN_MORALE 1 → 이순신 BLOCK +5 (사기×5)")
+	_assert(bm.get_hero_block("napoleon") == 5,
+		"철벽 진군: 아군 전원 적용 — 나폴레옹 BLOCK +5")
 
 
 func test_synergy_yisunsin_cleopatra() -> void:
@@ -604,8 +606,8 @@ func test_synergy_yisunsin_cleopatra() -> void:
 	bm.deck_mgr.hand.append(card)
 
 	bm.play_card(card, 0)
-	_assert(bm.get_enemy_hp(0) == 41,
-		"독침 반격: 이순신 DAMAGE 5 + 시너지 4 = 9 피해 → 적 HP 50-9=41")
+	_assert(bm.get_enemy_hp(0) == 20,
+		"독침 반격: 이순신 DAMAGE 5 + 시너지 25 = 30 피해 → 적 HP 50-30=20")
 
 
 func test_synergy_napoleon_cleopatra() -> void:
@@ -631,8 +633,8 @@ func test_synergy_napoleon_cleopatra() -> void:
 	bm.deck_mgr.hand.append(card)
 
 	bm.play_card(card, 0)
-	_assert(bm._enemy_status[0].get("charm", 0) == 1,
-		"혼란의 돌격: 나폴레옹 CONSUME_MORALE → 적 charm +1")
+	_assert(bm._enemy_status[0].get("charm", 0) == 2,
+		"혼란의 돌격: 나폴레옹 CONSUME_MORALE → 적 charm +2")
 
 
 func test_synergy_napoleon_cleopatra_no_morale() -> void:
@@ -761,10 +763,10 @@ func test_synergy_genghis_cleopatra_dmg_all() -> void:
 	card.effects = [eff]
 	bm.deck_mgr.hand.append(card)
 	bm.play_card(card, -1)
-	_assert(bm.get_enemy_status(0).get("poison_dmg", 0) == 2,
-		"약탈과 독: 칭기즈칸 DMG ALL → 적 0 poison_dmg +2")
-	_assert(bm.get_enemy_status(1).get("poison_dmg", 0) == 2,
-		"약탈과 독: 칭기즈칸 DMG ALL → 적 1 poison_dmg +2")
+	_assert(bm.get_enemy_status(0).get("poison_dmg", 0) == 20,
+		"약탈과 독: 칭기즈칸 DMG ALL → 적 0 poison_dmg +20")
+	_assert(bm.get_enemy_status(1).get("poison_dmg", 0) == 20,
+		"약탈과 독: 칭기즈칸 DMG ALL → 적 1 poison_dmg +20")
 
 func test_synergy_genghis_cleopatra_not_present() -> void:
 	print("[TestBattleManager] test_synergy_genghis_cleopatra_not_present")

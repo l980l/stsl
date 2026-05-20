@@ -50,7 +50,7 @@ static func vanir_elf(scene: PackedScene) -> Resource:
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 130; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "projectile"
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.DEBUFF; p0i3.value = 4; p0i3.status_type = "poison"
+	p0i3.action_type = IntentRes.ActionType.DEBUFF; p0i3.value = 40; p0i3.status_type = "poison"
 	p0i3.target = IntentRes.TargetType.ALL
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 190; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "projectile"

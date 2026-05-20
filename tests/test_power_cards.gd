@@ -164,12 +164,13 @@ func test_block_per_turn_permanent() -> void:
 
 	# 2번째 턴
 	bm.start_player_turn()
-	# 3번째 턴 — 권능 여전히 존재해야 함
+	# 3번째 턴 — 권능 여전히 존재 + 블록 +20 발동 (방어구 누적 → 델타로 검증)
+	var _blk_before: int = bm._hero_block.get("yi_sun_sin", 0)
 	bm.start_player_turn()
 	var powers := bm.get_all_active_powers()
 	_assert(powers.has("power.block_per_turn:yi_sun_sin"), "3번째 턴에도 권능 유지 (영구성 확인)")
 	var blk: int = bm._hero_block.get("yi_sun_sin", 0)
-	_assert(blk == 20, "3번째 턴에도 블록 +20 발동")
+	_assert(blk - _blk_before == 20, "3번째 턴에도 블록 +20 발동")
 
 # ---------- 3. 반격 태세 (counter_per_attack) ----------
 

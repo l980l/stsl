@@ -66,7 +66,7 @@ static func guanyin(scene: PackedScene) -> Resource:
 	var p0i3 := IntentRes.new()
 	p0i3.action_type = IntentRes.ActionType.BUFF; p0i3.value = 40; p0i3.status_type = "block"
 	var p0i4 := IntentRes.new()
-	p0i4.action_type = IntentRes.ActionType.DEBUFF; p0i4.value = 3; p0i4.status_type = "poison"
+	p0i4.action_type = IntentRes.ActionType.DEBUFF; p0i4.value = 30; p0i4.status_type = "poison"
 	p0i4.target = IntentRes.TargetType.ALL
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.DEBUFF; p1i1.value = 2; p1i1.status_type = "vulnerable"
@@ -74,7 +74,7 @@ static func guanyin(scene: PackedScene) -> Resource:
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 180; p1i2.target = IntentRes.TargetType.ALL; p1i2.damage_type = "holy_fire"
 	var p1i3 := IntentRes.new()
-	p1i3.action_type = IntentRes.ActionType.DEBUFF; p1i3.value = 4; p1i3.status_type = "poison"
+	p1i3.action_type = IntentRes.ActionType.DEBUFF; p1i3.value = 40; p1i3.status_type = "poison"
 	p1i3.target = IntentRes.TargetType.ALL
 	var p1i4 := IntentRes.new()
 	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 160; p1i4.target = IntentRes.TargetType.RANDOM; p1i4.damage_type = "holy_strike"
@@ -89,7 +89,7 @@ static func guanyin(scene: PackedScene) -> Resource:
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 230; p2i3.target = IntentRes.TargetType.LOWEST_HP; p2i3.damage_type = "holy_arrow"
 	var p2i4 := IntentRes.new()
-	p2i4.action_type = IntentRes.ActionType.DEBUFF; p2i4.value = 5; p2i4.status_type = "poison"
+	p2i4.action_type = IntentRes.ActionType.DEBUFF; p2i4.value = 50; p2i4.status_type = "poison"
 	p2i4.target = IntentRes.TargetType.RANDOM
 	var p2i5 := IntentRes.new()
 	p2i5.action_type = IntentRes.ActionType.ATTACK; p2i5.value = 200; p2i5.target = IntentRes.TargetType.ALL; p2i5.damage_type = "holy_fire"

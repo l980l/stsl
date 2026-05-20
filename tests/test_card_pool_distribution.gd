@@ -47,14 +47,14 @@ func test_napoleon_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_napoleon_rarity_distribution")
 	var gm = _load_gm()
 	var pool: Array = gm._napoleon_card_pool()
-	_assert(pool.size() == 31, "나폴레옹 풀 31장 (+speed)")
+	_assert(pool.size() == 32, "나폴레옹 풀 32장 (+speed +연합포격)")
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 5: 기병위협, 참호구축, 전열재편, 진격나팔, 정찰(마킹)
 	_assert(counts["COMMON"] == 5, "나폴레옹 COMMON 5장 (실제: %d)" % counts["COMMON"])
 	# UNCOMMON 10
 	_assert(counts["UNCOMMON"] == 10, "나폴레옹 UNCOMMON 10장 (실제: %d)" % counts["UNCOMMON"])
-	# RARE 12: 아우스터리츠기동, 정복칙령, 일기당천, 아르콜레돌파, 알프스횡단, 제국보병소집, 황제군단, 포병일제사격, 보로디노포격, 독수리군기, 승리포고, 황제포위령
-	_assert(counts["RARE"] == 12, "나폴레옹 RARE 12장 (실제: %d)" % counts["RARE"])
+	# RARE 13: 아우스터리츠기동, 정복칙령, 일기당천, 아르콜레돌파, 알프스횡단, 제국보병소집, 황제군단, 포병일제사격, 보로디노포격, 독수리군기, 승리포고, 황제포위령, 연합포격(교차)
+	_assert(counts["RARE"] == 13, "나폴레옹 RARE 13장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 2: 황제돌격, 황제명령
 	_assert(counts["LEGENDARY"] == 2, "나폴레옹 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
 	# DIVINE 2: 황제기개, 제국영광
@@ -64,14 +64,14 @@ func test_yi_sun_sin_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_yi_sun_sin_rarity_distribution")
 	var gm = _load_gm()
 	var pool: Array = gm._yi_sun_sin_card_pool()
-	_assert(pool.size() == 31, "이순신 풀 31장 (+speed)")
+	_assert(pool.size() == 33, "이순신 풀 33장 (+speed +카운터 +연합방벽)")
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 4: 거북선방패, 진형결속, 군기진작, 기사회생
 	_assert(counts["COMMON"] == 4, "이순신 COMMON 4장 (실제: %d)" % counts["COMMON"])
 	# UNCOMMON 8: 거북선돌격, 반격, 연속방어, 진형강화, 수군훈련, 전열정비, 이판사판, 죽음의결의
 	_assert(counts["UNCOMMON"] == 8, "이순신 UNCOMMON 8장 (실제: %d)" % counts["UNCOMMON"])
-	# RARE 15: 거북의권능, 함대연합, 일제사격, 함포일제사, 돌격태세, 함대지휘, 진형의힘, 진형사수, 엄정한훈련, 배수진, 전사의각오, 위기돌파, 사지결단, 혈전, 거북선점호
-	_assert(counts["RARE"] == 15, "이순신 RARE 15장 (실제: %d)" % counts["RARE"])
+	# RARE 17: 거북의권능, 함대연합, 일제사격, 함포일제사, 돌격태세, 함대지휘, 진형의힘, 진형사수, 엄정한훈련, 배수진, 전사의각오, 위기돌파, 사지결단, 혈전, 거북선점호, 카운터(universal), 연합방벽(교차)
+	_assert(counts["RARE"] == 17, "이순신 RARE 17장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 4: 귀선출항, 지휘본능, 필사즉생, 불사조
 	_assert(counts["LEGENDARY"] == 4, "이순신 LEGENDARY 4장 (실제: %d)" % counts["LEGENDARY"])
 	# DIVINE 0
@@ -133,14 +133,14 @@ func test_joan_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_joan_rarity_distribution")
 	var JoanCards = load("res://resources/cards/cards_joan_of_arc.gd")
 	var pool: Array = JoanCards.pool()
-	_assert(pool.size() == 31, "잔다르크 풀 31장 (+speed)")
+	_assert(pool.size() == 30, "잔다르크 풀 30장 (+speed)")
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 3: holy_bolt, holy_touch, communion
 	_assert(counts["COMMON"] == 3, "잔다르크 COMMON 3장 (실제: %d)" % counts["COMMON"])
 	# UNCOMMON 12: orleans,holy_wave,crusaders_faith,crusade,hymn,holy_purification,knights_oath,martyrs_will,altar_flame,martyrdom_steps,martyr_strength,grace_of_spirit (speed)
 	_assert(counts["UNCOMMON"] == 12, "잔다르크 UNCOMMON 12장 (실제: %d)" % counts["UNCOMMON"])
-	# RARE 11: holy_fury,divine_echo,archangels_wrath,holy_judge,oracle_light,guardian_angel,angel_wings,miracle_revive,passion_power,saints_revelation,last_shield
-	_assert(counts["RARE"] == 11, "잔다르크 RARE 11장 (실제: %d)" % counts["RARE"])
+	# RARE 10: holy_fury,divine_echo,archangels_wrath,holy_judge,oracle_light,guardian_angel,angel_wings,miracle_revive,saints_revelation,last_shield
+	_assert(counts["RARE"] == 10, "잔다르크 RARE 10장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 4: divine_punishment,joan_return,flag_of_orleans,martyrs_light
 	_assert(counts["LEGENDARY"] == 4, "잔다르크 LEGENDARY 4장 (실제: %d)" % counts["LEGENDARY"])
 	# DIVINE 1: saints_flame
@@ -157,10 +157,10 @@ func test_joan_archetype_distribution() -> void:
 			var a: String = TranslationServer.translate(a_key)
 			if a in archetypes:
 				archetypes[a] += 1
-	# 순교 9 + divine_punishment(신성공격→+순교) + oracle_light(신성→+순교) = 11
+	# 순교 8 + divine_punishment(신성공격→+순교) + oracle_light(신성→+순교) = 10
 	_assert(archetypes["신성"] == 3, "잔다르크 신성 3장 (실제: %d)" % archetypes["신성"])
 	_assert(archetypes["부활"] == 4, "잔다르크 부활 4장 (실제: %d)" % archetypes["부활"])
-	_assert(archetypes["순교"] == 11, "잔다르크 순교 11장 (실제: %d)" % archetypes["순교"])
+	_assert(archetypes["순교"] == 10, "잔다르크 순교 10장 (실제: %d)" % archetypes["순교"])
 
 func test_genghis_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_genghis_rarity_distribution")
@@ -172,12 +172,12 @@ func test_genghis_rarity_distribution() -> void:
 	_assert(counts["COMMON"] == 5, "칭기즈칸 COMMON 5장 (실제: %d)" % counts["COMMON"])
 	# UNCOMMON 12
 	_assert(counts["UNCOMMON"] == 12, "칭기즈칸 UNCOMMON 12장 (실제: %d)" % counts["UNCOMMON"])
-	# RARE 12: 기동의권능, 만리원정, 붉은지평선, 칭기즈광기, 군마의권능, 칸의깃발, 토큰일제사격, 천만의군세, 약탈자의본능, 칸의도박, 처형현상금, 기마돌격 (speed)
-	_assert(counts["RARE"] == 12, "칭기즈칸 RARE 12장 (실제: %d)" % counts["RARE"])
-	# LEGENDARY 2: 대칸의명령, 학살의칸
-	_assert(counts["LEGENDARY"] == 2, "칭기즈칸 LEGENDARY 2장 (실제: %d)" % counts["LEGENDARY"])
-	# DIVINE 0
-	_assert(counts["DIVINE"] == 0, "칭기즈칸 DIVINE 0장 (실제: %d)" % counts["DIVINE"])
+	# RARE 8: 기동의권능, 만리원정, 칭기즈광기, 칸의깃발, 약탈자의본능, 칸의도박, 처형현상금, 기마돌격 (speed)
+	_assert(counts["RARE"] == 8, "칭기즈칸 RARE 8장 (실제: %d)" % counts["RARE"])
+	# LEGENDARY 5: 대칸의명령, 학살의칸 + 희귀도 보강(붉은지평선, 토큰일제사격, 천만의군세)
+	_assert(counts["LEGENDARY"] == 5, "칭기즈칸 LEGENDARY 5장 (실제: %d)" % counts["LEGENDARY"])
+	# DIVINE 1: 군마의권능 (희귀도 보강)
+	_assert(counts["DIVINE"] == 1, "칭기즈칸 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
 
 func test_genghis_archetype_distribution() -> void:
 	print("[TestCardPoolDistribution] test_genghis_archetype_distribution")

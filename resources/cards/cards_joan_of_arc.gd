@@ -32,9 +32,9 @@ static func pool() -> Array:
 		_miracle_revive(), _joan_return(),                              # P
 		_holy_purification(), _knights_oath(),                          # C
 		_flag_of_orleans(),                                             # Chaos
-		# ── 순교 9 (F×3 / A×2 / P×2 / C×1 / Chaos×1) ──
+		# ── 순교 8 (F×3 / A×1 / P×2 / C×1 / Chaos×1) ──
 		_martyrs_will(), _altar_flame(), _martyrdom_steps(),            # F
-		_passion_power(), _martyr_strength(),                           # A
+		_martyr_strength(),                           # A
 		_saints_revelation(), _martyrs_light(),                         # P
 		_last_shield(),                                                 # C
 		_saints_flame(),                                                # Chaos
@@ -477,18 +477,6 @@ static func _martyrdom_steps() -> Resource:
 	eb.effect_type = EffRes.EffectType.DRAW
 	eb.value = 2; eb.base_value = 2
 	c.effects = [ea, eb]; return c
-
-static func _passion_power() -> Resource:
-	# [A] 수난의 권능 — RARE, 1코, POWER: sacrifice_bank 활성화 (SACRIFICE_HP 누적 추적)
-	var c := CardRes.new()
-	c.card_name = "card.joan_of_arc.passion_power.name"; c.owner_id = "joan_of_arc"
-	c.cost = 1; c.card_type = CardRes.CardType.POWER
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = ["card.joan_of_arc.passion_power.archetype"]
-	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.sacrifice_bank"; e.value = 0; e.base_value = 0; e.target = "SELF"
-	c.effects = [e]; return c
 
 static func _martyr_strength() -> Resource:
 	# [A] 순교의 힘 — UNCOMMON, 1코, POWER: SACRIFICE_HP 40 + strength_player +3 (희생으로 얻는 힘)

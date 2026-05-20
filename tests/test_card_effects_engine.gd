@@ -416,15 +416,15 @@ func test_double_next_damage_poison_tick() -> void:
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
 	bm.setup_battle([_make_enemy(500)])
-	# poison 2스택 (POISON_DMG_PER_STACK=5이므로 tick_dmg=10)
-	bm._enemy_status[0]["poison_dmg"] = 2
+	# poison_dmg 20 (tick_dmg = 20)
+	bm._enemy_status[0]["poison_dmg"] = 20
 	bm._enemy_status[0]["poison_dur"] = 3
 	# DOUBLE_NEXT_DAMAGE 등록
 	var eff_dnd := EffectRes.new()
 	eff_dnd.effect_type = EffectRes.EffectType.DOUBLE_NEXT_DAMAGE
 	eff_dnd.value = 0
 	bm._apply_card_effects(_make_card("genghis_khan", [eff_dnd]), -1)
-	# poison tick → 2스택 × 10 = 20, ×2 = 40 피해
+	# poison tick 20, ×2 = 40 피해
 	bm._tick_enemy_poison(0)
 	_assert(bm.get_enemy_hp(0) == 460, "DOUBLE_NEXT_DAMAGE: poison tick 20 × 2 = 40 피해 (500→460)")
 	_assert(not bm._active_powers.has("power.double_next_damage:__global__"), "DOUBLE_NEXT_DAMAGE: poison tick 소비 후 파워 제거됨")
