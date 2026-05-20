@@ -109,7 +109,7 @@ func test_cleopatra_card_pool_size() -> void:
 func test_yi_sun_sin_card_pool_size() -> void:
 	print("[TestHeroes] test_yi_sun_sin_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._yi_sun_sin_card_pool().size() == 33, "이순신 카드 풀 33장 (+speed +카운터 +연합방벽)")
+	_assert(gm._yi_sun_sin_card_pool().size() == 34, "이순신 카드 풀 34장 (+speed +카운터 +연합방벽 +수군소집)")
 
 func test_joan_of_arc_card_pool_size() -> void:
 	print("[TestHeroes] test_joan_of_arc_card_pool_size")

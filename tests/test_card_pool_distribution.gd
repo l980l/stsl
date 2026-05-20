@@ -64,12 +64,12 @@ func test_yi_sun_sin_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_yi_sun_sin_rarity_distribution")
 	var gm = _load_gm()
 	var pool: Array = gm._yi_sun_sin_card_pool()
-	_assert(pool.size() == 33, "이순신 풀 33장 (+speed +카운터 +연합방벽)")
+	_assert(pool.size() == 34, "이순신 풀 34장 (+speed +카운터 +연합방벽 +수군소집)")
 	var counts: Dictionary = _count_rarities(pool)
 	# COMMON 4: 거북선방패, 진형결속, 군기진작, 기사회생
 	_assert(counts["COMMON"] == 4, "이순신 COMMON 4장 (실제: %d)" % counts["COMMON"])
-	# UNCOMMON 8: 거북선돌격, 반격, 연속방어, 진형강화, 수군훈련, 전열정비, 이판사판, 죽음의결의
-	_assert(counts["UNCOMMON"] == 8, "이순신 UNCOMMON 8장 (실제: %d)" % counts["UNCOMMON"])
+	# UNCOMMON 9: 거북선돌격, 반격, 연속방어, 진형강화, 수군훈련, 전열정비, 이판사판, 죽음의결의, 수군소집
+	_assert(counts["UNCOMMON"] == 9, "이순신 UNCOMMON 9장 (실제: %d)" % counts["UNCOMMON"])
 	# RARE 17: 거북의권능, 함대연합, 일제사격, 함포일제사, 돌격태세, 함대지휘, 진형의힘, 진형사수, 엄정한훈련, 배수진, 전사의각오, 위기돌파, 사지결단, 혈전, 거북선점호, 카운터(universal), 연합방벽(교차)
 	_assert(counts["RARE"] == 17, "이순신 RARE 17장 (실제: %d)" % counts["RARE"])
 	# LEGENDARY 4: 귀선출항, 지휘본능, 필사즉생, 불사조
@@ -88,7 +88,7 @@ func test_yi_sun_sin_archetype_distribution() -> void:
 			var a: String = TranslationServer.translate(a_key)
 			if a in archetypes:
 				archetypes[a] += 1
-	_assert(archetypes["거북선"] == 10, "이순신 거북선 10장 (실제: %d)" % archetypes["거북선"])
+	_assert(archetypes["거북선"] == 11, "이순신 거북선 11장 (실제: %d)" % archetypes["거북선"])
 	_assert(archetypes["학익진"] == 11, "이순신 학익진 11장 (실제: %d)" % archetypes["학익진"])
 	# 필사즉생 10 + fleet_command 다중 archetype (학익진+필사즉생) = 11
 	_assert(archetypes["필사즉생"] == 11, "이순신 필사즉생 11장 (실제: %d)" % archetypes["필사즉생"])
