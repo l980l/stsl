@@ -53,6 +53,10 @@ const VFX_PAIRS := [
 	{"name": "boss_phase_changed", "gpu": "res://scenes/vfx/boss_phase_changed_gpu.gd", "cpu": "res://scenes/vfx/boss_phase_changed.gd"},
 	{"name": "death_dissolve",     "gpu": "res://scenes/vfx/death_dissolve_gpu.gd",     "cpu": "res://scenes/vfx/death_dissolve.gd"},
 	{"name": "poison_tick",        "gpu": "res://scenes/vfx/poison_tick_gpu.gd",        "cpu": "res://scenes/vfx/poison_tick.gd"},
+	# Phase 9 — 하이브리드 추가 변환 (폴리곤 도형 CPU 유지 + 파티클 GPU)
+	{"name": "dispel",      "gpu": "res://scenes/vfx/dispel_gpu.gd",      "cpu": "res://scenes/vfx/dispel.gd"},
+	{"name": "form_change", "gpu": "res://scenes/vfx/form_change_gpu.gd", "cpu": "res://scenes/vfx/form_change.gd"},
+	{"name": "counter",     "gpu": "res://scenes/vfx/counter_gpu.gd",     "cpu": "res://scenes/vfx/counter.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
@@ -62,7 +66,7 @@ const _SPRITE_H := 192.0
 const _CHAR_FOOT_Y_OFFSET := 96.0
 
 # caster 무시 / 타겟 위치 발치 anchor 사용하는 VFX (vfx_preview.gd 의 분기와 동일)
-const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff", "holy_buff", "power_up"]
+const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff", "holy_buff", "power_up", "form_change"]
 # caster 만 사용하는 VFX — ground anchor 도 caster 발치로
 const _CASTER_ONLY_VFX: Array = []
 
