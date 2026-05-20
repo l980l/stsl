@@ -56,6 +56,10 @@ func run_all() -> Dictionary:
 	test_synergy_genghis_cleopatra_not_present()
 	test_synergy_musashi_yisunsin_duel()
 	test_synergy_musashi_yisunsin_not_present()
+	test_synergy_joan_yi()
+	test_synergy_joan_yi_not_present()
+	test_synergy_joan_cleopatra()
+	test_synergy_joan_cleopatra_not_present()
 	test_on_enthrall_strength_trigger()
 	test_draw_per_enthrall_fires()
 	test_damage_per_charmed_enemy()
@@ -587,77 +591,38 @@ func test_synergy_napoleon_yisunsin() -> void:
 func test_synergy_yisunsin_cleopatra() -> void:
 	print("[TestBattleManager] test_synergy_yisunsin_cleopatra")
 	var bm := _make_bm()
-	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 50))
-	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
-	bm.setup_battle([_make_enemy(50, [])])
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 1000))
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 1000))
+	bm.setup_battle([_make_enemy(500, [])])
 	bm.start_player_turn()
-	bm._enemy_status[0]["poison_dmg"] = 3
-	bm._enemy_status[0]["poison_dur"] = 3
-
-	var card = CardRes.new()
-	card.card_name = "공격_테스트"
-	card.owner_id = "yi_sun_sin"
-	card.cost = 0
-	var eff = EffectRes.new()
-	eff.effect_type = EffectRes.EffectType.DAMAGE
-	eff.value = 5
-	eff.target = "SINGLE"
-	card.effects = [eff]
-	bm.deck_mgr.hand.append(card)
-
-	bm.play_card(card, 0)
-	_assert(bm.get_enemy_hp(0) == 20,
-		"독침 반격: 이순신 DAMAGE 5 + 시너지 25 = 30 피해 → 적 HP 50-30=20")
+	bm._deal_damage_to_hero("yi_sun_sin", 10, "", false, 0)
+	_assert(bm._enemy_status[0].get("poison_dmg", 0) == 30,
+		"독침 반격: 파티원 피격 → 공격한 적 poison_dmg +30")
 
 
 func test_synergy_napoleon_cleopatra() -> void:
 	print("[TestBattleManager] test_synergy_napoleon_cleopatra")
 	var bm := _make_bm()
-	bm.team_mgr.add_hero(_make_hero("napoleon", 50))
-	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
-	bm.setup_battle([_make_enemy(50, [])])
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 1000))
+	bm.setup_battle([_make_enemy(500, [])])
 	bm.start_player_turn()
-	if not bm._hero_status.has("napoleon"):
-		bm._hero_status["napoleon"] = {}
-	bm._hero_status["napoleon"]["morale"] = 3
-
-	var card = CardRes.new()
-	card.card_name = "사기소모_테스트"
-	card.owner_id = "napoleon"
-	card.cost = 0
-	var eff = EffectRes.new()
-	eff.effect_type = EffectRes.EffectType.CONSUME_MORALE
-	eff.value = 1
-	eff.bonus_value = 5
-	card.effects = [eff]
-	bm.deck_mgr.hand.append(card)
-
-	bm.play_card(card, 0)
-	_assert(bm._enemy_status[0].get("charm", 0) == 2,
-		"혼란의 돌격: 나폴레옹 CONSUME_MORALE → 적 charm +2")
+	bm._hero_status["napoleon"] = {"tokens": 1}
+	bm._phase_hero_pre("napoleon")
+	_assert(bm._enemy_status[0].get("charm", 0) == 3,
+		"혼란의 돌격: 나폴레옹 병사 공격 → 적 charm +3")
 
 
 func test_synergy_napoleon_cleopatra_no_morale() -> void:
 	print("[TestBattleManager] test_synergy_napoleon_cleopatra_no_morale")
 	var bm := _make_bm()
-	bm.team_mgr.add_hero(_make_hero("napoleon", 50))
-	bm.team_mgr.add_hero(_make_hero("cleopatra", 50))
-	bm.setup_battle([_make_enemy(50, [])])
+	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
+	bm.setup_battle([_make_enemy(500, [])])
 	bm.start_player_turn()
-	# morale = 0, so CONSUME_MORALE fails → no charm
-	var card = CardRes.new()
-	card.card_name = "사기소모_실패_테스트"
-	card.owner_id = "napoleon"
-	card.cost = 0
-	var eff = EffectRes.new()
-	eff.effect_type = EffectRes.EffectType.CONSUME_MORALE
-	eff.value = 1
-	eff.bonus_value = 5
-	card.effects = [eff]
-	bm.deck_mgr.hand.append(card)
-	bm.play_card(card, 0)
+	bm._hero_status["napoleon"] = {"tokens": 1}
+	bm._phase_hero_pre("napoleon")
 	_assert(bm._enemy_status[0].get("charm", 0) == 0,
-		"혼란의 돌격: 사기 부족 시 charm 미부여")
+		"혼란의 돌격: 클레오파트라 없으면 charm 미부여")
 
 
 func test_has_synergy_bonus() -> void:
@@ -714,6 +679,8 @@ func test_synergy_joan_napoleon_heal_all() -> void:
 	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
 	bm.setup_battle([_make_enemy(100, [])])
 	bm.start_player_turn()
+	bm._hero_status["napoleon"] = {"morale": 10}  # 사기 10 → 힐 ×1.7
+	bm.team_mgr.take_damage("joan_of_arc", 300)
 	var card := CardRes.new()
 	card.card_name = "성가_테스트"
 	card.owner_id = "joan_of_arc"
@@ -724,8 +691,8 @@ func test_synergy_joan_napoleon_heal_all() -> void:
 	card.effects = [eff]
 	bm.deck_mgr.hand.append(card)
 	bm.play_card(card, -1)
-	_assert(bm._hero_status.get("napoleon", {}).get("morale", 0) == 2,
-		"성전: 잔다르크 HEAL_ALL → 나폴레옹 morale +2")
+	_assert(bm.team_mgr.get_current_hp("joan_of_arc") == 802,
+		"성전: 나폴레옹 사기 10 → HEAL_ALL 60 ×1.7 = 102 (잔다르크 700→802)")
 
 func test_synergy_joan_napoleon_not_present() -> void:
 	print("[TestBattleManager] test_synergy_joan_napoleon_not_present")
@@ -733,6 +700,7 @@ func test_synergy_joan_napoleon_not_present() -> void:
 	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 1000))
 	bm.setup_battle([_make_enemy(100, [])])
 	bm.start_player_turn()
+	bm.team_mgr.take_damage("joan_of_arc", 300)
 	var card := CardRes.new()
 	card.card_name = "성가_나폴레옹없음"
 	card.owner_id = "joan_of_arc"
@@ -743,30 +711,20 @@ func test_synergy_joan_napoleon_not_present() -> void:
 	card.effects = [eff]
 	bm.deck_mgr.hand.append(card)
 	bm.play_card(card, -1)
-	_assert(bm._hero_status.get("napoleon", {}).get("morale", 0) == 0,
-		"성전: 나폴레옹 없으면 morale 미부여")
+	_assert(bm.team_mgr.get_current_hp("joan_of_arc") == 760,
+		"성전: 나폴레옹 없으면 힐 증폭 없음 (잔다르크 700→760)")
 
 func test_synergy_genghis_cleopatra_dmg_all() -> void:
 	print("[TestBattleManager] test_synergy_genghis_cleopatra_dmg_all")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
 	bm.team_mgr.add_hero(_make_hero("cleopatra", 1000))
-	bm.setup_battle([_make_enemy(500, []), _make_enemy(500, [])])
+	bm.setup_battle([_make_enemy(500, [])])
 	bm.start_player_turn()
-	var card := CardRes.new()
-	card.card_name = "기마돌격_테스트"
-	card.owner_id = "genghis_khan"
-	card.cost = 0
-	var eff := EffectRes.new()
-	eff.effect_type = EffectRes.EffectType.DAMAGE
-	eff.value = 50; eff.base_value = 50; eff.target = "ALL"
-	card.effects = [eff]
-	bm.deck_mgr.hand.append(card)
-	bm.play_card(card, -1)
-	_assert(bm.get_enemy_status(0).get("poison_dmg", 0) == 20,
-		"약탈과 독: 칭기즈칸 DMG ALL → 적 0 poison_dmg +20")
-	_assert(bm.get_enemy_status(1).get("poison_dmg", 0) == 20,
-		"약탈과 독: 칭기즈칸 DMG ALL → 적 1 poison_dmg +20")
+	bm._hero_status["genghis_khan"] = {"tokens": 1}
+	bm._phase_hero_pre("genghis_khan")
+	_assert(bm._enemy_status[0].get("poison_dmg", 0) == 5,
+		"약탈과 독: 칭기즈칸 병사 공격 → 적 poison_dmg +5")
 
 func test_synergy_genghis_cleopatra_not_present() -> void:
 	print("[TestBattleManager] test_synergy_genghis_cleopatra_not_present")
@@ -774,17 +732,9 @@ func test_synergy_genghis_cleopatra_not_present() -> void:
 	bm.team_mgr.add_hero(_make_hero("genghis_khan", 1000))
 	bm.setup_battle([_make_enemy(500, [])])
 	bm.start_player_turn()
-	var card := CardRes.new()
-	card.card_name = "기마돌격_클레오없음"
-	card.owner_id = "genghis_khan"
-	card.cost = 0
-	var eff := EffectRes.new()
-	eff.effect_type = EffectRes.EffectType.DAMAGE
-	eff.value = 50; eff.base_value = 50; eff.target = "ALL"
-	card.effects = [eff]
-	bm.deck_mgr.hand.append(card)
-	bm.play_card(card, -1)
-	_assert(bm.get_enemy_status(0).get("poison", 0) == 0,
+	bm._hero_status["genghis_khan"] = {"tokens": 1}
+	bm._phase_hero_pre("genghis_khan")
+	_assert(bm._enemy_status[0].get("poison_dmg", 0) == 0,
 		"약탈과 독: 클레오파트라 없으면 poison 미부여")
 
 func test_synergy_musashi_yisunsin_duel() -> void:
@@ -795,17 +745,21 @@ func test_synergy_musashi_yisunsin_duel() -> void:
 	bm.setup_battle([_make_enemy(500, [])])
 	bm.start_player_turn()
 	var card := CardRes.new()
-	card.card_name = "결투_테스트"
+	card.card_name = "공격_테스트"
 	card.owner_id = "musashi"
 	card.cost = 0
 	var eff := EffectRes.new()
-	eff.effect_type = EffectRes.EffectType.CONDITIONAL_DMG
-	eff.value = 100; eff.bonus_value = 160; eff.target = "SINGLE"; eff.status_type = "enemy_count_1"
+	eff.effect_type = EffectRes.EffectType.DAMAGE
+	eff.value = 30
+	eff.base_value = 30
+	eff.target = "SINGLE"
 	card.effects = [eff]
 	bm.deck_mgr.hand.append(card)
 	bm.play_card(card, 0)
-	_assert(bm._hero_block.get("yi_sun_sin", 0) == 15,
-		"검사의 약속: 무사시 결투 카드 → 이순신 BLOCK +15")
+	var m_spd: int = bm._sum_speed_instances(bm._hero_status.get("musashi", {}).get("speed_bonus", []))
+	var y_spd: int = bm._sum_speed_instances(bm._hero_status.get("yi_sun_sin", {}).get("speed_bonus", []))
+	_assert(m_spd == 1 and y_spd == 1,
+		"검사의 약속: 무사시 공격 → 무사시·이순신 속도 +1")
 
 func test_synergy_musashi_yisunsin_not_present() -> void:
 	print("[TestBattleManager] test_synergy_musashi_yisunsin_not_present")
@@ -814,17 +768,84 @@ func test_synergy_musashi_yisunsin_not_present() -> void:
 	bm.setup_battle([_make_enemy(500, [])])
 	bm.start_player_turn()
 	var card := CardRes.new()
-	card.card_name = "결투_이순신없음"
+	card.card_name = "공격_이순신없음"
 	card.owner_id = "musashi"
 	card.cost = 0
 	var eff := EffectRes.new()
-	eff.effect_type = EffectRes.EffectType.CONDITIONAL_DMG
-	eff.value = 100; eff.bonus_value = 160; eff.target = "SINGLE"; eff.status_type = "enemy_count_1"
+	eff.effect_type = EffectRes.EffectType.DAMAGE
+	eff.value = 30
+	eff.base_value = 30
+	eff.target = "SINGLE"
 	card.effects = [eff]
 	bm.deck_mgr.hand.append(card)
 	bm.play_card(card, 0)
-	_assert(bm._hero_block.get("yi_sun_sin", 0) == 0,
-		"검사의 약속: 이순신 없으면 BLOCK 미부여")
+	var m_spd: int = bm._sum_speed_instances(bm._hero_status.get("musashi", {}).get("speed_bonus", []))
+	_assert(m_spd == 0,
+		"검사의 약속: 이순신 없으면 속도 미부여")
+
+func test_synergy_joan_yi() -> void:
+	print("[TestBattleManager] test_synergy_joan_yi")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 1000))
+	bm.team_mgr.add_hero(_make_hero("yi_sun_sin", 1000))
+	bm.setup_battle([_make_enemy(500, [])])
+	bm.start_player_turn()
+	bm._heal_hero_safe("joan_of_arc", 10)
+	_assert(bm._hero_block.get("joan_of_arc", 0) == 30,
+		"성녀의 방패: 힐 적용 → 대상 방어구 +30")
+
+func test_synergy_joan_yi_not_present() -> void:
+	print("[TestBattleManager] test_synergy_joan_yi_not_present")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 1000))
+	bm.setup_battle([_make_enemy(500, [])])
+	bm.start_player_turn()
+	bm._heal_hero_safe("joan_of_arc", 10)
+	_assert(bm._hero_block.get("joan_of_arc", 0) == 0,
+		"성녀의 방패: 통제사 없으면 방어구 미부여")
+
+func test_synergy_joan_cleopatra() -> void:
+	print("[TestBattleManager] test_synergy_joan_cleopatra")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("joan_of_arc", 1000))
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 1000))
+	bm.setup_battle([_make_enemy(500, [])])
+	bm.start_player_turn()
+	bm.team_mgr.take_damage("joan_of_arc", 100)
+	var card := CardRes.new()
+	card.card_name = "독부여_테스트"
+	card.owner_id = "cleopatra"
+	card.cost = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.APPLY_STATUS
+	eff.status_type = "poison"
+	eff.value = 10
+	eff.target = "SINGLE"
+	card.effects = [eff]
+	bm._apply_synergy_bonus(card, 0)
+	_assert(bm.team_mgr.get_current_hp("joan_of_arc") == 915,
+		"성스러운 독: 클레오파트라 독 부여 → 아군 전체 회복 +15")
+
+func test_synergy_joan_cleopatra_not_present() -> void:
+	print("[TestBattleManager] test_synergy_joan_cleopatra_not_present")
+	var bm := _make_bm()
+	bm.team_mgr.add_hero(_make_hero("cleopatra", 1000))
+	bm.setup_battle([_make_enemy(500, [])])
+	bm.start_player_turn()
+	bm.team_mgr.take_damage("cleopatra", 100)
+	var card := CardRes.new()
+	card.card_name = "독부여_잔다르크없음"
+	card.owner_id = "cleopatra"
+	card.cost = 0
+	var eff := EffectRes.new()
+	eff.effect_type = EffectRes.EffectType.APPLY_STATUS
+	eff.status_type = "poison"
+	eff.value = 10
+	eff.target = "SINGLE"
+	card.effects = [eff]
+	bm._apply_synergy_bonus(card, 0)
+	_assert(bm.team_mgr.get_current_hp("cleopatra") == 900,
+		"성스러운 독: 잔다르크 없으면 회복 미부여")
 
 func test_on_enthrall_strength_trigger() -> void:
 	print("[TestBattleManager] test_on_enthrall_strength_trigger")
