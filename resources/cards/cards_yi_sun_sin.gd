@@ -40,6 +40,8 @@ static func pool() -> Array:
 		_phoenix(),                                                       # Chaos
 		# speed buff team (학익진 추가)
 		_turtleship_drill(),
+		# 이순신 토큰 소스 (거북선 — 함포 일제사·수륙 협공 활성화)
+		_naval_muster(),
 		# 교차 영웅 — 팀 사기 소모 → 팀 방어 (CONSUME_TEAM_MORALE)
 		_united_bulwark(),
 		# 카운터 (universal) — 거북선 역공 빌드용 드래프트 카드
@@ -72,6 +74,19 @@ static func _united_bulwark() -> Resource:
 	e.value = 2; e.base_value = 2
 	e.bonus_value = 30; e.base_bonus_value = 30
 	c.effects = [e]; return c
+
+static func _naval_muster() -> Resource:
+	# 수군 소집 — UNCOMMON, 1코, SKILL, 거북선: SUMMON_TOKEN 2 + BLOCK 40 (이순신 토큰 소스)
+	var c := CardRes.new()
+	c.card_name = "card.yi_sun_sin.naval_muster.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
+	c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
+	c.archetype = ["card.yi_sun_sin.turtle_shield.archetype"]
+	var ea := EffRes.new()
+	ea.effect_type = EffRes.EffectType.SUMMON_TOKEN; ea.value = 2; ea.base_value = 2
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.BLOCK; eb.value = 40; eb.base_value = 40; eb.target = "SELF"
+	c.effects = [ea, eb]; return c
 
 # ─────────────────────────────────────────
 # 시작덱 (4종)
