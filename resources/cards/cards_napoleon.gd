@@ -41,6 +41,8 @@ static func pool() -> Array:
 		_reconnaissance(),                                              # Chaos (정찰 = 마킹)
 		# speed buff (돌격 추가)
 		_blitz_advance(),
+		# 교차 영웅 — 팀 사기 합산 정산 (DAMAGE_PER_TEAM_MORALE)
+		_allied_bombardment(),
 		]
 
 static func _blitz_advance() -> Resource:
@@ -55,6 +57,19 @@ static func _blitz_advance() -> Resource:
 	e.value = 5; e.base_value = 5
 	e.bonus_value = 3; e.base_bonus_value = 3  # 지속 3턴
 	e.target = "SELF"
+	c.effects = [e]; return c
+
+static func _allied_bombardment() -> Resource:
+	# 연합 포격 — RARE, 2코, ATTACK, 교차 영웅: 생존 영웅 전원의 사기 합산 × 20 피해
+	# archetype 무소속 — 교차 영웅 카드는 단일 아키타입에 속하지 않음
+	var c := CardRes.new()
+	c.card_name = "card.napoleon.allied_bombardment.name"; c.owner_id = "napoleon"
+	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.DAMAGE_PER_TEAM_MORALE
+	e.value = 20; e.base_value = 20; e.target = "SINGLE"
+	e.damage_type = "explosive"
 	c.effects = [e]; return c
 
 # ─────────────────────────────────────────

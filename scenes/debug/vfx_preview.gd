@@ -54,6 +54,7 @@ const BOSS_DEATH := preload("res://scenes/vfx/boss_death.gd")
 const DISPEL := preload("res://scenes/vfx/dispel.gd")
 const FORM_CHANGE := preload("res://scenes/vfx/form_change.gd")
 const COUNTER_VFX := preload("res://scenes/vfx/counter.gd")
+const ENTHRALL_AURA := preload("res://scenes/vfx/enthrall_aura.gd")
 const _CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 const _CardResourceClass := preload("res://resources/card_resource.gd")
 
@@ -113,6 +114,7 @@ const VFX_CURRENT := [
 	{"name": "form_change",        "kind": "beam", "path": "res://scenes/vfx/form_change.gd"},
 	{"name": "counter",            "kind": "beam", "path": "res://scenes/vfx/counter.gd"},
 	{"name": "counter_major",      "kind": "beam", "path": "res://scenes/vfx/counter.gd"},
+	{"name": "enthrall_aura",      "kind": "beam",   "path": "res://scenes/vfx/enthrall_aura.gd"},
 ]
 
 # 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.
@@ -487,6 +489,8 @@ func _update_info() -> void:
 				COUNTER_VFX.PARRY_R, COUNTER_VFX.SHOCK_R]
 			s += "parry %.2fs → streak → hit %.2fs · hold %.2fs · fade %.2fs (major = charge 보스 차지 무효 변형)" % [
 				COUNTER_VFX.PARRY_DELAY, COUNTER_VFX.HIT_DELAY, COUNTER_VFX.HOLD_TIME, COUNTER_VFX.FADE_TIME]
+		"enthrall_aura":
+			s += "반함 표시 — 머리 위로 커다란 하트가 %.1fs마다 솟음 (반함 해제 시 사라짐)" % ENTHRALL_AURA.SPAWN_INTERVAL
 		_:
 			s += "시전자 마커는 beam 전용 — impact/self는 타겟 위치에서 재생"
 	# IMPACT_DELAY 한 줄 자동 추가 — VFX 스크립트에 노출돼 있으면 표시 (battle_manager 가 동기화에 사용)

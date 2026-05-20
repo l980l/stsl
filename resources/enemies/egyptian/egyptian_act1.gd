@@ -25,7 +25,7 @@ static func scarab_queen(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.egyptian.scarab_queen"; e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 4; i1.status_type = "poison"
+	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 40; i1.status_type = "poison"
 	i1.target = IntentRes.TargetType.ALL
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"

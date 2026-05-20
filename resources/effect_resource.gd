@@ -47,6 +47,9 @@ enum EffectType {
 	DEBUFF_SPEED,    # 적 speed -value, bonus_value 턴 일정 지속 (SINGLE/ALL)
 	MARK_ENEMY,      # 영웅이 적에게 마킹 — 적 status.marked_by 에 owner_id 추가. 모든 영웅 공격 치명타 확률 +30%.
 	COUNTER_REFLECT, # 보스 CHARGE_UP + counter_window 활성 → 차지 무효 + stun. 그 외 → counter_pending 부여 (다음 공격 50% 반감 + 100% 반사).
+	DAMAGE_PER_TEAM_MORALE,  # 교차 영웅: 생존 영웅 전원의 사기 합산 × value 피해
+	CONSUME_TEAM_MORALE,     # 교차 영웅: 생존 영웅 각자 value 사기 소모 → 소모 총량 × bonus_value 페이오프
+	DAMAGE_PER_TEAM_TOKEN,   # 교차 영웅: 생존 영웅 전원의 토큰 합산 × value 피해
 }
 
 @export var effect_type: EffectType = EffectType.DAMAGE
@@ -89,7 +92,7 @@ func display_text(override_value: int = -1) -> String:
 		EffectType.APPLY_STATUS:
 			if status_type == "poison":
 				var _pk: String = "effect.apply_status_poison.all.text" if target == "ALL" else "effect.apply_status_poison.single.text"
-				return TranslationServer.translate(_pk) % (value * 10)
+				return TranslationServer.translate(_pk) % value
 			elif status_type == "power.every_nth_attack_bonus":
 				var fmt: String = TranslationServer.translate("power.every_nth_attack_bonus.label")
 				return fmt % [bonus_value, value] if fmt.contains("%") else fmt
@@ -208,4 +211,10 @@ func display_text(override_value: int = -1) -> String:
 			return TranslationServer.translate("effect.mark_enemy.text")
 		EffectType.COUNTER_REFLECT:
 			return TranslationServer.translate("effect.counter_reflect.text")
+		EffectType.DAMAGE_PER_TEAM_MORALE:
+			return TranslationServer.translate("effect.damage_per_team_morale.text") % value
+		EffectType.CONSUME_TEAM_MORALE:
+			return TranslationServer.translate("effect.consume_team_morale.text") % [value, bonus_value]
+		EffectType.DAMAGE_PER_TEAM_TOKEN:
+			return TranslationServer.translate("effect.damage_per_team_token.text") % value
 	return ""

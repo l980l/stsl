@@ -11,7 +11,7 @@ static func apophis_serpent(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.egyptian.apophis_serpent"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.DEBUFF; i1.status_type = "poison"; i1.value = 5
+	i1.action_type = IntentRes.ActionType.DEBUFF; i1.status_type = "poison"; i1.value = 50
 	i1.target = IntentRes.TargetType.ALL
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
@@ -87,7 +87,7 @@ static func ra_horakhty(scene: PackedScene) -> Resource:
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 180; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "holy_strike"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "poison"; p1i2.value = 6
+	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "poison"; p1i2.value = 60
 	p1i2.target = IntentRes.TargetType.ALL
 	var p1i3 := IntentRes.new()
 	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 200; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "fire"

@@ -203,11 +203,12 @@ static func _endless_march() -> Resource:
 	c.effects = [e]; return c
 
 static func _red_horizon() -> Resource:
-	# [P] 붉은 지평선 — RARE, 1코, ATTACK EXHAUST: DMG 110 + ON_KILL_DRAW 2
+	# [P] 붉은 지평선 — LEGENDARY, 1코, ATTACK EXHAUST: DMG 110 + ON_KILL_DRAW 2
+	# 희귀도 보강: 약탈 아키타입 처치-드로우 핵심 카드 — 전설 승급
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.red_horizon.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
 	c.archetype = ["card.genghis_khan.red_horizon.archetype", "card.genghis_khan.loot.archetype"]
 	c.is_exhaust = true
 	var ea := EffRes.new()
@@ -314,11 +315,12 @@ static func _horde_advance() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _war_horse_power() -> Resource:
-	# [A] 군마의 권능 — RARE, 2코, POWER: 매 턴 시작 시 SUMMON_TOKEN 1
+	# [A] 군마의 권능 — DIVINE, 2코, POWER: 매 턴 시작 시 SUMMON_TOKEN 1
+	# 희귀도 보강: 몽골 기병 토큰 자동생성 엔진 — 칭기즈칸 유일 DIVINE 카드로 승급
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.war_horse_power.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.rarity = CardRes.Rarity.DIVINE; c.play_animation = "idle"
 	c.archetype = ["card.genghis_khan.war_horse_power.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
@@ -340,11 +342,12 @@ static func _khans_banner() -> Resource:
 	c.effects = [e]; return c
 
 static func _horde_volley() -> Resource:
-	# [P] 토큰 일제 사격 — RARE, 2코, ATTACK: 살아있는 토큰 수 × DMG 40 ALL
+	# [P] 토큰 일제 사격 — LEGENDARY, 2코, ATTACK: 살아있는 토큰 수 × DMG 40 ALL
+	# 희귀도 보강: 몽골 기병 아키타입의 토큰 정산 핵심 카드 — 전설 승급
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.horde_volley.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.ATTACK
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
+	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "attack"
 	c.archetype = ["card.genghis_khan.horde_volley.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.DAMAGE_PER_TOKEN
@@ -352,11 +355,12 @@ static func _horde_volley() -> Resource:
 	c.effects = [e]; return c
 
 static func _ten_thousand_army() -> Resource:
-	# [P] 천만의 군세 — RARE, 2코, SKILL: SUMMON_TOKEN 3 + BLOCK 20
+	# [P] 천만의 군세 — LEGENDARY, 2코, SKILL: SUMMON_TOKEN 3 + BLOCK 20
+	# 희귀도 보강: 몽골 기병 토큰 대량 전개 카드 — 전설 승급
 	var c := CardRes.new()
 	c.card_name = "card.genghis_khan.ten_thousand_army.name"; c.owner_id = "genghis_khan"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
-	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
 	c.archetype = ["card.genghis_khan.ten_thousand_army.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SUMMON_TOKEN; ea.value = 3; ea.base_value = 3

@@ -99,7 +99,7 @@ func _make_card(owner_id: String, effects: Array) -> Resource:
 func test_napoleon_card_pool_size() -> void:
 	print("[TestHeroes] test_napoleon_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._napoleon_card_pool().size() == 31, "나폴레옹 카드 풀 31장 (+speed)")
+	_assert(gm._napoleon_card_pool().size() == 32, "나폴레옹 카드 풀 32장 (+speed +연합포격)")
 
 func test_cleopatra_card_pool_size() -> void:
 	print("[TestHeroes] test_cleopatra_card_pool_size")
@@ -109,12 +109,12 @@ func test_cleopatra_card_pool_size() -> void:
 func test_yi_sun_sin_card_pool_size() -> void:
 	print("[TestHeroes] test_yi_sun_sin_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._yi_sun_sin_card_pool().size() == 31, "이순신 카드 풀 31장 (+speed)")
+	_assert(gm._yi_sun_sin_card_pool().size() == 33, "이순신 카드 풀 33장 (+speed +카운터 +연합방벽)")
 
 func test_joan_of_arc_card_pool_size() -> void:
 	print("[TestHeroes] test_joan_of_arc_card_pool_size")
 	var gm = _load_gm()
-	_assert(gm._joan_of_arc_card_pool().size() == 31, "잔다르크 카드 풀 31장 (+speed)")
+	_assert(gm._joan_of_arc_card_pool().size() == 30, "잔다르크 카드 풀 30장 (+speed)")
 
 func test_genghis_khan_card_pool_size() -> void:
 	print("[TestHeroes] test_genghis_khan_card_pool_size")
@@ -238,13 +238,13 @@ func test_poison_burst_damages_and_clears() -> void:
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("cleopatra", 60))
 	bm.setup_battle([_make_enemy(500)])
-	bm._enemy_status[0]["poison_dmg"] = 5
+	bm._enemy_status[0]["poison_dmg"] = 50
 	bm._enemy_status[0]["poison_dur"] = 3
 	var eff := EffectRes.new()
 	eff.effect_type = EffectRes.EffectType.POISON_BURST
 	eff.value = 300  # ×3 배율 (100 단위 인코딩)
 	bm._apply_card_effects(_make_card("cleopatra", [eff]), 0)
-	_assert(bm.get_enemy_hp(0) == 350, "POISON_BURST 독(5) ×3 ×10 = 150 피해 (500-150=350)")
+	_assert(bm.get_enemy_hp(0) == 350, "POISON_BURST 독(50) ×3 = 150 피해 (500-150=350)")
 	_assert(bm._enemy_status[0].get("poison_dmg", -1) == 0, "POISON_BURST 후 poison_dmg 초기화")
 	_assert(bm._enemy_status[0].get("poison_dur", -1) == 0, "POISON_BURST 후 poison_dur 초기화")
 

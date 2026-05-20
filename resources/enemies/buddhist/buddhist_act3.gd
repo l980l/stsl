@@ -115,7 +115,7 @@ static func acalanatha(scene: PackedScene) -> Resource:
 	var p2i5 := IntentRes.new()
 	p2i5.action_type = IntentRes.ActionType.ATTACK; p2i5.value = 190; p2i5.target = IntentRes.TargetType.ALL; p2i5.damage_type = "holy_fire"
 	var p2i6 := IntentRes.new()
-	p2i6.action_type = IntentRes.ActionType.DEBUFF; p2i6.value = 5; p2i6.status_type = "poison"
+	p2i6.action_type = IntentRes.ActionType.DEBUFF; p2i6.value = 50; p2i6.status_type = "poison"
 	p2i6.target = IntentRes.TargetType.RANDOM
 	# acalanatha (부동명왕, 진노의 명왕) — 분노의 저주: 페이즈 1,2 에서 INFLICT_WEAKNESS weakness_holy.
 	var p1i_curse := IntentRes.new()

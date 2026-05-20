@@ -57,7 +57,7 @@ static func jormungandr_shard(scene: PackedScene) -> Resource:
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 140; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "poison"
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.DEBUFF; p0i2.status_type = "poison"; p0i2.value = 4
+	p0i2.action_type = IntentRes.ActionType.DEBUFF; p0i2.status_type = "poison"; p0i2.value = 40
 	p0i2.target = IntentRes.TargetType.ALL
 	var p0i3 := IntentRes.new()
 	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 140; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "poison"
@@ -65,7 +65,7 @@ static func jormungandr_shard(scene: PackedScene) -> Resource:
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "poison"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "poison"; p1i2.value = 6
+	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "poison"; p1i2.value = 60
 	p1i2.target = IntentRes.TargetType.ALL
 	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
@@ -82,7 +82,7 @@ static func jormungandr(scene: PackedScene) -> Resource:
 	var p0i1 := IntentRes.new()
 	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 130; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "poison"
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.DEBUFF; p0i2.status_type = "poison"; p0i2.value = 5
+	p0i2.action_type = IntentRes.ActionType.DEBUFF; p0i2.status_type = "poison"; p0i2.value = 50
 	p0i2.target = IntentRes.TargetType.ALL
 	var p0i3 := IntentRes.new()
 	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 130; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "poison"
@@ -90,13 +90,13 @@ static func jormungandr(scene: PackedScene) -> Resource:
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 160; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "poison"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "poison"; p1i2.value = 6
+	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "poison"; p1i2.value = 60
 	p1i2.target = IntentRes.TargetType.ALL
 	var p1i3 := IntentRes.new()
 	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 200; p1i3.target = IntentRes.TargetType.LOWEST_HP; p1i3.damage_type = "poison"
 	# 페이즈2 (30% HP 전환) — 강독+전체공격+strength+강타 (분리)
 	var p2i1 := IntentRes.new()
-	p2i1.action_type = IntentRes.ActionType.DEBUFF; p2i1.status_type = "poison"; p2i1.value = 10
+	p2i1.action_type = IntentRes.ActionType.DEBUFF; p2i1.status_type = "poison"; p2i1.value = 100
 	p2i1.target = IntentRes.TargetType.ALL
 	var p2i2 := IntentRes.new()
 	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 80; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "poison"

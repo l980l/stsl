@@ -17,8 +17,8 @@
 | `HEAL_ALL` | 1 heal (전체) | 0.020 | |
 | `WEAK_SGL` | 1 weak (단일) | 0.3 | |
 | `WEAK_ALL_V` | 1 weak (전체) | 0.6 | |
-| `POISON_SGL` | 1 poison (단일) | 0.4 | |
-| `POISON_ALL_V` | 1 poison (전체) | 0.8 | |
+| `POISON_SGL` | 1 poison (단일) | 0.04 | |
+| `POISON_ALL_V` | 1 poison (전체) | 0.08 | |
 | `CHARM_SGL` | 1 charm (단일) | **0.030** | 임계치 100 기준 (개정 2026-05-04) |
 | `CHARM_ALL` | 1 charm (전체) | **0.045** | AOE 보정 (×1.5) |
 | `STRENGTH_V` | 1 strength | 0.5 | |

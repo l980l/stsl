@@ -95,7 +95,7 @@ static func _venom_needle() -> Resource:
 	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "poison"; eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"
+	eb.status_type = "poison"; eb.value = 10; eb.base_value = 10; eb.target = "SINGLE"
 	c.effects = [ea, eb]; return c
 
 static func _royal_guard() -> Resource:
@@ -110,7 +110,7 @@ static func _royal_guard() -> Resource:
 	ea.value = 80; ea.base_value = 80
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "poison"; eb.value = 1; eb.base_value = 1; eb.target = "SINGLE"
+	eb.status_type = "poison"; eb.value = 10; eb.base_value = 10; eb.target = "SINGLE"
 	c.effects = [ea, eb]; return c
 
 # ─────────────────────────────────────────
@@ -130,7 +130,7 @@ static func _poison_seed() -> Resource:
 	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "poison"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
+	eb.status_type = "poison"; eb.value = 10; eb.base_value = 10; eb.target = "ALL"
 	c.effects = [ea, eb]; return c
 
 static func _asp_fang() -> Resource:
@@ -142,7 +142,7 @@ static func _asp_fang() -> Resource:
 	c.archetype = ["card.cleopatra.asp_fang.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "poison"; e.value = 3; e.base_value = 3; e.target = "SINGLE"
+	e.status_type = "poison"; e.value = 30; e.base_value = 30; e.target = "SINGLE"
 	c.effects = [e]; return c
 
 static func _nile_mist() -> Resource:
@@ -154,7 +154,7 @@ static func _nile_mist() -> Resource:
 	c.archetype = ["card.cleopatra.nile_mist.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
-	ea.status_type = "poison"; ea.value = 1; ea.base_value = 1; ea.target = "ALL"
+	ea.status_type = "poison"; ea.value = 10; ea.base_value = 10; ea.target = "ALL"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.BLOCK
 	eb.value = 40; eb.base_value = 40; eb.target = "SELF"
@@ -173,7 +173,7 @@ static func _poison_feast() -> Resource:
 	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "poison"; eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"
+	eb.status_type = "poison"; eb.value = 20; eb.base_value = 20; eb.target = "SINGLE"
 	c.effects = [ea, eb]; return c
 
 static func _serpent_power() -> Resource:
@@ -185,7 +185,7 @@ static func _serpent_power() -> Resource:
 	c.archetype = ["card.cleopatra.serpent_power.archetype"]
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.poison_per_turn"; e.value = 1; e.base_value = 1; e.target = "SELF"
+	e.status_type = "power.poison_per_turn"; e.value = 10; e.base_value = 10; e.target = "SELF"
 	c.effects = [e]; return c
 
 static func _pharaoh_venom() -> Resource:
@@ -252,7 +252,7 @@ static func _poison_party() -> Resource:
 	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "poison"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
+	eb.status_type = "poison"; eb.value = 10; eb.base_value = 10; eb.target = "ALL"
 	c.effects = [ea, eb]; return c
 
 static func _poison_purge() -> Resource:
@@ -267,7 +267,7 @@ static func _poison_purge() -> Resource:
 	ea.target = "SELF"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "poison"; eb.value = 2; eb.base_value = 2; eb.target = "ALL"
+	eb.status_type = "poison"; eb.value = 20; eb.base_value = 20; eb.target = "ALL"
 	c.effects = [ea, eb]; return c
 
 static func _nile_fury() -> Resource:
@@ -283,7 +283,7 @@ static func _nile_fury() -> Resource:
 	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "poison"; eb.value = 1; eb.base_value = 1; eb.target = "ALL"
+	eb.status_type = "poison"; eb.value = 10; eb.base_value = 10; eb.target = "ALL"
 	c.effects = [ea, eb]; return c
 
 # ─────────────────────────────────────────
@@ -376,7 +376,7 @@ static func _curse_brand() -> Resource:
 	ec.status_type = "vulnerable"; ec.value = 1; ec.base_value = 1; ec.target = "SINGLE"
 	var ed := EffRes.new()
 	ed.effect_type = EffRes.EffectType.APPLY_STATUS
-	ed.status_type = "poison"; ed.value = 1; ed.base_value = 1; ed.target = "SINGLE"
+	ed.status_type = "poison"; ed.value = 10; ed.base_value = 10; ed.target = "SINGLE"
 	c.effects = [ea, eb, ec, ed]; return c
 
 static func _isis_judgment() -> Resource:
@@ -433,7 +433,7 @@ static func _venom_bloom() -> Resource:
 	ea.damage_type = "poison"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.status_type = "poison"; eb.value = 2; eb.base_value = 2; eb.target = "ALL"
+	eb.status_type = "poison"; eb.value = 20; eb.base_value = 20; eb.target = "ALL"
 	c.effects = [ea, eb]; return c
 
 # ─────────────────────────────────────────

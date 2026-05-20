@@ -84,7 +84,7 @@ static func scylla(scene: PackedScene) -> Resource:
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 100; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "slash"
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.DEBUFF; p0i3.value = 3; p0i3.status_type = "poison"
+	p0i3.action_type = IntentRes.ActionType.DEBUFF; p0i3.value = 30; p0i3.status_type = "poison"
 	p0i3.target = IntentRes.TargetType.RANDOM
 	var p0i4 := IntentRes.new()
 	p0i4.action_type = IntentRes.ActionType.ATTACK; p0i4.value = 80; p0i4.target = IntentRes.TargetType.RANDOM; p0i4.damage_type = "slash"
@@ -97,7 +97,7 @@ static func scylla(scene: PackedScene) -> Resource:
 	var p1i1 := IntentRes.new()
 	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 160; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "slash"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 5; p1i2.status_type = "poison"
+	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 50; p1i2.status_type = "poison"
 	p1i2.target = IntentRes.TargetType.ALL
 	var p1i3 := IntentRes.new()
 	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 160; p1i3.target = IntentRes.TargetType.RANDOM; p1i3.damage_type = "slash"
@@ -150,7 +150,7 @@ static func hydra(scene: PackedScene) -> Resource:
 	var p2_charge_atk := IntentRes.new()
 	p2_charge_atk.action_type = IntentRes.ActionType.ATTACK; p2_charge_atk.value = 260; p2_charge_atk.target = IntentRes.TargetType.LOWEST_HP; p2_charge_atk.damage_type = "poison"
 	var p2_charge_dbf := IntentRes.new()
-	p2_charge_dbf.action_type = IntentRes.ActionType.DEBUFF; p2_charge_dbf.value = 4; p2_charge_dbf.status_type = "poison"
+	p2_charge_dbf.action_type = IntentRes.ActionType.DEBUFF; p2_charge_dbf.value = 40; p2_charge_dbf.status_type = "poison"
 	p2_charge_dbf.target = IntentRes.TargetType.ALL
 	var p2_charge := IntentRes.new()
 	p2_charge.action_type = IntentRes.ActionType.CHARGE_UP; p2_charge.charge_turns = 2; p2_charge.payoff_intents = [p2_charge_atk, p2_charge_dbf]

@@ -212,7 +212,7 @@ static func _scarab_talisman() -> Resource:
 	r.description = "relic.scarab_talisman.desc"
 	r.trigger = RelicRes.TriggerType.BATTLE_START
 	r.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
-	r.status_type = "poison"; r.value = 4; return r
+	r.status_type = "poison"; r.value = 40; return r
 
 # ──── Act 3 렐릭 (북유럽 신화) ────
 
@@ -287,7 +287,7 @@ static func _ghost_talisman() -> Resource:
 	r.description = "relic.ghost_talisman.desc"
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
 	r.effect_type = RelicRes.EffectType.APPLY_STATUS_ENEMY
-	r.status_type = "poison"; r.value = 2; return r
+	r.status_type = "poison"; r.value = 20; return r
 
 static func _tengu_feather() -> Resource:
 	# 점점 강해지는 (A): 전투 시작 시 치른 전투 수 × value 만큼 영웅 전체 데미지 누적

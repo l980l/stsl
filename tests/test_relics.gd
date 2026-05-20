@@ -418,7 +418,7 @@ func test_scarab_talisman_uses_status_type_field() -> void:
 		return
 	_assert(scarab.effect_type == RelicRes.EffectType.APPLY_STATUS_ENEMY, "스카라베 effect_type=APPLY_STATUS_ENEMY")
 	_assert(scarab.status_type == "poison", "스카라베 status_type=poison (Phase 3에서 명시)")
-	_assert(scarab.value == 4, "스카라베 value=4")
+	_assert(scarab.value == 40, "스카라베 value=40")
 	# orochi_scale도 status_type 검증 — 이전엔 무시되던 weak 부여가 살아남
 	var orochi := _find_relic("relic.orochi_scale.name")
 	_assert(orochi != null, "오로치의 비늘 풀 존재")

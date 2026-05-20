@@ -40,6 +40,10 @@ static func pool() -> Array:
 		_phoenix(),                                                       # Chaos
 		# speed buff team (학익진 추가)
 		_turtleship_drill(),
+		# 교차 영웅 — 팀 사기 소모 → 팀 방어 (CONSUME_TEAM_MORALE)
+		_united_bulwark(),
+		# 카운터 (universal) — 거북선 역공 빌드용 드래프트 카드
+		CommonRes.counter("yi_sun_sin"),
 		]
 
 static func _turtleship_drill() -> Resource:
@@ -54,6 +58,19 @@ static func _turtleship_drill() -> Resource:
 	e.value = 4; e.base_value = 4
 	e.bonus_value = 4; e.base_bonus_value = 4
 	e.target = "ALL_ALLIES"
+	c.effects = [e]; return c
+
+static func _united_bulwark() -> Resource:
+	# 연합 방벽 — RARE, 2코, SKILL, 교차 영웅: 생존 영웅 각 사기 2 소모 → 소모 1당 팀 전체 방어 30
+	# archetype 무소속 — 교차 영웅 카드는 단일 아키타입에 속하지 않음
+	var c := CardRes.new()
+	c.card_name = "card.yi_sun_sin.united_bulwark.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
+	c.card_type = CardRes.CardType.SKILL
+	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
+	var e := EffRes.new()
+	e.effect_type = EffRes.EffectType.CONSUME_TEAM_MORALE
+	e.value = 2; e.base_value = 2
+	e.bonus_value = 30; e.base_bonus_value = 30
 	c.effects = [e]; return c
 
 # ─────────────────────────────────────────
@@ -193,14 +210,15 @@ static func _volley_fire() -> Resource:
 	c.effects = [ea, eb]; return c
 
 static func _fleet_fire() -> Resource:
-	# [P] 함포 일제사 — RARE, 2코, ATTACK: 살아있는 토큰 수 × 40 피해 ALL
+	# [P] 함포 일제사 — RARE, 2코, ATTACK: 팀 전체 토큰 수 × 45 피해 ALL (교차 영웅 — 나폴레옹·칭기즈칸 토큰 정산)
+	# 이순신 단독 토큰 소스가 없어 DAMAGE_PER_TOKEN(owner 전용)에선 무효였음 → 팀 토큰 참조로 전환
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.fleet_fire.name"; c.owner_id = "yi_sun_sin"; c.cost = 2
 	c.card_type = CardRes.CardType.ATTACK
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "attack"
 	c.archetype = ["card.yi_sun_sin.fleet_fire.archetype"]
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.DAMAGE_PER_TOKEN
+	e.effect_type = EffRes.EffectType.DAMAGE_PER_TEAM_TOKEN
 	e.value = 45; e.base_value = 45; e.target = "ALL"
 	e.damage_type = "explosive"
 	c.effects = [e]; return c
@@ -478,7 +496,8 @@ static func _crisis_breakthrough() -> Resource:
 	c.effects = [e]; return c
 
 static func _decisive_strike() -> Resource:
-	# [C] 사지결단 — RARE, 1코, ATTACK: CONDITIONAL_DMG (low_hp: 150 / else: 80)
+	# [C] 사지결단 — RARE, 1코, ATTACK: CONDITIONAL_DMG (low_hp: 150 / else: 80) + low_hp 시 BLOCK 40
+	# 중복 다양화: 필사즉생 low_hp 조건 카드 중 Connector 슬롯 — 위기에 공방 일체로 차별화
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.decisive_strike.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.ATTACK
@@ -490,7 +509,11 @@ static func _decisive_strike() -> Resource:
 	e.bonus_value = 150; e.base_bonus_value = 150
 	e.status_type = "low_hp"; e.target = "SINGLE"
 	e.damage_type = "slash"
-	c.effects = [e]; return c
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.BLOCK
+	eb.value = 40; eb.base_value = 40; eb.target = "SELF"
+	eb.condition = "low_hp"
+	c.effects = [e, eb]; return c
 
 static func _bloody_battle() -> Resource:
 	# [C] 혈전 — RARE, 1코, ATTACK: CONDITIONAL_DMG (low_hp: 120 / else: 70) + BLOCK 40

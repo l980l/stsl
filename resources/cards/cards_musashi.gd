@@ -262,7 +262,8 @@ static func _demon_swordsman() -> Resource:
 # ─────────────────────────────────────────
 
 static func _blood_path() -> Resource:
-	# [F] 혈로 개척 — UNCOMMON, 1코, 공격: 적 1명 → 180 / 복수 → 100
+	# [F] 혈로 개척 — UNCOMMON, 1코, 공격: 적 1명 → 180 + strength 1 / 복수 → 100
+	# 중복 다양화: 결투 enemy_count_1 카드 중 Foundation 슬롯 — 1대1 시 strength 적립으로 엔진 역할 부여
 	var c := CardRes.new()
 	c.card_name = "card.musashi.blood_path.name"; c.owner_id = "musashi"
 	c.cost = 1; c.card_type = CardRes.CardType.ATTACK
@@ -274,7 +275,11 @@ static func _blood_path() -> Resource:
 	e.bonus_value = 180; e.base_bonus_value = 180
 	e.target = "SINGLE"; e.status_type = "enemy_count_1"
 	e.damage_type = "slash"
-	c.effects = [e]; return c
+	var eb := EffRes.new()
+	eb.effect_type = EffRes.EffectType.APPLY_STATUS
+	eb.status_type = "strength"; eb.value = 1; eb.base_value = 1; eb.target = "SELF"
+	eb.condition = "enemy_count_1"
+	c.effects = [e, eb]; return c
 
 static func _peak_aim() -> Resource:
 	# [F] 정점의 겨냥 — COMMON, 1코, 공격: 적 1명 → 140 / 복수 → 90
@@ -524,7 +529,7 @@ static func _clear_wind() -> Resource:
 	ea.damage_type = "holy_slash"
 	var eb := EffRes.new()
 	eb.effect_type = EffRes.EffectType.APPLY_STATUS
-	eb.value = 2; eb.base_value = 2; eb.target = "SINGLE"; eb.status_type = "poison"
+	eb.value = 20; eb.base_value = 20; eb.target = "SINGLE"; eb.status_type = "poison"
 	eb.condition = "hand_size_0"
 	c.effects = [ea, eb]; return c
 
