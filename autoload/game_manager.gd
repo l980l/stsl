@@ -48,7 +48,6 @@ var current_state: GameState = GameState.MAP
 var current_floor: int = 0
 const MAX_CHAPTERS: int = 2
 var current_chapter: int = 1
-const _DEBUG_TEST_DECK: bool = true  # 임시: 파티클 타입 테스트용. 완료 후 false로 되돌릴 것
 const MAX_ACTS: int = 3
 var current_act: int = 1
 var gold: int = 0
@@ -191,44 +190,13 @@ func start_run(initial_hero_id: String = "napoleon", chapter: int = 1) -> void:
 	if dm:
 		dm.clear()
 
-	if _DEBUG_TEST_DECK:
-		# 임시 테스트 덱 — 가능한 VFX 최대 커버 (napoleon+joan_of_arc+cleopatra).
-		# 못 트리거: ice/lightning/fire (카드 미존재), holy_slash/projectile (musashi/genghis 만).
-		for hid: String in ["napoleon", "joan_of_arc", "cleopatra"]:
-			var h = _make_hero_by_id(hid)
-			if tm:
-				tm.add_hero(h)
-		if dm:
-			var test_cards: Array = [
-				# napoleon — slash/blunt/bullet/explosive + block
-				_NapoleonCards._strike(),            # slash
-				_NapoleonCards._defend(),            # block → defense_buff
-				_NapoleonCards._hussar_charge(),     # blunt
-				_NapoleonCards._salvo(),             # bullet → bullet_shot
-				_NapoleonCards._artillery_volley(),  # explosive
-				# joan_of_arc — holy_*/heal/revive/strength
-				_JoanCards._holy_smite(),            # holy_strike + vulnerable → debuff_hex
-				_JoanCards._holy_bolt(),             # holy_bolt → holy_arrow
-				_JoanCards._orleans_charge(),        # holy_blunt
-				_JoanCards._saints_flame(),          # holy_fire
-				_JoanCards._holy_touch(),            # HEAL → heal_blessing
-				_JoanCards._miracle_revive(),        # REVIVE → revive_blessing
-				_JoanCards._crusaders_faith(),       # strength power → warrior_buff
-				# cleopatra — poison/curse/charm
-				_CleopatraCards._venom_needle(),     # poison → poison_splash + poison_tick
-				_CleopatraCards._sandstorm(),        # curse + weak → debuff_hex
-				_CleopatraCards._cleopatras_kiss(),  # charm → charm_kiss / infatuation (enthrall)
-			]
-			for card in test_cards:
-				dm.add_card_to_deck(card)
-	else:
-		# 초기 영웅 생성 및 추가
-		var hero := _make_hero_by_id(initial_hero_id)
-		if tm:
-			tm.add_hero(hero)
+	# 초기 영웅 생성 및 추가
+	var hero := _make_hero_by_id(initial_hero_id)
+	if tm:
+		tm.add_hero(hero)
 
-		# 초기 덱 생성
-		_add_initial_deck_for(hero)
+	# 초기 덱 생성
+	_add_initial_deck_for(hero)
 
 	# 맵 생성
 	var MapGen = load("res://autoload/map_generator.gd")

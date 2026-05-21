@@ -28,6 +28,8 @@ const COL_SMOKE   := Color(0.706, 0.706, 0.745) # rgba(180,180,190) — 머즐 �
 const DRAW_TIME   := 0.30  # 조준 시간(s)
 const FLIGHT_TIME := 0.11  # 총알 비행 시간(s) — 매우 빠름
 const IMPACT_DELAY := DRAW_TIME + FLIGHT_TIME  # battle_manager 동기화용
+# 이 VFX 에 귀속된 SFX — battle_scene 이 명중(screen_effect) 시 재생. 총탄은 총소리(impact_projectile).
+const SFX_IMPACT := "impact_projectile"
 const HOLE_TIME   := 1.5   # 탄흔 유지 시간(s)
 const PSPEED      := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수
 

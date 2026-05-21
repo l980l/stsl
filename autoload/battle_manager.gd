@@ -136,6 +136,8 @@ signal hero_turn_skipped(hero_id: String)  # 스턴 등으로 영웅 차례 자�
 signal synergy_triggered(synergy_key: String, hero_id: String)  # 교차 영웅 시너지 발동 — battle_scene 토스트용
 signal hero_block_vfx(hero_id: String)  # 시너지 등으로 영웅 방어도 획득 — battle_scene defense_buff VFX용
 signal synergy_effect_vfx(caster_hero_id: String, vfx_status: String, enemy_indices: Array)  # 시너지 데미지/상태이상 — 지정 시전자에서 VFX 발사
+# 시너지 반격 — 지정 시전자→적 VFX 발사. battle_scene 이 VFX 임팩트 시점에 상태이상 적용.
+signal synergy_counter_vfx(caster_hero_id: String, target_enemy_index: int, status_type: String, stacks: int)
 
 # VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생.
 # 차지(IMPACT_DELAY) 이후 데미지/상태 적용 + 기존 시그널 (hero_damaged 등) emit.
@@ -1750,10 +1752,17 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 		if is_inside_tree():
 			get_tree().create_timer(0.2).timeout.connect(func() -> void:
 				counter_triggered.emit(_ct_hid, _ct_ei, false))
-	# 독침 반격 (통제사×파라오): 파티원 피격 시 공격한 적에게 독 30 반격
+	# 독침 반격 (이순신×클레오파트라): 파티원 피격 시 클레오파트라가 공격한 적에 독 30 반격.
+	# 적 공격 impact 이후 — 클레오 → 적 독 VFX, VFX 임팩트 시점에 poison 적용 (battle_scene).
 	if from_enemy_index >= 0 and from_enemy_index < _enemies.size() and _enemy_alive[from_enemy_index] and team_mgr.is_alive("yi_sun_sin") and team_mgr.is_alive("cleopatra"):
-		_apply_status_to_enemy(from_enemy_index, "poison", 30)
 		synergy_triggered.emit("synergy.yi_cleopatra.name", hero_id)
+		if is_inside_tree():
+			var _vc_ei: int = from_enemy_index
+			get_tree().create_timer(0.2).timeout.connect(func() -> void:
+				if _vc_ei < _enemy_alive.size() and _enemy_alive[_vc_ei]:
+					synergy_counter_vfx.emit("cleopatra", _vc_ei, "poison", 30))
+		else:
+			_apply_status_to_enemy(from_enemy_index, "poison", 30)  # 테스트 환경 — VFX 없이 즉시
 	var block: int = _hero_block.get(hero_id, 0)
 	var absorbed: int = min(block, amount)
 	_hero_block[hero_id] = block - absorbed
@@ -1801,6 +1810,12 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 	else:
 		_enemy_status[enemy_index][status_type] = _enemy_status[enemy_index].get(status_type, 0) + stacks
 	status_applied.emit("enemy_%d" % enemy_index, status_type, stacks)
+
+
+# 시너지 VFX 임팩트 시점에 battle_scene 이 호출 — 상태이상 적용 (status_applied → 폰트 동기).
+func apply_synergy_status_to_enemy(enemy_index: int, status_type: String, stacks: int) -> void:
+	if enemy_index >= 0 and enemy_index < _enemy_alive.size() and _enemy_alive[enemy_index]:
+		_apply_status_to_enemy(enemy_index, status_type, stacks)
 
 # 영웅이 적에게 도발 부여 — source 비교로 누적/덮어쓰기 결정.
 # - 같은 source (이미 그 영웅이 도발 중) → 지속 시간 합산 (스택 누적)

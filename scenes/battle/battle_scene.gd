@@ -924,6 +924,7 @@ func _connect_signals() -> void:
 	BattleManager.hero_block_gained.connect(_on_hero_block_gained)
 	BattleManager.hero_block_vfx.connect(_on_hero_block_vfx)
 	BattleManager.synergy_effect_vfx.connect(_on_synergy_effect_vfx)
+	BattleManager.synergy_counter_vfx.connect(_on_synergy_counter_vfx)
 	BattleManager.enemy_damaged.connect(_on_enemy_damaged)
 	BattleManager.token_attack_fired.connect(_on_token_attack_fired)
 	TeamManager.hero_healed.connect(_on_hero_healed)
@@ -1137,7 +1138,7 @@ func _start_battle() -> void:
 
 func _start_test_battle() -> void:
 	# 교차 영웅 시너지 테스트 전용 셋업 (battle_scene 단독 실행 시 폴백).
-	# 파티: 나폴레옹·이순신·클레오파트라 — 철벽 진군 / 혼란의 돌격 / 독침 반격 + 신규 교차 카드 검증용.
+	# 파티: 나폴레옹·이순신·클레오파트라 — 독침 반격 / 혼란의 돌격 / 철벽 진군 검증용.
 	var HeroRes = load("res://resources/hero_resource.gd")
 	var EnemyRes = load("res://resources/enemy_resource.gd")
 	var NapCards = load("res://resources/cards/cards_napoleon.gd")
@@ -1155,36 +1156,41 @@ func _start_test_battle() -> void:
 		TeamManager.add_hero(hero)
 
 	# 덱 설정 — 시너지 발동 카드 중심
-	#  나폴레옹: GAIN_MORALE(철벽 진군)·CONSUME_MORALE(혼란의 돌격)·연합 포격(신규)
-	#  이순신:   DAMAGE(독침 반격)·연합 방벽(신규)
-	#  클레오:   POISON(독침 반격 세팅)
+	#  나폴레옹: SUMMON_TOKEN — 병사 공격마다 매혹+3 (혼란의 돌격 #3)
+	#            GAIN_MORALE — 사기 획득 시 전원 방어구 +(사기×5) (철벽 진군 #1)
+	#  이순신:   기본 공격·방어 — 피격 시 공격한 적에 독30 반격 (독침 반격 #2, 패시브)
+	#  클레오:   기본 + 독 — #2·#3 패시브 조건(생존)
 	DeckManager.clear()
 	var test_deck: Array = [
-		NapCards._war_bugle(), NapCards._swift_march(), NapCards._marshal_appointment(),
-		NapCards._one_man_army(), NapCards._allied_bombardment(),
+		NapCards._imperial_infantry_call(), NapCards._guard_charge(),
+		NapCards._war_bugle(), NapCards._swift_march(),
 		NapCards._strike(), NapCards._defend(),
 		YiCards._strike(), YiCards._strike(), YiCards._counter_strike(),
-		YiCards._shield(), YiCards._united_bulwark(), YiCards._defend(),
-		CleoCards._venom_needle(), CleoCards._venom_needle(), CleoCards._asp_fang(),
-		CleoCards._strike(), CleoCards._defend(),
+		YiCards._shield(), YiCards._defend(), YiCards._defend(),
+		CleoCards._venom_needle(), CleoCards._asp_fang(),
+		CleoCards._strike(), CleoCards._strike(),
+		CleoCards._defend(), CleoCards._defend(),
 	]
 	for card in test_deck:
 		DeckManager.add_card_to_deck(card)
 
-	# 적 설정 — 시너지를 충분히 시험할 HP, 약한 공격
+	# 적 설정 — 2마리, 영웅 공격 (독침 반격 #2 발동 위해 ATTACK 의도 필수)
 	var IntentResClass = load("res://resources/intent_resource.gd")
-	var dummy = EnemyRes.new()
-	dummy.enemy_name = "enemy.greek.satyr"
-	dummy.max_hp = 3000
-	dummy.character_scene = load("res://characters/enemies/satyr/satyr.tscn")
-	var intent = IntentResClass.new()
-	intent.action_type = IntentResClass.ActionType.ATTACK
-	intent.value = 30
-	intent.target = IntentResClass.TargetType.RANDOM
-	dummy.intent_pattern = [intent]
+	var enemies: Array = []
+	for _ei in range(2):
+		var dummy = EnemyRes.new()
+		dummy.enemy_name = "enemy.greek.satyr"
+		dummy.max_hp = 3000
+		dummy.character_scene = load("res://characters/enemies/satyr/satyr.tscn")
+		var intent = IntentResClass.new()
+		intent.action_type = IntentResClass.ActionType.ATTACK
+		intent.value = 30
+		intent.target = IntentResClass.TargetType.RANDOM
+		dummy.intent_pattern = [intent]
+		enemies.append(dummy)
 
 	BattleManager.turn_interval = 0.4
-	BattleManager.setup_battle([dummy])
+	BattleManager.setup_battle(enemies)
 	_setup_heroes()
 	_setup_enemies()
 	await _play_battle_intro()
@@ -2966,7 +2972,8 @@ func _debuff_script_for_status(stype: String) -> GDScript:
 		return _VFX_POISON_SPLASH
 	return null
 
-# dtype → 적절한 SFX 키. 등록되지 않은 holy_* 는 기본 계열 SFX 재활용.
+# dtype → 명중 SFX 키 (VFX 에 SFX_IMPACT 상수가 없을 때의 폴백).
+# projectile(화살)은 impact_arrow, bullet(총탄)은 총소리(impact_projectile) — 혼동 금지.
 func _sfx_for_dtype(dtype: String) -> String:
 	match dtype:
 		"lightning":   return "impact_lightning"
@@ -2974,8 +2981,8 @@ func _sfx_for_dtype(dtype: String) -> String:
 		"fire":        return "impact_fire"
 		"holy_fire":   return "impact_fire"
 		"poison":      return "poison_splash"
-		"projectile":  return "impact_projectile"
-		"holy_bolt":   return "impact_projectile"
+		"projectile":  return "impact_arrow"
+		"holy_bolt":   return "impact_arrow"
 		"explosive":   return "impact_explosive"
 		"blunt":       return "impact_blunt"
 		"holy_blunt":  return "impact_blunt"
@@ -3013,7 +3020,10 @@ func _spawn_attack_beam_simple(dtype: String, caster_pos: Vector2, target_pos: V
 	# 바닥 글리프 가진 vfx (holy_strike 등) 만 발 위치로 anchor
 	if target_foot != Vector2.ZERO and fx.has_method("set_ground_anchor"):
 		fx.set_ground_anchor(target_foot)
-	var sfx_key: String = _sfx_for_dtype(dtype)
+	# SFX 는 VFX 에 귀속 — SFX_LAUNCH(발사 시)·SFX_IMPACT(명중 시) 상수, 없으면 dtype 폴백.
+	if "SFX_LAUNCH" in beam_script and beam_script.SFX_LAUNCH != "":
+		AudioManager.play_sfx(beam_script.SFX_LAUNCH)
+	var sfx_key: String = beam_script.SFX_IMPACT if "SFX_IMPACT" in beam_script else _sfx_for_dtype(dtype)
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
@@ -3028,6 +3038,24 @@ func _spawn_charm_or_infatuation(caster_pos: Vector2, target_pos: Vector2, enemy
 		_spawn_debuff_beam_simple(_VFX_INFATUATION, caster_pos, target_pos, "enthrall", target_foot)
 	else:
 		_spawn_debuff_beam_simple(_VFX_CHARM_KISS, caster_pos, target_pos, "charm", target_foot)
+
+# 시너지 반격 VFX — 시전자→적 빔. 카드/인텐트 차지와 무관 → vfx_impact_resolved 는 emit 안 함.
+# 임팩트(screen_effect) 시점에 on_impact 콜백으로 상태이상 적용 → status_applied → 폰트 동기.
+func _spawn_synergy_beam(beam_script: GDScript, caster_pos: Vector2, target_pos: Vector2, stype: String, target_foot: Vector2, on_impact: Callable) -> void:
+	var fx: Node2D = beam_script.new()
+	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
+	fx.position = Vector2.ZERO
+	if target_foot != Vector2.ZERO and fx.has_method("set_ground_anchor"):
+		fx.set_ground_anchor(target_foot)
+	var sfx_key: String = _sfx_for_status(stype)
+	fx.screen_effect.connect(func() -> void:
+		_play_screen_shake()
+		AudioManager.play_sfx(sfx_key)
+		if on_impact.is_valid():
+			on_impact.call()
+	)
+	fx.play(caster_pos, target_pos)
 
 # 단순 디버프 spawn — screen_effect 시점에 SFX
 func _spawn_debuff_beam_simple(beam_script: GDScript, caster_pos: Vector2, target_pos: Vector2, stype: String, target_foot: Vector2 = Vector2.ZERO) -> void:
@@ -3054,15 +3082,14 @@ func _spawn_caster_beam(beam_script: GDScript, caster_pos: Vector2, target_pos: 
 	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
 	fx.position = Vector2.ZERO
 	fx.screen_effect.connect(func() -> void: BattleManager.vfx_impact_resolved.emit(), CONNECT_ONE_SHOT)
-	# bullet 은 전용 SFX 파일이 없어 projectile SFX 로 폴백
-	var _sfx_key: String = "impact_projectile" if dtype == "bullet" else "impact_" + dtype
-	# projectile (활) 은 발사 시점에도 활시위 풀림 SFX 발동
-	if dtype == "projectile":
-		AudioManager.play_sfx("arrow_shot")
+	# SFX 는 VFX 에 귀속 — SFX_LAUNCH(발사 시)·SFX_IMPACT(명중 시) 상수, 없으면 dtype 폴백.
+	if "SFX_LAUNCH" in beam_script and beam_script.SFX_LAUNCH != "":
+		AudioManager.play_sfx(beam_script.SFX_LAUNCH)
+	var sfx_key: String = beam_script.SFX_IMPACT if "SFX_IMPACT" in beam_script else _sfx_for_dtype(dtype)
 	fx.screen_effect.connect(func() -> void:
 		_play_screen_flash()
 		_play_screen_shake()
-		AudioManager.play_sfx(_sfx_key)
+		AudioManager.play_sfx(sfx_key)
 		on_impact.call()
 	)
 	fx.play(caster_pos, target_pos)
@@ -3156,6 +3183,23 @@ func _on_synergy_effect_vfx(caster_hero_id: String, vfx_status: String, enemy_in
 		if idx >= 0 and idx < _enemy_char_nodes.size() and _enemy_char_nodes[idx] != null and BattleManager.is_enemy_alive(idx):
 			var enemy_node: Node2D = _enemy_char_nodes[idx]
 			_spawn_debuff_beam_simple(beam, caster.global_position, enemy_node.global_position, vfx_status, _foot_pos(enemy_node))
+
+# 시너지 반격 — 지정 시전자(예: 독침 반격 = 클레오파트라)가 적에게 VFX 발사.
+# VFX 임팩트 시점에 상태이상 적용 → status_applied → 데미지/상태 폰트가 임팩트에 맞춰 표시.
+func _on_synergy_counter_vfx(caster_hero_id: String, target_enemy_index: int, status_type: String, stacks: int) -> void:
+	var caster: Node2D = _hero_char_nodes.get(caster_hero_id)
+	if not is_instance_valid(caster):
+		return
+	if target_enemy_index < 0 or target_enemy_index >= _enemy_char_nodes.size():
+		return
+	var enemy_node: Node2D = _enemy_char_nodes[target_enemy_index]
+	if not is_instance_valid(enemy_node) or not BattleManager.is_enemy_alive(target_enemy_index):
+		return
+	var beam: GDScript = _debuff_script_for_status(status_type)
+	if beam == null:
+		return
+	_spawn_synergy_beam(beam, caster.global_position, enemy_node.global_position, status_type, _foot_pos(enemy_node),
+		func() -> void: BattleManager.apply_synergy_status_to_enemy(target_enemy_index, status_type, stacks))
 
 # 방어도 버프 VFX — BLOCK 획득 시 6각 dome + barrier + 룬링
 # screen_effect 시점(차지 끝)에 block SFX 발동
@@ -3727,6 +3771,10 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "", is_crit:
 
 const _SHARED_TOKEN_GRID_AREA_IDX := 1  # SummonArea2 (중앙) 공유
 
+# 토큰 공격 피격 피드백 핸드오프 슬롯 — _on_token_attack_fired 가 dict 를 넣고
+# 직후 _on_enemy_damaged 가 데미지 정보를 채운 뒤 비운다. VFX 명중 콜백이 그 dict 를 읽는다.
+var _token_hit_slot = null
+
 func _on_token_attack_fired(hero_id: String, token_index: int, enemy_index: int) -> void:
 	# 병사 토큰 동적 모션 — 영웅에서 spawn → 공유 그리드 → bullet → 영웅 복귀 → free
 	if enemy_index < 0 or enemy_index >= _enemy_char_nodes.size():
@@ -3758,20 +3806,30 @@ func _on_token_attack_fired(hero_id: String, token_index: int, enemy_index: int)
 	var tile_x: int = int(area_pos.x) + col * (TOKEN_TILE_W + TOKEN_TILE_GAP)
 	var tile_y: int = int(area_pos.y) + row * (TOKEN_TILE_H + TOKEN_TILE_GAP)
 	var grid_pos := Vector2(tile_x + TOKEN_TILE_W / 2.0 - 40.0, tile_y + TOKEN_TILE_H / 4.0)
-	# 모션: 영웅 → 그리드 (0.15s, 그 후 z 앞으로) → bullet 발사 → 대기 → 영웅 복귀 → free
-	# 병사 토큰 발사 VFX — 영웅별 분기 (이순신: 함포 폭발 / 칭기즈칸: 화살)
+	# 모션: 영웅 → 그리드 (0.15s, 그 후 z 앞으로) → 발사 → 대기 → 영웅 복귀 → free
+	# 병사 토큰 발사 VFX·SFX — 영웅별 분기 (나폴레옹: 총탄 / 이순신: 함포 폭발 / 칭기즈칸: 화살)
 	var token_vfx = _VFX_BULLET_SHOT
+	var token_dtype := "bullet"
 	if hero_id == "yi_sun_sin":
 		token_vfx = _VFX_EXPLOSION_BLAST
+		token_dtype = "explosive"
 	elif hero_id == "genghis_khan":
 		token_vfx = _VFX_ARROW_SHOT
+		token_dtype = "projectile"
+	# 피격 피드백(데미지 폰트·플래시·셰이크)을 VFX 명중 시점에 동기화 —
+	# _on_enemy_damaged 가 직후 이 dict 를 채우고, 명중 콜백이 읽어 _apply_enemy_hit_feedback 호출.
+	var hit_info: Dictionary = {}
+	_token_hit_slot = hit_info
 	var tw := create_tween()
 	tw.tween_property(soldier, "position", grid_pos, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.tween_callback(func():
 		soldier.z_index = hero_node.z_index + 1
 		# 발사 위치 = 병사 스프라이트 중앙 (origin 좌상단 → scale 2.0 적용 시 +40, +50 offset)
 		var muzzle_pos: Vector2 = soldier.global_position + Vector2(40, 50)
-		_spawn_caster_beam(token_vfx, muzzle_pos, target_node.global_position, "bullet", func(): pass)
+		_spawn_caster_beam(token_vfx, muzzle_pos, target_node.global_position, token_dtype, func() -> void:
+			if not hit_info.is_empty():
+				_apply_enemy_hit_feedback(hit_info["index"], hit_info["amount"], hit_info["dtype"], hit_info["is_crit"])
+		)
 	)
 	tw.tween_interval(0.25)
 	tw.tween_property(soldier, "position", hero_node.position, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -3779,6 +3837,20 @@ func _on_token_attack_fired(hero_id: String, token_index: int, enemy_index: int)
 
 func _on_enemy_damaged(index: int, amount: int, dtype: String = "", is_crit: bool = false) -> void:
 	_update_enemy_ui(index)
+	# 토큰(병사) 공격 — 피격 피드백을 VFX 명중 시점으로 지연 (_on_token_attack_fired 가 슬롯 설정).
+	# 화살·총탄이 날아가는 동안 데미지 폰트가 먼저 뜨던 타이밍 어긋남 해소.
+	if _token_hit_slot != null:
+		_token_hit_slot["index"] = index
+		_token_hit_slot["amount"] = amount
+		_token_hit_slot["dtype"] = dtype
+		_token_hit_slot["is_crit"] = is_crit
+		_token_hit_slot = null
+		return
+	_apply_enemy_hit_feedback(index, amount, dtype, is_crit)
+
+# 적 피격 피드백 — 데미지 팝업·플래시·셰이크·틴트·임팩트 파티클.
+# 카드 공격은 즉시, 토큰 공격은 VFX 명중 콜백에서 호출 (SFX·데미지 폰트 동기화).
+func _apply_enemy_hit_feedback(index: int, amount: int, dtype: String, is_crit: bool) -> void:
 	if index < _enemy_nodes.size() and _enemy_nodes[index]["panel"].visible:
 		var panel: ColorRect = _enemy_nodes[index]["panel"]
 		var popup_pos := panel.position + Vector2(SLOT_W / 2.0 - 20.0, SLOT_H / 3.0)
@@ -3805,7 +3877,6 @@ func _on_enemy_damaged(index: int, amount: int, dtype: String = "", is_crit: boo
 	if amount > 0 and char_node and _caster_beam_script(dtype) == null:
 		var spark_pos: Vector2 = char_node.global_position + _impact_jitter()
 		_spawn_impact_particles(spark_pos, amount, false, dtype)
-	# bullet 분기 — token_attack_fired signal 에서 처리 (각 병사 타일 위치 + SFX 분산)
 
 # ── 킬캠 + parallax sway (M7.5 깊이감) ──────────────────────────────
 # 킬캠: 처치/사망 시 슬로우 + 카메라 줌인. GameSettings.kill_cam_enabled 옵션.
@@ -3885,6 +3956,11 @@ func _cam_zoom_out() -> void:
 	_cam_tween.tween_property(_camera, "position", _KC_HOME_POS, t).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 
 func _cam_on_hero_turn_start(hid: String) -> void:
+	# PRE 단계 토큰(병사) VFX 가 아직 재생 중이면 — 영웅 줌인을 보류하고 전체 뷰 유지.
+	# VFX 종료 시 _on_child_exited_vfx_track → _cam_on_vfx_ended → _cam_try_return_to_hero 가 줌인 처리.
+	if _active_vfx_count > 0:
+		_cam_state = CamState.VFX_PLAYING
+		return
 	_cam_state = CamState.HERO_FOCUS
 	_cam_zoom_to_hero(hid)
 	_start_enemy_sidebar_transition(0.0 if _hero_zoom_disabled() else 1.0)
@@ -4639,7 +4715,7 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 			var lbl := Label.new()
 			if key == "poison_dmg":
 				var dur: int = status.get("poison_dur", 0)
-				lbl.text = "%d/%d" % [val * 10, dur]
+				lbl.text = "%d/%d" % [val, dur]
 			else:
 				lbl.text = "%d" % val
 			lbl.theme_type_variation = "EyebrowLabel"
@@ -4655,7 +4731,7 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	var fallback_lbl := Label.new()
 	if key == "poison_dmg":
 		var dur: int = status.get("poison_dur", 0)
-		fallback_lbl.text = "☠%d/%d" % [val * 10, dur]
+		fallback_lbl.text = "☠%d/%d" % [val, dur]
 	else:
 		fallback_lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
 	fallback_lbl.theme_type_variation = "EyebrowLabel"
