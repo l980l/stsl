@@ -3020,3 +3020,32 @@ func debug_set_enemy_hp(index: int, hp: int) -> void:
 	# UI 갱신만 — enemy_damaged 는 데미지 popup ("Block" 등) 트리거하므로 사용 X.
 	pending_damage_changed.emit(index)
 	_check_phase_transition(index)
+
+
+## ───────────────────────────────────────────────
+## 데미지 파이프라인 — DamageContext + compute_damage
+## ───────────────────────────────────────────────
+
+## 데미지 계산에 필요한 모든 수치를 담는 값 객체.
+## block 차감은 호출부 책임 — 이 구조체는 block을 다루지 않는다.
+class DamageContext extends RefCounted:
+	var base: int = 0
+	var flat: int = 0            # 공격자 평탄 보너스 합산 (strength 등)
+	var out_pct: float = 0.0     # 공격자 증폭 % 합산 풀 (weak −0.25, 황제의무도 +0.25 등)
+	var crit_mult: float = 1.0   # 치명타 배율 (비치명타 시 1.0)
+	var dnd_mult: float = 1.0    # double_next_damage 배율 (없으면 1.0)
+	var in_pct: float = 0.0      # 받는 쪽 % 합산 풀 (vulnerable +0.5 등)
+	var mitigation: Array = []   # 경감 곱연쇄 (방어모드 0.5, 내성 0.2 등) — Array[float]
+	var invuln: bool = false      # 무적 — true면 데미지 0
+
+
+## 순수 함수 — DamageContext를 받아 최종 데미지 정수를 반환한다.
+## 공식: (base + flat) × (1 + out_pct) × crit_mult × dnd_mult × (1 + in_pct) × mitigation 곱연쇄
+## block 차감은 호출부 책임이므로 이 함수는 block을 다루지 않는다.
+static func compute_damage(ctx: DamageContext) -> int:
+	if ctx.invuln:
+		return 0
+	var d: float = (ctx.base + ctx.flat) * (1.0 + ctx.out_pct) * ctx.crit_mult * ctx.dnd_mult * (1.0 + ctx.in_pct)
+	for m in ctx.mitigation:
+		d *= m
+	return max(0, int(floor(d)))
