@@ -137,7 +137,7 @@ const STATUS_EMOJI := {
 	"morale": "★", "charm": "♥", "strength": "↑",
 	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜",
 	"invuln": "🛡", "counter_pool": "🔄", "marked_by": "🎯",
-	"death_rattle": "💀",
+	"death_rattle": "💀", "sacrifice_bank": "🩸",
 	"sig_greek": "⚔", "sig_norse": "🌪", "sig_egyptian": "👁",
 	"sig_buddhist": "☸", "sig_daoist": "☯", "sig_japanese": "🌸",
 }
@@ -925,6 +925,7 @@ func _connect_signals() -> void:
 	BattleManager.hero_block_vfx.connect(_on_hero_block_vfx)
 	BattleManager.synergy_effect_vfx.connect(_on_synergy_effect_vfx)
 	BattleManager.synergy_counter_vfx.connect(_on_synergy_counter_vfx)
+	BattleManager.synergy_ally_vfx.connect(_on_synergy_ally_vfx)
 	BattleManager.enemy_damaged.connect(_on_enemy_damaged)
 	BattleManager.token_attack_fired.connect(_on_token_attack_fired)
 	TeamManager.hero_healed.connect(_on_hero_healed)
@@ -1138,16 +1139,16 @@ func _start_battle() -> void:
 
 func _start_test_battle() -> void:
 	# 교차 영웅 시너지 테스트 전용 셋업 (battle_scene 단독 실행 시 폴백).
-	# 파티: 나폴레옹·이순신·클레오파트라 — 독침 반격 / 혼란의 돌격 / 철벽 진군 검증용.
+	# 파티: 잔다르크·칭기즈칸·무사시 — 신의 원정 / 희생의 칼날 / 초원의 결투사 검증용.
 	var HeroRes = load("res://resources/hero_resource.gd")
 	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var NapCards = load("res://resources/cards/cards_napoleon.gd")
-	var YiCards = load("res://resources/cards/cards_yi_sun_sin.gd")
-	var CleoCards = load("res://resources/cards/cards_cleopatra.gd")
+	var JoanCards = load("res://resources/cards/cards_joan_of_arc.gd")
+	var GenghisCards = load("res://resources/cards/cards_genghis_khan.gd")
+	var MusashiCards = load("res://resources/cards/cards_musashi.gd")
 
 	# 영웅 설정 — 3인 파티 (실제 스케일 HP 1000)
 	TeamManager.clear()
-	for hid in ["napoleon", "yi_sun_sin", "cleopatra"]:
+	for hid in ["joan_of_arc", "genghis_khan", "musashi"]:
 		var hero = HeroRes.new()
 		hero.hero_id = hid
 		hero.hero_name = "hero.%s.name" % hid
@@ -1156,25 +1157,25 @@ func _start_test_battle() -> void:
 		TeamManager.add_hero(hero)
 
 	# 덱 설정 — 시너지 발동 카드 중심
-	#  나폴레옹: SUMMON_TOKEN — 병사 공격마다 매혹+3 (혼란의 돌격 #3)
-	#            GAIN_MORALE — 사기 획득 시 전원 방어구 +(사기×5) (철벽 진군 #1)
-	#  이순신:   기본 공격·방어 — 피격 시 공격한 적에 독30 반격 (독침 반격 #2, 패시브)
-	#  클레오:   기본 + 독 — #2·#3 패시브 조건(생존)
+	#  잔다르크: SACRIFICE_HP — 체력 희생 시 전원 속도+5 (희생의 칼날 #10)
+	#            공격 카드 — 치명타 시 전체 회복+30 (신의 원정 #9)
+	#  칭기즈칸: 공격 카드 — 치명타 발동 (신의 원정 #9 / 초원의 결투사 #14 치명타×3)
+	#  무사시:   공격 카드 — 치명타 발동 (#9 / #14)
 	DeckManager.clear()
 	var test_deck: Array = [
-		NapCards._imperial_infantry_call(), NapCards._guard_charge(),
-		NapCards._war_bugle(), NapCards._swift_march(),
-		NapCards._strike(), NapCards._defend(),
-		YiCards._strike(), YiCards._strike(), YiCards._counter_strike(),
-		YiCards._shield(), YiCards._defend(), YiCards._defend(),
-		CleoCards._venom_needle(), CleoCards._asp_fang(),
-		CleoCards._strike(), CleoCards._strike(),
-		CleoCards._defend(), CleoCards._defend(),
+		JoanCards._divine_punishment(), JoanCards._oracle_light(),
+		JoanCards._holy_smite(), JoanCards._hymn(),
+		JoanCards._strike(), JoanCards._defend(),
+		GenghisCards._strike(), GenghisCards._strike(), GenghisCards._horse_thrust(),
+		GenghisCards._quick_strike(), GenghisCards._khans_fury(), GenghisCards._defend(),
+		MusashiCards._strike(), MusashiCards._niten_slash(),
+		MusashiCards._whirlwind_cut(), MusashiCards._strike(),
+		MusashiCards._twin_blades_basic(), MusashiCards._defend(),
 	]
 	for card in test_deck:
 		DeckManager.add_card_to_deck(card)
 
-	# 적 설정 — 2마리, 영웅 공격 (독침 반격 #2 발동 위해 ATTACK 의도 필수)
+	# 적 설정 — 2마리, 영웅 공격 (피격으로 HP 손실 → 회복 시너지 #9 가시화)
 	var IntentResClass = load("res://resources/intent_resource.gd")
 	var enemies: Array = []
 	for _ei in range(2):
@@ -2817,8 +2818,17 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, target_hero_id:
 						did_buff = true
 						spawned_this = true
 				else:
+					# 자신 강화 (strength 등 SELF 타깃 버프) — 적 디버프 빔이 아닌 시전자 버프 VFX
+					if effect.target == "SELF":
+						if not did_buff:
+							if owner_id == "joan_of_arc":
+								_spawn_holy_buff(caster_pos, caster_foot)
+							else:
+								_spawn_warrior_buff(caster_pos, caster_foot)
+							did_buff = true
+							spawned_this = true
 					# 도발 — 시전 영웅(caster_pos) 에서 chest impact + 영웅→적 화살표
-					if effect.status_type == "taunt":
+					elif effect.status_type == "taunt":
 						if not did_debuff:
 							did_debuff = true
 							spawned_this = true
@@ -3200,6 +3210,36 @@ func _on_synergy_counter_vfx(caster_hero_id: String, target_enemy_index: int, st
 		return
 	_spawn_synergy_beam(beam, caster.global_position, enemy_node.global_position, status_type, _foot_pos(enemy_node),
 		func() -> void: BattleManager.apply_synergy_status_to_enemy(target_enemy_index, status_type, stacks))
+
+# 시너지 아군 효과 VFX — 회복(신의 원정)·속도버프(희생의 칼날) 등. 대상 전원에게 VFX 재생,
+# 각 VFX 임팩트 시점에 그 영웅에게 효과 적용 → 회복/상태 폰트가 VFX 임팩트에 동기.
+func _on_synergy_ally_vfx(vfx_kind: String, hero_ids: Array, value: int, duration: int) -> void:
+	var vfx_script: GDScript = _VFX_HEAL_BLESSING if vfx_kind == "heal" else _VFX_SPEED_BUFF
+	var sfx: String = "heal" if vfx_kind == "heal" else "speed_bonus"
+	for hid in hero_ids:
+		var node: Node2D = _hero_char_nodes.get(hid)
+		if not is_instance_valid(node):
+			continue
+		var pos: Vector2 = node.global_position
+		var _hid: String = hid
+		_spawn_synergy_self_vfx(vfx_script, pos, pos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET), sfx,
+			func() -> void: BattleManager.apply_synergy_ally_effect(vfx_kind, _hid, value, duration))
+
+# 시너지 아군 VFX 단일 spawn — 대상 위치에 self VFX. 임팩트 시점에 SFX·on_impact.
+# 카드/인텐트 차지와 무관 → vfx_impact_resolved 는 emit 안 함.
+func _spawn_synergy_self_vfx(vfx_script: GDScript, pos: Vector2, foot: Vector2, sfx: String, on_impact: Callable) -> void:
+	var fx: Node2D = vfx_script.new()
+	add_child(fx)
+	fx.z_index = 1300  # VFX — 캐릭터 UI(1200) 위, 화면 UI(1500) 아래
+	fx.position = Vector2.ZERO
+	if foot != Vector2.ZERO and fx.has_method("set_ground_anchor"):
+		fx.set_ground_anchor(foot)
+	fx.screen_effect.connect(func() -> void:
+		AudioManager.play_sfx(sfx)
+		if on_impact.is_valid():
+			on_impact.call()
+	)
+	fx.play(pos, pos)
 
 # 방어도 버프 VFX — BLOCK 획득 시 6각 dome + barrier + 룬링
 # screen_effect 시점(차지 끝)에 block SFX 발동

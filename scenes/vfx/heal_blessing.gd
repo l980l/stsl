@@ -38,8 +38,7 @@ const HEAL_TIME        := 1.4   # 발동 후 잎·반짝임 분출 지속(s)
 const RING_SQUASH      := 0.34  # 누운 원근 — y축 압축 (rotateX 70°)
 const PSPEED           := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수
 
-## 빔 VFX와 인터페이스 통일용 — 회복 VFX는 emit하지 않는다.
-@warning_ignore("unused_signal")
+## 회복 발동(차지 끝) 시점 — battle_scene 이 받아 SFX·효과 적용을 동기화.
 signal screen_effect
 
 var _target := Vector2.ZERO
@@ -144,6 +143,7 @@ func _run() -> void:
 	_cross_age = 0.0
 	_heal_timer = HEAL_TIME
 	_pop()
+	screen_effect.emit()  # 회복 발동 — battle_scene 이 SFX·효과 적용 동기화
 	# 3) 분출·페이드는 _process에서. 정리.
 	await get_tree().create_timer(HEAL_TIME + 1.5).timeout
 	if is_inside_tree():

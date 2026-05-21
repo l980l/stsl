@@ -138,6 +138,8 @@ signal hero_block_vfx(hero_id: String)  # 시너지 등으로 영웅 방어도 �
 signal synergy_effect_vfx(caster_hero_id: String, vfx_status: String, enemy_indices: Array)  # 시너지 데미지/상태이상 — 지정 시전자에서 VFX 발사
 # 시너지 반격 — 지정 시전자→적 VFX 발사. battle_scene 이 VFX 임팩트 시점에 상태이상 적용.
 signal synergy_counter_vfx(caster_hero_id: String, target_enemy_index: int, status_type: String, stacks: int)
+# 시너지 아군 효과 VFX — 회복/속도버프 등. battle_scene 이 대상 전원에 VFX 재생, 임팩트 시점에 효과 적용.
+signal synergy_ally_vfx(vfx_kind: String, hero_ids: Array, value: int, duration: int)
 
 # VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생.
 # 차지(IMPACT_DELAY) 이후 데미지/상태 적용 + 기존 시그널 (hero_damaged 등) emit.
@@ -1321,11 +1323,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			EffectRes.EffectType.SACRIFICE_HP:
 				if team_mgr:
 					team_mgr.take_damage(card.owner_id, effect.value)
-					# 전투 중 누적 희생 HP 추적 — 첫 희생 시 자동 생성 (활성화 카드 불필요)
-					var _bank_key: String = "power.sacrifice_bank:" + card.owner_id
-					if not _active_powers.has(_bank_key):
-						_register_power("power.sacrifice_bank", card.owner_id, 0)
-					_active_powers[_bank_key]["value"] += effect.value
+					# 전투 중 누적 희생 HP — 잔다르크 고유 상태이상 sacrifice_bank (상태이상 UI 표시)
+					if not _hero_status.has(card.owner_id):
+						_hero_status[card.owner_id] = {}
+					var _bank_total: int = _hero_status[card.owner_id].get("sacrifice_bank", 0) + effect.value
+					_hero_status[card.owner_id]["sacrifice_bank"] = _bank_total
+					status_applied.emit(card.owner_id, "sacrifice_bank", _bank_total)
 					_check_lose_condition()
 			EffectRes.EffectType.COST_ZERO_TURN:
 				if deck_mgr:
@@ -1511,8 +1514,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							_enemy_status[i][key] = cur * 2
 							status_applied.emit("enemy_%d" % i, key, cur * 2)
 			EffectRes.EffectType.SACRIFICE_PAYOFF:
-				var _sbank_key: String = "power.sacrifice_bank:" + card.owner_id
-				var _banked: int = _active_powers.get(_sbank_key, {}).get("value", 0)
+				var _banked: int = _hero_status.get(card.owner_id, {}).get("sacrifice_bank", 0)
 				if _banked > 0:
 					@warning_ignore("integer_division")
 					var _payout: int = (_banked / 100) * effect.value
@@ -1816,6 +1818,27 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 func apply_synergy_status_to_enemy(enemy_index: int, status_type: String, stacks: int) -> void:
 	if enemy_index >= 0 and enemy_index < _enemy_alive.size() and _enemy_alive[enemy_index]:
 		_apply_status_to_enemy(enemy_index, status_type, stacks)
+
+# 시너지 속도 버프 — speed_bonus 스택 추가 + 턴 큐 갱신 (희생의 칼날 등).
+func _apply_synergy_speed_bonus(hero_id: String, value: int, dur: int) -> void:
+	var _aid: String = "hero:" + hero_id
+	var _old: int = _actor_speed(_aid)
+	if not _hero_status.has(hero_id):
+		_hero_status[hero_id] = {}
+	if not _hero_status[hero_id].has("speed_bonus") or typeof(_hero_status[hero_id]["speed_bonus"]) != TYPE_ARRAY:
+		_hero_status[hero_id]["speed_bonus"] = []
+	_hero_status[hero_id]["speed_bonus"].append({"value": value, "dur": dur})
+	_adjust_turn_queue_for_speed_change(_aid, _old)
+	status_applied.emit(hero_id, "speed_bonus", value)
+
+# 시너지 아군 효과 — battle_scene 이 VFX 임팩트 시점에 호출 (heal / speed_buff).
+func apply_synergy_ally_effect(vfx_kind: String, hero_id: String, value: int, duration: int) -> void:
+	if team_mgr == null or not team_mgr.is_alive(hero_id):
+		return
+	if vfx_kind == "heal":
+		_heal_hero_safe(hero_id, value)
+	elif vfx_kind == "speed_buff":
+		_apply_synergy_speed_bonus(hero_id, value, duration)
 
 # 영웅이 적에게 도발 부여 — source 비교로 누적/덮어쓰기 결정.
 # - 같은 source (이미 그 영웅이 도발 중) → 지속 시간 합산 (스택 누적)
@@ -2474,11 +2497,17 @@ func _roll_crit_damage(base_dmg: int, has_mark: bool, target_enemy_index: int = 
 	if is_ally_attack and team_mgr != null and team_mgr.is_alive("genghis_khan") and team_mgr.is_alive("musashi"):
 		crit_mult = 3.0
 	var dmg: int = int(base_dmg * crit_mult) if is_crit else base_dmg
-	# 신의 원정 (잔다르크×칭기즈칸): 아군 치명타 발동 시 아군 전체 힐 +30
+	# 신의 원정 (잔다르크×칭기즈칸): 아군 치명타 발동 시 아군 전체 힐 +30 — 회복 VFX 임팩트에 적용
 	if is_crit and is_ally_attack and team_mgr != null and team_mgr.is_alive("joan_of_arc") and team_mgr.is_alive("genghis_khan"):
-		for _de_h in team_mgr.get_living_heroes():
-			_heal_hero_safe(_de_h.hero_id, 30)
 		synergy_triggered.emit("synergy.joan_genghis.name", "joan_of_arc")
+		var _jg_ids: Array = []
+		for _de_h in team_mgr.get_living_heroes():
+			_jg_ids.append(_de_h.hero_id)
+		if is_inside_tree():
+			synergy_ally_vfx.emit("heal", _jg_ids, 30, 0)
+		else:
+			for _jg_id in _jg_ids:
+				_heal_hero_safe(_jg_id, 30)
 	return {"dmg": dmg, "is_crit": is_crit}
 
 func _pick_highest_hp(hero_ids: Array) -> String:
@@ -2809,19 +2838,17 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 					morale_changed.emit(_cs_partner, _cs_m)
 					synergy_triggered.emit("synergy.napoleon_genghis.name", card_owner)
 			EffectRes.EffectType.SACRIFICE_HP:
-				# 희생의 칼날 (잔다르크×무사시) — 체력 희생 시 파티 전원 속도 +5 (3턴)
+				# 희생의 칼날 (잔다르크×무사시) — 체력 희생 시 파티 전원 속도 +5 (3턴) — 속도 버프 VFX 임팩트에 적용
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("musashi"):
-					for _bof_h in team_mgr.get_living_heroes():
-						var _bof_aid: String = "hero:" + _bof_h.hero_id
-						var _bof_old: int = _actor_speed(_bof_aid)
-						if not _hero_status.has(_bof_h.hero_id):
-							_hero_status[_bof_h.hero_id] = {}
-						if not _hero_status[_bof_h.hero_id].has("speed_bonus") or typeof(_hero_status[_bof_h.hero_id]["speed_bonus"]) != TYPE_ARRAY:
-							_hero_status[_bof_h.hero_id]["speed_bonus"] = []
-						_hero_status[_bof_h.hero_id]["speed_bonus"].append({"value": 5, "dur": 3})
-						_adjust_turn_queue_for_speed_change(_bof_aid, _bof_old)
-						status_applied.emit(_bof_h.hero_id, "speed_bonus", 5)
 					synergy_triggered.emit("synergy.joan_musashi.name", card_owner)
+					var _jm_ids: Array = []
+					for _bof_h in team_mgr.get_living_heroes():
+						_jm_ids.append(_bof_h.hero_id)
+					if is_inside_tree():
+						synergy_ally_vfx.emit("speed_buff", _jm_ids, 5, 3)
+					else:
+						for _jm_id in _jm_ids:
+							_apply_synergy_speed_bonus(_jm_id, 5, 3)
 			EffectRes.EffectType.DAMAGE:
 				# 검사의 약속 (이순신×무사시): 두 영웅 공격 시 둘 다 속도 +1 (전투 지속)
 				if (card_owner == "yi_sun_sin" or card_owner == "musashi") and team_mgr.is_alive("yi_sun_sin") and team_mgr.is_alive("musashi"):
