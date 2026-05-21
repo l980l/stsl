@@ -1139,16 +1139,16 @@ func _start_battle() -> void:
 
 func _start_test_battle() -> void:
 	# 교차 영웅 시너지 테스트 전용 셋업 (battle_scene 단독 실행 시 폴백).
-	# 파티: 잔다르크·칭기즈칸·무사시 — 신의 원정 / 희생의 칼날 / 초원의 결투사 검증용.
+	# 파티: 나폴레옹·칭기즈칸·무사시 — 정복자의 기세 / 황제의 무도 검증용.
 	var HeroRes = load("res://resources/hero_resource.gd")
 	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var JoanCards = load("res://resources/cards/cards_joan_of_arc.gd")
+	var NapCards = load("res://resources/cards/cards_napoleon.gd")
 	var GenghisCards = load("res://resources/cards/cards_genghis_khan.gd")
 	var MusashiCards = load("res://resources/cards/cards_musashi.gd")
 
 	# 영웅 설정 — 3인 파티 (실제 스케일 HP 1000)
 	TeamManager.clear()
-	for hid in ["joan_of_arc", "genghis_khan", "musashi"]:
+	for hid in ["napoleon", "genghis_khan", "musashi"]:
 		var hero = HeroRes.new()
 		hero.hero_id = hid
 		hero.hero_name = "hero.%s.name" % hid
@@ -1157,25 +1157,23 @@ func _start_test_battle() -> void:
 		TeamManager.add_hero(hero)
 
 	# 덱 설정 — 시너지 발동 카드 중심
-	#  잔다르크: SACRIFICE_HP — 체력 희생 시 전원 속도+5 (희생의 칼날 #10)
-	#            공격 카드 — 치명타 시 전체 회복+30 (신의 원정 #9)
-	#  칭기즈칸: 공격 카드 — 치명타 발동 (신의 원정 #9 / 초원의 결투사 #14 치명타×3)
-	#  무사시:   공격 카드 — 치명타 발동 (#9 / #14)
+	#  나폴레옹: GAIN_MORALE — 사기 획득 시 칭기즈칸도 사기 획득 (정복자의 기세 #11)
+	#            공격 카드 — 취약 적 공격 (황제의 무도 #12)
+	#  칭기즈칸: _flanking — 취약 ALL 부여 (황제의 무도 #12 셋업)
+	#  무사시:   _twin_blades_basic — DMG + 취약 / 공격 카드 (황제의 무도 #12)
 	DeckManager.clear()
 	var test_deck: Array = [
-		JoanCards._divine_punishment(), JoanCards._oracle_light(),
-		JoanCards._holy_smite(), JoanCards._hymn(),
-		JoanCards._strike(), JoanCards._defend(),
-		GenghisCards._strike(), GenghisCards._strike(), GenghisCards._horse_thrust(),
-		GenghisCards._quick_strike(), GenghisCards._khans_fury(), GenghisCards._defend(),
-		MusashiCards._strike(), MusashiCards._niten_slash(),
-		MusashiCards._whirlwind_cut(), MusashiCards._strike(),
-		MusashiCards._twin_blades_basic(), MusashiCards._defend(),
+		NapCards._war_bugle(), NapCards._war_bugle(), NapCards._swift_march(),
+		NapCards._strike(), NapCards._strike(), NapCards._defend(),
+		GenghisCards._flanking(), GenghisCards._strike(), GenghisCards._horse_thrust(),
+		GenghisCards._quick_strike(), GenghisCards._strike(), GenghisCards._defend(),
+		MusashiCards._twin_blades_basic(), MusashiCards._strike(), MusashiCards._niten_slash(),
+		MusashiCards._whirlwind_cut(), MusashiCards._strike(), MusashiCards._defend(),
 	]
 	for card in test_deck:
 		DeckManager.add_card_to_deck(card)
 
-	# 적 설정 — 2마리, 영웅 공격 (피격으로 HP 손실 → 회복 시너지 #9 가시화)
+	# 적 설정 — 2마리, 영웅 공격
 	var IntentResClass = load("res://resources/intent_resource.gd")
 	var enemies: Array = []
 	for _ei in range(2):
@@ -3214,8 +3212,20 @@ func _on_synergy_counter_vfx(caster_hero_id: String, target_enemy_index: int, st
 # 시너지 아군 효과 VFX — 회복(신의 원정)·속도버프(희생의 칼날) 등. 대상 전원에게 VFX 재생,
 # 각 VFX 임팩트 시점에 그 영웅에게 효과 적용 → 회복/상태 폰트가 VFX 임팩트에 동기.
 func _on_synergy_ally_vfx(vfx_kind: String, hero_ids: Array, value: int, duration: int) -> void:
-	var vfx_script: GDScript = _VFX_HEAL_BLESSING if vfx_kind == "heal" else _VFX_SPEED_BUFF
-	var sfx: String = "heal" if vfx_kind == "heal" else "speed_bonus"
+	var vfx_script: GDScript
+	var sfx: String
+	match vfx_kind:
+		"heal":
+			vfx_script = _VFX_HEAL_BLESSING
+			sfx = "heal"
+		"speed_buff":
+			vfx_script = _VFX_SPEED_BUFF
+			sfx = "speed_bonus"
+		"morale":
+			vfx_script = _VFX_MORALE_BOOST
+			sfx = "impact_divine"
+		_:
+			return
 	for hid in hero_ids:
 		var node: Node2D = _hero_char_nodes.get(hid)
 		if not is_instance_valid(node):
