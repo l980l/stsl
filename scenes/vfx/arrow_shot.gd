@@ -26,6 +26,10 @@ const COL_SPARK   := Color(1.0, 0.902, 0.706)   # rgba(255,230,180) — 스파�
 const DRAW_TIME   := 0.45  # 시위 당기기·조준 시간(s)
 const FLIGHT_TIME := 0.3   # 화살 비행 시간(s)
 const IMPACT_DELAY := DRAW_TIME + FLIGHT_TIME  # battle_manager 동기화용
+# 이 VFX 에 귀속된 SFX — battle_scene 이 재생.
+# 화살은 발사 시 arrow_shot(시위음), 명중 시 impact_arrow(화살 박히는 소리) — 별도 SFX.
+const SFX_LAUNCH := "arrow_shot"
+const SFX_IMPACT := "impact_arrow"
 const STUCK_TIME  := 1.5   # 타겟에 박힌 화살 유지 시간(s)
 const ARROW_LEN   := 44.0  # 화살 길이(px)
 const PSPEED      := 60.0  # HTML(dt*0.06) → Godot(delta*60) 환산 계수
