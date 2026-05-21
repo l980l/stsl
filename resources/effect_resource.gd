@@ -103,7 +103,11 @@ func display_text(override_value: int = -1) -> String:
 				var st_key: String = _STATUS_NAME_KEYS.get(status_type, "")
 				var st_name: String = tr(st_key) if st_key else status_type
 				var _label: String = "%s %d" % [st_name, value]
-				var _wk: String = "effect.apply_status.all.text" if target == "ALL" else "effect.apply_status.single.text"
+				var _wk: String
+				match target:
+					"ALL": _wk = "effect.apply_status.all.text"
+					"SELF": _wk = "effect.apply_status.self.text"
+					_: _wk = "effect.apply_status.single.text"
 				return TranslationServer.translate(_wk) % _label
 		EffectType.DRAW:        return TranslationServer.translate("effect.draw.text") % value
 		EffectType.ENERGY:      return TranslationServer.translate("effect.energy.text") % value
