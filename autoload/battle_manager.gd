@@ -1048,6 +1048,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				var _bph: int = _active_powers.get("power.bonus_per_hit:" + card.owner_id, {}).get("value", 0)
 				# 황제의 무도 (나폴레옹×무사시): 취약 적에게 가하는 피해 +25%
 				var _ed_active: bool = (card.owner_id == "napoleon" or card.owner_id == "musashi") and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi")
+				var _ed_fired: bool = false  # 황제의 무도 라벨 1회/카드
 				for _hit in range(effect.hit_count):
 					if effect.target == "ALL":
 						for i in range(_enemies.size()):
@@ -1058,6 +1059,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								var _all_dmg: int = _all_cr["dmg"]
 								if _ed_active and _enemy_status[i].get("vulnerable", 0) > 0:
 									_all_dmg = int(_all_dmg * 1.25)
+									if not _ed_fired:
+										_ed_fired = true
+										synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
 								_deal_damage_to_enemy(i, _all_dmg, effect.damage_type, _all_cr["is_crit"])
 								if _bph > 0:
 									_deal_damage_to_enemy(i, _bph, effect.damage_type)
@@ -1069,6 +1073,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							var _sgl_dmg: int = _cr["dmg"]
 							if _ed_active and _enemy_status[target_enemy_index].get("vulnerable", 0) > 0:
 								_sgl_dmg = int(_sgl_dmg * 1.25)
+								if not _ed_fired:
+									_ed_fired = true
+									synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
 							_deal_damage_to_enemy(target_enemy_index, _sgl_dmg, effect.damage_type, _cr["is_crit"])
 							if _bph > 0:
 								_deal_damage_to_enemy(target_enemy_index, _bph, effect.damage_type)
@@ -1839,6 +1846,12 @@ func apply_synergy_ally_effect(vfx_kind: String, hero_id: String, value: int, du
 		_heal_hero_safe(hero_id, value)
 	elif vfx_kind == "speed_buff":
 		_apply_synergy_speed_bonus(hero_id, value, duration)
+	elif vfx_kind == "morale":
+		if not _hero_status.has(hero_id):
+			_hero_status[hero_id] = {}
+		var _m: int = _hero_status[hero_id].get("morale", 0) + value
+		_hero_status[hero_id]["morale"] = _m
+		morale_changed.emit(hero_id, _m)
 
 # 영웅이 적에게 도발 부여 — source 비교로 누적/덮어쓰기 결정.
 # - 같은 source (이미 그 영웅이 도발 중) → 지속 시간 합산 (스택 누적)
@@ -2831,12 +2844,16 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 				elif card_owner == "genghis_khan" and team_mgr.is_alive("napoleon"):
 					_cs_partner = "napoleon"
 				if _cs_partner != "":
-					if not _hero_status.has(_cs_partner):
-						_hero_status[_cs_partner] = {}
-					var _cs_m: int = _hero_status[_cs_partner].get("morale", 0) + effect.value
-					_hero_status[_cs_partner]["morale"] = _cs_m
-					morale_changed.emit(_cs_partner, _cs_m)
 					synergy_triggered.emit("synergy.napoleon_genghis.name", card_owner)
+					if is_inside_tree():
+						# 파트너 사기 획득 — morale VFX 임팩트 시점에 적용
+						synergy_ally_vfx.emit("morale", [_cs_partner], effect.value, 0)
+					else:
+						if not _hero_status.has(_cs_partner):
+							_hero_status[_cs_partner] = {}
+						var _cs_m: int = _hero_status[_cs_partner].get("morale", 0) + effect.value
+						_hero_status[_cs_partner]["morale"] = _cs_m
+						morale_changed.emit(_cs_partner, _cs_m)
 			EffectRes.EffectType.SACRIFICE_HP:
 				# 희생의 칼날 (잔다르크×무사시) — 체력 희생 시 파티 전원 속도 +5 (3턴) — 속도 버프 VFX 임팩트에 적용
 				if card_owner == "joan_of_arc" and team_mgr.is_alive("musashi"):
