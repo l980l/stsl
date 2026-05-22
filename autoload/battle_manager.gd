@@ -697,20 +697,18 @@ func _start_hero_turn(hid: String) -> void:
 		if is_player_turn and is_battle_active:
 			end_player_turn()
 
-# 본인 영웅 차례 시작 사전 처리 — 본인 토큰 공격 + 본인 poison tick
-func _phase_hero_pre(hid: String) -> bool:
-	if team_mgr == null or not team_mgr.is_alive(hid):
-		return false
-	var did_work: bool = false
-	var token_count: int = _hero_status.get(hid, {}).get("tokens", 0)
-	# 수륙 협공 (이순신×칭기즈칸): 토큰 그리드 공용 — 두 영웅의 병사가 함께 공격
-	if (hid == "yi_sun_sin" or hid == "genghis_khan") and team_mgr != null and team_mgr.is_alive("yi_sun_sin") and team_mgr.is_alive("genghis_khan"):
-		var _jt_partner: String = "genghis_khan" if hid == "yi_sun_sin" else "yi_sun_sin"
-		var _jt_extra: int = _hero_status.get(_jt_partner, {}).get("tokens", 0)
-		if _jt_extra > 0:
-			token_count += _jt_extra
-			synergy_triggered.emit("synergy.yi_genghis.name", hid)
-	for _ti in range(token_count):
+# 영웅별 병사 토큰 공격 종류 — 이순신: 함포 폭발 / 칭기즈칸: 화살 / 그 외: 총탄
+func _token_dtype_for(owner: String) -> String:
+	match owner:
+		"yi_sun_sin": return "explosive"
+		"genghis_khan": return "projectile"
+		_: return "bullet"
+
+# 한 영웅의 병사 토큰 일괄 공격 — owner 기준 VFX·dtype·시너지 후처리
+func _run_token_attacks(owner: String, count: int) -> bool:
+	var did: bool = false
+	var dtype: String = _token_dtype_for(owner)
+	for _ti in range(count):
 		var alive_indices: Array = []
 		for ei in range(_enemies.size()):
 			if _enemy_alive[ei]:
@@ -718,24 +716,51 @@ func _phase_hero_pre(hid: String) -> bool:
 		if alive_indices.is_empty():
 			break
 		var pick: int = alive_indices[randi() % alive_indices.size()]
-		_last_attacker[pick] = hid
-		# 토큰 인덱스 + 타겟 적 전달 — battle_scene 이 병사 타일 위치에서 bullet VFX 발사
-		token_attack_fired.emit(hid, _ti, pick)
-		_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK, "bullet")
+		_last_attacker[pick] = owner
+		# 토큰 인덱스 + 타겟 적 전달 — battle_scene 이 병사 타일 위치에서 VFX 발사
+		token_attack_fired.emit(owner, _ti, pick)
+		_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK, dtype)
 		# 혼란의 돌격 (황제×파라오): 나폴레옹 병사 공격 1회당 매혹 +3
-		if hid == "napoleon" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
+		if owner == "napoleon" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
 			_apply_status_to_enemy(pick, "charm", 3)
-			synergy_triggered.emit("synergy.napoleon_cleopatra.name", hid)
+			synergy_triggered.emit("synergy.napoleon_cleopatra.name", owner)
 		# 약탈과 독 (정복자×파라오): 칭기즈칸 병사 공격 1회당 독 +5
-		if hid == "genghis_khan" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
+		if owner == "genghis_khan" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
 			_apply_status_to_enemy(pick, "poison", 5)
-			synergy_triggered.emit("synergy.genghis_cleopatra.name", hid)
-		did_work = true
+			synergy_triggered.emit("synergy.genghis_cleopatra.name", owner)
+		did = true
 		# 토큰 사이 짧은 랜덤 지연 — SFX 겹침 방지 (0.08~0.18s)
-		if token_count > 1:
+		if count > 1:
 			await get_tree().create_timer(0.08 + randf() * 0.10).timeout
 			if not is_battle_active:
-				return did_work
+				return did
+	return did
+
+# 본인 영웅 차례 시작 사전 처리 — 본인 토큰 공격 + 본인 poison tick
+func _phase_hero_pre(hid: String) -> bool:
+	if team_mgr == null or not team_mgr.is_alive(hid):
+		return false
+	var did_work: bool = false
+	var token_count: int = _hero_status.get(hid, {}).get("tokens", 0)
+	# 본인 병사가 있을 때만 토큰 공격 — 본인 병사가 없으면 파트너 병사도 합류하지 않음
+	if token_count > 0:
+		# 본인 병사 먼저 공격 (출현 → 공격 → 복귀)
+		if await _run_token_attacks(hid, token_count):
+			did_work = true
+		if not is_battle_active:
+			return did_work
+		# 수륙 협공 (이순신×칭기즈칸): 본인 병사 복귀 후 파트너 병사가 이어서 합동 공격
+		if (hid == "yi_sun_sin" or hid == "genghis_khan") and team_mgr.is_alive("yi_sun_sin") and team_mgr.is_alive("genghis_khan"):
+			var _jt_partner: String = "genghis_khan" if hid == "yi_sun_sin" else "yi_sun_sin"
+			var _jt_extra: int = _hero_status.get(_jt_partner, {}).get("tokens", 0)
+			if _jt_extra > 0:
+				synergy_triggered.emit("synergy.yi_genghis.name", hid)
+				# 본인 병사가 모두 복귀할 때까지 대기 후 파트너 병사 출현
+				await get_tree().create_timer(0.6).timeout
+				if not is_battle_active:
+					return did_work
+				if await _run_token_attacks(_jt_partner, _jt_extra):
+					did_work = true
 	# 본인 poison tick (영웅이 받은 독)
 	var dmg: int = _hero_status.get(hid, {}).get("poison_dmg", 0)
 	var dur: int = _hero_status.get(hid, {}).get("poison_dur", 0)
@@ -2964,16 +2989,32 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 							_hero_status[_sv_h] = {}
 						if not _hero_status[_sv_h].has("speed_bonus") or typeof(_hero_status[_sv_h]["speed_bonus"]) != TYPE_ARRAY:
 							_hero_status[_sv_h]["speed_bonus"] = []
-						_hero_status[_sv_h]["speed_bonus"].append({"value": 1, "dur": 999})
+						# 기존 영구(dur 999) 항목에 누적 — 매번 새 줄 추가 방지 (툴팁 1줄 유지)
+						var _sv_arr: Array = _hero_status[_sv_h]["speed_bonus"]
+						var _sv_perm = null
+						for _sv_e in _sv_arr:
+							if typeof(_sv_e) == TYPE_DICTIONARY and int(_sv_e.get("dur", 0)) >= 999:
+								_sv_perm = _sv_e
+								break
+						if _sv_perm != null:
+							_sv_perm["value"] = int(_sv_perm.get("value", 0)) + 1
+						else:
+							_sv_arr.append({"value": 1, "dur": 999})
 						_adjust_turn_queue_for_speed_change(_sv_aid, _sv_old)
 						status_applied.emit(_sv_h, "speed_bonus", 1)
 					synergy_triggered.emit("synergy.musashi_yi.name", card_owner)
 			EffectRes.EffectType.APPLY_STATUS:
-				# 성스러운 독 (성녀×파라오): 클레오파트라 독 부여 시 아군 전체 회복 +15
+				# 성스러운 독 (성녀×파라오): 클레오파트라 독 부여 시 아군 전체 회복 +15 — 회복 VFX 임팩트에 적용
 				if card_owner == "cleopatra" and effect.status_type == "poison" and team_mgr.is_alive("joan_of_arc"):
-					for _hc_h in team_mgr.get_living_heroes():
-						_heal_hero_safe(_hc_h.hero_id, 15)
 					synergy_triggered.emit("synergy.joan_cleopatra.name", card_owner)
+					var _hc_ids: Array = []
+					for _hc_h in team_mgr.get_living_heroes():
+						_hc_ids.append(_hc_h.hero_id)
+					if is_inside_tree():
+						synergy_ally_vfx.emit("heal", _hc_ids, 15, 0)
+					else:
+						for _hc_id in _hc_ids:
+							_heal_hero_safe(_hc_id, 15)
 
 
 func get_active_synergies() -> Array:
