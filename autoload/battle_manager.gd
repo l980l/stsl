@@ -1038,12 +1038,13 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			continue
 		match effect.effect_type:
 			EffectRes.EffectType.DAMAGE:
-				var dmg: int = effect.value
 				var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
-				if owner_status.get("weak", 0) > 0:
-					dmg = int(dmg * 0.75)
 				# power.strength_player: 영웅 측 strength 플랫 보너스
-				dmg += _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+				var _str_flat: int = _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+				# 공격자 out_pct 기본값 — weak(-0.25), 황제의 무도(+0.25) 는 hit 루프 안에서 합산
+				var _base_out_pct: float = 0.0
+				if owner_status.get("weak", 0) > 0:
+					_base_out_pct -= 0.25
 				# power.bonus_per_hit: 히트당 추가 피해
 				var _bph: int = _active_powers.get("power.bonus_per_hit:" + card.owner_id, {}).get("value", 0)
 				# 황제의 무도 (나폴레옹×무사시): 취약 적에게 가하는 피해 +25%
@@ -1055,13 +1056,20 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							if _enemy_alive[i]:
 								# 치명타 — 적 status.marked_by 비어있지 않으면 +30%
 								var _all_hm: bool = not _enemy_status[i].get("marked_by", []).is_empty()
-								var _all_cr: Dictionary = _roll_crit_damage(dmg, _all_hm, i)
-								var _all_dmg: int = _all_cr["dmg"]
+								var _all_cr: Dictionary = _roll_crit(i, _all_hm)
+								# 황제의 무도: 취약 적에게 +25% 합산
+								var _all_out_pct: float = _base_out_pct
 								if _ed_active and _enemy_status[i].get("vulnerable", 0) > 0:
-									_all_dmg = int(_all_dmg * 1.25)
+									_all_out_pct += 0.25
 									if not _ed_fired:
 										_ed_fired = true
 										synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
+								var _all_ctx := DamageContext.new()
+								_all_ctx.base = effect.value
+								_all_ctx.flat = _str_flat
+								_all_ctx.out_pct = _all_out_pct
+								_all_ctx.crit_mult = _all_cr["crit_mult"]
+								var _all_dmg: int = compute_damage(_all_ctx)
 								_deal_damage_to_enemy(i, _all_dmg, effect.damage_type, _all_cr["is_crit"])
 								if _bph > 0:
 									_deal_damage_to_enemy(i, _bph, effect.damage_type)
@@ -1069,13 +1077,20 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					else:
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 							var _hm: bool = not _enemy_status[target_enemy_index].get("marked_by", []).is_empty()
-							var _cr: Dictionary = _roll_crit_damage(dmg, _hm, target_enemy_index)
-							var _sgl_dmg: int = _cr["dmg"]
+							var _cr: Dictionary = _roll_crit(target_enemy_index, _hm)
+							# 황제의 무도: 취약 적에게 +25% 합산
+							var _sgl_out_pct: float = _base_out_pct
 							if _ed_active and _enemy_status[target_enemy_index].get("vulnerable", 0) > 0:
-								_sgl_dmg = int(_sgl_dmg * 1.25)
+								_sgl_out_pct += 0.25
 								if not _ed_fired:
 									_ed_fired = true
 									synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
+							var _sgl_ctx := DamageContext.new()
+							_sgl_ctx.base = effect.value
+							_sgl_ctx.flat = _str_flat
+							_sgl_ctx.out_pct = _sgl_out_pct
+							_sgl_ctx.crit_mult = _cr["crit_mult"]
+							var _sgl_dmg: int = compute_damage(_sgl_ctx)
 							_deal_damage_to_enemy(target_enemy_index, _sgl_dmg, effect.damage_type, _cr["is_crit"])
 							if _bph > 0:
 								_deal_damage_to_enemy(target_enemy_index, _bph, effect.damage_type)
@@ -2522,6 +2537,34 @@ func _roll_crit_damage(base_dmg: int, has_mark: bool, target_enemy_index: int = 
 			for _jg_id in _jg_ids:
 				_heal_hero_safe(_jg_id, 30)
 	return {"dmg": dmg, "is_crit": is_crit}
+
+# 치명타 굴림 (배율 전용) — _apply_card_effects DAMAGE 분기에서 사용.
+# _roll_crit_damage 와 동일한 확률·시너지 로직이지만 데미지를 직접 곱하지 않는다.
+# 반환: {crit_mult: float, is_crit: bool}
+func _roll_crit(target_enemy_index: int, has_mark: bool) -> Dictionary:
+	if _test_disable_crit:
+		return {"crit_mult": 1.0, "is_crit": false}
+	var rate: float = CRIT_BASE_RATE + (CRIT_MARK_BONUS if has_mark else 0.0)
+	# 독날 (클레오파트라×무사시): 반함 상태 적에게 치명타 확률 100%
+	if team_mgr != null and team_mgr.is_alive("cleopatra") and team_mgr.is_alive("musashi") and target_enemy_index < _enemy_status.size() and _enemy_status[target_enemy_index].get("enthrall", 0) > 0:
+		rate = 1.0
+	var is_crit: bool = randf() < rate
+	# 초원의 결투사 (칭기즈칸×무사시): 파티 치명타 데미지 ×3 (기본 ×2)
+	var crit_mult: float = CRIT_MULTIPLIER
+	if team_mgr != null and team_mgr.is_alive("genghis_khan") and team_mgr.is_alive("musashi"):
+		crit_mult = 3.0
+	# 신의 원정 (잔다르크×칭기즈칸): 아군 치명타 발동 시 아군 전체 힐 +30
+	if is_crit and team_mgr != null and team_mgr.is_alive("joan_of_arc") and team_mgr.is_alive("genghis_khan"):
+		synergy_triggered.emit("synergy.joan_genghis.name", "joan_of_arc")
+		var _jg_ids: Array = []
+		for _de_h in team_mgr.get_living_heroes():
+			_jg_ids.append(_de_h.hero_id)
+		if is_inside_tree():
+			synergy_ally_vfx.emit("heal", _jg_ids, 30, 0)
+		else:
+			for _jg_id in _jg_ids:
+				_heal_hero_safe(_jg_id, 30)
+	return {"crit_mult": crit_mult if is_crit else 1.0, "is_crit": is_crit}
 
 func _pick_highest_hp(hero_ids: Array) -> String:
 	if hero_ids.is_empty():
