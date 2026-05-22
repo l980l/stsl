@@ -1729,9 +1729,10 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	# ── 받는 측 DamageContext 구성 ──
 	var ctx := DamageContext.new()
 	ctx.base = amount
-	# T3-WARD: invuln 활성화 시 모든 데미지 무시
+	# T3-WARD: invuln 활성화 시 데미지 무시 — dnd 소진 전에 early-return
 	if _enemy_status[enemy_index].get("invuln", 0) > 0:
-		ctx.invuln = true
+		enemy_damaged.emit(enemy_index, 0, damage_type, false)
+		return
 	# double_next_damage: 플래그 확인·소진 후 ctx.dnd_mult=2.0 (×2는 ctx가 담당)
 	if _consume_dnd_flag():
 		ctx.dnd_mult = 2.0
@@ -1746,10 +1747,6 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	if _cur_weak != "" and damage_type != "" and damage_type != _cur_weak:
 		ctx.mitigation.append(0.2)
 	amount = compute_damage(ctx)
-	# invuln 시 시그널만 emit하고 종료
-	if ctx.invuln:
-		enemy_damaged.emit(enemy_index, 0, damage_type, false)
-		return
 	var absorbed: int = min(_enemy_block[enemy_index], amount)
 	_enemy_block[enemy_index] -= absorbed
 	amount -= absorbed
@@ -1801,7 +1798,7 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 	amount = compute_damage(ctx)
 	# counter_pending — 다음 받는 공격 100% 반사 + 1회 소멸 + VFX. (반감은 위 ctx에서 완료)
 	if status.get("counter_pending", 0) > 0 and from_enemy_index >= 0 and from_enemy_index < _enemies.size():
-		var _reflect_amt: int = ctx.base  # 반사는 incoming 원본(반감 전) 그대로
+		var _reflect_amt: int = int(ctx.base * (1.0 + ctx.in_pct))  # vulnerable 적용 후 반사 (구버전 동작 복원)
 		if _enemy_alive[from_enemy_index]:
 			_deal_damage_to_enemy(from_enemy_index, _reflect_amt, damage_type)
 		_hero_status[hero_id]["counter_pending"] = 0
