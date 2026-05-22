@@ -2193,30 +2193,34 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			return
 	match intent.action_type:
 		IntentRes.ActionType.ATTACK:
-			var dmg: int = intent.value
-			var strength: int = _enemy_status[enemy_index].get("strength", 0)
-			if strength > 0:
-				dmg = int(dmg * (1.0 + 0.1 * strength))
-			if _enemy_status[enemy_index].get("weak", 0) > 0:
-				dmg = int(dmg * 0.75)
-			# FORM_SWITCH offense — turn_modes index >= 1 = offense, 주는 damage 1.5x
-			if _is_enemy_in_offense_mode(enemy_index):
-				dmg = int(dmg * 1.5)
-			# CHANGE_AFFINITY override — intent.damage_type 대신 current_affinity 사용
-			var resolved_dmg_type: String = _resolve_enemy_damage_type(enemy_index, intent.damage_type)
+			# ── 공격자 측 DamageContext 구성 ──
+			var _atk_ctx := DamageContext.new()
+			_atk_ctx.base = intent.value
+			# strength: 곱연산 → flat 합연산 (영웅 strength 와 동작 통일)
+			_atk_ctx.flat = _enemy_status[enemy_index].get("strength", 0)
 			# T3-COUNTER: 누적된 counter_pool 가산 후 소진
 			var counter_pool: int = _enemy_status[enemy_index].get("counter_pool", 0)
 			if counter_pool > 0:
-				dmg += counter_pool
+				_atk_ctx.flat += counter_pool
 				_enemy_status[enemy_index]["counter_pool"] = 0
 				_enemy_status[enemy_index]["counter_ratio"] = 0.0
+			# weak: −25%, FORM_SWITCH offense: +50% (out_pct 합산)
+			if _enemy_status[enemy_index].get("weak", 0) > 0:
+				_atk_ctx.out_pct -= 0.25
+			# FORM_SWITCH offense — turn_modes index >= 1 = offense, 주는 damage 1.5x
+			if _is_enemy_in_offense_mode(enemy_index):
+				_atk_ctx.out_pct += 0.5
+			# CHANGE_AFFINITY override — intent.damage_type 대신 current_affinity 사용
+			var resolved_dmg_type: String = _resolve_enemy_damage_type(enemy_index, intent.damage_type)
 			if intent.target == IntentRes.TargetType.ALL:
 				if team_mgr:
 					for hero in team_mgr.get_living_heroes():
 						# 치명타: 영웅 status.marked_by 비어있지 않으면 +30%
 						var _all_hm: bool = not _hero_status.get(hero.hero_id, {}).get("marked_by", []).is_empty()
-						var _all_crit: Dictionary = _roll_crit_damage(dmg, _all_hm)
-						_deal_damage_to_hero(hero.hero_id, _all_crit["dmg"], resolved_dmg_type, _all_crit["is_crit"], enemy_index)
+						var _all_crit_e: Dictionary = _roll_crit_enemy(_all_hm)
+						_atk_ctx.crit_mult = _all_crit_e["crit_mult"]
+						var _all_outgoing: int = compute_damage(_atk_ctx)
+						_deal_damage_to_hero(hero.hero_id, _all_outgoing, resolved_dmg_type, _all_crit_e["is_crit"], enemy_index)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
 				# 미리 결정된 타겟 사용 (사망 시 fallback 으로 재결정)
@@ -2226,8 +2230,10 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				if target_id != "":
 					# 치명타: 영웅 status.marked_by 비어있지 않으면 +30% (마킹한 적 한정 X — 모든 적)
 					var has_mark: bool = not _hero_status.get(target_id, {}).get("marked_by", []).is_empty()
-					var crit_result: Dictionary = _roll_crit_damage(dmg, has_mark)
-					_deal_damage_to_hero(target_id, crit_result["dmg"], resolved_dmg_type, crit_result["is_crit"], enemy_index)
+					var crit_result_e: Dictionary = _roll_crit_enemy(has_mark)
+					_atk_ctx.crit_mult = crit_result_e["crit_mult"]
+					var outgoing: int = compute_damage(_atk_ctx)
+					_deal_damage_to_hero(target_id, outgoing, resolved_dmg_type, crit_result_e["is_crit"], enemy_index)
 					# 시그니처 hook: 적의 단일 타겟 공격 (이집트 저주 누적)
 					SignatureSys.on_enemy_attack(self, enemy_index, target_id)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": target_id})
@@ -2508,38 +2514,18 @@ func _cleanup_hero_status_on_death(hero_id: String) -> void:
 
 var _test_disable_crit: bool = false  # 테스트 환경 — 정확한 데미지 검증 위해 crit 비활성
 
-# 치명타 굴림 — 기본 5% + marked_by 보유 시 +30%. 발동 시 dmg × 2.
-# 반환: {dmg, is_crit}
-func _roll_crit_damage(base_dmg: int, has_mark: bool, target_enemy_index: int = -1) -> Dictionary:
+# 적 공격 전용 치명타 굴림 — 기본 5% + marked_by 보유 시 +30%.
+# 아군 시너지(독날·초원의 결투사·신의 원정) 적용 안 함.
+# 반환: {crit_mult: float, is_crit: bool}
+func _roll_crit_enemy(has_mark: bool) -> Dictionary:
 	if _test_disable_crit:
-		return {"dmg": base_dmg, "is_crit": false}
-	# 아군이 적을 공격하는 경우에만 시너지 적용 (적 공격 시 target_enemy_index = -1)
-	var is_ally_attack: bool = target_enemy_index >= 0
+		return {"crit_mult": 1.0, "is_crit": false}
 	var rate: float = CRIT_BASE_RATE + (CRIT_MARK_BONUS if has_mark else 0.0)
-	# 독날 (클레오파트라×무사시): 반함 상태 적에게 치명타 확률 100%
-	if is_ally_attack and team_mgr != null and team_mgr.is_alive("cleopatra") and team_mgr.is_alive("musashi") and target_enemy_index < _enemy_status.size() and _enemy_status[target_enemy_index].get("enthrall", 0) > 0:
-		rate = 1.0
 	var is_crit: bool = randf() < rate
-	# 초원의 결투사 (칭기즈칸×무사시): 파티 치명타 데미지 ×3 (기본 ×2)
-	var crit_mult: float = CRIT_MULTIPLIER
-	if is_ally_attack and team_mgr != null and team_mgr.is_alive("genghis_khan") and team_mgr.is_alive("musashi"):
-		crit_mult = 3.0
-	var dmg: int = int(base_dmg * crit_mult) if is_crit else base_dmg
-	# 신의 원정 (잔다르크×칭기즈칸): 아군 치명타 발동 시 아군 전체 힐 +30 — 회복 VFX 임팩트에 적용
-	if is_crit and is_ally_attack and team_mgr != null and team_mgr.is_alive("joan_of_arc") and team_mgr.is_alive("genghis_khan"):
-		synergy_triggered.emit("synergy.joan_genghis.name", "joan_of_arc")
-		var _jg_ids: Array = []
-		for _de_h in team_mgr.get_living_heroes():
-			_jg_ids.append(_de_h.hero_id)
-		if is_inside_tree():
-			synergy_ally_vfx.emit("heal", _jg_ids, 30, 0)
-		else:
-			for _jg_id in _jg_ids:
-				_heal_hero_safe(_jg_id, 30)
-	return {"dmg": dmg, "is_crit": is_crit}
+	var crit_mult: float = CRIT_MULTIPLIER if is_crit else 1.0
+	return {"crit_mult": crit_mult, "is_crit": is_crit}
 
 # 치명타 굴림 (배율 전용) — _apply_card_effects DAMAGE 분기에서 사용.
-# _roll_crit_damage 와 동일한 확률·시너지 로직이지만 데미지를 직접 곱하지 않는다.
 # 반환: {crit_mult: float, is_crit: bool}
 func _roll_crit(target_enemy_index: int, has_mark: bool) -> Dictionary:
 	if _test_disable_crit:
