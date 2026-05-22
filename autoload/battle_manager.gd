@@ -270,21 +270,26 @@ func _card_vfx_impact_delay(card: Resource, target_enemy_index: int = -1) -> flo
 # 차지 중 카드의 예측 데미지 — UI 가 사망 예정 적을 즉시 dim/비활성화 + 추가 ATTACK 거부
 signal pending_damage_changed(enemy_index: int)
 
-# 적 인텐트 표시용 — 강화/약화/counter_pool 적용된 실제 데미지 추정 (mark/타겟별 vulnerable 제외)
+# 적 인텐트 표시용 — strength·weak·FORM_SWITCH·counter_pool 적용된 실제 데미지 추정
+# (치명타·dnd·타겟별 vulnerable 은 미포함 — 실제 경로의 _execute_intent 와 버킷 동일)
 func get_intent_display_damage(enemy_index: int, intent: Resource) -> int:
-	var dmg: int = intent.value
 	if enemy_index < 0 or enemy_index >= _enemy_status.size():
-		return dmg
+		return intent.value
 	var status: Dictionary = _enemy_status[enemy_index]
-	var strength: int = status.get("strength", 0)
-	if strength > 0:
-		dmg = int(dmg * (1.0 + 0.1 * strength))
+	var ctx := DamageContext.new()
+	ctx.base = intent.value
+	# strength → flat (실제 경로 동일)
+	ctx.flat = status.get("strength", 0)
+	# counter_pool → flat 가산 (실제 경로 동일: _atk_ctx.flat += counter_pool)
+	ctx.flat += status.get("counter_pool", 0)
+	# weak → out_pct -0.25
 	if status.get("weak", 0) > 0:
-		dmg = int(dmg * 0.75)
-	var counter_pool: int = status.get("counter_pool", 0)
-	if counter_pool > 0:
-		dmg += counter_pool
-	return dmg
+		ctx.out_pct -= 0.25
+	# FORM_SWITCH offense → out_pct +0.5
+	if _is_enemy_in_offense_mode(enemy_index):
+		ctx.out_pct += 0.5
+	# crit_mult = 1.0, dnd_mult = 1.0 (미리보기: 확률·1회성 미포함)
+	return compute_damage(ctx)
 
 func _card_has_damage(card: Resource) -> bool:
 	for effect in card.effects:
@@ -293,39 +298,52 @@ func _card_has_damage(card: Resource) -> bool:
 	return false
 
 # UI 용 — 단일 DAMAGE effect 의 buff/debuff 반영 데미지 (1회 hit 기준).
-# target_enemy_index >= 0 시 그 적의 vulnerable 추가 반영. -1 면 hero strength/weak 만.
+# target_enemy_index >= 0 시 그 적의 vulnerable/황제의무도 추가 반영. -1 면 hero 측만.
 # DAMAGE 아니면 effect.value 그대로.
+# 치명타·dnd 는 미포함 (실제 경로 _apply_card_effects 와 동일 버킷, 비치명타 기준)
 func estimate_effect_damage(effect: Resource, owner_id: String, target_enemy_index: int = -1) -> int:
 	if effect.effect_type != EffectRes.EffectType.DAMAGE:
 		return effect.value
-	var dmg: int = effect.value
 	var owner_status: Dictionary = _hero_status.get(owner_id, {})
+	var ctx := DamageContext.new()
+	ctx.base = effect.value
+	# strength → flat
+	ctx.flat = _active_powers.get("power.strength_player:" + owner_id, {}).get("value", 0)
+	# weak → out_pct -0.25
 	if owner_status.get("weak", 0) > 0:
-		dmg = int(dmg * 0.75)
-	var strength: int = _active_powers.get("power.strength_player:" + owner_id, {}).get("value", 0)
-	dmg += strength
+		ctx.out_pct -= 0.25
 	if target_enemy_index >= 0 and target_enemy_index < _enemy_status.size():
 		var t_status: Dictionary = _enemy_status[target_enemy_index]
+		# 황제의 무도 (나폴레옹×무사시): 취약 적에게 out_pct +0.25
+		var _ed_active: bool = (owner_id == "napoleon" or owner_id == "musashi") \
+			and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi")
+		if _ed_active and t_status.get("vulnerable", 0) > 0:
+			ctx.out_pct += 0.25
+		# FORM_SWITCH offense → out_pct +0.5 (적이 공격자인 경우는 없으므로 영웅 측 카드 기준 불필요)
+		# vulnerable → in_pct +0.5
 		if t_status.get("vulnerable", 0) > 0:
-			dmg = int(dmg * 1.5)
-	return max(0, dmg)
+			ctx.in_pct += 0.5
+	# crit_mult = 1.0, dnd_mult = 1.0 (미리보기: 확률·1회성 미포함)
+	return compute_damage(ctx)
 
-# 카드의 단일 타겟/ALL 데미지 추정 — weak/strength/vulnerable 만 적용 (정확보다 보수적)
+# 카드의 단일 타겟/ALL 데미지 추정 — compute_damage 파이프라인 사용 (실제 경로 동일 버킷)
 # 결과: enemy_index → 예측 데미지 합 (hit_count 포함)
+# 치명타·dnd·bonus_per_hit 는 미포함 (확률·1회성)
 func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionary:
 	var result: Dictionary = {}
 	var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
-	var weak: int = owner_status.get("weak", 0)
-	var strength: int = _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+	var _str_flat: int = _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+	var _base_out_pct: float = 0.0
+	if owner_status.get("weak", 0) > 0:
+		_base_out_pct -= 0.25
+	# 황제의 무도 활성 여부 (타겟별 vulnerable 확인은 루프 내에서)
+	var _ed_active: bool = (card.owner_id == "napoleon" or card.owner_id == "musashi") \
+		and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi")
 	for effect in card.effects:
 		if effect.damage_type == "":
 			continue
 		if effect.condition != "" and not _evaluate_condition(effect.condition, card):
 			continue
-		var dmg: int = effect.value
-		if weak > 0:
-			dmg = int(dmg * 0.75)
-		dmg += strength
 		var targets: Array = []
 		if effect.target == "ALL":
 			for i in range(_enemies.size()):
@@ -335,11 +353,19 @@ func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionar
 			if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 				targets.append(target_enemy_index)
 		for ti in targets:
-			var t_dmg := dmg
 			var t_status: Dictionary = _enemy_status[ti] if ti < _enemy_status.size() else {}
+			var ctx := DamageContext.new()
+			ctx.base = effect.value
+			ctx.flat = _str_flat
+			ctx.out_pct = _base_out_pct
+			# 황제의 무도: 취약 적에게 out_pct +0.25
+			if _ed_active and t_status.get("vulnerable", 0) > 0:
+				ctx.out_pct += 0.25
+			# vulnerable → in_pct +0.5
 			if t_status.get("vulnerable", 0) > 0:
-				t_dmg = int(t_dmg * 1.5)
-			t_dmg = max(0, t_dmg)
+				ctx.in_pct += 0.5
+			# crit_mult = 1.0, dnd_mult = 1.0 (미리보기: 확률·1회성 미포함)
+			var t_dmg: int = compute_damage(ctx)
 			var prev: int = int(result[ti]) if result.has(ti) else 0
 			result[ti] = prev + t_dmg * effect.hit_count
 	return result
