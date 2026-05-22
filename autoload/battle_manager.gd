@@ -270,21 +270,26 @@ func _card_vfx_impact_delay(card: Resource, target_enemy_index: int = -1) -> flo
 # 차지 중 카드의 예측 데미지 — UI 가 사망 예정 적을 즉시 dim/비활성화 + 추가 ATTACK 거부
 signal pending_damage_changed(enemy_index: int)
 
-# 적 인텐트 표시용 — 강화/약화/counter_pool 적용된 실제 데미지 추정 (mark/타겟별 vulnerable 제외)
+# 적 인텐트 표시용 — strength·weak·FORM_SWITCH·counter_pool 적용된 실제 데미지 추정
+# (치명타·dnd·타겟별 vulnerable 은 미포함 — 실제 경로의 _execute_intent 와 버킷 동일)
 func get_intent_display_damage(enemy_index: int, intent: Resource) -> int:
-	var dmg: int = intent.value
 	if enemy_index < 0 or enemy_index >= _enemy_status.size():
-		return dmg
+		return intent.value
 	var status: Dictionary = _enemy_status[enemy_index]
-	var strength: int = status.get("strength", 0)
-	if strength > 0:
-		dmg = int(dmg * (1.0 + 0.1 * strength))
+	var ctx := DamageContext.new()
+	ctx.base = intent.value
+	# strength → flat (실제 경로 동일)
+	ctx.flat = status.get("strength", 0)
+	# counter_pool → flat 가산 (실제 경로 동일: _atk_ctx.flat += counter_pool)
+	ctx.flat += status.get("counter_pool", 0)
+	# weak → out_pct -0.25
 	if status.get("weak", 0) > 0:
-		dmg = int(dmg * 0.75)
-	var counter_pool: int = status.get("counter_pool", 0)
-	if counter_pool > 0:
-		dmg += counter_pool
-	return dmg
+		ctx.out_pct -= 0.25
+	# FORM_SWITCH offense → out_pct +0.5
+	if _is_enemy_in_offense_mode(enemy_index):
+		ctx.out_pct += 0.5
+	# crit_mult = 1.0, dnd_mult = 1.0 (미리보기: 확률·1회성 미포함)
+	return compute_damage(ctx)
 
 func _card_has_damage(card: Resource) -> bool:
 	for effect in card.effects:
@@ -293,39 +298,52 @@ func _card_has_damage(card: Resource) -> bool:
 	return false
 
 # UI 용 — 단일 DAMAGE effect 의 buff/debuff 반영 데미지 (1회 hit 기준).
-# target_enemy_index >= 0 시 그 적의 vulnerable 추가 반영. -1 면 hero strength/weak 만.
+# target_enemy_index >= 0 시 그 적의 vulnerable/황제의무도 추가 반영. -1 면 hero 측만.
 # DAMAGE 아니면 effect.value 그대로.
+# 치명타·dnd 는 미포함 (실제 경로 _apply_card_effects 와 동일 버킷, 비치명타 기준)
 func estimate_effect_damage(effect: Resource, owner_id: String, target_enemy_index: int = -1) -> int:
 	if effect.effect_type != EffectRes.EffectType.DAMAGE:
 		return effect.value
-	var dmg: int = effect.value
 	var owner_status: Dictionary = _hero_status.get(owner_id, {})
+	var ctx := DamageContext.new()
+	ctx.base = effect.value
+	# strength → flat
+	ctx.flat = _active_powers.get("power.strength_player:" + owner_id, {}).get("value", 0)
+	# weak → out_pct -0.25
 	if owner_status.get("weak", 0) > 0:
-		dmg = int(dmg * 0.75)
-	var strength: int = _active_powers.get("power.strength_player:" + owner_id, {}).get("value", 0)
-	dmg += strength
+		ctx.out_pct -= 0.25
 	if target_enemy_index >= 0 and target_enemy_index < _enemy_status.size():
 		var t_status: Dictionary = _enemy_status[target_enemy_index]
+		# 황제의 무도 (나폴레옹×무사시): 취약 적에게 out_pct +0.25
+		var _ed_active: bool = (owner_id == "napoleon" or owner_id == "musashi") \
+			and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi")
+		if _ed_active and t_status.get("vulnerable", 0) > 0:
+			ctx.out_pct += 0.25
+		# FORM_SWITCH offense → out_pct +0.5 (적이 공격자인 경우는 없으므로 영웅 측 카드 기준 불필요)
+		# vulnerable → in_pct +0.5
 		if t_status.get("vulnerable", 0) > 0:
-			dmg = int(dmg * 1.5)
-	return max(0, dmg)
+			ctx.in_pct += 0.5
+	# crit_mult = 1.0, dnd_mult = 1.0 (미리보기: 확률·1회성 미포함)
+	return compute_damage(ctx)
 
-# 카드의 단일 타겟/ALL 데미지 추정 — weak/strength/vulnerable 만 적용 (정확보다 보수적)
+# 카드의 단일 타겟/ALL 데미지 추정 — compute_damage 파이프라인 사용 (실제 경로 동일 버킷)
 # 결과: enemy_index → 예측 데미지 합 (hit_count 포함)
+# 치명타·dnd·bonus_per_hit 는 미포함 (확률·1회성)
 func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionary:
 	var result: Dictionary = {}
 	var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
-	var weak: int = owner_status.get("weak", 0)
-	var strength: int = _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+	var _str_flat: int = _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+	var _base_out_pct: float = 0.0
+	if owner_status.get("weak", 0) > 0:
+		_base_out_pct -= 0.25
+	# 황제의 무도 활성 여부 (타겟별 vulnerable 확인은 루프 내에서)
+	var _ed_active: bool = (card.owner_id == "napoleon" or card.owner_id == "musashi") \
+		and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi")
 	for effect in card.effects:
 		if effect.damage_type == "":
 			continue
 		if effect.condition != "" and not _evaluate_condition(effect.condition, card):
 			continue
-		var dmg: int = effect.value
-		if weak > 0:
-			dmg = int(dmg * 0.75)
-		dmg += strength
 		var targets: Array = []
 		if effect.target == "ALL":
 			for i in range(_enemies.size()):
@@ -335,11 +353,19 @@ func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionar
 			if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 				targets.append(target_enemy_index)
 		for ti in targets:
-			var t_dmg := dmg
 			var t_status: Dictionary = _enemy_status[ti] if ti < _enemy_status.size() else {}
+			var ctx := DamageContext.new()
+			ctx.base = effect.value
+			ctx.flat = _str_flat
+			ctx.out_pct = _base_out_pct
+			# 황제의 무도: 취약 적에게 out_pct +0.25
+			if _ed_active and t_status.get("vulnerable", 0) > 0:
+				ctx.out_pct += 0.25
+			# vulnerable → in_pct +0.5
 			if t_status.get("vulnerable", 0) > 0:
-				t_dmg = int(t_dmg * 1.5)
-			t_dmg = max(0, t_dmg)
+				ctx.in_pct += 0.5
+			# crit_mult = 1.0, dnd_mult = 1.0 (미리보기: 확률·1회성 미포함)
+			var t_dmg: int = compute_damage(ctx)
 			var prev: int = int(result[ti]) if result.has(ti) else 0
 			result[ti] = prev + t_dmg * effect.hit_count
 	return result
@@ -1038,12 +1064,13 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			continue
 		match effect.effect_type:
 			EffectRes.EffectType.DAMAGE:
-				var dmg: int = effect.value
 				var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
-				if owner_status.get("weak", 0) > 0:
-					dmg = int(dmg * 0.75)
 				# power.strength_player: 영웅 측 strength 플랫 보너스
-				dmg += _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+				var _str_flat: int = _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+				# 공격자 out_pct 기본값 — weak(-0.25), 황제의 무도(+0.25) 는 hit 루프 안에서 합산
+				var _base_out_pct: float = 0.0
+				if owner_status.get("weak", 0) > 0:
+					_base_out_pct -= 0.25
 				# power.bonus_per_hit: 히트당 추가 피해
 				var _bph: int = _active_powers.get("power.bonus_per_hit:" + card.owner_id, {}).get("value", 0)
 				# 황제의 무도 (나폴레옹×무사시): 취약 적에게 가하는 피해 +25%
@@ -1055,13 +1082,20 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							if _enemy_alive[i]:
 								# 치명타 — 적 status.marked_by 비어있지 않으면 +30%
 								var _all_hm: bool = not _enemy_status[i].get("marked_by", []).is_empty()
-								var _all_cr: Dictionary = _roll_crit_damage(dmg, _all_hm, i)
-								var _all_dmg: int = _all_cr["dmg"]
+								var _all_cr: Dictionary = _roll_crit(i, _all_hm)
+								# 황제의 무도: 취약 적에게 +25% 합산
+								var _all_out_pct: float = _base_out_pct
 								if _ed_active and _enemy_status[i].get("vulnerable", 0) > 0:
-									_all_dmg = int(_all_dmg * 1.25)
+									_all_out_pct += 0.25
 									if not _ed_fired:
 										_ed_fired = true
 										synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
+								var _all_ctx := DamageContext.new()
+								_all_ctx.base = effect.value
+								_all_ctx.flat = _str_flat
+								_all_ctx.out_pct = _all_out_pct
+								_all_ctx.crit_mult = _all_cr["crit_mult"]
+								var _all_dmg: int = compute_damage(_all_ctx)
 								_deal_damage_to_enemy(i, _all_dmg, effect.damage_type, _all_cr["is_crit"])
 								if _bph > 0:
 									_deal_damage_to_enemy(i, _bph, effect.damage_type)
@@ -1069,13 +1103,20 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					else:
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 							var _hm: bool = not _enemy_status[target_enemy_index].get("marked_by", []).is_empty()
-							var _cr: Dictionary = _roll_crit_damage(dmg, _hm, target_enemy_index)
-							var _sgl_dmg: int = _cr["dmg"]
+							var _cr: Dictionary = _roll_crit(target_enemy_index, _hm)
+							# 황제의 무도: 취약 적에게 +25% 합산
+							var _sgl_out_pct: float = _base_out_pct
 							if _ed_active and _enemy_status[target_enemy_index].get("vulnerable", 0) > 0:
-								_sgl_dmg = int(_sgl_dmg * 1.25)
+								_sgl_out_pct += 0.25
 								if not _ed_fired:
 									_ed_fired = true
 									synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
+							var _sgl_ctx := DamageContext.new()
+							_sgl_ctx.base = effect.value
+							_sgl_ctx.flat = _str_flat
+							_sgl_ctx.out_pct = _sgl_out_pct
+							_sgl_ctx.crit_mult = _cr["crit_mult"]
+							var _sgl_dmg: int = compute_damage(_sgl_ctx)
 							_deal_damage_to_enemy(target_enemy_index, _sgl_dmg, effect.damage_type, _cr["is_crit"])
 							if _bph > 0:
 								_deal_damage_to_enemy(target_enemy_index, _bph, effect.damage_type)
@@ -1689,23 +1730,49 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			_in_echo_replay = false
 	await _apply_synergy_bonus(card, target_enemy_index)
 
+## dnd 플래그 존재 여부 확인 후 소진 — ×2는 적용하지 않음.
+## _deal_damage_to_enemy 전용: compute_damage ctx.dnd_mult 에서 ×2를 담당하므로
+## _consume_double_next_damage(×2 반환) 대신 이 함수로 플래그만 소진한다.
+func _consume_dnd_flag() -> bool:
+	var consumed: bool = false
+	if _current_actor_id.begins_with("hero:"):
+		var hid: String = _current_actor_id.substr(5)
+		var key: String = _dnd_key(hid)
+		if _active_powers.has(key):
+			_active_powers.erase(key)
+			consumed = true
+	if _active_powers.has(DND_KEY):
+		_active_powers.erase(DND_KEY)
+		consumed = true
+	if consumed:
+		active_powers_changed.emit()
+	return consumed
+
+
 func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "", is_crit: bool = false) -> void:
 	if not _enemy_alive[enemy_index]:
 		return
-	# T3-WARD: invuln 활성화 시 모든 데미지 무시
+	# ── 받는 측 DamageContext 구성 ──
+	var ctx := DamageContext.new()
+	ctx.base = amount
+	# T3-WARD: invuln 활성화 시 데미지 무시 — dnd 소진 전에 early-return
 	if _enemy_status[enemy_index].get("invuln", 0) > 0:
 		enemy_damaged.emit(enemy_index, 0, damage_type, false)
 		return
-	amount = _consume_double_next_damage(amount)
+	# double_next_damage: 플래그 확인·소진 후 ctx.dnd_mult=2.0 (×2는 ctx가 담당)
+	if _consume_dnd_flag():
+		ctx.dnd_mult = 2.0
+	# vulnerable: 받는 측 +50%
 	if _enemy_status[enemy_index].get("vulnerable", 0) > 0:
-		amount = int(amount * 1.5)
+		ctx.in_pct += 0.5
 	# FORM_SWITCH defense — turn_modes 의 index 0 = defense 모드. 받는 damage 50%.
 	if _is_enemy_in_defense_mode(enemy_index):
-		amount = int(amount * 0.5)
+		ctx.mitigation.append(0.5)
 	# dynamic_resistance (Kunino Quad-Converge 영감) — current_weakness 와 damage_type 불일치 시 0.2배
 	var _cur_weak: String = _enemy_status[enemy_index].get("current_weakness", "")
 	if _cur_weak != "" and damage_type != "" and damage_type != _cur_weak:
-		amount = int(amount * 0.2)
+		ctx.mitigation.append(0.2)
+	amount = compute_damage(ctx)
 	var absorbed: int = min(_enemy_block[enemy_index], amount)
 	_enemy_block[enemy_index] -= absorbed
 	amount -= absorbed
@@ -1745,12 +1812,19 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 	if team_mgr == null or not team_mgr.is_alive(hero_id):
 		return
 	var status: Dictionary = _hero_status.get(hero_id, {})
+	# ── 받는 측 DamageContext 구성 ──
+	var ctx := DamageContext.new()
+	ctx.base = amount
+	# vulnerable: 받는 측 +50%
 	if status.get("vulnerable", 0) > 0:
-		amount = int(amount * 1.5)
-	# counter_pending — 다음 받는 공격 50% 반감 + 100% 반사. 1회 사용 후 소멸.
+		ctx.in_pct += 0.5
+	# counter_pending: 반감(×0.5)만 mitigation에 추가 — 반사·소진·VFX는 아래에서 그대로 처리
 	if status.get("counter_pending", 0) > 0 and from_enemy_index >= 0 and from_enemy_index < _enemies.size():
-		var _reflect_amt: int = amount
-		amount = int(amount * 0.5)
+		ctx.mitigation.append(0.5)
+	amount = compute_damage(ctx)
+	# counter_pending — 다음 받는 공격 100% 반사 + 1회 소멸 + VFX. (반감은 위 ctx에서 완료)
+	if status.get("counter_pending", 0) > 0 and from_enemy_index >= 0 and from_enemy_index < _enemies.size():
+		var _reflect_amt: int = int(ctx.base * (1.0 + ctx.in_pct))  # vulnerable 적용 후 반사 (구버전 동작 복원)
 		if _enemy_alive[from_enemy_index]:
 			_deal_damage_to_enemy(from_enemy_index, _reflect_amt, damage_type)
 		_hero_status[hero_id]["counter_pending"] = 0
@@ -2178,30 +2252,34 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 			return
 	match intent.action_type:
 		IntentRes.ActionType.ATTACK:
-			var dmg: int = intent.value
-			var strength: int = _enemy_status[enemy_index].get("strength", 0)
-			if strength > 0:
-				dmg = int(dmg * (1.0 + 0.1 * strength))
-			if _enemy_status[enemy_index].get("weak", 0) > 0:
-				dmg = int(dmg * 0.75)
-			# FORM_SWITCH offense — turn_modes index >= 1 = offense, 주는 damage 1.5x
-			if _is_enemy_in_offense_mode(enemy_index):
-				dmg = int(dmg * 1.5)
-			# CHANGE_AFFINITY override — intent.damage_type 대신 current_affinity 사용
-			var resolved_dmg_type: String = _resolve_enemy_damage_type(enemy_index, intent.damage_type)
+			# ── 공격자 측 DamageContext 구성 ──
+			var _atk_ctx := DamageContext.new()
+			_atk_ctx.base = intent.value
+			# strength: 곱연산 → flat 합연산 (영웅 strength 와 동작 통일)
+			_atk_ctx.flat = _enemy_status[enemy_index].get("strength", 0)
 			# T3-COUNTER: 누적된 counter_pool 가산 후 소진
 			var counter_pool: int = _enemy_status[enemy_index].get("counter_pool", 0)
 			if counter_pool > 0:
-				dmg += counter_pool
+				_atk_ctx.flat += counter_pool
 				_enemy_status[enemy_index]["counter_pool"] = 0
 				_enemy_status[enemy_index]["counter_ratio"] = 0.0
+			# weak: −25%, FORM_SWITCH offense: +50% (out_pct 합산)
+			if _enemy_status[enemy_index].get("weak", 0) > 0:
+				_atk_ctx.out_pct -= 0.25
+			# FORM_SWITCH offense — turn_modes index >= 1 = offense, 주는 damage 1.5x
+			if _is_enemy_in_offense_mode(enemy_index):
+				_atk_ctx.out_pct += 0.5
+			# CHANGE_AFFINITY override — intent.damage_type 대신 current_affinity 사용
+			var resolved_dmg_type: String = _resolve_enemy_damage_type(enemy_index, intent.damage_type)
 			if intent.target == IntentRes.TargetType.ALL:
 				if team_mgr:
 					for hero in team_mgr.get_living_heroes():
 						# 치명타: 영웅 status.marked_by 비어있지 않으면 +30%
 						var _all_hm: bool = not _hero_status.get(hero.hero_id, {}).get("marked_by", []).is_empty()
-						var _all_crit: Dictionary = _roll_crit_damage(dmg, _all_hm)
-						_deal_damage_to_hero(hero.hero_id, _all_crit["dmg"], resolved_dmg_type, _all_crit["is_crit"], enemy_index)
+						var _all_crit_e: Dictionary = _roll_crit_enemy(_all_hm)
+						_atk_ctx.crit_mult = _all_crit_e["crit_mult"]
+						var _all_outgoing: int = compute_damage(_atk_ctx)
+						_deal_damage_to_hero(hero.hero_id, _all_outgoing, resolved_dmg_type, _all_crit_e["is_crit"], enemy_index)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
 				# 미리 결정된 타겟 사용 (사망 시 fallback 으로 재결정)
@@ -2211,8 +2289,10 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 				if target_id != "":
 					# 치명타: 영웅 status.marked_by 비어있지 않으면 +30% (마킹한 적 한정 X — 모든 적)
 					var has_mark: bool = not _hero_status.get(target_id, {}).get("marked_by", []).is_empty()
-					var crit_result: Dictionary = _roll_crit_damage(dmg, has_mark)
-					_deal_damage_to_hero(target_id, crit_result["dmg"], resolved_dmg_type, crit_result["is_crit"], enemy_index)
+					var crit_result_e: Dictionary = _roll_crit_enemy(has_mark)
+					_atk_ctx.crit_mult = crit_result_e["crit_mult"]
+					var outgoing: int = compute_damage(_atk_ctx)
+					_deal_damage_to_hero(target_id, outgoing, resolved_dmg_type, crit_result_e["is_crit"], enemy_index)
 					# 시그니처 hook: 적의 단일 타겟 공격 (이집트 저주 누적)
 					SignatureSys.on_enemy_attack(self, enemy_index, target_id)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": target_id})
@@ -2493,25 +2573,33 @@ func _cleanup_hero_status_on_death(hero_id: String) -> void:
 
 var _test_disable_crit: bool = false  # 테스트 환경 — 정확한 데미지 검증 위해 crit 비활성
 
-# 치명타 굴림 — 기본 5% + marked_by 보유 시 +30%. 발동 시 dmg × 2.
-# 반환: {dmg, is_crit}
-func _roll_crit_damage(base_dmg: int, has_mark: bool, target_enemy_index: int = -1) -> Dictionary:
+# 적 공격 전용 치명타 굴림 — 기본 5% + marked_by 보유 시 +30%.
+# 아군 시너지(독날·초원의 결투사·신의 원정) 적용 안 함.
+# 반환: {crit_mult: float, is_crit: bool}
+func _roll_crit_enemy(has_mark: bool) -> Dictionary:
 	if _test_disable_crit:
-		return {"dmg": base_dmg, "is_crit": false}
-	# 아군이 적을 공격하는 경우에만 시너지 적용 (적 공격 시 target_enemy_index = -1)
-	var is_ally_attack: bool = target_enemy_index >= 0
+		return {"crit_mult": 1.0, "is_crit": false}
+	var rate: float = CRIT_BASE_RATE + (CRIT_MARK_BONUS if has_mark else 0.0)
+	var is_crit: bool = randf() < rate
+	var crit_mult: float = CRIT_MULTIPLIER if is_crit else 1.0
+	return {"crit_mult": crit_mult, "is_crit": is_crit}
+
+# 치명타 굴림 (배율 전용) — _apply_card_effects DAMAGE 분기에서 사용.
+# 반환: {crit_mult: float, is_crit: bool}
+func _roll_crit(target_enemy_index: int, has_mark: bool) -> Dictionary:
+	if _test_disable_crit:
+		return {"crit_mult": 1.0, "is_crit": false}
 	var rate: float = CRIT_BASE_RATE + (CRIT_MARK_BONUS if has_mark else 0.0)
 	# 독날 (클레오파트라×무사시): 반함 상태 적에게 치명타 확률 100%
-	if is_ally_attack and team_mgr != null and team_mgr.is_alive("cleopatra") and team_mgr.is_alive("musashi") and target_enemy_index < _enemy_status.size() and _enemy_status[target_enemy_index].get("enthrall", 0) > 0:
+	if team_mgr != null and team_mgr.is_alive("cleopatra") and team_mgr.is_alive("musashi") and target_enemy_index < _enemy_status.size() and _enemy_status[target_enemy_index].get("enthrall", 0) > 0:
 		rate = 1.0
 	var is_crit: bool = randf() < rate
 	# 초원의 결투사 (칭기즈칸×무사시): 파티 치명타 데미지 ×3 (기본 ×2)
 	var crit_mult: float = CRIT_MULTIPLIER
-	if is_ally_attack and team_mgr != null and team_mgr.is_alive("genghis_khan") and team_mgr.is_alive("musashi"):
+	if team_mgr != null and team_mgr.is_alive("genghis_khan") and team_mgr.is_alive("musashi"):
 		crit_mult = 3.0
-	var dmg: int = int(base_dmg * crit_mult) if is_crit else base_dmg
-	# 신의 원정 (잔다르크×칭기즈칸): 아군 치명타 발동 시 아군 전체 힐 +30 — 회복 VFX 임팩트에 적용
-	if is_crit and is_ally_attack and team_mgr != null and team_mgr.is_alive("joan_of_arc") and team_mgr.is_alive("genghis_khan"):
+	# 신의 원정 (잔다르크×칭기즈칸): 아군 치명타 발동 시 아군 전체 힐 +30
+	if is_crit and team_mgr != null and team_mgr.is_alive("joan_of_arc") and team_mgr.is_alive("genghis_khan"):
 		synergy_triggered.emit("synergy.joan_genghis.name", "joan_of_arc")
 		var _jg_ids: Array = []
 		for _de_h in team_mgr.get_living_heroes():
@@ -2521,7 +2609,7 @@ func _roll_crit_damage(base_dmg: int, has_mark: bool, target_enemy_index: int = 
 		else:
 			for _jg_id in _jg_ids:
 				_heal_hero_safe(_jg_id, 30)
-	return {"dmg": dmg, "is_crit": is_crit}
+	return {"crit_mult": crit_mult if is_crit else 1.0, "is_crit": is_crit}
 
 func _pick_highest_hp(hero_ids: Array) -> String:
 	if hero_ids.is_empty():
@@ -3020,3 +3108,32 @@ func debug_set_enemy_hp(index: int, hp: int) -> void:
 	# UI 갱신만 — enemy_damaged 는 데미지 popup ("Block" 등) 트리거하므로 사용 X.
 	pending_damage_changed.emit(index)
 	_check_phase_transition(index)
+
+
+## ───────────────────────────────────────────────
+## 데미지 파이프라인 — DamageContext + compute_damage
+## ───────────────────────────────────────────────
+
+## 데미지 계산에 필요한 모든 수치를 담는 값 객체.
+## block 차감은 호출부 책임 — 이 구조체는 block을 다루지 않는다.
+class DamageContext extends RefCounted:
+	var base: int = 0
+	var flat: int = 0            # 공격자 평탄 보너스 합산 (strength 등)
+	var out_pct: float = 0.0     # 공격자 증폭 % 합산 풀 (weak −0.25, 황제의무도 +0.25 등)
+	var crit_mult: float = 1.0   # 치명타 배율 (비치명타 시 1.0)
+	var dnd_mult: float = 1.0    # double_next_damage 배율 (없으면 1.0)
+	var in_pct: float = 0.0      # 받는 쪽 % 합산 풀 (vulnerable +0.5 등)
+	var mitigation: Array = []   # 경감 곱연쇄 (방어모드 0.5, 내성 0.2 등) — Array[float]
+	var invuln: bool = false      # 무적 — true면 데미지 0
+
+
+## 순수 함수 — DamageContext를 받아 최종 데미지 정수를 반환한다.
+## 공식: (base + flat) × (1 + out_pct) × crit_mult × dnd_mult × (1 + in_pct) × mitigation 곱연쇄
+## block 차감은 호출부 책임이므로 이 함수는 block을 다루지 않는다.
+static func compute_damage(ctx: DamageContext) -> int:
+	if ctx.invuln:
+		return 0
+	var d: float = (ctx.base + ctx.flat) * (1.0 + ctx.out_pct) * ctx.crit_mult * ctx.dnd_mult * (1.0 + ctx.in_pct)
+	for m in ctx.mitigation:
+		d *= m
+	return max(0, int(floor(d)))
