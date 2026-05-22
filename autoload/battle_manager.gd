@@ -1704,23 +1704,52 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			_in_echo_replay = false
 	await _apply_synergy_bonus(card, target_enemy_index)
 
+## dnd 플래그 존재 여부 확인 후 소진 — ×2는 적용하지 않음.
+## _deal_damage_to_enemy 전용: compute_damage ctx.dnd_mult 에서 ×2를 담당하므로
+## _consume_double_next_damage(×2 반환) 대신 이 함수로 플래그만 소진한다.
+func _consume_dnd_flag() -> bool:
+	var consumed: bool = false
+	if _current_actor_id.begins_with("hero:"):
+		var hid: String = _current_actor_id.substr(5)
+		var key: String = _dnd_key(hid)
+		if _active_powers.has(key):
+			_active_powers.erase(key)
+			consumed = true
+	if _active_powers.has(DND_KEY):
+		_active_powers.erase(DND_KEY)
+		consumed = true
+	if consumed:
+		active_powers_changed.emit()
+	return consumed
+
+
 func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "", is_crit: bool = false) -> void:
 	if not _enemy_alive[enemy_index]:
 		return
+	# ── 받는 측 DamageContext 구성 ──
+	var ctx := DamageContext.new()
+	ctx.base = amount
 	# T3-WARD: invuln 활성화 시 모든 데미지 무시
 	if _enemy_status[enemy_index].get("invuln", 0) > 0:
-		enemy_damaged.emit(enemy_index, 0, damage_type, false)
-		return
-	amount = _consume_double_next_damage(amount)
+		ctx.invuln = true
+	# double_next_damage: 플래그 확인·소진 후 ctx.dnd_mult=2.0 (×2는 ctx가 담당)
+	if _consume_dnd_flag():
+		ctx.dnd_mult = 2.0
+	# vulnerable: 받는 측 +50%
 	if _enemy_status[enemy_index].get("vulnerable", 0) > 0:
-		amount = int(amount * 1.5)
+		ctx.in_pct += 0.5
 	# FORM_SWITCH defense — turn_modes 의 index 0 = defense 모드. 받는 damage 50%.
 	if _is_enemy_in_defense_mode(enemy_index):
-		amount = int(amount * 0.5)
+		ctx.mitigation.append(0.5)
 	# dynamic_resistance (Kunino Quad-Converge 영감) — current_weakness 와 damage_type 불일치 시 0.2배
 	var _cur_weak: String = _enemy_status[enemy_index].get("current_weakness", "")
 	if _cur_weak != "" and damage_type != "" and damage_type != _cur_weak:
-		amount = int(amount * 0.2)
+		ctx.mitigation.append(0.2)
+	amount = compute_damage(ctx)
+	# invuln 시 시그널만 emit하고 종료
+	if ctx.invuln:
+		enemy_damaged.emit(enemy_index, 0, damage_type, false)
+		return
 	var absorbed: int = min(_enemy_block[enemy_index], amount)
 	_enemy_block[enemy_index] -= absorbed
 	amount -= absorbed
@@ -1760,12 +1789,19 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 	if team_mgr == null or not team_mgr.is_alive(hero_id):
 		return
 	var status: Dictionary = _hero_status.get(hero_id, {})
+	# ── 받는 측 DamageContext 구성 ──
+	var ctx := DamageContext.new()
+	ctx.base = amount
+	# vulnerable: 받는 측 +50%
 	if status.get("vulnerable", 0) > 0:
-		amount = int(amount * 1.5)
-	# counter_pending — 다음 받는 공격 50% 반감 + 100% 반사. 1회 사용 후 소멸.
+		ctx.in_pct += 0.5
+	# counter_pending: 반감(×0.5)만 mitigation에 추가 — 반사·소진·VFX는 아래에서 그대로 처리
 	if status.get("counter_pending", 0) > 0 and from_enemy_index >= 0 and from_enemy_index < _enemies.size():
-		var _reflect_amt: int = amount
-		amount = int(amount * 0.5)
+		ctx.mitigation.append(0.5)
+	amount = compute_damage(ctx)
+	# counter_pending — 다음 받는 공격 100% 반사 + 1회 소멸 + VFX. (반감은 위 ctx에서 완료)
+	if status.get("counter_pending", 0) > 0 and from_enemy_index >= 0 and from_enemy_index < _enemies.size():
+		var _reflect_amt: int = ctx.base  # 반사는 incoming 원본(반감 전) 그대로
 		if _enemy_alive[from_enemy_index]:
 			_deal_damage_to_enemy(from_enemy_index, _reflect_amt, damage_type)
 		_hero_status[hero_id]["counter_pending"] = 0
