@@ -1139,16 +1139,16 @@ func _start_battle() -> void:
 
 func _start_test_battle() -> void:
 	# 교차 영웅 시너지 테스트 전용 셋업 (battle_scene 단독 실행 시 폴백).
-	# 파티: 나폴레옹·칭기즈칸·무사시 — 정복자의 기세 / 황제의 무도 검증용.
+	# 파티: 잔다르크·클레오파트라·무사시 — 성스러운 독(#8) 검증용.
 	var HeroRes = load("res://resources/hero_resource.gd")
 	var EnemyRes = load("res://resources/enemy_resource.gd")
-	var NapCards = load("res://resources/cards/cards_napoleon.gd")
-	var GenghisCards = load("res://resources/cards/cards_genghis_khan.gd")
+	var JoanCards = load("res://resources/cards/cards_joan_of_arc.gd")
+	var CleoCards = load("res://resources/cards/cards_cleopatra.gd")
 	var MusashiCards = load("res://resources/cards/cards_musashi.gd")
 
 	# 영웅 설정 — 3인 파티 (실제 스케일 HP 1000)
 	TeamManager.clear()
-	for hid in ["napoleon", "genghis_khan", "musashi"]:
+	for hid in ["joan_of_arc", "cleopatra", "musashi"]:
 		var hero = HeroRes.new()
 		hero.hero_id = hid
 		hero.hero_name = "hero.%s.name" % hid
@@ -1157,18 +1157,17 @@ func _start_test_battle() -> void:
 		TeamManager.add_hero(hero)
 
 	# 덱 설정 — 시너지 발동 카드 중심
-	#  나폴레옹: GAIN_MORALE — 사기 획득 시 칭기즈칸도 사기 획득 (정복자의 기세 #11)
-	#            공격 카드 — 취약 적 공격 (황제의 무도 #12)
-	#  칭기즈칸: _flanking — 취약 ALL 부여 (황제의 무도 #12 셋업)
-	#  무사시:   _twin_blades_basic — DMG + 취약 / 공격 카드 (황제의 무도 #12)
+	#  클레오파트라: _venom_needle·_poison_seed·_asp_fang — 독 부여 (성스러운 독 #8)
+	#  잔다르크:     생존만으로 시너지 활성 (독 부여 시 아군 전체 회복 +15)
+	#  무사시:       일반 공격 카드
 	DeckManager.clear()
 	var test_deck: Array = [
-		NapCards._war_bugle(), NapCards._war_bugle(), NapCards._swift_march(),
-		NapCards._strike(), NapCards._strike(), NapCards._defend(),
-		GenghisCards._flanking(), GenghisCards._strike(), GenghisCards._horse_thrust(),
-		GenghisCards._quick_strike(), GenghisCards._strike(), GenghisCards._defend(),
-		MusashiCards._twin_blades_basic(), MusashiCards._strike(), MusashiCards._niten_slash(),
-		MusashiCards._whirlwind_cut(), MusashiCards._strike(), MusashiCards._defend(),
+		CleoCards._venom_needle(), CleoCards._venom_needle(), CleoCards._poison_seed(),
+		CleoCards._asp_fang(), CleoCards._strike(), CleoCards._defend(),
+		JoanCards._strike(), JoanCards._strike(), JoanCards._holy_smite(),
+		JoanCards._holy_bolt(), JoanCards._shield_prayer(), JoanCards._defend(),
+		MusashiCards._strike(), MusashiCards._strike(), MusashiCards._twin_blades_basic(),
+		MusashiCards._niten_slash(), MusashiCards._whirlwind_cut(), MusashiCards._defend(),
 	]
 	for card in test_deck:
 		DeckManager.add_card_to_deck(card)

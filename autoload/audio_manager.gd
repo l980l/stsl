@@ -41,6 +41,16 @@ func _ensure_buses() -> void:
 			AudioServer.add_bus(idx)
 			AudioServer.set_bus_name(idx, bname)
 			AudioServer.set_bus_send(idx, &"Master")
+	# SFX 버스 컴프레서 — 효과음이 겹쳐 출력이 누적되면 임계값 초과분을 자동 압축.
+	# 사운드마다 수동으로 dB 맞출 필요 없이 버스 단에서 전체 라우드니스를 제어.
+	var _sfx_idx := AudioServer.get_bus_index("SFX")
+	if _sfx_idx >= 0 and AudioServer.get_bus_effect_count(_sfx_idx) == 0:
+		var _comp := AudioEffectCompressor.new()
+		_comp.threshold = -4.0    # 이 레벨 이상부터 감쇠 — 단일 효과음은 통과, 겹침 누적만 억제
+		_comp.ratio = 2.0         # 초과분을 1/2 로 압축
+		_comp.attack_us = 20.0    # 빠른 반응 — 타격음 어택 보존
+		_comp.release_ms = 120.0
+		AudioServer.add_bus_effect(_sfx_idx, _comp)
 
 func _build_pool() -> void:
 	for _i in _POOL_SIZE:
