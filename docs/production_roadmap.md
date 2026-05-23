@@ -1,7 +1,7 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-20 v25)
-> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** 기준
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-23 v26)
+> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** + **시너지 시스템 v2(15종 전면 재설계·토큰 합동공격·SFX 컴프레서, PR #190·#191·#198)** + **데미지 모디파이어 버킷 재설계(`compute_damage()` 단일 파이프라인·합/곱 버킷·툴팁 표기, PR #196·#197)** + **VFX·UX 후속(시너지 VFX/SFX 동기화·sacrifice_bank 상태이상·정복자의 기세·황제의 무도 VFX·dispel/form_change/counter GPU 하이브리드 변환·LifeDrain VFX, PR #192~#195·#202)** + **영웅 전신 일러스트(배틀씬·영웅 선택씬, PR #189)** + **UI 폴리싱 v2(몬스터 정체성 13종 리스킨·Museum Mat 프레임·Sacred Cursors 9종·덱·턴 아이콘, PR #199~#202)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
 ---
@@ -42,6 +42,11 @@
 **전투 UX 폴리싱 v3** (PR #126): 차례 인터벌 fine-tune (영웅→영웅 1x, 영웅↔적 2x, 적→적 3x), 적 인텐트 hover tooltip (모든 action_type + SPECIAL, 9 언어, base/사이드바 모두 작동), 상태이상 UI 시그니처 6 + 활성 파워 15 SVG 아이콘 추가 (이모지 폴백 제거), 파워 tooltip = 시전자 영웅 이름 (옆 라벨의 효과 설명과 역할 분리). GDScript 워닝/런타임 에러 일괄 정리 — Shift+T 번역 키 디버그 모드 크래시 해결 (`_format_intent_tooltip` `tr() %` → `_trf`), `ui_sound` meta flag 로 중복 connect 차단, `card_scene._build_desc` 절대 경로 get_node → autoload 직접 참조.
 **영웅 별명 + i18n 통일** (PR #128): 스토리 설정 (영웅들이 현생 기억 X → 본명 모름) — 영웅 6명 `.name` 을 영웅적 칭호로 (아우스터리츠의 태양 / 마지막 파라오 / 불패의 통제사 / 오를레앙의 성녀 / 초원의 정복자 / 두 자루의 검객). 메커니즘 desc·시너지 의 본명 → 짧은 직함 일괄 치환 (488 셀, 4 csv, 9 언어, 그리스어 격변화/정관사 후처리). 1인칭 유물 4종 (난중일기·오를레앙 깃발·니텐이치류·오륜서) 추상화. 누락 번역키 일괄 채움 — battle.intent.tooltip ja/el/zh 26 키, joan archetype 12, 시그너처 toast 6, status name 8, 유물/카드 effect 텍스트 등 ~150 셀. turn queue 슬롯 가로 96 (별명 길이 대응).
 **speed 시스템** (PR #129): 영웅·적 `speed` 스탯에 동적 buff/debuff 시스템. status `speed_bonus`/`speed_penalty` + `_dur` (poison 패턴 일정 효과), power `power.speed_buff` (전투 끝까지). 카드 6 종 (영웅별 1: 전격 진군/유혹의 정체/거북선 점호/성령의 가호/기마 돌격/신속의 검) + 유물 2 종 (신속의 인장 BATTLE_START 모든 영웅 +3, 시간의 모래시계 영웅 차례 5회마다 +1 누적). speed 변경 시 `_adjust_turn_queue_for_speed_change` 가 `_turn_queue_at` 비율 보정 + `turn_queue_changed` emit → UI 즉시 갱신. APPLY_STATUS target 에 ALL_ALLIES/ALLY 추가. CP 테이블 `SPEED_PER_TURN_V`/`SPEED_POWER_V` + 배수 추가, balance_check 전체 통과 (246 OK + 50 upgrade + 중복 0). 9 언어 i18n 21 키. **1448 passed / 0 failed**.
+**시너지 시스템 v2** (PR #190·#191·#198): 교차 영웅 시너지 15종을 자동 패시브에서 게임 스케일에 맞는 의미 있는 효과로 전면 재설계. 옛 트리거 코드 전부 제거. 신규: 철벽 진군(사기×5 방어구)·독침 반격·혼란의 돌격(병사 공격마다 매혹+3)·성전(사기 1당 회복+7%)·약탈과 독·검사의 약속(공격마다 두 영웅 속도+1 영구)·성녀의 방패·성스러운 독·신의 원정(치명타 시 전체 +30 HP)·희생의 칼날·정복자의 기세·황제의 무도(취약 적 피해+25%)·수륙 협공(이순신×칭기즈칸 병사 합동 공격 토큰 그리드 공유)·초원의 결투사(치명타 ×3)·독날(반함 적 치명타 100%). 이순신 토큰 소스 카드 "수군 소집" 추가. 병사 토큰 발사 VFX 영웅별 분기. SFX 버스에 AudioEffectCompressor (threshold -4dB, ratio 2:1) — 효과음 겹침 자동 감쇠.
+**데미지 모디파이어 버킷 재설계** (PR #196·#197): 취약·치명타·시너지 곱 누적으로 수치 폭증하던 문제 해결. 5곳 분산된 데미지 계산 → 단일 `compute_damage()` 파이프라인 통합. **새 공식**: `floor( (base+flat) × (1+out_pct) × crit × dnd × (1+in_pct) × Π경감 )`. weak/strength/황제의 무도가 곱 연쇄 → 합산 풀(out_pct) 이동, `int()` 절삭 6회 → 2회, **미리보기 = 실제 데미지 보장**. Phase B 에서 카드 툴팁 합·곱 표기 (`+N%` / `최종 ×N`).
+**VFX·UX 후속** (PR #192~#195·#202): dispel·form_change·counter CPU→GPU 하이브리드 변환 (성능). 시너지 회복·버프 VFX 임팩트 시점 동기화, 카드 표시 수정. 토큰·시너지 VFX/SFX 동기화 + 독 표시 버그 수정. 정복자의 기세·황제의 무도 신규 VFX. **LifeDrain VFX** (CPU + GPU 하이브리드): open → siphon (tether/spiral/sigil) → seal 3 페이즈, 신규 SFX `life_drain`, 신호 `synergy_drain_vfx`. 신의 원정·성스러운 독 시너지 적→각 아군 흡수 빔으로 표현.
+**영웅 전신 일러스트** (PR #189): 색 사각형 placeholder → 실제 일러스트. `character_placeholder.gd` Sprite2D 추가, 80×80 sprite 영역에 cover 모드 (한쪽 일치 + 다른 쪽 region 잘림). 비균등 외부 scale (1.44, 2.4) 시각 보정. 영웅 선택씬 AtlasTexture region 으로 얼굴/상체 crop.
+**UI 폴리싱 v2** (PR #199~#202): **몬스터 정체성 13종 리스킨** — 같은 신화 인물 중복 9그룹 정리 (#199). **Museum Mat 프레임** — 배틀씬 영웅·몬스터 스프라이트 영역에 미술관 매트 프레임 적용 (#200). **Sacred Cursors 9종** — Godot CURSOR_* 슬롯에 default/pointer/grab/grabbing/attack/inspect/denied/wait/ally 매핑, 카드 드래그 중 호버 타겟에 따라 attack/ally/denied/grabbing 동적 스왑, 설정 커서 크기 4단계 (S=32/M=48/L=64/XL=96), grabbing per-cursor scale 1.5x 보정, 무사시 신속의 검 BUFF_SPEED 999턴 상태이상 UI 노출 (#201). **덱·턴 아이콘** — 배틀씬 버튼 텍스트·StyleBox 제거하고 TextureButton 아이콘만 (deck-fan, end-turn-skip), 호버 트윈 (-3px·1.08x), 비활성 시 self_modulate.a=0.4, 에너지 UI 와 세로 스택 + 모두 20% 확대 (#202).
 
 ---
 
@@ -856,12 +861,140 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ---
 
+## Milestone 6.23 — 시너지 시스템 v2 ✅ (PR #190·#191·#198)
+
+> 교차 영웅 시너지 15종을 자동 패시브에서 게임 스케일에 맞는 의미 있는 효과로 전면 재설계.
+
+### 6.23-1. 시너지 15종 재설계
+- ✅ #1 철벽 진군 (나×이): 사기 획득 시 아군 전원 방어구 +(획득 사기×5)
+- ✅ #2 독침 반격 (클×이): 파티원 피격 시 공격한 적에게 독 30 반격
+- ✅ #3 혼란의 돌격 (나×클): 나폴레옹 병사 공격마다 매혹 +3
+- ✅ #4 성전 (나×잔): 나폴레옹 사기 1당 회복 효과 +7%
+- ✅ #5 약탈과 독 (칭×클): 칭기즈칸 병사 공격마다 독 +5
+- ✅ #6 검사의 약속 (이×무): 공격 시 두 영웅 속도 +1 (영구, 기존 항목 누적)
+- ✅ #7 성녀의 방패 (잔×이): 힐 적용 시 대상 방어구 +30
+- ✅ #8 성스러운 독 (잔×클): 클레오 독 부여 시 아군 전체 회복 +15 (synergy_ally_vfx heal)
+- ✅ #9 신의 원정 (잔×칭): 아군 치명타 시 아군 전체 회복 +30
+- ✅ #10 희생의 칼날 (무×잔): 체력 희생 시 파티 전원 속도 +5 (3턴)
+- ✅ #11 정복자의 기세 (나×칭): 사기 획득 카드 시 두 영웅 모두 사기 획득
+- ✅ #12 황제의 무도 (나×무): 취약 적에게 두 영웅 피해 +25%
+- ✅ #13 수륙 협공 (이×칭): 이순신·칭기즈칸 병사 합동 공격 (토큰 그리드 공유), 본인 병사 없으면 토큰 공격 전체 생략
+- ✅ #14 초원의 결투사 (칭×무): 파티 치명타 피해 300%
+- ✅ #15 독날 (클×무): 반함 적에게 치명타 확률 100%
+- ✅ 옛 시너지 트리거 코드 전부 제거, 툴팁 13개 언어 갱신
+
+### 6.23-2. 보완·동작 보정
+- ✅ 이순신 토큰 소스 카드 "수군 소집" 추가 — #13·함포 일제사 활성화 (영웅별 카드 풀 33→34, UNCOMMON 8→9, 거북선 10→11)
+- ✅ 병사 토큰 발사 VFX 영웅별 분기 — 이순신: explosion_blast / 칭기즈칸: arrow_shot / 나폴레옹: bullet_shot
+- ✅ counter VFX 타이머 `is_inside_tree` 가드 — 헤드리스 테스트 크래시 수정
+- ✅ 토큰 공격 헬퍼 `_run_token_attacks(owner, count)` 분리, 매혹·독 시너지 후처리 실제 병사 소유자 기준 정정
+- ✅ 검사의 약속 속도 +1 매번 append → 기존 영구 항목 누적 (툴팁 한 줄 유지)
+- ✅ 성스러운 독 `_heal_hero_safe` 직접 호출 → `synergy_ally_vfx("heal")` 전환, heal_blessing VFX·SFX 동기화
+
+### 6.23-3. SFX 컴프레서
+- ✅ SFX 버스에 `AudioEffectCompressor` (threshold -4dB, ratio 2:1, attack 20μs, release 120ms) — 효과음 겹침 누적 시 자동 감쇠, 사운드별 수동 dB 튜닝 불필요
+
+---
+
+## Milestone 6.24 — 데미지 모디파이어 버킷 재설계 ✅ (PR #196·#197)
+
+> 취약·치명타·시너지 곱 누적으로 수치 폭증하던 문제 (예: `치명타×3 × 황제무도×1.25 × 취약×1.5 × dnd×2 = 11.25배`) 해결.
+> 인기 게임(PoE·메이플·STS) 리서치 결과 — 모디파이어를 합/곱 버킷으로 묶는 보편 해법 적용.
+
+### 6.24-1. Phase A — 파이프라인 통합 (PR #196)
+- ✅ `DamageContext` + `compute_damage()` 순수 함수 + 단위 테스트 9종
+- ✅ `battle_manager.gd` 5곳 분산된 데미지 계산 + 미리보기 3함수 → 단일 파이프라인
+- ✅ **새 공식**: `floor( (base+flat) × (1+out_pct) × crit × dnd × (1+in_pct) × Π경감 )`
+- ✅ 영웅 카드 공격: weak·strength·황제의 무도를 합산 풀(out_pct) 이동
+- ✅ 적 공격: 적 strength 곱연산 → flat 합연산 통일, `_roll_crit_enemy` 분리
+- ✅ 받는 쪽 (취약·경감·dnd) 통합 + 미세 회귀 2건 수정 (invuln dnd 소진·counter 반사량)
+- ✅ 미리보기 3함수 통일 — **미리보기 = 실제 데미지 보장**
+- ✅ `int()` 절삭 6회 → 2회
+- ✅ 치명타·취약·dnd 의도대로 곱연산 유지
+
+### 6.24-2. Phase B — 합·곱 툴팁 표기 (PR #197)
+- ✅ 카드 툴팁/효과 텍스트에 합 (`+N%`) 과 곱 (`최종 ×N`) 구분 표시
+- ✅ 플레이어가 모디파이어 버킷 구조 직관적 파악 가능
+
+### 6.24-3. 후속
+- 🔲 적 strength 곱→flat 전환에 따른 밸런스 계수 튜닝 (플레이테스트 후)
+
+---
+
+## Milestone 6.25 — VFX·UX 후속 ✅ (PR #192~#195·#202)
+
+> M6.23 시너지 재설계 직후 발견된 VFX·SFX 동기화 이슈 + GPU 하이브리드 추가 변환 + 신규 VFX (정복자의 기세·황제의 무도·LifeDrain).
+
+### 6.25-1. dispel·form_change·counter CPU→GPU 하이브리드 변환 (PR #192)
+- ✅ 세 VFX 의 표준 입자(속도/감속/색 페이드) 부분만 GPU 변환
+- ✅ 폴리곤 effect (hook tendril / pillar / parry flash) 는 CPU 유지
+
+### 6.25-2. 토큰·시너지 VFX/SFX 동기화 + 독 표시 버그 수정 (PR #193)
+- ✅ 토큰 공격·시너지 발동 시점에 VFX/SFX 정확 동기
+- ✅ 독 스택 표시 버그 수정 (popup 누락)
+
+### 6.25-3. 시너지 회복·버프 VFX + sacrifice_bank 상태이상화 + 카드 표시 수정 (PR #194)
+- ✅ 시너지 회복·버프 VFX 임팩트 시점 정확 동기화
+- ✅ `sacrifice_bank` (희생 누적) 을 상태이상 형태로 노출 → 플레이어 가시성 ↑
+- ✅ 카드 표시 수정 (시너지 강화 강조 누락 케이스)
+
+### 6.25-4. 정복자의 기세·황제의 무도 VFX + F6 테스트 파티 교체 (PR #195)
+- ✅ 시너지 #11 정복자의 기세 신규 VFX (사기 공유 강조)
+- ✅ 시너지 #12 황제의 무도 신규 VFX (취약 적 피해+25% 강조)
+- ✅ F6 테스트 파티 → 나폴레옹·칭기즈칸·무사시 (시너지 #11·#12·#14 검증용)
+
+### 6.25-5. LifeDrain VFX (PR #202)
+- ✅ `scenes/vfx/life_drain.gd` (CPU) — open(0.30s) → siphon(1.50s) → seal(0.70s) 3 페이즈
+  - open: 피 분출 28 splat + 시든 고리(wither) 등장
+  - siphon: wavy tether(caster↔target) + 흐름 입자 (target→caster, blood + brass) + 시전자 발 아래 spiral 회전 + 머리 위 성배 sigil + 바닥 망령/생명 motes
+  - seal: tether/spiral/wither 페이드, sigil 위로 사라짐
+- ✅ `scenes/vfx/life_drain_gpu.gd` (GPU 하이브리드) — wound burst·flow·rise 입자만 GPU, tether/wither/spiral/sigil 폴리곤은 CPU 유지
+  - flow 입자: speed 편차 0 + lifetime=dist/speed 정확 매칭 → caster 도착 시점에 정확히 사라짐 (거리 변화 자동 적응)
+  - rise 입자 ×4 밀도, cold 색 (COL_BLOOD_D) 가산 블렌드 가시성 보강 (size·mid_alpha)
+- ✅ 신규 SFX key `life_drain` (`assets/audio/sfx/life_drain_1.mp3` — .gitignore 로 git 제외)
+- ✅ 신규 시그널 `synergy_drain_vfx(hero_ids, value, target_enemy_index)`
+- ✅ 시너지 적용 (기존 `synergy_ally_vfx("heal", ...)` 2 사이트 교체):
+  - 신의 원정 (잔다르크×칭기즈칸): 아군 치명타 시 적→각 아군 흡수 빔, 임팩트 시 +30 HP
+  - 성스러운 독 (잔다르크×클레오): 클레오 독 부여 시 적→각 아군 흡수 빔, 임팩트 시 +15 HP
+- ✅ vfx_preview·vfx_preview_gpu 카탈로그 끝에 life_drain 등록, `_apply_ground_anchor` 가 `set_ground_anchors` 양발 anchor 분기
+
+---
+
+## Milestone 7.0 — UI 폴리싱 v2 ✅ (PR #199~#202)
+
+> Sacred UI 시스템 (M7-4, PR #86~#91) 위에 인게임 시각 톤 통일 + 사용성 개선 — 몬스터 정체성 / 스프라이트 프레임 / 커서 시스템 / 배틀 버튼 아이콘화.
+
+### 7.0-1. 몬스터 정체성 13종 리스킨 ✅ (PR #199)
+- ✅ 같은 신화 인물 중복 9그룹 정리 (apep_snake/apophis_serpent, fenrir_pup/fenrir_cub, frost_giant/hrimthurs_scout/frost_giant_pup, vajrapani/deva_guardian, snow_woman/yuki_onna/blizzard_queen, mara_soldier/mara_general/demon_soldier, vairocana/mahavairocana, kappa/river_kappa, oni_general/oni_king/shuten_doji)
+- ✅ 각 그룹에서 1종만 남기고 나머지는 같은 신화 다른 인물로 리스킨 (메커니즘 유지, 정체성만 교체)
+- ✅ `docs/game_design/enemy_reskin_2026-05-23.md` 기존/새 몬스터 매핑·외형 문서
+
+### 7.0-2. Museum Mat 프레임 ✅ (PR #200)
+- ✅ 배틀씬 영웅·몬스터 스프라이트 영역에 `ui_sample/ui_kits/portraits` 의 미술관 매트 프레임 적용
+- ✅ 사이즈/비율/매트 두께/색상 반복 조정으로 인게임 톤과 자연스럽게 매칭
+- ✅ `scenes/components/museum_mat_frame.gd` 컴포넌트화
+
+### 7.0-3. Sacred Cursors 9종 ✅ (PR #201)
+- ✅ `ui_sample/ui_kits/cursors/svg/` 의 9종 (default·pointer·grab·grabbing·attack·inspect·denied·wait·ally) 을 Godot `Input.CURSOR_*` 슬롯에 매핑, `assets/art/ui/cursors/` 이관
+- ✅ 설정 커서 크기 4단계 한 단계 상향: S=32 / M=48 / L=64 + XL=96 신설, 9종 모두 동시 리사이즈
+- ✅ 카드 드래그 — `MOUSE_MODE_HIDDEN`+arrow_head Sprite 제거 → `grabbing` 커서가 헤드 역할, chevron 트레일 유지. 호버 타겟에 따라 attack/ally/denied/grabbing 동적 스왑
+- ✅ `_CURSOR_MAP` per-cursor `scale` 필드 도입, grabbing(SVG 내부 작은 그래픽) `scale=1.5` 로 다른 커서와 시각 크기 정합
+- ✅ 무사시 신속의 검: `APPLY_STATUS/power.speed_buff` → `BUFF_SPEED(bonus_value=999)` 로 변경 → 상태이상 UI 노출
+
+### 7.0-4. 덱·턴 아이콘 ✅ (PR #202)
+- ✅ `assets/art/ui/icons/{deck-fan,end-turn-skip}.svg` — `ui_sample/ui_kits/icons` 에서 이관
+- ✅ 덱 보기/턴 종료 버튼 `Button` → `TextureButton` (텍스트·StyleBox·`animate_button` 데코 제거)
+- ✅ 호버 트윈 헬퍼 `_attach_icon_hover_anim` — 위로 -3px + 1.08x 확대 (EASE_OUT CUBIC 0.12s)
+- ✅ `_set_end_turn_btn_disabled` 헬퍼로 5개 disabled 호출 사이트 통일 (self_modulate 알파 0.4)
+- ✅ 덱 보기 / 에너지 hbox / 턴 종료 세로 스택, 같은 중심 x, 모두 +20% 확대 (에너지 180×32→216×38, 아이콘 64→77)
+
+---
+
 ## Milestone 7 — 비주얼 / 오디오
 
 ### 7-1. 캐릭터 아트
-- 🔲 나폴레옹 스프라이트 (아이들 / 공격 / 피격 / 사망)
-- 🔲 클레오파트라 스프라이트
-- 🔲 이순신 스프라이트
+- ✅ **영웅 6인 전신 일러스트 적용** (PR #189) — `character_placeholder.gd` Sprite2D, 80×80 sprite 영역 cover 모드(한쪽 일치 + 다른 쪽 region 잘림), 외부 비균등 scale (1.44, 2.4) 역수 보정, 영웅 선택씬 AtlasTexture region 얼굴/상체 crop
+- 🔲 아이들 / 공격 / 피격 / 사망 액션별 일러스트 (현재 static 단일 일러스트)
 - 🔲 사망 상태 연출 (반투명 or 그레이스케일)
 
 ### 7-2. 적 아트
@@ -1266,7 +1399,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 
 ## 우선순위 요약
 
-> 최종 갱신: 2026-05-20 v25. PR #185·#186·#187 반영 — 적 패턴 풍부화 3단계 (M6.22): counter_window 보스 1 → 9명 (Phase A) + SUMMON/MIMIC 4 적 확장 (Phase B) + silence/heal_block 4 적 추가 (Phase C).
+> 최종 갱신: 2026-05-23 v26. PR #189~#202 반영 — 영웅 전신 일러스트 (#189) + 시너지 시스템 v2 (#190·#191·#198) + dispel/form_change/counter GPU 하이브리드 (#192) + VFX·UX 후속 4건 (#193·#194·#195·#202) + 데미지 모디파이어 버킷 재설계 (#196·#197) + UI 폴리싱 v2 4건 (#199 몬스터 리스킨·#200 Museum Mat·#201 Sacred Cursors·#202 덱·턴 아이콘+LifeDrain VFX).
 
 | 우선순위 | 항목 | 이유 |
 |---|---|---|
@@ -1311,6 +1444,11 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 | ✅ 완료 | 카운터 시스템 + VFX 3종 + CC UI + SFX 확장 (M6.21) | PR #180·#181·#182·#183 + 후속. **status 전수조사** (i18n 14언어 + svg + STATUS_INTERNAL_KEYS — counter_pending/double_action/heal_block/silence) + **card_exhaust transform sync** (부채꼴 회전 + hover 확대 반영) + **SFX 신규 12키** (revive/arrow_shot/summon/charge_up/card_exhaust/speed_bonus/speed_penalty/card_steal/form_change/boss_phase/boss_phase_build/stun/warrior_buff/battle_lost). **신규 VFX 3종** — `dispel.gd` (빨간 hook 3가닥 + buff orb shatter) / `form_change.gd` (charge halo → pillar 발치→위 → crack → shatter → reveal, ground/glow 2 레이어) / `counter.gd` (parry flash + streak + hit burst; **major 변형**: `Engine.time_scale = 0.35` 0.6s + **흑백 postprocess shader** `assets/shaders/desaturate.gdshader` + `hint_screen_texture` uniform + **Bezier 곡선 streak 3가닥** dispel 스타일). **카운터 카드 시스템 개편** — `BattleManager.is_counter_window_active(idx)` 헬퍼 (counter_window_intent.enabled + charge_remaining > 0 OR 현재 의도 CHARGE_UP), COUNTER_REFLECT 자동 타겟 + 패턴 사이클 reset (intent_index = 0) 후속 공격 캔슬, counter_pending 중첩 X (binary), 카드 glow 황금↔파랑 sine 펄스, `_apply_card_state` add_child 후 호출 버그 fix (`_glow_mat` null silently fail), glow shader 둥근 모서리 (rounded box SDF) + smoothstep + 1.6배 강도. **CC UI** — 적 intent CC 라벨 우선 (stun > charm > enthrall > silence, `battle.cc.*` 14언어 텍스트만), 강력 CC popup (charm/enthrall/taunt/silence/heal_block, stacks 증가 시만), STUN! 큰 폰트 (STATUS_POPUP_INFO font_size override 64), counter window 활성 보스 intent ⚠️ 양옆 통일 + `counter_warning` tooltip, counter_pending UI 수치 표시 X, 매혹 저항 tooltip 동적 임계값 (`%d 초과 시 반함`). **적 메커니즘** — 적 stun 실제 처리 (turn skip + decrement + intent advance 차단), counter_triggered signal, `_check_win_condition` 패배 우선 (적+영웅 동시 사망), 보스 사망 VFX 전체 시퀀스 대기 (4.5s). **stun_stars 개편** — persistent 모드 (set_target_node/stop, stun 해제까지 머리 위 별 지속) + 타원 궤도. **버그 fix** — `set_enemy_hp` / `phase_heal_ratios` 의 `enemy_damaged.emit` → `pending_damage_changed` (페이즈 전환 시 "Block" popup 버그), ⚠️ U+FE0F 추가 (emoji-style 강제), popup spawn 조건 `stacks > 0`, 적 stun skip 시 popup 페이드 대기 (0.9s). **디버그** — `_make_checkbox_dialog` 검색 LineEdit (Shift+A/M/R/U/P/L/X 자동 적용). vfx_preview 4종 등록 (dispel/form_change/counter/counter_major). 카드 effect 텍스트 번역키 (`effect.counter_reflect.text` 14언어 = "카운터 효과를 얻습니다.") |
 | ✅ 완료 | 타겟 마킹 → 치명타 시스템 재설계 + VFX 정리 (M6.20) | PR #152. 기존 +50% boost 제거 → **모든 영웅/적 공격에 치명타 확률 +30%** (base 5%, 치명타 시 ×2). 신규 `MARK_ENEMY` effect + VFX hook (target_marking 재활용) + signal 에 `is_crit` 인자 → CRIT popup. 카드 변경 (신규 X — 기존 1장씩 교체): 칭기즈칸 **노획** = MARK+DRAW1, 나폴레옹 **정찰** = MARK+MORALE1. i18n 13 언어 (`effect.mark_enemy.text` + `status.marked_by.desc.on_hero/on_enemy`). **VFX 발바닥 anchor 일괄 정리**: holy_buff/warrior_buff 빛기둥 + boss_death pillar + 영웅/적 사망 시 발 그림자 fade out (`set_meta("ground_shadow")`). **vfx_preview 인게임 환경 동일화**: 시전자/타겟 1:2 사각형 sprite 영역 (96×192) + 발 십자가 + `set_ground_anchor` 자동 적용. 버그 fix: 렐릭 strength_player power 에 `owner_id` 누락 (game_manager) → tooltip 미표시. **1494 통과 / 0 fail** |
 | ✅ 완료 | 배경 시스템 v1 (M7.5) | PR #117·#119. SceneBackground 컴포넌트 (parallax 5 레이어 sky/far/mid/near/fg) + 6 신화 × 3 Act = 18 환경 팔레트 + EnvSpec (time_of_day × weather) + 6 신화 SVG 오브젝트 풀 (large/medium/small/pillars) + SceneCritters (새) + weather_particles (비·눈) — battle 씬 적용 |
+| ✅ 완료 | 영웅 전신 일러스트 (M7-1) | PR #189. character_placeholder Sprite2D + 80×80 cover 모드 + 비균등 scale 보정 + 영웅 선택씬 AtlasTexture region crop |
+| ✅ 완료 | 시너지 시스템 v2 (M6.23) | PR #190·#191·#198. 교차 영웅 시너지 15종 전면 재설계 (자동 패시브 → 게임 스케일 의미 있는 효과) + 토큰 합동 공격 (수륙 협공) + 검사의 약속 영구 누적 + 성스러운 독 VFX 동기화 + SFX 컴프레서. **1538 통과 / 0 fail** |
+| ✅ 완료 | 데미지 모디파이어 버킷 재설계 (M6.24) | PR #196·#197. compute_damage() 단일 파이프라인 (합/곱 버킷 분리) + 미리보기=실제 데미지 보장 + 카드 툴팁 합·곱 표기 (`+N%`/`최종 ×N`). 인기 게임 (PoE·메이플·STS) 리서치 기반 |
+| ✅ 완료 | VFX·UX 후속 (M6.25) | PR #192~#195·#202. dispel/form_change/counter CPU→GPU 하이브리드 + 시너지 회복·버프 VFX 동기화 + sacrifice_bank 상태이상화 + 정복자의 기세·황제의 무도 신규 VFX + **LifeDrain VFX** (CPU + GPU, open/siphon/seal 3 페이즈, 신호 synergy_drain_vfx, 신의 원정·성스러운 독에 적용) |
+| ✅ 완료 | UI 폴리싱 v2 (M7.0) | PR #199~#202. 몬스터 정체성 13종 리스킨 (같은 신화 인물 중복 9그룹 정리) + Museum Mat 프레임 + Sacred Cursors 9종 (Godot CURSOR_* 슬롯 매핑, 드래그 중 동적 스왑, S/M/L/XL 4단계) + 덱·턴 아이콘 (TextureButton, 호버 트윈, 에너지와 세로 스택 +20% 확대) |
 | 🟢 장기 | 배경 시스템 v2 — 잔여 (M7.5+) | DOF 셰이더 (거리 기반 blur, filmic 깊이감) + Light2D (어두운 배경 광원·그림자). 현 시점 분위기 충분 — "한 단계 더" 영역. event/rest/shop 은 별도 이미지로 이미 세팅·map 은 의도적으로 배경 없음 |
 | 🟡 중기 | 번역 내용 채우기 (M8.5-2) | 한국어 나머지 + 영어 전체 → 플레이어블 2개 언어 목표 |
 | ✅ 완료 | i18n 4 언어 인프라 + 7 csv 번역 (M8.5-3) | PR #142. ru/pt/pl/de 추가 (9→13 언어). LocaleManager LOCALES + DISPLAY_NAMES + project.godot 117 entry + test 13개로 갱신. 7/9 csv 직접 번역 (hero 15·synergy 30·status 45·relic 90·battle 137·ui 159·enemy 195 = 671행 × 4 언어). card 755·event 280 은 영어 fallback 으로 import 정상화 — 별도 PR 에서 진짜 번역. **1462 통과 / 0 fail** |
