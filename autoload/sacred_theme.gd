@@ -81,23 +81,24 @@ var _cursor_base_images: Dictionary = {}      # name → Image (32×32 베이스
 var _cursor_textures_cache: Dictionary = {}   # name → ImageTexture (현재 px 기준 리사이즈된 텍스처)
 var _cursor_hotspots_cache: Dictionary = {}   # name → Vector2 (현재 px 기준 스케일된 핫스팟)
 
-const _CURSOR_DEFAULT := 32
+const _CURSOR_DEFAULT := 48                    # 기본값 = settings_overlay 의 M 키 (px)
 const _CURSOR_BASE_PX := 32                    # 샘플 SVG viewBox 크기 (핫스팟 비례 기준)
 const _CURSORS_DIR    := "res://assets/art/ui/cursors/"
 const _SETTINGS_PATH  := "user://settings.cfg"
 
-# 이름 → {shape: Input.CursorShape, hotspot: Vector2 (32px 기준)}
+# 이름 → {shape: Input.CursorShape, hotspot: Vector2 (32px 기준), scale: float (시각 배율)}
 # shape = -1 은 Godot 슬롯 매핑 없음 (수동 set_named_cursor 전용, 예: ally)
+# scale 1.0 = 표준. SVG 내부 그래픽이 작게 그려진 커서(grabbing 등)는 1.0 이상으로 보정.
 const _CURSOR_MAP := {
-	"default":  {"shape": Input.CURSOR_ARROW,         "hotspot": Vector2(3, 3)},
-	"pointer":  {"shape": Input.CURSOR_POINTING_HAND, "hotspot": Vector2(16, 16)},
-	"grab":     {"shape": Input.CURSOR_CAN_DROP,      "hotspot": Vector2(16, 16)},
-	"grabbing": {"shape": Input.CURSOR_DRAG,          "hotspot": Vector2(16, 16)},
-	"attack":   {"shape": Input.CURSOR_CROSS,         "hotspot": Vector2(16, 16)},
-	"inspect":  {"shape": Input.CURSOR_HELP,          "hotspot": Vector2(12, 12)},
-	"denied":   {"shape": Input.CURSOR_FORBIDDEN,     "hotspot": Vector2(16, 16)},
-	"wait":     {"shape": Input.CURSOR_BUSY,          "hotspot": Vector2(16, 16)},
-	"ally":     {"shape": -1,                          "hotspot": Vector2(16, 16)},
+	"default":  {"shape": Input.CURSOR_ARROW,         "hotspot": Vector2(3, 3),   "scale": 1.0},
+	"pointer":  {"shape": Input.CURSOR_POINTING_HAND, "hotspot": Vector2(16, 16), "scale": 1.0},
+	"grab":     {"shape": Input.CURSOR_CAN_DROP,      "hotspot": Vector2(16, 16), "scale": 1.0},
+	"grabbing": {"shape": Input.CURSOR_DRAG,          "hotspot": Vector2(16, 16), "scale": 1.5},
+	"attack":   {"shape": Input.CURSOR_CROSS,         "hotspot": Vector2(16, 16), "scale": 1.0},
+	"inspect":  {"shape": Input.CURSOR_HELP,          "hotspot": Vector2(12, 12), "scale": 1.0},
+	"denied":   {"shape": Input.CURSOR_FORBIDDEN,     "hotspot": Vector2(16, 16), "scale": 1.0},
+	"wait":     {"shape": Input.CURSOR_BUSY,          "hotspot": Vector2(16, 16), "scale": 1.0},
+	"ally":     {"shape": -1,                          "hotspot": Vector2(16, 16), "scale": 1.0},
 }
 
 func _ready() -> void:
@@ -126,15 +127,16 @@ func apply_cursor_size(px: int) -> void:
 	if _cursor_base_images.is_empty():
 		_setup_cursor()
 		return
-	var scale_ratio: float = float(px) / float(_CURSOR_BASE_PX)
 	for name in _CURSOR_MAP.keys():
 		if not _cursor_base_images.has(name):
 			continue
-		var img := (_cursor_base_images[name] as Image).duplicate() as Image
-		img.resize(px, px, Image.INTERPOLATE_LANCZOS)
-		var tex := ImageTexture.create_from_image(img)
 		var info: Dictionary = _CURSOR_MAP[name]
-		var hotspot: Vector2 = (info["hotspot"] as Vector2) * scale_ratio
+		var visual_scale: float = float(info.get("scale", 1.0))
+		var actual_px: int = int(round(float(px) * visual_scale))
+		var img := (_cursor_base_images[name] as Image).duplicate() as Image
+		img.resize(actual_px, actual_px, Image.INTERPOLATE_LANCZOS)
+		var tex := ImageTexture.create_from_image(img)
+		var hotspot: Vector2 = (info["hotspot"] as Vector2) * (float(actual_px) / float(_CURSOR_BASE_PX))
 		_cursor_textures_cache[name] = tex
 		_cursor_hotspots_cache[name] = hotspot
 		var shape: int = int(info["shape"])

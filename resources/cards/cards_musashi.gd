@@ -43,16 +43,16 @@ static func pool() -> Array:
 		]
 
 static func _swift_blade() -> Resource:
-	# 신속의 검 — RARE, 2코, POWER, 무심: 전투 시작 시 본인 power.speed_buff +6 (전투 끝까지)
+	# 신속의 검 — RARE, 2코, POWER, 무심: 본인 speed_bonus +6 (999턴 = 전투 끝까지, 상태이상 UI 노출)
 	var c := CardRes.new()
 	c.card_name = "card.musashi.swift_blade.name"; c.owner_id = "musashi"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
 	c.archetype = ["card.musashi.meditation.archetype"]  # 무심
 	var e := EffRes.new()
-	e.effect_type = EffRes.EffectType.APPLY_STATUS
-	e.status_type = "power.speed_buff"
+	e.effect_type = EffRes.EffectType.BUFF_SPEED
 	e.value = 6; e.base_value = 6
+	e.bonus_value = 999       # 지속턴 (999 = 전투 종료까지)
 	e.target = "SELF"
 	c.effects = [e]; return c
 

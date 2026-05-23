@@ -108,7 +108,7 @@ var _drag_card: Resource = null
 var _drag_no_chevron: bool = false
 var _drag_cancel_ready: bool = false
 var _drag_chevrons: Array = []
-var _drag_arrow_head: Sprite2D = null
+# 드래그 화살표 머리는 grabbing 커서로 대체됨 (커서가 그 자리에 위치 — Sacred Cursors).
 var _drag_start_pos: Vector2 = Vector2.ZERO
 var _drag_end_pos: Vector2 = Vector2.ZERO
 var _drag_t_offset: float = 0.0
@@ -1771,6 +1771,7 @@ func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
 		return
 	_drag_end_pos = screen_pos
 	_update_drag_arrow(screen_pos)
+	SacredTheme.set_named_cursor(_drag_cursor_for(screen_pos))
 	_message_label.text = tr("battle.cancel_use") if _drag_cancel_ready and screen_pos.y >= BOTTOM_Y else _drag_hint_text()
 	# enemy 타겟 카드일 때 — 호버 중인 적 인덱스 검출 → 카드 데미지 표시에 target vulnerable 반영
 	if _card_target_type(_drag_card) == "enemy":
@@ -5704,7 +5705,8 @@ func _start_drag(card: Resource) -> void:
 	# 전투 종료 중(승리·패배 연출 1.5s 대기) 새 드래그 차단 — mouse HIDDEN 잔존 방지
 	if not BattleManager.is_battle_active or not BattleManager.is_player_turn:
 		return
-	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
+	# 드래그 중 커서를 grabbing 으로 교체 (화살표 머리 역할). 화살표 몸통(chevron) 만 별도 렌더.
+	SacredTheme.set_named_cursor("grabbing")
 	_reset_hand_fan()
 	_drag_card = card
 	_selected_card = null
@@ -5774,14 +5776,11 @@ func _finish_drag(drop_pos: Vector2) -> void:
 			_cleanup_drag()
 
 func _cleanup_drag() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	SacredTheme.clear_named_cursor()
 	for spr in _drag_chevrons:
 		if is_instance_valid(spr):
 			spr.queue_free()
 	_drag_chevrons.clear()
-	if _drag_arrow_head != null:
-		_drag_arrow_head.queue_free()
-		_drag_arrow_head = null
 	_drag_t_offset = 0.0
 	for btn in _card_buttons:
 		if is_instance_valid(btn):
@@ -5815,18 +5814,42 @@ func _create_drag_arrow(start_pos: Vector2) -> void:
 			_ui_add(chev)  # CanvasLayer — 카메라 zoom 영향 없음
 			_drag_chevrons.append(chev)
 
-	_drag_arrow_head = Sprite2D.new()
-	_drag_arrow_head.texture = ARROW_HEAD_TEX
-	_drag_arrow_head.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	_drag_arrow_head.scale = Vector2(0.5, 0.5)
-	_drag_arrow_head.modulate = Color.WHITE
-	_drag_arrow_head.z_index = 1551  # 화살표 머리 — chevron 위
-	_ui_add(_drag_arrow_head)  # CanvasLayer — 카메라 zoom 영향 없음
-
+	# 화살표 머리는 grabbing 커서로 대체 (Sacred Cursors). 별도 Sprite 생성 불필요.
 	_update_drag_arrow(start_pos)
 
 const _ARROW_GOLD := Color(0.788, 0.659, 0.298)   # #c9a84c
 const _ARROW_GRAY := Color(0.45, 0.45, 0.45)
+
+# 드래그 중 위치·카드 타겟 유형에 따른 커서 결정 — Sacred Cursors 매핑.
+# enemy 카드가 적 위 → attack, ally 카드가 아군 위 → ally, 취소 zone·잘못된 타겟 → denied, 그 외 → grabbing.
+func _drag_cursor_for(pos: Vector2) -> String:
+	if _drag_card == null:
+		return "grabbing"
+	if _drag_cancel_ready and pos.y >= BOTTOM_Y:
+		return "denied"
+	match _card_target_type(_drag_card):
+		"enemy":
+			for i in range(_enemy_nodes.size()):
+				var panel: ColorRect = _enemy_nodes[i]["panel"]
+				if panel.visible and BattleManager.is_enemy_alive(i) \
+						and panel.get_global_rect().has_point(pos):
+					return "attack"
+			return "denied"
+		"ally":
+			for entry in _hero_nodes:
+				if entry["panel"].visible and TeamManager.is_alive(entry["hero_id"]) \
+						and entry["panel"].get_global_rect().has_point(pos):
+					return "ally"
+			return "denied"
+		"dead_ally":
+			for entry in _hero_nodes:
+				if entry["panel"].visible and not TeamManager.is_alive(entry["hero_id"]) \
+						and entry["panel"].get_global_rect().has_point(pos):
+					return "ally"
+			return "denied"
+		"none":
+			return "grabbing"
+	return "grabbing"
 
 func _drag_arrow_color(pos: Vector2) -> Color:
 	if _drag_card == null:
@@ -5857,15 +5880,9 @@ func _drag_arrow_color(pos: Vector2) -> Color:
 			return _ARROW_GOLD
 	return _ARROW_GOLD
 
-func _update_drag_arrow(end_pos: Vector2) -> void:
-	if _drag_arrow_head == null:
-		return
-	var start := _drag_start_pos
-	var _ctrl := (start + end_pos) * 0.5 + Vector2(0, -200.0)
-	var base := _drag_arrow_color(end_pos)
-	_drag_arrow_head.position = end_pos.round()
-
-	_drag_arrow_head.modulate = base
+func _update_drag_arrow(_end_pos: Vector2) -> void:
+	# 화살표 머리는 grabbing 커서로 대체 — 커서는 OS 가 마우스 위치를 따라가므로 별도 업데이트 불필요.
+	pass
 
 func _update_drag_chevrons() -> void:
 	if _drag_chevrons.is_empty():
