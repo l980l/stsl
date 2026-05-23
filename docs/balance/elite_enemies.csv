@@ -12,7 +12,7 @@ greek,3,hephaestus_automaton,2200,0,3,explosive,160,0,80,0,0,0,N,N,N,Y,Y,2,N,0,B
 egyptian,1,jackal_warrior,1700,0,4,slash,170,4,0,0,0,0,N,N,N,Y,N,1,N,0,A130/slash->A130/slash->B:strength+4->A170/slash
 egyptian,1,scarab_queen,1600,0,4,poison,140,0,40,0,0,4,Y,N,N,Y,N,1,N,0,D:poison+4->A100/poison->B:block+40->A140/poison
 egyptian,1,obelisk_guardian,2000,0,2,holy_strike,150,0,60,0,0,0,N,N,N,Y,Y,2,N,0,B:block+60->A150/holy_strike
-egyptian,2,apep_snake,1600,0,6,poison,200,0,0,3,0,10,Y,N,N,Y,N,1,N,20,A140/poison->D:poison+5->A140/poison->D:poison+5->D:weak+3->A200/poison
+egyptian,2,serqet,1600,0,6,poison,200,0,0,3,0,10,Y,N,N,Y,N,1,N,20,A140/poison->D:poison+5->A140/poison->D:poison+5->D:weak+3->A200/poison
 egyptian,2,seth_hound,1800,0,4,slash,280,2,0,0,0,0,N,N,N,Y,N,1,N,20,A150/slash->B:strength+2->A150/slash->A280/slash
 egyptian,2,ba_bird,1500,0,5,projectile,110,0,0,0,0,0,N,N,N,Y,N,1,N,20,A110/projectile->A110/projectile->A110/projectile->A110/projectile->BLK2
 egyptian,3,apophis_serpent,2000,0,4,poison,140,0,0,0,0,8,Y,N,N,Y,N,1,N,0,D:poison+5->A140/poison->A140/poison->D:poison+3
@@ -20,7 +20,7 @@ egyptian,3,set_tempest,2100,0,4,lightning,190,6,0,0,0,0,Y,N,N,Y,N,1,N,0,A190/lig
 egyptian,3,isis_phantom,1950,0,3,holy_strike,150,0,0,2,2,0,Y,N,N,Y,Y,2,N,0,D:weak+2->D:vulnerable+2->A150/holy_strike
 norse,1,nidhogg_larva,1750,0,4,poison,120,0,0,0,0,8,Y,N,N,Y,N,1,N,0,D:poison+3->A120/poison->A120/poison->D:poison+5
 norse,1,skoll,1900,0,4,slash,180,6,0,0,0,0,N,N,N,Y,N,1,N,0,A140/slash->A140/slash->B:strength+6->A180/slash
-norse,1,hrimthurs_scout,1800,0,2,ice,130,0,50,0,0,0,N,N,N,Y,Y,2,N,0,B:block+50->A130/ice
+norse,1,modgud,1800,0,2,ice,130,0,50,0,0,0,N,N,N,Y,Y,2,N,0,B:block+50->A130/ice
 norse,2,troll_warrior,2050,0,4,blunt,160,0,60,0,0,0,Y,N,N,Y,N,1,N,0,A160/blunt->B:block+60->SUM->A140/blunt
 norse,2,norn,1900,0,4,holy_blunt,170,6,0,2,2,0,Y,N,N,Y,N,1,N,0,D:weak+2->D:vulnerable+2->A170/holy_blunt->B:strength+6
 norse,2,vanir_elf,1850,0,3,projectile,130,0,0,0,0,4,Y,N,N,Y,Y,2,N,0,A130/projectile->A130/projectile->D:poison+4
@@ -28,14 +28,14 @@ norse,3,fenrir_cub,1900,0,2,slash,170,8,0,0,0,0,N,N,N,Y,Y,2,N,0,B:strength+8->A1
 norse,3,valkyrie,1800,0,5,slash,250,0,60,2,0,0,N,N,N,Y,N,1,N,0,A160/slash->D:weak+2->B:block+60->A250/slash->BLK2
 norse,3,jormungandr_shard,2000,0,3,poison,140,0,0,0,0,4,Y,N,N,Y,Y,2,N,0,A140/poison->D:poison+4->A140/poison
 buddhist,1,vaisravana,1600,0,5,holy_strike,180,1,120,0,2,0,N,N,N,Y,N,1,N,20,B:block+60->D:vulnerable+2->B:block+60->B:strength+1->A180/holy_strike
-buddhist,1,deva_guardian,1700,0,4,blunt,150,0,0,2,2,0,Y,N,N,Y,N,1,N,20,D:vulnerable+2->A150/blunt->D:weak+2->A120/blunt
+buddhist,1,mahoraga,1700,0,4,blunt,150,0,0,2,2,0,Y,N,N,Y,N,1,N,20,D:vulnerable+2->A150/blunt->D:weak+2->A120/blunt
 buddhist,1,dharma_general,1900,0,5,holy_strike|holy_fire|holy_arrow,180,1,40,0,0,0,Y,N,N,Y,N,1,N,20,B:strength+1->B:block+40->A150/holy_strike->A120/holy_fire->A180/holy_arrow
 buddhist,2,asura_king,1800,0,4,blunt,170,2,30,0,0,0,Y,N,N,Y,N,1,N,20,B:strength+2->B:block+30->A170/blunt->A150/blunt
 buddhist,2,naga_king,1900,0,4,holy_strike|holy_fire,160,3,0,0,0,0,Y,N,N,Y,N,1,N,20,B:strength+2->A160/holy_strike->A140/holy_fire->B:strength+1
 buddhist,2,agni_buddha,1900,0,5,holy_strike|holy_fire,150,2,0,0,2,0,Y,N,N,Y,N,1,N,20,A90/holy_strike->A90/holy_strike->B:strength+2->A150/holy_fire->D:vulnerable+2
 buddhist,3,yama,1900,0,5,curse,180,0,0,2,2,0,Y,N,N,Y,N,1,Y,20,D:vulnerable+2->A140/curse->A180/curse->A160/curse->D:weak+2
 buddhist,3,ksitigarbha,2000,0,4,curse,200,2,40,0,0,0,N,N,N,Y,N,1,N,20,B:strength+2->B:block+40->A180/curse->A200/curse
-buddhist,3,vairocana,1800,0,5,holy_strike|holy_arrow,190,0,50,2,2,0,N,N,N,Y,N,1,N,20,B:block+50->D:weak+2->D:vulnerable+2->A170/holy_strike->A190/holy_arrow
+buddhist,3,virupaksha,1800,0,5,holy_strike|holy_arrow,190,0,50,2,2,0,N,N,N,Y,N,1,N,20,B:block+50->D:weak+2->D:vulnerable+2->A170/holy_strike->A190/holy_arrow
 daoist,1,golden_elixir,1600,0,6,holy_slash|holy_fire,160,1,40,0,4,0,Y,N,N,Y,N,1,N,20,B:block+40->B:strength+1->D:vulnerable+2->A160/holy_slash->A130/holy_fire->D:vulnerable+2
 daoist,1,silver_elixir,1700,0,4,holy_slash,170,2,0,2,0,0,Y,N,N,Y,N,1,N,20,D:weak+2->B:strength+2->A140/holy_slash->A170/holy_slash
 daoist,1,black_wind_immortal,1800,0,5,curse,150,2,0,0,3,0,Y,N,N,Y,N,1,N,20,D:vulnerable+2->A120/curse->A150/curse->B:strength+2->D:vulnerable+1
@@ -45,7 +45,7 @@ daoist,2,twin_immortals,1700,0,6,slash,160,0,0,2,3,0,N,N,N,Y,N,1,N,20,A130/slash
 daoist,3,white_tiger,1900,0,4,slash,180,4,0,0,0,0,N,N,N,Y,N,1,N,20,B:strength+3->A180/slash->A160/slash->B:strength+1
 daoist,3,vermilion_bird,2000,0,4,fire,200,2,0,0,2,0,Y,N,N,Y,N,1,N,20,D:vulnerable+2->A180/fire->A200/fire->B:strength+2
 daoist,3,black_tortoise,1800,0,5,blunt,210,2,120,3,0,0,Y,N,N,Y,N,1,N,20,B:block+70->D:weak+3->B:block+50->B:strength+2->A210/blunt
-japanese,1,oni_general,1600,0,4,blunt,150,2,0,0,2,0,N,N,N,Y,N,1,N,20,B:strength+2->A150/blunt->A130/blunt->D:vulnerable+2
+japanese,1,ushi_oni,1600,0,4,blunt,150,2,0,0,2,0,N,N,N,Y,N,1,N,20,B:strength+2->A150/blunt->A130/blunt->D:vulnerable+2
 japanese,1,yamamba,1700,0,4,curse,160,0,0,2,2,0,Y,N,N,Y,N,1,N,20,D:weak+2->A140/curse->D:vulnerable+2->A160/curse
 japanese,1,invincible_ronin,1800,0,4,slash,170,4,0,0,0,0,N,N,N,Y,N,1,N,20,B:strength+3->A170/slash->A150/slash->B:strength+1
 japanese,2,chaos_tengu,1800,0,3,slash,150,0,0,2,0,0,Y,N,N,Y,N,1,N,20,D:weak+2->A150/slash->D:speed_penalty+3
@@ -53,4 +53,4 @@ japanese,2,yasha,1900,0,4,slash,170,3,0,0,0,0,N,N,N,Y,N,1,N,20,B:strength+2->A17
 japanese,2,nureriyon,1700,0,5,curse,150,0,0,2,2,0,N,N,N,Y,N,1,N,20,A120/curse->D:weak+2->A130/curse->D:vulnerable+2->A150/curse
 japanese,3,iwato_guardian,1900,0,4,holy_slash|holy_arrow,190,0,120,0,0,0,N,N,N,Y,N,1,N,20,B:block+70->A170/holy_slash->B:block+50->A190/holy_arrow
 japanese,3,susanoo_blade,2000,0,4,lightning,190,3,0,0,2,0,Y,N,N,Y,N,1,N,20,B:strength+3->A190/lightning->A170/lightning->D:vulnerable+2
-japanese,3,blizzard_queen,1800,0,5,ice,180,2,0,3,0,0,Y,N,N,Y,N,1,N,20,D:weak+3->A160/ice->D:speed_penalty+4->A180/ice->B:strength+2
+japanese,3,jorogumo,1800,0,5,ice,180,2,0,3,0,0,Y,N,N,Y,N,1,N,20,D:weak+3->A160/ice->D:speed_penalty+4->A180/ice->B:strength+2

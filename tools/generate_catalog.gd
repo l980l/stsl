@@ -423,7 +423,7 @@ func _generate_enemies() -> void:
 	md = _gen_mythology(md, csv_rows, 1, "북유럽 신화 (Norse)",
 		[NorseNormals.draugr(null), NorseNormals.urdr_spider(null), NorseNormals.jotun_soldier(null),
 		 NorseNormals.volva_witch(null), NorseNormals.hrimfaxi_rider(null), NorseNormals.garlarr_snake(null)],
-		[NorseAct1.nidhogg_larva(null), NorseAct1.skoll(null), NorseAct1.hrimthurs_scout(null)],
+		[NorseAct1.nidhogg_larva(null), NorseAct1.skoll(null), NorseAct1.modgud(null)],
 		NorseAct1.fjorgynn(null),
 		[NorseAct2.troll_warrior(null), NorseAct2.norn(null), NorseAct2.vanir_elf(null)],
 		NorseAct2.surtr(null),
@@ -436,7 +436,7 @@ func _generate_enemies() -> void:
 		 EgyptNormals.sphinx_cub(null), EgyptNormals.sand_ifrit(null), EgyptNormals.ka_spirit(null)],
 		[EgyptAct1.jackal_warrior(null), EgyptAct1.scarab_queen(null), EgyptAct1.obelisk_guardian(null)],
 		EgyptAct1.sekhmet(null),
-		[EgyptAct2.apep_snake(null), EgyptAct2.seth_hound(null), EgyptAct2.ba_bird(null)],
+		[EgyptAct2.serqet(null), EgyptAct2.seth_hound(null), EgyptAct2.ba_bird(null)],
 		EgyptAct2.osiris(null),
 		[EgyptAct3.apophis_serpent(null), EgyptAct3.set_tempest(null), EgyptAct3.isis_phantom(null)],
 		EgyptAct3.ra_horakhty(null))
@@ -444,12 +444,12 @@ func _generate_enemies() -> void:
 	# 불교 신화
 	md = _gen_mythology(md, csv_rows, 1, "불교 신화 (Buddhist)",
 		[BuddhistNormals.yaksha(null), BuddhistNormals.virudhaka(null), BuddhistNormals.asura(null),
-		 BuddhistNormals.garuda(null), BuddhistNormals.mara_soldier(null), BuddhistNormals.vajrapani(null)],
-		[BuddhistAct1.vaisravana(null), BuddhistAct1.deva_guardian(null), BuddhistAct1.dharma_general(null)],
+		 BuddhistNormals.garuda(null), BuddhistNormals.pishacha(null), BuddhistNormals.vajrapani(null)],
+		[BuddhistAct1.vaisravana(null), BuddhistAct1.mahoraga(null), BuddhistAct1.dharma_general(null)],
 		BuddhistAct1.mahavairocana(null),
 		[BuddhistAct2.asura_king(null), BuddhistAct2.naga_king(null), BuddhistAct2.agni_buddha(null)],
 		BuddhistAct2.guanyin(null),
-		[BuddhistAct3.yama(null), BuddhistAct3.ksitigarbha(null), BuddhistAct3.vairocana(null)],
+		[BuddhistAct3.yama(null), BuddhistAct3.ksitigarbha(null), BuddhistAct3.virupaksha(null)],
 		BuddhistAct3.acalanatha(null))
 
 	# 도교 신화
@@ -467,11 +467,11 @@ func _generate_enemies() -> void:
 	md = _gen_mythology(md, csv_rows, 1, "일본 신화 (Japanese)",
 		[JapaneseNormals.oni(null), JapaneseNormals.tengu(null), JapaneseNormals.yuki_onna(null),
 		 JapaneseNormals.kappa(null), JapaneseNormals.shuten_minion(null), JapaneseNormals.ronin_ghost(null)],
-		[JapaneseAct1.oni_general(null), JapaneseAct1.yamamba(null), JapaneseAct1.invincible_ronin(null)],
+		[JapaneseAct1.ushi_oni(null), JapaneseAct1.yamamba(null), JapaneseAct1.invincible_ronin(null)],
 		JapaneseAct1.raijin(null),
 		[JapaneseAct2.chaos_tengu(null), JapaneseAct2.yasha(null), JapaneseAct2.nureriyon(null)],
 		JapaneseAct2.shuten_doji(null),
-		[JapaneseAct3.iwato_guardian(null), JapaneseAct3.susanoo_blade(null), JapaneseAct3.blizzard_queen(null)],
+		[JapaneseAct3.iwato_guardian(null), JapaneseAct3.susanoo_blade(null), JapaneseAct3.jorogumo(null)],
 		JapaneseAct3.yamata_no_orochi(null))
 
 	_write_text("enemies.md", md)

@@ -14,10 +14,10 @@ norse,1,WIN,3,3000,640,72,volva_witch|volva_witch
 norse,2,WIN,2,3000,340,56,garlarr_snake
 norse,3,WIN,4,2918,730,136,hrimfaxi_rider|ice_wolf
 norse,4,WIN,4,2895,840,159,raven_scout|raven_scout|raven_scout
-norse,5,WIN,5,2932,885,132,frost_giant_pup|bone_archer|dark_elf
+norse,5,WIN,5,2932,885,132,frost_wight|bone_archer|dark_elf
 norse,6,WIN,6,2728,1290,200,draugr|draugr|berserker
 norse,7,WIN,6,2902,1250,127,runestone_golem|night_hag|lindworm_spawn|einherjar_ghost
-norse,8,WIN,7,2468,1450,245,jotun_soldier|fenrir_pup|nidhogg_scale
+norse,8,WIN,7,2468,1450,245,jotun_soldier|garmr|nidhogg_scale
 norse,9,WIN,7,2385,1350,245,frost_giant|ragnarok_herald
 egyptian,0,WIN,2,3000,320,27,ka_spirit
 egyptian,1,WIN,3,2966,520,114,scarab|scarab
@@ -31,10 +31,10 @@ egyptian,8,WIN,7,2654,1450,271,mummy_warrior|sobek_spawn|ammit_cub
 egyptian,9,WIN,7,2352,1400,232,sphinx_adult|pyramid_golem
 buddhist,0,WIN,2,2990,280,90,garuda
 buddhist,1,WIN,3,2974,640,106,yaksha|yaksha
-buddhist,2,WIN,2,3000,350,35,mara_soldier
+buddhist,2,WIN,2,3000,350,35,pishacha
 buddhist,3,WIN,3,3000,570,59,dharma_puppet|lotus_spirit
 buddhist,4,WIN,4,2944,840,120,hungry_ghost|hungry_ghost|hungry_ghost
-buddhist,5,WIN,5,2949,970,122,asura|naga_spawn|demon_soldier
+buddhist,5,WIN,5,2949,970,122,asura|naga_spawn|rakshasa
 buddhist,6,WIN,6,2850,1270,140,virudhaka|virudhaka|karmic_fiend
 buddhist,7,WIN,6,2802,1210,190,sky_beast|earth_spirit|wrathful_spirit|cursed_monk
 buddhist,8,WIN,7,2703,1330,207,vajrapani|deva_soldier|ashura_warrior
@@ -56,6 +56,6 @@ japanese,3,WIN,4,2981,670,90,kappa|foxfire
 japanese,4,WIN,4,2853,780,171,koropokkuru|koropokkuru|koropokkuru
 japanese,5,WIN,4,2939,850,97,yamabiko|ittan_momen|azuki_washer
 japanese,6,WIN,6,2534,1270,242,oni|oni|samurai_ghost
-japanese,7,WIN,6,2765,1260,176,river_kappa|snow_woman|cursed_scroll|tatami_monster
+japanese,7,WIN,6,2765,1260,176,tennyo|hone_onna|cursed_scroll|tatami_monster
 japanese,8,WIN,7,2398,1370,257,ronin_ghost|yamabushi_ghost|dragon_serpent
-japanese,9,WIN,7,2154,1380,272,oni_king|hannya
+japanese,9,WIN,7,2154,1380,272,gashadokuro|hannya

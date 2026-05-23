@@ -5,9 +5,10 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 # ──── 엘리트 3종 ────
 
-static func apep_snake(scene: PackedScene) -> Resource:
+static func serqet(scene: PackedScene) -> Resource:
+	# 셀케트 — 전갈 여신. 독 누적 후 대형 독침 피니셔 (구 apep_snake 리스킨, 메커니즘 동일).
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.egyptian.apep_snake"; e.max_hp = 1600; e.character_scene = scene
+	e.enemy_name = "enemy.egyptian.serqet"; e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 140; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
@@ -110,7 +111,7 @@ static func osiris(scene: PackedScene) -> Resource:
 # ──── API ────
 
 static func elites() -> Array:
-	return ["apep_snake", "seth_hound", "ba_bird"]
+	return ["serqet", "seth_hound", "ba_bird"]
 
 static func boss() -> String:
 	return "osiris"

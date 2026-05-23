@@ -167,14 +167,14 @@
 
 ## Act 2 — 엘리트 + 보스
 
-> 코드: `egyptian_act2.gd` / elites() = ["apep_snake", "seth_hound", "ba_bird"] / boss() = "osiris"
+> 코드: `egyptian_act2.gd` / elites() = ["serqet", "seth_hound", "ba_bird"] / boss() = "osiris"
 > Act 2 실제 HP = 코드값 × 1.3, ATK = 코드값 × 1.2
 
 ### 엘리트 풀 (3종, 랜덤 1마리 선택)
 
 ---
 
-#### 아펩 뱀 (apep_snake)
+#### 아펩 뱀 (serqet)
 
 - **HP**: 1600 (Act 2 실제: 2080) / **매혹 저항**: 20
 - **인텐트 시퀀스** (6인텐트 순환):
@@ -306,7 +306,7 @@
 | `enemy.egyptian.scarab_queen`     | act1 엘리트   | ✓ |
 | `enemy.egyptian.obelisk_guardian` | act1 엘리트   | ✓ |
 | `enemy.egyptian.sekhmet`          | act1 보스     | ✓ |
-| `enemy.egyptian.apep_snake`       | act2 엘리트   | ✓ |
+| `enemy.egyptian.serqet`       | act2 엘리트   | ✓ |
 | `enemy.egyptian.seth_hound`       | act2 엘리트   | ✓ |
 | `enemy.egyptian.ba_bird`          | act2 엘리트   | ✓ |
 | `enemy.egyptian.osiris`           | act2 보스     | ✓ |

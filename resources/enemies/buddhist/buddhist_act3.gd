@@ -51,9 +51,10 @@ static func ksitigarbha(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func vairocana(scene: PackedScene) -> Resource:
+static func virupaksha(scene: PackedScene) -> Resource:
+	# 광목천왕 — 사천왕의 하나. 모든 악을 보는 눈으로 약화·취약 부여 (구 vairocana 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.buddhist.vairocana"; e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = "enemy.buddhist.virupaksha"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 50; i1.status_type = "block"
@@ -134,7 +135,7 @@ static func acalanatha(scene: PackedScene) -> Resource:
 	return e
 
 static func elites() -> Array:
-	return ["yama", "ksitigarbha", "vairocana"]
+	return ["yama", "ksitigarbha", "virupaksha"]
 
 static func boss() -> String:
 	return "acalanatha"

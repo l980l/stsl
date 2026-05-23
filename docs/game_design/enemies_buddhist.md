@@ -72,9 +72,9 @@
 
 ---
 
-### 5. 마라의 병사 (mara_soldier)
+### 5. 마라의 병사 (pishacha)
 
-- **enemy_name**: `enemy.buddhist.mara_soldier` / **HP**: 350
+- **enemy_name**: `enemy.buddhist.pishacha` / **HP**: 350
 - **인텐트 시퀀스** (4턴 순환):
   ① DEBUFF 취약 1 [RANDOM] → ② ATK 80 [RANDOM] (curse) → ③ DEBUFF 약화 2 [RANDOM] → ④ ATK 60 [RANDOM] (curse)
 - **핵심 메카닉**: 취약→공격→약화→공격. 디버프 교차 사이클로 영웅의 공방 모두 억제.
@@ -104,8 +104,8 @@
 | 4 | yaksha + virudhaka | 2 | 770 |
 | 5 | asura × 2 | 2 | 760 |
 | 6 | garuda × 2 | 2 | 560 |
-| 7 | mara_soldier | 1 | 350 |
-| 8 | mara_soldier + asura | 2 | 730 |
+| 7 | pishacha | 1 | 350 |
+| 8 | pishacha + asura | 2 | 730 |
 | 9 | vajrapani | 1 | 900 |
 | 10 | yaksha + garuda | 2 | 600 |
 | 11 | asura × 2 + garuda | 3 | 1,040 |
@@ -128,9 +128,9 @@
 
 ---
 
-#### 인왕역사 (deva_guardian)
+#### 인왕역사 (mahoraga)
 
-- **enemy_name**: `enemy.buddhist.deva_guardian` / **HP**: 1,700 / **charm_resistance**: 20
+- **enemy_name**: `enemy.buddhist.mahoraga` / **HP**: 1,700 / **charm_resistance**: 20
 - **인텐트 시퀀스** (4턴 순환):
   ① DEBUFF 취약 2 [ALL] → ② ATK 150 [LOWEST_HP] (blunt) → ③ DEBUFF 약화 2 [ALL] → ④ ATK 120 [RANDOM] (blunt)
 - **핵심 메카닉**: 전체 취약 → LOWEST_HP 처형 → 전체 약화 → 추가 타격. 디버프와 처형을 번갈아 적용.
@@ -245,7 +245,7 @@
 
 #### 비로자나불 화현 (vairocana_avatar)
 
-- **enemy_name**: `enemy.buddhist.vairocana` / **HP**: 1,800 / **charm_resistance**: 20
+- **enemy_name**: `enemy.buddhist.virupaksha` / **HP**: 1,800 / **charm_resistance**: 20
 - **인텐트 시퀀스** (5턴 순환):
   ① BUFF 방어 50 → ② DEBUFF 약화 2 [RANDOM] → ③ DEBUFF 취약 2 [RANDOM] → ④ ATK 170 [RANDOM] (divine) → ⑤ ATK 190 [LOWEST_HP] (divine)
 - **핵심 메카닉**: 방어 선행 후 약화+취약 2중 부여, 마지막 처형. 디버프로 반격을 억제하며 집중 처형.
@@ -275,7 +275,7 @@
 
 - **이순신 빌드 (방어형)**: virudhaka·vajrapani의 방어 쌓기 패턴에 대항해 방어 침투 필요. 거북선 블록 스택으로 Phase 2까지 버티는 전략 유효.
 - **나폴레옹 빌드 (근력 누적)**: asura·naga_king의 근력 누적과 경쟁. 아군 근력을 빠르게 쌓아 처형 당하기 전에 먼저 제거.
-- **LOWEST_HP 집중 압박**: 야차(일반)→deva_guardian(엘리트)→yama(엘리트)→모든 보스의 처형 체인. 영웅 HP 균등 유지가 필수 생존 조건.
+- **LOWEST_HP 집중 압박**: 야차(일반)→mahoraga(엘리트)→yama(엘리트)→모든 보스의 처형 체인. 영웅 HP 균등 유지가 필수 생존 조건.
 - **독 저항 빌드 대응**: guanyin_wrath Phase 2에서 독 5 집중. 독 해제 유물·카드 없으면 Act 2 보스가 가장 까다로운 보스.
 - **공격 카드 카운터**: yama_king의 ATTACK×4 트리거는 SKILL 중심 빌드를 유도. 나폴레옹/클레오파트라의 공격 집중 덱을 견제.
 
@@ -289,10 +289,10 @@
 | enemy.buddhist.virudhaka | enemy.korean.cheoyong | normal | 450 |
 | enemy.buddhist.asura | enemy.korean.dokkaebi | normal | 380 |
 | enemy.buddhist.garuda | enemy.korean.three_legged_crow | normal | 280 |
-| enemy.buddhist.mara_soldier | enemy.korean.gumiho | normal | 350 |
+| enemy.buddhist.pishacha | enemy.korean.gumiho | normal | 350 |
 | enemy.buddhist.vajrapani | enemy.korean.bulgasari | normal | 900 |
 | enemy.buddhist.vaisravana | enemy.korean.haechi | elite (act1) | 1,600 |
-| enemy.buddhist.deva_guardian | enemy.korean.jangseung | elite (act1) | 1,700 |
+| enemy.buddhist.mahoraga | enemy.korean.jangseung | elite (act1) | 1,700 |
 | enemy.buddhist.dharma_general | enemy.korean.haemosu | elite (act1) | 1,900 |
 | enemy.buddhist.mahavairocana | enemy.korean.dangun | boss (act1) | 4,500 |
 | enemy.buddhist.asura_king | enemy.korean.dokkaebi_chief | elite (act2) | 1,800 |
@@ -301,7 +301,7 @@
 | enemy.buddhist.guanyin | enemy.korean.samsin_grandma | boss (act2) | 4,800 |
 | enemy.buddhist.yama | enemy.korean.underworld_judge | elite (act3) | 1,900 |
 | enemy.buddhist.ksitigarbha | enemy.korean.gat_spirit | elite (act3) | 2,000 |
-| enemy.buddhist.vairocana | enemy.korean.cheoyong_god | elite (act3) | 1,800 |
+| enemy.buddhist.virupaksha | enemy.korean.cheoyong_god | elite (act3) | 1,800 |
 | enemy.buddhist.acalanatha | enemy.korean.gusamseung_halmang | boss (act3) | 4,800 |
 
 - intent_pattern·phase_patterns·card_count_trigger: 코드 원본(korean_*.gd)과 동일 (메카닉 재활용)
