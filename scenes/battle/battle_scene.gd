@@ -75,7 +75,7 @@ var _hero_char_nodes: Dictionary = {}  # hero_id → Node2D
 var _enemy_char_nodes: Array = []      # index → Node2D
 
 var _energy_label: Label
-var _end_turn_btn: Button
+var _end_turn_btn: TextureButton
 var _message_label: Label
 var _relic_container: FlowContainer
 var _turn_queue_box: HBoxContainer
@@ -291,17 +291,24 @@ func _build_ui() -> void:
 	banner_diamond.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	banner.add_child(banner_diamond)
 
-	# 에너지 — 아이콘 + 숫자만, 핸드 구분선 높이에 맞춤
+	# 에너지 + 덱 보기(위) + 턴 종료(아래) — 세로 스택, 같은 중심 x, 모두 20% 확대
+	const _ICON_BTN_PX := 77       # 64 → +20%
+	const _ICON_STACK_GAP := 10    # 에너지와 아이콘 세로 간격
+	const _ENERGY_W := 216         # 180 → +20%
+	const _ENERGY_H := 38          # 32 → +20%
+	const _ENERGY_CENTER_X := WINDOW_W - 110  # 기존 hbox 중심 유지
+
+	# 에너지 UI — 아이콘 + 숫자만, 핸드 구분선 높이에 맞춤
 	var energy_hbox := HBoxContainer.new()
 	energy_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	energy_hbox.add_theme_constant_override("separation", 14)
-	energy_hbox.position = Vector2(WINDOW_W - 200, BOTTOM_Y - 26)
-	energy_hbox.size = Vector2(180, 32)
+	energy_hbox.add_theme_constant_override("separation", 17)  # 14 → +20%
+	energy_hbox.position = Vector2(_ENERGY_CENTER_X - _ENERGY_W / 2, BOTTOM_Y - 26)
+	energy_hbox.size = Vector2(_ENERGY_W, _ENERGY_H)
 	add_child(energy_hbox)
 
 	var energy_icon := TextureRect.new()
 	energy_icon.texture = IconUtils.get_energy_icon()
-	energy_icon.custom_minimum_size = Vector2(24, 24)
+	energy_icon.custom_minimum_size = Vector2(29, 29)  # 24 → +20%
 	energy_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	energy_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	energy_icon.modulate = SacredPalette.BRASS_300
@@ -310,39 +317,33 @@ func _build_ui() -> void:
 
 	_energy_label = Label.new()
 	_energy_label.theme_type_variation = "EyebrowLabel"
-	_energy_label.add_theme_font_size_override("font_size", 22)
+	_energy_label.add_theme_font_size_override("font_size", 26)  # 22 → +20%
 	_energy_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_energy_label.text = "0/3"
 	energy_hbox.add_child(_energy_label)
 
-	# 턴 종료 버튼 — Control wrapper로 감싸 크기 고정
-	var end_btn_wrap := Control.new()
-	end_btn_wrap.position = Vector2(WINDOW_W - 214, BOTTOM_Y + 16)
-	end_btn_wrap.size = Vector2(200, 54)
-	add_child(end_btn_wrap)
-	_end_turn_btn = Button.new()
-	_end_turn_btn.text = tr("battle.btn_end_turn")
-	_end_turn_btn.add_theme_font_size_override("font_size", 18)
-	_end_turn_btn.disabled = true
-	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
-	end_btn_wrap.add_child(_end_turn_btn)
-	_end_turn_btn.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	LabelUtils.fit_text(_end_turn_btn, 18, 12, 168.0)
-	SacredTheme.animate_button(_end_turn_btn)
-
-	# 덱 보기 버튼 — Control wrapper로 감싸 크기 고정
-	var deck_wrap := Control.new()
-	deck_wrap.position = Vector2(WINDOW_W - 214, BOTTOM_Y + 78)
-	deck_wrap.size = Vector2(200, 54)
-	add_child(deck_wrap)
-	var deck_btn := Button.new()
-	deck_btn.text = tr("ui.battle.btn_deck_view")
-	deck_btn.add_theme_font_size_override("font_size", 18)
+	# 덱 보기(에너지 위) / 턴 종료(에너지 아래) — 중심 x 정렬, 세로로 분리해 클릭 실수 방지
+	var _icon_x: int = _ENERGY_CENTER_X - int(_ICON_BTN_PX / 2.0)
+	var deck_btn := TextureButton.new()
+	deck_btn.texture_normal = load("res://assets/art/ui/icons/deck-fan.svg")
+	deck_btn.ignore_texture_size = true
+	deck_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	deck_btn.position = Vector2(_icon_x, BOTTOM_Y - 26 - _ICON_STACK_GAP - _ICON_BTN_PX)
+	deck_btn.size = Vector2(_ICON_BTN_PX, _ICON_BTN_PX)
 	deck_btn.pressed.connect(_show_deck_viewer_in_battle)
-	deck_wrap.add_child(deck_btn)
-	deck_btn.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	LabelUtils.fit_text(deck_btn, 18, 12, 168.0)
-	SacredTheme.animate_button(deck_btn)
+	add_child(deck_btn)
+	_attach_icon_hover_anim(deck_btn)
+
+	_end_turn_btn = TextureButton.new()
+	_end_turn_btn.texture_normal = load("res://assets/art/ui/icons/end-turn-skip.svg")
+	_end_turn_btn.ignore_texture_size = true
+	_end_turn_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	_end_turn_btn.position = Vector2(_icon_x, BOTTOM_Y - 26 + _ENERGY_H + _ICON_STACK_GAP)
+	_end_turn_btn.size = Vector2(_ICON_BTN_PX, _ICON_BTN_PX)
+	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
+	add_child(_end_turn_btn)
+	_attach_icon_hover_anim(_end_turn_btn)
+	_set_end_turn_btn_disabled(true)
 
 	# 핸드존 구분선 — gradient rule + ✦ 다이아몬드
 	var hand_grad := Gradient.new()
@@ -402,7 +403,7 @@ func _build_ui() -> void:
 	# UI 노드들을 CanvasLayer 로 reparent — 카메라 zoom 영향 제거
 	# (영웅/적 패널은 캐릭터 따라가야 해서 self 자식 유지)
 	if _ui_layer:
-		for n in [banner, end_btn_wrap, deck_wrap, hand_rule, hand_diamond,
+		for n in [banner, _end_turn_btn, deck_btn, hand_rule, hand_diamond,
 				_relic_container, _active_powers_box, _turn_queue_box]:
 			if n != null and is_instance_valid(n):
 				n.reparent(_ui_layer)
@@ -947,6 +948,7 @@ func _connect_signals() -> void:
 	BattleManager.synergy_effect_vfx.connect(_on_synergy_effect_vfx)
 	BattleManager.synergy_counter_vfx.connect(_on_synergy_counter_vfx)
 	BattleManager.synergy_ally_vfx.connect(_on_synergy_ally_vfx)
+	BattleManager.synergy_drain_vfx.connect(_on_synergy_drain_vfx)
 	BattleManager.enemy_damaged.connect(_on_enemy_damaged)
 	BattleManager.token_attack_fired.connect(_on_token_attack_fired)
 	TeamManager.hero_healed.connect(_on_hero_healed)
@@ -1907,17 +1909,44 @@ func _open_hero_slot_hp_dialog(hero_id: String) -> void:
 	spin.get_line_edit().grab_focus()
 	spin.get_line_edit().select_all()
 
+func _set_end_turn_btn_disabled(d: bool) -> void:
+	# TextureButton 은 disabled 시 자동 틴팅이 없어 self_modulate 로 시각 피드백 보강
+	_end_turn_btn.disabled = d
+	_end_turn_btn.self_modulate = Color(1, 1, 1, 0.4) if d else Color.WHITE
+
+func _attach_icon_hover_anim(btn: TextureButton) -> void:
+	# 호버 시 살짝 위로 + 살짝 커짐 (중심 기준 확대)
+	btn.pivot_offset = btn.size * 0.5
+	var base_pos: Vector2 = btn.position
+	var tw_ref: Array = [null]
+	btn.mouse_entered.connect(func() -> void:
+		if tw_ref[0] != null:
+			(tw_ref[0] as Tween).kill()
+		var tw := btn.create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		tw.tween_property(btn, "position", base_pos + Vector2(0, -3), 0.12)
+		tw.tween_property(btn, "scale", Vector2(1.08, 1.08), 0.12)
+		tw_ref[0] = tw
+	)
+	btn.mouse_exited.connect(func() -> void:
+		if tw_ref[0] != null:
+			(tw_ref[0] as Tween).kill()
+		var tw := btn.create_tween().set_parallel(true).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+		tw.tween_property(btn, "position", base_pos, 0.12)
+		tw.tween_property(btn, "scale", Vector2.ONE, 0.12)
+		tw_ref[0] = tw
+	)
+
 func _on_end_turn_pressed() -> void:
 	if _card_pick_in_progress:
 		return
 	_selected_card = null
 	_message_label.text = ""
-	_end_turn_btn.disabled = true
+	_set_end_turn_btn_disabled(true)
 	BattleManager.end_player_turn()
 
 func _on_player_turn_started() -> void:
 	AudioManager.play_sfx("card_draw")
-	_end_turn_btn.disabled = false
+	_set_end_turn_btn_disabled(false)
 	# 현재 영웅 이름 표시 (개체 차례 시스템)
 	var cur_hid: String = BattleManager.get_current_hero_id()
 	var hero_name: String = cur_hid
@@ -1951,7 +1980,7 @@ func _on_player_turn_started() -> void:
 		_cam_on_hero_turn_start(cur_hid)
 
 func _on_enemy_turn_started() -> void:
-	_end_turn_btn.disabled = true
+	_set_end_turn_btn_disabled(true)
 	_selected_card = null
 	# 현재 적 이름 표시
 	var cur_aid: String = BattleManager.get_current_actor_id()
@@ -2374,6 +2403,7 @@ const _VFX_SIG_KEKKAI := preload("res://scenes/vfx/sig_kekkai.gd")
 const _VFX_TAUNT := preload("res://scenes/vfx/taunt.gd")
 const _VFX_CARD_EXHAUST := preload("res://scenes/vfx/card_exhaust_gpu.gd")
 const _VFX_BOSS_DEATH := preload("res://scenes/vfx/boss_death_gpu.gd")
+const _VFX_LIFE_DRAIN := preload("res://scenes/vfx/life_drain_gpu.gd")
 
 # lightning으로 죽는 적/영웅 — 사망 연출을 빔 임팩트 시점까지 지연하기 위한 빔 참조
 # key: "enemy_%d" 또는 hero_id → lightning_beam 인스턴스
@@ -3229,6 +3259,40 @@ func _on_synergy_counter_vfx(caster_hero_id: String, target_enemy_index: int, st
 		return
 	_spawn_synergy_beam(beam, caster.global_position, enemy_node.global_position, status_type, _foot_pos(enemy_node),
 		func() -> void: BattleManager.apply_synergy_status_to_enemy(target_enemy_index, status_type, stacks))
+
+# 시너지 생명 흡수 VFX — 적 위치에서 각 아군에게 빔 (신의 원정/성스러운 독).
+# 각 빔의 임팩트 시점에 해당 영웅 회복 적용 → 회복 폰트가 흡수 임팩트에 동기.
+func _on_synergy_drain_vfx(hero_ids: Array, value: int, target_enemy_index: int) -> void:
+	if target_enemy_index < 0 or target_enemy_index >= _enemy_nodes.size():
+		# 적 좌표 없음 — heal 폴백
+		_on_synergy_ally_vfx("heal", hero_ids, value, 0)
+		return
+	var enemy_entry: Dictionary = _enemy_nodes[target_enemy_index]
+	var enemy_char_node: Node2D = _enemy_char_nodes[target_enemy_index] if target_enemy_index < _enemy_char_nodes.size() else null
+	if not is_instance_valid(enemy_char_node):
+		_on_synergy_ally_vfx("heal", hero_ids, value, 0)
+		return
+	var enemy_pos: Vector2 = enemy_char_node.global_position
+	var enemy_foot: Vector2 = _foot_pos(enemy_char_node)
+	for hid in hero_ids:
+		var node: Node2D = _hero_char_nodes.get(hid)
+		if not is_instance_valid(node):
+			continue
+		var hero_pos: Vector2 = node.global_position
+		var hero_foot: Vector2 = _foot_pos(node)
+		var _hid: String = hid
+		var fx: Node2D = _VFX_LIFE_DRAIN.new()
+		add_child(fx)
+		fx.z_index = 1300
+		fx.position = Vector2.ZERO
+		if fx.has_method("set_ground_anchors"):
+			fx.set_ground_anchors(hero_foot, enemy_foot)
+		fx.screen_effect.connect(func() -> void:
+			AudioManager.play_sfx("life_drain")
+			BattleManager.apply_synergy_ally_effect("heal", _hid, value, 0)
+		)
+		# caster = 흡수자(아군), target = 피해 대상(적)
+		fx.play(hero_pos, enemy_pos)
 
 # 시너지 아군 효과 VFX — 회복(신의 원정)·속도버프(희생의 칼날) 등. 대상 전원에게 VFX 재생,
 # 각 VFX 임팩트 시점에 그 영웅에게 효과 적용 → 회복/상태 폰트가 VFX 임팩트에 동기.
@@ -4562,7 +4626,7 @@ func _on_hero_revived(hero_id: String) -> void:
 
 func _on_battle_won() -> void:
 	_message_label.text = tr("battle.msg_victory")
-	_end_turn_btn.disabled = true
+	_set_end_turn_btn_disabled(true)
 	_selected_card = null
 	# 드래그 중 전투 종료 시 마우스 hidden 잔존 방지 — 드래그 정리
 	if _drag_card != null:
@@ -4596,7 +4660,7 @@ func _on_battle_lost() -> void:
 	if _drag_card != null:
 		_cleanup_drag()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	_end_turn_btn.disabled = true
+	_set_end_turn_btn_disabled(true)
 	_selected_card = null
 	for entry in _enemy_nodes:
 		entry["btn"].disabled = true

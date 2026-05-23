@@ -55,6 +55,7 @@ const DISPEL := preload("res://scenes/vfx/dispel.gd")
 const FORM_CHANGE := preload("res://scenes/vfx/form_change.gd")
 const COUNTER_VFX := preload("res://scenes/vfx/counter.gd")
 const ENTHRALL_AURA := preload("res://scenes/vfx/enthrall_aura.gd")
+const LIFE_DRAIN := preload("res://scenes/vfx/life_drain.gd")
 const _CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 const _CardResourceClass := preload("res://resources/card_resource.gd")
 
@@ -115,6 +116,7 @@ const VFX_CURRENT := [
 	{"name": "counter",            "kind": "beam", "path": "res://scenes/vfx/counter.gd"},
 	{"name": "counter_major",      "kind": "beam", "path": "res://scenes/vfx/counter.gd"},
 	{"name": "enthrall_aura",      "kind": "beam",   "path": "res://scenes/vfx/enthrall_aura.gd"},
+	{"name": "life_drain",         "kind": "beam",   "path": "res://scenes/vfx/life_drain.gd"},
 ]
 
 # 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.
@@ -695,9 +697,13 @@ func _sprite_rect(center: Vector2) -> Rect2:
 func _foot_pos(center: Vector2) -> Vector2:
 	return center + Vector2(0.0, _CHAR_FOOT_Y_OFFSET)
 
-# 인게임과 동일하게 발 위치 anchor 주입. set_ground_anchor 지원 VFX 전부 대상.
+# 인게임과 동일하게 발 위치 anchor 주입. set_ground_anchor / set_ground_anchors 지원 VFX 전부 대상.
 # 대부분 target 발 anchor — 단 taunt 는 caster 발에서 발화하므로 예외.
+# life_drain 은 caster·target 두 발 anchor 모두 필요 (set_ground_anchors 메서드)
 func _apply_ground_anchor(fx: Node2D, vfx_name: String, c_center: Vector2, t_center: Vector2) -> void:
+	if fx.has_method("set_ground_anchors"):
+		fx.set_ground_anchors(_foot_pos(c_center), _foot_pos(t_center))
+		return
 	if not fx.has_method("set_ground_anchor"):
 		return
 	var anchor: Vector2 = _foot_pos(c_center) if vfx_name == "taunt" else _foot_pos(t_center)

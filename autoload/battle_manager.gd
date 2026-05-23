@@ -140,6 +140,8 @@ signal synergy_effect_vfx(caster_hero_id: String, vfx_status: String, enemy_indi
 signal synergy_counter_vfx(caster_hero_id: String, target_enemy_index: int, status_type: String, stacks: int)
 # 시너지 아군 효과 VFX — 회복/속도버프 등. battle_scene 이 대상 전원에 VFX 재생, 임팩트 시점에 효과 적용.
 signal synergy_ally_vfx(vfx_kind: String, hero_ids: Array, value: int, duration: int)
+# 시너지 생명 흡수 VFX — 적 위치에서 각 아군에게 빔. battle_scene 이 적→각 아군 life_drain 재생, 임팩트 시점에 회복 적용.
+signal synergy_drain_vfx(hero_ids: Array, value: int, target_enemy_index: int)
 
 # VFX 차지 시작 — battle_scene 이 받아 caster→target VFX 재생.
 # 차지(IMPACT_DELAY) 이후 데미지/상태 적용 + 기존 시그널 (hero_damaged 등) emit.
@@ -2630,7 +2632,7 @@ func _roll_crit(target_enemy_index: int, has_mark: bool) -> Dictionary:
 		for _de_h in team_mgr.get_living_heroes():
 			_jg_ids.append(_de_h.hero_id)
 		if is_inside_tree():
-			synergy_ally_vfx.emit("heal", _jg_ids, 30, 0)
+			synergy_drain_vfx.emit(_jg_ids, 30, target_enemy_index)
 		else:
 			for _jg_id in _jg_ids:
 				_heal_hero_safe(_jg_id, 30)
@@ -3004,14 +3006,14 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 						status_applied.emit(_sv_h, "speed_bonus", 1)
 					synergy_triggered.emit("synergy.musashi_yi.name", card_owner)
 			EffectRes.EffectType.APPLY_STATUS:
-				# 성스러운 독 (성녀×파라오): 클레오파트라 독 부여 시 아군 전체 회복 +15 — 회복 VFX 임팩트에 적용
+				# 성스러운 독 (성녀×파라오): 클레오파트라 독 부여 시 아군 전체 회복 +15 — 흡수 VFX 임팩트에 적용
 				if card_owner == "cleopatra" and effect.status_type == "poison" and team_mgr.is_alive("joan_of_arc"):
 					synergy_triggered.emit("synergy.joan_cleopatra.name", card_owner)
 					var _hc_ids: Array = []
 					for _hc_h in team_mgr.get_living_heroes():
 						_hc_ids.append(_hc_h.hero_id)
 					if is_inside_tree():
-						synergy_ally_vfx.emit("heal", _hc_ids, 15, 0)
+						synergy_drain_vfx.emit(_hc_ids, 15, target_enemy_index)
 					else:
 						for _hc_id in _hc_ids:
 							_heal_hero_safe(_hc_id, 15)
