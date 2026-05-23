@@ -13,6 +13,9 @@ const WINDOW_W := 1920
 const WINDOW_H := 1080
 const SLOT_W := 240
 const SLOT_H := 280
+# 캐릭터 스프라이트 영역 — character_placeholder._SPRITE_W/H (80) × char_node.scale (1.44, 2.4)
+const SPRITE_AREA_W := 115.2  # 80 * 1.44
+const SPRITE_AREA_H := 192.0  # 80 * 2.4
 # 캐릭터 노드의 position.y(slot.y + 184) 에서 발(slot.y + SLOT_H)까지 offset.
 # 바닥 VFX(룬링/글리프)를 발밑에 정렬할 때 사용.
 const _CHAR_FOOT_Y_OFFSET := float(SLOT_H - 184)
@@ -449,7 +452,16 @@ func _make_hero_slot(index: int) -> Dictionary:
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
 	add_child(panel)
+	# 패널 전체(240×280) L자 코너 브래킷 — 기존 영역 마커 복원
 	SacredTheme.add_corner_brackets(panel, SacredPalette.BRASS_500, 16, 2, 1)
+	# Museum Mat 프레임 — 안쪽 art 영역 = 실제 스프라이트 영역(115.2×192) 정합
+	# 매트 4px 추가하여 외곽, 스프라이트 중심(y+184) 기준 세로 중앙·패널 가로 중앙
+	var _mat: int = MuseumMatFrame.MAT_INSET
+	var _fw: float = SPRITE_AREA_W + _mat * 2
+	var _fh: float = SPRITE_AREA_H + _mat * 2
+	var _fx: float = (SLOT_W - _fw) / 2.0
+	var _fy: float = 184.0 - _fh / 2.0
+	SacredTheme.add_museum_mat_frame(panel, Rect2(_fx, _fy, _fw, _fh))
 
 	var bar_w: float = 211.0
 	var _bar_h: float = 12.0
@@ -506,7 +518,16 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	panel.size = Vector2(SLOT_W, SLOT_H)
 	panel.visible = false
 	add_child(panel)
+	# 패널 전체(240×280) L자 코너 브래킷 — 기존 영역 마커 복원
 	SacredTheme.add_corner_brackets(panel, SacredPalette.BRASS_500, 16, 2, 1)
+	# Museum Mat 프레임 — 안쪽 art 영역 = 실제 스프라이트 영역(115.2×192) 정합
+	# 매트 4px 추가하여 외곽, 스프라이트 중심(y+184) 기준 세로 중앙·패널 가로 중앙
+	var _mat: int = MuseumMatFrame.MAT_INSET
+	var _fw: float = SPRITE_AREA_W + _mat * 2
+	var _fh: float = SPRITE_AREA_H + _mat * 2
+	var _fx: float = (SLOT_W - _fw) / 2.0
+	var _fy: float = 184.0 - _fh / 2.0
+	SacredTheme.add_museum_mat_frame(panel, Rect2(_fx, _fy, _fw, _fh))
 
 	var bar_w: float = 211.0
 	var bar_x: float = pos.x + (SLOT_W - bar_w) / 2.0
