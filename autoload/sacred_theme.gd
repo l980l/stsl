@@ -447,6 +447,20 @@ func _on_tip_exit() -> void:
 # node 의 4모서리에 L자 ColorRect 8개를 자식으로 추가한다.
 # node.size 가 확정된 후 호출할 것.
 
+const _MUSEUM_MAT_FRAME = preload("res://scenes/components/museum_mat_frame.gd")
+
+# Museum Mat 프레임 (ui_sample portraits.css .pf--square 대응) 부착.
+# parent 의 rect.position 위치에 rect.size 크기로 자식 Control 추가.
+# 매트 밴드(16px) + 외곽 브라스 1px 테두리 + 안쪽 art 테두리 + 4코너 L자 + 외곽 후광.
+func add_museum_mat_frame(parent: Control, rect: Rect2,
+		frame_color: Color = SacredPalette.BRASS_500) -> Control:
+	var frame: Control = _MUSEUM_MAT_FRAME.new()
+	frame.position = rect.position
+	frame.size = rect.size
+	frame.frame_color = frame_color
+	parent.add_child(frame)
+	return frame
+
 func add_corner_brackets(node: Control,
 		color: Color = SacredPalette.BRASS_500,
 		bracket_len: int = 14,
