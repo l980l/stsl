@@ -57,6 +57,7 @@ const VFX_PAIRS := [
 	{"name": "dispel",      "gpu": "res://scenes/vfx/dispel_gpu.gd",      "cpu": "res://scenes/vfx/dispel.gd"},
 	{"name": "form_change", "gpu": "res://scenes/vfx/form_change_gpu.gd", "cpu": "res://scenes/vfx/form_change.gd"},
 	{"name": "counter",     "gpu": "res://scenes/vfx/counter_gpu.gd",     "cpu": "res://scenes/vfx/counter.gd"},
+	{"name": "life_drain",  "gpu": "res://scenes/vfx/life_drain_gpu.gd",  "cpu": "res://scenes/vfx/life_drain.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
