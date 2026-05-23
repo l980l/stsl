@@ -9,7 +9,7 @@ extends CanvasLayer
 @onready var _btn_cancel:   Button       = $Panel/Footer/BtnCancel
 @onready var _btn_apply:    Button       = $Panel/Footer/BtnApply
 
-const _CURSOR_SIZES:    Dictionary = {"S": 24, "M": 32, "L": 48, "XL": 64}
+const _CURSOR_SIZES:    Dictionary = {"S": 32, "M": 48, "L": 64, "XL": 96}
 const _DEFAULT_KEY   := "M"
 const _TABS          := [["sound", "ui.settings.sound"], ["graphics", "ui.settings.graphics"], ["gameplay", "ui.settings.gameplay"], ["language", "ui.settings.language_tab"]]
 

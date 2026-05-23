@@ -77,10 +77,29 @@ var _cached_line_shader: Shader = null
 var _cached_btn_glow_shader: Shader = null
 var _cached_card_glow_shader: Shader = null
 var _country_font_cache: Dictionary = {}
-var _cursor_base_image: Image = null
+var _cursor_base_images: Dictionary = {}      # name → Image (32×32 베이스)
+var _cursor_textures_cache: Dictionary = {}   # name → ImageTexture (현재 px 기준 리사이즈된 텍스처)
+var _cursor_hotspots_cache: Dictionary = {}   # name → Vector2 (현재 px 기준 스케일된 핫스팟)
 
-const _CURSOR_DEFAULT := 32
+const _CURSOR_DEFAULT := 48                    # 기본값 = settings_overlay 의 M 키 (px)
+const _CURSOR_BASE_PX := 32                    # 샘플 SVG viewBox 크기 (핫스팟 비례 기준)
+const _CURSORS_DIR    := "res://assets/art/ui/cursors/"
 const _SETTINGS_PATH  := "user://settings.cfg"
+
+# 이름 → {shape: Input.CursorShape, hotspot: Vector2 (32px 기준), scale: float (시각 배율)}
+# shape = -1 은 Godot 슬롯 매핑 없음 (수동 set_named_cursor 전용, 예: ally)
+# scale 1.0 = 표준. SVG 내부 그래픽이 작게 그려진 커서(grabbing 등)는 1.0 이상으로 보정.
+const _CURSOR_MAP := {
+	"default":  {"shape": Input.CURSOR_ARROW,         "hotspot": Vector2(3, 3),   "scale": 1.0},
+	"pointer":  {"shape": Input.CURSOR_POINTING_HAND, "hotspot": Vector2(16, 16), "scale": 1.0},
+	"grab":     {"shape": Input.CURSOR_CAN_DROP,      "hotspot": Vector2(16, 16), "scale": 1.0},
+	"grabbing": {"shape": Input.CURSOR_DRAG,          "hotspot": Vector2(16, 16), "scale": 1.5},
+	"attack":   {"shape": Input.CURSOR_CROSS,         "hotspot": Vector2(16, 16), "scale": 1.0},
+	"inspect":  {"shape": Input.CURSOR_HELP,          "hotspot": Vector2(12, 12), "scale": 1.0},
+	"denied":   {"shape": Input.CURSOR_FORBIDDEN,     "hotspot": Vector2(16, 16), "scale": 1.0},
+	"wait":     {"shape": Input.CURSOR_BUSY,          "hotspot": Vector2(16, 16), "scale": 1.0},
+	"ally":     {"shape": -1,                          "hotspot": Vector2(16, 16), "scale": 1.0},
+}
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(SacredPalette.INK_1000)
@@ -97,16 +116,46 @@ func _on_locale_changed(_locale: String) -> void:
 	theme.changed.emit()
 
 func _setup_cursor() -> void:
-	if _cursor_base_image == null:
-		_cursor_base_image = (load("res://assets/art/ui/cursor.svg") as Texture2D).get_image()
+	if _cursor_base_images.is_empty():
+		for name in _CURSOR_MAP.keys():
+			var tex: Texture2D = load(_CURSORS_DIR + name + ".svg") as Texture2D
+			if tex != null:
+				_cursor_base_images[name] = tex.get_image()
 	apply_cursor_size(load_cursor_size())
 
 func apply_cursor_size(px: int) -> void:
-	if _cursor_base_image == null:
-		_cursor_base_image = (load("res://assets/art/ui/cursor.svg") as Texture2D).get_image()
-	var img := _cursor_base_image.duplicate() as Image
-	img.resize(px, px, Image.INTERPOLATE_LANCZOS)
-	Input.set_custom_mouse_cursor(ImageTexture.create_from_image(img), Input.CURSOR_ARROW, Vector2(px * 0.5, px * 0.5))
+	if _cursor_base_images.is_empty():
+		_setup_cursor()
+		return
+	for name in _CURSOR_MAP.keys():
+		if not _cursor_base_images.has(name):
+			continue
+		var info: Dictionary = _CURSOR_MAP[name]
+		var visual_scale: float = float(info.get("scale", 1.0))
+		var actual_px: int = int(round(float(px) * visual_scale))
+		var img := (_cursor_base_images[name] as Image).duplicate() as Image
+		img.resize(actual_px, actual_px, Image.INTERPOLATE_LANCZOS)
+		var tex := ImageTexture.create_from_image(img)
+		var hotspot: Vector2 = (info["hotspot"] as Vector2) * (float(actual_px) / float(_CURSOR_BASE_PX))
+		_cursor_textures_cache[name] = tex
+		_cursor_hotspots_cache[name] = hotspot
+		var shape: int = int(info["shape"])
+		if shape >= 0:
+			Input.set_custom_mouse_cursor(tex, shape, hotspot)
+
+# 임시 커서 오버라이드 — 카드 드래그 → 아군 타겟팅 등 컨텍스트별 수동 적용.
+# CURSOR_ARROW 슬롯에 일시 덮어쓰기 후 clear_named_cursor 로 기본 매핑 복원.
+func set_named_cursor(name: String) -> void:
+	if not _cursor_textures_cache.has(name):
+		return
+	Input.set_custom_mouse_cursor(_cursor_textures_cache[name], Input.CURSOR_ARROW,
+		_cursor_hotspots_cache[name])
+
+func clear_named_cursor() -> void:
+	# default 의 텍스처·핫스팟을 ARROW 슬롯에 다시 등록 (전체 재리사이즈 불필요)
+	if _cursor_textures_cache.has("default"):
+		Input.set_custom_mouse_cursor(_cursor_textures_cache["default"], Input.CURSOR_ARROW,
+			_cursor_hotspots_cache["default"])
 
 func load_cursor_size() -> int:
 	var cfg := ConfigFile.new()
