@@ -21,9 +21,10 @@ static func vaisravana(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func deva_guardian(scene: PackedScene) -> Resource:
+static func mahoraga(scene: PackedScene) -> Resource:
+	# 마후라가 — 천룡팔부의 大蟒神. 최면 가락으로 아군 전체 약화·취약 (구 deva_guardian 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.buddhist.deva_guardian"; e.max_hp = 1700; e.character_scene = scene
+	e.enemy_name = "enemy.buddhist.mahoraga"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "vulnerable"
@@ -104,7 +105,7 @@ static func mahavairocana(scene: PackedScene) -> Resource:
 	return e
 
 static func elites() -> Array:
-	return ["vaisravana", "deva_guardian", "dharma_general"]
+	return ["vaisravana", "mahoraga", "dharma_general"]
 
 static func boss() -> String:
 	return "mahavairocana"

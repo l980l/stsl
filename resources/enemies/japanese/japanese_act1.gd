@@ -3,9 +3,10 @@
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 
-static func oni_general(scene: PackedScene) -> Resource:
+static func ushi_oni(scene: PackedScene) -> Resource:
+	# 우시오니 — 소 머리의 흉포한 요괴. blunt 강타형 엘리트 (구 oni_general 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.japanese.oni_general"; e.max_hp = 1600; e.character_scene = scene
+	e.enemy_name = "enemy.japanese.ushi_oni"; e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 2; i1.status_type = "strength"
@@ -105,7 +106,7 @@ static func raijin(scene: PackedScene) -> Resource:
 	return e
 
 static func elites() -> Array:
-	return ["oni_general", "yamamba", "invincible_ronin"]
+	return ["ushi_oni", "yamamba", "invincible_ronin"]
 
 static func boss() -> String:
 	return "raijin"

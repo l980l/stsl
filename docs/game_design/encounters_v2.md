@@ -129,10 +129,10 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | 3 | garlarr_snake 단독 | 340 |
 | 4 | hrimfaxi_rider + ice_wolf | 730 |
 | 5 | raven_scout × 3 | 840 |
-| 6 | frost_giant_pup + bone_archer + dark_elf | 885 |
+| 6 | frost_wight + bone_archer + dark_elf | 885 |
 | 7 | draugr × 2 + berserker | 1290 |
 | 8 | runestone_golem + night_hag + lindworm_spawn + einherjar_ghost | 1250 |
-| 9 | jotun_soldier + fenrir_pup + nidhogg_scale | 1450 |
+| 9 | jotun_soldier + garmr + nidhogg_scale | 1450 |
 | 10 | frost_giant + ragnarok_herald | 1350 |
 
 ※ 9/10번 총 HP가 같으나 10번 몬스터의 단일 데미지가 더 높음 (강도 차별화).
@@ -156,7 +156,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 |---|---|---|---|
 | ice_wolf | 얼음 늑대 | 350 | ATK 75 RANDOM blunt → ATK 75 RANDOM blunt → DEBUFF weak 1 |
 | raven_scout | 라그나로크 까마귀 | 280 | ATK 55 RANDOM slash → DEBUFF poison 2 → ATK 70 RANDOM slash |
-| frost_giant_pup | 서리 거인 새끼 | 310 | BUFF block 25 → ATK 70 RANDOM blunt → ATK 90 RANDOM blunt |
+| frost_wight | 서리 거인 새끼 | 310 | BUFF block 25 → ATK 70 RANDOM blunt → ATK 90 RANDOM blunt |
 | bone_archer | 뼈 궁수 | 280 | ATK 60 RANDOM slash → DEBUFF vulnerable 1 → ATK 60 RANDOM slash |
 | dark_elf | 다크 엘프 | 295 | DEBUFF weak 2 → ATK 65 RANDOM curse → ATK 65 RANDOM curse |
 | berserker | 버서커 | 450 | BUFF strength 2 → ATK 110 RANDOM slash → ATK 130 RANDOM slash |
@@ -164,7 +164,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | night_hag | 밤 마녀 | 280 | DEBUFF vulnerable 2 → DEBUFF weak 2 → ATK 80 RANDOM curse |
 | lindworm_spawn | 린드웜 새끼 | 320 | ATK 75 RANDOM poison → DEBUFF poison 2 → ATK 75 RANDOM slash |
 | einherjar_ghost | 전사의 유령 | 300 | BUFF strength 1 → ATK 80 RANDOM slash → ATK 80 RANDOM slash |
-| fenrir_pup | 펜리르 강아지 | 450 | ATK 110 RANDOM blunt → BUFF strength 1 → ATK 130 LOWEST_HP blunt |
+| garmr | 펜리르 강아지 | 450 | ATK 110 RANDOM blunt → BUFF strength 1 → ATK 130 LOWEST_HP blunt |
 | nidhogg_scale | 니드호그의 비늘 | 400 | ATK 90 RANDOM poison → DEBUFF poison 3 → ATK 90 RANDOM slash |
 | frost_giant | 서리 거인 | 680 | BUFF block 60 → ATK 150 RANDOM blunt → ATK 110 ALL blunt |
 | ragnarok_herald | 라그나로크 전령 | 670 | BUFF strength 2 → ATK 140 RANDOM slash → ATK 140 LOWEST_HP slash → ATK 80 ALL slash |
@@ -230,10 +230,10 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 |---|---|---|
 | 1 | garuda 단독 | 280 |
 | 2 | yaksha × 2 | 640 |
-| 3 | mara_soldier 단독 | 350 |
+| 3 | pishacha 단독 | 350 |
 | 4 | dharma_puppet + lotus_spirit | 610 |
 | 5 | hungry_ghost × 3 | 840 |
-| 6 | asura + naga_spawn + demon_soldier | 970 |
+| 6 | asura + naga_spawn + rakshasa | 970 |
 | 7 | virudhaka × 2 + karmic_fiend | 1270 |
 | 8 | sky_beast + earth_spirit + wrathful_spirit + cursed_monk | 1210 |
 | 9 | vajrapani + deva_soldier + ashura_warrior | 1230 |
@@ -249,7 +249,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 |---|---|---|---|
 | garuda | 가루다 | 280 | BUFF strength 1 → ATK 60 ALL fire |
 | yaksha | 야차 | 320 | ATK 70 LOWEST_HP slash → DEBUFF weak 2 → ATK 90 LOWEST_HP slash |
-| mara_soldier | 마라 병사 | 350 | DEBUFF vulnerable 1 → ATK 80 RANDOM curse → DEBUFF weak 2 → ATK 60 RANDOM curse |
+| pishacha | 마라 병사 | 350 | DEBUFF vulnerable 1 → ATK 80 RANDOM curse → DEBUFF weak 2 → ATK 60 RANDOM curse |
 | asura | 아수라 | 380 | BUFF strength 1 → DEBUFF vulnerable 2 → ATK 90 RANDOM blunt |
 | virudhaka | 증장천 | 450 | BUFF block 40 → ATK 100 RANDOM divine → ATK 120 RANDOM divine → BUFF block 20 |
 | vajrapani | 금강역사 | **500** | BUFF strength 2 → ATK 100 RANDOM blunt → ATK 130 RANDOM blunt |
@@ -262,7 +262,7 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | lotus_spirit | 연꽃 정령 | 310 | DEBUFF weak 2 → ATK 70 RANDOM divine → ATK 70 RANDOM divine |
 | hungry_ghost | 아귀 | 280 | ATK 60 RANDOM curse → ATK 60 RANDOM curse → DEBUFF vulnerable 1 |
 | naga_spawn | 나가 알 | 310 | ATK 70 RANDOM poison → DEBUFF poison 2 → ATK 70 RANDOM slash |
-| demon_soldier | 마군 병사 | 280 | BUFF strength 1 → ATK 70 RANDOM blunt → ATK 70 RANDOM blunt |
+| rakshasa | 마군 병사 | 280 | BUFF strength 1 → ATK 70 RANDOM blunt → ATK 70 RANDOM blunt |
 | karmic_fiend | 업 마귀 | 370 | DEBUFF weak 2 → DEBUFF vulnerable 2 → ATK 90 RANDOM curse |
 | sky_beast | 천신 짐승 | 330 | BUFF strength 1 → ATK 80 RANDOM divine → ATK 80 RANDOM divine |
 | earth_spirit | 지령 | 290 | DEBUFF vulnerable 2 → ATK 70 RANDOM blunt → ATK 70 RANDOM blunt |
@@ -339,9 +339,9 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | 5 | koropokkuru × 3 | 780 |
 | 6 | yamabiko + ittan_momen + azuki_washer | 850 |
 | 7 | oni × 2 + samurai_ghost | 1270 |
-| 8 | river_kappa + snow_woman + cursed_scroll + tatami_monster | 1260 |
+| 8 | tennyo + hone_onna + cursed_scroll + tatami_monster | 1260 |
 | 9 | ronin_ghost + yamabushi_ghost + dragon_serpent | 1370 |
-| 10 | oni_king + hannya | 1380 |
+| 10 | gashadokuro + hannya | 1380 |
 
 ### 몬스터 명세 (20종)
 
@@ -366,13 +366,13 @@ func _weighted_pick(items: Array, weights: Array) -> Variant:
 | ittan_momen | 잇탄모멘 | 280 | DEBUFF weak 2 → ATK 60 RANDOM slash → ATK 60 RANDOM slash |
 | azuki_washer | 아즈키 씻는 귀신 | 270 | ATK 55 RANDOM blunt → DEBUFF vulnerable 1 → ATK 70 RANDOM blunt |
 | samurai_ghost | 사무라이 영령 | 430 | BUFF strength 1 → ATK 100 RANDOM slash → ATK 100 LOWEST_HP slash → ATK 80 ALL slash |
-| river_kappa | 강물 갓파 | 350 | BUFF block 35 → ATK 85 RANDOM blunt → ATK 85 RANDOM blunt |
-| snow_woman | 눈의 여인 | 310 | DEBUFF weak 2 → ATK 75 LOWEST_HP ice → DEBUFF vulnerable 1 |
+| tennyo | 강물 갓파 | 350 | BUFF block 35 → ATK 85 RANDOM blunt → ATK 85 RANDOM blunt |
+| hone_onna | 눈의 여인 | 310 | DEBUFF weak 2 → ATK 75 LOWEST_HP ice → DEBUFF vulnerable 1 |
 | cursed_scroll | 저주 두루마리 | 270 | SPECIAL 1 → ATK 65 RANDOM curse → ATK 65 RANDOM curse |
 | tatami_monster | 다다미 괴물 | 330 | BUFF block 30 → ATK 80 RANDOM blunt → ATK 95 RANDOM blunt |
 | yamabushi_ghost | 야마부시 영령 | 480 | BUFF strength 1 → ATK 110 RANDOM slash → ATK 110 RANDOM slash → ATK 80 ALL slash |
 | dragon_serpent | 수룡 | 440 | ATK 100 RANDOM blunt → DEBUFF vulnerable 2 → ATK 100 RANDOM blunt |
-| oni_king | 오니 왕 | 700 | BUFF strength 2 → ATK 150 RANDOM blunt → ATK 120 ALL blunt |
+| gashadokuro | 오니 왕 | 700 | BUFF strength 2 → ATK 150 RANDOM blunt → ATK 120 ALL blunt |
 | hannya | 한냐 | 680 | BUFF strength 1 → ATK 140 LOWEST_HP curse → ATK 140 LOWEST_HP curse → ATK 90 ALL curse |
 
 ---

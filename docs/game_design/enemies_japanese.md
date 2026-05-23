@@ -118,9 +118,9 @@
 
 ### 엘리트 풀 (3종)
 
-#### 1. 오니 장군 (oni_general)
+#### 1. 오니 장군 (ushi_oni)
 
-- **enemy_name**: `enemy.japanese.oni_general` / **HP**: 1,600 / **charm_resistance**: 20
+- **enemy_name**: `enemy.japanese.ushi_oni` / **HP**: 1,600 / **charm_resistance**: 20
 - **인텐트 시퀀스** (4턴 순환):
   ① BUFF 근력 2 → ② ATK 150 [LOWEST_HP] (blunt) → ③ ATK 130 [RANDOM] (blunt) → ④ DEBUFF 취약 2 [RANDOM]
 - **핵심 메카닉**: 근력 2 선행 후 LOWEST_HP+RANDOM 2타, 취약 부여로 다음 사이클 강화.
@@ -248,9 +248,9 @@
 
 ---
 
-#### 3. 눈보라 여왕 (blizzard_queen)
+#### 3. 눈보라 여왕 (jorogumo)
 
-- **enemy_name**: `enemy.japanese.blizzard_queen` / **HP**: 1,800 / **charm_resistance**: 20
+- **enemy_name**: `enemy.japanese.jorogumo` / **HP**: 1,800 / **charm_resistance**: 20
 - **인텐트 시퀀스** (5턴 순환):
   ① DEBUFF 약화 3 [ALL] → ② ATK 160 [LOWEST_HP] (ice) → ③ DEBUFF 취약 2 [ALL] → ④ ATK 180 [RANDOM] (ice) → ⑤ BUFF 근력 2
 - **핵심 메카닉**: 전체 약화 3→LOWEST_HP 얼음→전체 취약 2→RANDOM 얼음→근력 2. 디버프 최대치 누적 후 공격.
@@ -283,8 +283,8 @@
 |---|---|---|
 | 근력 폭발 (oni, invincible_ronin, susanoo_blade) | 빠른 처치 불가 덱 | 근력 제거 or 선제 차단 |
 | 다속성 공격 (독+화염, 번개+얼음) | 단일 속성 저항 덱 | 복합 저항 or 블록 중심 |
-| 전체 약화 (yuki_onna, chaos_tengu, blizzard_queen) | 공격 위주 덱 | 약화 해제 / 방어 우선 전환 |
-| LOWEST_HP 처형 (yamamba, oni_general, yasha) | 단일 영웅 선봉 덱 | HP 균등 유지 |
+| 전체 약화 (yuki_onna, chaos_tengu, jorogumo) | 공격 위주 덱 | 약화 해제 / 방어 우선 전환 |
+| LOWEST_HP 처형 (yamamba, ushi_oni, yasha) | 단일 영웅 선봉 덱 | HP 균등 유지 |
 
 ---
 
@@ -298,7 +298,7 @@
 | `enemy.japanese.kappa` | 일반 |
 | `enemy.japanese.shuten_minion` | 일반 |
 | `enemy.japanese.ronin_ghost` | 일반 |
-| `enemy.japanese.oni_general` | Act 1 엘리트 |
+| `enemy.japanese.ushi_oni` | Act 1 엘리트 |
 | `enemy.japanese.yamamba` | Act 1 엘리트 |
 | `enemy.japanese.invincible_ronin` | Act 1 엘리트 |
 | `enemy.japanese.raijin` | Act 1 보스 |
@@ -308,5 +308,5 @@
 | `enemy.japanese.shuten_doji` | Act 2 보스 |
 | `enemy.japanese.iwato_guardian` | Act 3 엘리트 |
 | `enemy.japanese.susanoo_blade` | Act 3 엘리트 |
-| `enemy.japanese.blizzard_queen` | Act 3 엘리트 |
+| `enemy.japanese.jorogumo` | Act 3 엘리트 |
 | `enemy.japanese.yamata_no_orochi` | Act 3 보스 |

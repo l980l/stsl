@@ -197,10 +197,10 @@ static func samurai_ghost(scene: PackedScene) -> Resource:
 	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
-static func river_kappa(scene: PackedScene) -> Resource:
-	# T2-HEALER: LOWEST_HP 동료 HP +25 (강물 카파의 치유)
+static func tennyo(scene: PackedScene) -> Resource:
+	# 천녀 — 날개옷 선녀. T2-HEALER: LOWEST_HP 동료 HP +25 (구 river_kappa 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.japanese.river_kappa"; e.max_hp = 350; e.character_scene = scene
+	e.enemy_name = "enemy.japanese.tennyo"; e.max_hp = 350; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.HEAL_ALLY; i1.value = 25; i1.target = IntentRes.TargetType.LOWEST_HP
@@ -211,15 +211,16 @@ static func river_kappa(scene: PackedScene) -> Resource:
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
-static func snow_woman(scene: PackedScene) -> Resource:
-	# T1-DESPERATE: HP 30% 미만 strength +2 (눈여인의 마지막 한기)
+static func hone_onna(scene: PackedScene) -> Resource:
+	# 호네온나 — 산 자의 정기를 빨아먹는 뼈 여인. T1-DESPERATE: HP 30% 미만 strength +2
+	# (구 snow_woman 리스킨, 메커니즘 동일 — 공격 속성만 ice→curse)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.japanese.snow_woman"; e.max_hp = 310; e.character_scene = scene
+	e.enemy_name = "enemy.japanese.hone_onna"; e.max_hp = 310; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 2; i1.status_type = "weak"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 75; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "ice"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 75; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "curse"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 1; i3.status_type = "vulnerable"; i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]
@@ -298,10 +299,11 @@ static func dragon_serpent(scene: PackedScene) -> Resource:
 	e.phase_buffs = [[{"status": "strength", "value": 3}]]
 	return e
 
-static func oni_king(scene: PackedScene) -> Resource:
-	# T3-WARD: 오니 왕의 결계 — hannya와 함께 TH-WARD-ROTATE 테마 (인카운터 #10)
+static func gashadokuro(scene: PackedScene) -> Resource:
+	# 가샤도쿠로 — 거대 원귀 해골. T3-WARD: 뼈 갑옷 결계 — hannya와 함께 TH-WARD-ROTATE 테마 (인카운터 #10)
+	# (구 oni_king 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.japanese.oni_king"; e.max_hp = 700; e.character_scene = scene
+	e.enemy_name = "enemy.japanese.gashadokuro"; e.max_hp = 700; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.WARD; i1.value = 1
@@ -337,9 +339,9 @@ static func hannya(scene: PackedScene) -> Resource:
 
 # ──── 인카운터 조합 테이블 (난이도 오름차순 1~10) ────
 # #8~10 테마 시너지 (Phase 4):
-#   #8 — river_kappa + snow_woman + cursed_scroll(DEATH-RATTLE) + tatami_monster(PHASE)
+#   #8 — tennyo + hone_onna + cursed_scroll(DEATH-RATTLE) + tatami_monster(PHASE)
 #   #9 — ronin_ghost + yamabushi_ghost + dragon_serpent(DESPERATE)
-#   #10 TH-WARD-ROTATE — oni_king(WARD) + hannya(WARD) — 2 마리 무적 사이클
+#   #10 TH-WARD-ROTATE — gashadokuro(WARD) + hannya(WARD) — 2 마리 무적 사이클
 
 static func encounters() -> Array:
 	return [
@@ -350,7 +352,7 @@ static func encounters() -> Array:
 		["koropokkuru", "koropokkuru", "koropokkuru"],
 		["yamabiko", "ittan_momen", "azuki_washer"],
 		["oni", "oni", "samurai_ghost"],
-		["river_kappa", "snow_woman", "cursed_scroll", "tatami_monster"],
+		["tennyo", "hone_onna", "cursed_scroll", "tatami_monster"],
 		["ronin_ghost", "yamabushi_ghost", "dragon_serpent"],
-		["oni_king", "hannya"],
+		["gashadokuro", "hannya"],
 	]

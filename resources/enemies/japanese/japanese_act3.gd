@@ -36,21 +36,23 @@ static func susanoo_blade(scene: PackedScene) -> Resource:
 	e.charm_resistance = 20
 	return e
 
-static func blizzard_queen(scene: PackedScene) -> Resource:
+static func jorogumo(scene: PackedScene) -> Resource:
+	# 조로구모 — 거미 여인. 거미줄로 속박(speed_penalty)하며 독을 먹이는 엘리트
+	# (구 blizzard_queen 리스킨, 메커니즘 동일 — 공격 속성만 ice→poison)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.japanese.blizzard_queen"; e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = "enemy.japanese.jorogumo"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 3; i1.status_type = "weak"
 	i1.target = IntentRes.TargetType.ALL
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 160; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "ice"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 160; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "poison"
 	var i3 := IntentRes.new()
-	# 눈보라의 동결 — 영웅 전체 speed_penalty 4 (3턴 일정 효과)
+	# 거미줄의 속박 — 영웅 전체 speed_penalty 4 (3턴 일정 효과)
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 4; i3.status_type = "speed_penalty"
 	i3.duration = 3; i3.target = IntentRes.TargetType.ALL
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 180; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "ice"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 180; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "poison"
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.BUFF; i5.value = 2; i5.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
@@ -123,7 +125,7 @@ static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	return e
 
 static func elites() -> Array:
-	return ["iwato_guardian", "susanoo_blade", "blizzard_queen"]
+	return ["iwato_guardian", "susanoo_blade", "jorogumo"]
 
 static func boss() -> String:
 	return "yamata_no_orochi"

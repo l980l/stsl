@@ -27,7 +27,7 @@ enemy.egyptian.jackal_warrior,자칼 전사,Jackal Warrior,Guerrier Chacal,Guerr
 enemy.egyptian.scarab_queen,스카라베 여왕,Scarab Queen,Reine Scarabée,Regina Scarabeo,Reina Escarabajo,スカラベ女王,Βασίλισσα Σκαραβαίος,圣甲虫女王,圣甲虫女王,Королева скарабеев,Rainha Escaravelho,Królowa Skarabeuszy,Skarabäus-Königin
 enemy.egyptian.obelisk_guardian,오벨리스크 수호자,Obelisk Guardian,Gardien d'Obélisque,Guardiano dell'Obelisco,Guardián del Obelisco,オベリスクの守護者,Φύλακας Οβελίσκου,方尖碑守护者,方尖碑守护者,Страж обелиска,Guardião do Obelisco,Strażnik Obeliska,Obelisk-Wächter
 enemy.egyptian.sekhmet,세크메트,Sekhmet,Sekhmet,Sekhmet,Sekhmet,セクメト,Σεκμέτ,塞赫麦特,塞赫麦特,Сехмет,Sekhmet,Sechmet,Sachmet
-enemy.egyptian.apep_snake,아펩 뱀,Apep Serpent,Serpent Apep,Serpente Apep,Serpiente Apep,アペプの蛇,Φίδι Άπεπ,阿佩普之蛇,阿佩普之蛇,Змей Апеп,Serpente Apep,Wąż Apep,Apep-Schlange
+enemy.egyptian.serqet,셀케트,Serqet,Serqet,Serqet,Serqet,セルケト,Σερκέτ,塞尔凯特,塞爾凱特,Серкет,Serqet,Serqet,Serqet
 enemy.egyptian.seth_hound,세트의 사냥개,Hound of Seth,Chien de Seth,Levriero di Seth,Sabueso de Seth,セトの猟犬,Σκύλος του Σεθ,赛特之犬,赛特之犬,Пёс Сета,Cão de Seth,Pies Setha,Hund des Seth
 enemy.egyptian.ba_bird,바 새,Ba Bird,Oiseau Ba,Uccello Ba,Pájaro Ba,バーの鳥,Πουλί Μπα,巴鸟,巴鸟,Птица Ба,Pássaro Ba,Ptak Ba,Ba-Vogel
 enemy.egyptian.osiris,오시리스,Osiris,Osiris,Osiride,Osiris,オシリス,Όσιρις,奥西里斯,奥西里斯,Осирис,Osíris,Ozyrys,Osiris
@@ -43,7 +43,7 @@ enemy.norse.hrimfaxi_rider,흐림팍시 기수,Hrimfaxi Rider,Cavalier de Hrimfa
 enemy.norse.garlarr_snake,갸르라르 뱀,Garlarr Snake,Serpent Garlarr,Serpente Garlarr,Serpiente Garlarr,ギャルラルル蛇,Φίδι Γκάρλαρ,加拉尔之蛇,加拉尔之蛇,Змея Гарларр,Cobra Garlarr,Wąż Garlarr,Garlarr-Schlange
 enemy.norse.nidhogg_larva,니드호그 유충,Nidhogg Larva,Larve de Nidhogg,Larva di Nidhogg,Larva de Nidhogg,ニーズヘッグの幼虫,Λάρβα του Νίντχογκ,尼德霍格幼虫,尼德霍格幼虫,Личинка Нидхёгга,Larva de Nidhogg,Larwa Nidhogga,Nidhogg-Larve
 enemy.norse.skoll,스콜 늑대,Sköll Wolf,Loup Sköll,Lupo Sköll,Lobo Sköll,スコルの狼,Λύκος Σκολ,斯库尔狼,斯库尔狼,Волк Сколль,Lobo Sköll,Wilk Sköll,Sköll-Wolf
-enemy.norse.hrimthurs_scout,서리 거인 척후,Hrimthurs Scout,Éclaireur Hrimthurs,Esploratore Hrimthurs,Explorador Hrimthurs,霜の巨人の斥候,Πρόσκοπος Χρίμθουρς,霜巨人斥候,霜巨人斥候,Разведчик-Хримтурс,Batedor Hrimthurs,Zwiadowca Hrimthurs,Hrimthurs-Kundschafter
+enemy.norse.modgud,모드구드,Modgud,Modgud,Modgud,Modgud,モーズグズ,Μόντγκουντ,莫德古德,莫德古德,Модгуд,Modgud,Modgud,Modgud
 enemy.norse.fjorgynn,피요르기닌,Fjörgyn,Fjörgyn,Fjörgyn,Fjörgyn,フィヨルギュン,Φιοργκύν,费约尔根,費約根,Фьёргюн,Fjörgyn,Fjörgyn,Fjörgyn
 enemy.norse.troll_warrior,트롤 전사,Troll Warrior,Guerrier Troll,Guerriero Troll,Guerrero Troll,トロール戦士,Πολεμιστής Τρολ,巨魔战士,巨魔战士,Воин-тролль,Guerreiro Troll,Wojownik Troll,Troll-Krieger
 enemy.norse.norn,운명의 여신 노른,Norn of Fate,Norne du Destin,Norna del Destino,Norna del Destino,運命の女神ノルン,Νόρνα του Πεπρωμένου,命运女神诺恩,命运女神诺恩,Норна Судьбы,Norna do Destino,Norna Losu,Norne des Schicksals
@@ -59,7 +59,7 @@ enemy.japanese.yuki_onna,유키온나,Yuki-onna,Yuki-onna,Yuki-onna,Yuki-onna,�
 enemy.japanese.kappa,갓파,Kappa,Kappa,Kappa,Kappa,河童,Κάππα,河童,河童,Каппа,Kappa,Kappa,Kappa
 enemy.japanese.shuten_minion,슈텐도지 졸개,Shuten-doji Minion,Sbire de Shuten-doji,Scagnozzo di Shuten-doji,Secuaz de Shuten-doji,酒呑童子の手下,Υπηρέτης του Σούτεν-ντότζι,酒吞童子部下,酒吞童子部下,Слуга Сютэн-додзи,Servo de Shuten-doji,Sługa Shuten-doji,Shuten-doji-Diener
 enemy.japanese.ronin_ghost,로닌 망령,Ronin Ghost,Fantôme Ronin,Fantasma Ronin,Fantasma Ronin,浪人の亡霊,Φάντασμα Ρόνιν,浪人亡灵,浪人亡灵,Призрак ронина,Fantasma Ronin,Duch Ronina,Ronin-Geist
-enemy.japanese.oni_general,오니 장군,Oni General,Général Oni,Generale Oni,General Oni,鬼将軍,Στρατηγός Όνι,鬼将军,鬼将军,Генерал Они,General Oni,Generał Oni,Oni-General
+enemy.japanese.ushi_oni,우시오니,Ushi-Oni,Ushi-Oni,Ushi-Oni,Ushi-Oni,牛鬼,Ούσι-Όνι,牛鬼,牛鬼,Уси-они,Ushi-Oni,Ushi-Oni,Ushi-Oni
 enemy.japanese.yamamba,야마우바,Yamamba,Yamamba,Yamamba,Yamamba,山姥,Γιαμάμπα,山姥,山姥,Ямаумба,Yamamba,Yamamba,Yamamba
 enemy.japanese.invincible_ronin,로닌 무적,Invincible Ronin,Ronin Invincible,Ronin Invincibile,Ronin Invencible,無敵の浪人,Αήττητος Ρόνιν,无敌浪人,无敌浪人,Непобедимый ронин,Ronin Invencível,Niezwyciężony Ronin,Unbesiegbarer Ronin
 enemy.japanese.raijin,라이덴,Raijin,Raijin,Raijin,Raijin,雷神,Ραϊτζίν,雷神,雷神,Райдзин,Raijin,Raijin,Raijin
@@ -69,16 +69,16 @@ enemy.japanese.nureriyon,누레리온,Nurarihyon,Nurarihyon,Nurarihyon,Nurarihyo
 enemy.japanese.shuten_doji,슈텐도지,Shuten-doji,Shuten-doji,Shuten-doji,Shuten-doji,酒呑童子,Σούτεν-ντότζι,酒吞童子,酒吞童子,Сютэн-додзи,Shuten-doji,Shuten-doji,Shuten-doji
 enemy.japanese.iwato_guardian,아마노이와토 수문장,Amano-Iwato Guardian,Gardien d'Amano-Iwato,Guardiano di Amano-Iwato,Guardián de Amano-Iwato,天岩戸の守衛,Φύλακας του Αμάνο-Ιουάτο,天岩户守门人,天岩户守门人,Страж Амано-Ивато,Guardião de Amano-Iwato,Strażnik Amano-Iwato,Amano-Iwato-Wächter
 enemy.japanese.susanoo_blade,스사노오의 검,Blade of Susanoo,Lame de Susanoo,Lama di Susanoo,Filo de Susanoo,スサノオの剣,Λεπίδα του Σουσανόο,素盏呜尊之剑,素盏呜尊之剑,Клинок Сусаноо,Lâmina de Susanoo,Ostrze Susanoo,Klinge des Susanoo
-enemy.japanese.blizzard_queen,유키온나의 여왕,Blizzard Queen,Reine du blizzard,Regina della Tormenta,Reina de la Ventisca,雪女の女王,Βασίλισσα της Χιονοθύελλας,雪女之女王,雪女之女王,Королева метели,Rainha da Nevasca,Królowa Zamieci,Schneesturm-Königin
+enemy.japanese.jorogumo,조로구모,Jorogumo,Jorogumo,Jorogumo,Jorogumo,絡新婦,Ζορογκούμο,络新妇,絡新婦,Дзёрогумо,Jorogumo,Jorogumo,Jorogumo
 enemy.japanese.yamata_no_orochi,야마타노오로치,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi,八岐大蛇,Γιαμάτα νο Ορότσι,八岐大蛇,八岐大蛇,Ямата но Ороти,Yamata no Orochi,Yamata no Orochi,Yamata no Orochi
 enemy.buddhist.yaksha,야차,Yaksha,Yaksha,Yaksha,Yaksha,夜叉,Γιάκσα,夜叉,夜叉,Якша,Yaksha,Jaksza,Yaksha
 enemy.buddhist.virudhaka,증장천,Virudhaka,Virudhaka,Virudhaka,Virudhaka,増長天,Βιρουντάκα,增长天,增長天,Вирудхака,Virudhaka,Virudhaka,Virudhaka
 enemy.buddhist.asura,아수라,Asura,Asura,Asura,Asura,阿修羅,Άσουρα,阿修罗,阿修羅,Асура,Asura,Asura,Asura
 enemy.buddhist.garuda,가루다,Garuda,Garuda,Garuda,Garuda,ガルーダ,Γκαρούντα,迦楼罗,迦樓羅,Гаруда,Garuda,Garuda,Garuda
-enemy.buddhist.mara_soldier,마라 병졸,Mara Soldier,Soldat de Māra,Soldato di Māra,Soldado de Māra,魔羅の兵,Στρατιώτης Μάρα,魔罗士兵,魔羅士兵,Воин Мары,Soldado de Mara,Żołnierz Mary,Mara-Soldat
+enemy.buddhist.pishacha,피사차,Pishacha,Pishacha,Pishacha,Pishacha,ピシャーチャ,Πισάτσα,毕舍遮,畢舍遮,Пишача,Pishacha,Piśaća,Pishacha
 enemy.buddhist.vajrapani,금강역사,Vajrapani,Vajrapani,Vajrapani,Vajrapani,金剛力士,Βαγκραπάνι,金刚力士,金剛力士,Ваджрапани,Vajrapani,Wadżrapani,Vajrapani
 enemy.buddhist.vaisravana,다문천왕,Vaisravana,Vaisravana,Vaisravana,Vaisravana,多聞天王,Βαϊσραβάνα,多闻天王,多聞天王,Вайшравана,Vaisravana,Wajśrawana,Vaisravana
-enemy.buddhist.deva_guardian,인왕역사,Deva Guardian,Gardien Deva,Guardiano Deva,Guardián Deva,仁王力士,Φρουρός Ντέβα,仁王力士,仁王力士,Страж-дэва,Guardião Deva,Strażnik Deva,Deva-Wächter
+enemy.buddhist.mahoraga,마후라가,Mahoraga,Mahoraga,Mahoraga,Mahoraga,マホーラガ,Μαχοράγκα,摩睺罗伽,摩睺羅伽,Махорага,Mahoraga,Mahoraga,Mahoraga
 enemy.buddhist.dharma_general,호법신중,Dharma Guardian,Gardien du Dharma,Guardiano del Dharma,Guardián del Dharma,護法神衆,Φρουρός Ντάρμα,护法神众,護法神眾,Страж Дхармы,Guardião do Dharma,Strażnik Dharmy,Dharma-Wächter
 enemy.buddhist.mahavairocana,대일여래,Mahavairocana,Mahavairocana,Mahavairocana,Mahavairocana,大日如来,Μαχαβαϊρόκανα,大日如来,大日如來,Махавайрочана,Mahavairocana,Mahawajroczana,Mahavairocana
 enemy.buddhist.asura_king,아수라왕,Asura King,Roi Asura,Re degli Asura,Rey Asura,阿修羅王,Βασιλιάς Άσουρα,阿修罗王,阿修羅王,Король Асур,Rei Asura,Król Asura,Asura-König
@@ -87,7 +87,7 @@ enemy.buddhist.agni_buddha,화신여래,Agni Buddha,Bouddha Agni,Buddha Agni,Bud
 enemy.buddhist.guanyin,관세음보살,Guanyin,Guanyin,Guanyin,Guanyin,観世音菩薩,Γκουανγίν,观世音菩萨,觀世音菩薩,Гуаньинь,Guanyin,Guanyin,Guanyin
 enemy.buddhist.yama,염라대왕,Yama,Yama,Yama,Yama,閻魔大王,Γιάμα,阎罗大王,閻羅大王,Яма,Yama,Yama,Yama
 enemy.buddhist.ksitigarbha,지장보살,Ksitigarbha,Ksitigarbha,Ksitigarbha,Ksitigarbha,地蔵菩薩,Κσιτιγκαρμπά,地藏菩萨,地藏菩薩,Кшитигарбха,Ksitigarbha,Kszitigarbha,Ksitigarbha
-enemy.buddhist.vairocana,비로자나불,Vairocana,Vairocana,Vairocana,Vairocana,毘盧遮那仏,Βαϊρόκανα,毗卢遮那佛,毘盧遮那佛,Вайрочана,Vairocana,Wajroczana,Vairocana
+enemy.buddhist.virupaksha,광목천왕,Virupaksha,Virupaksha,Virupaksha,Virupaksha,広目天,Βιρουπάκσα,广目天王,廣目天王,Вирупакша,Virupaksha,Wirupakśa,Virupaksha
 enemy.buddhist.acalanatha,부동명왕,Acalanatha,Acalanatha,Acalanatha,Acalanatha,不動明王,Ακαλανάθα,不动明王,不動明王,Ачаланатха,Acalanatha,Acalanatha,Acalanatha
 enemy.buddhist.yama.counter,공격 카드 4장마다: 최저체력 영웅에게 저주 피해,Every 4 Attack cards: Curse to lowest HP hero,Every 4 Attack cards: Curse to lowest HP hero,Every 4 Attack cards: Curse to lowest HP hero,Every 4 Attack cards: Curse to lowest HP hero,攻撃カード4枚ごとに最低HP英雄へ呪い,Κάθε 4 κάρτες Επίθεσης: Κατάρα στον ήρωα,每4张攻击牌：对最低生命值英雄造成诅咒伤害,每4張攻擊牌：對最低生命值英雄造成詛咒傷害,Каждые 4 ATK: проклятие герою с миним. HP,A cada 4 ATK: maldição ao herói com menor HP,Co 4 ATK: klątwa na bohatera z najniż. HP,Alle 4 ATK: Fluch auf Held mit niedr. HP
 enemy.daoist.hermit_ghost,시해선,Hermit Ghost,Fantôme Ermite,Fantasma Eremita,Fantasma Ermitaño,尸解仙,Ερημίτης Φάντασμα,尸解仙,尸解仙,Призрак-отшельник,Fantasma Eremita,Duch Pustelnika,Einsiedler-Geist
@@ -125,7 +125,7 @@ enemy.greek.hydra_head,히드라의 머리,Hydra Head,Tête d'Hydre,Testa di Idr
 enemy.greek.tartaros_shade,타르타로스의 망령,Tartaros Shade,Ombre du Tartare,Ombra del Tartaro,Sombra del Tártaro,タルタロスの亡霊,Σκιά του Τάρταρου,塔尔塔洛斯幽灵,塔爾塔洛斯幽靈,Тень Тартара,Sombra do Tártaro,Cień Tartaru,Tartaros-Schatten
 enemy.norse.ice_wolf,얼음 늑대,Ice Wolf,Loup de Glace,Lupo di Ghiaccio,Lobo de Hielo,アイスウルフ,Παγωμένος Λύκος,冰狼,冰狼,Ледяной волк,Lobo de Gelo,Wilk Lodu,Eiswolf
 enemy.norse.raven_scout,라그나로크 까마귀,Raven Scout,Corbeau Éclaireur,Corvo Esploratore,Cuervo Explorador,レイヴンの斥候,Κόρακας Αναγνωριστικός,拉格纳洛克渡鸦,拉格納洛克渡鴉,Ворон-разведчик,Corvo Batedor,Kruk Zwiadowca,Raben-Kundschafter
-enemy.norse.frost_giant_pup,서리 거인 새끼,Frost Giant Pup,Jeune Géant du Givre,Cucciolo di Gigante del Gelo,Cría de Gigante de Hielo,霜の巨人の子,Νεαρός Παγωμένος Γίγαντας,霜巨人幼崽,霜巨人幼崽,Детёныш ледяного гиганта,Filhote de Gigante de Gelo,Młody Lodowy Olbrzym,Frost-Giganten-Junges
+enemy.norse.frost_wight,서리 망령,Frost Wight,Spectre du Givre,Spettro del Gelo,Espectro de Escarcha,霜の亡霊,Φάσμα του Πάγου,寒霜亡魂,寒霜亡魂,Морозный призрак,Espectro do Gelo,Mroźna Zjawa,Frostgespenst
 enemy.norse.bone_archer,뼈 궁수,Bone Archer,Archer d'Os,Arciere d'Ossa,Arquero de Hueso,骨の弓手,Τοξότης από Κόκαλα,骸骨弓手,骸骨弓手,Костяной лучник,Arqueiro de Osso,Łucznik z Kości,Knochen-Bogenschütze
 enemy.norse.dark_elf,다크 엘프,Dark Elf,Elfe Sombre,Elfo Oscuro,Elfo Oscuro,ダークエルフ,Σκοτεινός Ξωτικό,暗黑精灵,暗黑精靈,Тёмный эльф,Elfo Sombrio,Mroczny Elf,Dunkelelf
 enemy.norse.berserker,버서커,Berserker,Berserker,Berserker,Berserker,バーサーカー,Μπέρσερκερ,狂战士,狂戰士,Берсерк,Berserker,Berserker,Berserker
@@ -133,7 +133,7 @@ enemy.norse.runestone_golem,룬 골렘,Runestone Golem,Golem de Runes,Golem dell
 enemy.norse.night_hag,밤 마녀,Night Hag,Sorcière de Nuit,Strega della Notte,Bruja Nocturna,夜の老婆,Νυχτερινή Μάγισσα,夜巫,夜巫,Ночная ведьма,Bruxa Noturna,Nocna Wiedźma,Nacht-Hexe
 enemy.norse.lindworm_spawn,린드웜 새끼,Lindworm Spawn,Rejeton de Lindworm,Piccolo Lindworm,Cría de Lindworm,リンドウームの子,Νεαρό Λίντβορμ,林德虫幼体,林德蟲幼體,Линдворм-детёныш,Cria de Lindworm,Pomiot Lindworma,Lindwurm-Brut
 enemy.norse.einherjar_ghost,전사의 유령,Einherjar Ghost,Fantôme Einherjar,Fantasma Einherjar,Fantasma Einherjar,エインヘルヤルの霊,Φάντασμα Εϊνχέρι,英灵战士幽灵,英靈戰士幽靈,Призрак эйнхерия,Fantasma Einherjar,Duch Einherjara,Einherjar-Geist
-enemy.norse.fenrir_pup,펜리르 강아지,Fenrir Pup,Jeune Fenrir,Cucciolo di Fenrir,Cría de Fenrir,フェンリルの仔,Νεαρό Φένρι,芬尼尔幼崽,芬尼爾幼崽,Волчонок Фенрир,Filhote de Fenrir,Wilczę Fenrira,Fenrir-Welpe
+enemy.norse.garmr,가름,Garmr,Garmr,Garmr,Garmr,ガルム,Γκαρμ,加姆,加姆,Гарм,Garmr,Garm,Garm
 enemy.norse.nidhogg_scale,니드호그의 비늘,Nidhogg Scale,Écaille de Nidhogg,Scaglia di Nidhogg,Escama de Nidhogg,ニードホッグの鱗,Λέπι του Νίδχεγκ,尼德霍格之鳞,尼德霍格之鱗,Чешуя Нидхёгга,Escama de Nidhogg,Łuska Nidhogga,Nidhogg-Schuppe
 enemy.norse.frost_giant,서리 거인,Frost Giant,Géant du Givre,Gigante del Gelo,Gigante de Hielo,霜の巨人,Παγωμένος Γίγαντας,霜巨人,霜巨人,Ледяной гигант,Gigante de Gelo,Lodowy Olbrzym,Frost-Riese
 enemy.norse.ragnarok_herald,라그나로크 전령,Ragnarok Herald,Héraut du Ragnarök,Araldo del Ragnarök,Heraldo del Ragnarök,ラグナロクの使者,Κήρυκας Ραγκνάρεκ,诸神黄昏先驱,諸神黃昏先驅,Глашатай Рагнарёка,Arauto do Ragnarök,Herold Ragnaröka,Ragnarök-Herold
@@ -155,7 +155,7 @@ enemy.buddhist.dharma_puppet,법 꼭두각시,Dharma Puppet,Marionnette du Dharm
 enemy.buddhist.lotus_spirit,연꽃 정령,Lotus Spirit,Esprit du Lotus,Spirito del Loto,Espíritu del Loto,蓮の精霊,Πνεύμα Λωτού,莲花精灵,蓮花精靈,Дух лотоса,Espírito do Lótus,Duch Lotosu,Lotus-Geist
 enemy.buddhist.hungry_ghost,아귀,Hungry Ghost,Fantôme Affamé,Fantasma Affamato,Fantasma Hambriento,餓鬼,Πεινασμένο Φάντασμα,饿鬼,餓鬼,Голодный дух,Fantasma Faminto,Głodny Duch,Hungriger Geist
 enemy.buddhist.naga_spawn,나가 알,Naga Spawn,Rejeton Naga,Figlio Naga,Cría Naga,ナーガの子,Απόγονος Νάγκα,那伽幼体,那伽幼體,Потомок наги,Cria Naga,Pomiot Nagi,Naga-Brut
-enemy.buddhist.demon_soldier,마군 병사,Demon Soldier,Soldat Démon,Soldato Demone,Soldado Demonio,魔軍の兵士,Δαίμονας Στρατιώτης,魔军士兵,魔軍士兵,Воин-демон,Soldado Demônio,Żołnierz Demon,Dämon-Soldat
+enemy.buddhist.rakshasa,나찰,Rakshasa,Rakshasa,Rakshasa,Rakshasa,羅刹,Ρακσάσα,罗刹,羅刹,Ракшаса,Rakshasa,Rakszasa,Rakshasa
 enemy.buddhist.karmic_fiend,업 마귀,Karmic Fiend,Démon Karmique,Demone Karmico,Demonio Kármico,業の悪鬼,Καρμικός Δαίμονας,业障恶魔,業障惡魔,Кармический демон,Demônio Cármico,Demon Karmiczny,Karmischer Dämon
 enemy.buddhist.sky_beast,천신 짐승,Sky Beast,Bête Céleste,Bestia Celeste,Bestia Celestial,天神の獣,Ουράνιο Τέρας,天神兽,天神獸,Небесный зверь,Besta Celestial,Niebiańska Bestia,Himmlische Bestie
 enemy.buddhist.earth_spirit,지령,Earth Spirit,Esprit de la Terre,Spirito della Terra,Espíritu de la Tierra,地霊,Πνεύμα της Γης,地灵,地靈,Дух земли,Espírito da Terra,Duch Ziemi,Erdgeist
@@ -185,11 +185,11 @@ enemy.japanese.yamabiko,야마비코,Yamabiko,Yamabiko,Yamabiko,Yamabiko,ヤマ�
 enemy.japanese.ittan_momen,잇탄모멘,Ittan-Momen,Ittan-Momen,Ittan-Momen,Ittan-Momen,一反木綿,Ίτταν-Μόμεν,一反木棉,一反木棉,Иттан-Момэн,Ittan-Momen,Ittan-Momen,Ittan-Momen
 enemy.japanese.azuki_washer,아즈키 씻는 귀신,Azuki Washer,Laveur d'Azuki,Lavatore di Azuki,Lavador de Azuki,小豆洗い,Νιφτήρας Αζούκι,红豆洗鬼,紅豆洗鬼,Адзуки-араи,Lavador de Azuki,Mył Azuki,Azuki-Wäscher
 enemy.japanese.samurai_ghost,사무라이 영령,Samurai Ghost,Fantôme Samouraï,Fantasma Samurai,Fantasma Samurai,武者の霊,Φάντασμα Σαμουράι,武士幽灵,武士幽靈,Призрак самурая,Fantasma Samurai,Duch Samuraja,Samurai-Geist
-enemy.japanese.river_kappa,강물 갓파,River Kappa,Kappa de Rivière,Kappa del Fiume,Kappa del Río,川の河童,Κάππα Ποταμού,河流河童,河流河童,Речной Каппа,Kappa do Rio,Kappa Rzeki,Fluss-Kappa
-enemy.japanese.snow_woman,눈의 여인,Snow Woman,Femme des Neiges,Donna della Neve,Mujer de las Nieves,雪の女,Γυναίκα του Χιονιού,雪女,雪女,Снежная женщина,Mulher da Neve,Śnieżna Kobieta,Schneefrau
+enemy.japanese.tennyo,천녀,Tennyo,Tennyo,Tennyo,Tennyo,天女,Τεννιό,天女,天女,Тэннё,Tennyo,Tennyo,Tennyo
+enemy.japanese.hone_onna,호네온나,Hone-Onna,Hone-Onna,Hone-Onna,Hone-Onna,骨女,Χόνε-Όννα,骨女,骨女,Хонэ-онна,Hone-Onna,Hone-Onna,Hone-Onna
 enemy.japanese.cursed_scroll,저주 두루마리,Cursed Scroll,Parchemin Maudit,Pergamena Maledetta,Pergamino Maldito,呪いの巻物,Καταραμένο Κύλινδρο,诅咒卷轴,詛咒卷軸,Проклятый свиток,Pergaminho Amaldiçoado,Przeklęty Zwój,Verfluchte Schriftrolle
 enemy.japanese.tatami_monster,다다미 괴물,Tatami Monster,Monstre de Tatami,Mostro di Tatami,Monstruo Tatami,畳の怪物,Τέρας Τατάμι,榻榻米怪物,榻榻米怪物,Татами-монстр,Monstro Tatami,Potwór Tatami,Tatami-Monster
 enemy.japanese.yamabushi_ghost,야마부시 영령,Yamabushi Ghost,Fantôme Yamabushi,Fantasma Yamabushi,Fantasma Yamabushi,山伏の霊,Φάντασμα Γιαμαμπούσι,山伏幽灵,山伏幽靈,Призрак Ямабуси,Fantasma Yamabushi,Duch Yamabushi,Yamabushi-Geist
 enemy.japanese.dragon_serpent,수룡,Dragon Serpent,Dragon Serpentin,Serpente Drago,Serpiente Dragón,水龍,Δρακόφιδο,水龙,水龍,Дракон-змей,Serpente Dragão,Smok Wąż,Drachenschlange
-enemy.japanese.oni_king,오니 왕,Oni King,Roi Oni,Re Oni,Rey Oni,鬼王,Βασιλιάς Ονι,鬼王,鬼王,Король Они,Rei Oni,Król Oni,Oni-König
+enemy.japanese.gashadokuro,가샤도쿠로,Gashadokuro,Gashadokuro,Gashadokuro,Gashadokuro,がしゃどくろ,Γκασαντοκούρο,饿者骷髅,餓者骷髏,Гасядокуро,Gashadokuro,Gashadokuro,Gashadokuro
 enemy.japanese.hannya,한냐,Hannya,Hannya,Hannya,Hannya,般若,Χάνια,般若,般若,Ханнъя,Hannya,Hannya,Hannya

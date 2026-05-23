@@ -598,11 +598,11 @@ func test_summon_adds_enemy_to_battle() -> void:
 	print("[TestEnemyMechanics] test_summon_adds_enemy_to_battle")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
-	# 부모 적: norse, frost_giant_pup 1마리 소환
+	# 부모 적: norse, frost_wight 1마리 소환
 	var summon := IntentRes.new()
 	summon.action_type = IntentRes.ActionType.SUMMON
 	summon.value = 1
-	summon.status_type = "frost_giant_pup"
+	summon.status_type = "frost_wight"
 	var parent := EnemyRes.new()
 	parent.max_hp = 100
 	parent.mythology = "norse"
@@ -614,7 +614,7 @@ func test_summon_adds_enemy_to_battle() -> void:
 	bm.end_player_turn()  # SUMMON 발동
 	_assert(bm._enemies.size() == 2, "SUMMON 후 적 2마리")
 	_assert(bm._enemy_alive[1], "신규 적 alive")
-	_assert(bm._enemy_hp[1] == bm._enemies[1].max_hp, "신규 적 HP = max_hp (frost_giant_pup 기본 HP)")
+	_assert(bm._enemy_hp[1] == bm._enemies[1].max_hp, "신규 적 HP = max_hp (frost_wight 기본 HP)")
 	_assert(bm._enemy_status[1].is_empty(), "신규 적 status 빈 dict")
 
 # SUMMON value=2 → 2마리 추가
@@ -625,7 +625,7 @@ func test_summon_value_2_adds_two_enemies() -> void:
 	var summon := IntentRes.new()
 	summon.action_type = IntentRes.ActionType.SUMMON
 	summon.value = 2
-	summon.status_type = "mara_soldier"
+	summon.status_type = "pishacha"
 	var parent := EnemyRes.new()
 	parent.max_hp = 100
 	parent.mythology = "buddhist"
@@ -715,11 +715,11 @@ func test_theme_summon_boss_buddhist_10() -> void:
 func test_theme_ward_rotate_japanese_10() -> void:
 	print("[TestEnemyMechanics] test_theme_ward_rotate_japanese_10")
 	var enemies: Array = [
-		JapaneseNormals.oni_king(null),
+		JapaneseNormals.gashadokuro(null),
 		JapaneseNormals.hannya(null),
 	]
 	var wards: Array = _find_action_type_in_encounter(enemies, IntentRes.ActionType.WARD)
-	_assert(wards.size() == 2, "Japanese #10 TH-WARD-ROTATE — WARD 보유 적 정확히 2 (oni_king + hannya)")
+	_assert(wards.size() == 2, "Japanese #10 TH-WARD-ROTATE — WARD 보유 적 정확히 2 (gashadokuro + hannya)")
 
 # ─────────────── Phase 5-1: T3-MIMIC ───────────────
 

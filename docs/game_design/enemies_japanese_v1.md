@@ -375,6 +375,6 @@ WEAK + VULNERABLE을 동시에 부여하거나 연속 턴에 걸쳐 쌓아 아�
 - **Act 보스 함수명**:
   - act1: `raiden()` / act2: `shuten_doji()` / act3: `yamata_no_orochi()`
 - **엘리트 함수명**:
-  - act1: `oni_general()`, `yamauba()`, `ronin_invincible()`
+  - act1: `ushi_oni()`, `yamauba()`, `ronin_invincible()`
   - act2: `chaos_tengu()`, `yasha()`, `nurarihyon()`
   - act3: `amano_iwato_guard()`, `susanoo_blade()`, `yuki_onna_queen()`

@@ -109,7 +109,7 @@
 
 ## Act 1 — 엘리트 + 보스
 
-> 코드: `norse_act1.gd` / elites() = ["nidhogg_larva", "skoll", "hrimthurs_scout"] / boss() = "fjorgynn"
+> 코드: `norse_act1.gd` / elites() = ["nidhogg_larva", "skoll", "modgud"] / boss() = "fjorgynn"
 
 ### 엘리트 풀 (3종, 랜덤 1마리 선택)
 
@@ -137,7 +137,7 @@
 
 ---
 
-#### 흐림투르스 척후병 (hrimthurs_scout)
+#### 흐림투르스 척후병 (modgud)
 
 - **HP**: 1800 / **페이즈**: HP ≤ 50%에서 전환
 - **Phase 0** (HP > 50%, 2인텐트 순환):
@@ -311,7 +311,7 @@
 | `enemy.norse.garlarr_snake`       | normals       | ✓ |
 | `enemy.norse.nidhogg_larva`       | act1 엘리트   | ✓ |
 | `enemy.norse.skoll`               | act1 엘리트   | ✓ |
-| `enemy.norse.hrimthurs_scout`     | act1 엘리트   | ✓ |
+| `enemy.norse.modgud`     | act1 엘리트   | ✓ |
 | `enemy.norse.fjorgynn`            | act1 보스     | ✓ |
 | `enemy.norse.troll_warrior`       | act2 엘리트   | ✓ |
 | `enemy.norse.norn`                | act2 엘리트   | ✓ |

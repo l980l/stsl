@@ -123,9 +123,10 @@ static func raven_scout(scene: PackedScene) -> Resource:
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
-static func frost_giant_pup(scene: PackedScene) -> Resource:
+static func frost_wight(scene: PackedScene) -> Resource:
+	# 서리 망령 — 얼음 드라우그. 서리 거인이 부리는 소환물 (구 frost_giant_pup 리스킨, 메커니즘 동일).
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.norse.frost_giant_pup"; e.max_hp = 310; e.character_scene = scene
+	e.enemy_name = "enemy.norse.frost_wight"; e.max_hp = 310; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 25; i1.status_type = "block"
@@ -248,10 +249,10 @@ static func einherjar_ghost(scene: PackedScene) -> Resource:
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
-static func fenrir_pup(scene: PackedScene) -> Resource:
-	# T1-BERSERK: HP 50% 미만 strength +4 자동 (펜리르 새끼의 본성)
+static func garmr(scene: PackedScene) -> Resource:
+	# 가름 — 헬가르드의 피투성이 사냥개. T1-BERSERK: HP 50% 미만 strength +4 자동 (구 fenrir_pup 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.norse.fenrir_pup"; e.max_hp = 450; e.character_scene = scene
+	e.enemy_name = "enemy.norse.garmr"; e.max_hp = 450; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 110; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
@@ -281,12 +282,12 @@ static func nidhogg_scale(scene: PackedScene) -> Resource:
 	return e
 
 static func frost_giant(scene: PackedScene) -> Resource:
-	# T3-SUMMON: 서리 거인 — frost_giant_pup 새끼 1마리 소환 + 자기 block + 강타
+	# T3-SUMMON: 서리 거인 — frost_wight 서리 망령 1마리 소환 + 자기 block + 강타
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.norse.frost_giant"; e.max_hp = 680; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.SUMMON; i1.value = 1; i1.status_type = "frost_giant_pup"
+	i1.action_type = IntentRes.ActionType.SUMMON; i1.value = 1; i1.status_type = "frost_wight"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 60; i2.status_type = "block"
 	var i3 := IntentRes.new()
@@ -315,7 +316,7 @@ static func ragnarok_herald(scene: PackedScene) -> Resource:
 # ──── 인카운터 조합 테이블 (난이도 오름차순 1~10) ────
 # #8~10 테마 시너지 (Phase 4):
 #   #8 TH-TANK-HEAL-DPS — runestone_golem(GUARD) + einherjar_ghost(HEALER) + night_hag(DEATH-RATTLE) + lindworm_spawn(DPS)
-#   #9 — jotun_soldier(GUARD) + fenrir_pup(BERSERK) + nidhogg_scale(DEBUFF누적). 강한 단일 적
+#   #9 — jotun_soldier(GUARD) + garmr(BERSERK) + nidhogg_scale(DEBUFF누적). 강한 단일 적
 #   #10 TH-SUMMON-BOSS — frost_giant(SUMMON) + ragnarok_herald(MARK)
 
 static func encounters() -> Array:
@@ -325,9 +326,9 @@ static func encounters() -> Array:
 		["garlarr_snake"],
 		["hrimfaxi_rider", "ice_wolf"],
 		["raven_scout", "raven_scout", "raven_scout"],
-		["frost_giant_pup", "bone_archer", "dark_elf"],
+		["frost_wight", "bone_archer", "dark_elf"],
 		["draugr", "draugr", "berserker"],
 		["runestone_golem", "night_hag", "lindworm_spawn", "einherjar_ghost"],
-		["jotun_soldier", "fenrir_pup", "nidhogg_scale"],
+		["jotun_soldier", "garmr", "nidhogg_scale"],
 		["frost_giant", "ragnarok_herald"],
 	]

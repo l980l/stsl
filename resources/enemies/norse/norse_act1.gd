@@ -37,10 +37,11 @@ static func skoll(scene: PackedScene) -> Resource:
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
-static func hrimthurs_scout(scene: PackedScene) -> Resource:
-	# Ymir 빙결 컨셉 — 페이즈 2 영웅 1명에 heal_block 2턴 (회복 효과 차단)
+static func modgud(scene: PackedScene) -> Resource:
+	# 모드구드 — 죽음의 강 갈라르 다리 수문장. 페이즈 2 영웅 1명에 heal_block 2턴
+	# (삶으로 가는 길을 막는다 — 구 hrimthurs_scout 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.norse.hrimthurs_scout"; e.max_hp = 1800; e.character_scene = scene
+	e.enemy_name = "enemy.norse.modgud"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.5]
 	var p0i1 := IntentRes.new()
@@ -110,7 +111,7 @@ static func fjorgynn(scene: PackedScene) -> Resource:
 # ──── API ────
 
 static func elites() -> Array:
-	return ["nidhogg_larva", "skoll", "hrimthurs_scout"]
+	return ["nidhogg_larva", "skoll", "modgud"]
 
 static func boss() -> String:
 	return "fjorgynn"

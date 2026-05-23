@@ -14,10 +14,10 @@ norse,1,약함,2,640,220,2,0,0,0,2 disabled,4,volva_witch|volva_witch,-
 norse,2,약함,1,340,170,2,0,0,0,1 disabled,3,garlarr_snake,-
 norse,3,보통,2,730,410,5,0,0,0,all,15,hrimfaxi_rider|ice_wolf,-
 norse,4,보통,3,840,480,6,0,0,0,all,17,raven_scout|raven_scout|raven_scout,-
-norse,5,다소강함,3,885,435,6,1,0,0,all,21,frost_giant_pup|bone_archer|dark_elf,PHASE_TRIGGER
+norse,5,다소강함,3,885,435,6,1,0,0,all,21,frost_wight|bone_archer|dark_elf,PHASE_TRIGGER
 norse,6,강함,3,1290,600,6,3,0,0,all,39,draugr|draugr|berserker,PHASE_TRIGGER
 norse,7,강함,4,1250,385,5,0,2,1,all,39,runestone_golem|night_hag|lindworm_spawn|einherjar_ghost,BUFF_ALLY|DEATH_RATTLE|HEAL_ALLY
-norse,8,매우강함,3,1450,900,6,1,1,0,all,45,jotun_soldier|fenrir_pup|nidhogg_scale,BUFF_ALLY|PHASE_TRIGGER
+norse,8,매우강함,3,1450,900,6,1,1,0,all,45,jotun_soldier|garmr|nidhogg_scale,BUFF_ALLY|PHASE_TRIGGER
 norse,9,최강,2,1350,980,5,0,2,0,all,48,frost_giant|ragnarok_herald,SUMMON|MARK_TARGET
 egyptian,0,매우약함,1,320,110,2,0,0,0,1 disabled,2,ka_spirit,-
 egyptian,1,약함,2,520,230,4,0,0,0,2 disabled,3,scarab|scarab,-
@@ -31,10 +31,10 @@ egyptian,8,매우강함,3,1450,880,6,2,0,0,all,41,mummy_warrior|sobek_spawn|ammi
 egyptian,9,최강,2,1400,1050,6,1,1,0,all,48,sphinx_adult|pyramid_golem,PHASE_TRIGGER|BUFF_ALLY
 buddhist,0,매우약함,1,280,180,1,0,0,0,1 disabled,2,garuda,-
 buddhist,1,약함,2,640,320,4,0,0,0,2 disabled,6,yaksha|yaksha,-
-buddhist,2,약함,1,350,140,2,0,0,0,1 disabled,2,mara_soldier,-
+buddhist,2,약함,1,350,140,2,0,0,0,1 disabled,2,pishacha,-
 buddhist,3,보통,2,570,180,3,0,1,1,all,20,dharma_puppet|lotus_spirit,DEATH_RATTLE|HEAL_ALLY
 buddhist,4,보통,3,840,360,6,3,0,0,all,30,hungry_ghost|hungry_ghost|hungry_ghost,PHASE_TRIGGER
-buddhist,5,다소강함,3,970,370,5,2,0,1,all,30,asura|naga_spawn|demon_soldier,PHASE_TRIGGER|DEATH_RATTLE
+buddhist,5,다소강함,3,970,370,5,2,0,1,all,30,asura|naga_spawn|rakshasa,PHASE_TRIGGER|DEATH_RATTLE
 buddhist,6,강함,3,1270,530,5,0,2,1,all,42,virudhaka|virudhaka|karmic_fiend,BUFF_ALLY|DEATH_RATTLE
 buddhist,7,강함,4,1210,575,8,1,2,0,all,44,sky_beast|earth_spirit|wrathful_spirit|cursed_monk,BUFF_ALLY|PHASE_TRIGGER
 buddhist,8,매우강함,3,1330,625,6,1,2,0,all,46,vajrapani|deva_soldier|ashura_warrior,PHASE_TRIGGER|BUFF_ALLY|SACRIFICE
@@ -56,6 +56,6 @@ japanese,3,보통,2,670,315,4,1,0,0,all,17,kappa|foxfire,PHASE_TRIGGER
 japanese,4,보통,3,780,345,6,3,0,0,all,28,koropokkuru|koropokkuru|koropokkuru,PHASE_TRIGGER
 japanese,5,다소강함,3,850,295,5,1,1,2,all,34,yamabiko|ittan_momen|azuki_washer,MIMIC|DEATH_RATTLE|PHASE_TRIGGER
 japanese,6,강함,3,1270,840,7,3,0,0,all,43,oni|oni|samurai_ghost,PHASE_TRIGGER
-japanese,7,강함,4,1260,530,7,2,1,1,all,44,river_kappa|snow_woman|cursed_scroll|tatami_monster,HEAL_ALLY|PHASE_TRIGGER|DEATH_RATTLE
+japanese,7,강함,4,1260,530,7,2,1,1,all,44,tennyo|hone_onna|cursed_scroll|tatami_monster,HEAL_ALLY|PHASE_TRIGGER|DEATH_RATTLE
 japanese,8,매우강함,3,1370,890,7,2,1,0,all,48,ronin_ghost|yamabushi_ghost|dragon_serpent,PHASE_TRIGGER|BUFF_ALLY
-japanese,9,최강,2,1380,920,4,0,2,0,all,47,oni_king|hannya,WARD
+japanese,9,최강,2,1380,920,4,0,2,0,all,47,gashadokuro|hannya,WARD

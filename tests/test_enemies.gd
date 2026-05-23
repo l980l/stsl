@@ -36,7 +36,7 @@ func run_all() -> Dictionary:
 	test_act2_normal_sphinx_cub()
 	test_act2_normal_sand_ifrit()
 	test_act2_normal_ka_spirit()
-	test_act2_elite_apep_snake()
+	test_act2_elite_serqet()
 	test_act2_elite_seth_hound()
 	test_act2_elite_ba_bird()
 	test_act2_osiris_structure()
@@ -344,9 +344,9 @@ func test_act2_normal_ka_spirit() -> void:
 			if i.status_type == "vulnerable": has_vuln = true
 	_assert(has_weak and has_vuln, "weak + vulnerable 모두 존재")
 
-func test_act2_elite_apep_snake() -> void:
-	print("[TestEnemies] test_act2_elite_apep_snake")
-	var e := EgyptianAct2.apep_snake(_make_dummy_scene())
+func test_act2_elite_serqet() -> void:
+	print("[TestEnemies] test_act2_elite_serqet")
+	var e := EgyptianAct2.serqet(_make_dummy_scene())
 	_assert(e.max_hp == 1600, "HP 1600")
 	var has_poison := false
 	for i in e.intent_pattern:
@@ -740,9 +740,9 @@ func test_japanese_act1_shape() -> void:
 	_assert(b.phase_thresholds.size() == 2, "라이덴 3페이즈")
 	_assert(b.mythology == "japanese", "라이덴 mythology=japanese")
 	_assert(b.charm_resistance == 20, "라이덴 charm_resistance=20")
-	var elite = M.oni_general(scene)
-	_assert(elite.max_hp == 1600, "오니 장군 HP 1600")
-	_assert(elite.charm_resistance == 20, "오니 장군 charm_resistance=20")
+	var elite = M.ushi_oni(scene)
+	_assert(elite.max_hp == 1600, "우시오니 HP 1600")
+	_assert(elite.charm_resistance == 20, "우시오니 charm_resistance=20")
 
 func test_japanese_act2_shape() -> void:
 	print("[TestEnemies] test_japanese_act2_shape")

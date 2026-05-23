@@ -29,9 +29,10 @@ static func yaksha(scene: PackedScene) -> Resource:
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
-static func mara_soldier(scene: PackedScene) -> Resource:
+static func pishacha(scene: PackedScene) -> Resource:
+	# 피사차 — 식인 악귀. 저주·둔화 디버프형 (구 mara_soldier 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.buddhist.mara_soldier"; e.max_hp = 350; e.character_scene = scene
+	e.enemy_name = "enemy.buddhist.pishacha"; e.max_hp = 350; e.character_scene = scene
 	e.mythology = "buddhist"; e.signatures_enabled = false  # 인카운터 #3
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 1; i1.status_type = "vulnerable"; i1.target = IntentRes.TargetType.RANDOM
@@ -161,10 +162,10 @@ static func naga_spawn(scene: PackedScene) -> Resource:
 	e.death_trigger = dt
 	return e
 
-static func demon_soldier(scene: PackedScene) -> Resource:
-	# T1-DESPERATE: HP 30% 미만 strength +2
+static func rakshasa(scene: PackedScene) -> Resource:
+	# 나찰 — 흉포한 악귀 전사. T1-DESPERATE: HP 30% 미만 strength +2 (구 demon_soldier 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
-	e.enemy_name = "enemy.buddhist.demon_soldier"; e.max_hp = 280; e.character_scene = scene
+	e.enemy_name = "enemy.buddhist.rakshasa"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
@@ -286,12 +287,12 @@ static func ashura_warrior(scene: PackedScene) -> Resource:
 	return e
 
 static func mara_general(scene: PackedScene) -> Resource:
-	# T3-SUMMON: 마라 군단 — mara_soldier 1마리 소환 후 강력한 공격 사이클
+	# T3-SUMMON: 마라 군단 — pishacha 1마리 소환 후 강력한 공격 사이클
 	var e := EnemyRes.new()
 	e.enemy_name = "enemy.buddhist.mara_general"; e.max_hp = 680; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.SUMMON; i1.value = 1; i1.status_type = "mara_soldier"
+	i1.action_type = IntentRes.ActionType.SUMMON; i1.value = 1; i1.status_type = "pishacha"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "curse"
 	var i3 := IntentRes.new()
@@ -327,10 +328,10 @@ static func encounters() -> Array:
 	return [
 		["garuda"],
 		["yaksha", "yaksha"],
-		["mara_soldier"],
+		["pishacha"],
 		["dharma_puppet", "lotus_spirit"],
 		["hungry_ghost", "hungry_ghost", "hungry_ghost"],
-		["asura", "naga_spawn", "demon_soldier"],
+		["asura", "naga_spawn", "rakshasa"],
 		["virudhaka", "virudhaka", "karmic_fiend"],
 		["sky_beast", "earth_spirit", "wrathful_spirit", "cursed_monk"],
 		["vajrapani", "deva_soldier", "ashura_warrior"],
