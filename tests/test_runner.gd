@@ -25,7 +25,6 @@ var TestEnemyCounters = preload("res://tests/test_enemy_counters.gd")
 var TestRevive = preload("res://tests/test_revive.gd")
 var TestTauntSystem = preload("res://tests/test_taunt_system.gd")
 var TestRecruitSystem = preload("res://tests/test_recruit_system.gd")
-var TestSecretRoom = preload("res://tests/test_secret_room.gd")
 var TestEncounterWeighting = preload("res://tests/test_encounter_weighting.gd")
 var TestEnemyMechanics = preload("res://tests/test_enemy_mechanics.gd")
 var TestEnemyPatternsV2 = preload("res://tests/test_enemy_patterns_v2.gd")
@@ -75,7 +74,6 @@ func _init() -> void:
 		TestRevive.new(),
 		TestTauntSystem.new(),
 		TestRecruitSystem.new(),
-		TestSecretRoom.new(),
 		TestEncounterWeighting.new(),
 		TestEnemyMechanics.new(),
 		TestEnemyPatternsV2.new(),

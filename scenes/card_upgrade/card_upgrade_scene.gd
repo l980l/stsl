@@ -2,6 +2,9 @@
 extends Node2D
 
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
+func _make_card() -> Control:
+	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
 const CARD_W := 140
 const CARD_H := 200
 const COLS := 6
@@ -54,7 +57,7 @@ func _build_ui(upgradeable: Array) -> void:
 	scroll.add_child(grid)
 
 	for card: Resource in upgradeable:
-		var node: CardScene = CARD_SCENE.instantiate()
+		var node: Control = _make_card()
 		node.setup(card, node.Mode.UPGRADE)
 		node.card_clicked.connect(func(c): _on_card_selected(c))
 		grid.add_child(node)

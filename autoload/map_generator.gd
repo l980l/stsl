@@ -130,11 +130,10 @@ static func _assign_room_types(grid: Array, nodes: Array, rng: RandomNumberGener
 static func _weighted_room_type(node: Resource, nodes: Array, flr: int, col: int, grid: Array, rng: RandomNumberGenerator) -> MapNodeRes.RoomType:
 	var weights := {
 		MapNodeRes.RoomType.BATTLE: 50,
-		MapNodeRes.RoomType.EVENT:  18,
+		MapNodeRes.RoomType.EVENT:  20,
 		MapNodeRes.RoomType.ELITE:  14,
 		MapNodeRes.RoomType.REST:   10,
 		MapNodeRes.RoomType.SHOP:    6,
-		MapNodeRes.RoomType.SECRET:  2,
 	}
 
 	# 층 기반 제한

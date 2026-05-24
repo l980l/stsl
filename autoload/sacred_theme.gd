@@ -552,6 +552,37 @@ func _place_brackets(node: Control, color: Color,
 		rect.set_meta("_corner_bracket", true)
 		node.add_child(rect)
 
+# ── 아이콘 버튼 호버 트윈 (글로벌 헬퍼) ─────────────────────────────
+# TextureButton 등 아이콘 전용 버튼의 호버 시 위로 살짝 이동 + 살짝 커짐.
+# 배틀씬 _attach_icon_hover_anim 과 동일 동작. 챕터선택/영웅선택/맵 뒤로 가기 등에서 재사용.
+
+func attach_icon_hover_anim(btn: Control, lift: float = -4.0, scale_target: float = 1.12,
+		hover_modulate: Color = Color(1.063, 1.181, 2.275, 1.0)) -> void:
+	# 기본 hover_modulate = BRASS_300(#f0d870) 황금 SVG × 본 값 = 정확한 흰색
+	# (modulate 곱셈, RGB > 1.0 over-bright 가능). 다른 색 아이콘은 호출자가 override.
+	btn.pivot_offset = (btn.size * 0.5).floor()
+	var base_pos: Vector2 = btn.position
+	var base_modulate: Color = btn.modulate
+	var tw_ref: Array = [null]
+	btn.mouse_entered.connect(func() -> void:
+		if tw_ref[0] != null:
+			(tw_ref[0] as Tween).kill()
+		var tw := btn.create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		tw.tween_property(btn, "position", base_pos + Vector2(0, lift), 0.14)
+		tw.tween_property(btn, "scale", Vector2(scale_target, scale_target), 0.14)
+		tw.tween_property(btn, "modulate", hover_modulate, 0.14)
+		tw_ref[0] = tw
+	)
+	btn.mouse_exited.connect(func() -> void:
+		if tw_ref[0] != null:
+			(tw_ref[0] as Tween).kill()
+		var tw := btn.create_tween().set_parallel(true).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+		tw.tween_property(btn, "position", base_pos, 0.14)
+		tw.tween_property(btn, "scale", Vector2.ONE, 0.14)
+		tw.tween_property(btn, "modulate", base_modulate, 0.14)
+		tw_ref[0] = tw
+	)
+
 # ── 팝업 브라켓 (틱 마크 포함) ──────────────────────────────────────
 # CSS .sacred-popup__corner 대응 — L자 + 양 끝 틱 마크
 

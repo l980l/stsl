@@ -3,10 +3,13 @@ extends Node2D
 
 const MapNodeRes = preload("res://resources/map_node_resource.gd")
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
+func _make_card() -> Control:
+	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
 
 const NODE_SIZE      := 56
 const COL_GAP        := 130   # MapGenerator.COLS=7 과 동기화: 7×130=910
-const FLOOR_GAP      := 128
+const FLOOR_GAP      := 180
 const MAP_PAD_TOP    := 48    # 보스 노드 위 여백
 const MAP_PAD_BOT    := 64    # floor 0 노드 아래 여백
 const MAP_SCROLL_TOP := 150   # 스크롤 영역 시작 Y (타이틀·렐릭 아래)
@@ -14,7 +17,6 @@ const _MAP_W         := 7 * COL_GAP
 const COL_X_BASE     := int((1920 - _MAP_W) / 2.0) + int(COL_GAP / 2.0)
 
 var _node_buttons: Dictionary = {}  # node_id → Button
-var _floor_label: Label
 var _relic_container: FlowContainer
 var _map_scroll:        ScrollContainer = null
 var _map_content:       Control         = null
@@ -138,32 +140,28 @@ func _build_ui() -> void:
 		_create_node_button(node)
 
 	# 오버레이 UI (스크롤 위에 렌더)
-	_floor_label = Label.new()
-	_floor_label.theme_type_variation = "SubLabel"
-	_floor_label.position = Vector2(50, 520)
-	_floor_label.size = Vector2(300, 40)
-	add_child(_floor_label)
-
-	var deck_btn := Button.new()
-	deck_btn.text = tr("ui.map.btn_deck")
+	# 덱 보기 — 아이콘만 (배틀씬과 동일 TextureButton 패턴 + 호버 트윈)
+	const _DECK_ICON_PX := 77
+	var deck_btn := TextureButton.new()
+	deck_btn.texture_normal = load("res://assets/art/ui/icons/deck-fan.svg")
+	deck_btn.ignore_texture_size = true
+	deck_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 	deck_btn.position = Vector2(50, 570)
-	deck_btn.add_theme_font_size_override("font_size", 16)
+	deck_btn.size = Vector2(_DECK_ICON_PX, _DECK_ICON_PX)
 	deck_btn.pressed.connect(_show_deck_viewer)
 	add_child(deck_btn)
-	deck_btn.size = Vector2(160, 40)
-	LabelUtils.fit_text(deck_btn, 16, 12)
-	SacredTheme.animate_button(deck_btn)
+	_attach_icon_hover_anim(deck_btn)
 
-	var btn_back := Button.new()
-	btn_back.theme_type_variation = "VowButton"
-	btn_back.text = tr("ui.chapter_select.back")
+	# 뒤로 — 아이콘만 (Serif arrow), 호버 시 살짝 위로 + 커짐
+	var btn_back := TextureButton.new()
+	btn_back.texture_normal = load("res://assets/art/ui/back_arrow.svg")
+	btn_back.ignore_texture_size = true
+	btn_back.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 	btn_back.position = Vector2(60, 960)
-	btn_back.size = Vector2(200, 52)
-	btn_back.add_theme_font_size_override("font_size", 14)
+	btn_back.size = Vector2(64, 44)
 	btn_back.pressed.connect(_on_back_pressed)
 	add_child(btn_back)
-	LabelUtils.fit_text(btn_back, 14, 11)
-	SacredTheme.animate_button(btn_back)
+	SacredTheme.attach_icon_hover_anim(btn_back)
 
 	_build_party_panel()
 
@@ -299,8 +297,6 @@ func _create_node_button(node: Resource) -> void:
 	var btn := Button.new()
 	btn.position = _node_top_left(node)
 	btn.size = Vector2(NODE_SIZE, NODE_SIZE)
-	var tip_text := _room_type_text(node.room_type)
-	SacredTheme.attach_tooltip(btn, tip_text)
 	var icon: Texture2D = IconUtils.get_room_icon(node.room_type)
 	if icon != null:
 		btn.icon = icon
@@ -323,6 +319,29 @@ func _create_node_button(node: Resource) -> void:
 	_map_content.add_child(btn)
 	_node_buttons[node.node_id] = btn
 	SacredTheme.animate_button(btn)
+	# 헤럴딕 코너 틱 — 타입별 색 (HTML --node-line 매핑)
+	var bracket_color: Color
+	match node.room_type:
+		MapNodeRes.RoomType.ELITE: bracket_color = SacredPalette.BRASS_400
+		MapNodeRes.RoomType.BOSS:  bracket_color = SacredPalette.BLOOD_500
+		_:                          bracket_color = SacredPalette.BONE_300
+	SacredTheme.add_corner_brackets(btn, bracket_color, 8, 2, 1)
+	# visited 체크마크 — 우측 하단 작은 ✓, 초기 비활성
+	var check := Label.new()
+	check.text = "✓"
+	check.add_theme_color_override("font_color", SacredPalette.BONE_100)
+	check.add_theme_font_size_override("font_size", 22)
+	check.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	check.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	check.position = Vector2(NODE_SIZE - 22, NODE_SIZE - 24)
+	check.size = Vector2(22, 22)
+	check.visible = false
+	check.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	check.set_meta("_visited_check", true)
+	btn.add_child(check)
+	# disabled 시 배경 stylebox alpha 0.4 → 1.0 (normal stylebox 복제로 불투명 유지)
+	var disabled_sb: StyleBox = btn.get_theme_stylebox("normal").duplicate()
+	btn.add_theme_stylebox_override("disabled", disabled_sb)
 
 func _init_map_scroll() -> void:
 	if _map_scroll == null:
@@ -338,21 +357,29 @@ func _refresh_map() -> void:
 		var btn: Button = _node_buttons[node_id]
 		var node: Resource = GameManager.run_map[node_id]
 
+		# 체크마크 (visited) 토글
+		for child in btn.get_children():
+			if child is Label and child.has_meta("_visited_check") and child.get_meta("_visited_check"):
+				child.visible = node.visited
+				break
+
+		var is_available: bool = (not node.visited) and (node_id in GameManager.available_node_ids)
+
 		if node.visited:
 			btn.disabled = true
-			btn.modulate = Color(0.5, 0.5, 0.5)
-		elif node_id in GameManager.available_node_ids:
+			btn.modulate = Color(0.55, 0.55, 0.55, 1.0)  # 불투명 회색 (saturate 감소)
+		elif is_available:
 			btn.disabled = false
-			btn.modulate = SacredPalette.BRASS_300
+			btn.modulate = Color.WHITE  # 아이콘 본연 색 보존 (modulate 곱셈 회피)
 		else:
 			btn.disabled = true
-			btn.modulate = Color(0.6, 0.6, 0.7, 0.5)
+			btn.modulate = Color(0.5, 0.5, 0.55, 1.0)  # locked — 불투명, 어둡고 차가운 톤
 
 		if node_id == GameManager.current_node_id:
-			btn.modulate = Color(1.0, 1.0, 0.3)
+			# 현재 위치 — 살짝 황색 톤 정적 강조 (펄스 X, 색 너무 덮지 않게 0.7)
+			btn.modulate = Color(1.0, 1.0, 0.7)
 
-	_floor_label.text = _trf("ui.map.floor_label", GameManager.current_floor)
-	LabelUtils.fit_text(_floor_label, 18, 12)
+
 
 func _node_jitter(node: Resource) -> Vector2:
 	var rng := RandomNumberGenerator.new()
@@ -423,6 +450,28 @@ func _room_type_text(room_type: int) -> String:
 		MapNodeRes.RoomType.EVENT: return tr("ui.map.room_event")
 		MapNodeRes.RoomType.SECRET: return tr("ui.map.room_type.secret")
 		_: return "?"
+
+func _attach_icon_hover_anim(btn: TextureButton) -> void:
+	# 호버 시 살짝 위로 + 살짝 커짐 (배틀씬 _attach_icon_hover_anim 와 동일 패턴)
+	btn.pivot_offset = btn.size * 0.5
+	var base_pos: Vector2 = btn.position
+	var tw_ref: Array = [null]
+	btn.mouse_entered.connect(func() -> void:
+		if tw_ref[0] != null:
+			(tw_ref[0] as Tween).kill()
+		var tw := btn.create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		tw.tween_property(btn, "position", base_pos + Vector2(0, -3), 0.12)
+		tw.tween_property(btn, "scale", Vector2(1.08, 1.08), 0.12)
+		tw_ref[0] = tw
+	)
+	btn.mouse_exited.connect(func() -> void:
+		if tw_ref[0] != null:
+			(tw_ref[0] as Tween).kill()
+		var tw := btn.create_tween().set_parallel(true).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+		tw.tween_property(btn, "position", base_pos, 0.12)
+		tw.tween_property(btn, "scale", Vector2.ONE, 0.12)
+		tw_ref[0] = tw
+	)
 
 func _show_deck_viewer() -> void:
 	if _deck_viewer:
@@ -550,14 +599,14 @@ func _show_deck_viewer() -> void:
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
 		grid.add_child(wrapper)
 
-		var card_node: CardScene = CARD_SCENE.instantiate()
+		var card_node: Control = _make_card()
 		card_node.position     = Vector2(-1.75, -5.0)
 		card_node.pivot_offset = Vector2(70.0, 200.0)
 		card_node.scale        = Vector2(0.975, 0.975)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 
-		var captured_node: CardScene = card_node
+		var captured_node: Control = card_node
 		card_node.card_hovered.connect(func(_c): _show_deck_card_hover(captured_node))
 		card_node.card_unhovered.connect(func(_c): _clear_deck_card_hover(captured_node))
 
@@ -566,7 +615,7 @@ func _show_deck_viewer() -> void:
 	tw.tween_property(group, "scale", Vector2.ONE, 0.15)
 	tw.parallel().tween_property(group, "modulate:a", 1.0, 0.15)
 
-func _show_deck_card_hover(node: CardScene) -> void:
+func _show_deck_card_hover(node: Control) -> void:
 	if node in _deck_card_tweens:
 		_deck_card_tweens[node].kill()
 	_active_scroll = _deck_scroll
@@ -578,7 +627,7 @@ func _show_deck_card_hover(node: CardScene) -> void:
 	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
 	_deck_card_tweens[node] = tw
 
-func _clear_deck_card_hover(node: CardScene) -> void:
+func _clear_deck_card_hover(node: Control) -> void:
 	if node in _deck_card_tweens:
 		_deck_card_tweens[node].kill()
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)

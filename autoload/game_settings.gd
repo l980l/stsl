@@ -31,6 +31,10 @@ const CAM_ZOOM_SPEED_KEYS    := ["slow", "normal", "fast"]
 const CAM_ZOOM_SPEED_VALUES  := [0.6, 1.0, 1.7]  # slow=0.5s / normal=0.3s / fast=0.18s
 const CAM_ZOOM_SPEED_DEFAULT := "normal"
 
+# 카드 프레임 — classic (기존 PNG frame + 좌상 gem) / modern (신규 — 중앙 gem + brass border)
+const CARD_FRAME_KEYS    := ["classic", "modern"]
+const CARD_FRAME_DEFAULT := "classic"
+
 const _CONFIG_PATH := "user://game_settings.cfg"
 
 # 현재 multiplier 값 (직접 사용)
@@ -48,10 +52,14 @@ var kill_cam_enabled: bool = KILL_CAM_DEFAULT
 var hero_zoom_enabled: bool = HERO_ZOOM_DEFAULT
 var cam_zoom_speed_key: String = CAM_ZOOM_SPEED_DEFAULT
 var cam_zoom_speed_multiplier: float = 1.0
+var card_frame_key: String = CARD_FRAME_DEFAULT
 
 # 설정 변경 시그널 — 변경 즉시 반영 필요한 곳에서 구독
 @warning_ignore("unused_signal")
 signal hero_zoom_enabled_changed(enabled: bool)
+# 카드 프레임 변경 — battle_scene 등이 구독해 hand 재구성
+@warning_ignore("unused_signal")
+signal card_frame_changed(key: String)
 
 func _ready() -> void:
 	load_settings()
@@ -99,6 +107,14 @@ func set_cam_zoom_speed(key: String) -> void:
 	cam_zoom_speed_key = key
 	cam_zoom_speed_multiplier = CAM_ZOOM_SPEED_VALUES[idx]
 
+func set_card_frame(key: String) -> void:
+	if CARD_FRAME_KEYS.find(key) < 0:
+		return
+	if card_frame_key == key:
+		return
+	card_frame_key = key
+	card_frame_changed.emit(key)
+
 # ── 적용된 값 조회 (battle_manager 등이 사용) ──
 func get_vfx_delay(base: float) -> float:
 	return base * vfx_speed_multiplier
@@ -122,6 +138,7 @@ func save_settings() -> void:
 	cfg.set_value("gameplay", "kill_cam_enabled", kill_cam_enabled)
 	cfg.set_value("gameplay", "hero_zoom_enabled", hero_zoom_enabled)
 	cfg.set_value("gameplay", "cam_zoom_speed", cam_zoom_speed_key)
+	cfg.set_value("graphics", "card_frame", card_frame_key)
 	cfg.save(_CONFIG_PATH)
 
 func load_settings() -> void:
@@ -135,6 +152,7 @@ func load_settings() -> void:
 		set_kill_cam_enabled(KILL_CAM_DEFAULT)
 		set_hero_zoom_enabled(HERO_ZOOM_DEFAULT)
 		set_cam_zoom_speed(CAM_ZOOM_SPEED_DEFAULT)
+		set_card_frame(CARD_FRAME_DEFAULT)
 		return
 	set_particle_quality(cfg.get_value("graphics", "particle_quality", PARTICLE_DEFAULT))
 	set_vfx_speed(cfg.get_value("gameplay", "vfx_speed", VFX_SPEED_DEFAULT))
@@ -145,3 +163,4 @@ func load_settings() -> void:
 	set_kill_cam_enabled(cfg.get_value("gameplay", "kill_cam_enabled", KILL_CAM_DEFAULT))
 	set_hero_zoom_enabled(cfg.get_value("gameplay", "hero_zoom_enabled", HERO_ZOOM_DEFAULT))
 	set_cam_zoom_speed(cfg.get_value("gameplay", "cam_zoom_speed", CAM_ZOOM_SPEED_DEFAULT))
+	set_card_frame(cfg.get_value("graphics", "card_frame", CARD_FRAME_DEFAULT))

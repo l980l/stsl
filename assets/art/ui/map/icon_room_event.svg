@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Question mark curve -->
-  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-  <!-- Dot -->
-  <line x1="12" y1="17" x2="12" y2="17" stroke-width="2.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <!-- Hairline lozenge — the unknown (bone-300) -->
+  <path d="M16 3 L29 16 L16 29 L3 16 Z" stroke="#f59ec3" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- Question mark (path-only, ThorVG 호환) -->
+  <path d="M12 13 a4 4 0 0 1 8 0 c0 3 -4 3.5 -4 6" stroke="#f59ec3" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <circle cx="16" cy="22.5" r="1.1" fill="#f59ec3"/>
 </svg>
