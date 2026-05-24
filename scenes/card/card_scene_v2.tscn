@@ -1,0 +1,274 @@
+[gd_scene format=3 uid="uid://c7yam2k4v200v"]
+
+[ext_resource type="Script" uid="uid://cexaagar5dpoh" path="res://scenes/card/card_scene_v2.gd" id="1_v2script"]
+[ext_resource type="FontFile" uid="uid://d1vtjkeukfosk" path="res://assets/fonts/Cinzel-Regular.ttf" id="2_cinzel"]
+[ext_resource type="Texture2D" uid="uid://du0glps5j60v5" path="res://assets/art/cards/cardtypes/card_type_attack.png" id="3_attack"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frame"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.082, 0.082, 0.11, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.584, 0.455, 0.129, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 6
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="Gradient" id="Gradient_shadow"]
+colors = PackedColorArray(0.027, 0.027, 0.039, 0, 0.027, 0.027, 0.039, 0.55)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_shadow"]
+gradient = SubResource("Gradient_shadow")
+width = 16
+fill_from = Vector2(0.5, 0)
+fill_to = Vector2(0.5, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rule"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.965, 0.945, 0.902, 0.08)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_corner_tl"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 1
+border_width_top = 1
+border_color = Color(0.584, 0.455, 0.129, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_corner_tr"]
+bg_color = Color(0, 0, 0, 0)
+border_width_top = 1
+border_width_right = 1
+border_color = Color(0.584, 0.455, 0.129, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_corner_bl"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 1
+border_width_bottom = 1
+border_color = Color(0.584, 0.455, 0.129, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_corner_br"]
+bg_color = Color(0, 0, 0, 0)
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.584, 0.455, 0.129, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_art"]
+bg_color = Color(0.059, 0.075, 0.125, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 0.6)
+
+[sub_resource type="PlaceholderTexture2D" id="Placeholder_cost"]
+size = Vector2(21, 21)
+
+[sub_resource type="Gradient" id="Gradient_line_l"]
+colors = PackedColorArray(0.584, 0.455, 0.129, 0, 0.584, 0.455, 0.129, 0.7)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_line_l"]
+gradient = SubResource("Gradient_line_l")
+
+[sub_resource type="Gradient" id="Gradient_line_r"]
+colors = PackedColorArray(0.584, 0.455, 0.129, 0.7, 0.584, 0.455, 0.129, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_line_r"]
+gradient = SubResource("Gradient_line_r")
+
+[sub_resource type="PlaceholderTexture2D" id="Placeholder_gem"]
+size = Vector2(9, 9)
+
+[node name="CardSceneV2" type="Control" unique_id=1330872495]
+custom_minimum_size = Vector2(140, 200)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 140.0
+offset_bottom = 200.0
+script = ExtResource("1_v2script")
+
+[node name="Frame" type="Panel" parent="." unique_id=1273565362]
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 200.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_frame")
+
+[node name="ShadowOverlay" type="TextureRect" parent="." unique_id=874512389]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 139.0
+offset_bottom = 199.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_shadow")
+expand_mode = 1
+
+[node name="InnerRule" type="Panel" parent="." unique_id=276562183]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 135.0
+offset_bottom = 195.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_rule")
+
+[node name="CornerTL" type="Panel" parent="." unique_id=269738367]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 11.0
+offset_bottom = 11.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_corner_tl")
+
+[node name="CornerTR" type="Panel" parent="." unique_id=1923953633]
+layout_mode = 0
+offset_left = 129.0
+offset_top = 3.0
+offset_right = 137.0
+offset_bottom = 11.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_corner_tr")
+
+[node name="CornerBL" type="Panel" parent="." unique_id=980835143]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 189.0
+offset_right = 11.0
+offset_bottom = 197.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_corner_bl")
+
+[node name="CornerBR" type="Panel" parent="." unique_id=334956132]
+layout_mode = 0
+offset_left = 129.0
+offset_top = 189.0
+offset_right = 137.0
+offset_bottom = 197.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_corner_br")
+
+[node name="ArtFrame" type="Panel" parent="." unique_id=161980784]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 32.0
+offset_right = 130.0
+offset_bottom = 132.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_art")
+
+[node name="ArtRect" type="TextureRect" parent="." unique_id=1097503263]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 32.0
+offset_right = 130.0
+offset_bottom = 132.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="CostBg" type="TextureRect" parent="." unique_id=1408420737]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 28.0
+offset_bottom = 28.0
+mouse_filter = 2
+texture = SubResource("Placeholder_cost")
+expand_mode = 1
+
+[node name="CostLabel" type="Label" parent="." unique_id=1077509395]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 28.0
+offset_bottom = 28.0
+theme_type_variation = &"AccentLabel"
+theme_override_colors/font_color = Color(0.961, 0.941, 0.91, 1)
+theme_override_fonts/font = ExtResource("2_cinzel")
+theme_override_font_sizes/font_size = 11
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="." unique_id=1214445657]
+layout_mode = 0
+offset_left = 29.0
+offset_top = 8.0
+offset_right = 126.0
+offset_bottom = 28.0
+theme_type_variation = &"AccentLabel"
+theme_override_colors/font_color = Color(0.961, 0.941, 0.91, 1)
+theme_override_font_sizes/font_size = 9
+text = "Card Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="LineL" type="TextureRect" parent="." unique_id=740757914]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 137.0
+offset_right = 64.0
+offset_bottom = 138.0
+mouse_filter = 2
+texture = SubResource("GradientTexture1D_line_l")
+expand_mode = 1
+
+[node name="LineR" type="TextureRect" parent="." unique_id=2121055424]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 137.0
+offset_right = 121.0
+offset_bottom = 138.0
+mouse_filter = 2
+texture = SubResource("GradientTexture1D_line_r")
+expand_mode = 1
+
+[node name="GemTr" type="TextureRect" parent="." unique_id=816732923]
+layout_mode = 0
+offset_left = 65.5
+offset_top = 132.5
+offset_right = 74.5
+offset_bottom = 141.5
+mouse_filter = 2
+texture = SubResource("Placeholder_gem")
+expand_mode = 1
+
+[node name="DescLabel" type="Label" parent="." unique_id=67934319]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 144.0
+offset_right = 132.0
+offset_bottom = 194.0
+theme_override_colors/font_color = Color(0.929, 0.898, 0.831, 1)
+theme_override_constants/line_spacing = -1
+theme_override_font_sizes/font_size = 7
+text = "Card description."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="TypeIcon" type="TextureRect" parent="." unique_id=1868612427]
+modulate = Color(1, 1, 1, 0.4)
+layout_mode = 0
+offset_left = 112.0
+offset_top = 172.0
+offset_right = 136.0
+offset_bottom = 196.0
+mouse_filter = 2
+texture = ExtResource("3_attack")
+expand_mode = 1
+stretch_mode = 5

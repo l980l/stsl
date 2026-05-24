@@ -5,6 +5,9 @@
 extends CanvasLayer
 
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
+func _make_card() -> Control:
+	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
 
 ## 카드 선택 확정 시 발신. 인자는 선택된 카드 Resource.
 signal confirmed(card: Resource)
@@ -16,7 +19,7 @@ var _scroll: ScrollContainer = null
 var _card_parents: Dictionary = {}
 var _card_tweens: Dictionary = {}
 var _selected_card: Resource = null
-var _selected_node: CardScene = null
+var _selected_node: Control = null
 var _confirm_btn: Button = null
 var _closing: bool = false
 
@@ -132,14 +135,14 @@ func open(deck: Array, opts: Dictionary = {}) -> void:
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
 		grid.add_child(wrapper)
 
-		var card_node: CardScene = CARD_SCENE.instantiate()
+		var card_node: Control = _make_card()
 		card_node.position = Vector2(-1.75, -5.0)
 		card_node.pivot_offset = Vector2(70.0, 200.0)
 		card_node.scale = Vector2(0.975, 0.975)
 		card_node.setup(card, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 
-		var captured_node: CardScene = card_node
+		var captured_node: Control = card_node
 		card_node.card_hovered.connect(func(_c): _show_card_hover(captured_node))
 		card_node.card_unhovered.connect(func(_c): _clear_card_hover(captured_node))
 		card_node.gui_input.connect(func(ev: InputEvent):
@@ -183,7 +186,7 @@ func _input(ev: InputEvent) -> void:
 		_close()
 		get_viewport().set_input_as_handled()
 
-func _show_card_hover(node: CardScene) -> void:
+func _show_card_hover(node: Control) -> void:
 	if node in _card_tweens:
 		_card_tweens[node].kill()
 	if _overlay and node.get_parent() != _overlay:
@@ -194,7 +197,7 @@ func _show_card_hover(node: CardScene) -> void:
 	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
 	_card_tweens[node] = tw
 
-func _clear_card_hover(node: CardScene) -> void:
+func _clear_card_hover(node: Control) -> void:
 	if node in _card_tweens:
 		_card_tweens[node].kill()
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
@@ -212,7 +215,7 @@ func _clear_card_hover(node: CardScene) -> void:
 				node.scale = Vector2(0.975, 0.975))
 	_card_tweens[node] = tw
 
-func _on_select_card(card: Resource, node: CardScene) -> void:
+func _on_select_card(card: Resource, node: Control) -> void:
 	if is_instance_valid(_selected_node):
 		_selected_node.tween_glow(0.0, 0.12)
 	_selected_card = card

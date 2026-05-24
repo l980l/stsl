@@ -195,18 +195,17 @@ func _build_ui() -> void:
 		if not inactive:
 			SacredTheme.animate_button(btn)
 
-	# 뒤로 버튼 — 리크루트 모드에서는 숨김 (보스 클리어 후 진행 중)
+	# 뒤로 — 아이콘만 (Serif arrow), 리크루트 모드에서는 숨김
 	if not is_recruit:
-		var btn_back := Button.new()
-		btn_back.theme_type_variation = "VowButton"
-		btn_back.text = tr("ui.chapter_select.back")
+		var btn_back := TextureButton.new()
+		btn_back.texture_normal = load("res://assets/art/ui/back_arrow.svg")
+		btn_back.ignore_texture_size = true
+		btn_back.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 		btn_back.position = Vector2(60, 960)
-		btn_back.size = Vector2(200, 52)
-		btn_back.add_theme_font_size_override("font_size", 14)
+		btn_back.size = Vector2(64, 44)
 		btn_back.pressed.connect(_on_back)
 		add_child(btn_back)
-		LabelUtils.fit_text(btn_back, 14, 11)
-		SacredTheme.animate_button(btn_back)
+		SacredTheme.attach_icon_hover_anim(btn_back)
 
 func _on_back() -> void:
 	SceneTransition.go("res://scenes/chapter_select/chapter_select_scene.tscn")

@@ -2,6 +2,9 @@
 extends Node2D
 
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
+func _make_card() -> Control:
+	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
 
 var _picked_count: int = 0
 var _pick_max: int = 1
@@ -299,7 +302,7 @@ func _build_card_grid(cx: float) -> void:
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
 		cell.add_child(wrapper)
 
-		var card_node: CardScene = CARD_SCENE.instantiate()
+		var card_node: Control = _make_card()
 		card_node.position = Vector2(70.0 * (card_scale - 1.0), 200.0 * (card_scale - 1.0))
 		card_node.pivot_offset = Vector2(70.0, 200.0)
 		card_node.scale = Vector2(card_scale, card_scale)
@@ -388,7 +391,7 @@ func _process(_dt: float) -> void:
 		_cell_apply_hover[found].call()
 	_hovered_idx = found
 
-func _on_card_selected(card: Resource, cell: Panel, cta: Button, card_node: CardScene) -> void:
+func _on_card_selected(card: Resource, cell: Panel, cta: Button, card_node: Control) -> void:
 	if _picked_count >= _pick_max:
 		return
 	DeckManager.add_card_to_deck(card)

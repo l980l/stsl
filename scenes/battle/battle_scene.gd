@@ -5,6 +5,10 @@ const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
+# GameSettings.card_frame_key 따라 분기
+func _make_card() -> Control:
+	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
 const ARROW_CHEVRON_TEX := preload("res://assets/art/ui/arrow_chevron.svg")
 const ARROW_HEAD_TEX    := preload("res://assets/art/ui/arrow_head.svg")
 const CURSOR_TEX        := preload("res://assets/art/ui/cursor.svg")
@@ -1568,7 +1572,7 @@ func _intent_color(action_type: int) -> Color:
 # 카드 핸드 (Task 3에서 구현)
 # ─────────────────────────────────────────────
 
-func _apply_card_state(node: CardScene, card_res: Resource) -> void:
+func _apply_card_state(node: Control, card_res: Resource) -> void:
 	if not TeamManager.is_alive(card_res.owner_id):
 		node.set_owner_dead(true)
 	else:
@@ -1703,7 +1707,7 @@ func _refresh_hand() -> void:
 
 	for i in range(n_cards):
 		var card: Resource = hand[i]
-		var node: CardScene = CARD_SCENE.instantiate()
+		var node: Control = _make_card()
 		var angle: float = (i - (n_cards - 1) / 2.0) * step
 		var arc_pos: Vector2 = fan_pivot + Vector2(sin(angle), -cos(angle)) * FAN_PIVOT_Y_OFFSET
 		node.position = arc_pos - half_card
@@ -1800,10 +1804,10 @@ func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 	# 여전히 DRAGGING 이면 = 취소 → 영웅 줌인 복귀.
 	_cam_on_drag_canceled()
 
-func _on_card_hovered(_card: Resource, card_node: CardScene) -> void:
+func _on_card_hovered(_card: Resource, card_node: Control) -> void:
 	if _drag_card != null:
 		return
-	AudioManager.play_sfx("card_hover")
+	AudioManager.play_sfx("card_hover", -10.0)  # 호버 사운드 -10dB (시끄러움 완화)
 	var hover_idx: int = card_node.get_meta("_fan_idx", -1)
 	if hover_idx < 0:
 		return
@@ -4789,7 +4793,12 @@ func _get_hero_name_for_tooltip(hero_id: String) -> String:
 
 func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	var tex: Texture2D = IconUtils.get_status_icon(key)
-	var tooltip: String = _trf("status.%s.desc" % key, val)
+	# placeholder 가 1개 (단일 val) 인 status 만 default format. 2개 이상은 elif 분기가 처리 (charm_resistance 등).
+	var raw_desc: String = tr("status.%s.desc" % key)
+	var n_placeholders: int = raw_desc.count("%d") + raw_desc.count("%s") + raw_desc.count("%f")
+	var tooltip: String = raw_desc
+	if n_placeholders == 1:
+		tooltip = raw_desc % val
 	# speed_bonus / speed_penalty — 각 instance 별 "+N/M턴" list tooltip
 	if key in ["speed_bonus", "speed_penalty"] and typeof(status.get(key, null)) == TYPE_ARRAY:
 		var lines: Array[String] = []
@@ -5492,7 +5501,7 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
 		grid.add_child(wrapper)
 
-		var card_node: CardScene = CARD_SCENE.instantiate()
+		var card_node: Control = _make_card()
 		card_node.position     = base_pos
 		card_node.pivot_offset = Vector2(70.0, 200.0)
 		card_node.scale        = base_scale

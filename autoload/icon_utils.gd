@@ -15,7 +15,6 @@ const _ROOM_ICON_FILES := {
 	3: "icon_room_shop",
 	4: "icon_room_boss",
 	5: "icon_room_event",
-	6: "icon_room_secret",
 }
 
 const STATUS_FILE_ALIAS := {

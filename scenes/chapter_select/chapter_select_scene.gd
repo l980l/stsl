@@ -73,17 +73,16 @@ func _build_ui() -> void:
 	for i in range(_CHAPTERS.size()):
 		_make_chapter_card(_CHAPTERS[i], i)
 
-	# 뒤로 버튼 (Vow)
-	var btn_back := Button.new()
-	btn_back.theme_type_variation = "VowButton"
-	btn_back.text = tr("ui.chapter_select.back")
+	# 뒤로 — 아이콘만 (Serif arrow), 호버 시 살짝 위로 + 커짐
+	var btn_back := TextureButton.new()
+	btn_back.texture_normal = load("res://assets/art/ui/back_arrow.svg")
+	btn_back.ignore_texture_size = true
+	btn_back.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 	btn_back.position = Vector2(60, 960)
-	btn_back.size = Vector2(200, 52)
-	btn_back.add_theme_font_size_override("font_size", 14)
+	btn_back.size = Vector2(64, 44)
 	btn_back.pressed.connect(_on_back)
 	add_child(btn_back)
-	LabelUtils.fit_text(btn_back, 14, 11)
-	SacredTheme.animate_button(btn_back)
+	SacredTheme.attach_icon_hover_anim(btn_back)
 
 func _make_chapter_card(chapter: Dictionary, idx: int) -> void:
 	var P := SacredPalette

@@ -1,10 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Left log -->
-  <line x1="5" y1="22" x2="12" y2="16"/>
-  <!-- Right log -->
-  <line x1="19" y1="22" x2="12" y2="16"/>
-  <!-- Ground line -->
-  <line x1="7" y1="21" x2="17" y2="21"/>
-  <!-- Flame (closed teardrop shape) -->
-  <path d="M12 16c-2-3 0-6 0-9 3 3 4 6 0 9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Crescent moon over horizon — rest until dawn (verdigris) -->
+  <path d="M22.5 6.5 A 10 10 0 1 0 22.5 25.5 A 8 8 0 1 1 22.5 6.5 Z" fill="#5fb59a"/>
+  <line x1="4" y1="28" x2="28" y2="28" stroke="#5fb59a" stroke-width="1.25" stroke-linecap="square"/>
 </svg>

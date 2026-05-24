@@ -216,6 +216,7 @@ func open() -> void:
 		"hero_zoom":        "on" if GameSettings.hero_zoom_enabled else "off",
 		"cam_zoom_speed":   GameSettings.cam_zoom_speed_key,
 		"kill_cam":         "on" if GameSettings.kill_cam_enabled else "off",
+		"card_frame":       GameSettings.card_frame_key,
 	}
 	for gid in current_keys:
 		if _seg_groups.has(gid):
@@ -281,6 +282,7 @@ func _on_defaults() -> void:
 		"hero_zoom":        "on" if GameSettings.HERO_ZOOM_DEFAULT else "off",
 		"cam_zoom_speed":   GameSettings.CAM_ZOOM_SPEED_DEFAULT,
 		"kill_cam":         "on" if GameSettings.KILL_CAM_DEFAULT else "off",
+		"card_frame":       GameSettings.CARD_FRAME_DEFAULT,
 	}
 	for gid in defaults:
 		if not _seg_groups.has(gid):
@@ -399,6 +401,32 @@ func _build_graphics_panel() -> void:
 		_build_x_labels(GameSettings.PARTICLE_KEYS, GameSettings.PARTICLE_VALUES),
 		GameSettings.particle_key,
 		func(k: String) -> void: GameSettings.set_particle_quality(k))
+
+	# Row 3: 카드 프레임 (classic / modern)
+	_build_seg_row(p, mono, 136.0, tr("ui.settings.card_frame"), "card_frame",
+		GameSettings.CARD_FRAME_KEYS,
+		{"classic": tr("ui.settings.card_frame.classic"), "modern": tr("ui.settings.card_frame.modern")},
+		GameSettings.card_frame_key,
+		func(k: String) -> void: GameSettings.set_card_frame(k))
+	# 전투 중에는 비활성화 — 라벨 옆에 ⓘ 아이콘 + 호버 툴팁
+	var gm := get_node_or_null("/root/GameManager")
+	if gm != null and gm.current_state == gm.GameState.BATTLE:
+		var btns: Dictionary = _seg_groups["card_frame"]["buttons"]
+		for k in btns:
+			(btns[k] as Button).disabled = true
+		var info_lbl := Label.new()
+		info_lbl.text = "ⓘ"
+		# segment box 우측 끝 (520) 옆 — 8px gap
+		info_lbl.offset_left   = 528.0
+		info_lbl.offset_top    = 136.0
+		info_lbl.offset_right  = 558.0
+		info_lbl.offset_bottom = 166.0
+		info_lbl.add_theme_font_size_override("font_size", 18)
+		info_lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
+		info_lbl.mouse_filter = Control.MOUSE_FILTER_STOP
+		info_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		p.add_child(info_lbl)
+		SacredTheme.attach_tooltip(info_lbl, tr("ui.settings.card_frame.locked"))
 
 func _build_gameplay_panel() -> void:
 	var p := _tab_panels["gameplay"] as Control
