@@ -75,9 +75,17 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
+	var lm := get_node_or_null("/root/LocaleManager")
+	if lm != null:
+		lm.locale_changed.connect(_on_locale_changed)
 	if _card_res != null:
 		_refresh_from_card_res()
 	refresh()
+
+func _on_locale_changed(_locale: String) -> void:
+	if _card_res != null:
+		_refresh_from_card_res()
+		refresh()
 
 # ── 기존 CardScene 호환 API ──
 func setup(card: Resource, mode: int) -> void:
@@ -232,6 +240,8 @@ func refresh() -> void:
 	# 제목 폰트 자동 조절 — 긴 텍스트는 폭에 맞춰 축소 (기존 card_scene 패턴)
 	LabelUtils.fit_text(_title_label, 9, 6)
 	_desc_label.text = _desc
+	# 설명 폰트 자동 조절 — autowrap 라벨이므로 라인 수 × 라인 높이가 영역 초과 시 축소
+	LabelUtils.fit_text(_desc_label, 7, 5)
 	_art_rect.texture = _art_texture
 	# Type icon
 	match _card_type:

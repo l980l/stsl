@@ -180,6 +180,9 @@ func _ready() -> void:
 	_connect_signals()
 	_start_battle()
 	_play_battle_bgm()
+	# 언어 변경 시 적 이름 갱신 (카드/intent 는 자체 갱신). 카드 프레임 변경 시 핸드 재구성.
+	LocaleManager.locale_changed.connect(_on_locale_changed_battle)
+	GameSettings.card_frame_changed.connect(_on_card_frame_changed_battle)
 	if OS.is_debug_build():
 		_debug_badge = Label.new()
 		_debug_badge.position = Vector2(1500, 20)
@@ -1686,6 +1689,22 @@ func _resolve_actor_info(actor_id: String) -> Dictionary:
 			nm2 = tr(enemy_res.enemy_name)
 		return {"name": nm2, "color": Color(0.7, 0.25, 0.25)}
 	return {"name": actor_id, "color": Color(0.5, 0.5, 0.5)}
+
+func _on_locale_changed_battle(_locale: String) -> void:
+	for i in _enemy_nodes.size():
+		var entry: Dictionary = _enemy_nodes[i]
+		if entry.is_empty() or not entry.has("name_lbl"):
+			continue
+		var lbl: Label = entry["name_lbl"]
+		if not is_instance_valid(lbl):
+			continue
+		var enemy: Resource = BattleManager.get_enemy(i)
+		if enemy != null and enemy.get("enemy_name") != null:
+			lbl.text = tr(enemy.get("enemy_name"))
+
+func _on_card_frame_changed_battle(_key: String) -> void:
+	# 핸드 노드 전부 swap. 덱 보기 열려 있으면 자동으로 닫히지는 않음 (다음 열 때 새 frame 반영).
+	_refresh_hand()
 
 func _refresh_hand() -> void:
 	for n in _card_buttons:

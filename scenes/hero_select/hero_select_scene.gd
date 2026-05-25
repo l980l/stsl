@@ -127,15 +127,26 @@ func _build_ui() -> void:
 		var card_vbox := VBoxContainer.new()
 		panel.add_child(card_vbox)
 
+		# 이름과 HP 를 같은 라벨에 두면 영웅별 폰트가 HP 에도 적용돼 글씨체 통일 안 됨.
+		# Label 두 개로 분리 — 이름만 영웅 폰트, HP 는 공용 sacred 폰트.
 		var name_lbl := Label.new()
 		name_lbl.theme_type_variation = "AccentLabel"
 		name_lbl.add_theme_font_override("font", SacredTheme.get_hero_font(hid))
-		name_lbl.text = "%s\nHP %d" % [tr(info.get("name", hid) as String), info.get("hp", 0) as int]
+		name_lbl.text = tr(info.get("name", hid) as String)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_lbl.custom_minimum_size = Vector2(0, 45)  # name_lbl height 줄여서 아래 illust 위로 확장
+		name_lbl.custom_minimum_size = Vector2(0, 26)
 		if inactive:
 			name_lbl.modulate = Color(1, 1, 1, 0.45)
 		card_vbox.add_child(name_lbl)
+
+		var hp_lbl := Label.new()
+		hp_lbl.theme_type_variation = "AccentLabel"
+		hp_lbl.text = "HP %d" % (info.get("hp", 0) as int)
+		hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		hp_lbl.custom_minimum_size = Vector2(0, 19)
+		if inactive:
+			hp_lbl.modulate = Color(1, 1, 1, 0.45)
+		card_vbox.add_child(hp_lbl)
 
 		var illust_path := "res://assets/art/heroes/%s.png" % hid
 		if ResourceLoader.exists(illust_path):
