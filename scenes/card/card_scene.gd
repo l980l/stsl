@@ -65,6 +65,14 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
+	# class_name 글로벌 클래스 안에서는 autoload 식별자 컴파일 단계에서 unknown — 동적 참조 사용
+	var lm := get_node_or_null("/root/LocaleManager")
+	if lm != null:
+		lm.locale_changed.connect(_on_locale_changed)
+	if _card != null:
+		refresh()
+
+func _on_locale_changed(_locale: String) -> void:
 	if _card != null:
 		refresh()
 
@@ -157,6 +165,8 @@ func refresh() -> void:
 	$Container/RarityGem.texture = _resolve_gem_texture(_card.rarity)
 	$Container/TypeIcon.texture = _resolve_type_icon(_card.card_type)
 	$Container/DescLabel.text = _build_desc()
+	# 설명 폰트 자동 조절 — autowrap 라벨이므로 라인 수 × 라인 높이가 영역 초과 시 축소
+	LabelUtils.fit_text($Container/DescLabel, 40, 24)
 
 
 func set_target_enemy_index(idx: int) -> void:
@@ -175,7 +185,9 @@ func _build_desc() -> String:
 		# 데미지 effect 면 hero strength/weak (+ 호버 시 타겟 vulnerable) 반영한 값 표시.
 		# 그 외 effect 는 raw value.
 		if _mode == Mode.HAND and eff.effect_type == EffectResource.EffectType.DAMAGE:
-			var v: int = BattleManager.estimate_effect_damage(eff, _card.owner_id, _target_enemy_index)
+			# class_name 글로벌 클래스 내부에서는 autoload 식별자 컴파일 단계에서 unknown — 동적 참조
+			var bm := get_node_or_null("/root/BattleManager")
+			var v: int = bm.estimate_effect_damage(eff, _card.owner_id, _target_enemy_index) if bm else int(eff.value)
 			lines.append(eff.display_text(v))
 		else:
 			lines.append(eff.display_text())

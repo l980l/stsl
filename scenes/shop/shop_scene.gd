@@ -2,7 +2,11 @@
 extends Node2D
 
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
 const CARD_REMOVAL_OVERLAY := preload("res://scenes/components/card_removal_overlay.gd")
+
+func _make_card() -> Control:
+	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
 const CARD_W  := 140
 const CARD_H  := 200
 const CARD_GAP := 20
@@ -28,13 +32,50 @@ var _card_removed:          bool      = false
 var _upgrade_btn_ref:       Button    = null
 var _upgrade_price:         int       = 0
 var _selected_upgrade_card: Resource  = null
-var _selected_upgrade_node: CardScene = null
+var _selected_upgrade_node: Control = null
 var _confirm_upgrade_btn:   Button    = null
+# 구매 가능 버튼 → 가격. 골드 변경 시 disabled 일괄 갱신용. 구매 완료된 버튼은 erase.
+var _affordable_btns: Dictionary = {}
 
 func _ready() -> void:
 	_inventory = GameManager.generate_shop_inventory()
 	_build_ui()
 	AudioManager.play_bgm_dynamic("shop", "")
+	# 언어/카드 프레임 변경 시 진열 라벨·카드 노드만 다시 그림 (_inventory 는 유지 → 진열 reroll 방지)
+	LocaleManager.locale_changed.connect(_on_locale_or_frame_changed)
+	GameSettings.card_frame_changed.connect(_on_locale_or_frame_changed)
+
+func _on_locale_or_frame_changed(_v) -> void:
+	_rebuild_ui()
+
+func _rebuild_ui() -> void:
+	_hide_upgrade_panel()
+	for tw in _card_tweens.values():
+		if tw.is_valid():
+			tw.kill()
+	_card_tweens.clear()
+	_upgrade_btn_ref = null
+	_affordable_btns.clear()
+	# tscn 에 박혀있는 자식(SettingsButton/SettingsOverlay 등 owner 가 root 인 노드)은 보존,
+	# _build_ui 가 add 한 동적 자식만 제거.
+	for c in get_children():
+		if c.owner == self:
+			continue
+		c.queue_free()
+	_build_ui()
+
+# 구매 버튼 등록 — 가격 + 부가 조건(못 살 결정적 조건. 예: 강화 가능 카드 없음). 골드 변경 시 일괄 평가.
+func _register_buy_btn(btn: Button, price: int, extra_disabled: bool = false) -> void:
+	_affordable_btns[btn] = {"price": price, "extra": extra_disabled}
+	btn.disabled = extra_disabled or GameManager.gold < price
+
+func _refresh_affordable_btns() -> void:
+	for btn in _affordable_btns.keys():
+		if not is_instance_valid(btn):
+			_affordable_btns.erase(btn)
+			continue
+		var meta: Dictionary = _affordable_btns[btn]
+		btn.disabled = meta["extra"] or GameManager.gold < meta["price"]
 
 func _input(ev: InputEvent) -> void:
 	if _active_scroll == null:
@@ -147,13 +188,13 @@ func _build_card_section() -> void:
 		var price: int     = prices[i] if i < prices.size() else 75
 		var cx := start_x + i * (CARD_W + CARD_GAP)
 
-		var node: CardScene = CARD_SCENE.instantiate()
+		var node: Control = _make_card()
 		node.position     = Vector2(cx, 174)
 		node.pivot_offset = Vector2(CARD_W / 2.0, CARD_H)
 		node.setup(card, CardScene.Mode.REWARD)
 		add_child(node)
 
-		var captured_node: CardScene = node
+		var captured_node: Control = node
 		node.mouse_entered.connect(func(): _show_card_hover(captured_node))
 		node.mouse_exited.connect(func():  _clear_card_hover(captured_node))
 
@@ -176,8 +217,9 @@ func _build_card_section() -> void:
 		btn.pressed.connect(func(): _on_buy_card(captured_card, captured_btn, price))
 		add_child(btn)
 		SacredTheme.animate_button(btn)
+		_register_buy_btn(btn, price)
 
-func _show_card_hover(node: CardScene) -> void:
+func _show_card_hover(node: Control) -> void:
 	if node in _card_tweens:
 		_card_tweens[node].kill()
 	node.z_index = 50
@@ -185,7 +227,7 @@ func _show_card_hover(node: CardScene) -> void:
 	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
 	_card_tweens[node] = tw
 
-func _clear_card_hover(node: CardScene) -> void:
+func _clear_card_hover(node: Control) -> void:
 	if node in _card_tweens:
 		_card_tweens[node].kill()
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
@@ -335,6 +377,7 @@ func _build_relic_section() -> void:
 		btn.pressed.connect(func(): _on_buy_relic(captured_relic, captured_btn, relic_price))
 		panel.add_child(btn)
 		SacredTheme.animate_button(btn)
+		_register_buy_btn(btn, relic_price)
 
 		# 코너 브라켓 (마지막에 추가해서 가장 위에 렌더)
 		SacredTheme.add_corner_brackets(panel, P.BRASS_700)
@@ -468,11 +511,11 @@ func _build_service_section() -> void:
 		btn.position = Vector2(260, 60)
 		btn.size     = Vector2(108, 35)
 		btn.add_theme_font_size_override("font_size", 14)
-		btn.disabled = not svc["enabled"]
 		var captured_cb: Callable = svc["callback"]
 		btn.pressed.connect(captured_cb)
 		panel.add_child(btn)
-		if svc["enabled"]:
+		_register_buy_btn(btn, svc["price"], not svc["enabled"])
+		if not btn.disabled:
 			SacredTheme.animate_button(btn)
 		if i == 2:
 			_upgrade_btn_ref  = btn
@@ -505,6 +548,7 @@ func _on_buy_card(card: Resource, btn: Button, price: int) -> void:
 	DeckManager.add_card_to_deck(card)
 	btn.disabled = true
 	btn.text = tr("ui.shop.btn_purchased")
+	_affordable_btns.erase(btn)
 	_refresh_gold_label()
 	_refresh_upgrade_btn()
 
@@ -514,6 +558,7 @@ func _on_buy_relic(relic: Resource, btn: Button, price: int) -> void:
 	GameManager.add_relic(relic)
 	btn.disabled = true
 	btn.text = tr("ui.shop.btn_purchased")
+	_affordable_btns.erase(btn)
 	_refresh_gold_label()
 
 func _on_heal(amount: int, price: int) -> void:
@@ -551,13 +596,17 @@ func _refresh_gold_label() -> void:
 	var lbl := get_node_or_null("GoldLabel")
 	if lbl:
 		lbl.text = "⛬ %dg" % GameManager.gold
+	_refresh_affordable_btns()
 
 func _refresh_upgrade_btn() -> void:
 	if not is_instance_valid(_upgrade_btn_ref):
 		return
 	var can := _has_upgradeable_cards()
-	if _upgrade_btn_ref.disabled and can:
-		_upgrade_btn_ref.disabled = false
+	if _affordable_btns.has(_upgrade_btn_ref):
+		_affordable_btns[_upgrade_btn_ref]["extra"] = not can
+	var was_disabled: bool = _upgrade_btn_ref.disabled
+	_refresh_affordable_btns()
+	if was_disabled and not _upgrade_btn_ref.disabled:
 		SacredTheme.animate_button(_upgrade_btn_ref)
 
 # ── 카드 강화 패널 ────────────────────────────────────────
@@ -682,14 +731,14 @@ func _show_upgrade_panel(price: int) -> void:
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
 		grid.add_child(wrapper)
 
-		var card_node: CardScene = CARD_SCENE.instantiate()
+		var card_node: Control = _make_card()
 		card_node.position     = Vector2(-1.75, -5.0)
 		card_node.pivot_offset = Vector2(70.0, 200.0)
 		card_node.scale        = Vector2(0.975, 0.975)
 		card_node.setup(card, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 
-		var captured_node: CardScene = card_node
+		var captured_node: Control = card_node
 		card_node.card_hovered.connect(func(_c): _show_upgrade_card_hover(captured_node))
 		card_node.card_unhovered.connect(func(_c): _clear_upgrade_card_hover(captured_node))
 		card_node.gui_input.connect(func(ev: InputEvent):
@@ -719,7 +768,7 @@ func _show_upgrade_panel(price: int) -> void:
 	tw.tween_property(group, "scale", Vector2.ONE, 0.15)
 	tw.parallel().tween_property(group, "modulate:a", 1.0, 0.15)
 
-func _show_upgrade_card_hover(node: CardScene) -> void:
+func _show_upgrade_card_hover(node: Control) -> void:
 	if node in _upgrade_card_tweens:
 		_upgrade_card_tweens[node].kill()
 	_active_scroll = _upgrade_scroll
@@ -731,7 +780,7 @@ func _show_upgrade_card_hover(node: CardScene) -> void:
 	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
 	_upgrade_card_tweens[node] = tw
 
-func _clear_upgrade_card_hover(node: CardScene) -> void:
+func _clear_upgrade_card_hover(node: Control) -> void:
 	if node in _upgrade_card_tweens:
 		_upgrade_card_tweens[node].kill()
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
@@ -775,7 +824,7 @@ func _hide_upgrade_panel() -> void:
 		else:
 			if is_instance_valid(layer): layer.queue_free()
 
-func _on_select_upgrade_card(card: Resource, node: CardScene) -> void:
+func _on_select_upgrade_card(card: Resource, node: Control) -> void:
 	if is_instance_valid(_selected_upgrade_node):
 		_selected_upgrade_node.tween_glow(0.0, 0.12)
 	_selected_upgrade_card = card

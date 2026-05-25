@@ -256,10 +256,16 @@ func _on_apply() -> void:
 		_seg_groups[gid]["initial"] = _seg_groups[gid]["pending"]
 	var locale_changed := _pending_locale_idx != _initial_locale_idx
 	if locale_changed:
+		# LocaleManager 가 locale_changed signal 발산 → 카드/적/상점 등이 자체 라벨 갱신
 		LocaleManager.set_locale(LocaleManager.LOCALES[_pending_locale_idx])
 	close()
+	# 라이브 갱신을 처리한 씬 (BATTLE, SHOP) 은 reload 스킵 — 그 외 씬은 라벨이 tr() 결과를
+	# 캐싱하고 있어 reload 없이는 새 locale 반영 안 됨. BATTLE reload 시 전투 상태 초기화 버그 회피.
 	if locale_changed:
-		get_tree().reload_current_scene.call_deferred()
+		var gm := get_node_or_null("/root/GameManager")
+		var live_states := [gm.GameState.BATTLE, gm.GameState.SHOP] if gm != null else []
+		if gm == null or not (gm.current_state in live_states):
+			get_tree().reload_current_scene.call_deferred()
 
 func _on_cancel() -> void:
 	close()
@@ -402,31 +408,12 @@ func _build_graphics_panel() -> void:
 		GameSettings.particle_key,
 		func(k: String) -> void: GameSettings.set_particle_quality(k))
 
-	# Row 3: 카드 프레임 (classic / modern)
+	# Row 3: 카드 프레임 (classic / modern) — 전투/상점 포함 라이브 swap
 	_build_seg_row(p, mono, 136.0, tr("ui.settings.card_frame"), "card_frame",
 		GameSettings.CARD_FRAME_KEYS,
 		{"classic": tr("ui.settings.card_frame.classic"), "modern": tr("ui.settings.card_frame.modern")},
 		GameSettings.card_frame_key,
 		func(k: String) -> void: GameSettings.set_card_frame(k))
-	# 전투 중에는 비활성화 — 라벨 옆에 ⓘ 아이콘 + 호버 툴팁
-	var gm := get_node_or_null("/root/GameManager")
-	if gm != null and gm.current_state == gm.GameState.BATTLE:
-		var btns: Dictionary = _seg_groups["card_frame"]["buttons"]
-		for k in btns:
-			(btns[k] as Button).disabled = true
-		var info_lbl := Label.new()
-		info_lbl.text = "ⓘ"
-		# segment box 우측 끝 (520) 옆 — 8px gap
-		info_lbl.offset_left   = 528.0
-		info_lbl.offset_top    = 136.0
-		info_lbl.offset_right  = 558.0
-		info_lbl.offset_bottom = 166.0
-		info_lbl.add_theme_font_size_override("font_size", 18)
-		info_lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
-		info_lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-		info_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		p.add_child(info_lbl)
-		SacredTheme.attach_tooltip(info_lbl, tr("ui.settings.card_frame.locked"))
 
 func _build_gameplay_panel() -> void:
 	var p := _tab_panels["gameplay"] as Control

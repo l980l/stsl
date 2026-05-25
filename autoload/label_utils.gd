@@ -19,10 +19,15 @@ static func fit_text(control: Control, max_px: int, min_px: int, target_w: float
 		var fs := max_px
 		var check_h: float = target_h if target_h > 0.0 else lbl.size.y
 		await control.get_tree().process_frame
+		# await 후 라벨이 free 됐을 수 있음 (카드 핸드 갱신/언어 변경 등). 가드.
+		if not is_instance_valid(lbl) or not lbl.is_inside_tree():
+			return
 		while lbl.get_line_count() * lbl.get_line_height() > check_h and fs > min_px:
 			fs -= 1
 			lbl.add_theme_font_size_override("font_size", fs)
 			await lbl.get_tree().process_frame
+			if not is_instance_valid(lbl) or not lbl.is_inside_tree():
+				return
 	else:
 		if control is Label:
 			(control as Label).vertical_alignment = VERTICAL_ALIGNMENT_CENTER
