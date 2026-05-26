@@ -217,6 +217,7 @@ func open() -> void:
 		"cam_zoom_speed":   GameSettings.cam_zoom_speed_key,
 		"kill_cam":         "on" if GameSettings.kill_cam_enabled else "off",
 		"card_frame":       GameSettings.card_frame_key,
+		"msaa":             GameSettings.msaa_key,
 	}
 	for gid in current_keys:
 		if _seg_groups.has(gid):
@@ -289,6 +290,7 @@ func _on_defaults() -> void:
 		"cam_zoom_speed":   GameSettings.CAM_ZOOM_SPEED_DEFAULT,
 		"kill_cam":         "on" if GameSettings.KILL_CAM_DEFAULT else "off",
 		"card_frame":       GameSettings.CARD_FRAME_DEFAULT,
+		"msaa":             GameSettings.MSAA_DEFAULT,
 	}
 	for gid in defaults:
 		if not _seg_groups.has(gid):
@@ -414,6 +416,13 @@ func _build_graphics_panel() -> void:
 		{"classic": tr("ui.settings.card_frame.classic"), "modern": tr("ui.settings.card_frame.modern")},
 		GameSettings.card_frame_key,
 		func(k: String) -> void: GameSettings.set_card_frame(k))
+
+	# Row 4: MSAA 2D (off/2x/4x/8x) — 카드 부채꼴 회전·StyleBox 외곽 anti-alias
+	_build_seg_row(p, mono, 192.0, tr("ui.settings.msaa"), "msaa",
+		GameSettings.MSAA_KEYS,
+		{"off": tr("ui.settings.msaa.off"), "2x": "2x", "4x": "4x", "8x": "8x"},
+		GameSettings.msaa_key,
+		func(k: String) -> void: GameSettings.set_msaa(k))
 
 func _build_gameplay_panel() -> void:
 	var p := _tab_panels["gameplay"] as Control

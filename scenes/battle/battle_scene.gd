@@ -1752,11 +1752,8 @@ func _refresh_hand() -> void:
 		var node: Control = _make_card()
 		var angle: float = (i - (n_cards - 1) / 2.0) * step
 		var arc_pos: Vector2 = fan_pivot + Vector2(sin(angle), -cos(angle)) * FAN_PIVOT_Y_OFFSET
-		node.position = arc_pos - half_card
+		GameSettings.apply_card_transform(node, arc_pos - half_card, Vector2(70, 100), BASE_CARD_SCALE)
 		node.rotation = angle
-		# v2(modern) 는 native 가 1.4x 라서 pivot 도 1.4x, scale 은 1/1.4 보정 → effective 동일
-		node.pivot_offset = Vector2(70, 100) * GameSettings.get_card_native_pivot_mul()
-		node.scale = Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE) * GameSettings.get_card_native_scale()
 		node.z_index = 1500 + i  # 카드 — UI 와 같은 영역
 		node.set_meta("_fan_pos", node.position)
 		node.set_meta("_fan_rot", node.rotation)
@@ -1861,13 +1858,12 @@ func _on_card_hovered(_card: Resource, card_node: Control) -> void:
 		var base_pos: Vector2 = btn.get_meta("_fan_pos")
 		var base_rot: float = btn.get_meta("_fan_rot")
 		var tw := create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
-		var nsm := GameSettings.get_card_native_scale()
 		if idx == hover_idx:
-			var hover_scale := BASE_CARD_SCALE * 1.4 * nsm
-			# 호버 후 카드 하단 y = base_pos.y + hover_scale * 100 + 100
-			var card_bottom := base_pos.y + hover_scale * 100.0 + 100.0
+			var hover_scale_vec := GameSettings.get_card_scale(BASE_CARD_SCALE * 1.4)
+			# 호버 후 카드 하단 y = base_pos.y + hover_scale.y * 100 + 100
+			var card_bottom := base_pos.y + hover_scale_vec.y * 100.0 + 100.0
 			var lift := maxf(60.0, card_bottom - (WINDOW_H - 20.0))
-			tw.tween_property(btn, "scale", Vector2(hover_scale, hover_scale), 0.12)
+			tw.tween_property(btn, "scale", hover_scale_vec, 0.12)
 			tw.tween_property(btn, "position", base_pos + Vector2(0, -lift), 0.12)
 			tw.tween_property(btn, "rotation", 0.0, 0.12)
 			btn.z_index = 1700  # 호버 카드 — 다른 카드 위
@@ -1877,14 +1873,13 @@ func _on_card_hovered(_card: Resource, card_node: Control) -> void:
 			var falloff: float = maxf(0.0, 1.0 - abs(dist) / 4.0)
 			tw.tween_property(btn, "position", base_pos + Vector2(sign_x * 35.0 * falloff, 0), 0.12)
 			tw.tween_property(btn, "rotation", base_rot, 0.12)
-			tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE) * nsm, 0.12)
+			tw.tween_property(btn, "scale", GameSettings.get_card_scale(BASE_CARD_SCALE), 0.12)
 			btn.z_index = 1500 + idx
 
 func _on_card_unhovered(_card: Resource) -> void:
 	_reset_hand_fan()
 
 func _reset_hand_fan() -> void:
-	var nsm := GameSettings.get_card_native_scale()
 	for btn in _card_buttons:
 		if not is_instance_valid(btn):
 			continue
@@ -1892,7 +1887,7 @@ func _reset_hand_fan() -> void:
 		var tw := create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 		tw.tween_property(btn, "position", btn.get_meta("_fan_pos"), 0.12)
 		tw.tween_property(btn, "rotation", btn.get_meta("_fan_rot"), 0.12)
-		tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE) * nsm, 0.12)
+		tw.tween_property(btn, "scale", GameSettings.get_card_scale(BASE_CARD_SCALE), 0.12)
 		btn.z_index = 1500 + idx
 
 func _on_enemy_pressed(index: int) -> void:
@@ -5547,9 +5542,7 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		grid.add_child(wrapper)
 
 		var card_node: Control = _make_card()
-		card_node.position     = base_pos
-		card_node.pivot_offset = Vector2(70.0, 200.0) * GameSettings.get_card_native_pivot_mul()
-		card_node.scale        = base_scale * GameSettings.get_card_native_scale()
+		GameSettings.apply_card_transform(card_node, base_pos, Vector2(70.0, 200.0), card_scale)
 		card_node.setup(card_res, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 

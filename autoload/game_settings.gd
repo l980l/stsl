@@ -35,6 +35,12 @@ const CAM_ZOOM_SPEED_DEFAULT := "normal"
 const CARD_FRAME_KEYS    := ["classic", "modern"]
 const CARD_FRAME_DEFAULT := "classic"
 
+# MSAA 2D — 카드 부채꼴 회전·StyleBox 외곽·둥근 모서리 가장자리 anti-alias.
+# Viewport.MSAA enum: 0=DISABLED, 1=MSAA_2X, 2=MSAA_4X, 3=MSAA_8X
+const MSAA_KEYS    := ["off", "2x", "4x", "8x"]
+const MSAA_VALUES  := [0, 1, 2, 3]
+const MSAA_DEFAULT := "2x"
+
 const _CONFIG_PATH := "user://game_settings.cfg"
 
 # 현재 multiplier 값 (직접 사용)
@@ -53,6 +59,7 @@ var hero_zoom_enabled: bool = HERO_ZOOM_DEFAULT
 var cam_zoom_speed_key: String = CAM_ZOOM_SPEED_DEFAULT
 var cam_zoom_speed_multiplier: float = 1.0
 var card_frame_key: String = CARD_FRAME_DEFAULT
+var msaa_key: String = MSAA_DEFAULT
 
 # 설정 변경 시그널 — 변경 즉시 반영 필요한 곳에서 구독
 @warning_ignore("unused_signal")
@@ -116,6 +123,31 @@ func get_card_native_scale() -> float:
 func get_card_native_pivot_mul() -> float:
 	return 1.4 if card_frame_key == "modern" else 1.0
 
+# v2 native 1.4 배 + pivot/scale multiplier 적용 시 카드 visual offset 어긋남 (우측 하단 이동) 보정.
+# 기존 spawn 코드가 v1 기준 (pivot × (1 - outer_scale)) 의 visual offset 을 가정하고 position 계산.
+# v2 변경으로 그 보정이 사라져서 spawn 위치 차이 발생 → 이 헬퍼로 position 보정값 반환.
+# v1 인 경우 multiplier 1.0 라 반환값 0 (영향 없음).
+func get_card_visual_offset(base_pivot: Vector2, outer_scale: float) -> Vector2:
+	var pivot_mul := get_card_native_pivot_mul()
+	var scale_mul := get_card_native_scale()
+	var new_pivot := base_pivot * pivot_mul
+	var new_scale := outer_scale * scale_mul
+	var old_visual := base_pivot * (1.0 - outer_scale)
+	var new_visual := new_pivot * (1.0 - new_scale)
+	return old_visual - new_visual
+
+# 카드 노드의 transform (position/pivot/scale) 일괄 적용 — multiplier + visual_offset 자동 처리.
+# 사용: GameSettings.apply_card_transform(node, base_pos, Vector2(70, 200), 0.975)
+func apply_card_transform(node: Control, base_pos: Vector2, base_pivot: Vector2, outer_scale: float) -> void:
+	node.position = base_pos + get_card_visual_offset(base_pivot, outer_scale)
+	node.pivot_offset = base_pivot * get_card_native_pivot_mul()
+	node.scale = Vector2(outer_scale, outer_scale) * get_card_native_scale()
+
+# Hover/Reset tween 의 target scale — multiplier 자동 적용.
+# 사용: tw.tween_property(node, "scale", GameSettings.get_card_scale(1.5), 0.22)
+func get_card_scale(outer_scale: float) -> Vector2:
+	return Vector2(outer_scale, outer_scale) * get_card_native_scale()
+
 func set_card_frame(key: String) -> void:
 	if CARD_FRAME_KEYS.find(key) < 0:
 		return
@@ -123,6 +155,16 @@ func set_card_frame(key: String) -> void:
 		return
 	card_frame_key = key
 	card_frame_changed.emit(key)
+
+func set_msaa(key: String) -> void:
+	var idx := MSAA_KEYS.find(key)
+	if idx < 0:
+		return
+	msaa_key = key
+	# Window/Viewport msaa_2d 즉시 적용
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		tree.root.msaa_2d = MSAA_VALUES[idx]
 
 # ── 적용된 값 조회 (battle_manager 등이 사용) ──
 func get_vfx_delay(base: float) -> float:
@@ -148,6 +190,7 @@ func save_settings() -> void:
 	cfg.set_value("gameplay", "hero_zoom_enabled", hero_zoom_enabled)
 	cfg.set_value("gameplay", "cam_zoom_speed", cam_zoom_speed_key)
 	cfg.set_value("graphics", "card_frame", card_frame_key)
+	cfg.set_value("graphics", "msaa", msaa_key)
 	cfg.save(_CONFIG_PATH)
 
 func load_settings() -> void:
@@ -162,6 +205,7 @@ func load_settings() -> void:
 		set_hero_zoom_enabled(HERO_ZOOM_DEFAULT)
 		set_cam_zoom_speed(CAM_ZOOM_SPEED_DEFAULT)
 		set_card_frame(CARD_FRAME_DEFAULT)
+		set_msaa(MSAA_DEFAULT)
 		return
 	set_particle_quality(cfg.get_value("graphics", "particle_quality", PARTICLE_DEFAULT))
 	set_vfx_speed(cfg.get_value("gameplay", "vfx_speed", VFX_SPEED_DEFAULT))
@@ -173,3 +217,4 @@ func load_settings() -> void:
 	set_hero_zoom_enabled(cfg.get_value("gameplay", "hero_zoom_enabled", HERO_ZOOM_DEFAULT))
 	set_cam_zoom_speed(cfg.get_value("gameplay", "cam_zoom_speed", CAM_ZOOM_SPEED_DEFAULT))
 	set_card_frame(cfg.get_value("graphics", "card_frame", CARD_FRAME_DEFAULT))
+	set_msaa(cfg.get_value("graphics", "msaa", MSAA_DEFAULT))
