@@ -485,14 +485,14 @@ func _make_hero_slot(index: int) -> Dictionary:
 	hp_bar.z_index = 1
 	hp_bar.visible = false
 
-	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 22), Vector2(bar_w, 24), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 23), Vector2(bar_w, 24), 12)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hp_lbl.theme_type_variation = "EyebrowLabel"
 	hp_lbl.z_index = 1
 	hp_lbl.visible = false
 
-	var block_lbl := _make_label(Vector2(bar_x, pos.y + 22), Vector2(bar_w, 24), 12)
+	var block_lbl := _make_label(Vector2(bar_x, pos.y + 23), Vector2(bar_w, 24), 12)
 	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	block_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	block_lbl.theme_type_variation = "EyebrowLabel"
@@ -566,13 +566,13 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 48), bar_w, is_boss)
 	hp_bar.z_index = 1
 
-	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 42), Vector2(bar_w, 24), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 43), Vector2(bar_w, 24), 12)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hp_lbl.theme_type_variation = "EyebrowLabel"
 	hp_lbl.z_index = 1
 
-	var block_lbl := _make_label(Vector2(bar_x, pos.y + 42), Vector2(bar_w, 24), 12)
+	var block_lbl := _make_label(Vector2(bar_x, pos.y + 43), Vector2(bar_w, 24), 12)
 	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	block_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	block_lbl.theme_type_variation = "EyebrowLabel"
@@ -1123,6 +1123,8 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 	entry["btn"].visible = true
 	entry["btn"].disabled = false
 	entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
+	# layout_mode=0 에서 add_child 후 size 가 minimum_size 로 덮어써질 수 있어 target_w 명시 (bar_w=211)
+	LabelUtils.fit_text(entry["name_lbl"], 14, 9, 211.0)
 	var sig_node_spawn: Label = _attach_signature_icon(entry["panel"], enemy.get("mythology"))
 	entry["sig_icon"] = sig_node_spawn
 	if sig_node_spawn != null:
@@ -1259,6 +1261,7 @@ func _setup_heroes() -> void:
 		entry["status_box"].visible = true
 		entry["hero_id"] = hero.hero_id
 		entry["name_lbl"].text = tr(hero.get("hero_name")) if hero.get("hero_name") != null else hero.hero_id
+		LabelUtils.fit_text(entry["name_lbl"], 16, 10, 211.0)
 
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
@@ -1312,6 +1315,7 @@ func _setup_enemies() -> void:
 		entry["btn"].visible = true
 		entry["btn"].disabled = false
 		entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
+		LabelUtils.fit_text(entry["name_lbl"], 14, 9, 211.0)
 
 		# 신화 시그니처 아이콘 + 툴팁 — panel 우측 상단
 		var sig_node_setup: Label = _attach_signature_icon(entry["panel"], enemy.get("mythology"))
@@ -1731,8 +1735,9 @@ func _refresh_hand() -> void:
 		var arc_pos: Vector2 = fan_pivot + Vector2(sin(angle), -cos(angle)) * FAN_PIVOT_Y_OFFSET
 		node.position = arc_pos - half_card
 		node.rotation = angle
-		node.pivot_offset = Vector2(70, 100)
-		node.scale = Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE)
+		# v2(modern) 는 native 가 1.4x 라서 pivot 도 1.4x, scale 은 1/1.4 보정 → effective 동일
+		node.pivot_offset = Vector2(70, 100) * GameSettings.get_card_native_pivot_mul()
+		node.scale = Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE) * GameSettings.get_card_native_scale()
 		node.z_index = 1500 + i  # 카드 — UI 와 같은 영역
 		node.set_meta("_fan_pos", node.position)
 		node.set_meta("_fan_rot", node.rotation)
@@ -1837,8 +1842,9 @@ func _on_card_hovered(_card: Resource, card_node: Control) -> void:
 		var base_pos: Vector2 = btn.get_meta("_fan_pos")
 		var base_rot: float = btn.get_meta("_fan_rot")
 		var tw := create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+		var nsm := GameSettings.get_card_native_scale()
 		if idx == hover_idx:
-			var hover_scale := BASE_CARD_SCALE * 1.4
+			var hover_scale := BASE_CARD_SCALE * 1.4 * nsm
 			# 호버 후 카드 하단 y = base_pos.y + hover_scale * 100 + 100
 			var card_bottom := base_pos.y + hover_scale * 100.0 + 100.0
 			var lift := maxf(60.0, card_bottom - (WINDOW_H - 20.0))
@@ -1852,13 +1858,14 @@ func _on_card_hovered(_card: Resource, card_node: Control) -> void:
 			var falloff: float = maxf(0.0, 1.0 - abs(dist) / 4.0)
 			tw.tween_property(btn, "position", base_pos + Vector2(sign_x * 35.0 * falloff, 0), 0.12)
 			tw.tween_property(btn, "rotation", base_rot, 0.12)
-			tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE), 0.12)
+			tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE) * nsm, 0.12)
 			btn.z_index = 1500 + idx
 
 func _on_card_unhovered(_card: Resource) -> void:
 	_reset_hand_fan()
 
 func _reset_hand_fan() -> void:
+	var nsm := GameSettings.get_card_native_scale()
 	for btn in _card_buttons:
 		if not is_instance_valid(btn):
 			continue
@@ -1866,7 +1873,7 @@ func _reset_hand_fan() -> void:
 		var tw := create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 		tw.tween_property(btn, "position", btn.get_meta("_fan_pos"), 0.12)
 		tw.tween_property(btn, "rotation", btn.get_meta("_fan_rot"), 0.12)
-		tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE), 0.12)
+		tw.tween_property(btn, "scale", Vector2(BASE_CARD_SCALE, BASE_CARD_SCALE) * nsm, 0.12)
 		btn.z_index = 1500 + idx
 
 func _on_enemy_pressed(index: int) -> void:
@@ -5522,8 +5529,8 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 
 		var card_node: Control = _make_card()
 		card_node.position     = base_pos
-		card_node.pivot_offset = Vector2(70.0, 200.0)
-		card_node.scale        = base_scale
+		card_node.pivot_offset = Vector2(70.0, 200.0) * GameSettings.get_card_native_pivot_mul()
+		card_node.scale        = base_scale * GameSettings.get_card_native_scale()
 		card_node.setup(card_res, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 

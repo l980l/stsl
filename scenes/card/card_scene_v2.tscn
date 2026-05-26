@@ -15,13 +15,13 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.584, 0.455, 0.129, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 shadow_color = Color(0, 0, 0, 0.55)
-shadow_size = 6
-shadow_offset = Vector2(0, 4)
+shadow_size = 8
+shadow_offset = Vector2(0.0, 5.6)
 
 [sub_resource type="Gradient" id="Gradient_shadow"]
 colors = PackedColorArray(0.027, 0.027, 0.039, 0, 0.027, 0.027, 0.039, 0.55)
@@ -29,8 +29,8 @@ colors = PackedColorArray(0.027, 0.027, 0.039, 0, 0.027, 0.027, 0.039, 0.55)
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_shadow"]
 gradient = SubResource("Gradient_shadow")
 width = 16
-fill_from = Vector2(0.5, 0)
-fill_to = Vector2(0.5, 1)
+fill_from = Vector2(0.7, 0.0)
+fill_to = Vector2(0.7, 1.4)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rule"]
 bg_color = Color(0, 0, 0, 0)
@@ -73,7 +73,7 @@ border_width_bottom = 1
 border_color = Color(0, 0, 0, 0.6)
 
 [sub_resource type="PlaceholderTexture2D" id="Placeholder_cost"]
-size = Vector2(21, 21)
+size = Vector2(29.4, 29.4)
 
 [sub_resource type="Gradient" id="Gradient_line_l"]
 colors = PackedColorArray(0.584, 0.455, 0.129, 0, 0.584, 0.455, 0.129, 0.7)
@@ -88,130 +88,130 @@ colors = PackedColorArray(0.584, 0.455, 0.129, 0.7, 0.584, 0.455, 0.129, 0)
 gradient = SubResource("Gradient_line_r")
 
 [sub_resource type="PlaceholderTexture2D" id="Placeholder_gem"]
-size = Vector2(9, 9)
+size = Vector2(12.6, 12.6)
 
 [node name="CardSceneV2" type="Control" unique_id=1330872495]
-custom_minimum_size = Vector2(140, 200)
+custom_minimum_size = Vector2(196.0, 280.0)
 layout_mode = 3
 anchors_preset = 0
-offset_right = 140.0
-offset_bottom = 200.0
+offset_right = 196.0
+offset_bottom = 280.0
 script = ExtResource("1_v2script")
 
 [node name="Frame" type="Panel" parent="." unique_id=1273565362]
 layout_mode = 0
-offset_right = 140.0
-offset_bottom = 200.0
+offset_right = 196.0
+offset_bottom = 280.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_frame")
 
 [node name="ShadowOverlay" type="TextureRect" parent="." unique_id=874512389]
 layout_mode = 0
-offset_left = 1.0
-offset_top = 1.0
-offset_right = 139.0
-offset_bottom = 199.0
+offset_left = 1.4
+offset_top = 1.4
+offset_right = 194.6
+offset_bottom = 278.6
 mouse_filter = 2
 texture = SubResource("GradientTexture2D_shadow")
 expand_mode = 1
 
 [node name="InnerRule" type="Panel" parent="." unique_id=276562183]
 layout_mode = 0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 135.0
-offset_bottom = 195.0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 189.0
+offset_bottom = 273.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_rule")
 
 [node name="CornerTL" type="Panel" parent="." unique_id=269738367]
 layout_mode = 0
-offset_left = 3.0
-offset_top = 3.0
-offset_right = 11.0
-offset_bottom = 11.0
+offset_left = 4.2
+offset_top = 4.2
+offset_right = 15.4
+offset_bottom = 15.4
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_corner_tl")
 
 [node name="CornerTR" type="Panel" parent="." unique_id=1923953633]
 layout_mode = 0
-offset_left = 129.0
-offset_top = 3.0
-offset_right = 137.0
-offset_bottom = 11.0
+offset_left = 180.6
+offset_top = 4.2
+offset_right = 191.8
+offset_bottom = 15.4
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_corner_tr")
 
 [node name="CornerBL" type="Panel" parent="." unique_id=980835143]
 layout_mode = 0
-offset_left = 3.0
-offset_top = 189.0
-offset_right = 11.0
-offset_bottom = 197.0
+offset_left = 4.2
+offset_top = 264.6
+offset_right = 15.4
+offset_bottom = 275.8
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_corner_bl")
 
 [node name="CornerBR" type="Panel" parent="." unique_id=334956132]
 layout_mode = 0
-offset_left = 129.0
-offset_top = 189.0
-offset_right = 137.0
-offset_bottom = 197.0
+offset_left = 180.6
+offset_top = 264.6
+offset_right = 191.8
+offset_bottom = 275.8
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_corner_br")
 
 [node name="ArtFrame" type="Panel" parent="." unique_id=161980784]
 layout_mode = 0
-offset_left = 10.0
-offset_top = 32.0
-offset_right = 130.0
-offset_bottom = 132.0
+offset_left = 14.0
+offset_top = 44.8
+offset_right = 182.0
+offset_bottom = 184.8
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_art")
 
 [node name="ArtRect" type="TextureRect" parent="." unique_id=1097503263]
 layout_mode = 0
-offset_left = 10.0
-offset_top = 32.0
-offset_right = 130.0
-offset_bottom = 132.0
+offset_left = 14.0
+offset_top = 44.8
+offset_right = 182.0
+offset_bottom = 184.8
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 6
 
 [node name="CostBg" type="TextureRect" parent="." unique_id=1408420737]
 layout_mode = 0
-offset_left = 7.0
-offset_top = 7.0
-offset_right = 28.0
-offset_bottom = 28.0
+offset_left = 9.8
+offset_top = 9.8
+offset_right = 39.2
+offset_bottom = 39.2
 mouse_filter = 2
 texture = SubResource("Placeholder_cost")
 expand_mode = 1
 
 [node name="CostLabel" type="Label" parent="." unique_id=1077509395]
 layout_mode = 0
-offset_left = 7.0
-offset_top = 7.0
-offset_right = 28.0
-offset_bottom = 28.0
+offset_left = 9.8
+offset_top = 9.8
+offset_right = 39.2
+offset_bottom = 39.2
 theme_type_variation = &"AccentLabel"
 theme_override_colors/font_color = Color(0.961, 0.941, 0.91, 1)
 theme_override_fonts/font = ExtResource("2_cinzel")
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 15
 text = "1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TitleLabel" type="Label" parent="." unique_id=1214445657]
 layout_mode = 0
-offset_left = 29.0
-offset_top = 8.0
-offset_right = 126.0
-offset_bottom = 28.0
+offset_left = 40.6
+offset_top = 11.2
+offset_right = 176.4
+offset_bottom = 39.2
 theme_type_variation = &"AccentLabel"
 theme_override_colors/font_color = Color(0.961, 0.941, 0.91, 1)
-theme_override_font_sizes/font_size = 9
+theme_override_font_sizes/font_size = 13
 text = "Card Name"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -219,43 +219,43 @@ clip_text = true
 
 [node name="LineL" type="TextureRect" parent="." unique_id=740757914]
 layout_mode = 0
-offset_left = 19.0
-offset_top = 137.0
-offset_right = 64.0
-offset_bottom = 138.0
+offset_left = 26.6
+offset_top = 191.8
+offset_right = 89.6
+offset_bottom = 193.2
 mouse_filter = 2
 texture = SubResource("GradientTexture1D_line_l")
 expand_mode = 1
 
 [node name="LineR" type="TextureRect" parent="." unique_id=2121055424]
 layout_mode = 0
-offset_left = 76.0
-offset_top = 137.0
-offset_right = 121.0
-offset_bottom = 138.0
+offset_left = 106.4
+offset_top = 191.8
+offset_right = 169.4
+offset_bottom = 193.2
 mouse_filter = 2
 texture = SubResource("GradientTexture1D_line_r")
 expand_mode = 1
 
 [node name="GemTr" type="TextureRect" parent="." unique_id=816732923]
 layout_mode = 0
-offset_left = 65.5
-offset_top = 132.5
-offset_right = 74.5
-offset_bottom = 141.5
+offset_left = 91.7
+offset_top = 185.5
+offset_right = 104.3
+offset_bottom = 198.1
 mouse_filter = 2
 texture = SubResource("Placeholder_gem")
 expand_mode = 1
 
 [node name="DescLabel" type="Label" parent="." unique_id=67934319]
 layout_mode = 0
-offset_left = 8.0
-offset_top = 144.0
-offset_right = 132.0
-offset_bottom = 194.0
+offset_left = 11.2
+offset_top = 201.6
+offset_right = 184.8
+offset_bottom = 271.6
 theme_override_colors/font_color = Color(0.929, 0.898, 0.831, 1)
 theme_override_constants/line_spacing = -1
-theme_override_font_sizes/font_size = 7
+theme_override_font_sizes/font_size = 10
 text = "Card description."
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -264,10 +264,10 @@ autowrap_mode = 2
 [node name="TypeIcon" type="TextureRect" parent="." unique_id=1868612427]
 modulate = Color(1, 1, 1, 0.4)
 layout_mode = 0
-offset_left = 112.0
-offset_top = 172.0
-offset_right = 136.0
-offset_bottom = 196.0
+offset_left = 156.8
+offset_top = 240.8
+offset_right = 190.4
+offset_bottom = 274.4
 mouse_filter = 2
 texture = ExtResource("3_attack")
 expand_mode = 1

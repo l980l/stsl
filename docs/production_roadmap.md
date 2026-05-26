@@ -1112,6 +1112,21 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - 🔲 터치 타겟 크기 최소 44dp 보장
 - 🔲 카드 드래그 앤 드롭 모바일 터치 최적화
 
+### 8-1.5. 시각 sharpening — PC 해상도/창 크기 무관 sharp 보장 (진행 중)
+- 🔲 SubViewport supersampling 구조 도입 (PC 전용)
+  - 현재: raster 폰트 atlas size 가 fixed → 비정수 stretch 시 blur (4K 모니터 윈도우 모드, 1440p 풀스크린 등)
+  - 해결: main scene 을 SubViewport 로 wrap, SubViewport size 를 현재 윈도우 size 와 동적 일치
+  - 효과: 모든 해상도/창 크기에서 폰트·UI sharp 보장
+- 🔲 모바일은 기존 raster + native viewport 유지 (디바이스 해상도 고정 → 1:1 sharp, supersampling 부담 회피)
+- 🔲 작업 분해
+  - 새 root wrapper scene 생성 (`scenes/main_root.tscn` + `.gd`) — SubViewportContainer + SubViewport
+  - window resize signal → SubViewport size 자동 갱신
+  - `SceneTransition.go()` — `change_scene_to_file` 대신 SubViewport 자식 교체
+  - `OS.has_feature("mobile")` 분기로 SubViewport 우회 옵션
+  - ProjectSettings main_scene 을 wrapper 로 변경
+  - 모든 scene transition 회귀 테스트 (main_menu → chapter → hero → map → battle → reward → ...)
+- 🔲 모바일 빌드에서는 자동 비활성 (또는 옵션 토글)
+
 ### 8-2. Android 빌드
 - 🔲 Godot Android Export 설정
 - 🔲 APK / AAB 빌드 테스트

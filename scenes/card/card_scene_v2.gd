@@ -238,10 +238,10 @@ func refresh() -> void:
 	_cost_label.text = str(_cost)
 	_title_label.text = _card_name
 	# 제목 폰트 자동 조절 — 긴 텍스트는 폭에 맞춰 축소 (기존 card_scene 패턴)
-	LabelUtils.fit_text(_title_label, 9, 6)
+	LabelUtils.fit_text(_title_label, 13, 9)
 	_desc_label.text = _desc
 	# 설명 폰트 자동 조절 — autowrap 라벨이므로 라인 수 × 라인 높이가 영역 초과 시 축소
-	LabelUtils.fit_text(_desc_label, 7, 5)
+	LabelUtils.fit_text(_desc_label, 10, 7)
 	_art_rect.texture = _art_texture
 	# Type icon
 	match _card_type:
