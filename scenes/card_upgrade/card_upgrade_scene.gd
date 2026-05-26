@@ -58,6 +58,8 @@ func _build_ui(upgradeable: Array) -> void:
 
 	for card: Resource in upgradeable:
 		var node: Control = _make_card()
+		node.scale = Vector2.ONE * GameSettings.get_card_native_scale()
+		node.pivot_offset = Vector2(70.0, 100.0) * GameSettings.get_card_native_pivot_mul()
 		node.setup(card, node.Mode.UPGRADE)
 		node.card_clicked.connect(func(c): _on_card_selected(c))
 		grid.add_child(node)

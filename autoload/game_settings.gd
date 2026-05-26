@@ -107,6 +107,15 @@ func set_cam_zoom_speed(key: String) -> void:
 	cam_zoom_speed_key = key
 	cam_zoom_speed_multiplier = CAM_ZOOM_SPEED_VALUES[idx]
 
+# v2 카드(modern) 는 native size 가 v1 의 1.4 배 (font raster atlas 가 render size 와 일치 → sharp).
+# 외부 spawn 사이트가 v1 기준 scale 을 적용해도 effective size 가 동일하도록 1/1.4 보정 multiplier 제공.
+# pivot_offset 도 같은 값으로 곱해야 함 (multiplier 의 역수 — pivot 은 native 좌표라 v2 가 이미 1.4 배).
+func get_card_native_scale() -> float:
+	return 1.0 / 1.4 if card_frame_key == "modern" else 1.0
+
+func get_card_native_pivot_mul() -> float:
+	return 1.4 if card_frame_key == "modern" else 1.0
+
 func set_card_frame(key: String) -> void:
 	if CARD_FRAME_KEYS.find(key) < 0:
 		return
