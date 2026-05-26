@@ -1695,6 +1695,7 @@ func _resolve_actor_info(actor_id: String) -> Dictionary:
 	return {"name": actor_id, "color": Color(0.5, 0.5, 0.5)}
 
 func _on_locale_changed_battle(_locale: String) -> void:
+	# 적 이름
 	for i in _enemy_nodes.size():
 		var entry: Dictionary = _enemy_nodes[i]
 		if entry.is_empty() or not entry.has("name_lbl"):
@@ -1705,6 +1706,24 @@ func _on_locale_changed_battle(_locale: String) -> void:
 		var enemy: Resource = BattleManager.get_enemy(i)
 		if enemy != null and enemy.get("enemy_name") != null:
 			lbl.text = tr(enemy.get("enemy_name"))
+	# 영웅 이름
+	for h_entry in _hero_nodes:
+		if h_entry.is_empty() or not h_entry.has("name_lbl"):
+			continue
+		var h_lbl: Label = h_entry["name_lbl"]
+		if not is_instance_valid(h_lbl):
+			continue
+		var hid: String = h_entry.get("hero_id", "")
+		if hid == "":
+			continue
+		var hero: Resource = null
+		for h in TeamManager.heroes:
+			if h.hero_id == hid:
+				hero = h
+				break
+		if hero != null and hero.get("hero_name") != null:
+			h_lbl.text = tr(hero.get("hero_name"))
+			LabelUtils.fit_text(h_lbl, 16, 10, 211.0)
 
 func _on_card_frame_changed_battle(_key: String) -> void:
 	# 핸드 노드 전부 swap. 덱 보기 열려 있으면 자동으로 닫히지는 않음 (다음 열 때 새 frame 반영).
