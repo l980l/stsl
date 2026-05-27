@@ -1,6 +1,6 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-05-23 v26)
+> 작성일: 2026-04-17 (최종 동기화: 2026-05-27 v27 — i18n 라이브 갱신 + 키워드 namespace 정리)
 > 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** + **시너지 시스템 v2(15종 전면 재설계·토큰 합동공격·SFX 컴프레서, PR #190·#191·#198)** + **데미지 모디파이어 버킷 재설계(`compute_damage()` 단일 파이프라인·합/곱 버킷·툴팁 표기, PR #196·#197)** + **VFX·UX 후속(시너지 VFX/SFX 동기화·sacrifice_bank 상태이상·정복자의 기세·황제의 무도 VFX·dispel/form_change/counter GPU 하이브리드 변환·LifeDrain VFX, PR #192~#195·#202)** + **영웅 전신 일러스트(배틀씬·영웅 선택씬, PR #189)** + **UI 폴리싱 v2(몬스터 정체성 13종 리스킨·Museum Mat 프레임·Sacred Cursors 9종·덱·턴 아이콘, PR #199~#202)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
@@ -1543,3 +1543,31 @@ node.pivot_offset = Vector2(70, 100)   # CardScene 내부 카드 중심점 (loca
 - [ ] MIT 라이선스 명시
 - [ ] `plugin.cfg` 작성
 - [ ] AssetLib 제출 (에셋 카테고리: 2D / UI)
+
+---
+
+## i18n 인프라 강화 (PR #210·#211 + i18n-status-keywords)
+
+### 동기
+
+- 배틀씬 일부 UI (turn queue, 배너 메시지, 상태이상 툴팁, 설정창) 가 언어 변경 시 즉시 갱신되지 않음. 한 턴 또는 reload 후에만 새 locale 반영.
+- 상태이상 시그니처 desc (예: `signature.egyptian.desc`) 가 한국어/다국어 column 에 raw 영어 (ATTACK, vulnerable, strength, block 등) 박혀있음 → 사용자가 한국어 모드에서도 영어 단어 혼재 노출.
+
+### ✅ 완료 작업
+
+#### 1. 라이브 locale 갱신 (PR #211)
+- `_on_locale_changed_battle` 가 turn queue widget, 모든 enemy/hero UI (status icon + intent), 배틀 배너 메시지 (`_refresh_message_for_current_actor`) 까지 즉시 갱신.
+- 설정창은 locale 변경 시 인스턴스 자체 `queue_free` → 다음 open 시 새 인스턴스 → `_ready` 가 새 locale 로 tr() 재호출. BATTLE/SHOP 처럼 reload 안 하는 씬에서 효과.
+
+#### 2. raw 영어 키워드 분리 (브랜치 feat/i18n-status-keywords)
+- `signature.X.desc` (5개 시그니처) + `battle.signature.X.desc` (5개) — 동적 합성 패턴 적용. CSV 의 영어 단어 → `%s` placeholder, 코드에서 `_signature_desc_args` / `_battle_sig_desc_args` 헬퍼로 args 합성.
+- `power.echo_next_attack.desc` — placeholder 패턴 (사용처 없는 dead 키지만 일관성).
+- `power.{bonus_per_hit, morale_to_dmg, cards_played_bonus}.desc` — column 별 placeholder 위치 통일이 자연어 어순상 어려워 dead 키 (사용처 없음) → CSV 직접 자국어 단어 치환.
+- 신규 `keyword.X` 9종 추가 (14언어): `attack` / `block` / `damage` / `heal` / `sacrifice` / `draw` / `discard` / `exhaust` / `summon`.
+- 가이드 문서: [`docs/i18n_keyword_guide.md`](i18n_keyword_guide.md) — `status.X.name` (상태 이름) vs `keyword.X` (동작 용어) namespace 구분, 신규 desc 작성 규칙, 호출처 패턴.
+
+### 🔲 향후 과제
+
+- 신규 카드 효과 / 시그니처 desc 추가 시 `i18n_keyword_guide.md` 의 규칙 (placeholder + 동적 합성) 따라야. 신규 raw 영어 발견 시 keyword.X 추가 + 호출처 args 합성.
+- `_message_label` 의 동적 메시지 중 `_refresh_message_for_current_actor` 가 커버하는 영웅/적 차례 외 (예: drag hint, debug, victory/intro) 는 phase 전환 시 자연스러운 갱신에 의존 — 필요 시 별도 핸들러 추가.
+- `power.X.desc` 가 활성 power 박스에 표시되도록 _make_power_item 확장 시 dead 키들도 placeholder 패턴으로 통일 필요.
