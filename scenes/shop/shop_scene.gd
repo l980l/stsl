@@ -189,9 +189,7 @@ func _build_card_section() -> void:
 		var cx := start_x + i * (CARD_W + CARD_GAP)
 
 		var node: Control = _make_card()
-		node.position     = Vector2(cx, 174)
-		node.pivot_offset = Vector2(CARD_W / 2.0, CARD_H) * GameSettings.get_card_native_pivot_mul()
-		node.scale        = Vector2.ONE * GameSettings.get_card_native_scale()
+		GameSettings.apply_card_transform(node, Vector2(cx, 174), Vector2(CARD_W / 2.0, CARD_H), 1.0)
 		node.setup(card, CardScene.Mode.REWARD)
 		add_child(node)
 
@@ -225,14 +223,14 @@ func _show_card_hover(node: Control) -> void:
 		_card_tweens[node].kill()
 	node.z_index = 50
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(1.5, 1.5) * GameSettings.get_card_native_scale(), 0.22)
+	tw.tween_property(node, "scale", GameSettings.get_card_scale(1.5), 0.22)
 	_card_tweens[node] = tw
 
 func _clear_card_hover(node: Control) -> void:
 	if node in _card_tweens:
 		_card_tweens[node].kill()
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2.ONE * GameSettings.get_card_native_scale(), 0.16)
+	tw.tween_property(node, "scale", GameSettings.get_card_scale(1.0), 0.16)
 	tw.tween_callback(func():
 		if is_instance_valid(node):
 			node.z_index = 0
@@ -733,9 +731,7 @@ func _show_upgrade_panel(price: int) -> void:
 		grid.add_child(wrapper)
 
 		var card_node: Control = _make_card()
-		card_node.position     = Vector2(-1.75, -5.0)
-		card_node.pivot_offset = Vector2(70.0, 200.0) * GameSettings.get_card_native_pivot_mul()
-		card_node.scale        = Vector2(0.975, 0.975) * GameSettings.get_card_native_scale()
+		GameSettings.apply_card_transform(card_node, Vector2(-1.75, -5.0), Vector2(70.0, 200.0), 0.975)
 		card_node.setup(card, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 
@@ -778,14 +774,14 @@ func _show_upgrade_card_hover(node: Control) -> void:
 		node.reparent(_upgrade_overlay, true)
 	node.z_index = 50
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(1.5, 1.5) * GameSettings.get_card_native_scale(), 0.22)
+	tw.tween_property(node, "scale", GameSettings.get_card_scale(1.5), 0.22)
 	_upgrade_card_tweens[node] = tw
 
 func _clear_upgrade_card_hover(node: Control) -> void:
 	if node in _upgrade_card_tweens:
 		_upgrade_card_tweens[node].kill()
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(0.975, 0.975) * GameSettings.get_card_native_scale(), 0.16)
+	tw.tween_property(node, "scale", GameSettings.get_card_scale(0.975), 0.16)
 	tw.tween_callback(func():
 		if not is_instance_valid(node):
 			return
@@ -795,8 +791,7 @@ func _clear_upgrade_card_hover(node: Control) -> void:
 			_upgrade_card_parents.erase(node)
 			if is_instance_valid(orig):
 				node.reparent(orig, false)
-				node.position = Vector2(-1.75, -5.0)
-				node.scale    = Vector2(0.975, 0.975) * GameSettings.get_card_native_scale()
+				GameSettings.apply_card_transform(node, Vector2(-1.75, -5.0), Vector2(70.0, 200.0), 0.975)
 	)
 	_upgrade_card_tweens[node] = tw
 

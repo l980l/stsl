@@ -33,7 +33,21 @@ const CAM_ZOOM_SPEED_DEFAULT := "normal"
 
 # 카드 프레임 — classic (기존 PNG frame + 좌상 gem) / modern (신규 — 중앙 gem + brass border)
 const CARD_FRAME_KEYS    := ["classic", "modern"]
-const CARD_FRAME_DEFAULT := "classic"
+const CARD_FRAME_DEFAULT := "modern"
+
+# MSAA 2D — 카드 부채꼴 회전·StyleBox 외곽·둥근 모서리 가장자리 anti-alias.
+# Viewport.MSAA enum: 0=DISABLED, 1=MSAA_2X, 2=MSAA_4X, 3=MSAA_8X
+const MSAA_KEYS    := ["off", "2x", "4x", "8x"]
+const MSAA_VALUES  := [0, 1, 2, 3]
+const MSAA_DEFAULT := "2x"
+
+# 윈도우 해상도 — resizable=false 라 사용자 임의 resize 안 됨. 설정창에서만 변경.
+# 1080p (viewport 와 동일) = 1:1 sharp. 그 외는 비례 stretch (raster atlas 보간).
+# "fullscreen" = 독점 전체화면 (WINDOW_MODE_EXCLUSIVE_FULLSCREEN) — 진짜 풀스크린.
+# "borderless" = 테두리 없는 전체화면 창 (WINDOW_MODE_FULLSCREEN) — alt-tab 빠름.
+const WINDOW_SIZE_KEYS    := ["720p", "1080p", "1440p", "2160p", "fullscreen", "borderless"]
+const WINDOW_SIZE_VALUES  := [Vector2i(1280, 720), Vector2i(1920, 1080), Vector2i(2560, 1440), Vector2i(3840, 2160), Vector2i.ZERO, Vector2i.ZERO]
+const WINDOW_SIZE_DEFAULT := "1080p"
 
 const _CONFIG_PATH := "user://game_settings.cfg"
 
@@ -53,6 +67,8 @@ var hero_zoom_enabled: bool = HERO_ZOOM_DEFAULT
 var cam_zoom_speed_key: String = CAM_ZOOM_SPEED_DEFAULT
 var cam_zoom_speed_multiplier: float = 1.0
 var card_frame_key: String = CARD_FRAME_DEFAULT
+var msaa_key: String = MSAA_DEFAULT
+var window_size_key: String = WINDOW_SIZE_DEFAULT
 
 # 설정 변경 시그널 — 변경 즉시 반영 필요한 곳에서 구독
 @warning_ignore("unused_signal")
@@ -63,6 +79,47 @@ signal card_frame_changed(key: String)
 
 func _ready() -> void:
 	load_settings()
+	# 멀티 모니터 환경에서 부팅 시 윈도우 위치가 화면 밖에 걸칠 수 있음
+	# (헤더 잘림 등) → 첫 1회만 현재 모니터 중앙으로 정렬.
+	call_deferred("_center_window_on_boot")
+
+func _center_window_on_boot() -> void:
+	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
+		return
+	var screen := DisplayServer.window_get_current_screen()
+	# usable_rect = taskbar 제외한 작업 영역. 헤더가 항상 보이도록.
+	var usable := DisplayServer.screen_get_usable_rect(screen)
+	var win_size := DisplayServer.window_get_size()
+	var header_h := _get_header_height()
+	# Godot 의 window_set_position 은 client area 기준 → 헤더는 그 위에 그려짐.
+	# 헤더가 usable 안에 들어오도록 y 최소값을 usable.position.y + header_h 로.
+	var x: int = usable.position.x + int(max(0, usable.size.x - win_size.x)) / 2
+	var y_centered: int = usable.position.y + int(max(0, usable.size.y - win_size.y)) / 2
+	var y: int = int(max(y_centered, usable.position.y + header_h))
+	DisplayServer.window_set_position(Vector2i(x, y))
+
+# Godot 의 window_set_position 은 client area 기준이라 헤더(타이틀바)는 그 위에 그려짐.
+# decoration 포함 위치와 client 위치의 차이로 헤더 높이를 계산.
+func _get_header_height() -> int:
+	var content_pos := DisplayServer.window_get_position()
+	var deco_pos := DisplayServer.window_get_position_with_decorations()
+	return max(0, content_pos.y - deco_pos.y)
+
+# 현재 모니터의 usable 영역에 들어갈 수 있는 해상도 키만 반환.
+# fullscreen/borderless 는 size=ZERO 라 항상 포함.
+func get_available_window_size_keys() -> Array:
+	var screen := DisplayServer.window_get_current_screen()
+	var usable := DisplayServer.screen_get_usable_rect(screen)
+	var out: Array = []
+	for i in WINDOW_SIZE_KEYS.size():
+		var key: String = WINDOW_SIZE_KEYS[i]
+		var val: Vector2i = WINDOW_SIZE_VALUES[i]
+		if val == Vector2i.ZERO:
+			out.append(key)
+			continue
+		if val.x <= usable.size.x and val.y <= usable.size.y:
+			out.append(key)
+	return out
 
 # ── setter (segment 키 받음. multiplier 자동 갱신) ──
 func set_vfx_speed(key: String) -> void:
@@ -116,6 +173,31 @@ func get_card_native_scale() -> float:
 func get_card_native_pivot_mul() -> float:
 	return 1.4 if card_frame_key == "modern" else 1.0
 
+# v2 native 1.4 배 + pivot/scale multiplier 적용 시 카드 visual offset 어긋남 (우측 하단 이동) 보정.
+# 기존 spawn 코드가 v1 기준 (pivot × (1 - outer_scale)) 의 visual offset 을 가정하고 position 계산.
+# v2 변경으로 그 보정이 사라져서 spawn 위치 차이 발생 → 이 헬퍼로 position 보정값 반환.
+# v1 인 경우 multiplier 1.0 라 반환값 0 (영향 없음).
+func get_card_visual_offset(base_pivot: Vector2, outer_scale: float) -> Vector2:
+	var pivot_mul := get_card_native_pivot_mul()
+	var scale_mul := get_card_native_scale()
+	var new_pivot := base_pivot * pivot_mul
+	var new_scale := outer_scale * scale_mul
+	var old_visual := base_pivot * (1.0 - outer_scale)
+	var new_visual := new_pivot * (1.0 - new_scale)
+	return old_visual - new_visual
+
+# 카드 노드의 transform (position/pivot/scale) 일괄 적용 — multiplier + visual_offset 자동 처리.
+# 사용: GameSettings.apply_card_transform(node, base_pos, Vector2(70, 200), 0.975)
+func apply_card_transform(node: Control, base_pos: Vector2, base_pivot: Vector2, outer_scale: float) -> void:
+	node.position = base_pos + get_card_visual_offset(base_pivot, outer_scale)
+	node.pivot_offset = base_pivot * get_card_native_pivot_mul()
+	node.scale = Vector2(outer_scale, outer_scale) * get_card_native_scale()
+
+# Hover/Reset tween 의 target scale — multiplier 자동 적용.
+# 사용: tw.tween_property(node, "scale", GameSettings.get_card_scale(1.5), 0.22)
+func get_card_scale(outer_scale: float) -> Vector2:
+	return Vector2(outer_scale, outer_scale) * get_card_native_scale()
+
 func set_card_frame(key: String) -> void:
 	if CARD_FRAME_KEYS.find(key) < 0:
 		return
@@ -123,6 +205,44 @@ func set_card_frame(key: String) -> void:
 		return
 	card_frame_key = key
 	card_frame_changed.emit(key)
+
+func set_msaa(key: String) -> void:
+	var idx := MSAA_KEYS.find(key)
+	if idx < 0:
+		return
+	msaa_key = key
+	# Window/Viewport msaa_2d 즉시 적용
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		tree.root.msaa_2d = MSAA_VALUES[idx]
+
+func set_window_size(key: String) -> void:
+	var idx := WINDOW_SIZE_KEYS.find(key)
+	if idx < 0:
+		return
+	window_size_key = key
+	if key == "fullscreen":
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+		return
+	if key == "borderless":
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		return
+	# windowed 복귀 (fullscreen 이었을 경우 포함)
+	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	# resizable 런타임 강제 (project.godot 만으론 에디터 캐싱으로 미반영 가능)
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, true)
+	var new_size: Vector2i = WINDOW_SIZE_VALUES[idx]
+	DisplayServer.window_set_size(new_size)
+	# 위치는 유지하되, 헤더가 항상 보이도록 usable_rect + 헤더 마진 안으로 클램프
+	var screen := DisplayServer.window_get_current_screen()
+	var usable := DisplayServer.screen_get_usable_rect(screen)
+	var header_h := _get_header_height()
+	var pos := DisplayServer.window_get_position()
+	pos.x = clamp(pos.x, usable.position.x, usable.position.x + max(0, usable.size.x - new_size.x))
+	# y 최소값에 헤더 마진을 더해 client area 가 헤더만큼 아래로 — 헤더가 usable 안에 들어옴
+	pos.y = clamp(pos.y, usable.position.y + header_h, usable.position.y + max(header_h, usable.size.y - new_size.y))
+	DisplayServer.window_set_position(pos)
 
 # ── 적용된 값 조회 (battle_manager 등이 사용) ──
 func get_vfx_delay(base: float) -> float:
@@ -148,6 +268,8 @@ func save_settings() -> void:
 	cfg.set_value("gameplay", "hero_zoom_enabled", hero_zoom_enabled)
 	cfg.set_value("gameplay", "cam_zoom_speed", cam_zoom_speed_key)
 	cfg.set_value("graphics", "card_frame", card_frame_key)
+	cfg.set_value("graphics", "msaa", msaa_key)
+	cfg.set_value("graphics", "window_size", window_size_key)
 	cfg.save(_CONFIG_PATH)
 
 func load_settings() -> void:
@@ -162,6 +284,8 @@ func load_settings() -> void:
 		set_hero_zoom_enabled(HERO_ZOOM_DEFAULT)
 		set_cam_zoom_speed(CAM_ZOOM_SPEED_DEFAULT)
 		set_card_frame(CARD_FRAME_DEFAULT)
+		set_msaa(MSAA_DEFAULT)
+		set_window_size(WINDOW_SIZE_DEFAULT)
 		return
 	set_particle_quality(cfg.get_value("graphics", "particle_quality", PARTICLE_DEFAULT))
 	set_vfx_speed(cfg.get_value("gameplay", "vfx_speed", VFX_SPEED_DEFAULT))
@@ -173,3 +297,5 @@ func load_settings() -> void:
 	set_hero_zoom_enabled(cfg.get_value("gameplay", "hero_zoom_enabled", HERO_ZOOM_DEFAULT))
 	set_cam_zoom_speed(cfg.get_value("gameplay", "cam_zoom_speed", CAM_ZOOM_SPEED_DEFAULT))
 	set_card_frame(cfg.get_value("graphics", "card_frame", CARD_FRAME_DEFAULT))
+	set_msaa(cfg.get_value("graphics", "msaa", MSAA_DEFAULT))
+	set_window_size(cfg.get_value("graphics", "window_size", WINDOW_SIZE_DEFAULT))

@@ -303,9 +303,7 @@ func _build_card_grid(cx: float) -> void:
 		cell.add_child(wrapper)
 
 		var card_node: Control = _make_card()
-		card_node.position = Vector2(70.0 * (card_scale - 1.0), 200.0 * (card_scale - 1.0))
-		card_node.pivot_offset = Vector2(70.0, 200.0) * GameSettings.get_card_native_pivot_mul()
-		card_node.scale = Vector2(card_scale, card_scale) * GameSettings.get_card_native_scale()
+		GameSettings.apply_card_transform(card_node, Vector2(70.0 * (card_scale - 1.0), 200.0 * (card_scale - 1.0)), Vector2(70.0, 200.0), card_scale)
 		card_node.setup(card, CardScene.Mode.REWARD)
 		wrapper.add_child(card_node)
 
