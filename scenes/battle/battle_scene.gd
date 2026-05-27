@@ -20,9 +20,9 @@ const SLOT_H := 280
 # 캐릭터 스프라이트 영역 — character_placeholder._SPRITE_W/H (80) × char_node.scale (1.44, 2.4)
 const SPRITE_AREA_W := 115.2  # 80 * 1.44
 const SPRITE_AREA_H := 192.0  # 80 * 2.4
-# 캐릭터 노드의 position.y(slot.y + 184) 에서 발(slot.y + SLOT_H)까지 offset.
-# 바닥 VFX(룬링/글리프)를 발밑에 정렬할 때 사용.
-const _CHAR_FOOT_Y_OFFSET := float(SLOT_H - 184)
+# 캐릭터 노드의 position.y(slot.y + 174) 기준 발 끝까지의 offset.
+# sprite 자체 절반 높이 (placeholder 80 × scale 2.4 / 2). 바닥 VFX 정렬용.
+const _CHAR_FOOT_Y_OFFSET := 96.0
 const BOTTOM_Y := 840
 const CARD_W := 110
 const CARD_H := 160
@@ -79,6 +79,7 @@ var _hero_char_nodes: Dictionary = {}  # hero_id → Node2D
 var _enemy_char_nodes: Array = []      # index → Node2D
 
 var _energy_label: Label
+var _energy_hbox: HBoxContainer
 var _end_turn_btn: TextureButton
 var _message_label: Label
 var _relic_container: FlowContainer
@@ -306,12 +307,12 @@ func _build_ui() -> void:
 	const _ENERGY_CENTER_X := WINDOW_W - 110  # 기존 hbox 중심 유지
 
 	# 에너지 UI — 아이콘 + 숫자만, 핸드 구분선 높이에 맞춤
-	var energy_hbox := HBoxContainer.new()
-	energy_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	energy_hbox.add_theme_constant_override("separation", 17)  # 14 → +20%
-	energy_hbox.position = Vector2(_ENERGY_CENTER_X - _ENERGY_W / 2, BOTTOM_Y - 26)
-	energy_hbox.size = Vector2(_ENERGY_W, _ENERGY_H)
-	add_child(energy_hbox)
+	_energy_hbox = HBoxContainer.new()
+	_energy_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	_energy_hbox.add_theme_constant_override("separation", 17)  # 14 → +20%
+	_energy_hbox.position = Vector2(_ENERGY_CENTER_X - _ENERGY_W / 2, BOTTOM_Y - 26)
+	_energy_hbox.size = Vector2(_ENERGY_W, _ENERGY_H)
+	add_child(_energy_hbox)
 
 	var energy_icon := TextureRect.new()
 	energy_icon.texture = IconUtils.get_energy_icon()
@@ -320,14 +321,14 @@ func _build_ui() -> void:
 	energy_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	energy_icon.modulate = SacredPalette.BRASS_300
 	energy_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	energy_hbox.add_child(energy_icon)
+	_energy_hbox.add_child(energy_icon)
 
 	_energy_label = Label.new()
 	_energy_label.theme_type_variation = "EyebrowLabel"
 	_energy_label.add_theme_font_size_override("font_size", 26)  # 22 → +20%
 	_energy_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_energy_label.text = "0/3"
-	energy_hbox.add_child(_energy_label)
+	_energy_hbox.add_child(_energy_label)
 
 	# 덱 보기(에너지 위) / 턴 종료(에너지 아래) — 중심 x 정렬, 세로로 분리해 클릭 실수 방지
 	var _icon_x: int = _ENERGY_CENTER_X - int(_ICON_BTN_PX / 2.0)
@@ -411,7 +412,7 @@ func _build_ui() -> void:
 	# (영웅/적 패널은 캐릭터 따라가야 해서 self 자식 유지)
 	if _ui_layer:
 		for n in [banner, _end_turn_btn, deck_btn, hand_rule, hand_diamond,
-				_relic_container, _active_powers_box, _turn_queue_box]:
+				_relic_container, _active_powers_box, _turn_queue_box, _energy_hbox]:
 			if n != null and is_instance_valid(n):
 				n.reparent(_ui_layer)
 
@@ -463,12 +464,12 @@ func _make_hero_slot(index: int) -> Dictionary:
 	# 패널 전체(240×280) L자 코너 브래킷 — 기존 영역 마커 복원
 	SacredTheme.add_corner_brackets(panel, SacredPalette.BRASS_500, 16, 2, 1)
 	# Museum Mat 프레임 — 안쪽 art 영역 = 실제 스프라이트 영역(115.2×192) 정합
-	# 매트 4px 추가하여 외곽, 스프라이트 중심(y+184) 기준 세로 중앙·패널 가로 중앙
+	# 매트 4px 추가하여 외곽, 스프라이트 중심(y+174) 기준 세로 중앙·패널 가로 중앙
 	var _mat: int = MuseumMatFrame.MAT_INSET
 	var _fw: float = SPRITE_AREA_W + _mat * 2
 	var _fh: float = SPRITE_AREA_H + _mat * 2
 	var _fx: float = (SLOT_W - _fw) / 2.0
-	var _fy: float = 184.0 - _fh / 2.0
+	var _fy: float = 174.0 - _fh / 2.0
 	SacredTheme.add_museum_mat_frame(panel, Rect2(_fx, _fy, _fw, _fh))
 
 	var bar_w: float = 211.0
@@ -529,12 +530,12 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	# 패널 전체(240×280) L자 코너 브래킷 — 기존 영역 마커 복원
 	SacredTheme.add_corner_brackets(panel, SacredPalette.BRASS_500, 16, 2, 1)
 	# Museum Mat 프레임 — 안쪽 art 영역 = 실제 스프라이트 영역(115.2×192) 정합
-	# 매트 4px 추가하여 외곽, 스프라이트 중심(y+184) 기준 세로 중앙·패널 가로 중앙
+	# 매트 4px 추가하여 외곽, 스프라이트 중심(y+174) 기준 세로 중앙·패널 가로 중앙
 	var _mat: int = MuseumMatFrame.MAT_INSET
 	var _fw: float = SPRITE_AREA_W + _mat * 2
 	var _fh: float = SPRITE_AREA_H + _mat * 2
 	var _fx: float = (SLOT_W - _fw) / 2.0
-	var _fy: float = 184.0 - _fh / 2.0
+	var _fy: float = 174.0 - _fh / 2.0
 	SacredTheme.add_museum_mat_frame(panel, Rect2(_fx, _fy, _fw, _fh))
 
 	var bar_w: float = 211.0
@@ -1132,7 +1133,7 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 	var slot_pos: Vector2 = _enemy_slot_pos(enemy_index, total)
 	if enemy.character_scene != null:
 		var char_node = enemy.character_scene.instantiate()
-		char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
+		char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 174)
 		char_node.scale = Vector2(-1.44, 2.4)
 		char_node.z_index = int(slot_pos.y + SLOT_H)
 		# 발 그림자 — char_node 메타에 저장 (사망 시 제거)
@@ -1266,7 +1267,7 @@ func _setup_heroes() -> void:
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
 			var slot_pos := _hero_slot_pos(i)
-			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
+			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 174)
 			char_node.scale = Vector2(1.44, 2.4)
 			# 발 위치(=panel 발) 기준 z_index — fg sprite 와 동일 규칙
 			char_node.z_index = int(slot_pos.y + SLOT_H)
@@ -1326,7 +1327,7 @@ func _setup_enemies() -> void:
 		var slot_pos: Vector2 = _enemy_slot_pos(i, total)
 		if enemy.character_scene != null:
 			var char_node = enemy.character_scene.instantiate()
-			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 184)
+			char_node.position = Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + 174)
 			char_node.scale = Vector2(-1.44, 2.4)
 			char_node.z_index = int(slot_pos.y + SLOT_H)
 			# 발 그림자 — char_node 메타에 저장 (사망 시 제거)
@@ -1610,12 +1611,12 @@ func _any_counter_window_charging() -> bool:
 func _build_turn_queue_widget() -> void:
 	_turn_queue_box = HBoxContainer.new()
 	_turn_queue_box.position = Vector2(20, 18)
-	_turn_queue_box.size = Vector2(WINDOW_W - 40, 34)
+	_turn_queue_box.size = Vector2(WINDOW_W - 40, 34)  # 줄바꿈 fallback 시 2줄 수용 (이론 최소)
 	_turn_queue_box.add_theme_constant_override("separation", 6)
 	add_child(_turn_queue_box)  # _build_ui 끝에서 _ui_layer 로 reparent 됨
 	for i in range(TURN_QUEUE_PREVIEW_COUNT):
 		var slot := PanelContainer.new()
-		slot.custom_minimum_size = Vector2(96, 30)
+		slot.custom_minimum_size = Vector2(96, 34)
 		var sbx := StyleBoxFlat.new()
 		sbx.bg_color = Color(0.08, 0.07, 0.05, 0.85)
 		sbx.border_color = SacredPalette.BRASS_300
@@ -1671,8 +1672,8 @@ func _refresh_turn_queue_widget() -> void:
 		var info: Dictionary = _resolve_actor_info(aid)
 		slot["label"].text = info["name"]
 		slot["swatch"].color = info["color"]
-		# 폰트 크기 자동 조절 — 슬롯 너비 72px (80 - 좌우 4px padding) 안에 맞춤
-		LabelUtils.fit_text(slot["label"], 11, 7, 72.0)
+		# 폰트 크기 자동 조절 — 슬롯 너비 72px 안에 맞춤. min 폰트에서도 초과면 줄바꿈 (idempotent).
+		LabelUtils.fit_text(slot["label"], 11, 7, 72.0, -1.0, true)
 		# 현재 차례 = 첫 슬롯 강조 (밝게)
 		slot["root"].modulate = Color(1.0, 1.0, 1.0, 1.0) if i == 0 else Color(1.0, 1.0, 1.0, 0.7)
 
@@ -1724,6 +1725,15 @@ func _on_locale_changed_battle(_locale: String) -> void:
 		if hero != null and hero.get("hero_name") != null:
 			h_lbl.text = tr(hero.get("hero_name"))
 			LabelUtils.fit_text(h_lbl, 16, 10, 211.0)
+	# turn queue 라벨 즉시 갱신 (한 턴 기다리지 않도록)
+	_refresh_turn_queue_widget()
+	# status_box 안의 상태이상 아이콘 + intent 라벨 즉시 갱신
+	for i in _enemy_nodes.size():
+		_update_enemy_ui(i)
+	for h_entry in _hero_nodes:
+		var hid: String = h_entry.get("hero_id", "")
+		if hid != "":
+			_update_hero_ui(hid)
 
 func _on_card_frame_changed_battle(_key: String) -> void:
 	# 핸드 노드 전부 swap. 덱 보기 열려 있으면 자동으로 닫히지는 않음 (다음 열 때 새 frame 반영).
@@ -2162,7 +2172,8 @@ func _play_status_flash(node: Node2D, status_color: Color) -> void:
 	if node.has_method("flash"):
 		node.flash(Color(status_color.r, status_color.g, status_color.b, 0.85), 0.45)
 
-func _play_hit_shake(node: Node2D, amount: int) -> void:
+func _play_hit_shake(node: Node2D, amount: int, direction: int = -1) -> void:
+	# direction: -1 = 영웅 (좌측으로 밀림), +1 = 몬스터 (우측으로 밀림 — 영웅이 친 방향)
 	if node == null or amount <= 0: return
 	if node.has_meta("_shake_tween"):
 		var prev: Tween = node.get_meta("_shake_tween")
@@ -2174,10 +2185,11 @@ func _play_hit_shake(node: Node2D, amount: int) -> void:
 	elif amount >= 30: mag = 12.0
 	var orig: Vector2 = node.position
 	node.set_meta("_shake_orig_pos", orig)
+	var dir: float = float(sign(direction)) if direction != 0 else -1.0
 	var tw := create_tween()
-	tw.tween_property(node, "position", orig + Vector2(-mag, 0), 0.04)
-	tw.tween_property(node, "position", orig + Vector2(mag * 0.7, 0), 0.06)
-	tw.tween_property(node, "position", orig + Vector2(-mag * 0.4, 0), 0.06)
+	tw.tween_property(node, "position", orig + Vector2(mag * dir, 0), 0.04)
+	tw.tween_property(node, "position", orig + Vector2(-mag * 0.7 * dir, 0), 0.06)
+	tw.tween_property(node, "position", orig + Vector2(mag * 0.4 * dir, 0), 0.06)
 	tw.tween_property(node, "position", orig, 0.08)
 	node.set_meta("_shake_tween", tw)
 
@@ -3930,7 +3942,7 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "", is_crit:
 	var char_node = _hero_char_nodes.get(hero_id)
 	if char_node:
 		_play_hit_flash(char_node)
-		_play_hit_shake(char_node, amount)
+		_play_hit_shake(char_node, amount, -1)  # 영웅 — 좌측으로 밀림
 		if dtype == "ice":
 			_apply_frozen_tint(char_node)
 		elif dtype == "fire":
@@ -4040,7 +4052,7 @@ func _apply_enemy_hit_feedback(index: int, amount: int, dtype: String, is_crit: 
 	var char_node = _enemy_char_nodes[index] if index < _enemy_char_nodes.size() else null
 	if char_node:
 		_play_hit_flash(char_node)
-		_play_hit_shake(char_node, amount)
+		_play_hit_shake(char_node, amount, 1)  # 몬스터 — 영웅이 친 방향 (우측) 으로 밀림
 		if dtype == "ice":
 			_apply_frozen_tint(char_node)
 		elif dtype == "fire":
@@ -4599,10 +4611,8 @@ func _on_enemy_died(index: int) -> void:
 				_spawn_boss_death(char_node.global_position, _foot_pos(char_node))
 			else:
 				_spawn_death_dissolve(char_node.global_position)
-			if char_node.has_node("AnimationPlayer"):
-				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-				if ap.has_animation("death"):
-					ap.play("death")
+			# AnimationPlayer 'death' 는 sprite 를 안 보이게 만들기 때문에 호출하지 않음.
+			# dissolve VFX 만으로 사망 시각 표현 (sprite 자체는 그대로 남음)
 		# 처치 순간 킬캠 (옵션 켜져있으면)
 		if char_node:
 			_play_kill_cam(char_node.global_position)
