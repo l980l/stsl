@@ -168,6 +168,36 @@ func _trf(key: String, args) -> String:
 		return s % args
 	return s
 
+# 신화 시그니처 desc 의 %s placeholder 에 들어갈 번역된 키워드 args 배열.
+# signature.X.desc 가 동적 합성 형식으로 변경 (Attack/Vulnerable 등 raw 영어 제거).
+func _signature_desc_args(mythology: String) -> Array:
+	match mythology:
+		"greek", "norse":
+			return [tr("status.strength.name")]
+		"egyptian":
+			return [tr("keyword.attack"), tr("status.vulnerable.name")]
+		"daoist":
+			return [tr("status.strength.name"), tr("keyword.block")]
+		"japanese":
+			return [tr("keyword.block")]
+		_:
+			return []  # buddhist 등 raw 키워드 없는 desc
+
+# battle.signature.X.desc 키 → placeholder args.
+# 시그니처 보스 emoji 아이콘 / 활성 시너지 tooltip 에 사용.
+func _battle_sig_desc_args(desc_key: String) -> Array:
+	match desc_key:
+		"battle.signature.hubris.desc", "battle.signature.ragnarok.desc":
+			return [tr("status.strength.name")]
+		"battle.signature.egyptian_curse.desc":
+			return [tr("status.vulnerable.name")]
+		"battle.signature.yin_yang.desc":
+			return [tr("status.strength.name"), tr("keyword.block")]
+		"battle.signature.kekkai.desc":
+			return [tr("keyword.block")]
+		_:
+			return []  # battle.signature.karma.desc 및 일반 synergy desc
+
 func _ready() -> void:
 	# y-sort: 캐릭터·전경 SVG 모두 같은 좌표계 — y 큰(아래) 노드가 위로 자동 정렬
 	y_sort_enabled = true
@@ -607,7 +637,7 @@ func _refresh_hud() -> void:
 	for child in _relic_container.get_children():
 		child.queue_free()
 	for s in BattleManager.get_active_synergies():
-		var tip: String = "%s\n%s" % [tr(s["name_key"]), tr(s["desc_key"])]
+		var tip: String = "%s\n%s" % [tr(s["name_key"]), _trf(s["desc_key"], _battle_sig_desc_args(s["desc_key"]))]
 		var tex: Texture2D = IconUtils.get_synergy_icon(s["name_key"])
 		if tex != null:
 			var rect := TextureRect.new()
@@ -1107,7 +1137,7 @@ func _attach_signature_icon(panel: ColorRect, mythology) -> Label:
 	lbl.position = pp + Vector2(panel.size.x - 34.0, 4.0)
 	lbl.size = Vector2(26, 28)
 	add_child(lbl)
-	SacredTheme.attach_tooltip(lbl, tr(info["desc_key"]))
+	SacredTheme.attach_tooltip(lbl, _trf(info["desc_key"], _battle_sig_desc_args(info["desc_key"])))
 	return lbl
 
 # T3-SUMMON: 런타임에 spawn된 적의 UI 패널 + 캐릭터 노드 추가
@@ -4898,6 +4928,10 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	elif key == "charm_resistance":
 		var threshold: int = BattleManager.CHARM_THRESHOLD_BASE + val
 		tooltip = tr("status.charm_resistance.desc") % [val, threshold]
+	# poison_dmg — 피해량 + 남은 지속 턴 수 동적 표시
+	elif key == "poison_dmg":
+		var dur: int = status.get("poison_dur", 0)
+		tooltip = tr("status.poison_dmg.desc") % [val, dur]
 	# marked_by — Array. 적용 대상 (영웅/적) 으로 desc 분기.
 	# - 영웅 status: Array of enemy_index → 적 공격이 그 영웅에 치명타 +30%
 	# - 적 status: Array of hero_id → 모든 영웅 공격이 그 적에 치명타 +30%
@@ -5046,7 +5080,7 @@ func _refresh_status_icons_enemy(index: int) -> void:
 		if enemy_res.get("signatures_enabled") and enemy_res.mythology != "" and _signature_still_active(enemy_res.mythology, status):
 			var sig_key: String = "sig_" + enemy_res.mythology
 			var sig_lbl: Control = _make_status_label(sig_key, 1, {})
-			SacredTheme.attach_tooltip(sig_lbl, _trf("signature.%s.desc" % enemy_res.mythology, 0))
+			SacredTheme.attach_tooltip(sig_lbl, _trf("signature.%s.desc" % enemy_res.mythology, _signature_desc_args(enemy_res.mythology)))
 			box.add_child(sig_lbl)
 	# marked_by — Array (영웅 ID list). 비어있지 않으면 아이콘 + 부여 영웅 수 표시.
 	var marked_by_arr: Array = status.get("marked_by", [])
