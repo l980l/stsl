@@ -268,6 +268,10 @@ func _on_apply() -> void:
 		var live_states := [gm.GameState.BATTLE, gm.GameState.SHOP] if gm != null else []
 		if gm == null or not (gm.current_state in live_states):
 			get_tree().reload_current_scene.call_deferred()
+		else:
+			# 씬 reload 안 하는 경우 settings 인스턴스 자체 free — 다음 open 시
+			# settings_button 이 새로 instantiate → _ready 가 새 locale 로 tr() 재호출
+			call_deferred("queue_free")
 
 func _on_cancel() -> void:
 	close()
