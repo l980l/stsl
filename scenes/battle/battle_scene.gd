@@ -1734,6 +1734,29 @@ func _on_locale_changed_battle(_locale: String) -> void:
 		var hid: String = h_entry.get("hero_id", "")
 		if hid != "":
 			_update_hero_ui(hid)
+	# 배틀 메시지 라벨 (배너 중앙) 즉시 갱신 — 현재 차례 actor 기반으로 재구성
+	_refresh_message_for_current_actor()
+
+# 현재 actor (영웅/적) 에 맞는 메시지 라벨 재구성. locale 변경 시 + 차례 시작 시 호출.
+func _refresh_message_for_current_actor() -> void:
+	var aid: String = BattleManager.get_current_actor_id()
+	if aid == "":
+		return
+	if aid.begins_with("hero:"):
+		var hid: String = aid.substr(5)
+		var hero_name: String = hid
+		if TeamManager != null:
+			var hero_res = TeamManager.get_hero(hid)
+			if hero_res != null:
+				hero_name = tr(hero_res.hero_name)
+		_message_label.text = "%s — %s" % [hero_name, tr("battle.msg_player_turn")]
+	elif aid.begins_with("enemy:"):
+		var idx: int = int(aid.substr(6))
+		var ename: Resource = BattleManager.get_enemy(idx)
+		var label_text: String = tr("battle.msg_enemy_turn")
+		if ename != null:
+			label_text = "%s — %s" % [tr(ename.enemy_name), tr("battle.msg_enemy_turn")]
+		_message_label.text = label_text
 
 func _on_card_frame_changed_battle(_key: String) -> void:
 	# 핸드 노드 전부 swap. 덱 보기 열려 있으면 자동으로 닫히지는 않음 (다음 열 때 새 frame 반영).
