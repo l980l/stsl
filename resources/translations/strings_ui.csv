@@ -163,3 +163,6 @@ ui.settings.card_frame.modern,모던,Modern,Moderne,Moderno,Moderno,モダン,Μ
 ui.settings.card_frame.locked,전투 중에는 변경할 수 없습니다.,Cannot be changed during battle.,Modification impossible en combat.,Non modificabile in combattimento.,No se puede cambiar en combate.,戦闘中は変更できません。,Δεν αλλάζει κατά τη μάχη.,战斗中无法更改。,戰鬥中無法變更。,Нельзя изменить в бою.,Não pode alterar em batalha.,Nie można zmienić podczas walki.,Während des Kampfes nicht änderbar.
 ui.settings.msaa,안티에일리어싱,Anti-aliasing,Anti-crénelage,Antialiasing,Suavizado,アンチエイリアス,Εξομάλυνση,抗锯齿,抗鋸齒,Сглаживание,Antisserrilhamento,Antyaliasing,Kantenglättung
 ui.settings.msaa.off,꺼짐,Off,Off,Off,Apagado,オフ,Απενεργ.,关闭,關閉,Выкл,Desligado,Wyłączony,Aus
+ui.settings.window_size,화면 해상도,Resolution,Résolution,Risoluzione,Resolución,解像度,Ανάλυση,分辨率,解析度,Разрешение,Resolução,Rozdzielczość,Auflösung
+ui.settings.window_size.fullscreen,전체 화면,Fullscreen,Plein écran,Schermo intero,Pantalla completa,フルスクリーン,Πλήρης οθόνη,全屏,全螢幕,Полный экран,Tela cheia,Pełny ekran,Vollbild
+ui.settings.window_size.borderless,테두리 없는 창,Borderless,Sans bordure,Senza bordi,Sin bordes,ボーダーレス,Χωρίς πλαίσιο,无边框,無邊框,Без рамки,Sem bordas,Bez ramki,Randlos

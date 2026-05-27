@@ -11,7 +11,7 @@ extends CanvasLayer
 
 const _CURSOR_SIZES:    Dictionary = {"S": 32, "M": 48, "L": 64, "XL": 96}
 const _DEFAULT_KEY   := "M"
-const _TABS          := [["sound", "ui.settings.sound"], ["graphics", "ui.settings.graphics"], ["gameplay", "ui.settings.gameplay"], ["language", "ui.settings.language_tab"]]
+const _TABS          := [["graphics", "ui.settings.graphics"], ["gameplay", "ui.settings.gameplay"], ["sound", "ui.settings.sound"], ["language", "ui.settings.language_tab"]]
 
 # multiplier 값 → "x1.0" 형식 라벨 (GDScript 는 %g 미지원 → str() 사용)
 static func _x_label(value: float) -> String:
@@ -46,7 +46,7 @@ var _volume_labels:   Dictionary = {}
 # graphics/gameplay segment 상태 (key: 옵션 그룹 이름, value: { initial, pending, buttons:Dict[key→Button] })
 var _seg_groups: Dictionary = {}
 
-var _active_tab:  String     = "sound"
+var _active_tab:  String     = "graphics"
 var _tab_btns:    Dictionary = {}
 var _tab_panels:  Dictionary = {}
 
@@ -124,7 +124,7 @@ func _ready() -> void:
 	_build_gameplay_panel()
 	_build_language_panel()
 
-	_switch_tab("sound")
+	_switch_tab("graphics")
 
 func _add_h_line(parent: Control, y: float, x1: float, x2: float) -> void:
 	var line := TextureRect.new()
@@ -196,7 +196,6 @@ func open() -> void:
 	_initial_locale_idx = LocaleManager.LOCALES.find(LocaleManager.current_locale)
 	_pending_cursor_px  = _initial_cursor_px
 	_pending_locale_idx = _initial_locale_idx
-	_lang_opt.selected  = _initial_locale_idx
 	_applying = false
 	_refresh_seg()
 
@@ -218,6 +217,8 @@ func open() -> void:
 		"kill_cam":         "on" if GameSettings.kill_cam_enabled else "off",
 		"card_frame":       GameSettings.card_frame_key,
 		"msaa":             GameSettings.msaa_key,
+		"window_size":      GameSettings.window_size_key,
+		"language":         LocaleManager.current_locale,
 	}
 	for gid in current_keys:
 		if _seg_groups.has(gid):
@@ -274,7 +275,6 @@ func _on_cancel() -> void:
 func _on_defaults() -> void:
 	_set_pending_cursor(_CURSOR_SIZES[_DEFAULT_KEY])
 	_pending_locale_idx = _initial_locale_idx
-	_lang_opt.selected  = _initial_locale_idx
 	for bkey in _AUDIO_DEFAULTS:
 		var dv: float = _AUDIO_DEFAULTS[bkey]
 		AudioManager.set_bus_volume(bkey, dv)
@@ -291,6 +291,8 @@ func _on_defaults() -> void:
 		"kill_cam":         "on" if GameSettings.KILL_CAM_DEFAULT else "off",
 		"card_frame":       GameSettings.CARD_FRAME_DEFAULT,
 		"msaa":             GameSettings.MSAA_DEFAULT,
+		"window_size":      GameSettings.WINDOW_SIZE_DEFAULT,
+		"language":         LocaleManager.LOCALES[_initial_locale_idx],
 	}
 	for gid in defaults:
 		if not _seg_groups.has(gid):
@@ -400,73 +402,93 @@ func _build_graphics_panel() -> void:
 	var p := _tab_panels["graphics"] as Control
 	var mono := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
 
-	# Row 1: 커서 크기 (기존 cursor segment)
-	_build_cursor_seg_row(p, mono, 24.0)
+	# Row 1: 화면 해상도 — resizable=false 라 설정창에서만 변경.
+	# fullscreen/borderless 옆에 모니터 해상도 표시 (예: "전체 화면 (1920 x 1080)")
+	var screen := DisplayServer.window_get_current_screen()
+	var ssize := DisplayServer.screen_get_size(screen)
+	var screen_label := "%d x %d" % [ssize.x, ssize.y]
+	_build_option_row(p, 24.0, tr("ui.settings.window_size"), "window_size",
+		GameSettings.get_available_window_size_keys(),
+		{
+			"720p": "1280 x 720",
+			"1080p": "1920 x 1080",
+			"1440p": "2560 x 1440",
+			"2160p": "3840 x 2160",
+			"fullscreen": "%s (%s)" % [tr("ui.settings.window_size.fullscreen"), screen_label],
+			"borderless": "%s (%s)" % [tr("ui.settings.window_size.borderless"), screen_label],
+		},
+		GameSettings.window_size_key,
+		func(k: String) -> void: GameSettings.set_window_size(k))
 
-	# Row 2: 파티클 갯수 (graphics) — 라벨도 "xVAL" 형식 (x0.25/x0.5/x1.0)
-	_build_seg_row(p, mono, 80.0, tr("ui.settings.particle_quality"), "particle",
-		GameSettings.PARTICLE_KEYS,
-		_build_x_labels(GameSettings.PARTICLE_KEYS, GameSettings.PARTICLE_VALUES),
-		GameSettings.particle_key,
-		func(k: String) -> void: GameSettings.set_particle_quality(k))
-
-	# Row 3: 카드 프레임 (classic / modern) — 전투/상점 포함 라이브 swap
-	_build_seg_row(p, mono, 136.0, tr("ui.settings.card_frame"), "card_frame",
-		GameSettings.CARD_FRAME_KEYS,
-		{"classic": tr("ui.settings.card_frame.classic"), "modern": tr("ui.settings.card_frame.modern")},
-		GameSettings.card_frame_key,
-		func(k: String) -> void: GameSettings.set_card_frame(k))
-
-	# Row 4: MSAA 2D (off/2x/4x/8x) — 카드 부채꼴 회전·StyleBox 외곽 anti-alias
-	_build_seg_row(p, mono, 192.0, tr("ui.settings.msaa"), "msaa",
+	# Row 2: 안티에일리어싱 (MSAA 2D) — 카드 부채꼴 회전·StyleBox 외곽 anti-alias
+	_build_seg_row(p, mono, 80.0, tr("ui.settings.msaa"), "msaa",
 		GameSettings.MSAA_KEYS,
 		{"off": tr("ui.settings.msaa.off"), "2x": "2x", "4x": "4x", "8x": "8x"},
 		GameSettings.msaa_key,
 		func(k: String) -> void: GameSettings.set_msaa(k))
 
+	# Row 3: 파티클 갯수 — 라벨 "xVAL" 형식 (x0.1/x0.25/x0.5/x1.0)
+	_build_seg_row(p, mono, 136.0, tr("ui.settings.particle_quality"), "particle",
+		GameSettings.PARTICLE_KEYS,
+		_build_x_labels(GameSettings.PARTICLE_KEYS, GameSettings.PARTICLE_VALUES),
+		GameSettings.particle_key,
+		func(k: String) -> void: GameSettings.set_particle_quality(k))
+
+	# Row 4: 카드 프레임 (classic / modern) — 전투/상점 포함 라이브 swap
+	_build_seg_row(p, mono, 192.0, tr("ui.settings.card_frame"), "card_frame",
+		GameSettings.CARD_FRAME_KEYS,
+		{"classic": tr("ui.settings.card_frame.classic"), "modern": tr("ui.settings.card_frame.modern")},
+		GameSettings.card_frame_key,
+		func(k: String) -> void: GameSettings.set_card_frame(k))
+
+	# Row 5: 커서 크기 (cursor segment)
+	_build_cursor_seg_row(p, mono, 248.0)
+
 func _build_gameplay_panel() -> void:
 	var p := _tab_panels["gameplay"] as Control
 	var mono := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
 
-	# 각 segment 라벨은 multiplier 값 기반 ("x1.0" 형식)
-	_build_seg_row(p, mono, 24.0, tr("ui.settings.vfx_speed"), "vfx_speed",
-		GameSettings.VFX_SPEED_KEYS,
-		_build_x_labels(GameSettings.VFX_SPEED_KEYS, GameSettings.VFX_SPEED_VALUES),
-		GameSettings.vfx_speed_key,
-		func(k: String) -> void: GameSettings.set_vfx_speed(k))
-
-	_build_seg_row(p, mono, 80.0, tr("ui.settings.anim_speed"), "anim_speed",
-		GameSettings.ANIM_SPEED_KEYS,
-		_build_x_labels(GameSettings.ANIM_SPEED_KEYS, GameSettings.ANIM_SPEED_VALUES),
-		GameSettings.anim_speed_key,
-		func(k: String) -> void: GameSettings.set_anim_speed(k))
-
-	_build_seg_row(p, mono, 136.0, tr("ui.settings.turn_interval"), "turn_interval",
-		GameSettings.TURN_INTERVAL_KEYS,
-		_build_x_labels(GameSettings.TURN_INTERVAL_KEYS, GameSettings.TURN_INTERVAL_VALUES),
-		GameSettings.turn_interval_key,
-		func(k: String) -> void: GameSettings.set_turn_interval(k))
-
-	# 킬캠 (처치/사망 시 슬로우 + 카메라 줌인)
-	_build_seg_row(p, mono, 192.0, tr("ui.settings.kill_cam"), "kill_cam",
-		["off", "on"],
-		{"off": tr("ui.settings.off"), "on": tr("ui.settings.on")},
-		"on" if GameSettings.kill_cam_enabled else "off",
-		func(k: String) -> void: GameSettings.set_kill_cam_enabled(k == "on"))
-
-	# 영웅 차례 카메라 줌인 (개체 차례 시스템)
-	_build_seg_row(p, mono, 248.0, tr("ui.settings.hero_zoom"), "hero_zoom",
+	# Row 1: 영웅 차례 카메라 줌인 (개체 차례 시스템)
+	_build_seg_row(p, mono, 24.0, tr("ui.settings.hero_zoom"), "hero_zoom",
 		["off", "on"],
 		{"off": tr("ui.settings.off"), "on": tr("ui.settings.on")},
 		"on" if GameSettings.hero_zoom_enabled else "off",
 		func(k: String) -> void: GameSettings.set_hero_zoom_enabled(k == "on"))
 
-	# 카메라 줌 전환 속도
-	_build_seg_row(p, mono, 304.0, tr("ui.settings.cam_zoom_speed"), "cam_zoom_speed",
+	# Row 2: 킬캠 (처치/사망 시 슬로우 + 카메라 줌인)
+	_build_seg_row(p, mono, 80.0, tr("ui.settings.kill_cam"), "kill_cam",
+		["off", "on"],
+		{"off": tr("ui.settings.off"), "on": tr("ui.settings.on")},
+		"on" if GameSettings.kill_cam_enabled else "off",
+		func(k: String) -> void: GameSettings.set_kill_cam_enabled(k == "on"))
+
+	# Row 3: 카메라 줌 전환 속도
+	_build_seg_row(p, mono, 136.0, tr("ui.settings.cam_zoom_speed"), "cam_zoom_speed",
 		GameSettings.CAM_ZOOM_SPEED_KEYS,
 		_build_x_labels(GameSettings.CAM_ZOOM_SPEED_KEYS, GameSettings.CAM_ZOOM_SPEED_VALUES),
 		GameSettings.cam_zoom_speed_key,
 		func(k: String) -> void: GameSettings.set_cam_zoom_speed(k))
+
+	# Row 4: VFX 속도
+	_build_seg_row(p, mono, 192.0, tr("ui.settings.vfx_speed"), "vfx_speed",
+		GameSettings.VFX_SPEED_KEYS,
+		_build_x_labels(GameSettings.VFX_SPEED_KEYS, GameSettings.VFX_SPEED_VALUES),
+		GameSettings.vfx_speed_key,
+		func(k: String) -> void: GameSettings.set_vfx_speed(k))
+
+	# Row 5: 애니메이션 속도
+	_build_seg_row(p, mono, 248.0, tr("ui.settings.anim_speed"), "anim_speed",
+		GameSettings.ANIM_SPEED_KEYS,
+		_build_x_labels(GameSettings.ANIM_SPEED_KEYS, GameSettings.ANIM_SPEED_VALUES),
+		GameSettings.anim_speed_key,
+		func(k: String) -> void: GameSettings.set_anim_speed(k))
+
+	# Row 6: 차례 전환 인터벌
+	_build_seg_row(p, mono, 304.0, tr("ui.settings.turn_interval"), "turn_interval",
+		GameSettings.TURN_INTERVAL_KEYS,
+		_build_x_labels(GameSettings.TURN_INTERVAL_KEYS, GameSettings.TURN_INTERVAL_VALUES),
+		GameSettings.turn_interval_key,
+		func(k: String) -> void: GameSettings.set_turn_interval(k))
 
 # 일반 segment row 빌더 — 라벨 + N개 버튼. group_id 로 _seg_groups 등록.
 func _build_seg_row(parent: Control, mono: Font, row_y: float, label_text: String,
@@ -539,9 +561,141 @@ func _on_seg_pressed(group_id: String, key: String, on_select: Callable) -> void
 func _refresh_seg_group(group_id: String) -> void:
 	var grp: Dictionary = _seg_groups[group_id]
 	var pending: String = grp["pending"]
+	if grp.get("type", "segment") == "option":
+		var main_btn: Button = grp["main_btn"]
+		var label_map: Dictionary = grp["label_map"]
+		main_btn.text = label_map.get(pending, pending)
+		return
 	var buttons: Dictionary = grp["buttons"]
 	for k in buttons:
 		_apply_seg_style(buttons[k] as Button, k == pending)
+
+# 자체 드롭다운 행 — OptionButton 의 builtin popup 이 battle 씬에서 회색·반투명 이슈가
+# 있어, Button + PanelContainer 로 직접 만든 드롭다운으로 교체. 모든 styling 통제 가능.
+func _build_option_row(parent: Control, row_y: float, label_text: String,
+		group_id: String, keys: Array, label_map: Dictionary, current_key: String,
+		on_select: Callable) -> void:
+	var P := SacredPalette
+	var lbl := Label.new()
+	lbl.text = label_text
+	lbl.theme_type_variation = "SubLabel"
+	lbl.offset_left   = 32.0
+	lbl.offset_top    = row_y
+	lbl.offset_right  = 170.0
+	lbl.offset_bottom = row_y + 36.0
+	parent.add_child(lbl)
+	LabelUtils.fit_text(lbl, 16, 11)
+
+	# 메인 버튼 (닫힌 상태에서 표시)
+	var main_btn := Button.new()
+	main_btn.offset_left   = 180.0
+	main_btn.offset_top    = row_y - 2.0
+	main_btn.offset_right  = 520.0
+	main_btn.offset_bottom = row_y + 38.0
+	main_btn.focus_mode = Control.FOCUS_NONE
+	main_btn.text = label_map.get(current_key, current_key)
+	main_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	main_btn.add_theme_font_size_override("font_size", 14)
+	var normal_sb := StyleBoxFlat.new()
+	normal_sb.bg_color = P.INK_900
+	normal_sb.border_color = P.BRASS_700
+	normal_sb.set_border_width_all(1)
+	normal_sb.set_content_margin(SIDE_LEFT, 10)
+	normal_sb.set_content_margin(SIDE_RIGHT, 10)
+	normal_sb.set_content_margin(SIDE_TOP, 6)
+	normal_sb.set_content_margin(SIDE_BOTTOM, 6)
+	var hover_sb := normal_sb.duplicate() as StyleBoxFlat
+	hover_sb.border_color = P.BRASS_500
+	main_btn.add_theme_stylebox_override("normal",  normal_sb)
+	main_btn.add_theme_stylebox_override("hover",   hover_sb)
+	main_btn.add_theme_stylebox_override("pressed", hover_sb)
+	main_btn.add_theme_stylebox_override("focus",   hover_sb)
+	main_btn.add_theme_color_override("font_color",         P.BONE_100)
+	main_btn.add_theme_color_override("font_hover_color",   P.BRASS_300)
+	main_btn.add_theme_color_override("font_pressed_color", P.BRASS_300)
+	parent.add_child(main_btn)
+
+	# 우측 끝에 ▼ 화살표 — 드롭다운임을 시각 표시 (열림 시 ▲ 로 전환)
+	var arrow_lbl := Label.new()
+	arrow_lbl.text = "▼"
+	arrow_lbl.add_theme_color_override("font_color", P.BRASS_300)
+	arrow_lbl.add_theme_font_size_override("font_size", 10)
+	arrow_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	arrow_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	arrow_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	main_btn.add_child(arrow_lbl)
+	arrow_lbl.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
+	arrow_lbl.offset_left = -22.0
+	arrow_lbl.offset_right = -10.0
+
+	# 드롭다운 패널 (메인 버튼 클릭 시 표시) — 동일 parent 안에서 z_index 로 위로 끌어올림
+	var dropdown := PanelContainer.new()
+	dropdown.visible = false
+	dropdown.offset_left   = 180.0
+	dropdown.offset_top    = row_y + 38.0
+	dropdown.offset_right  = 520.0
+	dropdown.offset_bottom = row_y + 38.0 + keys.size() * 32.0 + 4.0
+	dropdown.z_index = 10
+	dropdown.mouse_filter = Control.MOUSE_FILTER_STOP
+	var dd_panel_sb := StyleBoxFlat.new()
+	dd_panel_sb.bg_color = P.INK_1000
+	dd_panel_sb.border_color = P.BRASS_700
+	dd_panel_sb.set_border_width_all(1)
+	dropdown.add_theme_stylebox_override("panel", dd_panel_sb)
+	parent.add_child(dropdown)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 0)
+	dropdown.add_child(vbox)
+
+	var item_buttons: Dictionary = {}
+	for i in keys.size():
+		var key: String = keys[i]
+		var item_btn := Button.new()
+		item_btn.text = label_map.get(key, key)
+		item_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		item_btn.focus_mode = Control.FOCUS_NONE
+		item_btn.custom_minimum_size = Vector2(0, 28)
+		item_btn.add_theme_font_size_override("font_size", 14)
+		var item_normal := StyleBoxFlat.new()
+		item_normal.bg_color = Color.TRANSPARENT
+		item_normal.set_content_margin(SIDE_LEFT, 10)
+		item_normal.set_content_margin(SIDE_RIGHT, 10)
+		item_normal.set_content_margin(SIDE_TOP, 4)
+		item_normal.set_content_margin(SIDE_BOTTOM, 4)
+		var item_hover := item_normal.duplicate() as StyleBoxFlat
+		item_hover.bg_color = Color(P.BRASS_700.r, P.BRASS_700.g, P.BRASS_700.b, 0.35)
+		item_btn.add_theme_stylebox_override("normal",  item_normal)
+		item_btn.add_theme_stylebox_override("hover",   item_hover)
+		item_btn.add_theme_stylebox_override("pressed", item_hover)
+		item_btn.add_theme_stylebox_override("focus",   item_normal)
+		item_btn.add_theme_color_override("font_color",         P.BONE_100)
+		item_btn.add_theme_color_override("font_hover_color",   P.BRASS_300)
+		item_btn.add_theme_color_override("font_pressed_color", P.BRASS_300)
+		vbox.add_child(item_btn)
+		item_buttons[key] = item_btn
+		item_btn.pressed.connect(func() -> void:
+			_seg_groups[group_id]["pending"] = key
+			main_btn.text = label_map.get(key, key)
+			dropdown.visible = false
+			arrow_lbl.text = "▼"
+			on_select.call(key))
+
+	main_btn.pressed.connect(func() -> void:
+		dropdown.visible = not dropdown.visible
+		arrow_lbl.text = "▲" if dropdown.visible else "▼")
+
+	_seg_groups[group_id] = {
+		"type": "option",
+		"initial": current_key,
+		"pending": current_key,
+		"main_btn": main_btn,
+		"dropdown": dropdown,
+		"item_buttons": item_buttons,
+		"label_map": label_map,
+		"keys": keys,
+		"on_select": on_select,
+	}
 
 # 기존 커서 크기 segment (cursor 만 별도 — _CURSOR_SIZES 의 px 값 직접 사용)
 func _build_cursor_seg_row(parent: Control, mono: Font, row_y: float) -> void:
@@ -604,32 +758,18 @@ func _build_cursor_seg_row(parent: Control, mono: Font, row_y: float) -> void:
 func _build_language_panel() -> void:
 	var p := _tab_panels["language"] as Control
 
-	var lbl := Label.new()
-	lbl.text = tr("ui.settings.language")
-	lbl.theme_type_variation = "SubLabel"
-	lbl.offset_left   = 32.0
-	lbl.offset_top    = 24.0
-	lbl.offset_right  = 170.0
-	lbl.offset_bottom = 60.0
-	p.add_child(lbl)
-	LabelUtils.fit_text(lbl, 16, 11)
-
-	var opt := OptionButton.new()
-	opt.offset_left   = 180.0
-	opt.offset_top    = 22.0
-	opt.offset_right  = 520.0
-	opt.offset_bottom = 62.0
-	opt.add_theme_font_size_override("font_size", 18)
-	p.add_child(opt)
-
-	# @onready 참조를 새로 생성한 버튼으로 교체
-	_lang_opt = opt
+	# 자체 드롭다운으로 교체 — battle 씬에서도 OptionButton popup 회색 이슈 없음
+	var keys: Array = []
+	var label_map: Dictionary = {}
 	for code in LocaleManager.LOCALES:
-		_lang_opt.add_item(LocaleManager.get_display_name(code))
-	_lang_opt.item_selected.connect(_on_locale_selected)
-	_style_option_button()
+		keys.append(code)
+		label_map[code] = LocaleManager.get_display_name(code)
+	_build_option_row(p, 24.0, tr("ui.settings.language"), "language",
+		keys, label_map, LocaleManager.current_locale,
+		func(k: String) -> void:
+			_pending_locale_idx = LocaleManager.LOCALES.find(k))
 
-func _style_option_button() -> void:
+func _style_option_button(opt: OptionButton) -> void:
 	var P := SacredPalette
 
 	var normal := StyleBoxFlat.new()
@@ -648,15 +788,15 @@ func _style_option_button() -> void:
 	var focus := normal.duplicate() as StyleBoxFlat
 	focus.border_color = P.BRASS_500
 
-	_lang_opt.add_theme_stylebox_override("normal",  normal)
-	_lang_opt.add_theme_stylebox_override("hover",   hover)
-	_lang_opt.add_theme_stylebox_override("pressed", hover)
-	_lang_opt.add_theme_stylebox_override("focus",   focus)
-	_lang_opt.add_theme_color_override("font_color",         P.BONE_100)
-	_lang_opt.add_theme_color_override("font_hover_color",   P.BRASS_300)
-	_lang_opt.add_theme_color_override("font_pressed_color", P.BRASS_300)
+	opt.add_theme_stylebox_override("normal",  normal)
+	opt.add_theme_stylebox_override("hover",   hover)
+	opt.add_theme_stylebox_override("pressed", hover)
+	opt.add_theme_stylebox_override("focus",   focus)
+	opt.add_theme_color_override("font_color",         P.BONE_100)
+	opt.add_theme_color_override("font_hover_color",   P.BRASS_300)
+	opt.add_theme_color_override("font_pressed_color", P.BRASS_300)
 
-	var popup := _lang_opt.get_popup()
+	var popup := opt.get_popup()
 	var pp := StyleBoxFlat.new()
 	pp.bg_color = P.INK_1000
 	pp.border_color = P.BRASS_700
@@ -669,8 +809,14 @@ func _style_option_button() -> void:
 	ph.set_border_width_all(0)
 	popup.add_theme_stylebox_override("hover", ph)
 
-	popup.add_theme_color_override("font_color",       P.BONE_100)
-	popup.add_theme_color_override("font_hover_color", P.BRASS_300)
+	# popup 모든 색 키 강제 override — battle 씬의 inherited theme 가 disabled 색으로 보이는 문제 fix
+	popup.add_theme_color_override("font_color",            P.BONE_100)
+	popup.add_theme_color_override("font_hover_color",      P.BRASS_300)
+	popup.add_theme_color_override("font_pressed_color",    P.BRASS_300)
+	popup.add_theme_color_override("font_disabled_color",   P.BONE_100)
+	popup.add_theme_color_override("font_focus_color",      P.BONE_100)
+	popup.add_theme_color_override("font_accelerator_color", P.BONE_100)
+	popup.add_theme_color_override("font_separator_color",  P.BRASS_500)
 	popup.add_theme_font_size_override("font_size", 14)
 
 func _style_slider(slider: HSlider) -> void:
