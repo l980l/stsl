@@ -17,6 +17,7 @@ const _VFX_POISON_SPLASH  = preload("res://scenes/vfx/poison_splash_gpu.gd")
 const _VFX_ACID_SPRAY     = preload("res://scenes/vfx/acid_spray_gpu.gd")
 const _VFX_NEEDLE_STING   = preload("res://scenes/vfx/needle_sting_gpu.gd")
 const _VFX_BITE_ATTACK    = preload("res://scenes/vfx/bite_attack_gpu.gd")
+const _VFX_CLAW_ATTACK    = preload("res://scenes/vfx/claw_attack_gpu.gd")
 const _VFX_ARROW_SHOT     = preload("res://scenes/vfx/arrow_shot_gpu.gd")
 const _VFX_EXPLOSION_BLAST = preload("res://scenes/vfx/explosion_blast_gpu.gd")
 const _VFX_BLUNT_SMASH    = preload("res://scenes/vfx/blunt_smash_gpu.gd")
@@ -186,6 +187,7 @@ func _vfx_impact_delay_for_damage_type(dtype: String) -> float:
 		"acid_spray":  base = _VFX_ACID_SPRAY.IMPACT_DELAY
 		"needle_sting": base = _VFX_NEEDLE_STING.IMPACT_DELAY
 		"bite_attack": base = _VFX_BITE_ATTACK.IMPACT_DELAY
+		"claw_attack": base = _VFX_CLAW_ATTACK.IMPACT_DELAY
 		"projectile":  base = _VFX_ARROW_SHOT.IMPACT_DELAY
 		"explosive":   base = _VFX_EXPLOSION_BLAST.IMPACT_DELAY
 		"blunt":       base = _VFX_BLUNT_SMASH.IMPACT_DELAY

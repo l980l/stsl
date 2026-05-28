@@ -31,13 +31,13 @@ static func seth_hound(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.egyptian.seth_hound"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 150; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 150; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "claw_attack"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.BUFF; i2.value = 2; i2.status_type = "strength"
 	var i2b := IntentRes.new()
-	i2b.action_type = IntentRes.ActionType.ATTACK; i2b.value = 150; i2b.target = IntentRes.TargetType.RANDOM; i2b.damage_type = "slash"
+	i2b.action_type = IntentRes.ActionType.ATTACK; i2b.value = 150; i2b.target = IntentRes.TargetType.RANDOM; i2b.damage_type = "claw_attack"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 280; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 280; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "claw_attack"
 	e.intent_pattern = [i1, i2, i2b, i3]
 	e.charm_resistance = 20
 	return e

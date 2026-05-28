@@ -14,7 +14,7 @@ static func minotaur(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 150; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "blunt"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 260; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 260; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "claw_attack"
 	e.intent_pattern = [i1, i2, i3]
 	e.charm_resistance = 20
 	return e
@@ -48,7 +48,7 @@ static func gorgon(scene: PackedScene) -> Resource:
 	e.mythology = "greek"
 	e.phase_thresholds = [0.5]
 	var p0i1 := IntentRes.new()
-	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 140; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "slash"
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 140; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "claw_attack"
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.DEBUFF; p0i2.value = 1; p0i2.status_type = "vulnerable"
 	p0i2.target = IntentRes.TargetType.RANDOM
@@ -58,12 +58,12 @@ static func gorgon(scene: PackedScene) -> Resource:
 	p0i4.action_type = IntentRes.ActionType.DEBUFF; p0i4.value = 1; p0i4.status_type = "vulnerable"
 	p0i4.target = IntentRes.TargetType.RANDOM
 	var p0i5 := IntentRes.new()
-	p0i5.action_type = IntentRes.ActionType.ATTACK; p0i5.value = 140; p0i5.target = IntentRes.TargetType.RANDOM; p0i5.damage_type = "slash"
+	p0i5.action_type = IntentRes.ActionType.ATTACK; p0i5.value = 140; p0i5.target = IntentRes.TargetType.RANDOM; p0i5.damage_type = "claw_attack"
 	var p0i6 := IntentRes.new()
 	p0i6.action_type = IntentRes.ActionType.DEBUFF; p0i6.value = 1; p0i6.status_type = "vulnerable"
 	p0i6.target = IntentRes.TargetType.ALL
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 160; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "slash"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 160; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "claw_attack"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.value = 2; p1i2.status_type = "vulnerable"
 	p1i2.target = IntentRes.TargetType.RANDOM
