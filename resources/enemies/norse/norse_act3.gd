@@ -55,15 +55,15 @@ static func jormungandr_shard(scene: PackedScene) -> Resource:
 	e.phase_thresholds = [0.4]
 	# 페이즈0: 공격 후 독 부여 (2인텐트 분리)
 	var p0i1 := IntentRes.new()
-	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 140; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "poison"
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 140; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "acid_spray"
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.DEBUFF; p0i2.status_type = "poison"; p0i2.value = 40
 	p0i2.target = IntentRes.TargetType.ALL
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 140; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "poison"
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 140; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "acid_spray"
 	# 페이즈1: 전체 공격 + 강독
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "poison"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.ALL; p1i1.damage_type = "acid_spray"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "poison"; p1i2.value = 60
 	p1i2.target = IntentRes.TargetType.ALL
@@ -80,30 +80,30 @@ static func jormungandr(scene: PackedScene) -> Resource:
 	e.phase_thresholds = [0.65, 0.3]
 	# 페이즈0
 	var p0i1 := IntentRes.new()
-	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 130; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "poison"
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 130; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "acid_spray"
 	var p0i2 := IntentRes.new()
 	p0i2.action_type = IntentRes.ActionType.DEBUFF; p0i2.status_type = "poison"; p0i2.value = 50
 	p0i2.target = IntentRes.TargetType.ALL
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 130; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "poison"
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 130; p0i3.target = IntentRes.TargetType.RANDOM; p0i3.damage_type = "acid_spray"
 	# 페이즈1 (65% HP 전환)
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 160; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "poison"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 160; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "acid_spray"
 	var p1i2 := IntentRes.new()
 	p1i2.action_type = IntentRes.ActionType.DEBUFF; p1i2.status_type = "poison"; p1i2.value = 60
 	p1i2.target = IntentRes.TargetType.ALL
 	var p1i3 := IntentRes.new()
-	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 200; p1i3.target = IntentRes.TargetType.LOWEST_HP; p1i3.damage_type = "poison"
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 200; p1i3.target = IntentRes.TargetType.LOWEST_HP; p1i3.damage_type = "acid_spray"
 	# 페이즈2 (30% HP 전환) — 강독+전체공격+strength+강타 (분리)
 	var p2i1 := IntentRes.new()
 	p2i1.action_type = IntentRes.ActionType.DEBUFF; p2i1.status_type = "poison"; p2i1.value = 100
 	p2i1.target = IntentRes.TargetType.ALL
 	var p2i2 := IntentRes.new()
-	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 80; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "poison"
+	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 80; p2i2.target = IntentRes.TargetType.ALL; p2i2.damage_type = "acid_spray"
 	var p2i3 := IntentRes.new()
 	p2i3.action_type = IntentRes.ActionType.BUFF; p2i3.status_type = "strength"; p2i3.value = 15
 	var p2i4 := IntentRes.new()
-	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 250; p2i4.target = IntentRes.TargetType.ALL; p2i4.damage_type = "poison"
+	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 250; p2i4.target = IntentRes.TargetType.ALL; p2i4.damage_type = "acid_spray"
 	# jormungandr (세계뱀) — turn_modes [coil, strike] FORM_SWITCH (똬리/공격 순환) + DISPEL.
 	# coil (똬리, 방어) / strike (공격) 사이클. 페이즈 2 에서 DISPEL ALL (영웅 buff 정화).
 	# time_limit 25턴 — 장기전 시 라그나로크 가속 (Okumura 영감, 매 turn strength +5 누적).

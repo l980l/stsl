@@ -28,11 +28,11 @@ static func scarab_queen(scene: PackedScene) -> Resource:
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 40; i1.status_type = "poison"
 	i1.target = IntentRes.TargetType.ALL
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "acid_spray"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.BUFF; i3.value = 40; i3.status_type = "block"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "poison"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "acid_spray"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 

@@ -47,7 +47,7 @@ static func snake(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.snake"; e.max_hp = 300; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "acid_spray"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 2; i2.status_type = "vulnerable"; i2.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2]
@@ -293,7 +293,7 @@ static func hydra_head(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.hydra_head"; e.max_hp = 400; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 115; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 115; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "acid_spray"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 115; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
 	var i3 := IntentRes.new()

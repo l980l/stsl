@@ -14,6 +14,7 @@ const _VFX_LIGHTNING_BEAM = preload("res://scenes/vfx/lightning_beam_gpu.gd")
 const _VFX_ICE_SHARDS     = preload("res://scenes/vfx/ice_shards_gpu.gd")
 const _VFX_FIRE_BLAST     = preload("res://scenes/vfx/fire_blast_gpu.gd")
 const _VFX_POISON_SPLASH  = preload("res://scenes/vfx/poison_splash_gpu.gd")
+const _VFX_ACID_SPRAY     = preload("res://scenes/vfx/acid_spray_gpu.gd")
 const _VFX_ARROW_SHOT     = preload("res://scenes/vfx/arrow_shot_gpu.gd")
 const _VFX_EXPLOSION_BLAST = preload("res://scenes/vfx/explosion_blast_gpu.gd")
 const _VFX_BLUNT_SMASH    = preload("res://scenes/vfx/blunt_smash_gpu.gd")
@@ -180,6 +181,7 @@ func _vfx_impact_delay_for_damage_type(dtype: String) -> float:
 		"ice":         base = _VFX_ICE_SHARDS.IMPACT_DELAY
 		"fire":        base = _VFX_FIRE_BLAST.IMPACT_DELAY
 		"poison":      base = _VFX_POISON_SPLASH.IMPACT_DELAY
+		"acid_spray":  base = _VFX_ACID_SPRAY.IMPACT_DELAY
 		"projectile":  base = _VFX_ARROW_SHOT.IMPACT_DELAY
 		"explosive":   base = _VFX_EXPLOSION_BLAST.IMPACT_DELAY
 		"blunt":       base = _VFX_BLUNT_SMASH.IMPACT_DELAY

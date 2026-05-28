@@ -46,13 +46,13 @@ static func jorogumo(scene: PackedScene) -> Resource:
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 3; i1.status_type = "weak"
 	i1.target = IntentRes.TargetType.ALL
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 160; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "poison"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 160; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "acid_spray"
 	var i3 := IntentRes.new()
 	# 거미줄의 속박 — 영웅 전체 speed_penalty 4 (3턴 일정 효과)
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 4; i3.status_type = "speed_penalty"
 	i3.duration = 3; i3.target = IntentRes.TargetType.ALL
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 180; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "poison"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 180; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "acid_spray"
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.BUFF; i5.value = 2; i5.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
@@ -66,9 +66,9 @@ static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	e.phase_thresholds = [0.66, 0.33]
 	# Phase 0 — 여덟 머리 (8 heads)
 	var p0i1 := IntentRes.new()
-	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 150; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "poison"
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 150; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "acid_spray"
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 150; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "poison"
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 150; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "acid_spray"
 	var p0i3 := IntentRes.new()
 	p0i3.action_type = IntentRes.ActionType.DEBUFF; p0i3.value = 2; p0i3.status_type = "weak"
 	p0i3.target = IntentRes.TargetType.ALL
@@ -78,9 +78,9 @@ static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	p0i5.action_type = IntentRes.ActionType.BUFF; p0i5.value = 1; p0i5.status_type = "strength"
 	# Phase 1 — 다섯 머리 (공격력 증가)
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 190; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "poison"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 190; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "acid_spray"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 190; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "poison"
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 190; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "acid_spray"
 	var p1i3 := IntentRes.new()
 	p1i3.action_type = IntentRes.ActionType.DEBUFF; p1i3.value = 2; p1i3.status_type = "vulnerable"
 	p1i3.target = IntentRes.TargetType.ALL
@@ -90,9 +90,9 @@ static func yamata_no_orochi(scene: PackedScene) -> Resource:
 	p1i5.action_type = IntentRes.ActionType.BUFF; p1i5.value = 2; p1i5.status_type = "strength"
 	# Phase 2 — 두 머리 (최고 공격력) — CHARGE_UP 등장: 2턴 → 강공격 + stun
 	var p2i1 := IntentRes.new()
-	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 230; p2i1.target = IntentRes.TargetType.LOWEST_HP; p2i1.damage_type = "poison"
+	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 230; p2i1.target = IntentRes.TargetType.LOWEST_HP; p2i1.damage_type = "acid_spray"
 	var p2_charge_bite := IntentRes.new()
-	p2_charge_bite.action_type = IntentRes.ActionType.ATTACK; p2_charge_bite.value = 260; p2_charge_bite.target = IntentRes.TargetType.LAST_ATTACKER; p2_charge_bite.damage_type = "poison"
+	p2_charge_bite.action_type = IntentRes.ActionType.ATTACK; p2_charge_bite.value = 260; p2_charge_bite.target = IntentRes.TargetType.LAST_ATTACKER; p2_charge_bite.damage_type = "acid_spray"
 	var p2_charge_stun := IntentRes.new()
 	p2_charge_stun.action_type = IntentRes.ActionType.DEBUFF; p2_charge_stun.value = 1; p2_charge_stun.status_type = "stun"
 	p2_charge_stun.target = IntentRes.TargetType.LAST_ATTACKER

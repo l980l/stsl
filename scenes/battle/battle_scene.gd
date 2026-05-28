@@ -2461,6 +2461,7 @@ const _VFX_LIGHTNING_BEAM := preload("res://scenes/vfx/lightning_beam_gpu.gd")
 const _VFX_ICE_SHARDS := preload("res://scenes/vfx/ice_shards_gpu.gd")
 const _VFX_FIRE_BLAST := preload("res://scenes/vfx/fire_blast_gpu.gd")
 const _VFX_POISON_SPLASH := preload("res://scenes/vfx/poison_splash_gpu.gd")
+const _VFX_ACID_SPRAY := preload("res://scenes/vfx/acid_spray_gpu.gd")
 const _VFX_ARROW_SHOT := preload("res://scenes/vfx/arrow_shot_gpu.gd")
 const _VFX_EXPLOSION_BLAST := preload("res://scenes/vfx/explosion_blast_gpu.gd")
 const _VFX_BLUNT_SMASH := preload("res://scenes/vfx/blunt_smash_gpu.gd")
@@ -3149,6 +3150,7 @@ func _sfx_for_dtype(dtype: String) -> String:
 		"fire":        return "impact_fire"
 		"holy_fire":   return "impact_fire"
 		"poison":      return "poison_splash"
+		"acid_spray":  return "acid_spray_splat"
 		"projectile":  return "impact_arrow"
 		"holy_bolt":   return "impact_arrow"
 		"explosive":   return "impact_explosive"
@@ -3274,6 +3276,8 @@ func _caster_beam_script(dtype: String) -> GDScript:
 			return _VFX_FIRE_BLAST
 		"poison":
 			return _VFX_POISON_SPLASH
+		"acid_spray":
+			return _VFX_ACID_SPRAY
 		"projectile":
 			return _VFX_ARROW_SHOT
 		"explosive":
@@ -4000,7 +4004,7 @@ func _on_hero_damaged(hero_id: String, amount: int, dtype: String = "", is_crit:
 			_apply_frozen_tint(char_node)
 		elif dtype == "fire":
 			_apply_scorched_tint(char_node)
-		elif dtype == "poison":
+		elif dtype == "poison" or dtype == "acid_spray":
 			_apply_poisoned_tint(char_node)
 		elif dtype == "explosive":
 			_apply_scorched_tint(char_node)
@@ -4110,7 +4114,7 @@ func _apply_enemy_hit_feedback(index: int, amount: int, dtype: String, is_crit: 
 			_apply_frozen_tint(char_node)
 		elif dtype == "fire":
 			_apply_scorched_tint(char_node)
-		elif dtype == "poison":
+		elif dtype == "poison" or dtype == "acid_spray":
 			_apply_poisoned_tint(char_node)
 		elif dtype == "explosive":
 			_apply_scorched_tint(char_node)
