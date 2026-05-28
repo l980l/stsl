@@ -10,9 +10,9 @@ static func fly_harpy(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.fly_harpy"; e.max_hp = 220; e.character_scene = scene
 	e.mythology = "greek"; e.signatures_enabled = false  # 인카운터 #1 (매우 약함)
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "claw_attack"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 60; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 60; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "claw_attack"
 	e.intent_pattern = [i1, i2]
 	return e
 
@@ -59,11 +59,11 @@ static func harpy(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.harpy"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 45; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 45; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "claw_attack"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.PREPARE; i2.value = 0
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 130; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "claw_attack"
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.SPECIAL; i4.value = 1; i4.status_type = "remove_card"
 	e.intent_pattern = [i1, i2, i3, i4]
@@ -181,11 +181,11 @@ static func centaur(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.centaur"; e.max_hp = 400; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "blunt"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "projectile"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "blunt"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.LOWEST_HP; i2.damage_type = "projectile"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 110; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "blunt"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 110; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "projectile"
 	e.intent_pattern = [i1, i2, i3]
 	e.phase_thresholds = [0.3]
 	e.phase_buffs = [[{"status": "strength", "value": 2}]]
@@ -215,9 +215,9 @@ static func griffin_cub(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF_ALLY; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 75; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 75; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "claw_attack"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 75; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 75; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "claw_attack"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 

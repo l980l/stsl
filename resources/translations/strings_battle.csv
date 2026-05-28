@@ -37,6 +37,7 @@ battle.element.poison,독,poison,poison,veleno,veneno,毒,δηλητήριο,毒
 battle.element.acid_spray,산성 분무,acid spray,jet acide,spruzzo acido,rociada ácida,酸の噴霧,οξύ ψεκασμός,酸液喷射,酸液噴射,кислотный спрей,jato ácido,natrysk kwasem,Säurespray
 battle.element.needle_sting,침 찌르기,needle sting,piqûre,puntura,picadura,刺し針,τσίμπημα βελόνας,毒针,毒針,укол жала,picada,ukłucie,Stachelstich
 battle.element.bite_attack,물기,bite,morsure,morso,mordisco,噛みつき,δάγκωμα,撕咬,撕咬,укус,mordida,ugryzienie,Biss
+battle.element.claw_attack,할퀴기,claw,griffe,artiglio,zarpazo,引っ掻き,γρατζουνιά,爪击,爪擊,коготь,arranhão,pazur,Krallen
 battle.element.curse,저주,curse,malédiction,maledizione,maldición,呪い,κατάρα,诅咒,詛咒,проклятие,maldição,klątwa,Fluch
 battle.element.projectile,화살,projectile,projectile,proiettile,proyectil,飛矢,βλήμα,飞射物,飛射物,стрела,projétil,pocisk,Geschoss
 battle.element.bullet,탄환,bullet,balle,proiettile,bala,弾丸,σφαίρα,子弹,子彈,пуля,bala,pocisk,Kugel

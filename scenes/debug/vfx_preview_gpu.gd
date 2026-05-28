@@ -64,6 +64,8 @@ const VFX_PAIRS := [
 	{"name": "needle_sting", "gpu": "res://scenes/vfx/needle_sting_gpu.gd", "cpu": "res://scenes/vfx/needle_sting.gd"},
 	# Phase 12 — bite_attack
 	{"name": "bite_attack",  "gpu": "res://scenes/vfx/bite_attack_gpu.gd",  "cpu": "res://scenes/vfx/bite_attack.gd"},
+	# Phase 13 — claw_attack (GPU 단독 — CPU 베이스 없음)
+	{"name": "claw_attack",  "gpu": "res://scenes/vfx/claw_attack_gpu.gd",  "cpu": ""},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192

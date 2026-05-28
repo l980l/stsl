@@ -2470,6 +2470,7 @@ const _VFX_POISON_SPLASH := preload("res://scenes/vfx/poison_splash_gpu.gd")
 const _VFX_ACID_SPRAY := preload("res://scenes/vfx/acid_spray_gpu.gd")
 const _VFX_NEEDLE_STING := preload("res://scenes/vfx/needle_sting_gpu.gd")
 const _VFX_BITE_ATTACK := preload("res://scenes/vfx/bite_attack_gpu.gd")
+const _VFX_CLAW_ATTACK := preload("res://scenes/vfx/claw_attack_gpu.gd")
 const _VFX_ARROW_SHOT := preload("res://scenes/vfx/arrow_shot_gpu.gd")
 const _VFX_EXPLOSION_BLAST := preload("res://scenes/vfx/explosion_blast_gpu.gd")
 const _VFX_BLUNT_SMASH := preload("res://scenes/vfx/blunt_smash_gpu.gd")
@@ -3161,6 +3162,7 @@ func _sfx_for_dtype(dtype: String) -> String:
 		"acid_spray":  return "acid_spray_splat"
 		"needle_sting": return "needle_sting_stab"
 		"bite_attack": return "bite_attack"
+		"claw_attack": return "claw_attack"
 		"projectile":  return "impact_arrow"
 		"holy_bolt":   return "impact_arrow"
 		"explosive":   return "impact_explosive"
@@ -3292,6 +3294,8 @@ func _caster_beam_script(dtype: String) -> GDScript:
 			return _VFX_NEEDLE_STING
 		"bite_attack":
 			return _VFX_BITE_ATTACK
+		"claw_attack":
+			return _VFX_CLAW_ATTACK
 		"projectile":
 			return _VFX_ARROW_SHOT
 		"explosive":
