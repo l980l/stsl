@@ -66,6 +66,8 @@ const VFX_PAIRS := [
 	{"name": "bite_attack",  "gpu": "res://scenes/vfx/bite_attack_gpu.gd",  "cpu": "res://scenes/vfx/bite_attack.gd"},
 	# Phase 13 — claw_attack (GPU 단독 — CPU 베이스 없음)
 	{"name": "claw_attack",  "gpu": "res://scenes/vfx/claw_attack_gpu.gd",  "cpu": ""},
+	# Phase 14 — monster_phase_changed (GPU 단독, 일반 몬스터 페이즈 전환)
+	{"name": "monster_phase", "gpu": "res://scenes/vfx/monster_phase_changed_gpu.gd", "cpu": ""},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
@@ -75,7 +77,7 @@ const _SPRITE_H := 192.0
 const _CHAR_FOOT_Y_OFFSET := 96.0
 
 # caster 무시 / 타겟 위치 발치 anchor 사용하는 VFX (vfx_preview.gd 의 분기와 동일)
-const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff", "holy_buff", "power_up", "form_change"]
+const _TARGET_ONLY_VFX := ["boss_death", "sig_ragnarok", "warrior_buff", "holy_buff", "power_up", "form_change", "monster_phase"]
 # caster 만 사용하는 VFX — ground anchor 도 caster 발치로
 const _CASTER_ONLY_VFX: Array = []
 
