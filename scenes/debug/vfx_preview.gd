@@ -60,6 +60,7 @@ const ACID_SPRAY := preload("res://scenes/vfx/acid_spray_gpu.gd")
 const NEEDLE_STING := preload("res://scenes/vfx/needle_sting.gd")
 const BITE_ATTACK := preload("res://scenes/vfx/bite_attack.gd")
 const CLAW_ATTACK := preload("res://scenes/vfx/claw_attack_gpu.gd")
+const MONSTER_PHASE := preload("res://scenes/vfx/monster_phase_changed_gpu.gd")
 const _CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 const _CardResourceClass := preload("res://resources/card_resource.gd")
 
@@ -125,6 +126,7 @@ const VFX_CURRENT := [
 	{"name": "needle_sting",       "kind": "beam",   "path": "res://scenes/vfx/needle_sting.gd"},
 	{"name": "bite_attack",        "kind": "beam",   "path": "res://scenes/vfx/bite_attack.gd"},
 	{"name": "claw_attack",        "kind": "beam",   "path": "res://scenes/vfx/claw_attack_gpu.gd"},
+	{"name": "monster_phase",      "kind": "beam",   "path": "res://scenes/vfx/monster_phase_changed_gpu.gd"},
 ]
 
 # 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.
@@ -543,7 +545,7 @@ func _play(entry: Dictionary) -> void:
 					var t_pos: Vector2 = _target_pos + Vector2(x_offsets[i], 0.0)
 					var c_pos: Vector2 = _caster_pos + Vector2(x_offsets[i], 0.0)
 					# 시전자 마커 무시, 타겟 위치를 중심·발치로
-					if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "taunt", "boss_death", "form_change"]:
+					if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "monster_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "taunt", "boss_death", "form_change"]:
 						c_pos = t_pos
 					_apply_ground_anchor(fx_n, entry["name"], c_pos, t_pos)
 					if i == 2:
@@ -586,7 +588,7 @@ func _play(entry: Dictionary) -> void:
 					tw.tween_callback(dummy.queue_free)
 					return
 				# 시전자 마커 무시, 타겟 위치를 중심·발치로
-				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "boss_death", "form_change"]:
+				if entry["name"] in ["power_up", "summon_circle", "speed_buff", "slow_debuff", "sacrifice", "counter_prepare", "purge_status", "morale_boost", "prepare", "boss_phase", "monster_phase", "sig_hubris", "sig_ragnarok", "sig_yin_yang", "sig_egyptian_curse", "sig_kekkai", "boss_death", "form_change"]:
 					_apply_ground_anchor(fx, entry["name"], _target_pos, _target_pos)
 					fx.play(_target_pos, _target_pos)
 				else:

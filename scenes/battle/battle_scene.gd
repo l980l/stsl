@@ -1037,13 +1037,21 @@ func _play_battle_bgm() -> void:
 		AudioManager.play_bgm_dynamic("battle", myth)
 
 func _on_boss_phase_changed(enemy_index: int, new_phase: int) -> void:
-	if new_phase >= 1 and not _bgm_boss_id.is_empty():
-		AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, new_phase)
-	# 보스 위치에 phase 전환 VFX + cinematic title (PHASE %d)
-	if enemy_index >= 0 and enemy_index < _enemy_char_nodes.size():
-		var boss_node: Node2D = _enemy_char_nodes[enemy_index]
-		if boss_node and is_instance_valid(boss_node):
-			_spawn_boss_phase_change(boss_node.global_position, _foot_pos(boss_node), new_phase + 1)
+	if enemy_index < 0 or enemy_index >= _enemy_char_nodes.size():
+		return
+	var node: Node2D = _enemy_char_nodes[enemy_index]
+	if node == null or not is_instance_valid(node):
+		return
+	var enemy_res = _enemies[enemy_index] if enemy_index < _enemies.size() else null
+	var is_boss: bool = enemy_res != null and enemy_res.grade == EnemyResource.Grade.BOSS
+	if is_boss:
+		# 보스 — BGM 전환 + cinematic 시각/SFX
+		if new_phase >= 1 and not _bgm_boss_id.is_empty():
+			AudioManager.play_bgm_dynamic("boss", _bgm_boss_id, new_phase)
+		_spawn_boss_phase_change(node.global_position, _foot_pos(node), new_phase + 1)
+	else:
+		# 일반 몬스터 — 가벼운 시각 + 전용 SFX (광폭화/desperation 시점)
+		_spawn_monster_phase_change(node.global_position, _foot_pos(node), new_phase + 1)
 
 # 신화 시그니처 발동 시 화면 중앙에 짧은 토스트 표시 (~1.5초 페이드)
 # Throttle: 같은 시그니처는 1턴에 1회만 (다중 적 동시 발동 시 중복 방지)
@@ -2513,6 +2521,7 @@ const _VFX_COUNTER := preload("res://scenes/vfx/counter_gpu.gd")
 const _VFX_MORALE_BOOST := preload("res://scenes/vfx/morale_boost_gpu.gd")
 const _VFX_PREPARE := preload("res://scenes/vfx/prepare.gd")
 const _VFX_BOSS_PHASE := preload("res://scenes/vfx/boss_phase_changed_gpu.gd")
+const _VFX_MONSTER_PHASE := preload("res://scenes/vfx/monster_phase_changed_gpu.gd")
 const _VFX_SIG_HUBRIS := preload("res://scenes/vfx/sig_hubris_gpu.gd")
 const _VFX_SIG_RAGNAROK := preload("res://scenes/vfx/sig_ragnarok_gpu.gd")
 const _VFX_SIG_KARMA := preload("res://scenes/vfx/sig_karma_gpu.gd")
@@ -3565,6 +3574,15 @@ func _spawn_boss_phase_change(target_pos: Vector2, foot_pos: Vector2, phase_num:
 			_play_screen_shake()
 	# cinematic letterbox + title toast — 사용자 요청으로 제거
 	# _spawn_boss_phase_cinematic(phase_num)
+
+# 일반 몬스터 phase 전환 — 가벼운 시각 (inward motes + 작은 충격파 + 지면 ring) + 전용 SFX
+func _spawn_monster_phase_change(target_pos: Vector2, foot_pos: Vector2, _phase_num: int) -> void:
+	var fx: Node2D = _VFX_MONSTER_PHASE.new()
+	add_child(fx)
+	fx.z_index = 1300
+	fx.position = Vector2.ZERO
+	fx.play(target_pos, foot_pos)
+	AudioManager.play_sfx("monster_phase_changed")
 
 # cinematic letterbox bars + "PHASE %d" 큰 텍스트 (페이드인/아웃)
 func _spawn_boss_phase_cinematic(phase_num: int) -> void:
