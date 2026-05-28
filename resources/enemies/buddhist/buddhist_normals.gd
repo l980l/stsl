@@ -155,7 +155,7 @@ static func naga_spawn(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 20; i2.status_type = "poison"; i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 70; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "bite_attack"
 	e.intent_pattern = [i1, i2, i3]
 	var dt := IntentRes.new()
 	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 20; dt.status_type = "poison"; dt.target = IntentRes.TargetType.ALL

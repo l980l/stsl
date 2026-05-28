@@ -11,13 +11,13 @@ static func ares_hound(scene: PackedScene) -> Resource:
 	e.mythology = "greek"
 	# 4턴 순환: ATK RANDOM / ATK RANDOM / BUFF strength / ATK ALL
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 180; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 180; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "bite_attack"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 180; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 180; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "bite_attack"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.BUFF; i3.status_type = "strength"; i3.value = 8
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 220; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "slash"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 220; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "bite_attack"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 

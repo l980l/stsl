@@ -16,12 +16,12 @@ static func fenrir_cub(scene: PackedScene) -> Resource:
 	var p0i_taunt := IntentRes.new()
 	p0i_taunt.action_type = IntentRes.ActionType.DEBUFF; p0i_taunt.status_type = "taunt"; p0i_taunt.value = 2; p0i_taunt.target = IntentRes.TargetType.LOWEST_HP
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 170; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "slash"
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 170; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "bite_attack"
 	# 페이즈1: 2연타
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "slash"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "bite_attack"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 200; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "slash"
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 200; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "bite_attack"
 	e.phase_patterns = [[p0i1, p0i_taunt, p0i2], [p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
 	return e

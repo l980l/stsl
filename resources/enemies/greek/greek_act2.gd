@@ -10,9 +10,9 @@ static func cerberus(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.greek.cerberus"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 170; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 170; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "bite_attack"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 170; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 170; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "bite_attack"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 140; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "fire"
 	var i4 := IntentRes.new()

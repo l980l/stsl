@@ -35,6 +35,8 @@ battle.element.ice,빙결,ice,glace,ghiaccio,hielo,氷,πάγος,冰冻,冰凍,
 battle.element.lightning,번개,lightning,foudre,fulmine,rayo,雷,κεραυνός,闪电,閃電,молния,raio,piorun,Blitz
 battle.element.poison,독,poison,poison,veleno,veneno,毒,δηλητήριο,毒,毒,яд,veneno,trucizna,Gift
 battle.element.acid_spray,산성 분무,acid spray,jet acide,spruzzo acido,rociada ácida,酸の噴霧,οξύ ψεκασμός,酸液喷射,酸液噴射,кислотный спрей,jato ácido,natrysk kwasem,Säurespray
+battle.element.needle_sting,침 찌르기,needle sting,piqûre,puntura,picadura,刺し針,τσίμπημα βελόνας,毒针,毒針,укол жала,picada,ukłucie,Stachelstich
+battle.element.bite_attack,물기,bite,morsure,morso,mordisco,噛みつき,δάγκωμα,撕咬,撕咬,укус,mordida,ugryzienie,Biss
 battle.element.curse,저주,curse,malédiction,maledizione,maldición,呪い,κατάρα,诅咒,詛咒,проклятие,maldição,klątwa,Fluch
 battle.element.projectile,화살,projectile,projectile,proiettile,proyectil,飛矢,βλήμα,飞射物,飛射物,стрела,projétil,pocisk,Geschoss
 battle.element.bullet,탄환,bullet,balle,proiettile,bala,弾丸,σφαίρα,子弹,子彈,пуля,bala,pocisk,Kugel

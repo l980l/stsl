@@ -38,7 +38,6 @@ var _target := Vector2.ZERO
 var _particle_scale_override: float = -1.0
 var _spray_emitters: Array[GPUParticles2D] = []
 var _splatter_timer: Timer
-var _splat_tick: int = 0
 
 func _pcount(n: int) -> int:
 	if _particle_scale_override > 0.0:
@@ -125,13 +124,7 @@ func _start_spray() -> void:
 	get_tree().create_timer(SPRAY_TIME).timeout.connect(_end_spray)
 
 func _spawn_splatter_tick() -> void:
-	# 매 3 tick (0.3s) 마다 추가 splat sfx. tick 1 은 battle_scene 의 SFX_IMPACT 와 겹치니 skip — rate_limit 50ms.
-	_splat_tick += 1
-	if _splat_tick > 1 and _splat_tick % 3 == 1:
-		var am := get_node_or_null("/root/AudioManager")
-		if am != null:
-			am.play_sfx("acid_spray_splat")
-	# secondary 튐 (작은 입자 사방으로) — 일반 블렌드
+	# secondary 튐 (작은 입자 사방으로) — 일반 블렌드. SFX 는 battle_scene 의 SFX_IMPACT 가 1회 처리.
 	var splatter := _Helpers.make_emitter({
 		"count": _pcount(8), "lifetime": 0.55, "color": COL_MID,
 		"speed_min": 80.0, "speed_max": 220.0,
