@@ -56,6 +56,7 @@ const FORM_CHANGE := preload("res://scenes/vfx/form_change.gd")
 const COUNTER_VFX := preload("res://scenes/vfx/counter.gd")
 const ENTHRALL_AURA := preload("res://scenes/vfx/enthrall_aura.gd")
 const LIFE_DRAIN := preload("res://scenes/vfx/life_drain.gd")
+const ACID_SPRAY := preload("res://scenes/vfx/acid_spray_gpu.gd")
 const _CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 const _CardResourceClass := preload("res://resources/card_resource.gd")
 
@@ -117,6 +118,7 @@ const VFX_CURRENT := [
 	{"name": "counter_major",      "kind": "beam", "path": "res://scenes/vfx/counter.gd"},
 	{"name": "enthrall_aura",      "kind": "beam",   "path": "res://scenes/vfx/enthrall_aura.gd"},
 	{"name": "life_drain",         "kind": "beam",   "path": "res://scenes/vfx/life_drain.gd"},
+	{"name": "acid_spray",         "kind": "beam",   "path": "res://scenes/vfx/acid_spray_gpu.gd"},
 ]
 
 # 구버전 — 더 이상 사용 X. 참조용으로 vfx_preview 에 표시.

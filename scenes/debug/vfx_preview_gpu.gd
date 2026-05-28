@@ -58,6 +58,8 @@ const VFX_PAIRS := [
 	{"name": "form_change", "gpu": "res://scenes/vfx/form_change_gpu.gd", "cpu": "res://scenes/vfx/form_change.gd"},
 	{"name": "counter",     "gpu": "res://scenes/vfx/counter_gpu.gd",     "cpu": "res://scenes/vfx/counter.gd"},
 	{"name": "life_drain",  "gpu": "res://scenes/vfx/life_drain_gpu.gd",  "cpu": "res://scenes/vfx/life_drain.gd"},
+	# Phase 10 — 신규 단독 GPU (CPU 베이스 없음 — cpu 모드/both 모드 무동작)
+	{"name": "acid_spray",  "gpu": "res://scenes/vfx/acid_spray_gpu.gd",  "cpu": ""},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192

@@ -114,27 +114,27 @@ static func hydra(scene: PackedScene) -> Resource:
 	e.mythology = "greek"; e.grade = EnemyRes.Grade.BOSS
 	e.phase_thresholds = [0.66, 0.33]
 	var p0i1 := IntentRes.new()
-	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 180; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "poison"
+	p0i1.action_type = IntentRes.ActionType.ATTACK; p0i1.value = 180; p0i1.target = IntentRes.TargetType.RANDOM; p0i1.damage_type = "acid_spray"
 	var p0i2 := IntentRes.new()
-	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 180; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "poison"
+	p0i2.action_type = IntentRes.ActionType.ATTACK; p0i2.value = 180; p0i2.target = IntentRes.TargetType.RANDOM; p0i2.damage_type = "acid_spray"
 	var p0i3 := IntentRes.new()
-	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 140; p0i3.target = IntentRes.TargetType.ALL; p0i3.damage_type = "poison"
+	p0i3.action_type = IntentRes.ActionType.ATTACK; p0i3.value = 140; p0i3.target = IntentRes.TargetType.ALL; p0i3.damage_type = "acid_spray"
 	var p1i1 := IntentRes.new()
-	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "poison"
+	p1i1.action_type = IntentRes.ActionType.ATTACK; p1i1.value = 200; p1i1.target = IntentRes.TargetType.RANDOM; p1i1.damage_type = "acid_spray"
 	var p1i2 := IntentRes.new()
-	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 200; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "poison"
+	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 200; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "acid_spray"
 	var p1i3 := IntentRes.new()
-	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 160; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "poison"
+	p1i3.action_type = IntentRes.ActionType.ATTACK; p1i3.value = 160; p1i3.target = IntentRes.TargetType.ALL; p1i3.damage_type = "acid_spray"
 	var p1i4 := IntentRes.new()
-	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 220; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "poison"
+	p1i4.action_type = IntentRes.ActionType.ATTACK; p1i4.value = 220; p1i4.target = IntentRes.TargetType.LOWEST_HP; p1i4.damage_type = "acid_spray"
 	var p2i1 := IntentRes.new()
-	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 240; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "poison"
+	p2i1.action_type = IntentRes.ActionType.ATTACK; p2i1.value = 240; p2i1.target = IntentRes.TargetType.RANDOM; p2i1.damage_type = "acid_spray"
 	var p2i2 := IntentRes.new()
-	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 240; p2i2.target = IntentRes.TargetType.RANDOM; p2i2.damage_type = "poison"
+	p2i2.action_type = IntentRes.ActionType.ATTACK; p2i2.value = 240; p2i2.target = IntentRes.TargetType.RANDOM; p2i2.damage_type = "acid_spray"
 	var p2i3 := IntentRes.new()
-	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 200; p2i3.target = IntentRes.TargetType.ALL; p2i3.damage_type = "poison"
+	p2i3.action_type = IntentRes.ActionType.ATTACK; p2i3.value = 200; p2i3.target = IntentRes.TargetType.ALL; p2i3.damage_type = "acid_spray"
 	var p2i4 := IntentRes.new()
-	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 260; p2i4.target = IntentRes.TargetType.LOWEST_HP; p2i4.damage_type = "poison"
+	p2i4.action_type = IntentRes.ActionType.ATTACK; p2i4.value = 260; p2i4.target = IntentRes.TargetType.LOWEST_HP; p2i4.damage_type = "acid_spray"
 	var p2i5 := IntentRes.new()
 	p2i5.action_type = IntentRes.ActionType.DEBUFF; p2i5.value = 2; p2i5.status_type = "vulnerable"
 	p2i5.target = IntentRes.TargetType.ALL
@@ -148,7 +148,7 @@ static func hydra(scene: PackedScene) -> Resource:
 	p1i5.target = IntentRes.TargetType.ALL; p1i5.play_animation = "debuff"
 	# 페이즈 2 — 9개 머리 일제 독숨 차지업 (counter 가능): 2턴 숨고르기 후 260 LOWEST_HP poison + poison 4 ALL
 	var p2_charge_atk := IntentRes.new()
-	p2_charge_atk.action_type = IntentRes.ActionType.ATTACK; p2_charge_atk.value = 260; p2_charge_atk.target = IntentRes.TargetType.LOWEST_HP; p2_charge_atk.damage_type = "poison"
+	p2_charge_atk.action_type = IntentRes.ActionType.ATTACK; p2_charge_atk.value = 260; p2_charge_atk.target = IntentRes.TargetType.LOWEST_HP; p2_charge_atk.damage_type = "acid_spray"
 	var p2_charge_dbf := IntentRes.new()
 	p2_charge_dbf.action_type = IntentRes.ActionType.DEBUFF; p2_charge_dbf.value = 40; p2_charge_dbf.status_type = "poison"
 	p2_charge_dbf.target = IntentRes.TargetType.ALL

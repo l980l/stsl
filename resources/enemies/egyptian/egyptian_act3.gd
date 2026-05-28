@@ -14,12 +14,12 @@ static func apophis_serpent(scene: PackedScene) -> Resource:
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.status_type = "poison"; i1.value = 50
 	i1.target = IntentRes.TargetType.ALL
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "acid_spray"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.status_type = "heal_block"; i3.value = 2
 	i3.target = IntentRes.TargetType.RANDOM
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "poison"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "acid_spray"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 

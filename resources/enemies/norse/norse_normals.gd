@@ -10,13 +10,13 @@ static func urdr_spider(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.norse.urdr_spider"; e.max_hp = 300; e.character_scene = scene
 	e.mythology = "norse"; e.signatures_enabled = false  # 인카운터 #1
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 60; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "acid_spray"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.status_type = "poison"; i2.value = 30; i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 60; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "poison"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 60; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "acid_spray"
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 60; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "poison"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 60; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "acid_spray"
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.DEBUFF; i5.status_type = "poison"; i5.value = 30; i5.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3, i4, i5]
@@ -42,9 +42,9 @@ static func garlarr_snake(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.SPECIAL; i1.value = 1
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 85; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 85; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "acid_spray"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 85; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "poison"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 85; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "acid_spray"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
@@ -227,7 +227,7 @@ static func lindworm_spawn(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.norse.lindworm_spawn"; e.max_hp = 320; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 75; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 75; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "acid_spray"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 20; i2.status_type = "poison"; i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
@@ -273,11 +273,11 @@ static func nidhogg_scale(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 20; i1.status_type = "poison"; i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "poison"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 80; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "acid_spray"
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 20; i3.status_type = "poison"; i3.target = IntentRes.TargetType.RANDOM
 	var i4 := IntentRes.new()
-	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "poison"
+	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "acid_spray"
 	e.intent_pattern = [i1, i2, i3, i4]
 	return e
 
