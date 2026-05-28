@@ -168,6 +168,12 @@ func _trf(key: String, args) -> String:
 		return s % args
 	return s
 
+# damage_type 영어 키 → i18n 번역. 미등록 dtype 은 raw 영어 fallback.
+func _i18n_dtype(dtype: String) -> String:
+	var key := "battle.element." + dtype
+	var translated := tr(key)
+	return translated if translated != key else dtype
+
 # 신화 시그니처 desc 의 %s placeholder 에 들어갈 번역된 키워드 args 배열.
 # signature.X.desc 가 동적 합성 형식으로 변경 (Attack/Vulnerable 등 raw 영어 제거).
 func _signature_desc_args(mythology: String) -> Array:
@@ -1540,7 +1546,7 @@ func _format_intent_tooltip(enemy_index: int, intent: Resource) -> String:
 			if target_all:
 				line += " (" + tr("battle.intent.tooltip.target_all") + ")"
 			if intent.damage_type != "":
-				line += " · " + _trf("battle.intent.tooltip.element", intent.damage_type)
+				line += " · " + _trf("battle.intent.tooltip.element", _i18n_dtype(intent.damage_type))
 			return line
 		IntentRes.ActionType.BUFF:
 			match intent.status_type:

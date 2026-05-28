@@ -28,6 +28,23 @@ battle.intent.special,❓,❓,❓,❓,❓,❓,❓,❓,❓,❓,❓,❓,❓
 battle.intent.tooltip.attack,공격 %d 데미지,Deal %d damage,Deal %d damage,Deal %d damage,Deal %d damage,敵に %d ダメージ,Προκάλεσε %d ζημιά,造成 %d 点伤害,造成 %d 點傷害,%d урона,%d de dano,%d obrażeń,%d Schaden
 battle.intent.tooltip.target_all,전체,all targets,all targets,all targets,all targets,全対象,όλοι οι στόχοι,全部目标,全部目標,все цели,todos alvos,wszystkie cele,alle Ziele
 battle.intent.tooltip.element,%s 속성,%s element,%s element,%s element,%s element,%s 属性,%s στοιχείο,%s 属性,%s 屬性,%s стихия,%s elemento,%s żywioł,%s Element
+battle.element.slash,베기,slash,tranchant,taglio,corte,斬撃,τομή,斩击,斬擊,разрез,corte,cięcie,Schnitt
+battle.element.blunt,둔기,blunt,contondant,contundente,contundente,打撃,αμβλύ,钝击,鈍擊,дробящий,contundente,tępy,Stumpf
+battle.element.fire,화염,fire,feu,fuoco,fuego,炎,φωτιά,火焰,火焰,огонь,fogo,ogień,Feuer
+battle.element.ice,빙결,ice,glace,ghiaccio,hielo,氷,πάγος,冰冻,冰凍,лёд,gelo,lód,Eis
+battle.element.lightning,번개,lightning,foudre,fulmine,rayo,雷,κεραυνός,闪电,閃電,молния,raio,piorun,Blitz
+battle.element.poison,독,poison,poison,veleno,veneno,毒,δηλητήριο,毒,毒,яд,veneno,trucizna,Gift
+battle.element.acid_spray,산성 분무,acid spray,jet acide,spruzzo acido,rociada ácida,酸の噴霧,οξύ ψεκασμός,酸液喷射,酸液噴射,кислотный спрей,jato ácido,natrysk kwasem,Säurespray
+battle.element.curse,저주,curse,malédiction,maledizione,maldición,呪い,κατάρα,诅咒,詛咒,проклятие,maldição,klątwa,Fluch
+battle.element.projectile,화살,projectile,projectile,proiettile,proyectil,飛矢,βλήμα,飞射物,飛射物,стрела,projétil,pocisk,Geschoss
+battle.element.bullet,탄환,bullet,balle,proiettile,bala,弾丸,σφαίρα,子弹,子彈,пуля,bala,pocisk,Kugel
+battle.element.explosive,폭발,explosive,explosif,esplosivo,explosivo,爆発,εκρηκτικό,爆炸,爆炸,взрывной,explosivo,wybuch,Explosion
+battle.element.holy_strike,신성 격타,holy strike,frappe sacrée,colpo sacro,golpe sagrado,聖打,ιερό χτύπημα,圣击,聖擊,святой удар,golpe sagrado,święte uderzenie,heiliger Schlag
+battle.element.holy_slash,신성 베기,holy slash,tranchant sacré,taglio sacro,corte sagrado,聖斬,ιερή τομή,圣斩,聖斬,святой разрез,corte sagrado,święte cięcie,heiliger Schnitt
+battle.element.holy_arrow,신성 화살,holy arrow,flèche sacrée,freccia sacra,flecha sagrada,聖矢,ιερό βέλος,圣箭,聖箭,святая стрела,flecha sagrada,święta strzała,heiliger Pfeil
+battle.element.holy_bolt,신성 볼트,holy bolt,éclair sacré,dardo sacro,rayo sagrado,聖矢,ιερό βέλος,圣箭,聖箭,святая стрела,dardo sagrado,święty bełt,heiliger Bolzen
+battle.element.holy_fire,신성 화염,holy fire,feu sacré,fuoco sacro,fuego sagrado,聖炎,ιερή φωτιά,圣火,聖火,святой огонь,fogo sagrado,święty ogień,heiliges Feuer
+battle.element.holy_blunt,신성 둔기,holy blunt,masse sacrée,contundente sacro,contundente sagrado,聖打,ιερό αμβλύ,圣钝击,聖鈍擊,святой дробящий,contundente sagrado,święty tępy,heiliger Schlag
 battle.intent.tooltip.buff_strength,자신 강화: 힘 +%d,Self: +%d strength,Self: +%d strength,Self: +%d strength,Self: +%d strength,自身強化: ストレングス +%d,Αυτο-ενίσχυση: Δύναμη +%d,自身强化: 力量 +%d,自身強化: 力量 +%d,Себе: +%d strength,Auto: +%d strength,Sobie: +%d strength,Selbst: +%d strength
 battle.intent.tooltip.buff_block,자신 방어: 블록 +%d,Self: +%d block,Self: +%d block,Self: +%d block,Self: +%d block,自身防御: ブロック +%d,Αυτο-άμυνα: Μπλοκ +%d,自身防御: 格挡 +%d,自身防禦: 格擋 +%d,Себе: +%d block,Auto: +%d block,Sobie: +%d block,Selbst: +%d block
 battle.intent.tooltip.buff_generic,자신 강화: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,自身強化: %s +%d,Αυτο-ενίσχυση: %s +%d,自身强化: %s +%d,自身強化: %s +%d,Себе: %s +%d,Auto: %s +%d,Sobie: %s +%d,Selbst: %s +%d
