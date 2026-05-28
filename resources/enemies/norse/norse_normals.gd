@@ -231,7 +231,7 @@ static func lindworm_spawn(scene: PackedScene) -> Resource:
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 20; i2.status_type = "poison"; i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 75; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 75; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "bite_attack"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 

@@ -43,11 +43,11 @@ static func desert_scorpion(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.egyptian.desert_scorpion"; e.max_hp = 420; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "poison"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 90; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "needle_sting"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 40; i2.status_type = "poison"; i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "poison"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 90; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "needle_sting"
 	e.intent_pattern = [i1, i2, i3]
 	var dt := IntentRes.new()
 	dt.action_type = IntentRes.ActionType.DEBUFF; dt.value = 20; dt.status_type = "poison"; dt.target = IntentRes.TargetType.ALL
@@ -103,9 +103,9 @@ static func scarab(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.egyptian.scarab"; e.max_hp = 260; e.character_scene = scene
 	e.mythology = "egyptian"; e.signatures_enabled = false  # 인카운터 #2
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "bite_attack"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 65; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 65; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "bite_attack"
 	e.intent_pattern = [i1, i2]
 	return e
 
@@ -133,11 +133,11 @@ static func sand_rat(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.egyptian.sand_rat"; e.max_hp = 280; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "slash"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 50; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "bite_attack"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.PREPARE; i2.value = 0
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 100; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 100; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "bite_attack"
 	e.intent_pattern = [i1, i2, i3]
 	return e
 
@@ -273,9 +273,9 @@ static func ammit_cub(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.BUFF; i1.value = 1; i1.status_type = "strength"
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "slash"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 100; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "bite_attack"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 100; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "slash"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 100; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "bite_attack"
 	e.intent_pattern = [i1, i2, i3]
 	e.phase_thresholds = [0.5]
 	e.phase_buffs = [[{"status": "strength", "value": 3}]]
