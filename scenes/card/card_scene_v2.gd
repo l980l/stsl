@@ -44,6 +44,8 @@ const _GEM_COLORS := {
 const _TYPE_ATTACK := preload("res://assets/art/cards/cardtypes/card_type_attack.png")
 const _TYPE_SKILL  := preload("res://assets/art/cards/cardtypes/card_type_skill.png")
 const _TYPE_POWER  := preload("res://assets/art/cards/cardtypes/card_type_power.png")
+const CARD_ART_DIR := "res://assets/art/cards/"
+static var _card_art_cache: Dictionary = {}
 
 # ── 노드 참조 (tscn 노드 트리에서) ──
 @onready var _frame:       Panel       = $Frame
@@ -104,7 +106,25 @@ func _refresh_from_card_res() -> void:
 	_rarity_key = _rarity_to_key(_card_res.rarity)
 	_hero_key = _card_res.owner_id if _card_res.owner_id != "" else "napoleon"
 	_desc = _build_desc()
-	_art_texture = _card_res.art if _card_res.art != null else null
+	_art_texture = _card_res.art if _card_res.art != null else _resolve_card_art(_card_res)
+
+# 카드 전용 일러스트 로드 — assets/art/cards/<owner>/<slug>.png (없으면 null → art_base 패널 폴백).
+# slug 은 i18n 키 card.<owner>.<slug>.name 의 중간 세그먼트.
+func _resolve_card_art(card: CardResource) -> Texture2D:
+	if card.owner_id == "":
+		return null
+	var parts := String(card.card_name).split(".")
+	var slug := ""
+	if parts.size() >= 4 and parts[1] == card.owner_id:
+		slug = parts[2]
+	elif parts.size() >= 3:
+		slug = parts[1]
+	if slug == "":
+		return null
+	var path := "%s%s/%s.png" % [CARD_ART_DIR, card.owner_id, slug]
+	if not _card_art_cache.has(path):
+		_card_art_cache[path] = load(path) if ResourceLoader.exists(path) else null
+	return _card_art_cache[path]
 
 func _rarity_to_key(r: int) -> String:
 	match r:

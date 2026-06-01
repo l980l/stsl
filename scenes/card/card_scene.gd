@@ -16,6 +16,7 @@ const GEM_DIR := "res://assets/art/cards/cardgems/"
 const TYPE_ICON_DIR := "res://assets/art/cards/cardtypes/"
 const DEFAULT_ART := "res://assets/art/cards/illustrations/default_art.png"
 const HERO_ART_DIR := "res://assets/art/heroes/"
+const CARD_ART_DIR := "res://assets/art/cards/"
 
 const _CINZEL_FONT := preload("res://assets/fonts/Cinzel-Regular.ttf")
 const _GEM_COMMON    := preload("res://assets/art/cards/cardgems/card_rarity_common.png")
@@ -161,7 +162,7 @@ func refresh() -> void:
 	$Container/CostLabel.text = str(_card.cost)
 	$Container/TitleLabel.text = tr(_card.card_name)
 	LabelUtils.fit_text($Container/TitleLabel, 50, 28)
-	$Container/ArtRect.texture = _card.art if _card.art != null else _resolve_art_texture(_card.owner_id)
+	$Container/ArtRect.texture = _card.art if _card.art != null else _resolve_art_texture(_card)
 	$Container/RarityGem.texture = _resolve_gem_texture(_card.rarity)
 	$Container/TypeIcon.texture = _resolve_type_icon(_card.card_type)
 	$Container/DescLabel.text = _build_desc()
@@ -214,11 +215,35 @@ func _resolve_type_icon(card_type: int) -> Texture2D:
 		CardResource.CardType.POWER: return _TYPE_POWER
 		_: return _TYPE_ATTACK
 
-func _resolve_art_texture(owner_id: String) -> Texture2D:
-	if not _art_cache.has(owner_id):
-		var hero_path := "%s%s.png" % [HERO_ART_DIR, owner_id]
-		_art_cache[owner_id] = load(hero_path) if ResourceLoader.exists(hero_path) else _DEFAULT_ART
-	return _art_cache[owner_id]
+func _resolve_art_texture(card: CardResource) -> Texture2D:
+	# 1순위 — 카드 전용 일러스트 assets/art/cards/<owner>/<slug>.png
+	var card_path := _card_art_path(card)
+	if card_path != "":
+		if not _art_cache.has(card_path):
+			_art_cache[card_path] = load(card_path) if ResourceLoader.exists(card_path) else null
+		if _art_cache[card_path] != null:
+			return _art_cache[card_path]
+	# 2순위 폴백 — 영웅 초상화, 없으면 기본 아트
+	var hero_key := "hero:" + card.owner_id
+	if not _art_cache.has(hero_key):
+		var hero_path := "%s%s.png" % [HERO_ART_DIR, card.owner_id]
+		_art_cache[hero_key] = load(hero_path) if ResourceLoader.exists(hero_path) else _DEFAULT_ART
+	return _art_cache[hero_key]
+
+# 카드 일러스트 경로 — slug 은 i18n 키 card.<owner>.<slug>.name 의 중간 세그먼트.
+# 공용카드(card.<slug>.name)는 owner_id 디렉토리 + slug 로 해석 (없으면 폴백).
+func _card_art_path(card: CardResource) -> String:
+	if card.owner_id == "":
+		return ""
+	var parts := String(card.card_name).split(".")
+	var slug := ""
+	if parts.size() >= 4 and parts[1] == card.owner_id:
+		slug = parts[2]
+	elif parts.size() >= 3:
+		slug = parts[1]
+	if slug == "":
+		return ""
+	return "%s%s/%s.png" % [CARD_ART_DIR, card.owner_id, slug]
 
 func _resolve_frame_texture(owner_id: String) -> Texture2D:
 	if not _frame_cache.has(owner_id):
