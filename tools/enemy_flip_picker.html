@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>Enemy Illust Flip Picker — 좌우반전 선택</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px;background:#0a0a0d;color:#e8e4d8;font-family:"Inter Tight",-apple-system,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  h1{margin:0 0 8px;font-size:22px;letter-spacing:.04em}
+  .help{color:#888;font-size:13px;line-height:1.5;margin-bottom:18px}
+  .help b{color:#e8c878}
+  .toolbar{position:sticky;top:0;background:rgba(10,10,13,.95);backdrop-filter:blur(10px);padding:14px 0;margin:-14px 0 14px;border-bottom:1px solid #222;z-index:10;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .toolbar button{appearance:none;background:#1a1a20;color:#e8e4d8;border:1px solid #333;padding:8px 14px;border-radius:6px;font:500 13px/1 inherit;cursor:pointer;transition:background .15s}
+  .toolbar button:hover{background:#252530;border-color:#555}
+  .toolbar .primary{background:linear-gradient(180deg,#d4a04a,#8a6818);color:#0a0a0d;border-color:transparent;font-weight:700}
+  .toolbar .count{margin-left:auto;color:#aaa;font:500 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.1em}
+  .toolbar .count b{color:#e8c878;font-size:14px}
+  .filter{display:flex;gap:6px}
+  .filter button{padding:6px 10px;font-size:12px}
+  .filter button.active{background:#3a2818;border-color:#e8c878;color:#e8c878}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+  .cell{position:relative;background:#15151a;border:2px solid #2a2a32;border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .1s}
+  .cell:hover{border-color:#666}
+  .cell.checked{border-color:#e8c878;background:#1a1410;box-shadow:0 0 12px rgba(232,200,120,.3)}
+  .cell.checked img{transform:scaleX(-1)}
+  .cell img{display:block;width:100%;height:140px;object-fit:contain;background:#000;transition:transform .2s}
+  .cell .name{padding:6px 8px;font:500 11px/1.3 ui-monospace,Menlo,monospace;color:#bbb;background:#0e0e12;border-top:1px solid #2a2a32;word-break:break-all}
+  .cell.checked .name{color:#e8c878}
+  .cell .check{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.7);border:2px solid #555;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700}
+  .cell.checked .check{background:#e8c878;border-color:#e8c878;color:#0a0a0d}
+  .output{margin-top:24px;padding:14px;background:#15151a;border:1px solid #333;border-radius:6px;font:500 12px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;max-height:240px;overflow:auto;color:#aaa}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#e8c878;color:#0a0a0d;padding:12px 24px;border-radius:8px;font:700 13px/1 inherit;letter-spacing:.06em;opacity:0;transition:opacity .25s;pointer-events:none}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<h1>Enemy Illustration Flip Picker</h1>
+<div class="help">
+  좌우 반전이 필요한 (= 현재 <b>오른쪽 바라보고 있는</b>) 일러스트를 클릭해서 선택하세요. 체크된 항목은 <b>미리보기로 좌우반전 적용</b>되어 표시됩니다 (= 적용 후 모습).<br>
+  선택 끝나면 <b>"파일명 복사"</b> 버튼 → claude 에게 붙여넣으면 일괄 처리합니다.<br>
+  필터로 신화별 빠른 탐색 / 전체 선택·해제 가능.
+</div>
+
+<div class="toolbar">
+  <div class="filter">
+    <button data-filter="all" class="active">전체 (237)</button>
+    <button data-filter="buddhist">불교</button>
+    <button data-filter="daoist">도교</button>
+    <button data-filter="egyptian">이집트</button>
+    <button data-filter="greek">그리스</button>
+    <button data-filter="japanese">일본</button>
+    <button data-filter="norse">북유럽</button>
+  </div>
+  <button id="selectAll">현재 필터 전체 선택</button>
+  <button id="clearAll">전체 해제</button>
+  <button class="primary" id="copyBtn">📋 파일명 복사</button>
+  <span class="count">선택: <b id="selCount">0</b> / 표시: <b id="visCount">237</b></span>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<details style="margin-top:24px">
+  <summary style="cursor:pointer;color:#888;font-size:13px">선택 결과 (JSON 배열)</summary>
+  <pre class="output" id="output">[]</pre>
+</details>
+
+<div class="toast" id="toast">복사됨!</div>
+
+<script>
+const FILES = ["buddhist_acalanatha.png","buddhist_acalanatha_p1.png","buddhist_acalanatha_p2.png","buddhist_agni_buddha.png","buddhist_ashura_warrior.png","buddhist_asura.png","buddhist_asura_king.png","buddhist_cursed_monk.png","buddhist_deva_soldier.png","buddhist_dharma_general.png","buddhist_dharma_puppet.png","buddhist_earth_spirit.png","buddhist_garuda.png","buddhist_guanyin.png","buddhist_guanyin_p1.png","buddhist_guanyin_p2.png","buddhist_hell_guardian.png","buddhist_hungry_ghost.png","buddhist_karmic_fiend.png","buddhist_ksitigarbha.png","buddhist_lotus_spirit.png","buddhist_mahavairocana.png","buddhist_mahavairocana_p1.png","buddhist_mahavairocana_p2.png","buddhist_mahoraga.png","buddhist_mara_general.png","buddhist_naga_king.png","buddhist_naga_spawn.png","buddhist_pishacha.png","buddhist_rakshasa.png","buddhist_sky_beast.png","buddhist_vaisravana.png","buddhist_vajrapani.png","buddhist_virudhaka.png","buddhist_virupaksha.png","buddhist_wrathful_spirit.png","buddhist_yaksha.png","buddhist_yama.png","daoist_azure_guardian.png","daoist_black_tortoise.png","daoist_black_wind_immortal.png","daoist_celestial_lion.png","daoist_celestial_soldier.png","daoist_child_immortal.png","daoist_cloud_beast.png","daoist_crimson_immortal.png","daoist_dao_disciple.png","daoist_dragon_king_child.png","daoist_earth_dragon.png","daoist_eastern_king.png","daoist_eastern_king_p1.png","daoist_eastern_king_p2.png","daoist_elder_hermit.png","daoist_fire_salamander.png","daoist_golden_elixir.png","daoist_hermit_ghost.png","daoist_immortal_sprite.png","daoist_immortal_warrior.png","daoist_iron_guard.png","daoist_jade_emperor.png","daoist_jade_emperor_p1.png","daoist_jade_emperor_p2.png","daoist_jade_puppet.png","daoist_mountain_spirit.png","daoist_nine_dragon.png","daoist_nine_tailed_spirit.png","daoist_river_spirit.png","daoist_silver_elixir.png","daoist_thunder_messenger.png","daoist_twin_immortals.png","daoist_vermilion_bird.png","daoist_white_tiger.png","daoist_wind_sprite.png","daoist_xuanwu.png","daoist_xuanwu_p1.png","daoist_xuanwu_p2.png","egyptian_ammit_cub.png","egyptian_anubis_guard.png","egyptian_apophis_serpent.png","egyptian_ba_bird.png","egyptian_clay_soldier.png","egyptian_desert_ghoul.png","egyptian_desert_scorpion.png","egyptian_isis_phantom.png","egyptian_isis_phantom_p1.png","egyptian_jackal_priest.png","egyptian_jackal_warrior.png","egyptian_ka_spirit.png","egyptian_khopesh_warrior.png","egyptian_mummy_warrior.png","egyptian_nile_crocodile.png","egyptian_obelisk_guardian.png","egyptian_obelisk_guardian_p1.png","egyptian_osiris.png","egyptian_osiris_p1.png","egyptian_pyramid_golem.png","egyptian_ra_horakhty.png","egyptian_ra_horakhty_p1.png","egyptian_ra_horakhty_p2.png","egyptian_sand_ifrit.png","egyptian_sand_rat.png","egyptian_sand_scout.png","egyptian_sand_wraith.png","egyptian_scarab.png","egyptian_scarab_queen.png","egyptian_sekhmet.png","egyptian_sekhmet_p1.png","egyptian_sekhmet_p2.png","egyptian_serqet.png","egyptian_set_tempest.png","egyptian_seth_hound.png","egyptian_sobek_spawn.png","egyptian_sphinx_adult.png","egyptian_sphinx_cub.png","egyptian_tomb_wraith.png","greek_ares_hound.png","greek_ares_soldier.png","greek_centaur.png","greek_cerberus.png","greek_charon.png","greek_chimera_cub.png","greek_cyclops.png","greek_dryad.png","greek_erinyes.png","greek_erinyes_p1.png","greek_fire_crab.png","greek_fly_harpy.png","greek_giant_ant.png","greek_gorgon.png","greek_gorgon_p1.png","greek_griffin_cub.png","greek_hades.png","greek_hades_p1.png","greek_hades_p2.png","greek_harpy.png","greek_hephaestus_automaton.png","greek_hephaestus_automaton_p1.png","greek_hydra.png","greek_hydra_head.png","greek_hydra_p1.png","greek_hydra_p2.png","greek_kronos.png","greek_kronos_p1.png","greek_kronos_p2.png","greek_lamia.png","greek_medusa.png","greek_medusid.png","greek_minotaur.png","greek_myrmidon.png","greek_poseidon_apostle.png","greek_satyr.png","greek_scylla.png","greek_scylla_p1.png","greek_snake.png","greek_stone_shard.png","greek_stymphalian_bird.png","greek_tartaros_shade.png","japanese_azuki_washer.png","japanese_chaos_tengu.png","japanese_cursed_scroll.png","japanese_dragon_serpent.png","japanese_foxfire.png","japanese_gashadokuro.png","japanese_hannya.png","japanese_hone_onna.png","japanese_invincible_ronin.png","japanese_ittan_momen.png","japanese_iwato_guardian.png","japanese_jorogumo.png","japanese_kappa.png","japanese_koropokkuru.png","japanese_nureriyon.png","japanese_oni.png","japanese_raijin.png","japanese_raijin_p1.png","japanese_raijin_p2.png","japanese_ronin_ghost.png","japanese_samurai_ghost.png","japanese_shuten_doji.png","japanese_shuten_doji_p1.png","japanese_shuten_doji_p2.png","japanese_shuten_minion.png","japanese_susanoo_blade.png","japanese_tatami_monster.png","japanese_tengu.png","japanese_tennyo.png","japanese_ushi_oni.png","japanese_yamabiko.png","japanese_yamabushi_ghost.png","japanese_yamamba.png","japanese_yamata_no_orochi.png","japanese_yamata_no_orochi_p1.png","japanese_yamata_no_orochi_p2.png","japanese_yasha.png","japanese_yuki_onna.png","norse_berserker.png","norse_bone_archer.png","norse_dark_elf.png","norse_draugr.png","norse_einherjar_ghost.png","norse_fenrir_cub.png","norse_fenrir_cub_p1.png","norse_fjorgynn.png","norse_fjorgynn_p1.png","norse_fjorgynn_p2.png","norse_frost_giant.png","norse_frost_wight.png","norse_garlarr_snake.png","norse_garmr.png","norse_hrimfaxi_rider.png","norse_ice_wolf.png","norse_jormungandr.png","norse_jormungandr_p1.png","norse_jormungandr_p2.png","norse_jormungandr_shard.png","norse_jormungandr_shard_p1.png","norse_jotun_soldier.png","norse_lindworm_spawn.png","norse_modgud.png","norse_modgud_p1.png","norse_nidhogg_larva.png","norse_nidhogg_scale.png","norse_night_hag.png","norse_norn.png","norse_ragnarok_herald.png","norse_raven_scout.png","norse_runestone_golem.png","norse_skoll.png","norse_surtr.png","norse_surtr_p1.png","norse_surtr_p2.png","norse_troll_warrior.png","norse_urdr_spider.png","norse_valkyrie.png","norse_vanir_elf.png","norse_vanir_elf_p1.png","norse_volva_witch.png"];
+
+const grid = document.getElementById('grid');
+const selCountEl = document.getElementById('selCount');
+const visCountEl = document.getElementById('visCount');
+const outputEl = document.getElementById('output');
+const toastEl = document.getElementById('toast');
+const selected = new Set();
+let currentFilter = 'all';
+
+function render() {
+  // innerHTML 회피 — createElement + textContent/setAttribute 로 안전 구성
+  while (grid.firstChild) grid.removeChild(grid.firstChild);
+  let visCount = 0;
+  for (const name of FILES) {
+    if (currentFilter !== 'all' && !name.startsWith(currentFilter + '_')) continue;
+    visCount++;
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (selected.has(name) ? ' checked' : '');
+    cell.dataset.name = name;
+    const check = document.createElement('div');
+    check.className = 'check';
+    check.textContent = selected.has(name) ? '✓' : '';
+    const img = document.createElement('img');
+    img.src = '../assets/art/enemies/' + name;
+    img.alt = name;
+    img.loading = 'lazy';
+    const label = document.createElement('div');
+    label.className = 'name';
+    label.textContent = name.replace('.png', '');
+    cell.appendChild(check);
+    cell.appendChild(img);
+    cell.appendChild(label);
+    cell.addEventListener('click', () => toggle(name));
+    grid.appendChild(cell);
+  }
+  visCountEl.textContent = visCount;
+  updateSelCount();
+}
+
+function toggle(name) {
+  if (selected.has(name)) selected.delete(name);
+  else selected.add(name);
+  // 셀만 갱신
+  const cell = grid.querySelector(`[data-name="${name}"]`);
+  if (cell) {
+    cell.classList.toggle('checked');
+    cell.querySelector('.check').textContent = selected.has(name) ? '✓' : '';
+  }
+  updateSelCount();
+}
+
+function updateSelCount() {
+  selCountEl.textContent = selected.size;
+  const sorted = [...selected].sort();
+  outputEl.textContent = JSON.stringify(sorted, null, 2);
+}
+
+document.querySelectorAll('.filter button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+});
+
+document.getElementById('selectAll').addEventListener('click', () => {
+  for (const name of FILES) {
+    if (currentFilter !== 'all' && !name.startsWith(currentFilter + '_')) continue;
+    selected.add(name);
+  }
+  render();
+});
+
+document.getElementById('clearAll').addEventListener('click', () => {
+  selected.clear();
+  render();
+});
+
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const sorted = [...selected].sort();
+  const text = JSON.stringify(sorted, null, 2);
+  try {
+    await navigator.clipboard.writeText(text);
+    toastEl.textContent = `복사됨! (${sorted.length}개)`;
+  } catch {
+    toastEl.textContent = '클립보드 실패 — 아래 박스에서 수동 복사';
+  }
+  toastEl.classList.add('show');
+  setTimeout(() => toastEl.classList.remove('show'), 1800);
+});
+
+render();
+</script>
+</body>
+</html>

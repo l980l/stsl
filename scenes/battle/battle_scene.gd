@@ -1042,7 +1042,7 @@ func _on_boss_phase_changed(enemy_index: int, new_phase: int) -> void:
 	var node: Node2D = _enemy_char_nodes[enemy_index]
 	if node == null or not is_instance_valid(node):
 		return
-	var enemy_res = _enemies[enemy_index] if enemy_index < _enemies.size() else null
+	var enemy_res = BattleManager._enemies[enemy_index] if enemy_index < BattleManager._enemies.size() else null
 	var is_boss: bool = enemy_res != null and enemy_res.grade == EnemyResource.Grade.BOSS
 	if is_boss:
 		# 보스 — BGM 전환 + cinematic 시각/SFX
@@ -1052,6 +1052,9 @@ func _on_boss_phase_changed(enemy_index: int, new_phase: int) -> void:
 	else:
 		# 일반 몬스터 — 가벼운 시각 + 전용 SFX (광폭화/desperation 시점)
 		_spawn_monster_phase_change(node.global_position, _foot_pos(node), new_phase + 1)
+	# 페이즈별 sprite 교체 — _p{N}.png 있는 enemy 만 효과. 없으면 swap_to_phase 가 자체 무시.
+	if node.has_method("swap_to_phase"):
+		node.swap_to_phase(new_phase)
 
 # 신화 시그니처 발동 시 화면 중앙에 짧은 토스트 표시 (~1.5초 페이드)
 # Throttle: 같은 시그니처는 1턴에 1회만 (다중 적 동시 발동 시 중복 방지)
@@ -1184,6 +1187,9 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 		var foot_pos := Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + SLOT_H - 4)
 		var sh_node := _add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
 		add_child(char_node)
+		# enemy_placeholder 에 enemy_name 전달 → 일러스트 로드 (set_enemy_id 가 _ready 후 호출되도록 add_child 이후)
+		if char_node.has_method("set_enemy_id"):
+			char_node.set_enemy_id(enemy.enemy_name)
 		char_node.set_meta("ground_shadow", sh_node)
 		_enemy_char_nodes[enemy_index] = char_node
 	else:
@@ -1249,14 +1255,16 @@ func _start_test_battle() -> void:
 	for card in test_deck:
 		DeckManager.add_card_to_deck(card)
 
-	# 적 설정 — 2마리, 영웅 공격
+	# 적 설정 — 2마리 (다른 일러스트로 확인하기 위해 satyr + hydra), 영웅 공격
 	var IntentResClass = load("res://resources/intent_resource.gd")
+	var enemy_placeholder := load("res://characters/enemies/enemy_placeholder.tscn")
+	var enemy_names := ["enemy.greek.satyr", "enemy.greek.hydra"]
 	var enemies: Array = []
-	for _ei in range(2):
+	for ei in range(2):
 		var dummy = EnemyRes.new()
-		dummy.enemy_name = "enemy.greek.satyr"
+		dummy.enemy_name = enemy_names[ei]
 		dummy.max_hp = 3000
-		dummy.character_scene = load("res://characters/enemies/satyr/satyr.tscn")
+		dummy.character_scene = enemy_placeholder
 		var intent = IntentResClass.new()
 		intent.action_type = IntentResClass.ActionType.ATTACK
 		intent.value = 30
@@ -1378,6 +1386,8 @@ func _setup_enemies() -> void:
 			var foot_pos := Vector2(slot_pos.x + SLOT_W / 2.0, slot_pos.y + SLOT_H - 4)
 			var sh_enemy := _add_ground_shadow(self, foot_pos, 90.0, 16.0, 0.45, int(slot_pos.y + SLOT_H) - 1)
 			add_child(char_node)
+			if char_node.has_method("set_enemy_id"):
+				char_node.set_enemy_id(enemy.enemy_name)
 			char_node.set_meta("ground_shadow", sh_enemy)
 			_enemy_char_nodes[i] = char_node
 		else:

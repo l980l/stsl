@@ -678,7 +678,9 @@ func _get_mythology_registry() -> Dictionary:
 	}
 
 func _scene_for(_myth: String, _fn_name: String) -> PackedScene:
-	return load("res://characters/enemies/satyr/satyr.tscn")
+	# 모든 enemy 가 동일 placeholder 사용. battle_scene 가 instantiate 후 set_enemy_id 호출 →
+	# enemy_name 기반으로 assets/art/enemies/{myth}_{name}.png 로드.
+	return load("res://characters/enemies/enemy_placeholder.tscn")
 
 func _make_normal_enemies() -> Array:
 	var myth: String = act_mythologies[current_act - 1]
