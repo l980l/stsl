@@ -151,7 +151,7 @@ static func naga_spawn(scene: PackedScene) -> Resource:
 	e.enemy_name = "enemy.buddhist.naga_spawn"; e.max_hp = 310; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
-	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "acid_spray"
+	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 70; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "bite_attack"
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.DEBUFF; i2.value = 20; i2.status_type = "poison"; i2.target = IntentRes.TargetType.RANDOM
 	var i3 := IntentRes.new()

@@ -13,9 +13,9 @@ static func nidhogg_larva(scene: PackedScene) -> Resource:
 	i1.action_type = IntentRes.ActionType.DEBUFF; i1.value = 30; i1.status_type = "poison"
 	i1.target = IntentRes.TargetType.RANDOM
 	var i2 := IntentRes.new()
-	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 120; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "acid_spray"
+	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 120; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "bite_attack"
 	var i3 := IntentRes.new()
-	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "acid_spray"
+	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 120; i3.target = IntentRes.TargetType.RANDOM; i3.damage_type = "bite_attack"
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.DEBUFF; i4.value = 50; i4.status_type = "poison"
 	i4.target = IntentRes.TargetType.ALL
