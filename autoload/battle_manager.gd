@@ -257,25 +257,60 @@ func _intent_vfx_impact_delay(intent: Resource) -> float:
 
 # 영웅 카드 차지 시간 — 첫 effect 기준
 # damage_type 이 명시된 effect 는 모두 ATTACK 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF 등)
-func _card_vfx_impact_delay(card: Resource, target_enemy_index: int = -1) -> float:
-	for effect in card.effects:
-		if effect.damage_type != "":
-			return _vfx_impact_delay_for_damage_type(effect.damage_type)
-		match effect.effect_type:
-			EffectRes.EffectType.APPLY_STATUS:
-				var d := _vfx_impact_delay_for_status(effect.status_type)
-				if d > 0.0:
-					return d
-			EffectRes.EffectType.CHARM:
-				# CHARM effect_type — enthrall 발동 예정이면 infatuation 빔(긴 차지) 딜레이로 동기
-				if target_enemy_index >= 0 and will_enthrall_enemy(target_enemy_index, effect.value):
-					return _VFX_INFATUATION.IMPACT_DELAY * _vfx_speed_mul()
-				return _VFX_CHARM_KISS.IMPACT_DELAY * _vfx_speed_mul()
-			EffectRes.EffectType.HEAL, EffectRes.EffectType.HEAL_ALL, EffectRes.EffectType.HEAL_PER_DEAD_ALLY:
-				return _VFX_HEAL_BLESSING.IMPACT_DELAY * _vfx_speed_mul()
-			EffectRes.EffectType.BLOCK, EffectRes.EffectType.BLOCK_ALL, EffectRes.EffectType.FORMATION_BLOCK, EffectRes.EffectType.COUNTER_BLOCK, EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED, EffectRes.EffectType.MORALE_TO_BLOCK:
-				return _VFX_DEFENSE_BUFF.IMPACT_DELAY * _vfx_speed_mul()
+# 단일 effect 의 VFX impact delay (해당 VFX screen_effect 시점 근사). 0 = 전용 VFX 없음.
+func _effect_vfx_impact_delay(effect: Resource, target_enemy_index: int = -1) -> float:
+	if effect.damage_type != "":
+		return _vfx_impact_delay_for_damage_type(effect.damage_type)
+	match effect.effect_type:
+		EffectRes.EffectType.APPLY_STATUS:
+			return _vfx_impact_delay_for_status(effect.status_type)
+		EffectRes.EffectType.CHARM:
+			# CHARM effect_type — enthrall 발동 예정이면 infatuation 빔(긴 차지) 딜레이로 동기
+			if target_enemy_index >= 0 and will_enthrall_enemy(target_enemy_index, effect.value):
+				return _VFX_INFATUATION.IMPACT_DELAY * _vfx_speed_mul()
+			return _VFX_CHARM_KISS.IMPACT_DELAY * _vfx_speed_mul()
+		EffectRes.EffectType.HEAL, EffectRes.EffectType.HEAL_ALL, EffectRes.EffectType.HEAL_PER_DEAD_ALLY:
+			return _VFX_HEAL_BLESSING.IMPACT_DELAY * _vfx_speed_mul()
+		EffectRes.EffectType.BLOCK, EffectRes.EffectType.BLOCK_ALL, EffectRes.EffectType.FORMATION_BLOCK, EffectRes.EffectType.COUNTER_BLOCK, EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED, EffectRes.EffectType.MORALE_TO_BLOCK:
+			return _VFX_DEFENSE_BUFF.IMPACT_DELAY * _vfx_speed_mul()
 	return 0.0
+
+# 효과가 속한 VFX 그룹 키 — battle_scene._on_card_vfx_start 의 dedup 그룹과 일치.
+# 같은 그룹의 여러 효과는 VFX 1개를 공유(첫 효과가 spawn, 나머지는 흡수) → 같은 impact 시점에 적용.
+func _effect_vfx_group(effect: Resource) -> String:
+	if effect.damage_type != "":
+		return "attack"
+	match effect.effect_type:
+		EffectRes.EffectType.APPLY_STATUS:
+			if effect.status_type.begins_with("power.") or effect.target == "SELF":
+				return "buff"
+			return "debuff"  # 적 디버프 + taunt (battle_scene did_debuff 그룹)
+		EffectRes.EffectType.CHARM, EffectRes.EffectType.DEBUFF_SPEED:
+			return "debuff"
+		EffectRes.EffectType.MARK_ENEMY:
+			return "mark"
+		EffectRes.EffectType.HEAL, EffectRes.EffectType.HEAL_ALL, EffectRes.EffectType.HEAL_PER_DEAD_ALLY, EffectRes.EffectType.BLOCK, EffectRes.EffectType.BLOCK_ALL, EffectRes.EffectType.FORMATION_BLOCK, EffectRes.EffectType.COUNTER_BLOCK, EffectRes.EffectType.BLOCK_PER_CARDS_PLAYED, EffectRes.EffectType.MORALE_TO_BLOCK, EffectRes.EffectType.SUMMON_TOKEN, EffectRes.EffectType.PURGE_STATUS:
+			return "self_aoe"
+		EffectRes.EffectType.BUFF_SPEED, EffectRes.EffectType.SACRIFICE_HP, EffectRes.EffectType.GAIN_MORALE:
+			return "buff"
+	return "none"  # 전용 VFX 없음 (DRAW/ENERGY 등) — 첫 스테이지에서 적용
+
+# 이 효과의 결과 폰트(데미지/상태)가 표시돼야 할 VFX impact delay.
+# 효과가 속한 VFX 그룹의 '첫 효과' delay 를 반환 (그룹 내 효과는 VFX 1개 공유 → 같은 시점에 표시).
+# ATTACK 빔은 디버프 rider(weak/vulnerable/charm 등)를 흡수 → 데미지와 같은 시점
+# (battle_scene 이 attack 발동 시 did_debuff=true 로 디버프 빔을 따로 안 띄움). 단, BLOCK/buff/heal
+# 등 별도 VFX 그룹은 자기 impact 시점에 따로 표시.
+func _effect_stage_delay(card: Resource, effect: Resource, target_enemy_index: int = -1) -> float:
+	var g := _effect_vfx_group(effect)
+	if _card_has_damage(card) and (g == "attack" or g == "debuff"):
+		for e in card.effects:
+			if e.damage_type != "":
+				return _vfx_impact_delay_for_damage_type(e.damage_type)
+		return 0.0
+	for e in card.effects:
+		if _effect_vfx_group(e) == g:
+			return _effect_vfx_impact_delay(e, target_enemy_index)
+	return _effect_vfx_impact_delay(effect, target_enemy_index)
 
 # 차지 중 카드의 예측 데미지 — UI 가 사망 예정 적을 즉시 dim/비활성화 + 추가 ATTACK 거부
 signal pending_damage_changed(enemy_index: int)
@@ -1076,24 +1111,40 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 	var _pending_estimate := _estimate_card_damage(card, target_enemy_index)
 	for _ei in _pending_estimate:
 		_add_pending_dmg(_ei, _pending_estimate[_ei])
-	var _delay := _card_vfx_impact_delay(card, target_enemy_index)
-	if _delay > 0.0:
-		# popup·SFX 동기화: fx.screen_effect 시점까지 대기 (fallback timer = _delay + 0.5s)
-		await _await_vfx_impact(_delay + 0.5)
-		if not is_battle_active:
-			for _ei in _pending_estimate:
-				_clear_pending_dmg(_ei, _pending_estimate[_ei])
-			return
-		if team_mgr and not team_mgr.is_alive(card.owner_id):
-			for _ei in _pending_estimate:
-				_clear_pending_dmg(_ei, _pending_estimate[_ei])
-			return
-	# 임팩트 도달 — pending 차감 후 실제 효과 적용 (실제 데미지 시그널이 hp 갱신)
-	for _ei in _pending_estimate:
-		_clear_pending_dmg(_ei, _pending_estimate[_ei])
+	# 각 효과를 자기 VFX 그룹의 impact 시점에 맞춰 적용 — 데미지/상태 폰트가 해당 VFX 임팩트와 동기.
+	# 효과를 impact delay 오름차순(동일 delay 는 원래 순서 유지)으로 정렬 후, 각 효과 적용 직전
+	# 자기 VFX 그룹 impact 까지 대기. ATTACK 카드는 모든 효과가 같은 delay → 한 번에 적용 (기존 동작).
+	# 테스트 환경(_vfx_speed_mul()==0)에서는 모든 delay 0 → 대기 없이 즉시 일괄 적용.
+	var _ordered: Array = []
+	for _oi in range(card.effects.size()):
+		_ordered.append([_effect_stage_delay(card, card.effects[_oi], target_enemy_index), _oi, card.effects[_oi]])
+	_ordered.sort_custom(func(a, b): return a[1] < b[1] if a[0] == b[0] else a[0] < b[0])
 	_kills_this_card = 0
 	_enthralls_this_card = 0
-	for effect in card.effects:
+	var _stage_elapsed := 0.0
+	var _pending_cleared := false
+	for _op in _ordered:
+		var _stage_d: float = _op[0]
+		var effect = _op[2]
+		if _stage_d > _stage_elapsed:
+			# 이 효과 VFX 그룹의 impact 까지 대기 (다음 vfx_impact_resolved 신호 = 이 그룹 빔).
+			await _await_vfx_impact((_stage_d - _stage_elapsed) + 0.5)
+			_stage_elapsed = _stage_d
+			if not is_battle_active:
+				if not _pending_cleared:
+					for _ei in _pending_estimate:
+						_clear_pending_dmg(_ei, _pending_estimate[_ei])
+				return
+			if team_mgr and not team_mgr.is_alive(card.owner_id):
+				if not _pending_cleared:
+					for _ei in _pending_estimate:
+						_clear_pending_dmg(_ei, _pending_estimate[_ei])
+				return
+		# 첫 실제 적용 직전 1회 pending(예측 데미지) 차감 → 실제 데미지 시그널이 hp 갱신
+		if not _pending_cleared:
+			for _ei in _pending_estimate:
+				_clear_pending_dmg(_ei, _pending_estimate[_ei])
+			_pending_cleared = true
 		# condition 필드 평가 — 조건 불충족 시 이 효과 스킵
 		if effect.condition != "" and not _evaluate_condition(effect.condition, card):
 			continue
