@@ -1947,8 +1947,11 @@ func _on_card_hovered(_card: Resource, card_node: Control) -> void:
 		var tw := create_tween().set_parallel(true).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 		if idx == hover_idx:
 			var hover_scale_vec := GameSettings.get_card_scale(BASE_CARD_SCALE * 1.4)
-			# 호버 후 카드 하단 y = base_pos.y + hover_scale.y * 100 + 100
-			var card_bottom := base_pos.y + hover_scale_vec.y * 100.0 + 100.0
+			# 카드 하단 screen y = pos.y + pivot.y + scale.y*(높이 - pivot.y).
+			# 프레임별(classic 140×200 / modern 196×280) native 크기·pivot 을 노드에서 직접 읽어 반영.
+			var card_h: float = btn.custom_minimum_size.y
+			var pivot_y: float = btn.pivot_offset.y
+			var card_bottom := base_pos.y + pivot_y + hover_scale_vec.y * (card_h - pivot_y)
 			var lift := maxf(60.0, card_bottom - (WINDOW_H - 20.0))
 			tw.tween_property(btn, "scale", hover_scale_vec, 0.12)
 			tw.tween_property(btn, "position", base_pos + Vector2(0, -lift), 0.12)
@@ -2969,7 +2972,7 @@ func _on_card_vfx_start(card: Resource, target_enemy_index: int, target_hero_id:
 	var caster_foot: Vector2 = _foot_pos(owner_node)
 	# 카드의 모든 effect 에 대해 적절한 VFX 시작 — 단, 같은 효과군은 한 번만 표시.
 	# damage_type 이 명시된 effect 는 모두 ATTACK 처리 (CONDITIONAL_DMG, DAMAGE_PER_*, SACRIFICE_PAYOFF 등)
-	# 차지 시간 동기화는 첫 effect 기준 (_card_vfx_impact_delay) — 다른 VFX 는 자체 타이밍.
+	# 효과 적용/폰트 동기화는 battle_manager._apply_card_effects 가 VFX 그룹별 impact 시점에 맞춰 처리.
 	# 여러 효과군 (예: BUFF + DEBUFF) 은 순차 spawn — VFX 사이 짧은 delay.
 	const _VFX_STEP_DELAY: float = 0.25
 	var _vfx_spawn_count: int = 0
