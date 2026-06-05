@@ -180,6 +180,7 @@ func _draw_ofudas(canvas: CanvasItem, ga: float) -> void:
 			HORIZONTAL_ALIGNMENT_CENTER, -1, 14,
 			Color(COL_SHRINE.r, COL_SHRINE.g, COL_SHRINE.b, alpha))
 
+@warning_ignore("shadowed_global_identifier")
 func _draw_ofuda_paper(canvas: CanvasItem, pos: Vector2, rot: float, alpha: float) -> void:
 	var hw: float = OFUDA_W * 0.5
 	var hh: float = OFUDA_H * 0.5

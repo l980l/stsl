@@ -58,6 +58,11 @@ var battles_completed: int = 0
 var enemies_killed_this_run: int = 0
 var act_mythologies: Array[String] = []
 
+# 스토리 오버레이 transient 가드 (비저장 — 게임 실행 단위)
+var _awakening_shown_run: bool = false  # 런당 각성 라인 1회
+var _realm_intro_act: int = -1          # act 변경 시 신역 진입 라인 1회
+var _story_last_idx: Dictionary = {}    # surface → 마지막 에버그린 인덱스 (직전 반복 회피)
+
 # ── Plan 04: 런 스테이트 ──────────────────────────────
 var run_map: Array = []             # Array[MapNodeResource]
 var available_node_ids: Array = []  # 현재 클릭 가능한 노드 ID 목록
@@ -205,10 +210,33 @@ func start_run(initial_hero_id: String = "napoleon", chapter: int = 1) -> void:
 	for node in run_map:
 		if node.floor_num == 0:
 			available_node_ids.append(node.node_id)
+	# 스토리: 런(각성) 카운트 증가 + 오버레이 가드 리셋
+	var _pm = get_node_or_null("/root/ProgressManager")
+	if _pm:
+		_pm.increment_run_count()
+	_awakening_shown_run = false
+	_realm_intro_act = -1
 	run_started.emit()
 
 func _make_hero_by_id(hero_id: String) -> Resource:
 	return _HeroRegistry.make_hero(hero_id)
+
+# 스토리 라인 i18n 키 선택 — 풀 하이브리드(포화 없음):
+#   awakening 첫 런 → .first / 4런+ 낮은 확률 → .deepN / 그 외 → 에버그린 .eN 랜덤(직전 반복 회피)
+func pick_story_key(surface: String) -> String:
+	var pm = get_node_or_null("/root/ProgressManager")
+	var rc: int = pm.run_count if pm else 1
+	if surface == "awakening" and rc <= 1:
+		return "story.awakening.first"
+	var deep_n: int = {"awakening": 2, "reanchor": 2}.get(surface, 0)
+	if deep_n > 0 and rc >= 4 and randf() < 0.18:
+		return "story.%s.deep%d" % [surface, randi() % deep_n + 1]
+	var ever_n: int = {"awakening": 6, "reanchor": 6, "cyclewin": 5}.get(surface, 1)
+	var idx: int = randi() % ever_n
+	if ever_n > 1 and idx == int(_story_last_idx.get(surface, -1)):
+		idx = (idx + 1) % ever_n
+	_story_last_idx[surface] = idx
+	return "story.%s.e%d" % [surface, idx + 1]
 
 func enter_node(node_id: int) -> void:
 	if node_id not in available_node_ids:
@@ -1085,17 +1113,14 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 					if _bm_re:
 						_bm_re._check_lose_condition()
 		RelicRes.EffectType.BUFF_SPEED_TEAM:
-			# 신속의 인장 — BATTLE_START 시 모든 영웅 power.speed_buff = value (덮어쓰기, 전투 끝까지)
+			# 신속의 인장 — BATTLE_START 시 모든 영웅 속도 +value (speed_bonus 상태 = 영웅 상태 아이콘, 전투 끝까지)
 			var bm_bst := _get_bm()
 			if bm_bst == null or tm == null:
 				return
 			for hero in tm.heroes:
-				var k_sb: String = "power.speed_buff:" + hero.hero_id
-				bm_bst._active_powers[k_sb] = {"value": value, "owner_id": hero.hero_id, "params": {}}
-				bm_bst._adjust_turn_queue_for_speed_change("hero:" + hero.hero_id, bm_bst._actor_speed("hero:" + hero.hero_id) - value)
-			bm_bst.active_powers_changed.emit()
+				bm_bst.apply_speed_bonus(hero.hero_id, value, 9999)
 		RelicRes.EffectType.TIME_HOURGLASS:
-			# 시간의 모래시계 — 매 영웅 차례 종료 시 counter++, condition_value 배수 시 모든 영웅 speed_buff += value 누적
+			# 시간의 모래시계 — 매 영웅 차례 종료 시 counter++, condition_value 배수 시 모든 영웅 속도 +value (speed_bonus 누적 = 상태 아이콘)
 			var bm_th := _get_bm()
 			if bm_th == null or tm == null:
 				return
@@ -1103,12 +1128,7 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 			var period: int = max(1, relic.condition_value)
 			if bm_th._hourglass_counter % period == 0:
 				for hero in tm.heroes:
-					var k_sh: String = "power.speed_buff:" + hero.hero_id
-					var cur_sh: int = bm_th._active_powers.get(k_sh, {}).get("value", 0)
-					bm_th._active_powers[k_sh] = {"value": cur_sh + value, "owner_id": hero.hero_id, "params": {}}
-					var _aid: String = "hero:" + hero.hero_id
-					bm_th._adjust_turn_queue_for_speed_change(_aid, bm_th._actor_speed(_aid) - value)
-				bm_th.active_powers_changed.emit()
+					bm_th.apply_speed_bonus(hero.hero_id, value, 9999)
 		RelicRes.EffectType.RUN_STRENGTH:
 			# "점점 강해지는" 렐릭 — BATTLE_START 시점에 런 카운터를 BM 파워로 세팅.
 			# status_type으로 메커니즘 구분. _active_powers는 매 전투 초기화되므로 누적처럼 동작.

@@ -14,7 +14,7 @@ var _snow_emitter: GPUParticles2D
 var _snow_made: bool = false
 
 # frost_mist — 비행 중 꽁무니. continuous emitter (첫 호출 시 만들고 매 프레임 위치 동기)
-func _spawn_frost_mist(pos: Vector2, intensity: float) -> void:
+func _spawn_frost_mist(pos: Vector2, _intensity: float) -> void:
 	if not _frost_made:
 		_frost_made = true
 		# mist 6/frame × intensity. continuous.

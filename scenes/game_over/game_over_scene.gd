@@ -29,6 +29,21 @@ func _build_ui() -> void:
 	title.size = Vector2(600, 120)
 	LabelUtils.fit_text(title, 72, 40)
 
+	# 스토리 라인 (패배=재안치 / 승리=순환 암시) — 풀 하이브리드 (포화 없음, 랜덤·직전 반복 회피)
+	var _story_key: String = GameManager.pick_story_key("cyclewin" if is_win else "reanchor")
+	var _story_txt: String = tr(_story_key)
+	if _story_txt != "" and _story_txt != _story_key:
+		var story_lbl := Label.new()
+		story_lbl.text = _story_txt
+		story_lbl.position = Vector2(460, 300)
+		story_lbl.size = Vector2(1000, 70)
+		story_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		story_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		story_lbl.theme_type_variation = "SubLabel"
+		story_lbl.add_theme_font_size_override("font_size", 22)
+		story_lbl.modulate = Color(0.74, 0.71, 0.64)
+		add_child(story_lbl)
+
 	var info := Label.new()
 	info.text = tr("ui.game_over.stats") % [GameManager.current_floor, GameManager.gold]
 	info.position = Vector2(660, 380)

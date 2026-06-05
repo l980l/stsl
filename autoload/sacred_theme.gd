@@ -115,6 +115,7 @@ func _on_locale_changed(_locale: String) -> void:
 	_setup_fonts()
 	theme.changed.emit()
 
+@warning_ignore("shadowed_variable_base_class")
 func _setup_cursor() -> void:
 	if _cursor_base_images.is_empty():
 		for name in _CURSOR_MAP.keys():
@@ -123,6 +124,7 @@ func _setup_cursor() -> void:
 				_cursor_base_images[name] = tex.get_image()
 	apply_cursor_size(load_cursor_size())
 
+@warning_ignore("shadowed_variable_base_class")
 func apply_cursor_size(px: int) -> void:
 	if _cursor_base_images.is_empty():
 		_setup_cursor()
@@ -145,6 +147,7 @@ func apply_cursor_size(px: int) -> void:
 
 # 임시 커서 오버라이드 — 카드 드래그 → 아군 타겟팅 등 컨텍스트별 수동 적용.
 # CURSOR_ARROW 슬롯에 일시 덮어쓰기 후 clear_named_cursor 로 기본 매핑 복원.
+@warning_ignore("shadowed_variable_base_class")
 func set_named_cursor(name: String) -> void:
 	if not _cursor_textures_cache.has(name):
 		return

@@ -140,7 +140,9 @@ func _build_desc() -> String:
 	var lines: Array = []
 	for eff in _card_res.effects:
 		if _mode == Mode.HAND and eff.effect_type == EffectResource.EffectType.DAMAGE:
-			var bm := get_node_or_null("/root/BattleManager")
+			# autoload 를 트리 안 root 에서 상대경로 조회 — 카드가 트리 밖(setup)일 때도 안전(절대경로 오류 방지)
+			var _ml = Engine.get_main_loop()
+			var bm = _ml.root.get_node_or_null("BattleManager") if _ml else null
 			var v: int = bm.estimate_effect_damage(eff, _card_res.owner_id, _target_enemy_index) if bm else int(eff.value)
 			lines.append(eff.display_text(v))
 		else:
@@ -290,6 +292,7 @@ func _apply_line_color(rect: TextureRect, fc: Color, _left_side: bool) -> void:
 	rect.texture = new_tex
 
 # 원형 텍스처 직접 생성 — 셰이더 의존 X.
+@warning_ignore("shadowed_variable_base_class")
 func _make_circle_texture(hi: Color, mid: Color, lo: Color, ring: Color,
 		ring_width_ratio: float = 0.08, size: int = 64,
 		highlight_strength: float = 0.65) -> ImageTexture:

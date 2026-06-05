@@ -348,6 +348,7 @@ func _draw_glow_pass(canvas: CanvasItem) -> void:
 		canvas.draw_circle(p["pos"], pr, Color(COL_BRASS.r, COL_BRASS.g, COL_BRASS.b, a))
 
 # 균열 — 보스 영역에 5 zigzag 빛나는 선 (위에서 아래로 그려짐)
+@warning_ignore("shadowed_variable_base_class")
 func _draw_cracks(canvas: CanvasItem, ga: float) -> void:
 	if _age >= IMPACT_DELAY:
 		return

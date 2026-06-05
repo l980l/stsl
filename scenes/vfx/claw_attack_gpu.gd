@@ -344,7 +344,7 @@ func _draw_gashes() -> void:
 		var bot: PackedVector2Array = g["bot"]
 		var mid: PackedVector2Array = g["mid"]
 		var body_cols: PackedColorArray = g["body_cols"]
-		var hi_cols: PackedColorArray = g["hi_cols"]
+		var _hi_cols: PackedColorArray = g["hi_cols"]
 		var spatter: Array = g["spatter"]
 		var drips: Array = g["drips"]
 		# 1. 본체 — vertex color 폴리곤 (양 끝 fade, 가운데 진한 빨강)

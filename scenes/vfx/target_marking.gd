@@ -269,7 +269,7 @@ func _draw_reticle(canvas: CanvasItem, ga: float) -> void:
 	# inner small ring
 	canvas.draw_arc(pos, r * 0.26, 0.0, TAU, 16, Color(COL_HOT, 0.9 * alpha), 1.0, true)
 	# crosshair cross (4 stub)
-	var stub: float = r * 0.36
+	var _stub: float = r * 0.36
 	canvas.draw_line(pos + Vector2(0, -r * 1.1), pos + Vector2(0, -r * 0.55), Color(COL_HOT, 0.95 * alpha), 1.4, true)
 	canvas.draw_line(pos + Vector2(0, r * 1.1), pos + Vector2(0, r * 0.55), Color(COL_HOT, 0.95 * alpha), 1.4, true)
 	canvas.draw_line(pos + Vector2(-r * 1.1, 0), pos + Vector2(-r * 0.55, 0), Color(COL_HOT, 0.95 * alpha), 1.4, true)
@@ -285,6 +285,7 @@ func _draw_reticle(canvas: CanvasItem, ga: float) -> void:
 		canvas.draw_line(p0, p1, Color(COL_MARK_HOT, 0.7 * alpha), 1.0, true)
 
 # 4 corner brackets (lock 시점 snap, hold pulse, fade)
+@warning_ignore("shadowed_variable_base_class")
 func _draw_brackets(canvas: CanvasItem, ga: float) -> void:
 	var post: float = _age - PEAK_DELAY
 	var snap: float = clampf(post / 0.2, 0.0, 1.0)
@@ -379,6 +380,7 @@ func _draw_lock_shock(canvas: CanvasItem, ga: float) -> void:
 	canvas.draw_arc(_target, rad, 0.0, TAU, 48, Color(COL_MARK_HOT, alpha), thick, true)
 
 # rune 글리프 — + × ◇ □ ◯ 단순 도형 (text 대신)
+@warning_ignore("shadowed_variable_base_class")
 func _draw_rune_glyph(canvas: CanvasItem, pos: Vector2, size: float, rot: float, idx: int, col: Color) -> void:
 	var r: float = size
 	var c: Vector2 = pos

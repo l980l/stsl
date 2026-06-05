@@ -10,6 +10,7 @@ const _DEFAULT_HEROES := ["napoleon", "cleopatra", "yi_sun_sin"]
 var chapters_cleared: Array = []
 var unlocked_heroes: Array = []
 var unlock_flags: Dictionary = {}
+var run_count: int = 0  # 누적 런(각성) 횟수 — 스토리 변주("전에도 왔다")용. 영구 저장.
 
 func _ready() -> void:
 	load_progress()
@@ -18,6 +19,12 @@ func reset_progress() -> void:
 	chapters_cleared.clear()
 	unlocked_heroes = _DEFAULT_HEROES.duplicate()
 	unlock_flags.clear()
+	run_count = 0
+
+# 런 시작 시 1회 호출 — 스토리 각성 라인 변주 기준.
+func increment_run_count() -> void:
+	run_count += 1
+	save_progress()
 
 func mark_chapter_cleared(chapter: int) -> void:
 	if chapter not in chapters_cleared:
@@ -93,6 +100,7 @@ func to_dict() -> Dictionary:
 		"chapters_cleared": chapters_cleared.duplicate(),
 		"unlocked_heroes": unlocked_heroes.duplicate(),
 		"unlock_flags": unlock_flags.duplicate(),
+		"run_count": run_count,
 	}
 
 func from_dict(data: Dictionary) -> void:
@@ -102,6 +110,7 @@ func from_dict(data: Dictionary) -> void:
 		heroes = _DEFAULT_HEROES.duplicate()
 	unlocked_heroes = heroes.duplicate()
 	unlock_flags = data.get("unlock_flags", {}).duplicate()
+	run_count = int(data.get("run_count", 0))
 
 func save_progress() -> void:
 	var file := FileAccess.open(PROGRESS_PATH, FileAccess.WRITE)

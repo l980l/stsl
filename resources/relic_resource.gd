@@ -31,3 +31,10 @@ enum EffectType {
 @export var penalty_trigger: TriggerType = TriggerType.PASSIVE
 @export var penalty_effect_type: EffectType = EffectType.DAMAGE_HERO
 @export var penalty_value: int = 0
+
+# 스토리 단서용 i18n lore 키 — relic_name("relic.X.name") → "relic.X.lore" 파생.
+# 호출부에서 tr() 후 키 원문/빈값이면 생략 (lore 미존재 유물 안전).
+func lore_key() -> String:
+	if relic_name.ends_with(".name"):
+		return relic_name.trim_suffix(".name") + ".lore"
+	return ""

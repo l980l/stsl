@@ -46,7 +46,7 @@ func _make_inflow(col: Color, count: int) -> GPUParticles2D:
 		"start_alpha": 1.0, "mid_alpha": 0.5, "end_alpha": 0.0,
 	})
 
-func _spawn_inflow(n: int) -> void:
+func _spawn_inflow(_n: int) -> void:
 	if not _inflow_made:
 		_inflow_made = true
 		# intensity 평균 4/frame × 60 = 240/s × lifetime 1.15 = 276 동시.

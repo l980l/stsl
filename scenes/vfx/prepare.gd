@@ -43,6 +43,7 @@ const WASH_R         := 110.0    # 캐릭터 뒤 dim wash 반경
 const PSPEED         := 60.0
 
 ## 시그널 — 호출처가 connect 가능하지만 PREPARE 는 emit 안 함 (효과 없는 턴)
+@warning_ignore("unused_signal")
 signal screen_effect
 
 var _target := Vector2.ZERO

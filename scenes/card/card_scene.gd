@@ -187,7 +187,8 @@ func _build_desc() -> String:
 		# 그 외 effect 는 raw value.
 		if _mode == Mode.HAND and eff.effect_type == EffectResource.EffectType.DAMAGE:
 			# class_name 글로벌 클래스 내부에서는 autoload 식별자 컴파일 단계에서 unknown — 동적 참조
-			var bm := get_node_or_null("/root/BattleManager")
+			var _ml = Engine.get_main_loop()
+			var bm = _ml.root.get_node_or_null("BattleManager") if _ml else null
 			var v: int = bm.estimate_effect_damage(eff, _card.owner_id, _target_enemy_index) if bm else int(eff.value)
 			lines.append(eff.display_text(v))
 		else:

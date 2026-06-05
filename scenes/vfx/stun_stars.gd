@@ -17,6 +17,7 @@ const STUN_TIME     := 2.0     # 일회성 모드 표시 지속 시간(s)
 const FADE_TIME     := 0.3
 
 ## 빔 VFX 와 인터페이스 통일용 — 스턴 표시는 emit 하지 않는다.
+@warning_ignore("unused_signal")
 signal screen_effect
 
 var _target := Vector2.ZERO
