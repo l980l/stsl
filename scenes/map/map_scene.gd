@@ -40,6 +40,70 @@ func _ready() -> void:
 	_build_ui()
 	_refresh_map()
 	call_deferred("_init_map_scroll")
+	_show_story_overlays()
+
+# 스토리 오버레이 — 신역 진입(act 변경 시 1회) + 각성(런당 1회, act1 진입). 페이드 인/아웃 라인.
+func _show_story_overlays() -> void:
+	var lines: Array = []  # {text, y, dur}
+	# 신역 진입 — act 변경 시 1회
+	if GameManager.current_act != GameManager._realm_intro_act:
+		GameManager._realm_intro_act = GameManager.current_act
+		var idx: int = GameManager.current_act - 1
+		if idx >= 0 and idx < GameManager.act_mythologies.size():
+			var rk: String = "story.realm.%s.intro" % GameManager.act_mythologies[idx]
+			var rt: String = tr(rk)
+			if rt != "" and rt != rk:
+				lines.append({"text": rt, "y": 150.0, "dur": 4.0})
+	# 각성 — 런당 1회 (act 1 진입). 풀 하이브리드 선택.
+	if GameManager.current_act == 1 and not GameManager._awakening_shown_run:
+		GameManager._awakening_shown_run = true
+		var ak: String = GameManager.pick_story_key("awakening")
+		var at: String = tr(ak)
+		if at != "" and at != ak:
+			lines.append({"text": at, "y": 540.0, "dur": 5.0})
+	if lines.is_empty():
+		return
+	# 어두운 막을 깔아 맵을 가린 뒤 라인 표시 (가장 긴 라인 길이만큼 유지)
+	var max_dur: float = 0.0
+	for l in lines:
+		max_dur = maxf(max_dur, l["dur"])
+	_spawn_story_backdrop(max_dur)
+	for l in lines:
+		_spawn_story_line(l["text"], l["y"], l["dur"])
+
+# 스토리 오버레이용 반투명 어두운 막 — 텍스트와 함께 페이드 인/아웃.
+func _spawn_story_backdrop(dur: float) -> void:
+	var bd := ColorRect.new()
+	bd.color = Color(0.02, 0.02, 0.04, 0.0)
+	bd.position = Vector2.ZERO
+	bd.size = Vector2(1920, 1080)
+	bd.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bd.z_index = 3999  # 라인(4000) 바로 아래
+	add_child(bd)
+	var tw := create_tween()
+	tw.tween_property(bd, "color:a", 0.62, 0.8)
+	tw.tween_interval(dur)
+	tw.tween_property(bd, "color:a", 0.0, 1.0)
+	tw.tween_callback(bd.queue_free)
+
+func _spawn_story_line(text: String, y: float, dur: float) -> void:
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.position = Vector2(360, y)
+	lbl.size = Vector2(1200, 90)
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lbl.theme_type_variation = "SubLabel"
+	lbl.add_theme_font_size_override("font_size", 26)
+	lbl.modulate = Color(0.80, 0.77, 0.70, 0.0)
+	lbl.z_index = 4000
+	add_child(lbl)
+	LabelUtils.fit_text(lbl, 26, 16, -1.0, 90.0)
+	var tw := create_tween()
+	tw.tween_property(lbl, "modulate:a", 0.92, 0.8)
+	tw.tween_interval(dur)
+	tw.tween_property(lbl, "modulate:a", 0.0, 1.0)
+	tw.tween_callback(lbl.queue_free)
 
 func _input(ev: InputEvent) -> void:
 	if _active_scroll != null and ev is InputEventMouseButton:
@@ -421,6 +485,11 @@ func _refresh_relics() -> void:
 			SacredTheme.attach_tooltip(lbl, tip)
 	for relic in GameManager.relics:
 		var tip: String = "%s\n%s" % [tr(relic.relic_name), tr(relic.description)]
+		var _lk: String = relic.lore_key()
+		if _lk != "":
+			var _lt: String = tr(_lk)
+			if _lt != "" and _lt != _lk:
+				tip += "\n\n「%s」" % _lt
 		var tex: Texture2D = IconUtils.get_relic_icon(relic.relic_name)
 		if tex != null:
 			var rect := TextureRect.new()

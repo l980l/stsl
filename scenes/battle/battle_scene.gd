@@ -346,7 +346,7 @@ func _build_ui() -> void:
 	_energy_hbox = HBoxContainer.new()
 	_energy_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	_energy_hbox.add_theme_constant_override("separation", 17)  # 14 → +20%
-	_energy_hbox.position = Vector2(_ENERGY_CENTER_X - _ENERGY_W / 2, BOTTOM_Y - 26)
+	_energy_hbox.position = Vector2(_ENERGY_CENTER_X - _ENERGY_W / 2.0, BOTTOM_Y - 26)
 	_energy_hbox.size = Vector2(_ENERGY_W, _ENERGY_H)
 	add_child(_energy_hbox)
 
@@ -666,6 +666,11 @@ func _refresh_hud() -> void:
 		return
 	for relic in GameManager.relics:
 		var tip: String = "%s\n%s" % [tr(relic.relic_name), tr(relic.description)]
+		var _lk: String = relic.lore_key()
+		if _lk != "":
+			var _lt: String = tr(_lk)
+			if _lt != "" and _lt != _lk:
+				tip += "\n\n「%s」" % _lt
 		var tex: Texture2D = IconUtils.get_relic_icon(relic.relic_name)
 		if tex != null:
 			var rect := TextureRect.new()
@@ -3420,7 +3425,7 @@ func _on_synergy_drain_vfx(hero_ids: Array, value: int, target_enemy_index: int)
 		# 적 좌표 없음 — heal 폴백
 		_on_synergy_ally_vfx("heal", hero_ids, value, 0)
 		return
-	var enemy_entry: Dictionary = _enemy_nodes[target_enemy_index]
+	var _enemy_entry: Dictionary = _enemy_nodes[target_enemy_index]
 	var enemy_char_node: Node2D = _enemy_char_nodes[target_enemy_index] if target_enemy_index < _enemy_char_nodes.size() else null
 	if not is_instance_valid(enemy_char_node):
 		_on_synergy_ally_vfx("heal", hero_ids, value, 0)
@@ -3565,7 +3570,7 @@ func _animate_soldier_summon_motion(hero_node: Node2D, grid_pos: Vector2) -> voi
 	tw.tween_callback(soldier.queue_free)
 
 # 보스 phase 전환 — 보스 위치 build-up → core erupt + 6겹 shockwave + 화면 flash·shake + cinematic title + letterbox
-func _spawn_boss_phase_change(target_pos: Vector2, foot_pos: Vector2, phase_num: int) -> void:
+func _spawn_boss_phase_change(target_pos: Vector2, foot_pos: Vector2, _phase_num: int) -> void:
 	var fx: Node2D = _VFX_BOSS_PHASE.new()
 	add_child(fx)
 	fx.z_index = 1300
@@ -3586,7 +3591,7 @@ func _spawn_boss_phase_change(target_pos: Vector2, foot_pos: Vector2, phase_num:
 		if is_inside_tree():
 			_play_screen_shake()
 	# cinematic letterbox + title toast — 사용자 요청으로 제거
-	# _spawn_boss_phase_cinematic(phase_num)
+	# _spawn_boss_phase_cinematic(_phase_num)
 
 # 일반 몬스터 phase 전환 — 가벼운 시각 (inward motes + 작은 충격파 + 지면 ring) + 전용 SFX
 func _spawn_monster_phase_change(target_pos: Vector2, foot_pos: Vector2, _phase_num: int) -> void:
@@ -5651,7 +5656,7 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 	var card_w := 194.0
 	var card_scale := card_w / 140.0
 	var card_h := 200.0 * card_scale
-	var base_scale := Vector2(card_scale, card_scale)
+	var _base_scale := Vector2(card_scale, card_scale)
 	# pivot(70,200) 기준 스케일로 비주얼이 래퍼 좌·상단 밖으로 밀리는 만큼 보정
 	var base_pos := Vector2(70.0 * (card_scale - 1.0), 200.0 * (card_scale - 1.0))
 

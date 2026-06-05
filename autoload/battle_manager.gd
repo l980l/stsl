@@ -139,6 +139,7 @@ signal passive_buff_applied(enemy_index: int, status_type: String, value: int)  
 signal hero_turn_skipped(hero_id: String)  # 스턴 등으로 영웅 차례 자동 종료 — 토스트·VFX 용
 signal synergy_triggered(synergy_key: String, hero_id: String)  # 교차 영웅 시너지 발동 — battle_scene 토스트용
 signal hero_block_vfx(hero_id: String)  # 시너지 등으로 영웅 방어도 획득 — battle_scene defense_buff VFX용
+@warning_ignore("unused_signal")
 signal synergy_effect_vfx(caster_hero_id: String, vfx_status: String, enemy_indices: Array)  # 시너지 데미지/상태이상 — 지정 시전자에서 VFX 발사
 # 시너지 반격 — 지정 시전자→적 VFX 발사. battle_scene 이 VFX 임팩트 시점에 상태이상 적용.
 signal synergy_counter_vfx(caster_hero_id: String, target_enemy_index: int, status_type: String, stacks: int)
@@ -743,6 +744,7 @@ func _start_hero_turn(hid: String) -> void:
 			end_player_turn()
 
 # 영웅별 병사 토큰 공격 종류 — 이순신: 함포 폭발 / 칭기즈칸: 화살 / 그 외: 총탄
+@warning_ignore("shadowed_variable_base_class")
 func _token_dtype_for(owner: String) -> String:
 	match owner:
 		"yi_sun_sin": return "explosive"
@@ -750,6 +752,7 @@ func _token_dtype_for(owner: String) -> String:
 		_: return "bullet"
 
 # 한 영웅의 병사 토큰 일괄 공격 — owner 기준 VFX·dtype·시너지 후처리
+@warning_ignore("shadowed_variable_base_class")
 func _run_token_attacks(owner: String, count: int) -> bool:
 	var did: bool = false
 	var dtype: String = _token_dtype_for(owner)
@@ -1814,7 +1817,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 										_deal_damage_to_enemy(target_enemy_index, _bph2, effect.damage_type)
 									_last_attacker[target_enemy_index] = card.owner_id
 			_in_echo_replay = false
-	await _apply_synergy_bonus(card, target_enemy_index)
+	_apply_synergy_bonus(card, target_enemy_index)
 
 ## dnd 플래그 존재 여부 확인 후 소진 — ×2는 적용하지 않음.
 ## _deal_damage_to_enemy 전용: compute_damage ctx.dnd_mult 에서 ×2를 담당하므로
@@ -1986,8 +1989,8 @@ func apply_synergy_status_to_enemy(enemy_index: int, status_type: String, stacks
 	if enemy_index >= 0 and enemy_index < _enemy_alive.size() and _enemy_alive[enemy_index]:
 		_apply_status_to_enemy(enemy_index, status_type, stacks)
 
-# 시너지 속도 버프 — speed_bonus 스택 추가 + 턴 큐 갱신 (희생의 칼날 등).
-func _apply_synergy_speed_bonus(hero_id: String, value: int, dur: int) -> void:
+# 속도 버프 — speed_bonus 스택 추가 + 턴 큐 갱신 + status_applied(상태 아이콘). 시너지·릴릭 공용.
+func apply_speed_bonus(hero_id: String, value: int, dur: int) -> void:
 	var _aid: String = "hero:" + hero_id
 	var _old: int = _actor_speed(_aid)
 	if not _hero_status.has(hero_id):
@@ -2005,7 +2008,7 @@ func apply_synergy_ally_effect(vfx_kind: String, hero_id: String, value: int, du
 	if vfx_kind == "heal":
 		_heal_hero_safe(hero_id, value)
 	elif vfx_kind == "speed_buff":
-		_apply_synergy_speed_bonus(hero_id, value, duration)
+		apply_speed_bonus(hero_id, value, duration)
 	elif vfx_kind == "morale":
 		if not _hero_status.has(hero_id):
 			_hero_status[hero_id] = {}
@@ -3039,7 +3042,7 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 						synergy_ally_vfx.emit("speed_buff", _jm_ids, 5, 3)
 					else:
 						for _jm_id in _jm_ids:
-							_apply_synergy_speed_bonus(_jm_id, 5, 3)
+							apply_speed_bonus(_jm_id, 5, 3)
 			EffectRes.EffectType.DAMAGE:
 				# 검사의 약속 (이순신×무사시): 두 영웅 공격 시 둘 다 속도 +1 (전투 지속)
 				if (card_owner == "yi_sun_sin" or card_owner == "musashi") and team_mgr.is_alive("yi_sun_sin") and team_mgr.is_alive("musashi"):
