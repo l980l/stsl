@@ -29,6 +29,20 @@ var _deck_card_parents: Dictionary      = {}
 var _active_scroll:     ScrollContainer = null
 var _confirm_popup:     CanvasLayer     = null
 
+# 스토리 오버레이 상태 (풀블랙 막 위 한 줄씩 노출 + 클릭 advance)
+const _STORY_DWELL := 2.0                   # 다음 줄 자동 노출까지 대기(초)
+var _story_layer:      CanvasLayer    = null
+var _story_root:       Control        = null
+var _story_prompt:     Label          = null
+var _story_timer:      Timer          = null
+var _story_pulse:      Tween          = null
+var _story_labels:     Array[Label]   = []
+var _story_tweens:     Array[Tween]   = []
+var _story_lines:      Array[String]  = []
+var _story_idx:        int            = 0
+var _story_active:     bool           = false
+var _story_dismissing: bool           = false
+
 
 func _trf(key: String, args) -> String:
 	var s := tr(key)
@@ -42,10 +56,18 @@ func _ready() -> void:
 	call_deferred("_init_map_scroll")
 	_show_story_overlays()
 
-# 스토리 오버레이 — 신역 진입(act 변경 시 1회) + 각성(런당 1회, act1 진입). 페이드 인/아웃 라인.
+# 스토리 오버레이 — 신역 진입(act 변경 시 1회) + 각성(런당 1회, act1 진입).
+# 100% 불투명 검정 막 위에 문구를 한 줄씩 노출. 클릭하면 다음 줄 즉시, 마지막 줄 뒤 클릭하면 해제.
 func _show_story_overlays() -> void:
-	var lines: Array = []  # {text, y, dur}
-	# 신역 진입 — act 변경 시 1회
+	var lines: Array[String] = []
+	# 각성 — 런당 1회(act1 진입). "눈을 뜬다" 가 신역 인식보다 먼저.
+	if GameManager.current_act == 1 and not GameManager._awakening_shown_run:
+		GameManager._awakening_shown_run = true
+		var ak: String = GameManager.pick_story_key("awakening")
+		var at: String = tr(ak)
+		if at != "" and at != ak:
+			lines.append(at)
+	# 신역 진입 — act 변경 시 1회.
 	if GameManager.current_act != GameManager._realm_intro_act:
 		GameManager._realm_intro_act = GameManager.current_act
 		var idx: int = GameManager.current_act - 1
@@ -53,59 +75,200 @@ func _show_story_overlays() -> void:
 			var rk: String = "story.realm.%s.intro" % GameManager.act_mythologies[idx]
 			var rt: String = tr(rk)
 			if rt != "" and rt != rk:
-				lines.append({"text": rt, "y": 150.0, "dur": 4.0})
-	# 각성 — 런당 1회 (act 1 진입). 풀 하이브리드 선택.
-	if GameManager.current_act == 1 and not GameManager._awakening_shown_run:
-		GameManager._awakening_shown_run = true
-		var ak: String = GameManager.pick_story_key("awakening")
-		var at: String = tr(ak)
-		if at != "" and at != ak:
-			lines.append({"text": at, "y": 540.0, "dur": 5.0})
+				lines.append(rt)
 	if lines.is_empty():
 		return
-	# 어두운 막을 깔아 맵을 가린 뒤 라인 표시 (가장 긴 라인 길이만큼 유지)
-	var max_dur: float = 0.0
-	for l in lines:
-		max_dur = maxf(max_dur, l["dur"])
-	_spawn_story_backdrop(max_dur)
-	for l in lines:
-		_spawn_story_line(l["text"], l["y"], l["dur"])
+	_story_lines = lines
+	_story_idx = 0
+	_story_active = true
+	_story_dismissing = false
+	get_viewport().gui_release_focus()
+	_build_story_overlay()
 
-# 스토리 오버레이용 반투명 어두운 막 — 텍스트와 함께 페이드 인/아웃.
-func _spawn_story_backdrop(dur: float) -> void:
-	var bd := ColorRect.new()
-	bd.color = Color(0.02, 0.02, 0.04, 0.0)
-	bd.position = Vector2.ZERO
-	bd.size = Vector2(1920, 1080)
-	bd.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bd.z_index = 3999  # 라인(4000) 바로 아래
-	add_child(bd)
+func _build_story_overlay() -> void:
+	_story_layer = CanvasLayer.new()
+	_story_layer.layer = 128  # 맵·HUD 위
+	add_child(_story_layer)
+
+	_story_root = Control.new()
+	_story_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_story_root.mouse_filter = Control.MOUSE_FILTER_STOP  # 뒤 맵 클릭 차단 + 입력 수집
+	_story_root.modulate = Color(1, 1, 1, 0)
+	_story_root.gui_input.connect(_on_story_gui_input)
+	_story_layer.add_child(_story_root)
+
+	var bg := ColorRect.new()
+	bg.color = Color(0, 0, 0, 1)  # 100% 불투명 검정
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_story_root.add_child(bg)
+
+	_story_labels = []
+	_story_tweens = []
+
+	_story_prompt = Label.new()
+	_story_prompt.text = tr("story.continue")
+	_story_prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_story_prompt.offset_top = -128
+	_story_prompt.offset_bottom = -84
+	_story_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_story_prompt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_story_prompt.add_theme_font_size_override("font_size", 16)
+	_story_prompt.add_theme_color_override("font_color", Color(0.62, 0.60, 0.55))
+	_story_prompt.modulate = Color(1, 1, 1, 0)
+	_story_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_story_root.add_child(_story_prompt)
+
+	_story_timer = Timer.new()
+	_story_timer.one_shot = true
+	_story_timer.timeout.connect(_story_step)
+	_story_root.add_child(_story_timer)
+
+	# 막 페이드 인 후 첫 줄.
 	var tw := create_tween()
-	tw.tween_property(bd, "color:a", 0.62, 0.8)
-	tw.tween_interval(dur)
-	tw.tween_property(bd, "color:a", 0.0, 1.0)
-	tw.tween_callback(bd.queue_free)
+	tw.tween_property(_story_root, "modulate:a", 1.0, 0.3)
+	tw.tween_callback(_story_step)
 
-func _spawn_story_line(text: String, y: float, dur: float) -> void:
+# 현재 인덱스 줄을 노출하고 다음 줄을 예약. 마지막이면 프롬프트 표시.
+func _story_step() -> void:
+	if not _story_active or _story_dismissing:
+		return
+	_story_timer.stop()
+	if _story_idx >= _story_lines.size():
+		return
+	_spawn_story_line(_story_lines[_story_idx])
+	_story_idx += 1
+	if _story_idx < _story_lines.size():
+		_story_timer.start(_STORY_DWELL)
+	else:
+		_show_story_prompt()
+
+# 한 줄 라벨 추가 — 폭 1100 으로 1프레임 대기 후 실제 높이를 재서 전체를 세로 중앙에 배치.
+func _spawn_story_line(text: String) -> void:
 	var lbl := Label.new()
 	lbl.text = text
-	lbl.position = Vector2(360, y)
-	lbl.size = Vector2(1200, 90)
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.theme_type_variation = "SubLabel"
-	lbl.add_theme_font_size_override("font_size", 26)
-	lbl.modulate = Color(0.80, 0.77, 0.70, 0.0)
-	lbl.z_index = 4000
-	add_child(lbl)
-	LabelUtils.fit_text(lbl, 26, 16, -1.0, 90.0)
+	lbl.add_theme_font_size_override("font_size", 32)
+	lbl.add_theme_color_override("font_color", Color(0.88, 0.85, 0.78))
+	lbl.modulate = Color(1, 1, 1, 0)
+	lbl.position = Vector2(410, 540)
+	lbl.size = Vector2(1100, 10)
+	_story_root.add_child(lbl)
+	_story_labels.append(lbl)
+
+	# 폭(1100) 기준 줄바꿈 확정을 위해 1프레임 대기 후 재배치.
+	await get_tree().process_frame
+	if not _story_active or _story_dismissing or not is_instance_valid(lbl):
+		return
+	_relayout_story_labels(lbl)
+
+# 모든 줄의 실제 렌더 높이를 합해 세로 중앙 배치. 새 줄은 살짝 아래서 올라오며 페이드 인, 기존 줄은 새 위치로 이동.
+func _relayout_story_labels(new_lbl: Label) -> void:
+	for t in _story_tweens:
+		if t and t.is_valid():
+			t.kill()
+	_story_tweens.clear()
+
+	var gap := 24.0
+	var heights: Array[float] = []
+	var total := 0.0
+	for lbl in _story_labels:
+		var lh: float = float(lbl.get_line_height())
+		var h: float = maxf(lbl.get_line_count(), 1) * lh
+		lbl.size = Vector2(1100, h)
+		heights.append(h)
+		total += h
+	total += gap * maxf(_story_labels.size() - 1, 0)
+
+	var y: float = (1080.0 - total) / 2.0
+	for i in _story_labels.size():
+		var lbl: Label = _story_labels[i]
+		var tw := create_tween()
+		if lbl == new_lbl:
+			lbl.position = Vector2(410, y + 14.0)   # 살짝 아래서 시작
+			tw.set_parallel(true)
+			tw.tween_property(lbl, "modulate:a", 0.96, 0.5)
+			tw.tween_property(lbl, "position:y", y, 0.45).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		else:
+			lbl.modulate.a = 0.96   # 이전 fade 가 중단됐을 수 있어 가시성 보장
+			tw.tween_property(lbl, "position:y", y, 0.45).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		_story_tweens.append(tw)
+		y += heights[i] + gap
+
+func _show_story_prompt() -> void:
 	var tw := create_tween()
-	tw.tween_property(lbl, "modulate:a", 0.92, 0.8)
-	tw.tween_interval(dur)
-	tw.tween_property(lbl, "modulate:a", 0.0, 1.0)
-	tw.tween_callback(lbl.queue_free)
+	tw.tween_property(_story_prompt, "modulate:a", 0.85, 0.6)
+	tw.tween_callback(_start_story_pulse)
+
+func _start_story_pulse() -> void:
+	if not is_instance_valid(_story_prompt) or _story_dismissing:
+		return
+	_story_pulse = create_tween().set_loops()
+	_story_pulse.tween_property(_story_prompt, "modulate:a", 0.45, 1.1).set_trans(Tween.TRANS_SINE)
+	_story_pulse.tween_property(_story_prompt, "modulate:a", 0.85, 1.1).set_trans(Tween.TRANS_SINE)
+
+func _on_story_gui_input(ev: InputEvent) -> void:
+	if not _story_active or _story_dismissing:
+		return
+	if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+		_story_root.accept_event()
+		if _story_idx < _story_lines.size():
+			_story_step()       # 다음 줄 즉시
+		else:
+			_story_dismiss()
+
+# 키보드로도 진행 — Space/Enter 는 다음 줄, Esc 는 전체 건너뛰기.
+func _story_handle_key(ev: InputEvent) -> void:
+	if _story_dismissing or not (ev is InputEventKey) or not ev.pressed or ev.echo:
+		return
+	match ev.keycode:
+		KEY_ESCAPE:
+			get_viewport().set_input_as_handled()
+			_story_dismiss()
+		KEY_SPACE, KEY_ENTER, KEY_KP_ENTER:
+			get_viewport().set_input_as_handled()
+			if _story_idx < _story_lines.size():
+				_story_step()
+			else:
+				_story_dismiss()
+
+func _story_dismiss() -> void:
+	if _story_dismissing:
+		return
+	_story_dismissing = true
+	if _story_timer:
+		_story_timer.stop()
+	if _story_pulse and _story_pulse.is_valid():
+		_story_pulse.kill()
+	for t in _story_tweens:
+		if t and t.is_valid():
+			t.kill()
+	_story_tweens.clear()
+	var tw := create_tween()
+	tw.tween_property(_story_root, "modulate:a", 0.0, 0.5)
+	tw.tween_callback(_free_story_overlay)
+
+func _free_story_overlay() -> void:
+	_story_active = false
+	_story_dismissing = false
+	if is_instance_valid(_story_layer):
+		_story_layer.queue_free()
+	_story_layer = null
+	_story_root = null
+	_story_prompt = null
+	_story_timer = null
+	_story_pulse = null
+	_story_labels = []
+	_story_tweens = []
 
 func _input(ev: InputEvent) -> void:
+	if _story_active:
+		_story_handle_key(ev)
+		return
 	if _active_scroll != null and ev is InputEventMouseButton:
 		if ev.button_index == MOUSE_BUTTON_WHEEL_UP:
 			_active_scroll.scroll_vertical -= 40
@@ -117,6 +280,8 @@ func _input(ev: InputEvent) -> void:
 			return
 
 func _unhandled_input(ev: InputEvent) -> void:
+	if _story_active:
+		return
 	if ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
 		if _confirm_popup:
 			_close_confirm_popup()
