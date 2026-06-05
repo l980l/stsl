@@ -128,7 +128,7 @@ func _global_alpha() -> float:
 	return clampf(1.0 - t, 0.0, 1.0)
 
 func _spawn_cyan_mote() -> void:
-	var foot := _foot_pos()
+	var _foot := _foot_pos()
 	var angle: float = randf() * TAU
 	_particles.append({
 		"pos": _target + Vector2(cos(angle) * 35.0, randf_range(-30.0, 30.0)),

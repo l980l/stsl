@@ -278,6 +278,7 @@ func _draw_target_mark(canvas: CanvasItem, ga: float) -> void:
 	canvas.draw_polyline(pts, Color(COL_BLOOD, alpha * 0.95), 1.5, true)
 
 # 비행 카드 — CHARGE_TIME~IMPACT_DELAY 동안 영웅→적 호 그리며 이동
+@warning_ignore("shadowed_variable_base_class")
 func _draw_flying_card(canvas: CanvasItem, ga: float) -> void:
 	var t: float = (_age - CHARGE_TIME) / FLIGHT_TIME
 	if t < 0.0 or t > 1.1:

@@ -9,6 +9,7 @@ extends Node2D
 const Infatuation = preload("res://scenes/vfx/infatuation.gd")  # heart_shape() 재사용
 
 ## 빔 VFX 와 인터페이스 통일용 — 하트 오라는 emit 하지 않는다.
+@warning_ignore("unused_signal")
 signal screen_effect
 
 const HEAD_OFFSET_Y := -100.0  # 타겟 머리 위 위치(px)

@@ -45,7 +45,7 @@ func _make_rising_emitter(col: Color, count_total: int, foot: Vector2) -> GPUPar
 	return em
 
 # _spawn_rising override — mote 3 색 GPU 분리 + rune CPU
-func _spawn_rising(n: int) -> void:
+func _spawn_rising(_n: int) -> void:
 	if not _rising_made:
 		_rising_made = true
 		var foot: Vector2 = _foot_pos()

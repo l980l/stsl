@@ -93,8 +93,8 @@ func _center_window_on_boot() -> void:
 	var header_h := _get_header_height()
 	# Godot 의 window_set_position 은 client area 기준 → 헤더는 그 위에 그려짐.
 	# 헤더가 usable 안에 들어오도록 y 최소값을 usable.position.y + header_h 로.
-	var x: int = usable.position.x + int(max(0, usable.size.x - win_size.x)) / 2
-	var y_centered: int = usable.position.y + int(max(0, usable.size.y - win_size.y)) / 2
+	var x: int = usable.position.x + int(max(0, usable.size.x - win_size.x) / 2.0)
+	var y_centered: int = usable.position.y + int(max(0, usable.size.y - win_size.y) / 2.0)
 	var y: int = int(max(y_centered, usable.position.y + header_h))
 	DisplayServer.window_set_position(Vector2i(x, y))
 
