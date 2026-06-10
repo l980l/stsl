@@ -26,7 +26,7 @@ assets/art/enemies/
 assets/art/events/
 assets/art/heroes/
 assets/art/scenes/
-assets/art/ui/intent/
+# assets/art/ui/intent/ 는 git tracked — 인텐트 라인 SVG 아이콘(이모지 대체, 게임 실행 필수)
 assets/art/ui/relic/
 assets/art/ui/status/*
 assets/art/ui/status_backup/

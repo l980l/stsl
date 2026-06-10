@@ -5,18 +5,18 @@ battle.token_soldier,병사,Soldier,Soldat,Soldato,Soldado,兵士,Στρατιώ
 battle.msg_intro,전투!,Battle!,Combat !,Battaglia!,¡Batalla!,戦闘！,Μάχη!,战斗！,戰鬥！,Бой!,Batalha!,Walka!,Kampf!
 battle.msg_player_turn,플레이어 턴,Player Turn,Tour du Joueur,Turno Giocatore,Turno del Jugador,プレイヤーターン,Γύρος Παίκτη,玩家回合,玩家回合,Ход игрока,Turno do Jogador,Tura Gracza,Spielerrunde
 battle.msg_enemy_turn,적 턴...,Enemy Turn...,Tour de l'Ennemi...,Turno Nemico...,Turno del Enemigo...,敵ターン...,Γύρος Εχθρού...,敌人回合...,敌人回合...,Ход врага...,Turno do Inimigo...,Tura Wroga...,Feindrunde...
-battle.msg_victory,🏆 승리!,🏆 Victory!,🏆 Victoire !,🏆 Vittoria!,🏆 ¡Victoria!,🏆 勝利！,🏆 Νίκη!,🏆 胜利！,🏆 胜利！,🏆 Победа!,🏆 Vitória!,🏆 Zwycięstwo!,🏆 Sieg!
-battle.msg_defeat,💀 패배...,💀 Defeat...,💀 Défaite...,💀 Sconfitta...,💀 Derrota...,💀 敗北...,💀 Ήττα...,💀 失败...,💀 失败...,💀 Поражение...,💀 Derrota...,💀 Porażka...,💀 Niederlage...
+battle.msg_victory,승리!,Victory!,Victoire !,Vittoria!,¡Victoria!,勝利！,Νίκη!,胜利！,胜利！,Победа!,Vitória!,Zwycięstwo!,Sieg!
+battle.msg_defeat,패배,Defeat,Défaite,Sconfitta,Derrota,敗北,Ήττα,失败,失败,Поражение,Derrota,Porażka,Niederlage
 battle.drag_enemy,적을 선택하세요 ▶,Select Enemy ▶,Choisir l'ennemi ▶,Seleziona Nemico ▶,Seleccionar Enemigo ▶,敵を選択してください ▶,Επιλογή Εχθρού ▶,选择敌人 ▶,选择敌人 ▶,Выберите врага ▶,Selecionar Inimigo ▶,Wybierz Wroga ▶,Feind wählen ▶
 battle.drag_ally,아군을 선택하세요 ▶,Select Ally ▶,Choisir l'allié ▶,Seleziona Alleato ▶,Seleccionar Aliado ▶,味方を選択してください ▶,Επιλογή Συμμάχου ▶,选择队友 ▶,选择队友 ▶,Выберите союзника ▶,Selecionar Aliado ▶,Wybierz Sojusznika ▶,Verbündeten wählen ▶
 battle.drag_release,놓아서 사용 ▶,Release to Use ▶,Relâcher pour utiliser ▶,Rilascia per usare ▶,Soltar para usar ▶,離して使用 ▶,Αφήστε για Χρήση ▶,松开以使用 ▶,松开以使用 ▶,Отпустите для использования ▶,Soltar para Usar ▶,Puść by Użyć ▶,Loslassen zum Verwenden ▶
 battle.intent.attack,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d,⚔️ %d
-battle.intent.buff.strength,💪,💪,💪,💪,💪,💪,💪,💪,💪,💪,💪,💪,💪
-battle.intent.buff.block,🛡,🛡,🛡,🛡,🛡,🛡,🛡,🛡,🛡,🛡,🛡,🛡,🛡
+battle.intent.buff.strength,💪 %d,💪 %d,💪 %d,💪 %d,💪 %d,💪 %d,💪 %d,💪 %d,💪 %d,💪 %d,💪 %d,💪 %d,💪 %d
+battle.intent.buff.block,🛡 %d,🛡 %d,🛡 %d,🛡 %d,🛡 %d,🛡 %d,🛡 %d,🛡 %d,🛡 %d,🛡 %d,🛡 %d,🛡 %d,🛡 %d
 battle.intent.debuff,👿,👿,👿,👿,👿,👿,👿,👿,👿,👿,👿,👿,👿
 battle.intent.prepare,⏳,⏳,⏳,⏳,⏳,⏳,⏳,⏳,⏳,⏳,⏳,⏳,⏳
 battle.intent.dead,💀,💀,💀,💀,💀,💀,💀,💀,💀,💀,💀,💀,💀
-battle.intent.heal_ally,💚,💚,💚,💚,💚,💚,💚,💚,💚,💚,💚,💚,💚
+battle.intent.heal_ally,💚 %d,💚 %d,💚 %d,💚 %d,💚 %d,💚 %d,💚 %d,💚 %d,💚 %d,💚 %d,💚 %d,💚 %d,💚 %d
 battle.intent.buff_ally,✨,✨,✨,✨,✨,✨,✨,✨,✨,✨,✨,✨,✨
 battle.intent.counter_prepare,🔄,🔄,🔄,🔄,🔄,🔄,🔄,🔄,🔄,🔄,🔄,🔄,🔄
 battle.intent.mark_target,🎯,🎯,🎯,🎯,🎯,🎯,🎯,🎯,🎯,🎯,🎯,🎯,🎯
@@ -50,9 +50,9 @@ battle.element.holy_fire,신성 화염,holy fire,feu sacré,fuoco sacro,fuego sa
 battle.element.holy_blunt,신성 둔기,holy blunt,masse sacrée,contundente sacro,contundente sagrado,聖打,ιερό αμβλύ,圣钝击,聖鈍擊,святой дробящий,contundente sagrado,święty tępy,heiliger Schlag
 battle.intent.tooltip.buff_strength,자신 강화: 힘 +%d,Self: +%d strength,Self: +%d strength,Self: +%d strength,Self: +%d strength,自身強化: ストレングス +%d,Αυτο-ενίσχυση: Δύναμη +%d,自身强化: 力量 +%d,自身強化: 力量 +%d,Себе: +%d strength,Auto: +%d strength,Sobie: +%d strength,Selbst: +%d strength
 battle.intent.tooltip.buff_block,자신 방어: 블록 +%d,Self: +%d block,Self: +%d block,Self: +%d block,Self: +%d block,自身防御: ブロック +%d,Αυτο-άμυνα: Μπλοκ +%d,自身防御: 格挡 +%d,自身防禦: 格擋 +%d,Себе: +%d block,Auto: +%d block,Sobie: +%d block,Selbst: +%d block
-battle.intent.tooltip.buff_generic,자신 강화: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,Self buff: %s +%d,自身強化: %s +%d,Αυτο-ενίσχυση: %s +%d,自身强化: %s +%d,自身強化: %s +%d,Себе: %s +%d,Auto: %s +%d,Sobie: %s +%d,Selbst: %s +%d
-battle.intent.tooltip.debuff_weak,약화 부여 (영웅 공격 -25%%),Apply weak (-25%% atk),Apply weak (-25%% atk),Apply weak (-25%% atk),Apply weak (-25%% atk),弱体化付与（攻撃 -25%%）,Εφαρμογή Αδυναμίας (-25%% επίθεση),施加虚弱 (-25%% 攻击),施加虛弱 (-25%% 攻擊),Слабость (-25%% атк),Fraco (-25%% atq),Słabość (-25%% atk),Schwach (-25%% Angriff)
-battle.intent.tooltip.debuff_vulnerable,취약 부여 (받는 데미지 +50%%),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),Apply vulnerable (+50%% damage taken),脆弱付与（被ダメ +50%%）,Εφαρμογή Ευπάθειας (+50%% ζημιά),施加易伤 (+50%% 受伤),施加易傷 (+50%% 受傷),Уязвимость (+50%% урона),Vulnerável (+50%% dano),Wrażliwy (+50%% obr.),Verwundbar (+50%% Schaden)
+battle.intent.tooltip.buff_generic,자신: %s +%d,Self: %s +%d,Soi : %s +%d,Sé: %s +%d,Propio: %s +%d,自身: %s +%d,Εαυτός: %s +%d,自身: %s +%d,自身: %s +%d,Себе: %s +%d,Próprio: %s +%d,Sobie: %s +%d,Selbst: %s +%d
+battle.intent.tooltip.debuff_weak,약화 부여 (영웅 공격 -25%),Apply weak (-25% atk),Apply weak (-25% atk),Apply weak (-25% atk),Apply weak (-25% atk),弱体化付与（攻撃 -25%）,Εφαρμογή Αδυναμίας (-25% επίθεση),施加虚弱 (-25% 攻击),施加虛弱 (-25% 攻擊),Слабость (-25% атк),Fraco (-25% atq),Słabość (-25% atk),Schwach (-25% Angriff)
+battle.intent.tooltip.debuff_vulnerable,취약 부여 (받는 데미지 +50%),Apply vulnerable (+50% damage taken),Apply vulnerable (+50% damage taken),Apply vulnerable (+50% damage taken),Apply vulnerable (+50% damage taken),脆弱付与（被ダメ +50%）,Εφαρμογή Ευπάθειας (+50% ζημιά),施加易伤 (+50% 受伤),施加易傷 (+50% 受傷),Уязвимость (+50% урона),Vulnerável (+50% dano),Wrażliwy (+50% obr.),Verwundbar (+50% Schaden)
 battle.intent.tooltip.debuff_poison,독 부여 (%d 스택),Apply poison (%d stacks),Apply poison (%d stacks),Apply poison (%d stacks),Apply poison (%d stacks),毒付与（%d スタック）,Εφαρμογή Δηλητηρίου (%d στοίβες),施加中毒 (%d 层),施加中毒 (%d 層),Яд (%d стаков),Veneno (%d pilhas),Trucizna (%d stosów),Gift (%d Stapel)
 battle.intent.tooltip.debuff_charm,매혹 부여 (%d 스택),Apply charm (%d stacks),Apply charm (%d stacks),Apply charm (%d stacks),Apply charm (%d stacks),魅了付与（%d スタック）,Εφαρμογή Γοητείας (%d στοίβες),施加魅惑 (%d 层),施加魅惑 (%d 層),Очарование (%d стаков),Encanto (%d pilhas),Urok (%d stosów),Bezauberung (%d Stapel)
 battle.intent.tooltip.debuff_generic,%s 부여 +%d,Apply %s +%d,Apply %s +%d,Apply %s +%d,Apply %s +%d,%s 付与 +%d,Εφαρμογή %s +%d,施加 %s +%d,施加 %s +%d,%s +%d,%s +%d,%s +%d,%s +%d
@@ -60,7 +60,7 @@ battle.intent.tooltip.prepare,준비 — 다음 차례 강한 공격 예고,Prep
 battle.intent.tooltip.heal_ally,동료 회복 +%d 체력,Heal ally +%d HP,Heal ally +%d HP,Heal ally +%d HP,Heal ally +%d HP,味方回復 +%d HP,Θεραπεία συμμάχου +%d HP,队友恢复 +%d HP,隊友恢復 +%d HP,Лечит союзника +%d HP,Cura aliado +%d HP,Lecz sojusznika +%d HP,Heile Verb. +%d HP
 battle.intent.tooltip.buff_ally,동료에게 %s +%d 부여,Buff ally: %s +%d,Buff ally: %s +%d,Buff ally: %s +%d,Buff ally: %s +%d,味方に %s +%d 付与,Σύμμαχος: %s +%d,给队友施加 %s +%d,給隊友施加 %s +%d,Союзнику: %s +%d,Aliado: %s +%d,Sojusznik: %s +%d,Verb.: %s +%d
 battle.intent.tooltip.counter_prepare,반격 태세 — 받은 데미지 %d%% 다음 공격에 추가,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,Counter — add %d%% of damage taken,反撃態勢 — 被ダメの %d%% を次の攻撃に加算,Αντεπίθεση — προσθέτει %d%% της ζημιάς που δέχτηκε,反击态势 — 受到伤害的 %d%% 加到下次攻击,反擊態勢 — 受到傷害的 %d%% 加到下次攻擊,Контратака — +%d%% урона след. атаке,Contra-atq — +%d%% dano à próx. atq,Kontra — +%d%% obr. do nast. ataku,Konter — +%d%% Schaden zur nächsten Atk
-battle.intent.tooltip.mark_target,마킹 — 표적 영웅이 받는 데미지 +50%%,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,Mark — marked hero takes +50%% damage,マーキング — 対象英雄が被ダメ +50%%,Σήμανση — ο σημαδεμένος ήρωας δέχεται +50%% ζημιά,标记 — 被标记英雄受伤 +50%%,標記 — 被標記英雄受傷 +50%%,Метка — герой получ. +50%% урона,Marca — herói recebe +50%% dano,Znacznik — bohater +50%% obr.,Markierung — Held +50%% Schaden
+battle.intent.tooltip.mark_target,마킹,Mark,Marque,Marchio,Marca,マーキング,Σήμανση,标记,標記,Метка,Marca,Znacznik,Markierung
 battle.intent.tooltip.sacrifice,희생 — 자신 체력 %d 소비 + 다음 공격 강화,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,Sacrifice — -%d HP + boost next attack,犠牲 — 自身HP %d 消費 + 次の攻撃強化,Θυσία — -%d HP + ενίσχυση επόμενης επίθεσης,牺牲 — 消耗自身 %d HP + 强化下次攻击,犧牲 — 消耗自身 %d HP + 強化下次攻擊,Жертва — -%d HP + усиление след. атаки,Sacrifício — -%d HP + reforça próx. atq,Poświęcenie — -%d HP + wzmocn. nast. ataku,Opfer — -%d HP + nächste Atk verstärkt
 battle.intent.tooltip.ward,수호 — %d 차례 동안 무적,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,Ward — invulnerable for %d turns,守護 — %d ターンの間無敵,Φύλακας — άτρωτος για %d γύρους,守护 — %d 回合内无敌,守護 — %d 回合內無敵,Защита — неуязвим %d х.,Proteção — invulnerável %d t.,Bariera — niewrażliwy %d tur,Schutz — unverwundbar %d R.
 battle.intent.tooltip.summon,소환 — 적 %d 마리 추가,Summon %d enemies,Summon %d enemies,Summon %d enemies,Summon %d enemies,召喚 — 敵 %d 体追加,Κάλεσμα — %d εχθροί επιπλέον,召唤 — 追加 %d 个敌人,召喚 — 追加 %d 個敵人,Призыв %d врагов,Invocar %d inimigos,Przyzwij %d wrogów,%d Feinde beschwören
@@ -71,12 +71,12 @@ battle.intent.tooltip.special_generic,특수: %s,Special: %s,Special: %s,Special
 battle.intent.tooltip.special_unknown,특수 효과,Special effect,Special effect,Special effect,Special effect,特殊効果,Ειδική επίδραση,特殊效果,特殊效果,Особый эффект,Efeito especial,Efekt specjalny,Spezialeffekt
 battle.intent.tooltip.unknown,알 수 없는 인텐트,Unknown intent,Unknown intent,Unknown intent,Unknown intent,不明なインテント,Άγνωστη πρόθεση,未知意图,未知意圖,Неизвестное намерение,Intenção desconhecida,Nieznane zamierzenie,Unbekannte Absicht
 battle.notify.cards_exhausted,❌ 카드를 빼앗겼다!,❌ Cards stolen!,❌ Cartes volées!,❌ Carte rubate!,❌ ¡Cartas robadas!,❌ カード奪取！,❌ Κάρτες κλάπηκαν!,❌ 卡牌被夺！,❌ 卡牌被奪！,❌ Карты украдены!,❌ Cartas roubadas!,❌ Karty skradzione!,❌ Karten gestohlen!
-battle.signature.hubris.toast,⚔ 휴브리스!,⚔ Hubris!,⚔ Hybris !,⚔ Hubris!,⚔ ¡Hibris!,⚔ ヒュブリス！,⚔ Ύβρις!,⚔ 傲慢！,⚔ 傲慢！,⚔ Гибрис!,⚔ Hubris!,⚔ Hybris!,⚔ Hybris!
-battle.signature.ragnarok.toast,🌪 라그나로크!,🌪 Ragnarok!,🌪 Ragnarök !,🌪 Ragnarök!,🌪 ¡Ragnarök!,🌪 ラグナロク！,🌪 Ραγκναρόκ!,🌪 诸神黄昏！,🌪 諸神黃昏！,🌪 Рагнарёк!,🌪 Ragnarök!,🌪 Ragnarök!,🌪 Ragnarök!
-battle.signature.karma.toast,☸ 인과응보!,☸ Karma!,☸ Karma !,☸ Karma!,☸ ¡Karma!,☸ 因果応報！,☸ Κάρμα!,☸ 因果报应！,☸ 因果報應！,☸ Карма!,☸ Karma!,☸ Karma!,☸ Karma!
-battle.signature.kekkai.toast,🛡 결계!,🛡 Kekkai!,🛡 Kekkai !,🛡 Kekkai!,🛡 ¡Kekkai!,🛡 結界！,🛡 Κεκκάι!,🛡 结界！,🛡 結界！,🛡 Кеккай!,🛡 Kekkai!,🛡 Kekkai!,🛡 Kekkai!
-battle.signature.egyptian_curse.toast,👁 영원의 저주!,👁 Eternal Curse!,👁 Malédiction !,👁 Maledizione!,👁 ¡Maldición!,👁 永遠の呪い！,👁 Αιώνια Κατάρα!,👁 永恒诅咒！,👁 永恆詛咒！,👁 Вечное проклятие!,👁 Maldição Eterna!,👁 Wieczna Klątwa!,👁 Ewiger Fluch!
-battle.signature.yin_yang.toast,☯ 음양 순환!,☯ Yin-Yang!,☯ Yin-Yang !,☯ Yin-Yang!,☯ ¡Yin-Yang!,☯ 陰陽！,☯ Γιν-Γιανγκ!,☯ 阴阳！,☯ 陰陽！,☯ Инь-Ян!,☯ Yin-Yang!,☯ Yin-Yang!,☯ Yin-Yang!
+battle.signature.hubris.toast,휴브리스!,Hubris!,Hybris !,Hubris!,¡Hibris!,ヒュブリス！,Ύβρις!,傲慢！,傲慢！,Гибрис!,Hubris!,Hybris!,Hybris!
+battle.signature.ragnarok.toast,라그나로크!,Ragnarok!,Ragnarök !,Ragnarök!,¡Ragnarök!,ラグナロク！,Ραγκναρόκ!,诸神黄昏！,諸神黃昏！,Рагнарёк!,Ragnarök!,Ragnarök!,Ragnarök!
+battle.signature.karma.toast,인과응보!,Karma!,Karma !,Karma!,¡Karma!,因果応報！,Κάρμα!,因果报应！,因果報應！,Карма!,Karma!,Karma!,Karma!
+battle.signature.kekkai.toast,결계!,Kekkai!,Kekkai !,Kekkai!,¡Kekkai!,結界！,Κεκκάι!,结界！,結界！,Кеккай!,Kekkai!,Kekkai!,Kekkai!
+battle.signature.egyptian_curse.toast,영원의 저주!,Eternal Curse!,Malédiction !,Maledizione!,¡Maldición!,永遠の呪い！,Αιώνια Κατάρα!,永恒诅咒！,永恆詛咒！,Вечное проклятие!,Maldição Eterna!,Wieczna Klątwa!,Ewiger Fluch!
+battle.signature.yin_yang.toast,음양 순환!,Yin-Yang!,Yin-Yang !,Yin-Yang!,¡Yin-Yang!,陰陽！,Γιν-Γιανγκ!,阴阳！,陰陽！,Инь-Ян!,Yin-Yang!,Yin-Yang!,Yin-Yang!
 battle.signature.hubris.desc,그리스 휴브리스: 25 이상 피해를 받으면 다음 턴 시작 시 %s +2,Greek Hubris: take 25+ damage → next turn %s +2,Hybris : 25+ dégâts → %s +2,Hybris: 25+ danni → %s +2,Hibris: 25+ daño → %s +2,ヒュブリス: 25以上の被害 → 次ターン %s +2,Ύβρις: 25+ ζημιά → %s +2,傲慢：受25+伤害下回合 %s +2,傲慢：受25+傷害下回合 %s +2,Гибрис: 25+ урона → след. ход %s +2,Hubris: 25+ dano → próx. turno %s +2,Hybris: 25+ obr. → nast. tura %s +2,Hybris: 25+ Schaden → nächste Runde %s +2
 battle.signature.ragnarok.desc,북유럽 라그나로크: 체력 30%% 이하 시 모든 적 %s +1 (1회),Norse Ragnarok: at 30%% HP all enemies gain %s +1 (once),Ragnarök : 30%% PV → tous %s +1 (1 fois),Ragnarök: 30%% PV → tutti %s +1 (una volta),Ragnarök: 30%% PV → todos %s +1 (una vez),ラグナロク: HP30%%以下で全敵 %s +1（1回）,Ραγκναρόκ: 30%% HP → όλοι %s +1,诸神黄昏：HP 30%%时全敌 %s +1,諸神黃昏：HP 30%%時全敵 %s +1,Рагнарёк: HP 30%% → все %s +1 (1×),Ragnarök: HP 30%% → todos %s +1 (1×),Ragnarök: HP 30%% → wszyscy %s +1 (1×),Ragnarök: HP 30%% → alle %s +1 (1×)
 battle.signature.egyptian_curse.desc,이집트 영원의 저주: 단일 공격 명중 시 %s +1 자동 부여,Egyptian Eternal Curse: single-target hit auto-applies %s +1,Malédiction : attaque unique → %s +1,Maledizione: attacco singolo → %s +1,Maldición: ataque único → %s +1,永遠の呪い: 単体攻撃命中 → %s +1,Αιώνια Κατάρα: μονό χτύπημα → %s +1,永恒诅咒：单体命中→ %s +1,永恆詛咒：單體命中→ %s +1,Вечн. проклятие: одиночное попад. → %s +1,Maldição: ataque único → %s +1,Klątwa: pojed. atak → %s +1,Fluch: Einzeltreffer → %s +1

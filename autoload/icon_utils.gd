@@ -7,6 +7,8 @@ const RELIC_DIR := "res://assets/art/ui/relic/"
 const MAP_DIR := "res://assets/art/ui/map/"
 const INTENT_DIR := "res://assets/art/ui/intent/"
 const HUD_DIR := "res://assets/art/ui/hud/"
+const SIGNATURE_DIR := "res://assets/art/ui/signature/"
+const TOAST_DIR := "res://assets/art/ui/toast/"
 
 const _ROOM_ICON_FILES := {
 	0: "icon_room_battle",
@@ -81,6 +83,50 @@ func get_intent_icon(action_type: int) -> Texture2D:
 	if fname == "":
 		return null
 	return _load(INTENT_DIR + fname + ".svg")
+
+# 인텐트 종류별 단색 라인 아이콘 (intent/) — action_type/status_type/target 로 결정. 이모지 라벨 대체.
+# action_type int: 0=ATTACK 1=BUFF 2=DEBUFF 3=SPECIAL 4=PREPARE 5=HEAL_ALLY 6=BUFF_ALLY
+#   7=COUNTER_PREPARE 8=MARK_TARGET 9=SACRIFICE 10=WARD 11=SUMMON 12=MIMIC 13=CHARGE_UP
+#   14=DISPEL 15=FORM_SWITCH 16=CHANGE_AFFINITY 17=INFLICT_WEAKNESS. TargetType.ALL == 3.
+const _INTENT_STATUS_ICON := {
+	"strength": "strength", "block": "block", "speed_bonus": "haste",
+	"weak": "weak", "vulnerable": "vulnerable", "poison": "poison",
+	"charm": "charm", "speed_penalty": "slow", "stun": "stun", "silence": "silence",
+}
+const _INTENT_ACTION_ICON := {
+	4: "prepare", 5: "heal", 7: "counter", 8: "mark", 9: "sacrifice",
+	10: "ward", 11: "summon", 12: "mimic", 13: "charge_up",
+	3: "special", 14: "special", 15: "form_switch", 16: "special", 17: "debuff",
+}
+
+func get_intent_icon_for(intent) -> Texture2D:
+	if intent == null:
+		return null
+	var at: int = intent.action_type
+	var fname: String = ""
+	if at == 0:  # ATTACK — target ALL 이면 광역 아이콘
+		fname = "attack_all" if int(intent.target) == 3 else "attack"
+	elif at == 1 or at == 6:  # BUFF / BUFF_ALLY — 부여 스탯 아이콘
+		fname = _INTENT_STATUS_ICON.get(intent.status_type, "buff")
+	elif at == 2:  # DEBUFF — 상태이상 아이콘
+		fname = _INTENT_STATUS_ICON.get(intent.status_type, "debuff")
+	else:
+		fname = _INTENT_ACTION_ICON.get(at, "")
+	if fname == "":
+		return null
+	return _load(INTENT_DIR + fname + ".svg")
+
+# intent/ 의 임의 라인 아이콘 (warning, dead 등 — action_type 비의존)
+func get_intent_named(name: String) -> Texture2D:
+	return _load(INTENT_DIR + name + ".svg")
+
+# 신화 시그니처 아이콘 (signature_name: hubris/ragnarok/karma/kekkai/egyptian_curse/yin_yang)
+func get_signature_icon(name: String) -> Texture2D:
+	return _load(SIGNATURE_DIR + name + ".svg")
+
+# 토스트 아이콘 (victory/defeat 등)
+func get_toast_icon(name: String) -> Texture2D:
+	return _load(TOAST_DIR + name + ".svg")
 
 func get_card_type_icon(card_type: int) -> Texture2D:
 	var fname: String = _CARD_TYPE_ICON_FILES.get(card_type, "")
