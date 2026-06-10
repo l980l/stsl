@@ -39,6 +39,11 @@ var _particle_scale_override: float = -1.0
 var _spray_emitters: Array[GPUParticles2D] = []
 var _splatter_timer: Timer
 
+# 바닥 풀 — 캐릭터 뒤 지면 레이어로 분리 (poison_splash 와 동일 패턴)
+var _ground_pos := Vector2.ZERO
+var _has_ground: bool = false
+var _ground_layer: Node2D = null
+
 func _pcount(n: int) -> int:
 	if _particle_scale_override > 0.0:
 		return maxi(1, int(round(n * _particle_scale_override)))
@@ -50,6 +55,16 @@ func _scale() -> float:
 		return _particle_scale_override
 	var gs := get_node_or_null("/root/GameSettings")
 	return 1.0 if gs == null else gs.particle_count_scale()
+
+# 바닥 풀을 캐릭터 뒤 지면 레이어로 분리. battle_scene._spawn_attack_beam_simple 가 발 위치로 호출.
+func set_ground_anchor(pos: Vector2) -> void:
+	_ground_pos = pos
+	_has_ground = true
+	if _ground_layer == null:
+		_ground_layer = Node2D.new()
+		add_child(_ground_layer)
+	_ground_layer.z_as_relative = false
+	_ground_layer.z_index = int(pos.y) - 1  # 캐릭터(z=발 y) 바로 뒤
 
 func play(caster: Vector2, target: Vector2) -> void:
 	_caster = caster
@@ -164,8 +179,8 @@ func _end_spray() -> void:
 	get_tree().create_timer(POOL_TIME + 0.5).timeout.connect(queue_free)
 
 func _spawn_pool() -> void:
-	# 발치 산성 풀 — Sprite2D (큰 옅은 가산 타원) + sizzle bubbles emitter
-	var ground: Vector2 = _target + Vector2(0.0, 90.0)
+	# 발치 산성 풀 — Sprite2D (큰 옅은 가산 타원, 캐릭터 뒤) + sizzle bubbles emitter (앞)
+	var ground: Vector2 = _ground_pos if _has_ground else _target + Vector2(0.0, 90.0)
 	var pool := Sprite2D.new()
 	pool.texture = _Helpers.circle_tex()
 	pool.position = ground
@@ -174,7 +189,9 @@ func _spawn_pool() -> void:
 	var pool_mat := CanvasItemMaterial.new()
 	pool_mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	pool.material = pool_mat
-	add_child(pool)
+	# 풀 본체는 지면 레이어(캐릭터 뒤)에, 거품(sizzle)은 self(앞)에 — poison 과 동일
+	var pool_parent: Node = _ground_layer if _ground_layer != null else self
+	pool_parent.add_child(pool)
 	var tw := create_tween()
 	tw.tween_property(pool, "modulate:a", 0.7, 0.2)
 	tw.tween_interval(POOL_TIME * 0.55)
