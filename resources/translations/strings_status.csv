@@ -57,7 +57,7 @@ status.heal_block.desc,%d턴 동안 모든 회복 효과 무효,All healing effe
 status.silence.name,침묵,Silence,Silence,Silenzio,Silencio,沈黙,Σιωπή,沉默,沉默,Молчание,Silêncio,Cisza,Stille
 status.silence.desc,%d턴 동안 카드를 사용할 수 없음,Cannot play cards for %d turns,Impossible de jouer des cartes pendant %d tours,Non puoi giocare carte per %d turni,No puedes jugar cartas durante %d turnos,%dターン中、カードを使用できない,Δεν μπορείς να παίξεις κάρτες για %d γύρους,%d回合内无法使用卡牌,%d回合內無法使用卡牌,Нельзя играть карты в течение %d ходов,Não pode jogar cartas por %d turnos,Nie możesz zagrywać kart przez %d tur,Kann %d Runden lang keine Karten spielen
 keyword.attack,공격,Attack,Attaque,Attacco,Ataque,攻撃,Επίθεση,攻击,攻擊,Атака,Ataque,Atak,Angriff
-keyword.block,방어,Block,Blocage,Blocco,Bloqueo,ブロック,Μπλοκ,格挡,格擋,Блок,Bloqueio,Blok,Block
+keyword.block,방어도,Block,Blocage,Blocco,Bloqueo,ブロック,Μπλοκ,格挡,格擋,Блок,Bloqueio,Blok,Block
 keyword.damage,피해,Damage,Dégâts,Danno,Daño,ダメージ,Ζημιά,伤害,傷害,Урон,Dano,Obrażenia,Schaden
 keyword.heal,회복,Heal,Soin,Cura,Curación,回復,Θεραπεία,治疗,治療,Лечение,Cura,Leczenie,Heilung
 keyword.sacrifice,희생,Sacrifice,Sacrifice,Sacrificio,Sacrificio,犠牲,Θυσία,牺牲,犧牲,Жертва,Sacrifício,Ofiara,Opfern

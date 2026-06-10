@@ -3,6 +3,7 @@ extends Node2D
 
 const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const _INTENT_GRAD_SHADER = preload("res://assets/shaders/intent_gradient.gdshader")
 const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
@@ -62,17 +63,17 @@ const SIGNATURE_COLORS := {
 	"egyptian_curse": Color(0.45, 0.95, 0.4),  # 이집트 — 녹색 저주
 	"karma":          Color(1.0, 0.85, 0.3),   # 불교 — 황금
 	"yin_yang":       Color(0.85, 0.95, 1.0),  # 도교 — 청백
-	"kekkai":         Color(0.3, 0.7, 1.0),    # 일본 — 푸른 결계
+	"kekkai":         Color(1.0, 0.55, 0.78),  # 일본 — 벚꽃
 }
 
 # 신화 → 시그니처 아이콘 + 툴팁 desc 키 (적 panel 우측 상단 표시)
 const SIGNATURE_INFO := {
-	"greek":    {"emoji": "⚔",  "desc_key": "battle.signature.hubris.desc"},
-	"norse":    {"emoji": "🌪", "desc_key": "battle.signature.ragnarok.desc"},
-	"egyptian": {"emoji": "👁", "desc_key": "battle.signature.egyptian_curse.desc"},
-	"buddhist": {"emoji": "☸",  "desc_key": "battle.signature.karma.desc"},
-	"daoist":   {"emoji": "☯",  "desc_key": "battle.signature.yin_yang.desc"},
-	"japanese": {"emoji": "🛡", "desc_key": "battle.signature.kekkai.desc"},
+	"greek":    {"emoji": "⚔",  "sig": "hubris",         "desc_key": "battle.signature.hubris.desc"},
+	"norse":    {"emoji": "🌪", "sig": "ragnarok",       "desc_key": "battle.signature.ragnarok.desc"},
+	"egyptian": {"emoji": "👁", "sig": "egyptian_curse", "desc_key": "battle.signature.egyptian_curse.desc"},
+	"buddhist": {"emoji": "☸",  "sig": "karma",          "desc_key": "battle.signature.karma.desc"},
+	"daoist":   {"emoji": "☯",  "sig": "yin_yang",       "desc_key": "battle.signature.yin_yang.desc"},
+	"japanese": {"emoji": "🛡", "sig": "kekkai",         "desc_key": "battle.signature.kekkai.desc"},
 }
 var _card_buttons: Array = []
 var _hero_char_nodes: Dictionary = {}  # hero_id → Node2D
@@ -173,6 +174,12 @@ func _i18n_dtype(dtype: String) -> String:
 	var key := "battle.element." + dtype
 	var translated := tr(key)
 	return translated if translated != key else dtype
+
+func _i18n_status_kw(status_type: String) -> String:
+	# 상태/키워드 영어 raw → 현지화 명칭. block 은 keyword.block(방어도), 나머지는 status.X.name.
+	var key := "keyword.block" if status_type == "block" else "status.%s.name" % status_type
+	var t := tr(key)
+	return t if t != key else status_type
 
 # 신화 시그니처 desc 의 %s placeholder 에 들어갈 번역된 키워드 args 배열.
 # signature.X.desc 가 동적 합성 형식으로 변경 (Attack/Vulnerable 등 raw 영어 제거).
@@ -482,6 +489,8 @@ func _set_char_entry_z(entry: Dictionary) -> void:
 			entry[k].z_index = Z_LBL
 	if entry.has("intent_lbl") and is_instance_valid(entry["intent_lbl"]):
 		entry["intent_lbl"].z_index = Z_INTENT
+	if entry.has("intent_box") and is_instance_valid(entry["intent_box"]):
+		entry["intent_box"].z_index = Z_INTENT
 
 func _hero_slot_pos(index: int) -> Vector2:
 	return (get_node("HeroSlot%d" % (index + 1)) as Marker2D).position
@@ -584,6 +593,18 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	intent_lbl.z_index = 1
 	intent_lbl.mouse_filter = Control.MOUSE_FILTER_STOP  # tooltip hover
 
+	# 인텐트 아이콘 칩 행 (이모지 텍스트 대체). intent_lbl 과 같은 자리 — 상황에 따라 하나만 visible.
+	var intent_box := HBoxContainer.new()
+	intent_box.position = Vector2(pos.x, pos.y - 1)
+	intent_box.size = Vector2(SLOT_W, 32)
+	intent_box.custom_minimum_size = Vector2(SLOT_W, 32)
+	intent_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	intent_box.add_theme_constant_override("separation", 6)
+	intent_box.z_index = 1
+	intent_box.mouse_filter = Control.MOUSE_FILTER_PASS
+	intent_box.visible = false
+	add_child(intent_box)
+
 	var btn := Button.new()
 	btn.flat = true
 	btn.position = pos
@@ -630,9 +651,10 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 		"hp_lbl":     hp_lbl.position,
 		"block_lbl":  block_lbl.position,
 		"intent_lbl": intent_lbl.position,
+		"intent_box": intent_box.position,
 		"status_box": status_box.position,
 	}
-	return { "panel": panel, "intent_lbl": intent_lbl, "btn": btn,
+	return { "panel": panel, "intent_lbl": intent_lbl, "intent_box": intent_box, "btn": btn,
 			 "name_lbl": name_lbl, "hp_bar": hp_bar, "hp_lbl": hp_lbl,
 			 "block_lbl": block_lbl, "status_box": status_box,
 			 "base_positions": base_positions, "sig_icon": null }
@@ -1082,23 +1104,42 @@ func _on_counter_triggered(hero_id: String, enemy_index: int, is_major: bool) ->
 		return
 	_spawn_counter(hero_node.global_position, enemy_node.global_position, is_major)
 
+func _signature_gradient(name: String) -> Array:
+	match name:
+		"hubris":         return [Color(1.0, 0.42, 0.18), Color(0.77, 0.12, 0.12)]  # 붉은 분노
+		"ragnarok":       return [Color(0.75, 0.38, 0.94), Color(0.42, 0.12, 0.63)] # 자주 운명
+		"karma":          return [Color(1.0, 0.88, 0.3), Color(0.88, 0.58, 0.12)]   # 황금
+		"kekkai":         return [Color(1.0, 0.82, 0.9), Color(1.0, 0.48, 0.69)]    # 벚꽃
+		"egyptian_curse": return [Color(0.65, 0.95, 0.36), Color(0.24, 0.66, 0.24)] # 녹색 저주
+		"yin_yang":       return [Color(0.92, 1.0, 1.0), Color(0.55, 0.78, 0.9)]    # 청백
+		_:                return [Color(1.0, 0.9, 0.5), Color(0.85, 0.6, 0.2)]
+
 func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	if _signatures_shown_this_turn.has(signature_name):
 		return
 	_signatures_shown_this_turn[signature_name] = true
 	# 토스트 라벨 (화면 중앙 페이드)
 	var color: Color = SIGNATURE_COLORS.get(signature_name, Color(1.0, 0.85, 0.3))
-	var toast := Label.new()
-	toast.text = tr("battle.signature.%s.toast" % signature_name)
-	toast.theme_type_variation = "TitleLabel"
-	toast.add_theme_font_size_override("font_size", 32)
-	toast.modulate = color
+	# 아이콘 + 텍스트 HBox (modulate 가 자식에 전파되어 색·페이드 일괄 적용)
+	var toast := HBoxContainer.new()
+	toast.alignment = BoxContainer.ALIGNMENT_CENTER
+	toast.add_theme_constant_override("separation", 12)
+	toast.modulate = Color(1, 1, 1, 0.0)  # 흰색 — fade(a)만, 색은 아이콘 그라데이션·라벨이 담당
 	toast.z_index = 2000  # 시그니처 토스트 — popup 위, debug 아래
 	toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	toast.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	toast.position = Vector2(WINDOW_W / 2.0 - 200, 280)
 	toast.size = Vector2(400, 60)
+	var sig_tex: Texture2D = IconUtils.get_signature_icon(signature_name)
+	if sig_tex != null:
+		toast.add_child(_disc_icon(sig_tex, _signature_gradient(signature_name), 46))
+	var sig_lbl := Label.new()
+	sig_lbl.text = tr("battle.signature.%s.toast" % signature_name)
+	sig_lbl.theme_type_variation = "TitleLabel"
+	sig_lbl.add_theme_font_size_override("font_size", 32)
+	sig_lbl.modulate = color  # 라벨은 시그니처 단색
+	sig_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	sig_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	toast.add_child(sig_lbl)
 	add_child(toast)
 	var tw := create_tween()
 	tw.tween_property(toast, "modulate:a", 1.0, 0.225)
@@ -1140,7 +1181,7 @@ func _burst_signature_at_enemy(_enemy_index: int, _color: Color) -> void:
 # 신화 시그니처 아이콘 — 적 panel 우측 상단. 호버 시 툴팁으로 효과 설명.
 # 주의: btn 이 panel 과 같은 사이즈로 self 의 자식이라 — panel 자식 Label 은 가려짐.
 # 해결: Label 을 self(battle_scene) 의 자식 + 매우 늦게 add (btn 위) + z_index 최상위.
-func _attach_signature_icon(panel: ColorRect, mythology) -> Label:
+func _attach_signature_icon(panel: ColorRect, mythology) -> Control:
 	if panel == null or mythology == null:
 		return null
 	var info: Dictionary = SIGNATURE_INFO.get(mythology, {})
@@ -1148,19 +1189,35 @@ func _attach_signature_icon(panel: ColorRect, mythology) -> Label:
 		return null
 	var existing := get_node_or_null(NodePath("_SigIcon_%s" % str(panel.get_instance_id())))
 	if existing != null:
-		return existing as Label
-	var lbl := Label.new()
-	lbl.name = "_SigIcon_%s" % str(panel.get_instance_id())
-	lbl.text = info["emoji"]
-	lbl.add_theme_font_size_override("font_size", 22)
-	lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-	lbl.z_index = 1900
+		return existing as Control
+	var sig_name: String = info.get("sig", "")
+	var tex: Texture2D = IconUtils.get_signature_icon(sig_name)
+	var node: Control
+	if tex != null:
+		node = _disc_icon(tex, _signature_gradient(sig_name), 28)
+	else:
+		var lbl := Label.new()
+		lbl.text = info["emoji"]
+		lbl.add_theme_font_size_override("font_size", 22)
+		node = lbl
+	node.name = "_SigIcon_%s" % str(panel.get_instance_id())
+	node.mouse_filter = Control.MOUSE_FILTER_STOP
+	node.z_index = 1900
 	var pp: Vector2 = panel.position
-	lbl.position = pp + Vector2(panel.size.x - 34.0, 4.0)
-	lbl.size = Vector2(26, 28)
-	add_child(lbl)
-	SacredTheme.attach_tooltip(lbl, _trf(info["desc_key"], _battle_sig_desc_args(info["desc_key"])))
-	return lbl
+	node.position = pp + Vector2(panel.size.x - 36.0, 3.0)
+	node.size = Vector2(28, 28)
+	add_child(node)
+	SacredTheme.attach_tooltip(node, _trf(info["desc_key"], _battle_sig_desc_args(info["desc_key"])))
+	return node
+
+# 신화 시그니처 아이콘 TextureRect (새 SVG + 그라데이션). 없으면 null. 상태창 등에서 재사용.
+func _make_signature_texrect(mythology: String, sz: int) -> Control:
+	var info: Dictionary = SIGNATURE_INFO.get(mythology, {})
+	var sig_name: String = info.get("sig", "")
+	var tex: Texture2D = IconUtils.get_signature_icon(sig_name)
+	if tex == null:
+		return null
+	return _disc_icon(tex, _signature_gradient(sig_name), sz)
 
 # T3-SUMMON: 런타임에 spawn된 적의 UI 패널 + 캐릭터 노드 추가
 func _on_enemy_spawned(enemy_index: int) -> void:
@@ -1178,7 +1235,7 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 	entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
 	# layout_mode=0 에서 add_child 후 size 가 minimum_size 로 덮어써질 수 있어 target_w 명시 (bar_w=211)
 	LabelUtils.fit_text(entry["name_lbl"], 14, 9, 211.0)
-	var sig_node_spawn: Label = _attach_signature_icon(entry["panel"], enemy.get("mythology"))
+	var sig_node_spawn: Control = _attach_signature_icon(entry["panel"], enemy.get("mythology"))
 	entry["sig_icon"] = sig_node_spawn
 	if sig_node_spawn != null:
 		entry["base_positions"]["sig_icon"] = sig_node_spawn.position
@@ -1349,6 +1406,7 @@ func _setup_enemies() -> void:
 	for entry in _enemy_nodes:
 		entry["panel"].queue_free()
 		entry["intent_lbl"].queue_free()
+		entry["intent_box"].queue_free()
 		entry["btn"].queue_free()
 		entry["name_lbl"].queue_free()
 		entry["hp_bar"].queue_free()
@@ -1376,7 +1434,7 @@ func _setup_enemies() -> void:
 		LabelUtils.fit_text(entry["name_lbl"], 14, 9, 211.0)
 
 		# 신화 시그니처 아이콘 + 툴팁 — panel 우측 상단
-		var sig_node_setup: Label = _attach_signature_icon(entry["panel"], enemy.get("mythology"))
+		var sig_node_setup: Control = _attach_signature_icon(entry["panel"], enemy.get("mythology"))
 		entry["sig_icon"] = sig_node_setup
 		if sig_node_setup != null:
 			entry["base_positions"]["sig_icon"] = sig_node_setup.position
@@ -1475,39 +1533,52 @@ func _update_enemy_ui(index: int) -> void:
 		entry["panel"].modulate = Color.WHITE
 		# btn 의 enable 상태는 다른 경로(turn 변화 등)가 결정 — 사망 예정 해제 시는 유지
 
-	# CC 상태 우선 — stun/charm/enthrall 등 행동 불가 상태면 기존 intent 대신 CC 라벨 표시
-	var cc_label: String = _cc_intent_label_for_enemy(index)
-	if cc_label != "":
-		entry["intent_lbl"].text = cc_label
-		entry["intent_lbl"].modulate = Color(1.0, 0.85, 0.45)
-		SacredTheme.attach_tooltip(entry["intent_lbl"], cc_label)
-		SacredTheme.attach_tooltip(entry["btn"], cc_label)
-	else:
-		# 의도 표시 — CHARGE_UP 페이오프 등 한 턴에 여러 효과면 가로로 모두 표시
-		var intents: Array = BattleManager.get_enemy_current_intents(index)
-		if not intents.is_empty():
-			var label_parts: Array[String] = []
-			var tip_parts: Array[String] = []
-			for it in intents:
-				label_parts.append(_format_intent_label(index, it))
-				tip_parts.append(_format_intent_tooltip(index, it))
-			var label_text: String = "  ".join(label_parts)
-			var intent_tip: String = "\n".join(tip_parts)
-			# counter window 활성 + charge 진행 중 (payoff 표시 시점) → 양 옆 ⚠️ 강조 + tooltip 교체
-			if BattleManager.is_counter_window_active(index):
-				var _ew_st: Dictionary = BattleManager.get_enemy_status(index)
-				if _ew_st.get("charge_remaining", 0) > 0:
-					label_text = "⚠️ " + label_text + " ⚠️"
-				intent_tip = tr("battle.intent.tooltip.counter_warning")
-			entry["intent_lbl"].text = label_text
-			entry["intent_lbl"].modulate = _intent_color(intents[0].action_type)
-			SacredTheme.attach_tooltip(entry["intent_lbl"], intent_tip)
-			SacredTheme.attach_tooltip(entry["btn"], intent_tip)
-
+	# 인텐트 표시 — 아이콘 칩(intent_box) / CC·사망은 텍스트·아이콘(intent_lbl/box). 둘 중 하나만 visible.
+	var intent_lbl: Label = entry["intent_lbl"]
+	var intent_box: HBoxContainer = entry["intent_box"]
+	for chip in intent_box.get_children():
+		chip.queue_free()
 	if not BattleManager.is_enemy_alive(index):
 		entry["panel"].modulate = Color(0.3, 0.3, 0.3)
 		entry["btn"].disabled = true
-		entry["intent_lbl"].text = tr("battle.intent.dead")
+		intent_lbl.visible = false
+		intent_box.visible = true
+		intent_box.add_child(_make_icon_chip("dead", Color(0.6, 0.6, 0.6), 32))
+	else:
+		var cc_label: String = _cc_intent_label_for_enemy(index)
+		if cc_label != "":
+			# CC (기절!/매혹! 등) — 현지화 텍스트 유지
+			intent_lbl.text = cc_label
+			intent_lbl.modulate = Color(1.0, 0.85, 0.45)
+			intent_lbl.visible = true
+			intent_box.visible = false
+			SacredTheme.attach_tooltip(intent_lbl, cc_label)
+			SacredTheme.attach_tooltip(entry["btn"], cc_label)
+		else:
+			# 의도 표시 — CHARGE_UP 페이오프 등 한 턴에 여러 효과면 칩을 가로로 모두 표시
+			var intents: Array = BattleManager.get_enemy_current_intents(index)
+			if intents.is_empty():
+				intent_lbl.visible = false
+				intent_box.visible = false
+			else:
+				# counter window 활성 + charge 진행 중 → 양옆 경고 아이콘 + tooltip 교체
+				var counter_warn: bool = false
+				if BattleManager.is_counter_window_active(index):
+					var _ew_st: Dictionary = BattleManager.get_enemy_status(index)
+					counter_warn = _ew_st.get("charge_remaining", 0) > 0
+				var tip_parts: Array[String] = []
+				for it in intents:
+					tip_parts.append(_format_intent_tooltip(index, it))
+				if counter_warn:
+					intent_box.add_child(_make_icon_chip("warning", Color(1.0, 0.65, 0.2), 28, [Color(0.95, 0.2, 0.2), Color(1.0, 0.6, 0.2)]))
+				for it in intents:
+					intent_box.add_child(_make_intent_chip(index, it))
+				if counter_warn:
+					intent_box.add_child(_make_icon_chip("warning", Color(1.0, 0.65, 0.2), 28, [Color(0.95, 0.2, 0.2), Color(1.0, 0.6, 0.2)]))
+				intent_lbl.visible = false
+				intent_box.visible = true
+				var intent_tip: String = tr("battle.intent.tooltip.counter_warning") if counter_warn else "\n".join(tip_parts)
+				SacredTheme.attach_tooltip(entry["btn"], intent_tip)
 
 	_refresh_status_icons_enemy(index)
 
@@ -1523,6 +1594,96 @@ func _cc_intent_label_for_enemy(enemy_index: int) -> String:
 	if st.get("silence", 0) > 0:
 		return tr("battle.cc.silenced")
 	return ""
+
+# 아이콘 = 어두운 원반(별도 노드, 셰이더 무관 → 어느 배경에서나 가시성) + 그라데이션 글리프(셰이더). sz×sz Control.
+func _disc_icon(tex: Texture2D, grad: Array, sz: int) -> Control:
+	var box := Control.new()
+	box.custom_minimum_size = Vector2(sz, sz)
+	box.size = Vector2(sz, sz)
+	box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var disc := TextureRect.new()
+	disc.texture = IconUtils.get_intent_named("disc")
+	disc.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	disc.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	disc.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	disc.modulate = Color(0.08, 0.07, 0.05, 0.82)  # 어두운 잉크 배경
+	disc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(disc)
+	var ic := TextureRect.new()
+	ic.texture = tex
+	ic.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if grad.size() == 2:
+		var mat := ShaderMaterial.new()
+		mat.shader = _INTENT_GRAD_SHADER
+		mat.set_shader_parameter("grad_top", grad[0])
+		mat.set_shader_parameter("grad_bot", grad[1])
+		ic.material = mat
+	box.add_child(ic)
+	return box
+
+func _make_intent_chip(enemy_index: int, intent: Resource) -> Control:
+	# 아이콘+숫자 칩 (이모지 라벨 대체). 색은 _intent_color 로 틴트, 숫자는 _intent_number.
+	var tex: Texture2D = IconUtils.get_intent_icon_for(intent)
+	var color: Color = _intent_color_for(intent)
+	var tip: String = _format_intent_tooltip(enemy_index, intent)
+	if tex == null:
+		# 아이콘 누락 시 이모지 라벨 폴백
+		var fb := Label.new()
+		fb.text = _format_intent_label(enemy_index, intent)
+		fb.theme_type_variation = "EyebrowLabel"
+		fb.modulate = color
+		fb.mouse_filter = Control.MOUSE_FILTER_STOP
+		SacredTheme.attach_tooltip(fb, tip)
+		return fb
+	var hbox := HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 3)
+	hbox.custom_minimum_size = Vector2(0, 32)
+	hbox.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	hbox.mouse_filter = Control.MOUSE_FILTER_STOP
+	SacredTheme.attach_tooltip(hbox, tip)
+	var grad: Array = _intent_gradient(intent)
+	if grad.size() != 2:
+		grad = [color.lightened(0.22), color.darkened(0.45)]  # 기본색의 밝게→어둡게 자동 그라데이션
+	hbox.add_child(_disc_icon(tex, grad, 32))
+	var num: int = _intent_number(enemy_index, intent)
+	if num >= 0:
+		var lbl := Label.new()
+		lbl.text = "%d" % num
+		lbl.theme_type_variation = "EyebrowLabel"
+		lbl.add_theme_font_size_override("font_size", 22)
+		lbl.modulate = color
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		hbox.add_child(lbl)
+	return hbox
+
+# 숫자 없는 단일 아이콘 칩 (사망 skull / 카운터 경고 등)
+func _make_icon_chip(icon_name: String, color: Color, sz: int, grad: Array = []) -> Control:
+	var g: Array = grad if grad.size() == 2 else [color.lightened(0.22), color.darkened(0.45)]
+	return _disc_icon(IconUtils.get_intent_named(icon_name), g, sz)
+
+# 인텐트 칩에 표시할 숫자 (없으면 -1). 수치는 라벨에, 설명은 툴팁에.
+func _intent_number(enemy_index: int, intent: Resource) -> int:
+	match intent.action_type:
+		IntentRes.ActionType.ATTACK:
+			return BattleManager.get_intent_display_damage(enemy_index, intent)
+		IntentRes.ActionType.SUMMON:
+			return max(1, intent.value)
+		IntentRes.ActionType.DEBUFF:
+			if intent.status_type == "poison" or intent.status_type == "charm":
+				return intent.value if intent.value > 0 else -1
+			return -1
+		IntentRes.ActionType.BUFF, IntentRes.ActionType.BUFF_ALLY, \
+		IntentRes.ActionType.HEAL_ALLY, IntentRes.ActionType.COUNTER_PREPARE, \
+		IntentRes.ActionType.SACRIFICE, IntentRes.ActionType.WARD, IntentRes.ActionType.MIMIC:
+			return intent.value if intent.value > 0 else -1
+		_:
+			return -1
 
 func _format_intent_label(enemy_index: int, intent: Resource) -> String:
 	# intent 1개의 라벨 문자열 (이모지 또는 ATTACK 수치 포함).
@@ -1557,42 +1718,28 @@ func _format_intent_label(enemy_index: int, intent: Resource) -> String:
 		IntentRes.ActionType.SPECIAL:    return tr("battle.intent.special")
 		_:                                return "?"
 
-func _format_intent_tooltip(enemy_index: int, intent: Resource) -> String:
-	# 인텐트 hover 시 표시할 자세한 설명. 모든 action_type 지원.
-	# _trf 사용 — 번역 키 누락/specifier 없을 때 args 자동 무시 (% 직접 사용 시 터짐).
+func _format_intent_tooltip(_enemy_index: int, intent: Resource) -> String:
+	# 인텐트 hover 시 표시 — 수치는 인텐트 라벨에 이미 있으므로 툴팁은 키워드 이름만.
 	var v: int = intent.value
-	var target_all: bool = intent.target == IntentRes.TargetType.ALL
 	match intent.action_type:
 		IntentRes.ActionType.ATTACK:
-			var dmg: int = BattleManager.get_intent_display_damage(enemy_index, intent)
-			var line: String = _trf("battle.intent.tooltip.attack", dmg)
-			if target_all:
-				line += " (" + tr("battle.intent.tooltip.target_all") + ")"
-			if intent.damage_type != "":
-				line += " · " + _trf("battle.intent.tooltip.element", _i18n_dtype(intent.damage_type))
-			return line
+			return tr("keyword.attack")
 		IntentRes.ActionType.BUFF:
 			match intent.status_type:
-				"strength": return _trf("battle.intent.tooltip.buff_strength", v)
-				"block": return _trf("battle.intent.tooltip.buff_block", v)
 				"speed_bonus": return _trf("battle.intent.tooltip.buff_speed", [v, intent.duration])
-				_: return _trf("battle.intent.tooltip.buff_generic", [intent.status_type, v])
+				_: return _i18n_status_kw(intent.status_type)
 		IntentRes.ActionType.DEBUFF:
 			match intent.status_type:
-				"weak": return tr("battle.intent.tooltip.debuff_weak")
-				"vulnerable": return tr("battle.intent.tooltip.debuff_vulnerable")
-				"poison": return _trf("battle.intent.tooltip.debuff_poison", v)
-				"charm": return _trf("battle.intent.tooltip.debuff_charm", v)
 				"speed_penalty": return _trf("battle.intent.tooltip.debuff_speed", [v, intent.duration])
-				_: return _trf("battle.intent.tooltip.debuff_generic", [intent.status_type, v])
+				_: return _i18n_status_kw(intent.status_type)
 		IntentRes.ActionType.PREPARE:
 			return tr("battle.intent.tooltip.prepare")
 		IntentRes.ActionType.CHARGE_UP:
 			return tr("battle.intent.tooltip.charge_up")
 		IntentRes.ActionType.HEAL_ALLY:
-			return _trf("battle.intent.tooltip.heal_ally", v)
+			return tr("keyword.heal")
 		IntentRes.ActionType.BUFF_ALLY:
-			return _trf("battle.intent.tooltip.buff_ally", [intent.status_type, v])
+			return _trf("battle.intent.tooltip.buff_ally", [_i18n_status_kw(intent.status_type), v])
 		IntentRes.ActionType.COUNTER_PREPARE:
 			return _trf("battle.intent.tooltip.counter_prepare", v)
 		IntentRes.ActionType.MARK_TARGET:
@@ -1627,13 +1774,53 @@ func _drag_hint_text() -> String:
 
 func _intent_color(action_type: int) -> Color:
 	match action_type:
-		IntentRes.ActionType.ATTACK:  return Color(1.0, 0.35, 0.35)
-		IntentRes.ActionType.BUFF:    return Color(0.4, 0.85, 1.0)
-		IntentRes.ActionType.DEBUFF:  return Color(0.75, 0.4, 1.0)
-		IntentRes.ActionType.PREPARE: return Color(0.75, 0.75, 0.75)
-		IntentRes.ActionType.CHARGE_UP: return Color(1.0, 0.65, 0.2)  # 의미심장한 주황 — 곧 큰 일
-		IntentRes.ActionType.WARD: return Color(0.4, 1.0, 0.8)  # 청록 — 🛡 가 BUFF.block(파랑)과 색으로 구분
-		_:                            return Color(1.0, 0.8, 0.2)
+		IntentRes.ActionType.ATTACK:    return Color(1.0, 0.35, 0.35)   # 빨강
+		IntentRes.ActionType.BUFF:      return Color(0.4, 0.85, 1.0)    # 파랑
+		IntentRes.ActionType.DEBUFF:    return Color(0.75, 0.4, 1.0)    # 보라
+		IntentRes.ActionType.PREPARE:   return Color(0.75, 0.75, 0.75)  # 회색
+		IntentRes.ActionType.CHARGE_UP: return Color(1.0, 0.65, 0.2)    # 주황 — 곧 큰 일
+		IntentRes.ActionType.WARD:      return Color(0.4, 1.0, 0.8)     # 청록
+		IntentRes.ActionType.HEAL_ALLY: return Color(0.42, 0.85, 0.46)  # 초록 — 회복
+		IntentRes.ActionType.BUFF_ALLY: return Color(0.55, 0.9, 0.8)    # 민트 — 동료 강화
+		IntentRes.ActionType.COUNTER_PREPARE: return Color(1.0, 0.84, 0.3)  # 황색 — 반격
+		IntentRes.ActionType.MARK_TARGET:     return Color(1.0, 0.55, 0.35)  # 주홍 — 표적
+		IntentRes.ActionType.SACRIFICE:       return Color(0.85, 0.3, 0.4)   # 진홍 — 피
+		IntentRes.ActionType.SUMMON:          return Color(0.72, 0.78, 0.42) # 올리브 — 소환
+		IntentRes.ActionType.MIMIC:           return Color(0.85, 0.5, 0.9)   # 자홍 — 모방
+		IntentRes.ActionType.SPECIAL:         return Color(0.9, 0.85, 0.62)  # 옅은 금 — 특수
+		_:                              return Color(1.0, 0.8, 0.2)     # 금색
+
+# 자버프/디버프는 상태이상 종류별로 어울리는 색 (그 외는 _intent_color)
+func _intent_color_for(intent: Resource) -> Color:
+	if intent.action_type == IntentRes.ActionType.BUFF or intent.action_type == IntentRes.ActionType.DEBUFF:
+		match intent.status_type:
+			"strength":      return Color(1.0, 0.54, 0.3)    # 주황 — 힘
+			"block":         return Color(0.5, 0.69, 0.88)   # 강철 — 방어
+			"speed_bonus":   return Color(0.37, 0.88, 0.88)  # 청록 — 가속
+			"weak":          return Color(0.56, 0.63, 0.73)  # 회청 — 약화
+			"vulnerable":    return Color(1.0, 0.6, 0.36)    # 주황 — 취약
+			"poison":        return Color(0.65, 0.85, 0.24)  # 라임 — 독
+			"charm":         return Color(1.0, 0.49, 0.79)   # 분홍 — 매혹
+			"stun":          return Color(1.0, 0.88, 0.3)    # 노랑 — 기절
+			"silence":       return Color(0.61, 0.55, 1.0)   # 남보라 — 침묵
+			"speed_penalty": return Color(0.79, 0.63, 0.4)   # 황토 — 둔화
+	return _intent_color(intent.action_type)
+
+# 일부 인텐트는 2색 세로 그라데이션 [top, bot]. 없으면 [] → 단색 modulate.
+func _intent_gradient(intent: Resource) -> Array:
+	match intent.action_type:
+		IntentRes.ActionType.CHARGE_UP: return [Color(1.0, 0.88, 0.3), Color(1.0, 0.46, 0.16)]     # 노랑→주황 (충전)
+		IntentRes.ActionType.HEAL_ALLY: return [Color(0.62, 0.95, 0.7), Color(0.24, 0.66, 0.34)]   # 민트→초록 (회복)
+		IntentRes.ActionType.SACRIFICE: return [Color(1.0, 0.38, 0.45), Color(0.5, 0.1, 0.16)]     # 빨강→진홍 (피)
+		IntentRes.ActionType.MARK_TARGET: return [Color(1.0, 0.62, 0.32), Color(0.88, 0.22, 0.22)] # 공격색 (주황→빨강)
+		IntentRes.ActionType.MIMIC:     return [Color(0.4, 0.7, 1.0), Color(1.0, 0.9, 0.3)]        # 파랑→노랑
+		IntentRes.ActionType.SPECIAL:   return [Color(0.7, 0.45, 1.0), Color(1.0, 0.9, 0.3)]       # 보라→노랑
+		IntentRes.ActionType.FORM_SWITCH: return [Color(0.45, 0.85, 0.4), Color(1.0, 0.9, 0.3)]    # 초록→노랑
+		IntentRes.ActionType.DEBUFF:
+			match intent.status_type:
+				"poison": return [Color(0.74, 0.92, 0.32), Color(0.36, 0.68, 0.16)]  # 라임→초록 (독)
+				"charm":  return [Color(1.0, 0.62, 0.85), Color(0.9, 0.28, 0.52)]    # 분홍→장미 (매혹)
+	return []
 
 # ─────────────────────────────────────────────
 # 카드 핸드 (Task 3에서 구현)
@@ -4366,7 +4553,7 @@ func _apply_enemy_sidebar_to_entry(entry: Dictionary, slot_idx: int) -> void:
 	if _camera != null and abs(_camera.zoom.x) > 0.001:
 		inv_zoom = Vector2.ONE / _camera.zoom
 	var scale_now: Vector2 = Vector2.ONE.lerp(inv_zoom, t)
-	for key in ["name_lbl", "hp_bar", "hp_lbl", "block_lbl", "intent_lbl", "status_box", "sig_icon"]:
+	for key in ["name_lbl", "hp_bar", "hp_lbl", "block_lbl", "intent_lbl", "intent_box", "status_box", "sig_icon"]:
 		var node = entry.get(key)
 		if node == null or not is_instance_valid(node):
 			continue
@@ -4789,8 +4976,24 @@ func _on_hero_revived(hero_id: String) -> void:
 			if ap.has_animation("idle"):
 				ap.play("idle")
 
+func _spawn_banner_icon(tex: Texture2D, grad: Array, center: Vector2, sz: float, hold: float) -> void:
+	if tex == null:
+		return
+	var ic := _disc_icon(tex, grad, int(sz))
+	ic.modulate = Color(1, 1, 1, 0.0)  # fade(a)만 — 자식(원반+글리프)에 전파
+	ic.z_index = 50  # _ui_layer(layer 5) 내 상단 — 암전 오버레이(layer 10/100)는 위라 함께 덮임
+	ic.position = center - Vector2(sz, sz) * 0.5
+	ic.size = Vector2(sz, sz)
+	_ui_add(ic)
+	var tw := create_tween()
+	tw.tween_property(ic, "modulate:a", 1.0, 0.3)
+	tw.tween_interval(hold)
+	tw.tween_property(ic, "modulate:a", 0.0, 0.5)
+	tw.tween_callback(ic.queue_free)
+
 func _on_battle_won() -> void:
 	_message_label.text = tr("battle.msg_victory")
+	_spawn_banner_icon(IconUtils.get_toast_icon("victory"), [Color(1.0, 0.89, 0.48), Color(0.88, 0.6, 0.12)], Vector2(WINDOW_W / 2.0, 132.0), 92.0, 1.5)
 	_set_end_turn_btn_disabled(true)
 	_selected_card = null
 	# 드래그 중 전투 종료 시 마우스 hidden 잔존 방지 — 드래그 정리
@@ -4876,8 +5079,20 @@ func _play_defeat_overlay() -> Signal:
 	lbl.scale = Vector2(1.2, 1.2)
 	layer.add_child(lbl)
 
+	var dsk := _disc_icon(IconUtils.get_toast_icon("defeat"), [Color(0.85, 0.23, 0.25), Color(0.62, 0.62, 0.66)], 104)
+	dsk.modulate = Color(1, 1, 1, 0.0)  # 흰색 — fade(a)만 (자식 전파)
+	dsk.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	dsk.offset_left = -52.0
+	dsk.offset_right = 52.0
+	dsk.offset_top = -168.0
+	dsk.offset_bottom = -64.0
+	layer.add_child(dsk)
+	var dtw := create_tween()
+	dtw.tween_interval(0.3)
+	dtw.tween_property(dsk, "modulate:a", 0.9, 0.6)
+
 	var tw := layer.create_tween().set_parallel(true)
-	tw.tween_property(dim, "color:a", 0.65, 0.6)
+	tw.tween_property(dim, "color:a", 0.88, 0.6)
 	tw.tween_property(lbl, "modulate:a", 1.0, 0.5).set_delay(0.2)
 	tw.tween_property(lbl, "scale", Vector2(1.0, 1.0), 0.5) \
 		.set_delay(0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -5136,8 +5351,11 @@ func _refresh_status_icons_enemy(index: int) -> void:
 			box.add_child(dr_lbl)
 		# 신화 시그니처: signatures_enabled + 1회성 시그니처는 발동 후 숨김
 		if enemy_res.get("signatures_enabled") and enemy_res.mythology != "" and _signature_still_active(enemy_res.mythology, status):
-			var sig_key: String = "sig_" + enemy_res.mythology
-			var sig_lbl: Control = _make_status_label(sig_key, 1, {})
+			var sig_lbl: Control = _make_signature_texrect(enemy_res.mythology, 20)
+			if sig_lbl == null:
+				sig_lbl = _make_status_label("sig_" + enemy_res.mythology, 1, {})
+			else:
+				sig_lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 			SacredTheme.attach_tooltip(sig_lbl, _trf("signature.%s.desc" % enemy_res.mythology, _signature_desc_args(enemy_res.mythology)))
 			box.add_child(sig_lbl)
 	# marked_by — Array (영웅 ID list). 비어있지 않으면 아이콘 + 부여 영웅 수 표시.
