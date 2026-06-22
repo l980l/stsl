@@ -28,6 +28,8 @@ const _VFX_HOLY_ARROW     = preload("res://scenes/vfx/holy_arrow_gpu.gd")
 const _VFX_HOLY_FIRE      = preload("res://scenes/vfx/holy_fire_gpu.gd")
 const _VFX_HOLY_BLUNT     = preload("res://scenes/vfx/holy_blunt_gpu.gd")
 const _VFX_DEBUFF_HEX     = preload("res://scenes/vfx/debuff_hex_gpu.gd")
+const _VFX_VULNERABLE     = preload("res://scenes/vfx/vulnerable_debuff_gpu.gd")
+const _VFX_WEAKEN         = preload("res://scenes/vfx/weaken_debuff_gpu.gd")
 const _VFX_CHARM_KISS     = preload("res://scenes/vfx/charm_kiss_gpu.gd")
 const _VFX_INFATUATION    = preload("res://scenes/vfx/infatuation_gpu.gd")
 const _VFX_HOLY_BUFF      = preload("res://scenes/vfx/holy_buff_gpu.gd")
@@ -132,7 +134,7 @@ signal card_pick_requested(action: String, draw_count: int)
 signal boss_phase_changed(enemy_index: int, new_phase: int)
 signal enemy_spawned(enemy_index: int)  # T3-SUMMON: 런타임 적 추가 알림 (UI 갱신용)
 @warning_ignore("unused_signal")
-signal signature_fired(enemy_index: int, signature_name: String)  # 신화 시그니처 발동 알림 (UI 토스트용)
+signal signature_fired(enemy_index: int, signature_name: String, target_hero_id: String)  # 신화 시그니처 발동 알림 (UI 토스트용). target_hero_id: 영웅 대상 시그니처(저주 등)의 타겟, 없으면 ""
 signal counter_triggered(hero_id: String, enemy_index: int, is_major: bool)  # 카운터 발동 — VFX 트리거 (major = charge 보스 무효)
 signal token_attack_fired(hero_id: String, token_index: int, enemy_index: int)  # 토큰 (병사) 발사 — VFX/SFX 시각 처리용
 signal passive_buff_applied(enemy_index: int, status_type: String, value: int)  # phase_buffs / 시그너처 등 intent 외 자동 BUFF — battle_scene 이 VFX spawn 용도
@@ -204,8 +206,10 @@ func _vfx_impact_delay_for_damage_type(dtype: String) -> float:
 
 func _vfx_impact_delay_for_status(stype: String) -> float:
 	var base: float = 0.0
-	if stype == "weak" or stype == "vulnerable":
-		base = _VFX_DEBUFF_HEX.IMPACT_DELAY
+	if stype == "weak":
+		base = _VFX_WEAKEN.IMPACT_DELAY
+	elif stype == "vulnerable":
+		base = _VFX_VULNERABLE.IMPACT_DELAY
 	elif stype == "charm":
 		base = _VFX_CHARM_KISS.IMPACT_DELAY
 	elif stype == "enthrall":
