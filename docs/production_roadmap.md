@@ -98,7 +98,7 @@
 
 **보스** (목표: 1종 — 히드라)
 - ✅ 히드라 (3페이즈, phase_thresholds 구현, HP 4500)
-- 🔲 히드라 실제 비주얼 및 페이즈별 연출
+- ✅ 페이즈 전환 연출 — 보스 grade 자동 적용 (`boss_phase_changed_gpu`: build-up rumble + core erupt + 6겹 shockwave + flash/shake + 전용 SFX), `swap_to_phase` 스프라이트 교체 (PR #217). 히드라 전용 비주얼(머리 수 감소)은 스프라이트 에셋 대기
 
 ### 1-3. 렐릭 확장
 - ✅ 공용 렐릭 ~10종
@@ -246,7 +246,7 @@
 - ✅ 일반 적 6종: 사막 척후병, 사막 전갈, 미라 전사, 스핑크스 새끼, 모래 이프리트, 카 영혼 (HP 320~600)
 - ✅ 엘리트 적 3종: 아펩 뱀 (독 특화), 세트의 사냥개 (strength 축적), 바 새 (SPECIAL 카드 영구 제거)
 - ✅ 보스: 오시리스 (2페이즈, HP 3000, 50% 시 HP 60% 회복 + 패턴 강화)
-- 🔲 오시리스 페이즈 전환 비주얼 연출 (Milestone 7-5에서)
+- ✅ 오시리스 페이즈 전환 연출 — 보스 grade 자동 적용 (`boss_phase_changed_gpu`, PR #217)
 
 ### 2-3. Act 2 이벤트 (이집트 테마 10종)
 - ✅ 이집트 테마 이벤트 10종: 사자의 서, 아누비스의 심판, 스카라베 풍뎅이, 파라오의 무덤, 나일강 범람, 토트의 지혜, 바스테트 고양이, 오아시스 상인, 미라의 저주, 라의 태양선
@@ -1002,7 +1002,7 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 ### 7-1. 캐릭터 아트
 - ✅ **영웅 6인 전신 일러스트 적용** (PR #189) — `character_placeholder.gd` Sprite2D, 80×80 sprite 영역 cover 모드(한쪽 일치 + 다른 쪽 region 잘림), 외부 비균등 scale (1.44, 2.4) 역수 보정, 영웅 선택씬 AtlasTexture region 얼굴/상체 crop
 - 🔲 아이들 / 공격 / 피격 / 사망 액션별 일러스트 (현재 static 단일 일러스트)
-- 🔲 사망 상태 연출 (반투명 or 그레이스케일)
+- ✅ 사망 상태 연출 — 적 `death_dissolve`/보스 `boss_death` VFX 유지 + **스프라이트 스무스 grayscale** (`set_dead_grayscale`, desat 0→1 0.6s, 시체로 남김). 영웅 alpha 페이드아웃 제거 → 회색조로 통일, 부활 시 `clear_grayscale` 복구. `character_placeholder.gd`·`enemy_placeholder.gd` 공통 `_FLASH_SHADER` 에 desat uniform 추가
 
 ### 7-2. 적 아트
 - 🔲 Act 1 적 전체 스프라이트 (일반 6 + 엘리트 3 + 히드라)
@@ -1035,13 +1035,13 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 ### 7-7. 카드 폴리싱 — 미구현 효과
 - 🔲 치명타(Critical Hit) 시스템: 특정 카드/렐릭이 일정 확률로 피해 ×1.5~2.0, HP 바 crit 비주얼 트리거
 - 🔲 도발(Taunt) UI 강화: 도발 대상에 아이콘 강조 표시, 인텐트 화살표 변경
-- 🔲 크리티컬 HP 상태(15% 이하) 전투 연출: hp_lbl 색상 BLOOD_300, 화면 가장자리 비네트
+- ✅ 크리티컬 HP 상태(15% 이하) 전투 연출: HP바 crit 그라데이션 + 강한 블룸 펄스(BLOOD_300, `battle_scene.gd:919-948`). 화면 가장자리 비네트는 의도적으로 미적용 — 파티 멀티 영웅 구조상 HP바 펄스로 충분 (per-hero 명확성 우선)
 
 ### 7-5. 애니메이션 / 이펙트
 - ✅ **카드 사용 시 이펙트 (공격 임팩트·독 스플래시·방어막) — VFX 시스템 v1 (M6.8, PR #111~#113)**: 20종 GDScript 포팅, 임팩트 시점 동기화, GameSettings autoload hook
 - 🔲 히트 스톱 (공격 시 0.1초 정지)
 - ✅ 씬 전환 페이드 인/아웃 (`autoload/scene_transition.gd` + CanvasLayer 검정 오버레이)
-- 🔲 페이즈 전환 연출 (보스 분노 이펙트)
+- ✅ 페이즈 전환 연출 (보스/일반 2종 — `boss_phase_changed_gpu` + `monster_phase_changed_gpu`, grade 분기, PR #217)
 
 ### 7-6. 오디오 ✅ 기반 완료 (PR #94)
 - ✅ 사운드 에셋 요구사항 문서 (`docs/sound_assets_required.md`)

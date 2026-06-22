@@ -7,7 +7,10 @@ extends Node2D
 const _FLASH_SHADER := """
 shader_type canvas_item;
 uniform vec4 flash_color : source_color = vec4(0.0);
+uniform float desat : hint_range(0.0, 1.0) = 0.0;  // 사망 시 회색조 (0=원색, 1=완전 흑백)
 void fragment() {
+	float gray = dot(COLOR.rgb, vec3(0.299, 0.587, 0.114));
+	COLOR.rgb = mix(COLOR.rgb, vec3(gray), desat);
 	COLOR.rgb += flash_color.rgb * flash_color.a;
 }
 """
@@ -22,6 +25,7 @@ const _SPRITE_H := 80.0
 
 var _flash_mat: ShaderMaterial = null
 var _flash_tween: Tween = null
+var _gray_tween: Tween = null
 var _illust_sprite: Sprite2D = null
 var _enemy_id: String = ""    # "{myth}_{name}" 형식 — 페이즈 swap 시 사용
 var _phase: int = 0
@@ -118,6 +122,17 @@ func flash(color: Color, duration: float) -> void:
 		func(a: float) -> void: _flash_mat.set_shader_parameter("flash_color", Color(color.r, color.g, color.b, a)),
 		color.a, 0.0, duration
 	)
+
+# 사망 시 스프라이트를 부드럽게 회색조로 — 디졸브 VFX 와 병행, sprite 는 시체로 남김.
+func set_dead_grayscale(duration: float = 0.6) -> void:
+	if _flash_mat == null:
+		return
+	if _gray_tween and _gray_tween.is_valid(): _gray_tween.kill()
+	_gray_tween = create_tween()
+	_gray_tween.tween_method(
+		func(v: float) -> void: _flash_mat.set_shader_parameter("desat", v),
+		0.0, 1.0, duration
+	).set_ease(Tween.EASE_OUT)
 
 func _build_animations() -> void:
 	var lib := AnimationLibrary.new()
