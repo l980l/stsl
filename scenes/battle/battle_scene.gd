@@ -4926,7 +4926,9 @@ func _on_enemy_died(index: int) -> void:
 			else:
 				_spawn_death_dissolve(char_node.global_position)
 			# AnimationPlayer 'death' 는 sprite 를 안 보이게 만들기 때문에 호출하지 않음.
-			# dissolve VFX 만으로 사망 시각 표현 (sprite 자체는 그대로 남음)
+			# dissolve VFX 와 병행해 sprite 를 부드럽게 회색조로 (시체로 남김)
+			if char_node.has_method("set_dead_grayscale"):
+				char_node.set_dead_grayscale(0.6)
 		# 처치 순간 킬캠 (옵션 켜져있으면)
 		if char_node:
 			_play_kill_cam(char_node.global_position)
@@ -4957,13 +4959,9 @@ func _on_hero_died(hero_id: String) -> void:
 			_spawn_death_dissolve(char_node.global_position)
 			# 영웅 사망 순간 킬캠 (옵션 켜져있으면)
 			_play_kill_cam(char_node.global_position)
-			if char_node.has_node("AnimationPlayer"):
-				var ap: AnimationPlayer = char_node.get_node("AnimationPlayer")
-				if ap.has_animation("death"):
-					ap.play("death")
-					return
-			var tw2: Tween = char_node.create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
-			tw2.tween_property(char_node, "modulate:a", 0.0, 0.6)
+			# 사망 스프라이트 — 페이드아웃(투명화) 대신 부드럽게 회색조 (디졸브 VFX 와 병행, 시체로 남김)
+			if char_node.has_method("set_dead_grayscale"):
+				char_node.set_dead_grayscale(0.6)
 	_run_or_defer_death(hero_id, death_fx)
 
 func _on_hero_revived(hero_id: String) -> void:
@@ -4973,6 +4971,9 @@ func _on_hero_revived(hero_id: String) -> void:
 			continue
 		entry["panel"].visible = true
 		entry["panel"].modulate = Color(1.0, 1.0, 1.0)  # 사망 시 회색화 복원
+		var rchar = _hero_char_nodes.get(hero_id)
+		if rchar and rchar.has_method("clear_grayscale"):
+			rchar.clear_grayscale()  # 스프라이트 회색조 원색 복구
 		entry["name_lbl"].visible = true
 		entry["hp_bar"].visible = true
 		entry["hp_lbl"].visible = true
