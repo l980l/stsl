@@ -68,6 +68,10 @@ const VFX_PAIRS := [
 	{"name": "claw_attack",  "gpu": "res://scenes/vfx/claw_attack_gpu.gd",  "cpu": ""},
 	# Phase 14 — monster_phase_changed (GPU 단독, 일반 몬스터 페이즈 전환)
 	{"name": "monster_phase", "gpu": "res://scenes/vfx/monster_phase_changed_gpu.gd", "cpu": ""},
+	# Phase 15 — vulnerable_debuff (취약 — CPU base + GPU 하이브리드)
+	{"name": "vulnerable_debuff", "gpu": "res://scenes/vfx/vulnerable_debuff_gpu.gd", "cpu": "res://scenes/vfx/vulnerable_debuff.gd"},
+	# Phase 16 — weaken_debuff (약화 — CPU base + GPU 하이브리드)
+	{"name": "weaken_debuff", "gpu": "res://scenes/vfx/weaken_debuff_gpu.gd", "cpu": "res://scenes/vfx/weaken_debuff.gd"},
 ]
 
 # 인게임 캐릭터 sprite 영역 — placeholder 80×80 × scale (1.44, 2.4) = 115.2 × 192
@@ -126,16 +130,22 @@ func _ready() -> void:
 		mode_box.add_child(mb)
 
 	var vfx_lbl := Label.new()
-	vfx_lbl.text = "── VFX (Phase 1: 5 개 — GPU/CPU 토글로 같은 위치 비교) ──"
+	vfx_lbl.text = "── VFX (%d 종 — GPU/CPU 토글로 같은 위치 비교) ──" % VFX_PAIRS.size()
 	vfx_lbl.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
 	panel.add_child(vfx_lbl)
+	var avail_w: float = get_viewport_rect().size.x - 48.0  # 패널 좌우 여백 제외한 가용 폭
 	var grid := GridContainer.new()
-	grid.columns = 5  # 5/5 = Phase1/Phase2
+	grid.columns = maxi(5, int(avail_w / 160.0))  # 가용 폭에 맞춰 열 수 동적 — 버튼이 가로로 꽉 차게
+	grid.custom_minimum_size = Vector2(avail_w, 0.0)
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
 	panel.add_child(grid)
 	for entry in VFX_PAIRS:
 		var b := Button.new()
 		b.text = entry["name"]
-		b.custom_minimum_size = Vector2(180.0, 0.0)
+		b.custom_minimum_size = Vector2(120.0, 0.0)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL  # 셀(열) 가득 채움
+		b.clip_text = true
 		b.pressed.connect(_select_and_play.bind(entry))
 		grid.add_child(b)
 
@@ -161,15 +171,21 @@ func _ready() -> void:
 			_update_info())
 		pq_box.add_child(pq_btn)
 
+	# 4-way / BOTH 비교 토글 — 한 줄에 가로로 꽉 차게 (각 절반 폭)
+	var cmp_box := HBoxContainer.new()
+	cmp_box.custom_minimum_size = Vector2(avail_w, 0.0)
+	cmp_box.add_theme_constant_override("separation", 12)
+	panel.add_child(cmp_box)
 	var cmp_btn := CheckBox.new()
 	cmp_btn.text = "4-way 비교 (x0.1 | x0.25 | x0.5 | x1.0 동시 spawn)"
+	cmp_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cmp_btn.toggled.connect(func(on: bool) -> void: _compare_4way = on)
-	panel.add_child(cmp_btn)
-
+	cmp_box.add_child(cmp_btn)
 	var both_btn := CheckBox.new()
 	both_btn.text = "Both 비교 (좌: GPU | 우: CPU 동시 spawn)"
+	both_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	both_btn.toggled.connect(func(on: bool) -> void: _both_mode = on)
-	panel.add_child(both_btn)
+	cmp_box.add_child(both_btn)
 
 	_info = Label.new()
 	panel.add_child(_info)

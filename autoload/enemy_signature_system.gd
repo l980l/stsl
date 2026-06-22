@@ -18,7 +18,7 @@ static func on_enemy_damaged(bm: Object, idx: int, amount: int) -> void:
 		"greek":
 			if amount >= 25 and not bm._enemy_status[idx].get("greek_hubris_pending", false):
 				bm._enemy_status[idx]["greek_hubris_pending"] = true
-				bm.signature_fired.emit(idx, "hubris")  # 토스트용
+				bm.signature_fired.emit(idx, "hubris", "")  # 토스트용
 		"norse":
 			if not bm._enemy_status[idx].get("norse_ragnarok_fired", false) and bm._enemy_alive[idx]:
 				var hp_ratio: float = float(bm._enemy_hp[idx]) / float(enemy.max_hp)
@@ -28,7 +28,7 @@ static func on_enemy_damaged(bm: Object, idx: int, amount: int) -> void:
 						if bm._enemy_alive[i]:
 							bm._apply_status_to_enemy(i, "strength", 1)
 							bm.passive_buff_applied.emit(i, "strength", 1)
-					bm.signature_fired.emit(idx, "ragnarok")  # 토스트용 (전투당 1회)
+					bm.signature_fired.emit(idx, "ragnarok", "")  # 토스트용 (전투당 1회)
 
 # ─── Hook: 적이 영웅에게 ATTACK ───
 # 이집트 저주 누적 — 자기 ATTACK 적중 시 타겟에 vulnerable +1 자동 부여
@@ -40,7 +40,7 @@ static func on_enemy_attack(bm: Object, idx: int, target_hero_id: String) -> voi
 	var enemy: Resource = bm._enemies[idx]
 	if enemy.mythology == "egyptian":
 		bm._apply_status_to_hero(target_hero_id, "vulnerable", 1)
-		bm.signature_fired.emit(idx, "egyptian_curse")  # 토스트 (battle_scene 에서 1턴 1회 throttle)
+		bm.signature_fired.emit(idx, "egyptian_curse", target_hero_id)  # 토스트 (battle_scene 에서 1턴 1회 throttle), VFX 는 피격 타겟에
 
 # ─── Hook: 적 사망 ───
 # 불교 인과응보 — 받은 누적 피해의 25%를 ALL 영웅에 반환 (1회)
@@ -54,7 +54,7 @@ static func on_enemy_death(bm: Object, idx: int) -> void:
 		if reflect > 0 and bm.team_mgr:
 			for hero in bm.team_mgr.get_living_heroes():
 				bm._deal_damage_to_hero(hero.hero_id, reflect, "")
-			bm.signature_fired.emit(idx, "karma")  # 토스트용 (사망 시 1회)
+			bm.signature_fired.emit(idx, "karma", "")  # 토스트용 (사망 시 1회)
 
 # ─── Hook: 적 턴 시작 ───
 # 그리스 휴브리스 pending 처리 — strength +2 부여 후 플래그 해제
@@ -83,7 +83,7 @@ static func on_enemy_turn_start(bm: Object, idx: int) -> int:
 			bm.passive_buff_applied.emit(idx, "block", 15)
 		emitted += 1
 		bm._enemy_status[idx]["daoist_stance"] = 1 - stance
-		bm.signature_fired.emit(idx, "yin_yang")  # 토스트 (1턴 1회 throttle)
+		bm.signature_fired.emit(idx, "yin_yang", "")  # 토스트 (1턴 1회 throttle)
 	# Japanese: 결계 매 5턴마다
 	elif enemy.mythology == "japanese":
 		var turn_count: int = bm._enemy_status[idx].get("japanese_turn_count", 0) + 1
@@ -92,7 +92,7 @@ static func on_enemy_turn_start(bm: Object, idx: int) -> int:
 			bm._enemy_block[idx] += 20
 			bm.passive_buff_applied.emit(idx, "block", 20)
 			emitted += 1
-			bm.signature_fired.emit(idx, "kekkai")  # 토스트용 (5턴마다)
+			bm.signature_fired.emit(idx, "kekkai", "")  # 토스트용 (5턴마다)
 	return emitted
 
 # ─── 헬퍼 ───

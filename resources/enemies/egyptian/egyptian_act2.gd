@@ -13,11 +13,11 @@ static func serqet(scene: PackedScene) -> Resource:
 	var i1 := IntentRes.new()
 	i1.action_type = IntentRes.ActionType.ATTACK; i1.value = 140; i1.target = IntentRes.TargetType.RANDOM; i1.damage_type = "needle_sting"
 	var i1b := IntentRes.new()
-	i1b.action_type = IntentRes.ActionType.DEBUFF; i1b.value = 50; i1b.status_type = "poison"; i1b.target = IntentRes.TargetType.RANDOM
+	i1b.action_type = IntentRes.ActionType.DEBUFF; i1b.value = 50; i1b.status_type = "poison"; i1b.target = IntentRes.TargetType.RANDOM; i1b.damage_type = "needle_sting"  # 전갈 침으로 독 주입
 	var i2 := IntentRes.new()
 	i2.action_type = IntentRes.ActionType.ATTACK; i2.value = 140; i2.target = IntentRes.TargetType.RANDOM; i2.damage_type = "needle_sting"
 	var i2b := IntentRes.new()
-	i2b.action_type = IntentRes.ActionType.DEBUFF; i2b.value = 50; i2b.status_type = "poison"; i2b.target = IntentRes.TargetType.RANDOM
+	i2b.action_type = IntentRes.ActionType.DEBUFF; i2b.value = 50; i2b.status_type = "poison"; i2b.target = IntentRes.TargetType.RANDOM; i2b.damage_type = "needle_sting"  # 전갈 침으로 독 주입
 	var i3 := IntentRes.new()
 	i3.action_type = IntentRes.ActionType.DEBUFF; i3.value = 3; i3.status_type = "weak"; i3.target = IntentRes.TargetType.ALL
 	var i4 := IntentRes.new()

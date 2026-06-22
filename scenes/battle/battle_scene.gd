@@ -1114,7 +1114,7 @@ func _signature_gradient(name: String) -> Array:
 		"yin_yang":       return [Color(0.92, 1.0, 1.0), Color(0.55, 0.78, 0.9)]    # 청백
 		_:                return [Color(1.0, 0.9, 0.5), Color(0.85, 0.6, 0.2)]
 
-func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
+func _on_signature_fired(enemy_index: int, signature_name: String, target_hero_id: String = "") -> void:
 	if _signatures_shown_this_turn.has(signature_name):
 		return
 	_signatures_shown_this_turn[signature_name] = true
@@ -1149,7 +1149,7 @@ func _on_signature_fired(enemy_index: int, signature_name: String) -> void:
 	# 적 위치에 색상 플래시 (시그니처 색상)
 	_burst_signature_at_enemy(enemy_index, color)
 	# 신화별 cinematic VFX spawn
-	_spawn_signature_vfx(enemy_index, signature_name)
+	_spawn_signature_vfx(enemy_index, signature_name, target_hero_id)
 
 # 적 SPECIAL 인텐트가 카드를 이번 전투 동안 exhaust 시켰을 때 — 토스트 알림
 func _on_cards_exhausted_by_enemy(card_names: Array) -> void:
@@ -2519,8 +2519,8 @@ func _add_popup_halo(container: Node2D, text: String, font_size: int, color: Col
 
 # 색은 VFX HTML 톤 — 채도 낮춤 + 밝기 ↑ (촌스러운 원색 회피)
 const _STATUS_POPUP_INFO := {
-	"weak":          ["Weak",          Color(1.00, 0.65, 0.30)],   # rgba(255,166,77)  부드러운 오렌지
-	"vulnerable":    ["Vulnerable",    Color(0.75, 0.50, 1.00)],   # rgba(191,128,255) 라벤더 보라
+	"weak":          ["Weak",          Color(0.561, 0.702, 0.612)], # #8fb39c  약화 VFX 색 (병든 sage)
+	"vulnerable":    ["Vulnerable",    Color(0.851, 0.290, 0.314)], # #d94a50  취약 VFX 색 (핏빛 적)
 	"poison":        ["Poison",        Color(0.71, 1.00, 0.35)],   # rgba(180,255,90)  라임
 	"strength":      ["Strength",      Color(1.00, 0.92, 0.62)],   # rgba(255,235,160) 따뜻한 골드
 	"charm":         ["Charm",         Color(1.00, 0.60, 0.85)],   # rgba(255,153,217) 로즈핑크
@@ -2699,6 +2699,8 @@ const _VFX_REVIVE_BLESSING := preload("res://scenes/vfx/revive_blessing_gpu.gd")
 # slash 명중 시 기존 베기 파티클에 더해 발동하는 피 분출
 const _VFX_BLOOD_SPRAY := preload("res://scenes/vfx/blood_spray.gd")
 const _VFX_DEBUFF_HEX := preload("res://scenes/vfx/debuff_hex_gpu.gd")
+const _VFX_VULNERABLE := preload("res://scenes/vfx/vulnerable_debuff_gpu.gd")
+const _VFX_WEAKEN := preload("res://scenes/vfx/weaken_debuff_gpu.gd")
 const _VFX_CHARM_KISS := preload("res://scenes/vfx/charm_kiss_gpu.gd")
 const _VFX_INFATUATION := preload("res://scenes/vfx/infatuation_gpu.gd")
 const _VFX_POISON_TICK := preload("res://scenes/vfx/poison_tick_gpu.gd")
@@ -3047,6 +3049,16 @@ func _on_intent_vfx_start(enemy_index: int, intent: Resource, target_hero_id: St
 				else:
 					var thpos: Vector2 = _hero_pos_or_first(target_hero_id)
 					_spawn_taunt(caster_pos, caster_foot, thpos)
+			elif intent.damage_type != "" and _caster_beam_script(intent.damage_type) != null:
+				# DEBUFF 에 damage_type 지정 + 대응 빔 존재 → 그 공격 VFX 로 전달 (전갈류: poison 부여를 needle_sting 침으로).
+				# 상태 적용은 vfx_impact_resolved 동기 → splash 경로와 동일.
+				if intent.target == ir.TargetType.ALL:
+					for hpos in _all_living_hero_positions():
+						_spawn_attack_beam_simple(intent.damage_type, caster_pos, hpos + _impact_jitter(), hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
+				else:
+					var hpos: Vector2 = _hero_pos_or_first(target_hero_id)
+					if hpos != Vector2.ZERO:
+						_spawn_attack_beam_simple(intent.damage_type, caster_pos, hpos + _impact_jitter(), hpos + Vector2(0.0, _CHAR_FOOT_Y_OFFSET))
 			else:
 				var fx_script: GDScript = _debuff_script_for_status(stype)
 				if fx_script:
@@ -3354,8 +3366,10 @@ func _is_holy_enemy(enemy_index: int) -> bool:
 
 # 디버프 status_type → VFX 스크립트
 func _debuff_script_for_status(stype: String) -> GDScript:
-	if stype == "weak" or stype == "vulnerable":
-		return _VFX_DEBUFF_HEX
+	if stype == "weak":
+		return _VFX_WEAKEN
+	elif stype == "vulnerable":
+		return _VFX_VULNERABLE
 	elif stype == "charm":
 		return _VFX_CHARM_KISS
 	elif stype == "enthrall":
@@ -4094,7 +4108,7 @@ func _spawn_power_up(caster_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> v
 
 # 신화 시그너처 VFX 디스패치 — _on_signature_fired 가 호출.
 # 신화별 spawn 위치·SFX·screen effect 분기.
-func _spawn_signature_vfx(enemy_index: int, signature_name: String) -> void:
+func _spawn_signature_vfx(enemy_index: int, signature_name: String, target_hero_id: String = "") -> void:
 	var caster_node: Node2D = null
 	if enemy_index >= 0 and enemy_index < _enemy_char_nodes.size():
 		caster_node = _enemy_char_nodes[enemy_index]
@@ -4105,7 +4119,13 @@ func _spawn_signature_vfx(enemy_index: int, signature_name: String) -> void:
 		"ragnarok": _spawn_sig_ragnarok()
 		"karma": _spawn_sig_karma(caster_pos, foot_pos)
 		"yin_yang": _spawn_sig_yin_yang(caster_pos, foot_pos)
-		"egyptian_curse": _spawn_sig_egyptian_curse(_first_living_hero_pos(), _first_living_hero_foot())
+		"egyptian_curse":
+			# 저주는 피격 영웅에 vulnerable 부여 → VFX 도 그 타겟 머리 위에 (없으면 첫 영웅 폴백)
+			var c_node: Node2D = _hero_char_nodes.get(target_hero_id)
+			if c_node != null:
+				_spawn_sig_egyptian_curse(c_node.global_position, _foot_pos(c_node))
+			else:
+				_spawn_sig_egyptian_curse(_first_living_hero_pos(), _first_living_hero_foot())
 		"kekkai": _spawn_sig_kekkai(caster_pos, foot_pos)
 
 # 그리스 휴브리스 — 적 위치에 황금 halo + zigzag 번개
@@ -4176,8 +4196,7 @@ func _spawn_sig_yin_yang(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) 
 		fx.set_ground_anchor(foot_pos)
 	fx.play(target_pos, target_pos)
 
-# 이집트 저주 — 피해 입은 영웅 머리 위 호루스의 눈 stamp.
-# 3연발은 VFX 내부 (STAMP_COUNT) — screen_effect 가 stamp 마다 emit 되어 SFX 도 3번.
+# 이집트 저주 — 피해 입은 영웅 머리 위 호루스의 눈 stamp. (SFX 없음 — 매 공격마다 발동이라 무음)
 func _spawn_sig_egyptian_curse(target_pos: Vector2, foot_pos: Vector2 = Vector2.ZERO) -> void:
 	if target_pos == Vector2.ZERO:
 		return
@@ -4187,9 +4206,6 @@ func _spawn_sig_egyptian_curse(target_pos: Vector2, foot_pos: Vector2 = Vector2.
 	fx.position = Vector2.ZERO
 	if foot_pos != Vector2.ZERO:
 		fx.set_ground_anchor(foot_pos)
-	fx.screen_effect.connect(func() -> void:
-		AudioManager.play_sfx("impact_curse")
-	)
 	fx.play(target_pos, target_pos)
 
 # 일본 결계 — 적 위치에 4 ofuda + 6각 hex barrier + 結 kanji
@@ -5349,15 +5365,7 @@ func _refresh_status_icons_enemy(index: int) -> void:
 			var dr_lbl: Control = _make_status_label("death_rattle", 1, {})
 			SacredTheme.attach_tooltip(dr_lbl, _format_death_rattle_tooltip(enemy_res.death_trigger))
 			box.add_child(dr_lbl)
-		# 신화 시그니처: signatures_enabled + 1회성 시그니처는 발동 후 숨김
-		if enemy_res.get("signatures_enabled") and enemy_res.mythology != "" and _signature_still_active(enemy_res.mythology, status):
-			var sig_lbl: Control = _make_signature_texrect(enemy_res.mythology, 20)
-			if sig_lbl == null:
-				sig_lbl = _make_status_label("sig_" + enemy_res.mythology, 1, {})
-			else:
-				sig_lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-			SacredTheme.attach_tooltip(sig_lbl, _trf("signature.%s.desc" % enemy_res.mythology, _signature_desc_args(enemy_res.mythology)))
-			box.add_child(sig_lbl)
+		# 신화 시그니처 배지는 상태이상 줄에서 제거 — 별도 시그니처 패널이 상시 표시함
 	# marked_by — Array (영웅 ID list). 비어있지 않으면 아이콘 + 부여 영웅 수 표시.
 	var marked_by_arr: Array = status.get("marked_by", [])
 	if marked_by_arr.size() > 0:
