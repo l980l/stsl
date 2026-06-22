@@ -1,6 +1,8 @@
 # scenes/main_menu/main_menu_scene.gd
 extends Node2D
 
+const CreditsOverlay := preload("res://scenes/ui/credits_overlay.gd")
+
 func _ready() -> void:
 	AudioManager.play_bgm_dynamic("menu", "")
 	_build_ui()
@@ -54,30 +56,24 @@ func _build_ui() -> void:
 	divider.size = Vector2(400, 1)
 	add_child(divider)
 
+	# 버튼 수직 스택 — 새 게임 / (이어하기) / 크레딧 / 종료
+	var btn_y := 420.0
+
 	# 새 게임 버튼 (Primary)
-	var btn_new := Button.new()
-	btn_new.theme_type_variation = "PrimaryButton"
-	btn_new.position = Vector2(810, 420)
-	btn_new.size = Vector2(300, 60)
-	btn_new.add_theme_font_size_override("font_size", 16)
-	btn_new.text = tr("ui.main_menu.new_game")
-	btn_new.pressed.connect(_on_new_game)
-	add_child(btn_new)
-	LabelUtils.fit_text(btn_new, 16, 12)
-	SacredTheme.animate_button(btn_new)
+	_add_menu_button(tr("ui.main_menu.new_game"), btn_y, "PrimaryButton", _on_new_game)
+	btn_y += 80.0
 
 	# 이어하기 버튼 (Primary — 있을 때만)
 	if SaveManager.has_save():
-		var btn_cont := Button.new()
-		btn_cont.theme_type_variation = "PrimaryButton"
-		btn_cont.position = Vector2(810, 500)
-		btn_cont.size = Vector2(300, 60)
-		btn_cont.add_theme_font_size_override("font_size", 16)
-		btn_cont.text = tr("ui.main_menu.continue")
-		btn_cont.pressed.connect(_on_continue)
-		add_child(btn_cont)
-		LabelUtils.fit_text(btn_cont, 16, 12)
-		SacredTheme.animate_button(btn_cont)
+		_add_menu_button(tr("ui.main_menu.continue"), btn_y, "PrimaryButton", _on_continue)
+		btn_y += 80.0
+
+	# 크레딧 버튼 (Vow)
+	_add_menu_button(tr("ui.main_menu.credits"), btn_y, "VowButton", _on_credits)
+	btn_y += 80.0
+
+	# 종료 버튼 (Vow)
+	_add_menu_button(tr("ui.main_menu.quit"), btn_y, "VowButton", _on_quit)
 
 	# 하단 금빛 수평선 장식
 	var bot_line := ColorRect.new()
@@ -86,6 +82,19 @@ func _build_ui() -> void:
 	bot_line.size = Vector2(1920, 1)
 	add_child(bot_line)
 
+# 메뉴 버튼 빌더 — 810,y 기준 300×60, 폰트 16, 호버 애니메이션.
+func _add_menu_button(text: String, y: float, variation: String, handler: Callable) -> void:
+	var btn := Button.new()
+	btn.theme_type_variation = variation
+	btn.position = Vector2(810, y)
+	btn.size = Vector2(300, 60)
+	btn.add_theme_font_size_override("font_size", 16)
+	btn.text = text
+	btn.pressed.connect(handler)
+	add_child(btn)
+	LabelUtils.fit_text(btn, 16, 12)
+	SacredTheme.animate_button(btn)
+
 func _on_new_game() -> void:
 	SaveManager.clear_save()
 	SceneTransition.go("res://scenes/chapter_select/chapter_select_scene.tscn")
@@ -93,3 +102,13 @@ func _on_new_game() -> void:
 func _on_continue() -> void:
 	SaveManager.load_save()
 	SceneTransition.go("res://scenes/map/map_scene.tscn")
+
+func _on_credits() -> void:
+	if get_node_or_null("CreditsOverlay") != null:
+		return
+	var overlay := CreditsOverlay.new()
+	overlay.name = "CreditsOverlay"
+	add_child(overlay)
+
+func _on_quit() -> void:
+	get_tree().quit()
