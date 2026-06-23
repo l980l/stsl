@@ -9,6 +9,8 @@ const PANEL_H := 824.0
 # 고유 명사 — 번역하지 않고 그대로 노출 (사이트/도구/작품명)
 const _SOUND_SOURCE := "Sound Effect Lab — soundeffect-lab.info"
 const _AI_BGM       := "ACE-Step 1.5"
+const _AI_ILLUST    := "Nano Banana"
+const _AI_IMGEDIT   := "Qwen Image Edit"
 const _AI_FRAME     := "Z-Image Turbo"
 const _AI_VFXUI     := "Claude"
 # [작품명(고유명사·비번역), 영감받은 부분 i18n 키]
@@ -129,6 +131,8 @@ func _build() -> void:
 	_add_section(vbox, tr("ui.credits.section.sound"), [_SOUND_SOURCE])
 	_add_section(vbox, tr("ui.credits.section.ai"), [
 		"%s — %s" % [tr("ui.credits.ai.bgm"), _AI_BGM],
+		"%s — %s" % [tr("ui.credits.ai.illust"), _AI_ILLUST],
+		"%s — %s" % [tr("ui.credits.ai.imgedit"), _AI_IMGEDIT],
 		"%s — %s" % [tr("ui.credits.ai.frame"), _AI_FRAME],
 		"%s — %s" % [tr("ui.credits.ai.vfxui"), _AI_VFXUI],
 	])
