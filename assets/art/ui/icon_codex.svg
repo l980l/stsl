@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+
+  <ellipse cx="16" cy="28" rx="11.5" ry="1.2" fill="#000" opacity="0.45"></ellipse>
+
+  <path d="M16 8.5 C12.5 6.8, 8.5 6.3, 5 7.3 L5 23.5 C8.5 22.5, 12.5 23, 16 24.8 Z" fill="#0e0e12" stroke="#8a6f1e" stroke-width="0.9" stroke-linejoin="round" opacity="0.9"></path>
+  <path d="M16 8.5 C19.5 6.8, 23.5 6.3, 27 7.3 L27 23.5 C23.5 22.5, 19.5 23, 16 24.8 Z" fill="#0e0e12" stroke="#d4a948" stroke-width="1.1" stroke-linejoin="round"></path>
+  <path d="M16 8.5 C12.5 6.8, 8.5 6.3, 5 7.3 L5 23.5 C8.5 22.5, 12.5 23, 16 24.8 Z" fill="none" stroke="#d4a948" stroke-width="1.1" stroke-linejoin="round"></path>
+
+  <line x1="16" y1="8.5" x2="16" y2="24.8" stroke="#8a6f1e" stroke-width="0.9"></line>
+
+  <line x1="8" y1="11" x2="13.5" y2="11.6" stroke="#e8c878" stroke-width="0.5" opacity="0.65"></line>
+  <line x1="8" y1="14" x2="13.5" y2="14.4" stroke="#e8c878" stroke-width="0.5" opacity="0.65"></line>
+  <line x1="8" y1="17" x2="13.5" y2="17.3" stroke="#e8c878" stroke-width="0.5" opacity="0.65"></line>
+  <line x1="18.5" y1="11.6" x2="24" y2="11" stroke="#e8c878" stroke-width="0.5" opacity="0.65"></line>
+  <line x1="18.5" y1="14.4" x2="24" y2="14" stroke="#e8c878" stroke-width="0.5" opacity="0.65"></line>
+  <line x1="18.5" y1="17.3" x2="24" y2="17" stroke="#e8c878" stroke-width="0.5" opacity="0.65"></line>
+
+  <path d="M16 8.7 L16 29 L14.6 26.4 L13.2 29 L13.2 9.1 Z" fill="#b22a30" stroke="#6b1318" stroke-width="0.5" stroke-linejoin="round"></path>
+</svg>

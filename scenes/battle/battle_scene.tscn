@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://wu4sy8k572ia" path="res://scenes/battle/battle_slot_preview.gd" id="preview"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_button.tscn" id="sb"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_overlay.tscn" id="so"]
+[ext_resource type="PackedScene" path="res://scenes/ui/codex_button.tscn" id="cb"]
 
 [node name="BattleScene" type="Node2D" unique_id=2021987535]
 y_sort_enabled = true
@@ -45,6 +46,8 @@ position = Vector2(138, 587)
 
 [node name="SlotPreview" type="Node2D" parent="." unique_id=1071944172]
 script = ExtResource("preview")
+
+[node name="CodexButton" parent="." instance=ExtResource("cb")]
 
 [node name="SettingsButton" parent="." unique_id=19073087 instance=ExtResource("sb")]
 

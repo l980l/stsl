@@ -11,6 +11,8 @@ var chapters_cleared: Array = []
 var unlocked_heroes: Array = []
 var unlock_flags: Dictionary = {}
 var run_count: int = 0  # 누적 런(각성) 횟수 — 스토리 변주("전에도 왔다")용. 영구 저장.
+var discovered_cards: Array = []  # 도감 — 획득(보유)한 카드 키 목록. 영구 저장.
+var seen_cards: Array = []         # 도감 — 관측(발견)만 한 카드 키 목록 (보상/상점 진열 등). 영구 저장.
 
 func _ready() -> void:
 	load_progress()
@@ -20,11 +22,45 @@ func reset_progress() -> void:
 	unlocked_heroes = _DEFAULT_HEROES.duplicate()
 	unlock_flags.clear()
 	run_count = 0
+	discovered_cards.clear()
+	seen_cards.clear()
 
 # 런 시작 시 1회 호출 — 스토리 각성 라인 변주 기준.
 func increment_run_count() -> void:
 	run_count += 1
 	save_progress()
+
+# 도감 — 카드 획득(보유) 시 호출. 보유는 관측도 포함. 신규면 true + 저장.
+func discover_card(card_id: String) -> bool:
+	if card_id == "":
+		return false
+	var changed := false
+	if card_id not in discovered_cards:
+		discovered_cards.append(card_id)
+		changed = true
+	if card_id not in seen_cards:
+		seen_cards.append(card_id)
+		changed = true
+	if changed:
+		save_progress()
+	return changed
+
+# 도감 — 카드 관측(발견)만 했을 때 호출 (보상/상점 진열 등). 신규면 true + 저장.
+func observe_card(card_id: String) -> bool:
+	if card_id == "" or card_id in seen_cards:
+		return false
+	seen_cards.append(card_id)
+	save_progress()
+	return true
+
+func is_card_discovered(card_id: String) -> bool:
+	return card_id in discovered_cards
+
+func is_card_seen(card_id: String) -> bool:
+	return card_id in seen_cards
+
+func discovered_card_count() -> int:
+	return discovered_cards.size()
 
 func mark_chapter_cleared(chapter: int) -> void:
 	if chapter not in chapters_cleared:
@@ -101,6 +137,8 @@ func to_dict() -> Dictionary:
 		"unlocked_heroes": unlocked_heroes.duplicate(),
 		"unlock_flags": unlock_flags.duplicate(),
 		"run_count": run_count,
+		"discovered_cards": discovered_cards.duplicate(),
+		"seen_cards": seen_cards.duplicate(),
 	}
 
 func from_dict(data: Dictionary) -> void:
@@ -111,6 +149,8 @@ func from_dict(data: Dictionary) -> void:
 	unlocked_heroes = heroes.duplicate()
 	unlock_flags = data.get("unlock_flags", {}).duplicate()
 	run_count = int(data.get("run_count", 0))
+	discovered_cards = data.get("discovered_cards", []).duplicate()
+	seen_cards = data.get("seen_cards", []).duplicate()
 
 func save_progress() -> void:
 	var file := FileAccess.open(PROGRESS_PATH, FileAccess.WRITE)

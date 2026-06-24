@@ -183,6 +183,13 @@ func _build_card_section() -> void:
 	var total_w := n * CARD_W + (n - 1) * CARD_GAP
 	var start_x: int = int((1920 - total_w) / 2.0)
 
+	# 도감 — 상점에 진열된 카드는 "관측(발견)" 처리 (구매 안 해도 발견 상태)
+	var _pm = get_node_or_null("/root/ProgressManager")
+	if _pm != null:
+		for c in cards:
+			if c != null and c.card_name != "":
+				_pm.observe_card(c.owner_id + "|" + c.card_name)
+
 	for i in range(n):
 		var card: Resource = cards[i]
 		var price: int     = prices[i] if i < prices.size() else 75

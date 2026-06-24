@@ -285,6 +285,15 @@ func get_all_hands() -> Array:
 
 # ── meta deck (전투 외) ─────────────────────────────
 func add_card_to_deck(card: Resource) -> void:
+	# 도감 — 획득 카드는 발견 처리 (영구 저장). 모든 카드 획득 경로가 이 함수를 통과.
+	# 키 = owner_id|card_name (카운터 등 공유 card_name 을 영웅별로 구분).
+	# 헤드리스 테스트(_init 단계)에선 main_loop 이 아직 null 일 수 있어 방어.
+	if card != null and card.card_name != "":
+		var ml := Engine.get_main_loop()
+		if ml is SceneTree:
+			var pm = (ml as SceneTree).root.get_node_or_null("ProgressManager")
+			if pm != null:
+				pm.discover_card(card.owner_id + "|" + card.card_name)
 	# 전투 외 — meta_deck 에 누적. 전투 시작 시 owner_id 기반 분배.
 	# 전투 중 — owner 가 현재 차례 영웅이면 hand 로 (디버그 즉시 사용), 아니면 discard 로.
 	if _heroes.is_empty():

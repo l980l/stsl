@@ -2,6 +2,7 @@
 extends Node2D
 
 const CreditsOverlay := preload("res://scenes/ui/credits_overlay.gd")
+const CodexOverlayScene := preload("res://scenes/ui/codex_scene.tscn")
 
 func _ready() -> void:
 	AudioManager.play_bgm_dynamic("menu", "")
@@ -68,6 +69,10 @@ func _build_ui() -> void:
 		_add_menu_button(tr("ui.main_menu.continue"), btn_y, "PrimaryButton", _on_continue)
 		btn_y += 80.0
 
+	# 도감 버튼 (Vow)
+	_add_menu_button(tr("ui.main_menu.codex"), btn_y, "VowButton", _on_codex)
+	btn_y += 80.0
+
 	# 크레딧 버튼 (Vow)
 	_add_menu_button(tr("ui.main_menu.credits"), btn_y, "VowButton", _on_credits)
 	btn_y += 80.0
@@ -102,6 +107,13 @@ func _on_new_game() -> void:
 func _on_continue() -> void:
 	SaveManager.load_save()
 	SceneTransition.go("res://scenes/map/map_scene.tscn")
+
+func _on_codex() -> void:
+	if get_node_or_null("CodexOverlay") != null:
+		return
+	var ov := CodexOverlayScene.instantiate()
+	ov.name = "CodexOverlay"
+	add_child(ov)
 
 func _on_credits() -> void:
 	if get_node_or_null("CreditsOverlay") != null:
