@@ -6,13 +6,17 @@ extends CanvasLayer
 const PANEL_W := 720.0
 const PANEL_H := 824.0
 
-# 고유 명사 — 번역하지 않고 그대로 노출 (사이트/도구/작품명)
+# 고유 명사 — 번역하지 않고 그대로 노출 (사이트/도구/작품명/엔진/폰트)
 const _SOUND_SOURCE := "Sound Effect Lab — soundeffect-lab.info"
 const _AI_BGM       := "ACE-Step 1.5"
 const _AI_ILLUST    := "Nano Banana"
 const _AI_IMGEDIT   := "Qwen Image Edit"
 const _AI_FRAME     := "Z-Image Turbo"
 const _AI_VFXUI     := "Claude"
+const _AI_TRANSLATE := "Claude & Gemini"
+const _ENGINE       := "Godot Engine 4.6.2"
+# 번들 폰트 — 모두 SIL Open Font License (Latin·KO·JA·ZH·EL, 변형 통합 표기)
+const _FONTS := "Cinzel, Cinzel Decorative, IM Fell English, Inter, Space Mono, Pretendard, Hahmlet, Gowun Batang, D2Coding, Noto Sans JP, Hina Mincho, Zen Old Mincho, HackGen, Noto Sans SC, Noto Sans TC, Source Han Serif, LXGW WenKai, Sarasa Mono, Cormorant Garamond, EB Garamond, JetBrains Mono — SIL OFL"
 # [작품명(고유명사·비번역), 영감받은 부분 i18n 키]
 const _INSPIRED := [
 	["Slay the Spire", "ui.credits.inspired.sts"],
@@ -127,17 +131,22 @@ func _build() -> void:
 	vbox.add_theme_constant_override("separation", 10)
 	scroll.add_child(vbox)
 
-	# 섹션들
-	_add_section(vbox, tr("ui.credits.section.sound"), [_SOUND_SOURCE])
+	# 섹션들 — 고증 → 영감받은 작품 → 에셋(폰트·효과음) → AI 도구 → 게임 엔진
+	_add_section(vbox, tr("ui.credits.section.disclaimer"), [tr("ui.credits.disclaimer.body")])
+	_add_inspired(vbox, tr("ui.credits.section.inspired"))
+	_add_section(vbox, tr("ui.credits.section.assets"), [
+		"%s — %s" % [tr("ui.credits.assets.fonts"), _FONTS],
+		"%s — %s" % [tr("ui.credits.section.sound"), _SOUND_SOURCE],
+	])
 	_add_section(vbox, tr("ui.credits.section.ai"), [
 		"%s — %s" % [tr("ui.credits.ai.bgm"), _AI_BGM],
 		"%s — %s" % [tr("ui.credits.ai.illust"), _AI_ILLUST],
 		"%s — %s" % [tr("ui.credits.ai.imgedit"), _AI_IMGEDIT],
 		"%s — %s" % [tr("ui.credits.ai.frame"), _AI_FRAME],
 		"%s — %s" % [tr("ui.credits.ai.vfxui"), _AI_VFXUI],
+		"%s — %s" % [tr("ui.credits.ai.translation"), _AI_TRANSLATE],
 	])
-	_add_inspired(vbox, tr("ui.credits.section.inspired"))
-	_add_section(vbox, tr("ui.credits.section.disclaimer"), [tr("ui.credits.disclaimer.body")])
+	_add_section(vbox, tr("ui.credits.section.engine"), [_ENGINE])
 
 	# 하단 뒤로 버튼
 	var mono := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font

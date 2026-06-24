@@ -202,6 +202,10 @@ ui.credits.section.sound,효과음,Sound Effects,Effets sonores,Effetti sonori,E
 ui.credits.section.ai,AI 도구,AI Tools,Outils IA,Strumenti IA,Herramientas de IA,AIツール,Εργαλεία AI,AI 工具,AI 工具,Инструменты ИИ,Ferramentas de IA,Narzędzia AI,KI-Tools
 ui.credits.section.inspired,영감을 받은 작품,Inspired By,Inspiré par,Ispirato a,Inspirado en,影響を受けた作品,Εμπνευσμένο από,灵感来源,靈感來源,Вдохновлено,Inspirado por,Inspirowane przez,Inspiriert von
 ui.credits.section.disclaimer,고증에 대하여,A Note on Accuracy,Note sur l'exactitude,Nota sull'accuratezza,Nota sobre la precisión,考証について,Σημείωση ακρίβειας,关于考据,關於考據,О достоверности,Nota sobre precisão,Uwaga o dokładności,Hinweis zur Genauigkeit
+ui.credits.section.assets,에셋,Assets,Ressources,Risorse,Recursos,アセット,Πόροι,素材,素材,Ресурсы,Recursos,Zasoby,Assets
+ui.credits.section.engine,게임 엔진,Game Engine,Moteur de jeu,Motore di gioco,Motor de juego,ゲームエンジン,Μηχανή παιχνιδιού,游戏引擎,遊戲引擎,Игровой движок,Motor de jogo,Silnik gry,Spiel-Engine
+ui.credits.assets.fonts,폰트,Fonts,Polices,Caratteri,Fuentes,フォント,Γραμματοσειρές,字体,字體,Шрифты,Fontes,Czcionki,Schriftarten
+ui.credits.ai.translation,번역,Translation,Traduction,Traduzione,Traducción,翻訳,Μετάφραση,翻译,翻譯,Перевод,Tradução,Tłumaczenie,Übersetzung
 ui.credits.ai.bgm,음악,Music,Musique,Musica,Música,音楽,Μουσική,音乐,音樂,Музыка,Música,Muzyka,Musik
 ui.credits.ai.frame,클래식 카드 프레임,Classic Card Frames,Cadres de cartes classiques,Cornici carte classiche,Marcos de carta clásicos,クラシックカード枠,Κλασικά πλαίσια καρτών,经典卡牌边框,經典卡牌邊框,Классические рамки карт,Molduras de carta clássicas,Klasyczne ramki kart,Klassische Kartenrahmen
 ui.credits.ai.vfxui,VFX·UI,VFX & UI,VFX & UI,VFX & UI,VFX & UI,VFX・UI,VFX & UI,VFX·UI,VFX·UI,VFX & UI,VFX & UI,VFX & UI,VFX & UI
@@ -215,3 +219,29 @@ ui.credits.inspired.metaphor,아키타입(역할) 시스템과 신화적 세계�
 ui.credits.inspired.civ,여러 문명·신화를 넘나드는 구성,A structure that spans many civilizations and mythologies,Une structure qui traverse de nombreuses civilisations et mythologies,Una struttura che attraversa molte civiltà e mitologie,Una estructura que abarca muchas civilizaciones y mitologías,複数の文明・神話を横断する構成,Μια δομή που εκτείνεται σε πολλούς πολιτισμούς και μυθολογίες,横跨多个文明与神话的结构,橫跨多個文明與神話的結構,"Структура, охватывающая множество цивилизаций и мифологий",Uma estrutura que abrange muitas civilizações e mitologias,Struktura obejmująca wiele cywilizacji i mitologii,"Eine Struktur, die viele Zivilisationen und Mythologien umspannt"
 ui.credits.ai.illust,일러스트,Illustrations,Illustrations,Illustrazioni,Ilustraciones,イラスト,Εικονογραφήσεις,插画,插畫,Иллюстрации,Ilustrações,Ilustracje,Illustrationen
 ui.credits.ai.imgedit,이미지 편집,Image Editing,Édition d'image,Modifica immagini,Edición de imágenes,画像編集,Επεξεργασία εικόνας,图像编辑,圖像編輯,Редактирование изображений,Edição de imagem,Edycja obrazu,Bildbearbeitung
+ui.main_menu.codex,도감,Codex,Codex,Codex,Códice,図鑑,Κώδικας,图鉴,圖鑑,Кодекс,Códice,Kodeks,Kodex
+ui.codex.title,도감,The Codex,Le Codex,Il Codex,El Códice,図鑑,Ο Κώδικας,图鉴,圖鑑,Кодекс,O Códice,Kodeks,Der Kodex
+ui.codex.back,뒤로,Back,Retour,Indietro,Atrás,戻る,Πίσω,返回,返回,Назад,Voltar,Wstecz,Zurück
+ui.codex.tally,수집,Inscribed,Inscrites,Iscritte,Inscritas,収集,Καταγεγραμμένα,已收集,已收集,Собрано,Inscritas,Zebrane,Erfasst
+ui.codex.facet.rarity,희귀도,Rarity,Rareté,Rarità,Rareza,レアリティ,Σπανιότητα,稀有度,稀有度,Редкость,Raridade,Rzadkość,Seltenheit
+ui.codex.facet.type,타입,Type,Type,Tipo,Tipo,タイプ,Τύπος,类型,類型,Тип,Tipo,Typ,Typ
+ui.codex.facet.cost,비용,Cost,Coût,Costo,Coste,コスト,Κόστος,费用,費用,Стоимость,Custo,Koszt,Kosten
+ui.codex.facet.hero,영웅,Hero,Héros,Eroe,Héroe,英雄,Ήρωας,英雄,英雄,Герой,Herói,Bohater,Held
+ui.codex.facet.collection,수집,Collection,Collection,Collezione,Colección,コレクション,Συλλογή,收藏,收藏,Коллекция,Coleção,Kolekcja,Sammlung
+ui.codex.reset,필터 초기화,Clear filters,Effacer les filtres,Azzera filtri,Borrar filtros,フィルター解除,Καθαρισμός φίλτρων,清除筛选,清除篩選,Сбросить фильтры,Limpar filtros,Wyczyść filtry,Filter zurücksetzen
+ui.codex.group,그룹,Group,Groupe,Gruppo,Grupo,グループ,Ομάδα,分组,分組,Группа,Grupo,Grupa,Gruppe
+ui.codex.group.hero,영웅별,By hero,Par héros,Per eroe,Por héroe,英雄別,Ανά ήρωα,按英雄,按英雄,По герою,Por herói,Wg bohatera,Nach Held
+ui.codex.group.flat,전체,Flat,À plat,Lista,Lista,フラット,Επίπεδο,平铺,平鋪,Списком,Plano,Płasko,Flach
+ui.codex.sort,정렬,Sort,Trier,Ordina,Ordenar,並び替え,Ταξινόμηση,排序,排序,Сортировка,Ordenar,Sortuj,Sortieren
+ui.codex.sort.cost,비용,Cost,Coût,Costo,Coste,コスト,Κόστος,费用,費用,Стоимость,Custo,Koszt,Kosten
+ui.codex.sort.rarity,희귀도,Rarity,Rareté,Rarità,Rareza,レアリティ,Σπανιότητα,稀有度,稀有度,Редкость,Raridade,Rzadkość,Seltenheit
+ui.codex.sort.type,타입,Type,Type,Tipo,Tipo,タイプ,Τύπος,类型,類型,Тип,Tipo,Typ,Typ
+ui.codex.sort.name,이름,Name,Nom,Nome,Nombre,名前,Όνομα,名称,名稱,Имя,Nome,Nazwa,Name
+ui.codex.sort.dir,정렬 방향,Sort direction,Sens de tri,Direzione,Dirección,並び順,Κατεύθυνση,排序方向,排序方向,Направление,Direção,Kierunek,Richtung
+ui.codex.collection.discovered,수집함,Discovered,Découvertes,Scoperte,Descubiertas,発見済み,Ανακαλυμμένα,已发现,已發現,Открытые,Descobertas,Odkryte,Entdeckt
+ui.codex.collection.locked,미발견,Locked,Verrouillées,Bloccate,Bloqueadas,未発見,Κλειδωμένα,未发现,未發現,Закрытые,Bloqueadas,Zablokowane,Gesperrt
+ui.codex.search,검색,Search,Rechercher,Cerca,Buscar,検索,Αναζήτηση,搜索,搜尋,Поиск,Pesquisar,Szukaj,Suche
+ui.codex.cards,장,cards,cartes,carte,cartas,枚,κάρτες,张,張,карт,cartas,kart,Karten
+ui.codex.empty,조건에 맞는 카드가 없습니다,No cards match,Aucune carte,Nessuna carta,Sin cartas,該当なし,Καμία κάρτα,无匹配卡牌,無匹配卡牌,Нет карт,Nenhuma carta,Brak kart,Keine Karten
+ui.codex.collection.owned,보유함,Owned,Possédées,Possedute,Poseídas,所持,Κατεχόμενα,已拥有,已擁有,В наличии,Possuídas,Posiadane,Im Besitz
+ui.codex.collection.seen,발견,Discovered,Découvertes,Scoperte,Descubiertas,発見,Ανακαλυμμένα,已发现,已發現,Открытые,Descobertas,Odkryte,Entdeckt

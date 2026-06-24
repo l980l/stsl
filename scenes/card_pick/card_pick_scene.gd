@@ -255,6 +255,13 @@ func _build_card_grid(cx: float) -> void:
 	var cards: Array = GameManager.card_rewards
 	var count: int = cards.size()
 
+	# 도감 — 보상으로 진열된 카드는 "관측(발견)" 처리 (획득 안 해도 발견 상태)
+	var pm = get_node_or_null("/root/ProgressManager")
+	if pm != null:
+		for c in cards:
+			if c != null and c.card_name != "":
+				pm.observe_card(c.owner_id + "|" + c.card_name)
+
 	var cell_w: float = 240.0
 	var cell_h: float = 432.0
 	var gap: float = 36.0
