@@ -243,5 +243,20 @@ ui.codex.collection.locked,미발견,Locked,Verrouillées,Bloccate,Bloqueadas,�
 ui.codex.search,검색,Search,Rechercher,Cerca,Buscar,検索,Αναζήτηση,搜索,搜尋,Поиск,Pesquisar,Szukaj,Suche
 ui.codex.cards,장,cards,cartes,carte,cartas,枚,κάρτες,张,張,карт,cartas,kart,Karten
 ui.codex.empty,조건에 맞는 카드가 없습니다,No cards match,Aucune carte,Nessuna carta,Sin cartas,該当なし,Καμία κάρτα,无匹配卡牌,無匹配卡牌,Нет карт,Nenhuma carta,Brak kart,Keine Karten
+ui.codex.relics,개,relics,reliques,reliquie,reliquias,個,κειμήλια,个,個,реликвий,relíquias,relikwii,Relikte
+ui.codex.tab.card,카드,Cards,Cartes,Carte,Cartas,カード,Κάρτες,卡牌,卡牌,Карты,Cartas,Karty,Karten
+ui.codex.tab.relic,렐릭,Relics,Reliques,Reliquie,Reliquias,レリック,Κειμήλια,遗物,遺物,Реликвии,Relíquias,Relikwie,Relikte
+ui.codex.relic.common,공용,Universal,Universel,Universale,Universal,汎用,Γενικό,通用,通用,Общие,Universal,Uniwersalne,Universal
+ui.codex.facet.owner,소유,Owner,Propriétaire,Proprietario,Dueño,所有,Κάτοχος,归属,歸屬,Владелец,Dono,Właściciel,Besitzer
+ui.codex.facet.cursed,저주,Cursed,Maudit,Maledetto,Maldito,呪い,Καταραμένο,诅咒,詛咒,Проклятие,Amaldiçoado,Klątwa,Verflucht
+ui.codex.facet.trigger,발동,Trigger,Déclencheur,Attivazione,Activación,発動,Ενεργοποίηση,触发,觸發,Триггер,Disparo,Wyzwalacz,Auslöser
+ui.codex.cursed,저주받음,Cursed,Maudit,Maledetto,Maldito,呪い,Καταραμένο,诅咒,詛咒,Проклятый,Amaldiçoado,Przeklęty,Verflucht
+ui.codex.group.owner,소유별,By Owner,Par propriétaire,Per proprietario,Por dueño,所有者別,Ανά κάτοχο,按归属,按歸屬,По владельцу,Por dono,Wg właściciela,Nach Besitzer
+ui.codex.sort.trigger,발동시점,Trigger,Déclencheur,Attivazione,Activación,発動,Ενεργοποίηση,触发,觸發,Триггер,Disparo,Wyzwalacz,Auslöser
+ui.codex.trigger.passive,상시,Passive,Passif,Passivo,Pasivo,常時,Παθητικό,常驻,常駐,Пассивно,Passivo,Pasywny,Passiv
+ui.codex.trigger.battle_start,전투 시작,Battle Start,Début de combat,Inizio combattimento,Inicio de combate,戦闘開始,Έναρξη μάχης,战斗开始,戰鬥開始,Начало боя,Início de combate,Początek walki,Kampfbeginn
+ui.codex.trigger.turn_start,턴 시작,Turn Start,Début de tour,Inizio turno,Inicio de turno,ターン開始,Έναρξη γύρου,回合开始,回合開始,Начало хода,Início do turno,Początek tury,Zugbeginn
+ui.codex.trigger.turn_end,턴 종료,Turn End,Fin de tour,Fine turno,Fin de turno,ターン終了,Τέλος γύρου,回合结束,回合結束,Конец хода,Fim do turno,Koniec tury,Zugende
+ui.codex.trigger.hero_damaged,피격 시,On Damage,Aux dégâts,Quando colpito,Al recibir daño,被ダメージ時,Όταν δέχεται ζημιά,受伤时,受傷時,При уроне,Ao sofrer dano,Przy obrażeniach,Bei Schaden
 ui.codex.collection.owned,보유함,Owned,Possédées,Possedute,Poseídas,所持,Κατεχόμενα,已拥有,已擁有,В наличии,Possuídas,Posiadane,Im Besitz
 ui.codex.collection.seen,발견,Discovered,Découvertes,Scoperte,Descubiertas,発見,Ανακαλυμμένα,已发现,已發現,Открытые,Descobertas,Odkryte,Entdeckt
