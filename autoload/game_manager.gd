@@ -146,6 +146,11 @@ func spend_gold(amount: int) -> bool:
 func add_relic(relic: Resource) -> void:
 	relics.append(relic)
 	relic_added.emit(relic)
+	# 도감 — 렐릭 획득(보유) 기록
+	if relic != null and relic.relic_name != "":
+		var pm := get_node_or_null("/root/ProgressManager")
+		if pm != null:
+			pm.discover_relic(relic.relic_name)
 	# PASSIVE 렐릭은 즉시 1회 적용 (영구 효과). trigger_relics(PASSIVE) 호출은
 	# 기존 보유 PASSIVE 렐릭까지 재적용하므로 방금 추가한 relic만 직접 호출.
 	var _RR = load("res://resources/relic_resource.gd")

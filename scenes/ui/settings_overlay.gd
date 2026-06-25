@@ -9,6 +9,10 @@ extends CanvasLayer
 @onready var _btn_cancel:   Button       = $Panel/Footer/BtnCancel
 @onready var _btn_apply:    Button       = $Panel/Footer/BtnApply
 
+# 도감 등 자체 재번역 오버레이에서 연 경우 true — 언어 변경 시 씬 reload 를 건너뛴다
+# (밑 씬 reload 가 오버레이를 파괴하지 않도록. 오버레이가 닫힐 때 직접 reload 처리.)
+var skip_scene_reload: bool = false
+
 const _CURSOR_SIZES:    Dictionary = {"S": 32, "M": 48, "L": 64, "XL": 96}
 const _DEFAULT_KEY   := "M"
 const _TABS          := [["graphics", "ui.settings.graphics"], ["gameplay", "ui.settings.gameplay"], ["sound", "ui.settings.sound"], ["language", "ui.settings.language_tab"]]
@@ -266,11 +270,12 @@ func _on_apply() -> void:
 	if locale_changed:
 		var gm := get_node_or_null("/root/GameManager")
 		var live_states := [gm.GameState.BATTLE, gm.GameState.SHOP] if gm != null else []
-		if gm == null or not (gm.current_state in live_states):
+		# skip_scene_reload: 도감 등 자체 재번역 오버레이가 연 경우 — 씬 reload 안 함
+		if not skip_scene_reload and (gm == null or not (gm.current_state in live_states)):
 			get_tree().reload_current_scene.call_deferred()
 		else:
 			# 씬 reload 안 하는 경우 settings 인스턴스 자체 free — 다음 open 시
-			# settings_button 이 새로 instantiate → _ready 가 새 locale 로 tr() 재호출
+			# 새로 instantiate → _ready 가 새 locale 로 tr() 재호출
 			call_deferred("queue_free")
 
 func _on_cancel() -> void:

@@ -278,6 +278,11 @@ func _build_relic_section() -> void:
 		var py := 510
 		var hero_col: Color = _hero_color(relic.owner_hero_id)
 
+		# 도감 — 상점 진열 = 관측(발견)
+		var _pm := get_node_or_null("/root/ProgressManager")
+		if _pm != null:
+			_pm.observe_relic(relic.relic_name)
+
 		# 패널 (INK_900 배경)
 		var panel := Panel.new()
 		panel.position = Vector2(px, py)

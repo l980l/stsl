@@ -251,8 +251,9 @@ func _open_hero_unlock_dialog() -> void:
 # ── 렐릭 추가 ───────────────────────────────────────
 
 func _open_relic_add_dialog() -> void:
-	var RelicsGd = load("res://resources/relics/relics.gd")
-	var all_relics: Array = RelicsGd.build_pool()
+	# 도감과 동일한 단일 소스 — build_pool + 이벤트 전용(신성한 두루마리)까지 모두 포함
+	var RelicCatalog = load("res://resources/relic_catalog.gd")
+	var all_relics: Array = RelicCatalog.get_all_relics()
 	var opts: Array = []
 	for r in all_relics:
 		var owned: bool = GameManager.has_relic(r.relic_name)

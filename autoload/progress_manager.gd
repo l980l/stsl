@@ -13,6 +13,8 @@ var unlock_flags: Dictionary = {}
 var run_count: int = 0  # 누적 런(각성) 횟수 — 스토리 변주("전에도 왔다")용. 영구 저장.
 var discovered_cards: Array = []  # 도감 — 획득(보유)한 카드 키 목록. 영구 저장.
 var seen_cards: Array = []         # 도감 — 관측(발견)만 한 카드 키 목록 (보상/상점 진열 등). 영구 저장.
+var discovered_relics: Array = []  # 도감 — 획득(보유)한 렐릭 키(relic_name) 목록. 영구 저장.
+var seen_relics: Array = []        # 도감 — 관측(발견)만 한 렐릭 키 목록 (보상/상점 진열 등). 영구 저장.
 
 func _ready() -> void:
 	load_progress()
@@ -24,6 +26,8 @@ func reset_progress() -> void:
 	run_count = 0
 	discovered_cards.clear()
 	seen_cards.clear()
+	discovered_relics.clear()
+	seen_relics.clear()
 
 # 런 시작 시 1회 호출 — 스토리 각성 라인 변주 기준.
 func increment_run_count() -> void:
@@ -61,6 +65,35 @@ func is_card_seen(card_id: String) -> bool:
 
 func discovered_card_count() -> int:
 	return discovered_cards.size()
+
+# 도감 — 렐릭 획득(보유) 시 호출. 보유는 관측도 포함. 신규면 true + 저장.
+func discover_relic(relic_id: String) -> bool:
+	if relic_id == "":
+		return false
+	var changed := false
+	if relic_id not in discovered_relics:
+		discovered_relics.append(relic_id)
+		changed = true
+	if relic_id not in seen_relics:
+		seen_relics.append(relic_id)
+		changed = true
+	if changed:
+		save_progress()
+	return changed
+
+# 도감 — 렐릭 관측(발견)만 했을 때 호출 (보상/상점 진열 등). 신규면 true + 저장.
+func observe_relic(relic_id: String) -> bool:
+	if relic_id == "" or relic_id in seen_relics:
+		return false
+	seen_relics.append(relic_id)
+	save_progress()
+	return true
+
+func is_relic_discovered(relic_id: String) -> bool:
+	return relic_id in discovered_relics
+
+func is_relic_seen(relic_id: String) -> bool:
+	return relic_id in seen_relics
 
 func mark_chapter_cleared(chapter: int) -> void:
 	if chapter not in chapters_cleared:
@@ -139,6 +172,8 @@ func to_dict() -> Dictionary:
 		"run_count": run_count,
 		"discovered_cards": discovered_cards.duplicate(),
 		"seen_cards": seen_cards.duplicate(),
+		"discovered_relics": discovered_relics.duplicate(),
+		"seen_relics": seen_relics.duplicate(),
 	}
 
 func from_dict(data: Dictionary) -> void:
@@ -151,6 +186,8 @@ func from_dict(data: Dictionary) -> void:
 	run_count = int(data.get("run_count", 0))
 	discovered_cards = data.get("discovered_cards", []).duplicate()
 	seen_cards = data.get("seen_cards", []).duplicate()
+	discovered_relics = data.get("discovered_relics", []).duplicate()
+	seen_relics = data.get("seen_relics", []).duplicate()
 
 func save_progress() -> void:
 	var file := FileAccess.open(PROGRESS_PATH, FileAccess.WRITE)
