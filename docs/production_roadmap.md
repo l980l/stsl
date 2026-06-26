@@ -1,7 +1,7 @@
 # STSL — Production Roadmap
 
-> 작성일: 2026-04-17 (최종 동기화: 2026-06-22 v28 — 몬스터 타입별 공격 VFX + 적·카드 일러스트 + 스토리/로어 + act-intro + 커스텀 SVG 아이콘 세트 + 취약·약화 디버프 VFX)
-> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** + **시너지 시스템 v2(15종 전면 재설계·토큰 합동공격·SFX 컴프레서, PR #190·#191·#198)** + **데미지 모디파이어 버킷 재설계(`compute_damage()` 단일 파이프라인·합/곱 버킷·툴팁 표기, PR #196·#197)** + **VFX·UX 후속(시너지 VFX/SFX 동기화·sacrifice_bank 상태이상·정복자의 기세·황제의 무도 VFX·dispel/form_change/counter GPU 하이브리드 변환·LifeDrain VFX, PR #192~#195·#202)** + **영웅 전신 일러스트(배틀씬·영웅 선택씬, PR #189)** + **UI 폴리싱 v2(몬스터 정체성 13종 리스킨·Museum Mat 프레임·Sacred Cursors 9종·덱·턴 아이콘, PR #199~#202)** 기준
+> 작성일: 2026-04-17 (최종 동기화: 2026-06-26 v29 — 인게임 도감 3탭(카드·렐릭·몬스터) + 메인메뉴 크레딧 오버레이 + 죽음 스프라이트 grayscale)
+> 기준: 챕터 1·2 완성 + 영웅 6인 카드 풀 재설계 v3 + balance_check SKIP 0 + 번역 인프라 + 덱뷰어 + 오디오 시스템 완성 + 인카운터 v2(중복 0·floor 가중치) + 몬스터 메커니즘 레이어 v1(6 신화 시그니처·IntentRes 7종·~115/120 monsters tier) + 이벤트·렐릭 v2(신규 EffectType 3종·다양화 22개·렐릭 차별화 5종·신규 이벤트 5종·PASSIVE 버그 수정) + **이벤트 UX 마무리(NONE 옵션 재설계·태그 시스템·카드 제거 UI 통합·autoload 버그 수정, PR #108~#110)** + **VFX 시스템 v1(공격·상태·버프 VFX 20종 GDScript 포팅·divine→holy 일괄 이주·임팩트 시점 동기화·GameSettings autoload·SFX 매핑·다수 시각 버그 수정, PR #111~#113)** + **설정 graphics/gameplay 탭 + GameSettings save/load (PR #114)** + **전투 UX 폴리싱 v2(VFX impact 시점 정확 동기화·글로벌 툴팁 시스템·popup 글로우/색상/Cinzel-Bold·카드 입력 스무스·사망 예측 차단·HP 블룸 임계치·파티클 4단계, PR #115)** + **시너지 시스템 v2(15종 전면 재설계·토큰 합동공격·SFX 컴프레서, PR #190·#191·#198)** + **데미지 모디파이어 버킷 재설계(`compute_damage()` 단일 파이프라인·합/곱 버킷·툴팁 표기, PR #196·#197)** + **VFX·UX 후속(시너지 VFX/SFX 동기화·sacrifice_bank 상태이상·정복자의 기세·황제의 무도 VFX·dispel/form_change/counter GPU 하이브리드 변환·LifeDrain VFX, PR #192~#195·#202)** + **영웅 전신 일러스트(배틀씬·영웅 선택씬, PR #189)** + **UI 폴리싱 v2(몬스터 정체성 13종 리스킨·Museum Mat 프레임·Sacred Cursors 9종·덱·턴 아이콘, PR #199~#202)** + **인게임 도감 3탭(카드·렐릭·몬스터 — 자동집계·발견추적·필터/정렬/검색·셀 캐시+가상스크롤·몬스터 비동기 썸네일, PR #228~#230)** + **메인메뉴 크레딧 오버레이 + 종료 버튼(PR #227·#228)** + **죽음 스프라이트 스무스 grayscale(PR #226)** 기준
 > 범례: ✅ 완료 / 🔲 미완료 / 🔶 부분 완료
 
 ---
@@ -54,6 +54,8 @@
 **스토리·로어 + cinematic act-intro** (PR #220·#221·#222): 카드 효과 폰트 per-VFX impact 동기화 + 모던 카드 호버 레이아웃 (#220), 암시적 스토리/로어 (Hall of the Departed / the Cycle, #221), cinematic act-intro 오버레이 (순차 라인 + 클릭/키 진행, #222).
 **커스텀 tintable SVG 아이콘 세트** (PR #223): 인텐트·시그니처·승리/패배 아이콘을 단색 tintable SVG로 전면 교체 + 2색 gradient 셰이더 + 별도 dark disc 노드 (배경 다양성 대응) + 원형 ring 래핑 + 승리 아이콘 UI 캔버스 배치 + 패배 오버레이 정리.
 **취약·약화 디버프 VFX + 시그니처 UI 정리** (PR #224): GPU 취약 VFX (혈색/황동 파쇄 + 타겟 중앙 깨진 방패) + GPU 약화 VFX (sage/재 흡수 + 시드는 칼날). 중앙 `_debuff_script_for_status` resolver 배선 (적 인텐트·카드·시너지·시너지 카운터 전 소스). 떠오르는 Weak/Vulnerable 팝업 색을 각 VFX 팔레트(#8fb39c / #d94a50)와 통일. 저주의 시선 시그니처 타겟 정확화 (`target_hero_id`) + SFX 소거. 상태이상 줄에서 신화 시그니처 배지 제거 (별도 패널이 상시 표시).
+**메인메뉴 크레딧 + 죽음 grayscale** (PR #226~#228): 죽음 시 스프라이트 스무스 grayscale (alpha 페이드 제거, 부활 복구). 메인메뉴 전용 크레딧 오버레이 + 종료 버튼 — 고증 면책·영감받은 작품(슬더스/하데스/33원정대/페르소나/메타포/문명)·에셋(폰트·효과음연구소)·AI 도구(ACE-Step/Nano Banana/Qwen Image Edit/Z-Image Turbo/Claude·Gemini)·게임 엔진(Godot) 13개 언어.
+**인게임 도감 3탭** (PR #228~#230): 카드·렐릭·몬스터 도감을 단일 오버레이 탭으로. 메인메뉴 + 맵/배틀/상점에서 접근(우상단 아이콘, 설정 버튼 좌측). 카드(`CardCatalog`)·렐릭(`RelicCatalog`)·몬스터(`MonsterCatalog`) 자동집계 — 정의에 추가하면 도감에 자동 노출. ProgressManager 발견 추적(보유/발견/미발견·영구저장). 필터/정렬/검색, 셀 캐시 + 가상 스크롤. 몬스터는 배틀씬과 동일한 Museum Mat 프레임·cover-crop·좌우반전 + 페이즈 일러스트 선택 + 거대 일러스트 비동기 썸네일(WorkerThreadPool). 시너지 도감은 미채택. 글자 1.25 고정 확대.
 
 ---
 
@@ -1043,6 +1045,18 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 - ✅ 씬 전환 페이드 인/아웃 (`autoload/scene_transition.gd` + CanvasLayer 검정 오버레이)
 - ✅ 페이즈 전환 연출 (보스/일반 2종 — `boss_phase_changed_gpu` + `monster_phase_changed_gpu`, grade 분기, PR #217)
 
+### 7-8. 인게임 도감 (컬렉션) ✅ (PR #228~#230)
+- ✅ 단일 오버레이 + 탭 구조 (카드 | 렐릭 | 몬스터) — 메인메뉴 + 맵/배틀/상점 접근(우상단 아이콘, 설정 버튼 좌측), 탭별 필터/정렬/검색 상태 독립 유지
+- ✅ 자동 집계 — `CardCatalog`(영웅 pool+starter) / `RelicCatalog`(build_pool+이벤트 두루마리) / `MonsterCatalog`(신화별 encounters+elites+boss). 정의에 추가하면 도감 작업 없이 자동 노출
+- ✅ 발견 추적 — `ProgressManager` discovered/seen (카드·렐릭) + discovered (몬스터, 조우), 영구 저장. 보유=컬러 / 발견=흑백 / 미발견=`?`
+- ✅ 발견 훅 — 카드: 덱 추가(보유)·보상/상점 진열(발견) / 렐릭: 획득·상점 진열 / 몬스터: 전투 조우
+- ✅ 카드: 실제 CardScene 재사용(classic/modern), 희귀도 보석·타입 아이콘 필터, 영웅별 그룹·정렬(비용/희귀도/타입/이름)
+- ✅ 렐릭: 아이콘+이름+설명, 영웅(공용 포함)·저주 필터
+- ✅ 몬스터: 배틀씬과 동일한 Museum Mat 프레임·sprite-area cover-crop·좌우반전, 페이즈 일러스트(`_pN`) 선택, 신화별 그룹/필터
+- ✅ 성능 — 셀 캐시(reparent 재사용) + 가상 스크롤(뷰포트 진입 시 생성). 거대 몬스터 일러스트(최대 1536×2752)는 ~320px 썸네일 다운스케일 + WorkerThreadPool 비동기 로딩(스크롤 끊김 제거)
+- ✅ 도감 내 설정 버튼(언어 변경) — 언어 변경 시 이전 씬 복귀 없이 라이브 재번역, 글자 1.25 고정 확대
+- ⏹️ 시너지 도감 — 미채택 (도감은 카드·렐릭·몬스터 3탭으로 종료)
+
 ### 7-6. 오디오 ✅ 기반 완료 (PR #94)
 - ✅ 사운드 에셋 요구사항 문서 (`docs/sound_assets_required.md`)
 - ✅ `AudioManager` autoload — SFX 풀(16ch) + BGM 크로스페이드 페어 + 버스 볼륨 저장(`user://audio_settings.json`)
@@ -1307,8 +1321,8 @@ GDD 기준 MVP 3인 이후 확장 영웅.
 ### 9-5. 법무·라이선스
 - 🔲 개인정보처리방침 (웹 URL 필수 — 모바일 스토어 등재 조건)
 - 🔲 EULA (선택, 권장)
-- 🔲 라이선스 고지 화면 (Godot MIT / NotoSansCJK OFL / 사용 에셋)
-- 🔲 크레딧 스크린
+- 🔶 라이선스 고지 화면 (Godot MIT / NotoSansCJK OFL / 사용 에셋) — 크레딧 오버레이가 에셋·AI·엔진 출처 표기로 일부 커버 (PR #228)
+- ✅ 크레딧 스크린 (PR #227·#228) — 메인메뉴 전용 오버레이. 고증 면책·영감받은 작품·에셋(폰트·효과음)·AI 도구·게임 엔진, 13개 언어
 
 ### 9-6. 마케팅·커뮤니티
 - 🔲 프레스 킷 (Press Kit) — 로고·스크린샷·설명·연락처
