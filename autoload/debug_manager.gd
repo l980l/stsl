@@ -252,7 +252,7 @@ func _open_hero_unlock_dialog() -> void:
 
 func _open_relic_add_dialog() -> void:
 	# 도감과 동일한 단일 소스 — build_pool + 이벤트 전용(신성한 두루마리)까지 모두 포함
-	var RelicCatalog = load("res://resources/relic_catalog.gd")
+	# (RelicCatalog 은 class_name 전역 클래스 — 직접 호출)
 	var all_relics: Array = RelicCatalog.get_all_relics()
 	var opts: Array = []
 	for r in all_relics:
