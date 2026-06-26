@@ -1427,6 +1427,11 @@ func _setup_enemies() -> void:
 		_enemy_status_containers.append(entry["status_box"])
 
 		var enemy: Resource = BattleManager.get_enemy(i)
+		# 도감 — 전투 조우 기록
+		if enemy != null and enemy.get("enemy_name") != null and enemy.enemy_name != "":
+			var pm := get_node_or_null("/root/ProgressManager")
+			if pm != null:
+				pm.discover_monster(enemy.enemy_name)
 		entry["panel"].visible = true
 		entry["btn"].visible = true
 		entry["btn"].disabled = false

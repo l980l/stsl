@@ -15,6 +15,7 @@ var discovered_cards: Array = []  # 도감 — 획득(보유)한 카드 키 목�
 var seen_cards: Array = []         # 도감 — 관측(발견)만 한 카드 키 목록 (보상/상점 진열 등). 영구 저장.
 var discovered_relics: Array = []  # 도감 — 획득(보유)한 렐릭 키(relic_name) 목록. 영구 저장.
 var seen_relics: Array = []        # 도감 — 관측(발견)만 한 렐릭 키 목록 (보상/상점 진열 등). 영구 저장.
+var discovered_monsters: Array = []  # 도감 — 전투에서 조우한 몬스터 키(enemy_name) 목록. 영구 저장.
 
 func _ready() -> void:
 	load_progress()
@@ -28,6 +29,7 @@ func reset_progress() -> void:
 	seen_cards.clear()
 	discovered_relics.clear()
 	seen_relics.clear()
+	discovered_monsters.clear()
 
 # 런 시작 시 1회 호출 — 스토리 각성 라인 변주 기준.
 func increment_run_count() -> void:
@@ -94,6 +96,21 @@ func is_relic_discovered(relic_id: String) -> bool:
 
 func is_relic_seen(relic_id: String) -> bool:
 	return relic_id in seen_relics
+
+# 도감 — 전투에서 몬스터 조우 시 호출. 조우 = 발견(seen)과 동일 상태. 신규면 true + 저장.
+func discover_monster(monster_id: String) -> bool:
+	if monster_id == "" or monster_id in discovered_monsters:
+		return false
+	discovered_monsters.append(monster_id)
+	save_progress()
+	return true
+
+# 몬스터는 조우=발견 단일 상태 — discovered 와 seen 동일.
+func is_monster_discovered(monster_id: String) -> bool:
+	return monster_id in discovered_monsters
+
+func is_monster_seen(monster_id: String) -> bool:
+	return monster_id in discovered_monsters
 
 func mark_chapter_cleared(chapter: int) -> void:
 	if chapter not in chapters_cleared:
@@ -174,6 +191,7 @@ func to_dict() -> Dictionary:
 		"seen_cards": seen_cards.duplicate(),
 		"discovered_relics": discovered_relics.duplicate(),
 		"seen_relics": seen_relics.duplicate(),
+		"discovered_monsters": discovered_monsters.duplicate(),
 	}
 
 func from_dict(data: Dictionary) -> void:
@@ -188,6 +206,7 @@ func from_dict(data: Dictionary) -> void:
 	seen_cards = data.get("seen_cards", []).duplicate()
 	discovered_relics = data.get("discovered_relics", []).duplicate()
 	seen_relics = data.get("seen_relics", []).duplicate()
+	discovered_monsters = data.get("discovered_monsters", []).duplicate()
 
 func save_progress() -> void:
 	var file := FileAccess.open(PROGRESS_PATH, FileAccess.WRITE)

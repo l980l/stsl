@@ -8,16 +8,21 @@ extends CanvasLayer
 
 const CARD_SCENE_CLASSIC := preload("res://scenes/card/card_scene.tscn")
 const CARD_SCENE_MODERN  := preload("res://scenes/card/card_scene_v2.tscn")
-const CardCatalog  := preload("res://resources/card_catalog.gd")
-const RelicCatalog := preload("res://resources/relic_catalog.gd")
-const HeroRegistry := preload("res://resources/heroes/hero_registry.gd")
 const CardRes      := preload("res://resources/card_resource.gd")
 const RelicRes     := preload("res://resources/relic_resource.gd")
+# CardCatalog/RelicCatalog/MonsterCatalog/HeroRegistry/MuseumMatFrame 는 class_name 전역 클래스 — 직접 사용 (const preload 시 shadow 경고)
 
 const RARITY_KEYS := ["common", "uncommon", "rare", "legendary", "divine"]
 const TYPE_KEYS   := ["attack", "skill", "power"]
 const RELIC_CELL_W := 212.0
 const RELIC_ICON   := 84.0
+const ENEMY_ART_DIR := "res://assets/art/enemies/"
+# 배틀씬 적 스프라이트 영역 비율(= 외부 scale 1.44:2.4 = 0.6) + cover-crop + 좌우 반전 + museum mat 프레임 재현.
+# 내부 art = 프레임 - MAT_INSET*2(=8). 내부 120×200(0.6) → 프레임 128×208.
+const MON_FRAME_W := 128.0
+const MON_FRAME_H := 208.0
+const MONSTER_CELL_W := 156.0
+const MON_THUMB_MAX := 320  # 몬스터 일러스트 썸네일 최장변 (원본 거대 → VRAM/디코드 절감)
 const FONT_SCALE := 1.25  # 도감 라벨 글자 고정 배율 (가독성)
 
 # 모던 카드(card_scene_v2)와 동일한 희귀도 보석 색 — 도감 필터 보석 칩에 사용
@@ -74,6 +79,13 @@ static var _r_sort: String = "name"
 static var _r_dir: int = 1
 static var _r_group: String = "owner"
 
+# 몬스터 탭 필터 상태 (탭별 독립)
+static var _mf_myth: Array = []    # String (mythology)
+static var _m_search: String = ""
+static var _m_sort: String = "name"
+static var _m_dir: int = 1
+static var _m_group: String = "myth"
+
 const SETTINGS_OVERLAY := preload("res://scenes/ui/settings_overlay.tscn")
 
 var _gray_mat: ShaderMaterial = null
@@ -83,6 +95,14 @@ var _dd_closers: Array = []  # 열린 드롭다운들을 서로 닫기 위한 cl
 var _ui_root: Control = null  # 본문 UI 루트 — 언어 변경 시 이 노드만 재생성 (설정 자식은 보존)
 var _cell_cache: Dictionary = {}  # card_key → 카드 셀. 정렬/필터 시 재인스턴스화 없이 reparent 만
 var _scroll: ScrollContainer = null  # 가상 스크롤 가시성 판정용
+var _realize_pending: bool = false   # 점진 realize 중복 예약 방지
+# 몬스터 일러스트 썸네일 캐시 (path → 다운스케일 ImageTexture). static — 세션 내 재사용.
+static var _mon_thumb: Dictionary = {}
+# 비동기 썸네일 로딩 (WorkerThreadPool) — 스크롤 끊김 방지
+var _thumb_mutex := Mutex.new()
+var _thumb_ready: Dictionary = {}     # path → Image (워커 완료, 메인에서 텍스처화 대기). mutex 보호.
+var _thumb_inflight: Dictionary = {}  # path → task_id (진행 중)
+var _thumb_waiters: Dictionary = {}   # path → Array[TextureRect] (텍스처 대기 중인 대상)
 var _locale_dirty: bool = false  # 도감 열린 동안 언어 변경됨 → 닫을 때 밑 씬 reload
 var _grid_host: VBoxContainer
 var _result_lbl: Label
@@ -102,7 +122,10 @@ func _ready() -> void:
 	LocaleManager.locale_changed.connect(_rebuild)
 
 func _load_all() -> void:
-	_all = RelicCatalog.get_all_relics() if _tab == "relic" else CardCatalog.get_all_cards()
+	match _tab:
+		"relic":   _all = RelicCatalog.get_all_relics()
+		"monster": _all = MonsterCatalog.get_all_monsters()
+		_:         _all = CardCatalog.get_all_cards()
 
 # 본문 UI 전체 재생성 (탭 전환/언어 변경 공용) — 설정 오버레이 자식은 보존
 func _rebuild_view() -> void:
@@ -130,39 +153,75 @@ func _switch_tab(tab: String) -> void:
 	_rebuild_view()
 
 # ── 탭별 상태 접근 (현재 탭에 맞는 static var 반환/설정) ──
-func _cur_sort() -> String:  return _r_sort if _tab == "relic" else _sort
-func _cur_dir() -> int:      return _r_dir if _tab == "relic" else _dir
-func _cur_group() -> String: return _r_group if _tab == "relic" else _group
-func _cur_search() -> String: return _r_search if _tab == "relic" else _search
+func _cur_sort() -> String:
+	match _tab:
+		"relic": return _r_sort
+		"monster": return _m_sort
+		_: return _sort
+func _cur_dir() -> int:
+	match _tab:
+		"relic": return _r_dir
+		"monster": return _m_dir
+		_: return _dir
+func _cur_group() -> String:
+	match _tab:
+		"relic": return _r_group
+		"monster": return _m_group
+		_: return _group
+func _cur_search() -> String:
+	match _tab:
+		"relic": return _r_search
+		"monster": return _m_search
+		_: return _search
 
 func _set_sort(k: String) -> void:
-	if _tab == "relic": _r_sort = k
-	else: _sort = k
+	match _tab:
+		"relic": _r_sort = k
+		"monster": _m_sort = k
+		_: _sort = k
 
 func _flip_dir() -> void:
-	if _tab == "relic": _r_dir *= -1
-	else: _dir *= -1
+	match _tab:
+		"relic": _r_dir *= -1
+		"monster": _m_dir *= -1
+		_: _dir *= -1
 
 func _set_group(k: String) -> void:
-	if _tab == "relic": _r_group = k
-	else: _group = k
+	match _tab:
+		"relic": _r_group = k
+		"monster": _m_group = k
+		_: _group = k
 
 func _set_search(t: String) -> void:
-	if _tab == "relic": _r_search = t
-	else: _search = t
+	match _tab:
+		"relic": _r_search = t
+		"monster": _m_search = t
+		_: _search = t
 
-# ── 아이템(카드/렐릭) 공통 접근 ──
+# ── 아이템(카드/렐릭/몬스터) 공통 접근 ──
 func _item_key(item) -> String:
-	return RelicCatalog.relic_key(item) if _tab == "relic" else CardCatalog.card_key(item)
+	match _tab:
+		"relic": return RelicCatalog.relic_key(item)
+		"monster": return MonsterCatalog.monster_key(item)
+		_: return CardCatalog.card_key(item)
 
 func _item_owner(item) -> String:
-	return item.owner_hero_id if _tab == "relic" else item.owner_id
+	match _tab:
+		"relic": return item.owner_hero_id
+		"monster": return item.mythology
+		_: return item.owner_id
 
 func _item_name(item) -> String:
-	return tr(item.relic_name) if _tab == "relic" else tr(item.card_name)
+	match _tab:
+		"relic": return tr(item.relic_name)
+		"monster": return tr(item.enemy_name)
+		_: return tr(item.card_name)
 
 func _group_order() -> Array:
-	return RelicCatalog.OWNER_ORDER if _tab == "relic" else CardCatalog.HERO_ORDER
+	match _tab:
+		"relic": return RelicCatalog.OWNER_ORDER
+		"monster": return MonsterCatalog.MYTH_ORDER
+		_: return CardCatalog.HERO_ORDER
 
 # 도감 글자 크기 — 고정 배율(가독성). 모든 라벨 폰트가 이 배율을 거침.
 func _fs(base: int) -> int:
@@ -315,7 +374,7 @@ func _build_tab_bar() -> Control:
 	mc.add_theme_constant_override("margin_top", 10)
 	mc.add_theme_constant_override("margin_bottom", 10)
 	mc.add_child(row)
-	for entry in [["card", "ui.codex.tab.card"], ["relic", "ui.codex.tab.relic"]]:
+	for entry in [["card", "ui.codex.tab.card"], ["relic", "ui.codex.tab.relic"], ["monster", "ui.codex.tab.monster"]]:
 		var key: String = entry[0]
 		var active := (key == _tab)
 		var b := Button.new()
@@ -460,7 +519,6 @@ func _on_settings() -> void:
 	overlay.open()
 
 func _build_rail() -> Control:
-	var P := SacredPalette
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.custom_minimum_size = Vector2(256, 0)
@@ -485,11 +543,20 @@ func _build_rail() -> Control:
 	reset.pressed.connect(_on_reset)
 	rail.add_child(reset)
 
-	if _tab == "relic":
-		_build_relic_facets(rail)
-	else:
-		_build_card_facets(rail)
+	match _tab:
+		"relic":   _build_relic_facets(rail)
+		"monster": _build_monster_facets(rail)
+		_:         _build_card_facets(rail)
 	return scroll
+
+func _build_monster_facets(rail: VBoxContainer) -> void:
+	# mythology — 신화별
+	rail.add_child(_facet_head(tr("ui.codex.facet.myth")))
+	var myth_box := VBoxContainer.new()
+	myth_box.add_theme_constant_override("separation", 4)
+	for m in MonsterCatalog.MYTH_ORDER:
+		myth_box.add_child(_make_chip(tr("ui.codex.myth.%s" % m), _mf_myth, m, SacredPalette.BRASS_400, true))
+	rail.add_child(myth_box)
 
 func _build_card_facets(rail: VBoxContainer) -> void:
 	# rarity
@@ -580,30 +647,36 @@ func _build_toolbar() -> Control:
 	mc.add_theme_constant_override("margin_bottom", 12)
 	mc.add_child(bar)
 
-	# group — 드롭다운 (카드: 영웅별 / 렐릭: 소유별)
+	# group — 드롭다운 (카드/렐릭: 영웅별 / 몬스터: 신화별)
 	bar.add_child(_tool_label(tr("ui.codex.group")))
-	var group_key: String = "owner" if _tab == "relic" else "hero"
-	var group_lbl: String = tr("ui.codex.group.hero")  # 카드·렐릭 모두 "영웅별"
+	var group_key: String
+	var group_lbl: String
+	match _tab:
+		"monster": group_key = "myth"; group_lbl = tr("ui.codex.group.myth")
+		"relic":   group_key = "owner"; group_lbl = tr("ui.codex.group.hero")
+		_:         group_key = "hero"; group_lbl = tr("ui.codex.group.hero")
 	var group_map := {group_key: group_lbl, "none": tr("ui.codex.group.flat")}
 	bar.add_child(_make_dropdown([group_key, "none"], group_map, _cur_group(), 112.0,
 		func(k: String) -> void:
 			_set_group(k)
 			_render()))
 
-	# sort — 드롭다운 + 방향 버튼 (탭별 정렬 키)
+	# sort — 드롭다운(정렬 키 2개 이상일 때만) + 방향 버튼. 렐릭/몬스터는 이름 정렬만.
 	bar.add_child(_tool_label(tr("ui.codex.sort")))
 	var sort_keys: Array
 	var sort_map: Dictionary
-	if _tab == "relic":
-		sort_keys = ["name", "trigger"]
-		sort_map = {"name": tr("ui.codex.sort.name"), "trigger": tr("ui.codex.sort.trigger")}
-	else:
-		sort_keys = ["cost", "rarity", "type", "name"]
-		sort_map = {"cost": tr("ui.codex.sort.cost"), "rarity": tr("ui.codex.sort.rarity"), "type": tr("ui.codex.sort.type"), "name": tr("ui.codex.sort.name")}
-	bar.add_child(_make_dropdown(sort_keys, sort_map, _cur_sort(), 112.0,
-		func(k: String) -> void:
-			_set_sort(k)
-			_render()))
+	match _tab:
+		"relic", "monster":
+			sort_keys = ["name"]
+			sort_map = {"name": tr("ui.codex.sort.name")}
+		_:
+			sort_keys = ["cost", "rarity", "type", "name"]
+			sort_map = {"cost": tr("ui.codex.sort.cost"), "rarity": tr("ui.codex.sort.rarity"), "type": tr("ui.codex.sort.type"), "name": tr("ui.codex.sort.name")}
+	if sort_keys.size() > 1:
+		bar.add_child(_make_dropdown(sort_keys, sort_map, _cur_sort(), 112.0,
+			func(k: String) -> void:
+				_set_sort(k)
+				_render()))
 	_dir_btn = _make_dir_button()
 	bar.add_child(_dir_btn)
 
@@ -869,10 +942,10 @@ func _add_h_line(parent: Control) -> void:
 
 # ─────────────────────────── 툴바 핸들러 ───────────────────────────
 func _on_reset() -> void:
-	if _tab == "relic":
-		_rf_owner.clear(); _rf_cursed.clear(); _rf_coll.clear()
-	else:
-		_f_rarity.clear(); _f_type.clear(); _f_cost.clear(); _f_hero.clear(); _f_coll.clear()
+	match _tab:
+		"relic": _rf_owner.clear(); _rf_cursed.clear(); _rf_coll.clear()
+		"monster": _mf_myth.clear()
+		_: _f_rarity.clear(); _f_type.clear(); _f_cost.clear(); _f_hero.clear(); _f_coll.clear()
 	_set_search("")
 	if _search_edit:
 		_search_edit.text = ""
@@ -896,16 +969,35 @@ func _is_discovered(item) -> bool:
 	var pm = get_node_or_null("/root/ProgressManager")
 	if pm == null:
 		return false
-	return pm.is_relic_discovered(_item_key(item)) if _tab == "relic" else pm.is_card_discovered(_item_key(item))
+	match _tab:
+		"relic": return pm.is_relic_discovered(_item_key(item))
+		"monster": return pm.is_monster_discovered(_item_key(item))
+		_: return pm.is_card_discovered(_item_key(item))
 
 func _is_seen(item) -> bool:
 	var pm = get_node_or_null("/root/ProgressManager")
 	if pm == null:
 		return false
-	return pm.is_relic_seen(_item_key(item)) if _tab == "relic" else pm.is_card_seen(_item_key(item))
+	match _tab:
+		"relic": return pm.is_relic_seen(_item_key(item))
+		"monster": return pm.is_monster_seen(_item_key(item))
+		_: return pm.is_card_seen(_item_key(item))
 
 func _passes(item) -> bool:
-	return _passes_relic(item) if _tab == "relic" else _passes_card(item)
+	match _tab:
+		"relic": return _passes_relic(item)
+		"monster": return _passes_monster(item)
+		_: return _passes_card(item)
+
+func _passes_monster(mon) -> bool:
+	if _mf_myth.size() and mon.mythology not in _mf_myth:
+		return false
+	if _m_search != "":
+		if not _is_seen(mon):  # 미조우는 검색 제외 (이름 노출 방지)
+			return false
+		if _m_search not in tr(mon.enemy_name).to_lower():
+			return false
+	return true
 
 func _passes_card(card) -> bool:
 	if _f_rarity.size() and card.rarity not in _f_rarity:
@@ -954,9 +1046,9 @@ func _passes_collection(item, coll: Array) -> bool:
 # 정렬 1차 키 (sort 모드별). 동일 모드 내 a/b 는 같은 타입 반환.
 func _sort_primary(item):
 	if _tab == "relic":
-		match _r_sort:
-			"trigger": return item.trigger
-			_:         return tr(item.relic_name)
+		return tr(item.relic_name)
+	if _tab == "monster":
+		return tr(item.enemy_name)
 	match _sort:
 		"rarity": return item.rarity
 		"type":   return item.card_type
@@ -992,7 +1084,11 @@ func _render() -> void:
 	list.sort_custom(_cmp)
 
 	_update_tally()
-	var noun: String = tr("ui.codex.relics") if _tab == "relic" else tr("ui.codex.cards")
+	var noun: String
+	match _tab:
+		"relic": noun = tr("ui.codex.relics")
+		"monster": noun = tr("ui.codex.monsters")
+		_: noun = tr("ui.codex.cards")
 	_result_lbl.text = "%d / %d  %s" % [list.size(), _all.size(), noun]
 
 	if list.is_empty():
@@ -1020,7 +1116,10 @@ func _group_header(gid: String, items: Array) -> Control:
 	var P := SacredPalette
 	var accent: Color
 	var group_name: String
-	if gid == "":  # 렐릭 공용
+	if _tab == "monster":  # 몬스터 — 신화 그룹
+		accent = P.BRASS_400
+		group_name = tr("ui.codex.myth.%s" % gid)
+	elif gid == "":  # 렐릭 공용
 		accent = P.BRASS_400
 		group_name = tr("ui.codex.relic.common")
 	else:
@@ -1083,7 +1182,10 @@ func _get_cell(item) -> Control:
 	return cell
 
 func _make_cell(item) -> Control:
-	return _make_relic_cell(item) if _tab == "relic" else _make_card_cell(item)
+	match _tab:
+		"relic": return _make_relic_cell(item)
+		"monster": return _make_monster_cell(item)
+		_: return _make_card_cell(item)
 
 # 트리에 붙지 않은(필터로 빠진) 캐시 셀 해제 — 고아 노드 누수 방지
 func _free_orphan_cells() -> void:
@@ -1092,6 +1194,10 @@ func _free_orphan_cells() -> void:
 			cell.free()
 
 func _exit_tree() -> void:
+	# 진행 중 워커가 freed self 에 접근하지 않도록 완료 대기 (queue_free 시 잠깐 블록)
+	for tid in _thumb_inflight.values():
+		WorkerThreadPool.wait_for_task_completion(tid)
+	_thumb_inflight.clear()
 	_free_orphan_cells()
 
 # 셀 프레임 — 크기는 미리 확정(레이아웃·스크롤 정확). 보유/발견 카드 비주얼은
@@ -1139,10 +1245,10 @@ func _realize_cell(cell: Control) -> void:
 	if cell.get_meta("realized", true):
 		return
 	cell.set_meta("realized", true)
-	if cell.get_meta("kind", "card") == "relic":
-		_realize_relic_cell(cell)
-	else:
-		_realize_card_cell(cell)
+	match cell.get_meta("kind", "card"):
+		"relic": _realize_relic_cell(cell)
+		"monster": _realize_monster_cell(cell)
+		_: _realize_card_cell(cell)
 
 func _realize_card_cell(cell: Control) -> void:
 	var card = cell.get_meta("card")
@@ -1176,6 +1282,230 @@ func _realize_relic_cell(cell: Control) -> void:
 	if not cell.get_meta("owned"):
 		icon.material = _gray_mat  # 발견(미보유) 흑백
 
+# ── 몬스터 셀 ──
+# "enemy.{myth}.{slug}" → "{myth}_{slug}" (art 파일 베이스)
+func _monster_art_base(mon) -> String:
+	var parts: PackedStringArray = mon.enemy_name.split(".")
+	return "%s_%s" % [parts[1], parts[2]] if parts.size() >= 3 else mon.enemy_name
+
+# 페이즈 ph(1=기본, 2=_p1, ...) 의 일러스트 경로
+func _monster_phase_path(base: String, ph: int) -> String:
+	if ph <= 1:
+		return ENEMY_ART_DIR + base + ".png"
+	return ENEMY_ART_DIR + "%s_p%d.png" % [base, ph - 1]
+
+# 사용 가능한 일러스트 수 (기본 + _p1, _p2, ...)
+func _monster_phase_count(base: String) -> int:
+	var n := 1 if ResourceLoader.exists(ENEMY_ART_DIR + base + ".png") else 0
+	var k := 1
+	while ResourceLoader.exists(ENEMY_ART_DIR + "%s_p%d.png" % [base, k]):
+		n += 1
+		k += 1
+	return maxi(n, 1)
+
+# 몬스터 셀 — 일러스트 + 이름 + (페이즈 있으면) 페이즈 선택. 일러스트는 가상 스크롤로 지연 생성.
+func _make_monster_cell(mon) -> Control:
+	var P := SacredPalette
+	var discovered := _is_discovered(mon)
+	var base := _monster_art_base(mon)
+
+	var cell := VBoxContainer.new()
+	cell.custom_minimum_size = Vector2(MONSTER_CELL_W, MON_FRAME_H + 60.0)
+	cell.add_theme_constant_override("separation", 6)
+
+	# 일러스트 영역 — 배틀씬과 동일한 museum mat 프레임 + 내부 art 영역(0.6 비율, cover-crop).
+	var art_row := HBoxContainer.new()
+	art_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	var frame_wrap := Control.new()
+	frame_wrap.custom_minimum_size = Vector2(MON_FRAME_W, MON_FRAME_H)
+	art_row.add_child(frame_wrap)
+	cell.add_child(art_row)
+
+	# 내부 art 클립 홀더 (MAT_INSET 만큼 안쪽) — 일러스트가 여기서 cover-crop
+	var mat: int = MuseumMatFrame.MAT_INSET
+	var holder := Control.new()
+	holder.clip_contents = true
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame_wrap.add_child(holder)
+	holder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	holder.offset_left = mat; holder.offset_top = mat
+	holder.offset_right = -mat; holder.offset_bottom = -mat
+	var bg := ColorRect.new()
+	bg.color = Color(0.06, 0.05, 0.10, 1.0)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	holder.add_child(bg)
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	# museum mat 프레임 (홀더 위에 — 매트·테두리 오버레이, 배틀과 동일 두께)
+	var frame := MuseumMatFrame.new()
+	frame_wrap.add_child(frame)
+	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	if not discovered:
+		var q := Label.new()
+		q.text = "?"
+		q.add_theme_font_size_override("font_size", _fs(48))
+		q.add_theme_color_override("font_color", Color(0.96, 0.94, 0.90, 0.14))
+		q.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		q.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		q.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		holder.add_child(q)
+
+	# 이름
+	var name_lbl := Label.new()
+	name_lbl.add_theme_font_size_override("font_size", _fs(12))
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_lbl.add_theme_color_override("font_color", P.BONE_100 if discovered else P.BONE_400)
+	name_lbl.text = tr(mon.enemy_name) if discovered else "— — —"
+	cell.add_child(name_lbl)
+
+	cell.set_meta("kind", "monster")
+	cell.set_meta("art_base", base)
+	cell.set_meta("holder", holder)
+	cell.set_meta("owned", discovered)
+	cell.set_meta("phase", 1)
+	cell.set_meta("lazy", discovered)
+	cell.set_meta("realized", not discovered)
+
+	# 페이즈 선택 (조우 + 일러스트 2개 이상)
+	if discovered:
+		var phases := _monster_phase_count(base)
+		if phases > 1:
+			var prow := HBoxContainer.new()
+			prow.alignment = BoxContainer.ALIGNMENT_CENTER
+			prow.add_theme_constant_override("separation", 4)
+			var btns: Array = []
+			for ph in range(1, phases + 1):
+				var pb := _make_phase_btn(cell, ph)
+				prow.add_child(pb)
+				btns.append(pb)
+			cell.add_child(prow)
+			cell.set_meta("phase_btns", btns)
+			_refresh_phase_btns(cell, 1)
+	return cell
+
+# 몬스터 일러스트(PNG)를 뷰포트 진입 시 생성 (가상 스크롤). 이름/페이즈 버튼은 즉시.
+# 배틀씬과 동일: cover-crop(영역 채움) + 좌우 반전(flip_h — 배틀의 음수 x scale 재현).
+func _realize_monster_cell(cell: Control) -> void:
+	var holder: Control = cell.get_meta("holder")
+	var illust := TextureRect.new()
+	illust.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	illust.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	illust.flip_h = true  # 배틀씬 적 방향과 동일 (좌우 반전)
+	illust.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	holder.add_child(illust)
+	illust.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)  # 내부 art 영역 꽉 채움
+	cell.set_meta("illust", illust)
+	_apply_monster_phase(cell, cell.get_meta("phase", 1))
+
+# 페이즈 일러스트 적용 — 썸네일 비동기 요청 (캐시되어 있으면 즉시)
+func _apply_monster_phase(cell: Control, ph: int) -> void:
+	var illust = cell.get_meta("illust", null)
+	cell.set_meta("phase", ph)
+	if not is_instance_valid(illust):
+		return
+	_request_thumb(_monster_phase_path(cell.get_meta("art_base"), ph), illust)
+
+# 썸네일 요청 — 캐시 hit 시 즉시 적용, 아니면 워커 스레드에 생성 의뢰 (스크롤 끊김 방지)
+func _request_thumb(path: String, target: TextureRect) -> void:
+	if _mon_thumb.has(path):
+		if is_instance_valid(target):
+			target.texture = _mon_thumb[path]
+		return
+	if not _thumb_waiters.has(path):
+		_thumb_waiters[path] = []
+	_thumb_waiters[path].append(target)
+	if _thumb_inflight.has(path):
+		return  # 이미 로딩 중
+	_thumb_inflight[path] = WorkerThreadPool.add_task(_thumb_worker.bind(path))
+	set_process(true)
+
+# [워커 스레드] 거대 PNG → 다운스케일 Image. 텍스처화(GPU 업로드)는 메인에서.
+func _thumb_worker(path: String) -> void:
+	var img := _make_thumb_image(path)
+	_thumb_mutex.lock()
+	_thumb_ready[path] = img
+	_thumb_mutex.unlock()
+
+func _make_thumb_image(path: String) -> Image:
+	if not ResourceLoader.exists(path):
+		return null
+	var tex: Texture2D = ResourceLoader.load(path, "Texture2D", ResourceLoader.CACHE_MODE_IGNORE)
+	if tex == null:
+		return null
+	var img: Image = tex.get_image()
+	if img == null:
+		return null
+	if img.is_compressed():
+		img.decompress()
+	var s := img.get_size()
+	var longest: int = maxi(int(s.x), int(s.y))
+	if longest > MON_THUMB_MAX:
+		var sc: float = float(MON_THUMB_MAX) / float(longest)
+		img.resize(maxi(1, int(s.x * sc)), maxi(1, int(s.y * sc)), Image.INTERPOLATE_BILINEAR)
+	return img
+
+# 완료된 워커 폴링 — Image → ImageTexture(메인) 후 대기 중 대상에 적용
+func _process(_dt: float) -> void:
+	if _thumb_inflight.is_empty():
+		set_process(false)
+		return
+	var done: Array = []
+	for path in _thumb_inflight:
+		if WorkerThreadPool.is_task_completed(_thumb_inflight[path]):
+			WorkerThreadPool.wait_for_task_completion(_thumb_inflight[path])
+			done.append(path)
+	for path in done:
+		_thumb_inflight.erase(path)
+		_thumb_mutex.lock()
+		var img: Image = _thumb_ready.get(path, null)
+		_thumb_ready.erase(path)
+		_thumb_mutex.unlock()
+		var tex: Texture2D = null
+		if img != null:
+			tex = ImageTexture.create_from_image(img)
+			_mon_thumb[path] = tex
+		var waiters: Array = _thumb_waiters.get(path, [])
+		_thumb_waiters.erase(path)
+		if tex != null:
+			for w in waiters:
+				if is_instance_valid(w):
+					w.texture = tex
+
+# 페이즈 선택 버튼 클릭 — 미생성 시 먼저 realize 후 일러스트 교체
+func _select_monster_phase(cell: Control, ph: int) -> void:
+	if not cell.get_meta("realized", false):
+		_realize_cell(cell)
+	_apply_monster_phase(cell, ph)
+	_refresh_phase_btns(cell, ph)
+
+func _make_phase_btn(cell: Control, ph: int) -> Button:
+	var b := Button.new()
+	b.focus_mode = Control.FOCUS_NONE
+	b.text = str(ph)
+	b.custom_minimum_size = Vector2(28, 24)
+	b.add_theme_font_size_override("font_size", _fs(10))
+	b.pressed.connect(func() -> void: _select_monster_phase(cell, ph))
+	return b
+
+# 페이즈 버튼 활성 표시 갱신
+func _refresh_phase_btns(cell: Control, active_ph: int) -> void:
+	var P := SacredPalette
+	var btns: Array = cell.get_meta("phase_btns", [])
+	for i in btns.size():
+		var b: Button = btns[i]
+		var on := (i + 1) == active_ph
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color(P.BRASS_500.r, P.BRASS_500.g, P.BRASS_500.b, 0.22) if on else Color(0.03, 0.03, 0.04, 0.4)
+		sb.border_color = P.BRASS_400 if on else P.BRASS_700
+		sb.set_border_width_all(1)
+		sb.set_corner_radius_all(2)
+		b.add_theme_stylebox_override("normal", sb)
+		b.add_theme_stylebox_override("hover", sb)
+		b.add_theme_stylebox_override("pressed", sb)
+		b.add_theme_color_override("font_color", P.BONE_100 if on else P.BONE_400)
+
 # 뷰포트(+상하 1화면 버퍼) 안의 미생성 셀만 realize.
 # 셀의 "콘텐츠 내 상대 y"(스크롤 무관) vs scroll_vertical 로 판정 — get_global_rect 의
 # 스크롤 트랜스폼 적용 타이밍에 의존하지 않아 value_changed 콜백에서도 정확.
@@ -1188,7 +1518,12 @@ func _update_visible_cells() -> void:
 	var top := _scroll.scroll_vertical - vh          # 위쪽 버퍼 1화면
 	var bot := _scroll.scroll_vertical + vh * 2.0     # 뷰 + 아래쪽 버퍼 1화면
 	var content_top := _grid_host.global_position.y
+	# 프레임당 realize 수 제한 — 몬스터는 썸네일을 비동기 로딩하므로 realize 자체는 가벼움(높게).
+	# 카드는 CardScene 동기 인스턴스화라 낮게 유지.
+	var budget := 12 if _tab == "monster" else 6
 	for cell in _cell_cache.values():
+		if budget <= 0:
+			break
 		if not is_instance_valid(cell):
 			continue
 		if cell.get_meta("realized", true):
@@ -1199,6 +1534,23 @@ func _update_visible_cells() -> void:
 		var ch: float = cell.size.y
 		if (cy + ch) >= top and cy <= bot:
 			_realize_cell(cell)
+			budget -= 1
+	if budget <= 0:
+		_schedule_more_realize()  # 남은 가시 셀은 다음 프레임에 이어서
+
+# 점진 realize — 다음 프레임에 _update_visible_cells 재실행 (중복 예약 방지)
+func _schedule_more_realize() -> void:
+	if _realize_pending:
+		return
+	_realize_pending = true
+	var tree := get_tree()
+	if tree == null:
+		_realize_pending = false
+		return
+	await tree.process_frame
+	_realize_pending = false
+	if is_inside_tree():
+		_update_visible_cells()
 
 # 레이아웃 정착 후 가시 셀 갱신 — _render 끝에서 fire-and-forget.
 # 콘텐츠 높이가 뷰포트 이상이 될 때까지 대기(중첩 컨테이너 min_size 전파 완료 신호).

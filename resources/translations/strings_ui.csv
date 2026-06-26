@@ -252,11 +252,20 @@ ui.codex.facet.cursed,저주,Cursed,Maudit,Maledetto,Maldito,呪い,Καταρα
 ui.codex.facet.trigger,발동,Trigger,Déclencheur,Attivazione,Activación,発動,Ενεργοποίηση,触发,觸發,Триггер,Disparo,Wyzwalacz,Auslöser
 ui.codex.cursed,저주받음,Cursed,Maudit,Maledetto,Maldito,呪い,Καταραμένο,诅咒,詛咒,Проклятый,Amaldiçoado,Przeklęty,Verflucht
 ui.codex.group.owner,소유별,By Owner,Par propriétaire,Per proprietario,Por dueño,所有者別,Ανά κάτοχο,按归属,按歸屬,По владельцу,Por dono,Wg właściciela,Nach Besitzer
-ui.codex.sort.trigger,발동시점,Trigger,Déclencheur,Attivazione,Activación,発動,Ενεργοποίηση,触发,觸發,Триггер,Disparo,Wyzwalacz,Auslöser
 ui.codex.trigger.passive,상시,Passive,Passif,Passivo,Pasivo,常時,Παθητικό,常驻,常駐,Пассивно,Passivo,Pasywny,Passiv
 ui.codex.trigger.battle_start,전투 시작,Battle Start,Début de combat,Inizio combattimento,Inicio de combate,戦闘開始,Έναρξη μάχης,战斗开始,戰鬥開始,Начало боя,Início de combate,Początek walki,Kampfbeginn
 ui.codex.trigger.turn_start,턴 시작,Turn Start,Début de tour,Inizio turno,Inicio de turno,ターン開始,Έναρξη γύρου,回合开始,回合開始,Начало хода,Início do turno,Początek tury,Zugbeginn
 ui.codex.trigger.turn_end,턴 종료,Turn End,Fin de tour,Fine turno,Fin de turno,ターン終了,Τέλος γύρου,回合结束,回合結束,Конец хода,Fim do turno,Koniec tury,Zugende
 ui.codex.trigger.hero_damaged,피격 시,On Damage,Aux dégâts,Quando colpito,Al recibir daño,被ダメージ時,Όταν δέχεται ζημιά,受伤时,受傷時,При уроне,Ao sofrer dano,Przy obrażeniach,Bei Schaden
+ui.codex.tab.monster,몬스터,Monsters,Monstres,Mostri,Monstruos,モンスター,Τέρατα,怪物,怪物,Монстры,Monstros,Potwory,Monster
+ui.codex.monsters,마리,monsters,monstres,mostri,monstruos,体,τέρατα,只,隻,монстров,monstros,potworów,Monster
+ui.codex.facet.myth,신화,Mythology,Mythologie,Mitologia,Mitología,神話,Μυθολογία,神话,神話,Мифология,Mitologia,Mitologia,Mythologie
+ui.codex.group.myth,신화별,By Myth,Par mythe,Per mito,Por mito,神話別,Ανά μύθο,按神话,按神話,По мифологии,Por mito,Wg mitu,Nach Mythos
+ui.codex.myth.greek,그리스,Greek,Grecque,Greca,Griega,ギリシャ,Ελληνική,希腊,希臘,Греческая,Grega,Grecka,Griechisch
+ui.codex.myth.egyptian,이집트,Egyptian,Égyptienne,Egizia,Egipcia,エジプト,Αιγυπτιακή,埃及,埃及,Египетская,Egípcia,Egipska,Ägyptisch
+ui.codex.myth.norse,북유럽,Norse,Nordique,Norrena,Nórdica,北欧,Σκανδιναβική,北欧,北歐,Скандинавская,Nórdica,Nordycka,Nordisch
+ui.codex.myth.buddhist,불교,Buddhist,Bouddhiste,Buddhista,Budista,仏教,Βουδιστική,佛教,佛教,Буддийская,Budista,Buddyjska,Buddhistisch
+ui.codex.myth.daoist,도교,Taoist,Taoïste,Taoista,Taoísta,道教,Ταοϊστική,道教,道教,Даосская,Taoísta,Taoistyczna,Taoistisch
+ui.codex.myth.japanese,일본,Japanese,Japonaise,Giapponese,Japonesa,日本,Ιαπωνική,日本,日本,Японская,Japonesa,Japońska,Japanisch
 ui.codex.collection.owned,보유함,Owned,Possédées,Possedute,Poseídas,所持,Κατεχόμενα,已拥有,已擁有,В наличии,Possuídas,Posiadane,Im Besitz
 ui.codex.collection.seen,발견,Discovered,Découvertes,Scoperte,Descubiertas,発見,Ανακαλυμμένα,已发现,已發現,Открытые,Descobertas,Odkryte,Entdeckt
