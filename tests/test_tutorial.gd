@@ -13,6 +13,7 @@ func run_all() -> Dictionary:
 	test_tutorial_completed_roundtrip()
 	test_modern_card_glow_sets_opacity()
 	test_driver_advances_and_completes()
+	test_lesson_basics_builders()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -89,3 +90,18 @@ func test_driver_advances_and_completes() -> void:
 	_assert(d.is_finished(), "마지막 스텝 통과 시 종료")
 	_assert(done[0] == true, "lesson_completed emit")
 	d.queue_free()
+
+func test_lesson_basics_builders() -> void:
+	print("[TestTutorial] test_lesson_basics_builders")
+	var LB = load("res://scenes/tutorial/lessons/lesson_basics.gd")
+	_assert(LB.lesson_id() == "basics", "lesson_id basics")
+	var enemy = LB.build_enemy()
+	_assert(enemy.intent_pattern.size() >= 1, "적 intent_pattern 비어있지 않음")
+	_assert(enemy.intent_pattern[0].action_type == IntentResource.ActionType.ATTACK, "첫 인텐트 ATTACK")
+	var deck = LB.build_deck()
+	_assert(deck.size() == 3, "덱 3장")
+	for c in deck:
+		_assert(c.is_innate == true, "모든 카드 is_innate")
+	var steps = LB.steps()
+	_assert(steps.size() >= 3, "스텝 3개 이상")
+	_assert(steps[0].has("text") and steps[0].has("complete_event"), "스텝 형식 유효")
