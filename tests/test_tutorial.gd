@@ -12,6 +12,7 @@ func run_all() -> Dictionary:
 	test_force_crit_off_by_default()
 	test_tutorial_completed_roundtrip()
 	test_modern_card_glow_sets_opacity()
+	test_driver_advances_and_completes()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -64,3 +65,27 @@ func test_modern_card_glow_sets_opacity() -> void:
 	card.hide_glow()
 	_assert(card._glow_mat.get_shader_parameter("opacity") == 0.0, "hide_glow 시 opacity=0.0")
 	card.free()
+
+func test_driver_advances_and_completes() -> void:
+	print("[TestTutorial] test_driver_advances_and_completes")
+	var TD = load("res://scenes/tutorial/tutorial_driver.gd")
+	var d = TD.new()
+	var main_loop = Engine.get_main_loop()
+	if main_loop and main_loop.root:
+		main_loop.root.add_child(d)
+	else:
+		d._ready()
+	var done = [false]
+	d.lesson_completed.connect(func() -> void: done[0] = true)
+	d.start([
+		{"text": "tutorial.basics.s1", "complete_event": "card_played"},
+		{"text": "tutorial.basics.s2", "complete_event": "turn_ended"},
+	])
+	d.notify("turn_ended")  # 잘못된 이벤트 — 진행 안 함
+	_assert(d.current_step()["text"] == "tutorial.basics.s1", "불일치 이벤트는 진행 안 함")
+	d.notify("card_played")
+	_assert(d.current_step()["text"] == "tutorial.basics.s2", "일치 이벤트로 다음 스텝")
+	d.notify("turn_ended")
+	_assert(d.is_finished(), "마지막 스텝 통과 시 종료")
+	_assert(done[0] == true, "lesson_completed emit")
+	d.queue_free()
