@@ -10,6 +10,7 @@ var failed: int = 0
 func run_all() -> Dictionary:
 	test_force_crit_returns_crit()
 	test_force_crit_off_by_default()
+	test_tutorial_completed_roundtrip()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -34,3 +35,18 @@ func test_force_crit_returns_crit() -> void:
 	_assert(r["is_crit"] == true, "force_crit 시 is_crit true")
 	_assert(r["crit_mult"] == BM.CRIT_MULTIPLIER, "force_crit 시 crit_mult = ×2")
 	bm.free()
+
+func test_tutorial_completed_roundtrip() -> void:
+	print("[TestTutorial] test_tutorial_completed_roundtrip")
+	var PM = load("res://autoload/progress_manager.gd")
+	var pm = PM.new()
+	pm.reset_progress()
+	_assert(not pm.is_tutorial_completed("basics"), "초기 미완료")
+	var first: bool = pm.complete_tutorial("basics")
+	var dup: bool = pm.complete_tutorial("basics")
+	_assert(first == true, "신규 완료 true")
+	_assert(dup == false, "중복 완료 false")
+	var d: Dictionary = pm.to_dict()
+	var pm2 = PM.new()
+	pm2.from_dict(d)
+	_assert(pm2.is_tutorial_completed("basics"), "직렬화 복원")
