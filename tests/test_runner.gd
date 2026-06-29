@@ -45,6 +45,7 @@ var TestExplosionBlast = preload("res://tests/test_explosion_blast.gd")
 var TestBluntSmash = preload("res://tests/test_blunt_smash.gd")
 var TestBulletShot = preload("res://tests/test_bullet_shot.gd")
 var TestDamagePipeline = preload("res://tests/test_damage_pipeline.gd")
+var TestTutorial = preload("res://tests/test_tutorial.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -94,6 +95,7 @@ func _init() -> void:
 		TestBluntSmash.new(),
 		TestBulletShot.new(),
 		TestDamagePipeline.new(),
+		TestTutorial.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()

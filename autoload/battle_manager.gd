@@ -53,6 +53,9 @@ const CRIT_BASE_RATE: float = 0.05
 const CRIT_MARK_BONUS: float = 0.30
 const CRIT_MULTIPLIER: float = 2.0
 
+# 튜토리얼 — true면 치명타 확정 (시연용). debug_hero_invincible 패턴.
+var tutorial_force_crit: bool = false
+
 # 의존성 주입 — 프로덕션: BattleScene이 설정, 테스트: 직접 할당
 var team_mgr = null
 var deck_mgr = null
@@ -2680,6 +2683,8 @@ func _roll_crit_enemy(has_mark: bool) -> Dictionary:
 # 치명타 굴림 (배율 전용) — _apply_card_effects DAMAGE 분기에서 사용.
 # 반환: {crit_mult: float, is_crit: bool}
 func _roll_crit(target_enemy_index: int, has_mark: bool) -> Dictionary:
+	if tutorial_force_crit:
+		return {"crit_mult": CRIT_MULTIPLIER, "is_crit": true}
 	if _test_disable_crit:
 		return {"crit_mult": 1.0, "is_crit": false}
 	var rate: float = CRIT_BASE_RATE + (CRIT_MARK_BONUS if has_mark else 0.0)
