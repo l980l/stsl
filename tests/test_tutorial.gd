@@ -11,6 +11,7 @@ func run_all() -> Dictionary:
 	test_force_crit_returns_crit()
 	test_force_crit_off_by_default()
 	test_tutorial_completed_roundtrip()
+	test_modern_card_glow_sets_opacity()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -50,3 +51,16 @@ func test_tutorial_completed_roundtrip() -> void:
 	var pm2 = PM.new()
 	pm2.from_dict(d)
 	_assert(pm2.is_tutorial_completed("basics"), "직렬화 복원")
+
+func test_modern_card_glow_sets_opacity() -> void:
+	print("[TestTutorial] test_modern_card_glow_sets_opacity")
+	var scn = load("res://scenes/card/card_scene_v2.tscn")
+	var card = scn.instantiate()
+	# _create_glow_rect() 를 직접 호출 (테스트에서 트리 추가 불가)
+	card._create_glow_rect()
+	card.show_glow(1.0)
+	var op = card._glow_mat.get_shader_parameter("opacity")
+	_assert(op == 1.0, "show_glow 시 opacity=1.0")
+	card.hide_glow()
+	_assert(card._glow_mat.get_shader_parameter("opacity") == 0.0, "hide_glow 시 opacity=0.0")
+	card.free()
