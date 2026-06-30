@@ -5073,8 +5073,7 @@ func _init_tutorial(lesson_id: String) -> void:
 	# 카드 사용 감지는 _finish_drag 의 play_card 지점에서 _tut_notify 로 직접 처리 (전용 시그널 없음).
 	BattleManager.enemy_damaged.connect(func(_i, _a, _t, is_crit) -> void:
 		if is_crit and _tutorial_driver: _tutorial_driver.notify("crit_landed"))
-	# 레슨 동안 치명타 확정 (치명타 시연 스텝 보장)
-	BattleManager.tutorial_force_crit = true
+	# 치명타 확정은 스텝 단위로 제어 (s4_crit 스텝에서만) — _refresh_tutorial_card_gating 참고
 
 # 튜토리얼 드라이버에 이벤트 전달 (드라이버 없으면 무시).
 func _tut_notify(event: String) -> void:
@@ -5085,27 +5084,51 @@ func _on_tutorial_lesson_completed() -> void:
 	if GameManager.tutorial_lesson_id != "":
 		ProgressManager.complete_tutorial(GameManager.tutorial_lesson_id)
 
-# 현재 스텝 허용 카드만 사용 가능 + 빛남, 나머지는 비활성.
+# 현재 스텝 허용 카드만 사용 가능 + 빛남(펄스), 나머지는 비활성 + 어둡게.
 func _apply_tutorial_card_state(node: Control, card_res: Resource) -> void:
 	var allowed: Array = _tutorial_driver.current_allowed_cards()
 	if not allowed.is_empty() and card_res.card_name in allowed:
 		node.set_owner_dead(false)
 		node.set_disabled(false)
+		node.modulate = Color.WHITE
 		node.set_glow_color(SacredPalette.BRASS_400)
 		node.start_glow_pulse(Color(1.0, 0.85, 0.3), Color(0.96, 0.93, 0.85), 1.1)
-		node.show_glow(1.4)
+		node.show_glow(1.6)
 	else:
 		node.set_disabled(true)
 		node.stop_glow_pulse()
 		node.hide_glow()
+		node.modulate = Color(0.34, 0.34, 0.42, 0.92)  # 강조된 카드만 밝게, 나머진 어둡게
 
-# 스텝 변경 시 현재 손패 카드들의 게이팅을 재적용.
+# 스텝 변경 시 치명타 플래그 + 손패 게이팅 + 턴 종료 강조 재적용.
 func _refresh_tutorial_card_gating() -> void:
+	if _tutorial_driver == null:
+		return
+	var step: Dictionary = _tutorial_driver.current_step()
+	BattleManager.tutorial_force_crit = step.get("force_crit", false)
 	for node in _card_buttons:
 		if is_instance_valid(node):
 			var cr = node.get_meta("_card_res", null)
 			if cr != null:
 				_apply_card_state(node, cr)
+	# 카드 없이 턴 종료해야 하는 스텝이면 턴 종료 버튼 강조
+	_set_endturn_highlight(step.get("complete_event", "") == "turn_ended")
+
+var _endturn_pulse_tween: Tween = null
+
+# 튜토리얼 — 턴 종료 버튼을 황동빛으로 깜빡여 "여기를 누르라" 강조.
+func _set_endturn_highlight(on: bool) -> void:
+	if _end_turn_btn == null:
+		return
+	if _endturn_pulse_tween != null and _endturn_pulse_tween.is_valid():
+		_endturn_pulse_tween.kill()
+		_endturn_pulse_tween = null
+	if on:
+		_endturn_pulse_tween = create_tween().set_loops()
+		_endturn_pulse_tween.tween_property(_end_turn_btn, "self_modulate", Color(1.0, 0.82, 0.28), 0.6).set_trans(Tween.TRANS_SINE)
+		_endturn_pulse_tween.tween_property(_end_turn_btn, "self_modulate", Color.WHITE, 0.6).set_trans(Tween.TRANS_SINE)
+	else:
+		_end_turn_btn.self_modulate = Color.WHITE
 
 func _on_battle_lost() -> void:
 	if _lose_played:
