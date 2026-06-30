@@ -16,6 +16,7 @@ var seen_cards: Array = []         # 도감 — 관측(발견)만 한 카드 키
 var discovered_relics: Array = []  # 도감 — 획득(보유)한 렐릭 키(relic_name) 목록. 영구 저장.
 var seen_relics: Array = []        # 도감 — 관측(발견)만 한 렐릭 키 목록 (보상/상점 진열 등). 영구 저장.
 var discovered_monsters: Array = []  # 도감 — 전투에서 조우한 몬스터 키(enemy_name) 목록. 영구 저장.
+var tutorial_completed: Array = []  # 완료한 튜토리얼 레슨 id 목록. 영구 저장.
 
 func _ready() -> void:
 	load_progress()
@@ -30,6 +31,7 @@ func reset_progress() -> void:
 	discovered_relics.clear()
 	seen_relics.clear()
 	discovered_monsters.clear()
+	tutorial_completed.clear()
 
 # 런 시작 시 1회 호출 — 스토리 각성 라인 변주 기준.
 func increment_run_count() -> void:
@@ -112,6 +114,17 @@ func is_monster_discovered(monster_id: String) -> bool:
 func is_monster_seen(monster_id: String) -> bool:
 	return monster_id in discovered_monsters
 
+# 튜토리얼 완료. 신규면 true + 저장.
+func complete_tutorial(lesson_id: String) -> bool:
+	if lesson_id == "" or lesson_id in tutorial_completed:
+		return false
+	tutorial_completed.append(lesson_id)
+	save_progress()
+	return true
+
+func is_tutorial_completed(lesson_id: String) -> bool:
+	return lesson_id in tutorial_completed
+
 func mark_chapter_cleared(chapter: int) -> void:
 	if chapter not in chapters_cleared:
 		chapters_cleared.append(chapter)
@@ -192,6 +205,7 @@ func to_dict() -> Dictionary:
 		"discovered_relics": discovered_relics.duplicate(),
 		"seen_relics": seen_relics.duplicate(),
 		"discovered_monsters": discovered_monsters.duplicate(),
+		"tutorial_completed": tutorial_completed.duplicate(),
 	}
 
 func from_dict(data: Dictionary) -> void:
@@ -207,6 +221,7 @@ func from_dict(data: Dictionary) -> void:
 	discovered_relics = data.get("discovered_relics", []).duplicate()
 	seen_relics = data.get("seen_relics", []).duplicate()
 	discovered_monsters = data.get("discovered_monsters", []).duplicate()
+	tutorial_completed = data.get("tutorial_completed", []).duplicate()
 
 func save_progress() -> void:
 	var file := FileAccess.open(PROGRESS_PATH, FileAccess.WRITE)

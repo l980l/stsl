@@ -64,6 +64,16 @@ static var _card_art_cache: Dictionary = {}
 @onready var _desc_label:  Label       = $DescLabel
 @onready var _type_icon:   TextureRect = $TypeIcon
 
+# Glow 상태 변수
+var _glow_rect: ColorRect = null
+var _glow_mat: ShaderMaterial = null
+var _glow_color: Color = SacredPalette.BRASS_300
+var _glow_tween: Tween = null
+var _pulse_color_a: Color = Color.WHITE
+var _pulse_color_b: Color = Color.WHITE
+var _pulse_period: float = 0.0
+var _pulse_age: float = 0.0
+
 # 카드 데이터
 var _card_name: String = "Card"
 var _cost: int = 1
@@ -83,6 +93,7 @@ func _ready() -> void:
 	if _card_res != null:
 		_refresh_from_card_res()
 	refresh()
+	_create_glow_rect()
 
 func _on_locale_changed(_locale: String) -> void:
 	if _card_res != null:
@@ -189,13 +200,95 @@ func set_highlight(v: bool) -> void:
 func set_pick_selectable(v: bool) -> void:
 	_pick_selectable = v
 
-# Glow 관련 — v2 단순화 (no-op). classic 의 화려한 glow 효과는 modern 디자인 미반영.
-func show_glow(_intensity: float = 1.0) -> void: pass
-func hide_glow() -> void: pass
-func set_glow_color(_color: Color) -> void: pass
-func start_glow_pulse(_a: Color, _b: Color, _period: float = 1.2) -> void: pass
-func stop_glow_pulse() -> void: pass
-func tween_glow(_alpha: float, _duration: float) -> void: pass
+# 튜토리얼 — 비용(코스트) 표시(원 + 숫자)에 커졌다 작아졌다 펄스. 비용 개념 강조용.
+var _cost_pulse_tween: Tween = null
+func pulse_cost(on: bool) -> void:
+	if _cost_pulse_tween != null and _cost_pulse_tween.is_valid():
+		_cost_pulse_tween.kill()
+		_cost_pulse_tween = null
+	if not on:
+		if _cost_bg != null: _cost_bg.scale = Vector2.ONE
+		if _cost_label != null: _cost_label.scale = Vector2.ONE
+		return
+	if _cost_bg != null:
+		_cost_bg.pivot_offset = _cost_bg.size / 2.0
+	if _cost_label != null:
+		_cost_label.pivot_offset = _cost_label.size / 2.0
+	_cost_pulse_tween = create_tween().set_loops()
+	_cost_pulse_tween.tween_method(_apply_cost_scale, 1.0, 1.35, 0.5).set_trans(Tween.TRANS_SINE)
+	_cost_pulse_tween.tween_method(_apply_cost_scale, 1.35, 1.0, 0.5).set_trans(Tween.TRANS_SINE)
+
+func _apply_cost_scale(s: float) -> void:
+	if _cost_bg != null: _cost_bg.scale = Vector2(s, s)
+	if _cost_label != null: _cost_label.scale = Vector2(s, s)
+
+func _create_glow_rect() -> void:
+	const PAD := 14.0
+	const INSET := 8.0
+	const W := 196.0 + PAD * 2.0
+	const H := 280.0 + PAD * 2.0
+	var glow := ColorRect.new()
+	var mat := ShaderMaterial.new()
+	var _theme := get_node_or_null("/root/SacredTheme")
+	if _theme:
+		mat.shader = _theme._get_card_glow_shader()
+	mat.set_shader_parameter("opacity", 0.0)
+	mat.set_shader_parameter("radius", 0.0)
+	mat.set_shader_parameter("edge_uv", Vector2((PAD + INSET) / W, (PAD + INSET) / H))
+	mat.set_shader_parameter("glow_color", Vector4(_glow_color.r, _glow_color.g, _glow_color.b, 1.0))
+	glow.material = mat
+	glow.position = Vector2(-PAD, -PAD)
+	glow.size = Vector2(W, H)
+	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(glow)
+	move_child(glow, 0)
+	_glow_rect = glow
+	_glow_mat = mat
+	set_process(false)  # 펄스 활성(start_glow_pulse) 전까지 매 프레임 처리 비활성
+
+func show_glow(intensity: float = 1.0) -> void:
+	if _glow_mat:
+		_glow_mat.set_shader_parameter("opacity", intensity)
+		_glow_mat.set_shader_parameter("radius", 1.0)
+
+func hide_glow() -> void:
+	if _glow_mat:
+		_glow_mat.set_shader_parameter("opacity", 0.0)
+		_glow_mat.set_shader_parameter("radius", 0.0)
+
+func set_glow_color(color: Color) -> void:
+	_glow_color = color
+	_pulse_period = 0.0
+	if _glow_mat:
+		_glow_mat.set_shader_parameter("glow_color", Vector4(color.r, color.g, color.b, 1.0))
+
+func start_glow_pulse(color_a: Color, color_b: Color, period: float = 1.2) -> void:
+	_pulse_color_a = color_a
+	_pulse_color_b = color_b
+	_pulse_period = period
+	_pulse_age = 0.0
+	set_process(true)
+
+func stop_glow_pulse() -> void:
+	_pulse_period = 0.0
+	set_process(false)
+
+func _process(delta: float) -> void:
+	if _pulse_period > 0.0 and _glow_mat:
+		_pulse_age += delta
+		var t: float = (sin(_pulse_age * TAU / _pulse_period) + 1.0) * 0.5
+		var c: Color = _pulse_color_a.lerp(_pulse_color_b, t)
+		_glow_mat.set_shader_parameter("glow_color", Vector4(c.r, c.g, c.b, 1.0))
+
+func tween_glow(alpha: float, duration: float) -> void:
+	if not _glow_mat:
+		return
+	if _glow_tween and _glow_tween.is_valid():
+		_glow_tween.kill()
+	var entering := alpha > 0.0
+	var _theme2 := get_node_or_null("/root/SacredTheme")
+	if _theme2:
+		_glow_tween = _theme2.tween_glow_material(self, _glow_mat, alpha, 1.0 if entering else 0.0, duration, not entering)
 
 func _gui_input(event: InputEvent) -> void:
 	if (_disabled or _owner_dead) and not _pick_selectable:

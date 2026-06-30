@@ -82,7 +82,9 @@ var _enemy_char_nodes: Array = []      # index → Node2D
 var _energy_label: Label
 var _energy_hbox: HBoxContainer
 var _end_turn_btn: TextureButton
+var _deck_btn: TextureButton  # 덱 보기 버튼 — 튜토리얼 잠금 대상
 var _message_label: Label
+var _tutorial_driver = null  # 튜토리얼 모드일 때만 생성 (TutorialDriver)
 var _relic_container: FlowContainer
 var _turn_queue_box: HBoxContainer
 var _turn_queue_slots: Array = []  # 각 슬롯: {root: PanelContainer, swatch: ColorRect, label: Label}
@@ -384,6 +386,7 @@ func _build_ui() -> void:
 	deck_btn.pressed.connect(_show_deck_viewer_in_battle)
 	add_child(deck_btn)
 	_attach_icon_hover_anim(deck_btn)
+	_deck_btn = deck_btn
 
 	_end_turn_btn = TextureButton.new()
 	_end_turn_btn.texture_normal = load("res://assets/art/ui/icons/end-turn-skip.svg")
@@ -1279,6 +1282,8 @@ func _start_battle() -> void:
 		_setup_enemies()
 		await _play_battle_intro()
 		BattleManager.start_player_turn()
+		if GameManager.tutorial_lesson_id != "":
+			_init_tutorial(GameManager.tutorial_lesson_id)
 	else:
 		_start_test_battle()  # GameManager 없이 단독 실행 시 폴백
 
@@ -1832,6 +1837,10 @@ func _intent_gradient(intent: Resource) -> Array:
 # ─────────────────────────────────────────────
 
 func _apply_card_state(node: Control, card_res: Resource) -> void:
+	# 튜토리얼 게이팅 — 현재 스텝에 허용된 카드만 사용 가능 + 빛남, 나머지는 비활성.
+	if _tutorial_driver != null and not _tutorial_driver.is_finished():
+		_apply_tutorial_card_state(node, card_res)
+		return
 	if not TeamManager.is_alive(card_res.owner_id):
 		node.set_owner_dead(true)
 	else:
@@ -2273,6 +2282,7 @@ func _on_end_turn_pressed() -> void:
 	_selected_card = null
 	_message_label.text = ""
 	_set_end_turn_btn_disabled(true)
+	if _tutorial_driver: _tutorial_driver.notify("turn_ended")
 	BattleManager.end_player_turn()
 
 func _on_player_turn_started() -> void:
@@ -2290,6 +2300,9 @@ func _on_player_turn_started() -> void:
 	_energy_label.text = "%d/%d" % [DeckManager.get_energy(cur_hid), DeckManager.MAX_ENERGY]
 	# 본인 영웅 핸드 표시 (start_hero_turn 가 드로우 완료)
 	_refresh_hand()
+	# 튜토리얼 — 턴 시작이 핸드/턴종료 버튼을 초기화하므로 게이팅 재적용 (end_turn 재잠금)
+	if _tutorial_driver != null and not _tutorial_driver.is_finished():
+		_refresh_tutorial_card_gating()
 	_refresh_turn_queue_widget()
 	# 영웅 블록 UI 갱신
 	for entry in _hero_nodes:
@@ -5017,6 +5030,16 @@ func _on_battle_won() -> void:
 	_message_label.text = tr("battle.msg_victory")
 	_spawn_banner_icon(IconUtils.get_toast_icon("victory"), [Color(1.0, 0.89, 0.48), Color(0.88, 0.6, 0.12)], Vector2(WINDOW_W / 2.0, 132.0), 92.0, 1.5)
 	_set_end_turn_btn_disabled(true)
+	# 튜토리얼 승리 — 정규 보상 흐름 대신 레슨 완료 처리 후 레슨 선택으로 복귀
+	if GameManager.tutorial_lesson_id != "":
+		BattleManager.tutorial_force_crit = false
+		if _tutorial_driver: _tutorial_driver.notify("battle_won")
+		ProgressManager.complete_tutorial(GameManager.tutorial_lesson_id)
+		GameManager.tutorial_lesson_id = ""
+		await get_tree().create_timer(1.5).timeout
+		if is_inside_tree():
+			SceneTransition.go("res://scenes/tutorial/tutorial_select_scene.tscn")
+		return
 	_selected_card = null
 	# 드래그 중 전투 종료 시 마우스 hidden 잔존 방지 — 드래그 정리
 	if _drag_card != null:
@@ -5041,10 +5064,141 @@ func _on_battle_won() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	GameManager.complete_battle(true)
 
+# 튜토리얼 부트스트랩 — 드라이버 오버레이 생성 + BattleManager 시그널 브리지.
+func _init_tutorial(lesson_id: String) -> void:
+	var LB = load("res://scenes/tutorial/lessons/lesson_basics.gd")
+	var TD = load("res://scenes/tutorial/tutorial_driver.gd")
+	_tutorial_driver = TD.new()
+	add_child(_tutorial_driver)
+	_tutorial_driver.lesson_completed.connect(_on_tutorial_lesson_completed)
+	_tutorial_driver.step_changed.connect(_refresh_tutorial_card_gating)
+	# 덱 보기 버튼 — 레슨 동안 잠금 (튜토리얼 흐름 외 UI 차단)
+	if _deck_btn != null:
+		_deck_btn.disabled = true
+		_deck_btn.self_modulate = Color(1, 1, 1, 0.4)
+	_tutorial_driver.start(LB.steps())
+	_refresh_tutorial_card_gating()
+	# 시그널 브리지 — BattleManager 이벤트 → driver.notify (battle_scene 해제 시 자동 disconnect)
+	# 카드 사용 감지는 _finish_drag 의 play_card 지점에서 _tut_notify 로 직접 처리 (전용 시그널 없음).
+	BattleManager.enemy_damaged.connect(func(_i, _a, _t, is_crit) -> void:
+		if is_crit and _tutorial_driver: _tutorial_driver.notify("crit_landed"))
+	# 치명타 확정은 스텝 단위로 제어 (s4_crit 스텝에서만) — _refresh_tutorial_card_gating 참고
+
+# 튜토리얼 드라이버에 이벤트 전달 (드라이버 없으면 무시).
+func _tut_notify(event: String) -> void:
+	if _tutorial_driver:
+		_tutorial_driver.notify(event)
+
+func _on_tutorial_lesson_completed() -> void:
+	if GameManager.tutorial_lesson_id != "":
+		ProgressManager.complete_tutorial(GameManager.tutorial_lesson_id)
+
+# 현재 스텝 허용 카드만 사용 가능 + 빛남(펄스), 나머지는 비활성 + 어둡게.
+func _apply_tutorial_card_state(node: Control, card_res: Resource) -> void:
+	var allowed: Array = _tutorial_driver.current_allowed_cards()
+	if not allowed.is_empty() and card_res.card_name in allowed:
+		node.set_owner_dead(false)
+		node.set_disabled(false)
+		node.modulate = Color.WHITE
+		node.set_glow_color(SacredPalette.BRASS_400)
+		node.start_glow_pulse(Color(1.0, 0.85, 0.3), Color(0.96, 0.93, 0.85), 1.1)
+		node.show_glow(1.6)
+	else:
+		node.set_disabled(true)
+		node.stop_glow_pulse()
+		node.hide_glow()
+		node.modulate = Color(0.34, 0.34, 0.42, 0.92)  # 강조된 카드만 밝게, 나머진 어둡게
+
+# 스텝 변경 시 치명타 플래그 + 손패 게이팅 + 턴 종료 강조 재적용.
+func _refresh_tutorial_card_gating() -> void:
+	if _tutorial_driver == null:
+		return
+	var step: Dictionary = _tutorial_driver.current_step()
+	BattleManager.tutorial_force_crit = step.get("force_crit", false)
+	# 비용(에너지) 교육 스텝 — 카드는 밝게 보이되 비활성(클릭은 드라이버 캐처가 막음), 비용/에너지 펄스 강조
+	var emphasize_cost: bool = step.get("emphasize", "") == "cost"
+	for node in _card_buttons:
+		if not is_instance_valid(node):
+			continue
+		var cr = node.get_meta("_card_res", null)
+		if cr == null:
+			continue
+		if emphasize_cost:
+			node.set_owner_dead(false)
+			node.set_disabled(true)
+			node.modulate = Color.WHITE
+			node.stop_glow_pulse()
+			node.hide_glow()
+		else:
+			_apply_card_state(node, cr)
+		if node.has_method("pulse_cost"):
+			node.pulse_cost(emphasize_cost)
+	_set_cost_emphasis(emphasize_cost)
+	# 턴 종료 버튼 — 스텝별 명시 상태로 구분:
+	#   "lock"      특정 카드 강제 스텝 → 비활성 (스킵 방지)
+	#   "highlight" 턴 종료 유도 스텝 → 활성 + 강조
+	#   "free"(기본) 자유 진행(적 처치 등) → 활성, 강조 없음
+	match step.get("end_turn", "free"):
+		"highlight":
+			_set_end_turn_btn_disabled(false)
+			_set_endturn_highlight(true)
+		"lock":
+			_set_endturn_highlight(false)
+			_set_end_turn_btn_disabled(true)
+		_:
+			_set_endturn_highlight(false)
+			_set_end_turn_btn_disabled(false)
+
+var _cost_emph_tween: Tween = null
+
+# 튜토리얼 — 우하단 에너지 UI 를 커졌다 작아졌다 펄스해 "현재 에너지" 위치 강조.
+func _set_cost_emphasis(on: bool) -> void:
+	if _energy_hbox == null:
+		return
+	if _cost_emph_tween != null and _cost_emph_tween.is_valid():
+		_cost_emph_tween.kill()
+		_cost_emph_tween = null
+	if not on:
+		_energy_hbox.scale = Vector2.ONE
+		return
+	_energy_hbox.pivot_offset = _energy_hbox.size / 2.0
+	_cost_emph_tween = create_tween().set_loops()
+	_cost_emph_tween.tween_property(_energy_hbox, "scale", Vector2(1.25, 1.25), 0.5).set_trans(Tween.TRANS_SINE)
+	_cost_emph_tween.tween_property(_energy_hbox, "scale", Vector2(1.0, 1.0), 0.5).set_trans(Tween.TRANS_SINE)
+
+var _endturn_pulse_tween: Tween = null
+
+# 튜토리얼 — 턴 종료 버튼을 황동 틴트 + 스케일 펄스(커졌다 작아짐)로 분명하게 "여기를 누르라" 강조.
+func _set_endturn_highlight(on: bool) -> void:
+	if _end_turn_btn == null:
+		return
+	if _endturn_pulse_tween != null and _endturn_pulse_tween.is_valid():
+		_endturn_pulse_tween.kill()
+		_endturn_pulse_tween = null
+	if not on:
+		_end_turn_btn.self_modulate = Color.WHITE
+		_end_turn_btn.scale = Vector2.ONE
+		return
+	_end_turn_btn.pivot_offset = _end_turn_btn.size / 2.0  # 가운데 기준 스케일
+	_end_turn_btn.self_modulate = Color(1.0, 0.82, 0.28)
+	_endturn_pulse_tween = create_tween().set_loops()
+	_endturn_pulse_tween.tween_property(_end_turn_btn, "scale", Vector2(1.3, 1.3), 0.5).set_trans(Tween.TRANS_SINE)
+	_endturn_pulse_tween.tween_property(_end_turn_btn, "scale", Vector2(1.0, 1.0), 0.5).set_trans(Tween.TRANS_SINE)
+
 func _on_battle_lost() -> void:
 	if _lose_played:
 		return
 	_lose_played = true
+	# 튜토리얼 패배 — 정규 게임오버 흐름을 타지 않고 상태 정리 후 레슨 선택으로 복귀.
+	# (정규 패배 경로는 complete_battle 을 호출하지 않으므로 여기서 직접 정리해야 누수가 없다.)
+	if GameManager.tutorial_lesson_id != "":
+		BattleManager.tutorial_force_crit = false
+		GameManager.tutorial_lesson_id = ""
+		if _drag_card != null:
+			_cleanup_drag()
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		SceneTransition.go("res://scenes/tutorial/tutorial_select_scene.tscn")
+		return
 	AudioManager.play_sfx("battle_lost")
 	# 드래그 중 전투 종료 시 마우스 hidden 잔존 방지
 	if _drag_card != null:
@@ -6209,7 +6363,8 @@ func _finish_drag(drop_pos: Vector2) -> void:
 					continue
 				if panel.get_global_rect().has_point(drop_pos):
 					_last_card_play_pos = drop_pos
-					BattleManager.play_card(_drag_card, i)
+					if BattleManager.play_card(_drag_card, i):
+						_tut_notify("card_played")
 					_cleanup_drag()
 					return
 			_cleanup_drag()
@@ -6222,7 +6377,8 @@ func _finish_drag(drop_pos: Vector2) -> void:
 					continue
 				if entry["panel"].get_global_rect().has_point(drop_pos):
 					_last_card_play_pos = drop_pos
-					BattleManager.play_card(_drag_card, -1, hero_id)
+					if BattleManager.play_card(_drag_card, -1, hero_id):
+						_tut_notify("card_played")
 					_cleanup_drag()
 					return
 			_cleanup_drag()
@@ -6235,12 +6391,14 @@ func _finish_drag(drop_pos: Vector2) -> void:
 					continue
 				if entry["panel"].get_global_rect().has_point(drop_pos):
 					_last_card_play_pos = drop_pos
-					BattleManager.play_card(_drag_card, -1, hero_id)
+					if BattleManager.play_card(_drag_card, -1, hero_id):
+						_tut_notify("card_played")
 					_cleanup_drag()
 					return
 			_cleanup_drag()
 		"none":
-			BattleManager.play_card(_drag_card, -1)
+			if BattleManager.play_card(_drag_card, -1):
+				_tut_notify("card_played")
 			_cleanup_drag()
 
 func _cleanup_drag() -> void:

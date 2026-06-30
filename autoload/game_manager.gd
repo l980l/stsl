@@ -85,6 +85,9 @@ var last_battle_damage: int = 0
 var last_battle_gold: int = 0
 # ─────────────────────────────────────────────────────
 
+# 튜토리얼 상태 — 빈 문자열이면 일반 전투
+var tutorial_lesson_id: String = ""
+
 signal state_changed(new_state: GameState)
 signal gold_changed(new_gold: int)
 signal relic_added(relic: Resource)
@@ -168,6 +171,8 @@ func reset() -> void:
 	current_floor = 0
 	current_act = 1
 	gold = 0
+	# 튜토리얼 상태 누수 방지 (런 시작 시 항상 비튜토리얼로 출발)
+	tutorial_lesson_id = ""
 	relics.clear()
 	battles_completed = 0
 	enemies_killed_this_run = 0
@@ -225,6 +230,24 @@ func start_run(initial_hero_id: String = "napoleon", chapter: int = 1) -> void:
 
 func _make_hero_by_id(hero_id: String) -> Resource:
 	return _HeroRegistry.make_hero(hero_id)
+
+# 튜토리얼 레슨 부팅 — 영웅/덱/적을 코드로 세팅 후 battle_scene 진입.
+func start_tutorial(lesson_id: String) -> void:
+	var LB = load("res://scenes/tutorial/lessons/lesson_basics.gd")
+	reset()
+	var tm := _get_tm()
+	if tm: tm.clear()
+	var dm := _get_dm()
+	if dm: dm.clear()
+	var hero := _make_hero_by_id(LB.HERO_ID)
+	if tm: tm.add_hero(hero)
+	if dm:
+		for c in LB.build_deck():
+			dm.add_card_to_deck(c)
+	pending_enemies = [LB.build_enemy()]
+	tutorial_lesson_id = lesson_id
+	change_state(GameState.BATTLE)
+	_request_scene("res://scenes/battle/battle_scene.tscn")
 
 # 스토리 라인 i18n 키 선택 — 풀 하이브리드(포화 없음):
 #   awakening 첫 런 → .first / 4런+ 낮은 확률 → .deepN / 그 외 → 에버그린 .eN 랜덤(직전 반복 회피)

@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bgcmcgtt6ejio"
+
+[deps]
+
+files=["res://resources/translations/strings_tutorial.ko.translation", "res://resources/translations/strings_tutorial.en.translation", "res://resources/translations/strings_tutorial.fr.translation", "res://resources/translations/strings_tutorial.it.translation", "res://resources/translations/strings_tutorial.es.translation", "res://resources/translations/strings_tutorial.ja.translation", "res://resources/translations/strings_tutorial.el.translation", "res://resources/translations/strings_tutorial.zh.translation", "res://resources/translations/strings_tutorial.zh_TW.translation", "res://resources/translations/strings_tutorial.ru.translation", "res://resources/translations/strings_tutorial.pt.translation", "res://resources/translations/strings_tutorial.pl.translation", "res://resources/translations/strings_tutorial.de.translation"]
+
+source_file="res://resources/translations/strings_tutorial.csv"
+dest_files=["res://resources/translations/strings_tutorial.ko.translation", "res://resources/translations/strings_tutorial.en.translation", "res://resources/translations/strings_tutorial.fr.translation", "res://resources/translations/strings_tutorial.it.translation", "res://resources/translations/strings_tutorial.es.translation", "res://resources/translations/strings_tutorial.ja.translation", "res://resources/translations/strings_tutorial.el.translation", "res://resources/translations/strings_tutorial.zh.translation", "res://resources/translations/strings_tutorial.zh_TW.translation", "res://resources/translations/strings_tutorial.ru.translation", "res://resources/translations/strings_tutorial.pt.translation", "res://resources/translations/strings_tutorial.pl.translation", "res://resources/translations/strings_tutorial.de.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true
