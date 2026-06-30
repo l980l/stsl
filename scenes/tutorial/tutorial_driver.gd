@@ -9,16 +9,11 @@ signal step_changed  # 현재 스텝이 바뀔 때마다 (battle_scene 이 카�
 var _steps: Array = []
 var _idx: int = -1
 var _label: Label = null
-var _dim: ColorRect = null
 var _breathe_tween: Tween = null
 
 func _ready() -> void:
 	layer = 60
-	_dim = ColorRect.new()
-	_dim.color = Color(0, 0, 0, 0.25)
-	_dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_dim)
+	# 화면 전체 디밍은 사용 안 함 — 카드 게이팅(비활성 카드 어둡게)으로 강조하므로 불필요.
 	# 상단 중앙 안내 문구 — 배경 없이 텍스트만, 흰색↔황금 breathe 애니메이션.
 	_label = Label.new()
 	_label.theme_type_variation = "TitleLabel"
