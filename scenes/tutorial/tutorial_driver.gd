@@ -9,23 +9,43 @@ signal step_changed  # 현재 스텝이 바뀔 때마다 (battle_scene 이 카�
 var _steps: Array = []
 var _idx: int = -1
 var _label: Label = null
+var _msg_bg: TextureRect = null
 var _breathe_tween: Tween = null
 
 func _ready() -> void:
 	layer = 60
 	# 화면 전체 디밍은 사용 안 함 — 카드 게이팅(비활성 카드 어둡게)으로 강조하므로 불필요.
-	# 상단 중앙 안내 문구 — 배경 없이 텍스트만, 흰색↔황금 breathe 애니메이션.
+	# 안내 문구 뒤에만 어두운 띠 (배틀씬 메시지와 동일한 좌우 페이드 그라디언트) → 가독성 확보.
+	var grad := Gradient.new()
+	grad.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	grad.colors = PackedColorArray([Color(0, 0, 0, 0), Color(0, 0, 0, 0.62), Color(0, 0, 0, 0)])
+	var grad_tex := GradientTexture1D.new()
+	grad_tex.gradient = grad
+	_msg_bg = TextureRect.new()
+	_msg_bg.texture = grad_tex
+	_msg_bg.stretch_mode = TextureRect.STRETCH_SCALE
+	_msg_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_msg_bg.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_msg_bg.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_msg_bg.offset_left = -660
+	_msg_bg.offset_right = 660
+	_msg_bg.offset_top = 146
+	_msg_bg.offset_bottom = 266
+	add_child(_msg_bg)
+	_msg_bg.visible = false
+	# 상단 중앙 안내 문구 — 흰색↔황금 breathe 애니메이션.
 	_label = Label.new()
 	_label.theme_type_variation = "TitleLabel"
 	_label.add_theme_font_size_override("font_size", 32)
 	_label.add_theme_color_override("font_color", SacredPalette.BONE_100)
 	_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	_label.offset_left = -560
 	_label.offset_right = 560
-	_label.offset_top = 150
-	_label.offset_bottom = 280
+	_label.offset_top = 148
+	_label.offset_bottom = 264
 	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_label)
 	_label.visible = false
@@ -66,6 +86,8 @@ func _render(text: String) -> void:
 		return
 	_label.text = text
 	_label.visible = text != ""
+	if _msg_bg:
+		_msg_bg.visible = text != ""
 	if text != "":
 		_start_breathe()
 	else:
