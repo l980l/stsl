@@ -5115,11 +5115,25 @@ func _refresh_tutorial_card_gating() -> void:
 		return
 	var step: Dictionary = _tutorial_driver.current_step()
 	BattleManager.tutorial_force_crit = step.get("force_crit", false)
+	# 비용(에너지) 교육 스텝 — 카드는 밝게 보이되 비활성(클릭은 드라이버 캐처가 막음), 비용/에너지 펄스 강조
+	var emphasize_cost: bool = step.get("emphasize", "") == "cost"
 	for node in _card_buttons:
-		if is_instance_valid(node):
-			var cr = node.get_meta("_card_res", null)
-			if cr != null:
-				_apply_card_state(node, cr)
+		if not is_instance_valid(node):
+			continue
+		var cr = node.get_meta("_card_res", null)
+		if cr == null:
+			continue
+		if emphasize_cost:
+			node.set_owner_dead(false)
+			node.set_disabled(true)
+			node.modulate = Color.WHITE
+			node.stop_glow_pulse()
+			node.hide_glow()
+		else:
+			_apply_card_state(node, cr)
+		if node.has_method("pulse_cost"):
+			node.pulse_cost(emphasize_cost)
+	_set_cost_emphasis(emphasize_cost)
 	# 턴 종료 버튼 — 스텝별 명시 상태로 구분:
 	#   "lock"      특정 카드 강제 스텝 → 비활성 (스킵 방지)
 	#   "highlight" 턴 종료 유도 스텝 → 활성 + 강조
@@ -5134,6 +5148,23 @@ func _refresh_tutorial_card_gating() -> void:
 		_:
 			_set_endturn_highlight(false)
 			_set_end_turn_btn_disabled(false)
+
+var _cost_emph_tween: Tween = null
+
+# 튜토리얼 — 우하단 에너지 UI 를 커졌다 작아졌다 펄스해 "현재 에너지" 위치 강조.
+func _set_cost_emphasis(on: bool) -> void:
+	if _energy_hbox == null:
+		return
+	if _cost_emph_tween != null and _cost_emph_tween.is_valid():
+		_cost_emph_tween.kill()
+		_cost_emph_tween = null
+	if not on:
+		_energy_hbox.scale = Vector2.ONE
+		return
+	_energy_hbox.pivot_offset = _energy_hbox.size / 2.0
+	_cost_emph_tween = create_tween().set_loops()
+	_cost_emph_tween.tween_property(_energy_hbox, "scale", Vector2(1.25, 1.25), 0.5).set_trans(Tween.TRANS_SINE)
+	_cost_emph_tween.tween_property(_energy_hbox, "scale", Vector2(1.0, 1.0), 0.5).set_trans(Tween.TRANS_SINE)
 
 var _endturn_pulse_tween: Tween = null
 

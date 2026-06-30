@@ -45,6 +45,7 @@ static func build_enemy() -> EnemyResource:
 # force_crit=true 면 그 스텝에서 치명타 확정.
 static func steps() -> Array:
 	return [
+		{"text": "tutorial.basics.s0_energy", "complete_event": "screen_clicked", "allowed_cards": [], "end_turn": "lock", "emphasize": "cost"},
 		{"text": "tutorial.basics.s1_intro", "complete_event": "card_played", "allowed_cards": [CARD_STRIKE], "end_turn": "lock"},
 		{"text": "tutorial.basics.s2_block", "complete_event": "card_played", "allowed_cards": [CARD_DEFEND], "end_turn": "lock"},
 		{"text": "tutorial.basics.s_power", "complete_event": "card_played", "allowed_cards": [CARD_POWER], "end_turn": "lock"},

@@ -11,9 +11,17 @@ var _idx: int = -1
 var _label: Label = null
 var _msg_bg: TextureRect = null
 var _breathe_tween: Tween = null
+var _click_catcher: Control = null
 
 func _ready() -> void:
 	layer = 60
+	# 화면 클릭 캐처 — complete_event == "screen_clicked" 스텝에서만 STOP(클릭 가로채 다음으로),
+	# 그 외 스텝에선 IGNORE 로 게임 입력을 통과시킨다. 라벨/배경보다 뒤(아래)에 둬 시각은 가리지 않음.
+	_click_catcher = Control.new()
+	_click_catcher.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_click_catcher.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_click_catcher.gui_input.connect(_on_catcher_input)
+	add_child(_click_catcher)
 	# 화면 전체 디밍은 사용 안 함 — 카드 게이팅(비활성 카드 어둡게)으로 강조하므로 불필요.
 	# 안내 문구 뒤에만 어두운 띠 (배틀씬 메시지와 동일한 좌우 페이드 그라디언트) → 가독성 확보.
 	var grad := Gradient.new()
@@ -95,6 +103,18 @@ func _render(text: String) -> void:
 		_start_breathe()
 	else:
 		_stop_breathe()
+	_update_click_catcher()
+
+# 현재 스텝이 화면 클릭으로 완료되는 스텝이면 클릭 캐처 활성화.
+func _update_click_catcher() -> void:
+	if _click_catcher == null:
+		return
+	var ev: String = current_step().get("complete_event", "")
+	_click_catcher.mouse_filter = Control.MOUSE_FILTER_STOP if ev == "screen_clicked" else Control.MOUSE_FILTER_IGNORE
+
+func _on_catcher_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		notify("screen_clicked")
 
 func notify(event: String, data: Dictionary = {}) -> void:
 	if is_finished():

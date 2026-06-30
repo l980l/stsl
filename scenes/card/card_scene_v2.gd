@@ -200,6 +200,28 @@ func set_highlight(v: bool) -> void:
 func set_pick_selectable(v: bool) -> void:
 	_pick_selectable = v
 
+# 튜토리얼 — 비용(코스트) 표시(원 + 숫자)에 커졌다 작아졌다 펄스. 비용 개념 강조용.
+var _cost_pulse_tween: Tween = null
+func pulse_cost(on: bool) -> void:
+	if _cost_pulse_tween != null and _cost_pulse_tween.is_valid():
+		_cost_pulse_tween.kill()
+		_cost_pulse_tween = null
+	if not on:
+		if _cost_bg != null: _cost_bg.scale = Vector2.ONE
+		if _cost_label != null: _cost_label.scale = Vector2.ONE
+		return
+	if _cost_bg != null:
+		_cost_bg.pivot_offset = _cost_bg.size / 2.0
+	if _cost_label != null:
+		_cost_label.pivot_offset = _cost_label.size / 2.0
+	_cost_pulse_tween = create_tween().set_loops()
+	_cost_pulse_tween.tween_method(_apply_cost_scale, 1.0, 1.35, 0.5).set_trans(Tween.TRANS_SINE)
+	_cost_pulse_tween.tween_method(_apply_cost_scale, 1.35, 1.0, 0.5).set_trans(Tween.TRANS_SINE)
+
+func _apply_cost_scale(s: float) -> void:
+	if _cost_bg != null: _cost_bg.scale = Vector2(s, s)
+	if _cost_label != null: _cost_label.scale = Vector2(s, s)
+
 func _create_glow_rect() -> void:
 	const PAD := 14.0
 	const INSET := 8.0
