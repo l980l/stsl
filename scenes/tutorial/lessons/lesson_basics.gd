@@ -41,13 +41,14 @@ static func build_enemy() -> EnemyResource:
 	return e
 
 # 스텝: text(i18n) + 완료 이벤트 + allowed_cards(이 스텝에 사용 가능한 카드 이름).
-# allowed_cards 가 비어있으면 모든 카드 비활성(턴 종료 유도). force_crit=true 면 그 스텝에서 치명타 확정.
+# end_turn: "lock"=턴종료 비활성(특정 카드 강제) / "highlight"=활성+강조(턴종료 유도) / "free"(기본)=자유.
+# force_crit=true 면 그 스텝에서 치명타 확정.
 static func steps() -> Array:
 	return [
-		{"text": "tutorial.basics.s1_intro", "complete_event": "card_played", "allowed_cards": [CARD_STRIKE]},
-		{"text": "tutorial.basics.s2_block", "complete_event": "card_played", "allowed_cards": [CARD_DEFEND]},
-		{"text": "tutorial.basics.s_power", "complete_event": "card_played", "allowed_cards": [CARD_POWER]},
-		{"text": "tutorial.basics.s3_endturn", "complete_event": "turn_ended", "allowed_cards": []},
-		{"text": "tutorial.basics.s4_crit", "complete_event": "crit_landed", "allowed_cards": [CARD_STRIKE], "force_crit": true},
-		{"text": "tutorial.basics.s5_win", "complete_event": "battle_won", "allowed_cards": [CARD_STRIKE]},
+		{"text": "tutorial.basics.s1_intro", "complete_event": "card_played", "allowed_cards": [CARD_STRIKE], "end_turn": "lock"},
+		{"text": "tutorial.basics.s2_block", "complete_event": "card_played", "allowed_cards": [CARD_DEFEND], "end_turn": "lock"},
+		{"text": "tutorial.basics.s_power", "complete_event": "card_played", "allowed_cards": [CARD_POWER], "end_turn": "lock"},
+		{"text": "tutorial.basics.s3_endturn", "complete_event": "turn_ended", "allowed_cards": [], "end_turn": "highlight"},
+		{"text": "tutorial.basics.s4_crit", "complete_event": "crit_landed", "allowed_cards": [CARD_STRIKE], "force_crit": true, "end_turn": "free"},
+		{"text": "tutorial.basics.s5_win", "complete_event": "battle_won", "allowed_cards": [CARD_STRIKE], "end_turn": "free"},
 	]

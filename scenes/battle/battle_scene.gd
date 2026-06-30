@@ -5120,14 +5120,20 @@ func _refresh_tutorial_card_gating() -> void:
 			var cr = node.get_meta("_card_res", null)
 			if cr != null:
 				_apply_card_state(node, cr)
-	# 턴 종료 버튼 — 턴 종료 스텝에서만 활성+강조, 카드 지정 스텝에선 잠금(스킵 방지).
-	var is_endturn: bool = step.get("complete_event", "") == "turn_ended"
-	if is_endturn:
-		_set_end_turn_btn_disabled(false)
-		_set_endturn_highlight(true)
-	else:
-		_set_endturn_highlight(false)
-		_set_end_turn_btn_disabled(true)
+	# 턴 종료 버튼 — 스텝별 명시 상태로 구분:
+	#   "lock"      특정 카드 강제 스텝 → 비활성 (스킵 방지)
+	#   "highlight" 턴 종료 유도 스텝 → 활성 + 강조
+	#   "free"(기본) 자유 진행(적 처치 등) → 활성, 강조 없음
+	match step.get("end_turn", "free"):
+		"highlight":
+			_set_end_turn_btn_disabled(false)
+			_set_endturn_highlight(true)
+		"lock":
+			_set_endturn_highlight(false)
+			_set_end_turn_btn_disabled(true)
+		_:
+			_set_endturn_highlight(false)
+			_set_end_turn_btn_disabled(false)
 
 var _endturn_pulse_tween: Tween = null
 
