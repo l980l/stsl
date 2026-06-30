@@ -222,6 +222,7 @@ func _create_glow_rect() -> void:
 	move_child(glow, 0)
 	_glow_rect = glow
 	_glow_mat = mat
+	set_process(false)  # 펄스 활성(start_glow_pulse) 전까지 매 프레임 처리 비활성
 
 func show_glow(intensity: float = 1.0) -> void:
 	if _glow_mat:
@@ -248,6 +249,7 @@ func start_glow_pulse(color_a: Color, color_b: Color, period: float = 1.2) -> vo
 
 func stop_glow_pulse() -> void:
 	_pulse_period = 0.0
+	set_process(false)
 
 func _process(delta: float) -> void:
 	if _pulse_period > 0.0 and _glow_mat:

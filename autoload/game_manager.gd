@@ -171,6 +171,8 @@ func reset() -> void:
 	current_floor = 0
 	current_act = 1
 	gold = 0
+	# 튜토리얼 상태 누수 방지 (런 시작 시 항상 비튜토리얼로 출발)
+	tutorial_lesson_id = ""
 	relics.clear()
 	battles_completed = 0
 	enemies_killed_this_run = 0
@@ -299,13 +301,6 @@ func enter_node(node_id: int) -> void:
 
 func complete_battle(won: bool) -> void:
 	pending_enemies.clear()
-	# 튜토리얼 상태 누수 방지 (튜토리얼 승리는 battle_scene 에서 별도 처리되지만, 패배/예외 경로 보험)
-	if tutorial_lesson_id != "":
-		tutorial_lesson_id = ""
-		# 패배 경로에서도 강제 치명타 플래그가 다음 일반 전투로 새지 않게 해제
-		var _bm = get_node_or_null("/root/BattleManager")
-		if _bm:
-			_bm.tutorial_force_crit = false
 	if won:
 		# BattleManager 통계 캡처 (씬 전환 전)
 		var bm = _get_bm()

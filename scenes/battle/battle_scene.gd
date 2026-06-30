@@ -5083,6 +5083,16 @@ func _on_battle_lost() -> void:
 	if _lose_played:
 		return
 	_lose_played = true
+	# 튜토리얼 패배 — 정규 게임오버 흐름을 타지 않고 상태 정리 후 레슨 선택으로 복귀.
+	# (정규 패배 경로는 complete_battle 을 호출하지 않으므로 여기서 직접 정리해야 누수가 없다.)
+	if GameManager.tutorial_lesson_id != "":
+		BattleManager.tutorial_force_crit = false
+		GameManager.tutorial_lesson_id = ""
+		if _drag_card != null:
+			_cleanup_drag()
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		SceneTransition.go("res://scenes/tutorial/tutorial_select_scene.tscn")
+		return
 	AudioManager.play_sfx("battle_lost")
 	# 드래그 중 전투 종료 시 마우스 hidden 잔존 방지
 	if _drag_card != null:
