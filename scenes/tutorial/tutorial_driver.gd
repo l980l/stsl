@@ -38,7 +38,8 @@ func _ready() -> void:
 	_label.theme_type_variation = "TitleLabel"
 	_label.add_theme_font_size_override("font_size", 32)
 	_label.add_theme_color_override("font_color", SacredPalette.BONE_100)
-	_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+	_label.autowrap_mode = TextServer.AUTOWRAP_OFF  # 줄바꿈 안 함 — 폭은 fit_text 로 폰트 축소
+	_label.clip_text = false
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -89,6 +90,8 @@ func _render(text: String) -> void:
 	if _msg_bg:
 		_msg_bg.visible = text != ""
 	if text != "":
+		# 줄바꿈 없이 폭(1120)에 맞춰 폰트 자동 축소 (32 → 최소 18)
+		LabelUtils.fit_text(_label, 32, 18, 1120.0)
 		_start_breathe()
 	else:
 		_stop_breathe()
