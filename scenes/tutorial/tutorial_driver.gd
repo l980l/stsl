@@ -4,6 +4,7 @@ class_name TutorialDriver
 extends CanvasLayer
 
 signal lesson_completed
+signal step_changed  # 현재 스텝이 바뀔 때마다 (battle_scene 이 카드 게이팅 재적용)
 
 var _steps: Array = []
 var _idx: int = -1
@@ -13,7 +14,7 @@ var _dim: ColorRect = null
 func _ready() -> void:
 	layer = 60
 	_dim = ColorRect.new()
-	_dim.color = Color(0, 0, 0, 0.45)
+	_dim.color = Color(0, 0, 0, 0.25)
 	_dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_dim)
@@ -39,9 +40,11 @@ func _advance() -> void:
 	_idx += 1
 	if _idx >= _steps.size():
 		_render("")
+		step_changed.emit()
 		lesson_completed.emit()
 		return
 	_render(tr(_steps[_idx].get("text", "")))
+	step_changed.emit()
 
 func _render(text: String) -> void:
 	if _label:

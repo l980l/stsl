@@ -43,6 +43,9 @@ static func build_enemy() -> EnemyResource:
 	e.grade = EnemyResource.Grade.NORMAL
 	e.max_hp = 40
 	e.signatures_enabled = false
+	# character_scene 없으면 battle_scene 이 ColorRect placeholder 를 만들어 _play_hit_flash(Node2D) 에서 크래시.
+	# 테스트 전투와 동일한 Node2D placeholder 씬을 사용해 피격 피드백이 정상 동작하게 한다.
+	e.character_scene = load("res://characters/enemies/enemy_placeholder.tscn")
 	var atk := IntentResource.new()
 	atk.action_type = IntentResource.ActionType.ATTACK
 	atk.value = 6
@@ -51,12 +54,14 @@ static func build_enemy() -> EnemyResource:
 	e.intent_pattern = [atk]
 	return e
 
-# 스텝: text(i18n) + 완료 이벤트. 이벤트는 battle_scene 브리지가 notify.
+# 스텝: text(i18n) + 완료 이벤트 + allowed_cards(이 스텝에 사용 가능한 카드 이름).
+# allowed_cards 가 비어있으면 이 스텝에선 모든 카드 비활성(예: 턴 종료 유도).
+# 이벤트는 battle_scene 브리지가 notify.
 static func steps() -> Array:
 	return [
-		{"text": "tutorial.basics.s1_intro", "complete_event": "card_played"},
-		{"text": "tutorial.basics.s2_block", "complete_event": "card_played"},
-		{"text": "tutorial.basics.s3_endturn", "complete_event": "turn_ended"},
-		{"text": "tutorial.basics.s4_crit", "complete_event": "crit_landed"},
-		{"text": "tutorial.basics.s5_win", "complete_event": "battle_won"},
+		{"text": "tutorial.basics.s1_intro", "complete_event": "card_played", "allowed_cards": ["tutorial.card.strike.name"]},
+		{"text": "tutorial.basics.s2_block", "complete_event": "card_played", "allowed_cards": ["tutorial.card.guard.name"]},
+		{"text": "tutorial.basics.s3_endturn", "complete_event": "turn_ended", "allowed_cards": []},
+		{"text": "tutorial.basics.s4_crit", "complete_event": "crit_landed", "allowed_cards": ["tutorial.card.strike.name"]},
+		{"text": "tutorial.basics.s5_win", "complete_event": "battle_won", "allowed_cards": ["tutorial.card.strike.name"]},
 	]

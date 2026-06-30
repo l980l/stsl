@@ -1835,6 +1835,10 @@ func _intent_gradient(intent: Resource) -> Array:
 # ─────────────────────────────────────────────
 
 func _apply_card_state(node: Control, card_res: Resource) -> void:
+	# 튜토리얼 게이팅 — 현재 스텝에 허용된 카드만 사용 가능 + 빛남, 나머지는 비활성.
+	if _tutorial_driver != null and not _tutorial_driver.is_finished():
+		_apply_tutorial_card_state(node, card_res)
+		return
 	if not TeamManager.is_alive(card_res.owner_id):
 		node.set_owner_dead(true)
 	else:
@@ -5062,7 +5066,9 @@ func _init_tutorial(lesson_id: String) -> void:
 	_tutorial_driver = TD.new()
 	add_child(_tutorial_driver)
 	_tutorial_driver.lesson_completed.connect(_on_tutorial_lesson_completed)
+	_tutorial_driver.step_changed.connect(_refresh_tutorial_card_gating)
 	_tutorial_driver.start(LB.steps())
+	_refresh_tutorial_card_gating()
 	# 시그널 브리지 — BattleManager 이벤트 → driver.notify (battle_scene 해제 시 자동 disconnect)
 	# 카드 사용 감지는 _finish_drag 의 play_card 지점에서 _tut_notify 로 직접 처리 (전용 시그널 없음).
 	BattleManager.enemy_damaged.connect(func(_i, _a, _t, is_crit) -> void:
@@ -5078,6 +5084,28 @@ func _tut_notify(event: String) -> void:
 func _on_tutorial_lesson_completed() -> void:
 	if GameManager.tutorial_lesson_id != "":
 		ProgressManager.complete_tutorial(GameManager.tutorial_lesson_id)
+
+# 현재 스텝 허용 카드만 사용 가능 + 빛남, 나머지는 비활성.
+func _apply_tutorial_card_state(node: Control, card_res: Resource) -> void:
+	var allowed: Array = _tutorial_driver.current_allowed_cards()
+	if not allowed.is_empty() and card_res.card_name in allowed:
+		node.set_owner_dead(false)
+		node.set_disabled(false)
+		node.set_glow_color(SacredPalette.BRASS_400)
+		node.start_glow_pulse(Color(1.0, 0.85, 0.3), Color(0.96, 0.93, 0.85), 1.1)
+		node.show_glow(1.4)
+	else:
+		node.set_disabled(true)
+		node.stop_glow_pulse()
+		node.hide_glow()
+
+# 스텝 변경 시 현재 손패 카드들의 게이팅을 재적용.
+func _refresh_tutorial_card_gating() -> void:
+	for node in _card_buttons:
+		if is_instance_valid(node):
+			var cr = node.get_meta("_card_res", null)
+			if cr != null:
+				_apply_card_state(node, cr)
 
 func _on_battle_lost() -> void:
 	if _lose_played:
