@@ -83,6 +83,7 @@ var _energy_label: Label
 var _energy_hbox: HBoxContainer
 var _end_turn_btn: TextureButton
 var _message_label: Label
+var _tutorial_driver = null  # 튜토리얼 모드일 때만 생성 (TutorialDriver)
 var _relic_container: FlowContainer
 var _turn_queue_box: HBoxContainer
 var _turn_queue_slots: Array = []  # 각 슬롯: {root: PanelContainer, swatch: ColorRect, label: Label}
@@ -1279,6 +1280,8 @@ func _start_battle() -> void:
 		_setup_enemies()
 		await _play_battle_intro()
 		BattleManager.start_player_turn()
+		if GameManager.tutorial_lesson_id != "":
+			_init_tutorial(GameManager.tutorial_lesson_id)
 	else:
 		_start_test_battle()  # GameManager 없이 단독 실행 시 폴백
 
@@ -2273,6 +2276,7 @@ func _on_end_turn_pressed() -> void:
 	_selected_card = null
 	_message_label.text = ""
 	_set_end_turn_btn_disabled(true)
+	if _tutorial_driver: _tutorial_driver.notify("turn_ended")
 	BattleManager.end_player_turn()
 
 func _on_player_turn_started() -> void:
@@ -5017,6 +5021,16 @@ func _on_battle_won() -> void:
 	_message_label.text = tr("battle.msg_victory")
 	_spawn_banner_icon(IconUtils.get_toast_icon("victory"), [Color(1.0, 0.89, 0.48), Color(0.88, 0.6, 0.12)], Vector2(WINDOW_W / 2.0, 132.0), 92.0, 1.5)
 	_set_end_turn_btn_disabled(true)
+	# 튜토리얼 승리 — 정규 보상 흐름 대신 레슨 완료 처리 후 레슨 선택으로 복귀
+	if GameManager.tutorial_lesson_id != "":
+		BattleManager.tutorial_force_crit = false
+		if _tutorial_driver: _tutorial_driver.notify("battle_won")
+		ProgressManager.complete_tutorial(GameManager.tutorial_lesson_id)
+		GameManager.tutorial_lesson_id = ""
+		await get_tree().create_timer(1.5).timeout
+		if is_inside_tree():
+			SceneTransition.go("res://scenes/tutorial/tutorial_select_scene.tscn")
+		return
 	_selected_card = null
 	# 드래그 중 전투 종료 시 마우스 hidden 잔존 방지 — 드래그 정리
 	if _drag_card != null:
@@ -5040,6 +5054,30 @@ func _on_battle_won() -> void:
 		_cleanup_drag()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	GameManager.complete_battle(true)
+
+# 튜토리얼 부트스트랩 — 드라이버 오버레이 생성 + BattleManager 시그널 브리지.
+func _init_tutorial(lesson_id: String) -> void:
+	var LB = load("res://scenes/tutorial/lessons/lesson_basics.gd")
+	var TD = load("res://scenes/tutorial/tutorial_driver.gd")
+	_tutorial_driver = TD.new()
+	add_child(_tutorial_driver)
+	_tutorial_driver.lesson_completed.connect(_on_tutorial_lesson_completed)
+	_tutorial_driver.start(LB.steps())
+	# 시그널 브리지 — BattleManager 이벤트 → driver.notify (battle_scene 해제 시 자동 disconnect)
+	# 카드 사용 감지는 _finish_drag 의 play_card 지점에서 _tut_notify 로 직접 처리 (전용 시그널 없음).
+	BattleManager.enemy_damaged.connect(func(_i, _a, _t, is_crit) -> void:
+		if is_crit and _tutorial_driver: _tutorial_driver.notify("crit_landed"))
+	# 레슨 동안 치명타 확정 (치명타 시연 스텝 보장)
+	BattleManager.tutorial_force_crit = true
+
+# 튜토리얼 드라이버에 이벤트 전달 (드라이버 없으면 무시).
+func _tut_notify(event: String) -> void:
+	if _tutorial_driver:
+		_tutorial_driver.notify(event)
+
+func _on_tutorial_lesson_completed() -> void:
+	if GameManager.tutorial_lesson_id != "":
+		ProgressManager.complete_tutorial(GameManager.tutorial_lesson_id)
 
 func _on_battle_lost() -> void:
 	if _lose_played:
@@ -6209,7 +6247,8 @@ func _finish_drag(drop_pos: Vector2) -> void:
 					continue
 				if panel.get_global_rect().has_point(drop_pos):
 					_last_card_play_pos = drop_pos
-					BattleManager.play_card(_drag_card, i)
+					if BattleManager.play_card(_drag_card, i):
+						_tut_notify("card_played")
 					_cleanup_drag()
 					return
 			_cleanup_drag()
@@ -6222,7 +6261,8 @@ func _finish_drag(drop_pos: Vector2) -> void:
 					continue
 				if entry["panel"].get_global_rect().has_point(drop_pos):
 					_last_card_play_pos = drop_pos
-					BattleManager.play_card(_drag_card, -1, hero_id)
+					if BattleManager.play_card(_drag_card, -1, hero_id):
+						_tut_notify("card_played")
 					_cleanup_drag()
 					return
 			_cleanup_drag()
@@ -6235,12 +6275,14 @@ func _finish_drag(drop_pos: Vector2) -> void:
 					continue
 				if entry["panel"].get_global_rect().has_point(drop_pos):
 					_last_card_play_pos = drop_pos
-					BattleManager.play_card(_drag_card, -1, hero_id)
+					if BattleManager.play_card(_drag_card, -1, hero_id):
+						_tut_notify("card_played")
 					_cleanup_drag()
 					return
 			_cleanup_drag()
 		"none":
-			BattleManager.play_card(_drag_card, -1)
+			if BattleManager.play_card(_drag_card, -1):
+				_tut_notify("card_played")
 			_cleanup_drag()
 
 func _cleanup_drag() -> void:

@@ -112,6 +112,7 @@ func _build_ui() -> void:
 	if SaveManager.has_save():
 		_add_ledger_row(rows, "%02d" % idx, tr("ui.main_menu.continue"), "", true, _on_continue); idx += 1
 	_add_ledger_row(rows, "%02d" % idx, tr("ui.main_menu.codex"), _codex_meta(), false, _on_codex); idx += 1
+	_add_ledger_row(rows, "%02d" % idx, tr("tutorial.menu.entry"), "", false, _on_tutorial); idx += 1
 	_add_ledger_row(rows, "%02d" % idx, tr("ui.main_menu.credits"), "", false, _on_credits); idx += 1
 	_add_ledger_row(rows, "%02d" % idx, tr("ui.main_menu.quit"), "", false, _on_quit)
 
@@ -230,6 +231,9 @@ func _on_codex() -> void:
 	var ov := CodexOverlayScene.instantiate()
 	ov.name = "CodexOverlay"
 	add_child(ov)
+
+func _on_tutorial() -> void:
+	SceneTransition.go("res://scenes/tutorial/tutorial_select_scene.tscn")
 
 func _on_credits() -> void:
 	if get_node_or_null("CreditsOverlay") != null:
