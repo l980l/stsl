@@ -5116,19 +5116,22 @@ func _refresh_tutorial_card_gating() -> void:
 
 var _endturn_pulse_tween: Tween = null
 
-# 튜토리얼 — 턴 종료 버튼을 황동빛으로 깜빡여 "여기를 누르라" 강조.
+# 튜토리얼 — 턴 종료 버튼을 황동 틴트 + 스케일 펄스(커졌다 작아짐)로 분명하게 "여기를 누르라" 강조.
 func _set_endturn_highlight(on: bool) -> void:
 	if _end_turn_btn == null:
 		return
 	if _endturn_pulse_tween != null and _endturn_pulse_tween.is_valid():
 		_endturn_pulse_tween.kill()
 		_endturn_pulse_tween = null
-	if on:
-		_endturn_pulse_tween = create_tween().set_loops()
-		_endturn_pulse_tween.tween_property(_end_turn_btn, "self_modulate", Color(1.0, 0.82, 0.28), 0.6).set_trans(Tween.TRANS_SINE)
-		_endturn_pulse_tween.tween_property(_end_turn_btn, "self_modulate", Color.WHITE, 0.6).set_trans(Tween.TRANS_SINE)
-	else:
+	if not on:
 		_end_turn_btn.self_modulate = Color.WHITE
+		_end_turn_btn.scale = Vector2.ONE
+		return
+	_end_turn_btn.pivot_offset = _end_turn_btn.size / 2.0  # 가운데 기준 스케일
+	_end_turn_btn.self_modulate = Color(1.0, 0.82, 0.28)
+	_endturn_pulse_tween = create_tween().set_loops()
+	_endturn_pulse_tween.tween_property(_end_turn_btn, "scale", Vector2(1.3, 1.3), 0.5).set_trans(Tween.TRANS_SINE)
+	_endturn_pulse_tween.tween_property(_end_turn_btn, "scale", Vector2(1.0, 1.0), 0.5).set_trans(Tween.TRANS_SINE)
 
 func _on_battle_lost() -> void:
 	if _lose_played:

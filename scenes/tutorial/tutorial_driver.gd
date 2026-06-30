@@ -43,8 +43,8 @@ func _start_breathe() -> void:
 	var c_gold: Color = SacredPalette.BRASS_300
 	_label.add_theme_color_override("font_color", c_white)
 	_breathe_tween = create_tween().set_loops()
-	_breathe_tween.tween_property(_label, "theme_override_colors/font_color", c_gold, 1.4).set_trans(Tween.TRANS_SINE)
-	_breathe_tween.tween_property(_label, "theme_override_colors/font_color", c_white, 1.4).set_trans(Tween.TRANS_SINE)
+	_breathe_tween.tween_property(_label, "theme_override_colors/font_color", c_gold, 0.5).set_trans(Tween.TRANS_SINE)
+	_breathe_tween.tween_property(_label, "theme_override_colors/font_color", c_white, 0.5).set_trans(Tween.TRANS_SINE)
 
 func _stop_breathe() -> void:
 	if _breathe_tween != null and _breathe_tween.is_valid():
