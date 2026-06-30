@@ -82,6 +82,7 @@ var _enemy_char_nodes: Array = []      # index → Node2D
 var _energy_label: Label
 var _energy_hbox: HBoxContainer
 var _end_turn_btn: TextureButton
+var _deck_btn: TextureButton  # 덱 보기 버튼 — 튜토리얼 잠금 대상
 var _message_label: Label
 var _tutorial_driver = null  # 튜토리얼 모드일 때만 생성 (TutorialDriver)
 var _relic_container: FlowContainer
@@ -385,6 +386,7 @@ func _build_ui() -> void:
 	deck_btn.pressed.connect(_show_deck_viewer_in_battle)
 	add_child(deck_btn)
 	_attach_icon_hover_anim(deck_btn)
+	_deck_btn = deck_btn
 
 	_end_turn_btn = TextureButton.new()
 	_end_turn_btn.texture_normal = load("res://assets/art/ui/icons/end-turn-skip.svg")
@@ -2298,6 +2300,9 @@ func _on_player_turn_started() -> void:
 	_energy_label.text = "%d/%d" % [DeckManager.get_energy(cur_hid), DeckManager.MAX_ENERGY]
 	# 본인 영웅 핸드 표시 (start_hero_turn 가 드로우 완료)
 	_refresh_hand()
+	# 튜토리얼 — 턴 시작이 핸드/턴종료 버튼을 초기화하므로 게이팅 재적용 (end_turn 재잠금)
+	if _tutorial_driver != null and not _tutorial_driver.is_finished():
+		_refresh_tutorial_card_gating()
 	_refresh_turn_queue_widget()
 	# 영웅 블록 UI 갱신
 	for entry in _hero_nodes:
@@ -5067,6 +5072,10 @@ func _init_tutorial(lesson_id: String) -> void:
 	add_child(_tutorial_driver)
 	_tutorial_driver.lesson_completed.connect(_on_tutorial_lesson_completed)
 	_tutorial_driver.step_changed.connect(_refresh_tutorial_card_gating)
+	# 덱 보기 버튼 — 레슨 동안 잠금 (튜토리얼 흐름 외 UI 차단)
+	if _deck_btn != null:
+		_deck_btn.disabled = true
+		_deck_btn.self_modulate = Color(1, 1, 1, 0.4)
 	_tutorial_driver.start(LB.steps())
 	_refresh_tutorial_card_gating()
 	# 시그널 브리지 — BattleManager 이벤트 → driver.notify (battle_scene 해제 시 자동 disconnect)
@@ -5111,8 +5120,14 @@ func _refresh_tutorial_card_gating() -> void:
 			var cr = node.get_meta("_card_res", null)
 			if cr != null:
 				_apply_card_state(node, cr)
-	# 카드 없이 턴 종료해야 하는 스텝이면 턴 종료 버튼 강조
-	_set_endturn_highlight(step.get("complete_event", "") == "turn_ended")
+	# 턴 종료 버튼 — 턴 종료 스텝에서만 활성+강조, 카드 지정 스텝에선 잠금(스킵 방지).
+	var is_endturn: bool = step.get("complete_event", "") == "turn_ended"
+	if is_endturn:
+		_set_end_turn_btn_disabled(false)
+		_set_endturn_highlight(true)
+	else:
+		_set_endturn_highlight(false)
+		_set_end_turn_btn_disabled(true)
 
 var _endturn_pulse_tween: Tween = null
 
