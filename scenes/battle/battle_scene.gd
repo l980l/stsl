@@ -5066,7 +5066,10 @@ func _on_battle_won() -> void:
 
 # 튜토리얼 부트스트랩 — 드라이버 오버레이 생성 + BattleManager 시그널 브리지.
 func _init_tutorial(lesson_id: String) -> void:
-	var LB = load("res://scenes/tutorial/lessons/lesson_basics.gd")
+	var _lesson_path := "res://scenes/tutorial/lessons/lesson_%s.gd" % lesson_id
+	if not ResourceLoader.exists(_lesson_path):
+		return
+	var LB = load(_lesson_path)
 	var TD = load("res://scenes/tutorial/tutorial_driver.gd")
 	_tutorial_driver = TD.new()
 	add_child(_tutorial_driver)
@@ -5082,6 +5085,9 @@ func _init_tutorial(lesson_id: String) -> void:
 	# 카드 사용 감지는 _finish_drag 의 play_card 지점에서 _tut_notify 로 직접 처리 (전용 시그널 없음).
 	BattleManager.enemy_damaged.connect(func(_i, _a, _t, is_crit) -> void:
 		if is_crit and _tutorial_driver: _tutorial_driver.notify("crit_landed"))
+	# 카운터 발동 — is_major(차지 무효) 시 counter_major, 아니면 counter_reflect
+	BattleManager.counter_triggered.connect(func(_h, _e, is_major) -> void:
+		if _tutorial_driver: _tutorial_driver.notify("counter_major" if is_major else "counter_reflect"))
 	# 치명타 확정은 스텝 단위로 제어 (s4_crit 스텝에서만) — _refresh_tutorial_card_gating 참고
 
 # 튜토리얼 드라이버에 이벤트 전달 (드라이버 없으면 무시).

@@ -8,7 +8,7 @@ const MONO_FONT := preload("res://assets/fonts/SpaceMono-Regular.ttf")
 # 레슨 목록 — basics 만 활성, 나머지는 준비 중(잠금).
 const LESSONS := [
 	{"num": "01", "name": "tutorial.lesson.basics.name", "desc": "tutorial.lesson.basics.desc", "meta": "tutorial.lesson.basics.meta", "id": "basics"},
-	{"num": "02", "name": "tutorial.lesson.counter.name", "desc": "tutorial.lesson.counter.desc", "meta": "", "id": ""},
+	{"num": "02", "name": "tutorial.lesson.counter.name", "desc": "tutorial.lesson.counter.desc", "meta": "tutorial.lesson.counter.meta", "id": "counter"},
 	{"num": "03", "name": "tutorial.lesson.status.name", "desc": "tutorial.lesson.status.desc", "meta": "", "id": ""},
 	{"num": "04", "name": "tutorial.lesson.team.name", "desc": "tutorial.lesson.team.desc", "meta": "", "id": ""},
 ]

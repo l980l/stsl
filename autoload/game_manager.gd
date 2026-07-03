@@ -233,7 +233,11 @@ func _make_hero_by_id(hero_id: String) -> Resource:
 
 # 튜토리얼 레슨 부팅 — 영웅/덱/적을 코드로 세팅 후 battle_scene 진입.
 func start_tutorial(lesson_id: String) -> void:
-	var LB = load("res://scenes/tutorial/lessons/lesson_basics.gd")
+	# 레슨 스크립트는 lesson_<id>.gd 규칙 — id 로 자동 디스패치.
+	var _lesson_path := "res://scenes/tutorial/lessons/lesson_%s.gd" % lesson_id
+	if not ResourceLoader.exists(_lesson_path):
+		return
+	var LB = load(_lesson_path)
 	reset()
 	var tm := _get_tm()
 	if tm: tm.clear()
