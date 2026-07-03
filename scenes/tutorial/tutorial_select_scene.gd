@@ -9,7 +9,7 @@ const MONO_FONT := preload("res://assets/fonts/SpaceMono-Regular.ttf")
 const LESSONS := [
 	{"num": "01", "name": "tutorial.lesson.basics.name", "desc": "tutorial.lesson.basics.desc", "meta": "tutorial.lesson.basics.meta", "id": "basics"},
 	{"num": "02", "name": "tutorial.lesson.counter.name", "desc": "tutorial.lesson.counter.desc", "meta": "tutorial.lesson.counter.meta", "id": "counter"},
-	{"num": "03", "name": "tutorial.lesson.status.name", "desc": "tutorial.lesson.status.desc", "meta": "", "id": ""},
+	{"num": "03", "name": "tutorial.lesson.status.name", "desc": "tutorial.lesson.status.desc", "meta": "tutorial.lesson.status.meta", "id": "status"},
 	{"num": "04", "name": "tutorial.lesson.team.name", "desc": "tutorial.lesson.team.desc", "meta": "", "id": ""},
 ]
 
