@@ -11,6 +11,9 @@ func save() -> void:
 	var _dm = get_node_or_null("/root/DeckManager")
 	if _gm == null or _tm == null or _dm == null:
 		return
+	# Practice battles must never overwrite the player's resumable run.
+	if _gm.tutorial_lesson_id != "":
+		return
 	var data := {
 		"version": 2,
 		"game_manager": _gm.to_dict(),

@@ -236,7 +236,7 @@ func test_crit_roll_base_rate_no_mark() -> void:
 	var bm := _make_bm()
 	var crits := 0
 	for _i in range(1000):
-		var r: Dictionary = bm._roll_crit_damage(100, false)
+		var r: Dictionary = bm._roll_crit(0, false)
 		if r["is_crit"]:
 			crits += 1
 	# 5% 기본 → 1000회 ≈ 50 (±25 허용)
@@ -248,7 +248,7 @@ func test_crit_roll_higher_rate_with_mark() -> void:
 	var bm := _make_bm()
 	var crits := 0
 	for _i in range(1000):
-		var r: Dictionary = bm._roll_crit_damage(100, true)
+		var r: Dictionary = bm._roll_crit(0, true)
 		if r["is_crit"]:
 			crits += 1
 	# 35% (5% + 30% mark bonus) → 1000회 ≈ 350 (±50 허용)
@@ -262,14 +262,14 @@ func test_crit_doubles_damage_when_triggered() -> void:
 	var saw_crit: bool = false
 	var saw_normal: bool = false
 	for _i in range(100):
-		var r: Dictionary = bm._roll_crit_damage(100, true)
+		var r: Dictionary = bm._roll_crit(0, true)
 		if r["is_crit"]:
 			saw_crit = true
-			_assert(r["dmg"] == 200, "crit 시 dmg 100 → 200")
+			_assert(r["crit_mult"] == 2.0, "crit 시 배율 ×2")
 			if saw_normal: break
 		else:
 			saw_normal = true
-			_assert(r["dmg"] == 100, "non-crit 시 dmg 100 그대로")
+			_assert(r["crit_mult"] == 1.0, "non-crit 시 배율 ×1")
 			if saw_crit: break
 	_assert(saw_crit and saw_normal, "100회 굴림으로 crit + non-crit 모두 관찰")
 

@@ -226,9 +226,9 @@ func test_poison_tick_enemy() -> void:
 	bm._enemy_status[0]["poison_dmg"] = 3
 	bm._enemy_status[0]["poison_dur"] = 3
 
-	# 적 독은 내 사후턴에 틱 → _phase_player_post 직접 호출
-	bm._phase_player_post()
-	_assert(bm.get_enemy_hp(0) == 170, "독 3dmg 틱 → 3×10=30 피해 → HP 200 → 170")
+	# 현재 시스템은 적 자신의 턴 시작에 독이 1회 틱한다.
+	bm._tick_enemy_poison(0)
+	_assert(bm.get_enemy_hp(0) == 197, "독 3dmg 틱 → HP 200 → 197")
 	_assert(bm._enemy_status[0].get("poison_dur", -1) == 2, "독 지속 3 → 2")
 
 func test_poison_tick_hero() -> void:
@@ -239,9 +239,9 @@ func test_poison_tick_hero() -> void:
 	bm._hero_status["napoleon"] = {"poison_dmg": 4, "poison_dur": 3}
 	bm.is_battle_active = true
 
-	# 영웅 독은 적 사후턴에 틱 → _phase_enemy_post 직접 호출
-	bm._phase_enemy_post()
-	_assert(bm.team_mgr.get_current_hp("napoleon") == 30, "독 4dmg 틱 → 4×10=40 피해 → HP 70 → 30")
+	# 현재 시스템은 해당 영웅 차례 시작에 독이 1회 틱한다.
+	bm._tick_hero_poison("napoleon")
+	_assert(bm.team_mgr.get_current_hp("napoleon") == 66, "독 4dmg 틱 → HP 70 → 66")
 	_assert(bm._hero_status["napoleon"].get("poison_dur", -1) == 2, "독 지속 3 → 2")
 
 func test_enemy_turn_attacks_hero() -> void:
@@ -876,7 +876,7 @@ func test_draw_per_enthrall_fires() -> void:
 	bm.start_player_turn()
 	# deck에 더미 카드 충분히 추가
 	for _i in range(5):
-		bm.deck_mgr.deck.append(_make_card("cleopatra", 0, []))
+		bm.deck_mgr._heroes["cleopatra"]["draw"].append(_make_card("cleopatra", 0, []))
 	# 클레오파트라의 입맞춤: CHARM 100 SINGLE + DRAW_PER_ENTHRALL 2
 	var ea := EffectRes.new()
 	ea.effect_type = EffectRes.EffectType.CHARM

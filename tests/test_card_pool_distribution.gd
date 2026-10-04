@@ -5,6 +5,7 @@ extends RefCounted
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_napoleon_rarity_distribution()
@@ -18,6 +19,10 @@ func run_all() -> Dictionary:
 	test_genghis_archetype_distribution()
 	test_musashi_rarity_distribution()
 	test_musashi_archetype_distribution()
+	for node in _to_free:
+		if is_instance_valid(node):
+			node.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
 
 func _assert(cond: bool, msg: String) -> void:
@@ -29,7 +34,9 @@ func _assert(cond: bool, msg: String) -> void:
 		print("  FAIL: " + msg)
 
 func _load_gm():
-	return load("res://autoload/game_manager.gd").new()
+	var gm = load("res://autoload/game_manager.gd").new()
+	_to_free.append(gm)
+	return gm
 
 func _count_rarities(pool: Array) -> Dictionary:
 	var counts := {"COMMON": 0, "UNCOMMON": 0, "RARE": 0, "LEGENDARY": 0, "DIVINE": 0}

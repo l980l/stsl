@@ -258,6 +258,7 @@ func test_discard_random() -> void:
 	dm.discard_random(2)
 	_assert(dm.hand.size() == 1, "discard_random(2) 후 hand 1장 남음")
 	_assert(dm.discard_pile.size() == 2, "discard_pile에 2장 추가")
+	dm.free()
 
 # ──────────────────────────────────────────────
 # Act 2 적 테스트
@@ -399,6 +400,7 @@ func test_act2_osiris_phase_transition_heals() -> void:
 func test_act2_gm_act_switch() -> void:
 	print("[TestEnemies] test_act2_gm_act_switch")
 	var gm := GameManagerClass.new()
+	_to_free.append(gm)
 	gm.act_mythologies = ["greek", "egyptian"]
 	gm.current_act = 1
 	var boss_act1 := gm._make_boss_enemies()
@@ -595,6 +597,7 @@ func test_mythology_randomization_structure() -> void:
 	print("[TestEnemies] test_mythology_randomization_structure")
 	# mythology 목록이 항상 3종 포함 + 중복 없음을 확인
 	var gm := GameManagerClass.new()
+	_to_free.append(gm)
 	gm.reset()
 	_assert(gm.act_mythologies.size() == 3, "act_mythologies 항상 3개")
 	_assert(gm.act_mythologies.has("greek"), "그리스 포함")

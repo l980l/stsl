@@ -101,6 +101,13 @@ var _test_tm_override: Object = null
 var _test_dm_override: Object = null
 var _test_bm_override: Object = null
 
+# SceneTree 밖에서 실행되는 단위 테스트에서도 root 경로 조회 오류를 내지 않는 autoload 접근.
+func _get_autoload(name: String) -> Node:
+	var ml := Engine.get_main_loop()
+	if ml and ml.root:
+		return ml.root.get_node_or_null(name)
+	return null
+
 func _get_tm() -> Object:
 	if _test_tm_override:
 		return _test_tm_override
@@ -151,7 +158,7 @@ func add_relic(relic: Resource) -> void:
 	relic_added.emit(relic)
 	# 도감 — 렐릭 획득(보유) 기록
 	if relic != null and relic.relic_name != "":
-		var pm := get_node_or_null("/root/ProgressManager")
+		var pm := _get_autoload("ProgressManager")
 		if pm != null:
 			pm.discover_relic(relic.relic_name)
 	# PASSIVE 렐릭은 즉시 1회 적용 (영구 효과). trigger_relics(PASSIVE) 호출은
@@ -221,7 +228,7 @@ func start_run(initial_hero_id: String = "napoleon", chapter: int = 1) -> void:
 		if node.floor_num == 0:
 			available_node_ids.append(node.node_id)
 	# 스토리: 런(각성) 카운트 증가 + 오버레이 가드 리셋
-	var _pm = get_node_or_null("/root/ProgressManager")
+	var _pm = _get_autoload("ProgressManager")
 	if _pm:
 		_pm.increment_run_count()
 	_awakening_shown_run = false
@@ -249,6 +256,7 @@ func start_tutorial(lesson_id: String) -> void:
 		for c in LB.build_deck():
 			dm.add_card_to_deck(c)
 	pending_enemies = [LB.build_enemy()]
+	act_mythologies = [pending_enemies[0].mythology]
 	tutorial_lesson_id = lesson_id
 	change_state(GameState.BATTLE)
 	_request_scene("res://scenes/battle/battle_scene.tscn")
@@ -256,7 +264,7 @@ func start_tutorial(lesson_id: String) -> void:
 # 스토리 라인 i18n 키 선택 — 풀 하이브리드(포화 없음):
 #   awakening 첫 런 → .first / 4런+ 낮은 확률 → .deepN / 그 외 → 에버그린 .eN 랜덤(직전 반복 회피)
 func pick_story_key(surface: String) -> String:
-	var pm = get_node_or_null("/root/ProgressManager")
+	var pm = _get_autoload("ProgressManager")
 	var rc: int = pm.run_count if pm else 1
 	if surface == "awakening" and rc <= 1:
 		return "story.awakening.first"
@@ -323,7 +331,7 @@ func complete_battle(won: bool) -> void:
 		# 룸 타입별 카드 보상 수량 및 보스 릴릭 처리
 		if current_node_id >= 0 and current_node_id < run_map.size():
 			var node: Resource = run_map[current_node_id]
-			var pm = get_node_or_null("/root/ProgressManager")
+			var pm = _get_autoload("ProgressManager")
 			match node.room_type:
 				_MapNodeRes.RoomType.ELITE:
 					card_rewards_pick_count = 2
@@ -363,7 +371,7 @@ func complete_battle(won: bool) -> void:
 	else:
 		run_won = false
 		run_ended.emit(false)
-		var _sm_fail = get_node_or_null("/root/SaveManager")
+		var _sm_fail = _get_autoload("SaveManager")
 		if _sm_fail:
 			_sm_fail.clear_save()
 		change_state(GameState.GAME_OVER)
@@ -578,10 +586,10 @@ func _start_next_act() -> void:
 func _end_run_won() -> void:
 	run_won = true
 	run_ended.emit(true)
-	var _sm = get_node_or_null("/root/SaveManager")
+	var _sm = _get_autoload("SaveManager")
 	if _sm:
 		_sm.clear_save()
-	var _pm = get_node_or_null("/root/ProgressManager")
+	var _pm = _get_autoload("ProgressManager")
 	if _pm:
 		_pm.mark_chapter_cleared(current_chapter)
 		_pm.check_unlock_conditions()
@@ -743,6 +751,13 @@ func _scene_for(_myth: String, _fn_name: String) -> PackedScene:
 	return load("res://characters/enemies/enemy_placeholder.tscn")
 
 func _make_normal_enemies() -> Array:
+	# 이벤트 전투·단위 테스트처럼 런 초기화 없이 호출되는 경로도 안전하게 처리.
+	if current_act < 1 or act_mythologies.size() < current_act:
+		act_mythologies = _get_chapter_mythology_pool(current_chapter)
+		act_mythologies.shuffle()
+	if act_mythologies.size() < current_act:
+		push_warning("일반 적 생성용 신화 풀이 비어 있습니다")
+		return []
 	var myth: String = act_mythologies[current_act - 1]
 	var reg: Dictionary = _get_mythology_registry()
 	var normals_mod = reg[myth]["normals"]
@@ -868,7 +883,7 @@ func _recruit_hero_pool() -> Array:
 	var existing := []
 	for h in tm.heroes:
 		existing.append(h.hero_id)
-	var pm = get_node_or_null("/root/ProgressManager")
+	var pm = _get_autoload("ProgressManager")
 	var pool := []
 	for hid in _HeroRegistry.all_hero_ids():
 		if hid in existing:
@@ -961,6 +976,7 @@ func to_dict() -> Dictionary:
 	}
 
 func from_dict(data: Dictionary) -> void:
+	tutorial_lesson_id = ""
 	current_chapter = data.get("current_chapter", 1)
 	current_act = data.get("current_act", 1)
 	current_floor = data.get("current_floor", 0)
@@ -985,10 +1001,10 @@ func _request_scene(path: String) -> void:
 	if is_inside_tree():
 		# 맵으로 돌아갈 때 저장
 		if path == "res://scenes/map/map_scene.tscn" and not run_map.is_empty():
-			var _sm = get_node_or_null("/root/SaveManager")
+			var _sm = _get_autoload("SaveManager")
 			if _sm:
 				_sm.save()
-		var _st := get_node_or_null("/root/SceneTransition")
+		var _st := _get_autoload("SceneTransition")
 		if _st:
 			_st.go(path)
 

@@ -6,6 +6,7 @@ const PM = preload("res://autoload/progress_manager.gd")
 
 var passed: int = 0
 var failed: int = 0
+var _to_free: Array = []
 
 func run_all() -> Dictionary:
 	test_default_unlocked_heroes()
@@ -21,7 +22,16 @@ func run_all() -> Dictionary:
 	test_evaluate_flag_prefix_condition()
 	test_evaluate_threshold_condition()
 	test_check_unlock_conditions_unlocks_default_heroes()
+	for node in _to_free:
+		if is_instance_valid(node):
+			node.free()
+	_to_free.clear()
 	return {"passed": passed, "failed": failed}
+
+func _new_pm() -> Node:
+	var pm := PM.new()
+	_to_free.append(pm)
+	return pm
 
 func _assert(cond: bool, msg: String) -> void:
 	if cond:
@@ -33,7 +43,7 @@ func _assert(cond: bool, msg: String) -> void:
 
 func test_default_unlocked_heroes() -> void:
 	print("[TestProgressManager] test_default_unlocked_heroes")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	_assert(pm.is_hero_unlocked("napoleon"), "나폴레옹 기본 해금")
 	_assert(pm.is_hero_unlocked("cleopatra"), "클레오파트라 기본 해금")
@@ -42,7 +52,7 @@ func test_default_unlocked_heroes() -> void:
 
 func test_mark_chapter_cleared_dedup() -> void:
 	print("[TestProgressManager] test_mark_chapter_cleared_dedup")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	pm.chapters_cleared.clear()
 	pm.mark_chapter_cleared(1)
@@ -51,7 +61,7 @@ func test_mark_chapter_cleared_dedup() -> void:
 
 func test_is_chapter_unlocked() -> void:
 	print("[TestProgressManager] test_is_chapter_unlocked")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	pm.chapters_cleared.clear()
 	_assert(pm.is_chapter_unlocked(1), "챕터 1은 항상 해금")
@@ -61,7 +71,7 @@ func test_is_chapter_unlocked() -> void:
 
 func test_unlock_hero_returns_false_if_duplicate() -> void:
 	print("[TestProgressManager] test_unlock_hero_returns_false_if_duplicate")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	var first = pm.unlock_hero("jeanne_darc")
 	var second = pm.unlock_hero("jeanne_darc")
@@ -71,7 +81,7 @@ func test_unlock_hero_returns_false_if_duplicate() -> void:
 
 func test_unlock_flags_roundtrip() -> void:
 	print("[TestProgressManager] test_unlock_flags_roundtrip")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	_assert(not pm.has_flag("killed_hydra"), "초기값 false")
 	pm.unlock_flags["killed_hydra"] = true
@@ -79,14 +89,14 @@ func test_unlock_flags_roundtrip() -> void:
 
 func test_to_dict_from_dict_roundtrip() -> void:
 	print("[TestProgressManager] test_to_dict_from_dict_roundtrip")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	pm.chapters_cleared.append(1)
 	pm.unlocked_heroes.append("jeanne_darc")
 	pm.unlock_flags["killed_hydra"] = true
 
 	var d = pm.to_dict()
-	var pm2 = PM.new()
+	var pm2 = _new_pm()
 	pm2.from_dict(d)
 	_assert(pm2.chapters_cleared == [1], "chapters_cleared 복원")
 	_assert("jeanne_darc" in pm2.unlocked_heroes, "unlocked_heroes 복원")
@@ -94,7 +104,7 @@ func test_to_dict_from_dict_roundtrip() -> void:
 
 func test_increment_flag_accumulates() -> void:
 	print("[TestProgressManager] test_increment_flag_accumulates")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	pm.increment_flag("elite_kills_total")
 	pm.increment_flag("elite_kills_total")
@@ -103,20 +113,20 @@ func test_increment_flag_accumulates() -> void:
 
 func test_get_flag_int_defaults_to_zero() -> void:
 	print("[TestProgressManager] test_get_flag_int_defaults_to_zero")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	_assert(pm.get_flag_int("nonexistent") == 0, "미등록 키 기본값 0")
 
 func test_evaluate_default_condition() -> void:
 	print("[TestProgressManager] test_evaluate_default_condition")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	_assert(pm._evaluate_condition("default"), "default 조건은 항상 참")
 	_assert(pm._evaluate_condition(""), "빈 문자열도 항상 참")
 
 func test_evaluate_clear_chapter_condition() -> void:
 	print("[TestProgressManager] test_evaluate_clear_chapter_condition")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	pm.chapters_cleared.clear()
 	_assert(not pm._evaluate_condition("clear_chapter_1"), "챕터 미클리어 시 false")
@@ -125,7 +135,7 @@ func test_evaluate_clear_chapter_condition() -> void:
 
 func test_evaluate_flag_prefix_condition() -> void:
 	print("[TestProgressManager] test_evaluate_flag_prefix_condition")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	_assert(not pm._evaluate_condition("flag:kill_boss:hydra"), "플래그 미설정 시 false")
 	pm.set_flag("kill_boss:hydra")
@@ -133,7 +143,7 @@ func test_evaluate_flag_prefix_condition() -> void:
 
 func test_evaluate_threshold_condition() -> void:
 	print("[TestProgressManager] test_evaluate_threshold_condition")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	_assert(not pm._evaluate_condition("elite_kills_total>=10"), "카운터 부족 시 false")
 	pm.increment_flag("elite_kills_total", 10)
@@ -142,7 +152,7 @@ func test_evaluate_threshold_condition() -> void:
 
 func test_check_unlock_conditions_unlocks_default_heroes() -> void:
 	print("[TestProgressManager] test_check_unlock_conditions_unlocks_default_heroes")
-	var pm = PM.new()
+	var pm = _new_pm()
 	pm.reset_progress()
 	pm.unlocked_heroes.clear()
 	_assert(not pm.is_hero_unlocked("napoleon"), "초기 클리어 후 미해금 상태")

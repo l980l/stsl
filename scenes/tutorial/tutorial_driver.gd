@@ -5,16 +5,25 @@ extends CanvasLayer
 
 signal lesson_completed
 signal step_changed  # 현재 스텝이 바뀔 때마다 (battle_scene 이 카드 게이팅 재적용)
+signal exit_requested
 
 var _steps: Array = []
 var _idx: int = -1
+var _completed: bool = false
 var _label: Label = null
+var _progress_label: Label = null
 var _msg_bg: TextureRect = null
 var _breathe_tween: Tween = null
 var _click_catcher: Control = null
+var _exit_button: Button = null
+var _exit_enabled: bool = false
 
 func _ready() -> void:
 	layer = 60
+	if is_inside_tree():
+		var locale_manager := get_node_or_null("/root/LocaleManager")
+		if locale_manager != null:
+			locale_manager.locale_changed.connect(_on_locale_changed)
 	# 화면 클릭 캐처 — complete_event == "screen_clicked" 스텝에서만 STOP(클릭 가로채 다음으로),
 	# 그 외 스텝에선 IGNORE 로 게임 입력을 통과시킨다. 라벨/배경보다 뒤(아래)에 둬 시각은 가리지 않음.
 	_click_catcher = Control.new()
@@ -37,27 +46,57 @@ func _ready() -> void:
 	_msg_bg.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_msg_bg.offset_left = -660
 	_msg_bg.offset_right = 660
-	_msg_bg.offset_top = 146
-	_msg_bg.offset_bottom = 266
+	_msg_bg.offset_top = 124
+	_msg_bg.offset_bottom = 292
 	add_child(_msg_bg)
 	_msg_bg.visible = false
+	_progress_label = Label.new()
+	_progress_label.theme_type_variation = "EyebrowLabel"
+	_progress_label.add_theme_font_size_override("font_size", 14)
+	_progress_label.add_theme_color_override("font_color", SacredPalette.FG_3)
+	_progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_progress_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_progress_label.offset_left = -200
+	_progress_label.offset_right = 200
+	_progress_label.offset_top = 98
+	_progress_label.offset_bottom = 120
+	_progress_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_progress_label.visible = false
+	add_child(_progress_label)
 	# 상단 중앙 안내 문구 — 흰색↔황금 breathe 애니메이션.
 	_label = Label.new()
 	_label.theme_type_variation = "TitleLabel"
-	_label.add_theme_font_size_override("font_size", 32)
+	_label.add_theme_font_size_override("font_size", 30)
 	_label.add_theme_color_override("font_color", SacredPalette.BONE_100)
-	_label.autowrap_mode = TextServer.AUTOWRAP_OFF  # 줄바꿈 안 함 — 폭은 fit_text 로 폰트 축소
+	_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_label.clip_text = false
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	_label.offset_left = -560
 	_label.offset_right = 560
-	_label.offset_top = 148
-	_label.offset_bottom = 264
+	_label.offset_top = 132
+	_label.offset_bottom = 284
 	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_label)
 	_label.visible = false
+
+	_exit_button = Button.new()
+	_exit_button.theme_type_variation = "IconButton"
+	_exit_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_exit_button.offset_left = -150
+	_exit_button.offset_right = -110
+	_exit_button.offset_top = 10
+	_exit_button.offset_bottom = 50
+	_exit_button.icon = preload("res://assets/art/ui/back_arrow.svg")
+	_exit_button.expand_icon = true
+	_exit_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_exit_button.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
+	_exit_button.focus_mode = Control.FOCUS_NONE
+	_exit_button.pressed.connect(func() -> void: exit_requested.emit())
+	add_child(_exit_button)
+	set_exit_enabled(_exit_enabled)
+	_refresh_localized_text()
 
 # 안내 문구 호흡 애니메이션 — 흰색 → 황금 → 흰색 반복.
 func _start_breathe() -> void:
@@ -78,16 +117,20 @@ func _stop_breathe() -> void:
 func start(steps: Array) -> void:
 	_steps = steps
 	_idx = -1
+	_completed = false
 	_advance()
 
 func _advance() -> void:
+	if _completed:
+		return
 	_idx += 1
 	if _idx >= _steps.size():
+		_completed = true
 		_render("")
 		step_changed.emit()
 		lesson_completed.emit()
 		return
-	_render(tr(_steps[_idx].get("text", "")))
+	_refresh_localized_text()
 	step_changed.emit()
 
 func _render(text: String) -> void:
@@ -98,12 +141,37 @@ func _render(text: String) -> void:
 	if _msg_bg:
 		_msg_bg.visible = text != ""
 	if text != "":
-		# 줄바꿈 없이 폭(1120)에 맞춰 폰트 자동 축소 (32 → 최소 18)
-		LabelUtils.fit_text(_label, 32, 18, 1120.0)
 		_start_breathe()
 	else:
 		_stop_breathe()
 	_update_click_catcher()
+	_update_progress()
+
+func _refresh_localized_text() -> void:
+	if _exit_button != null:
+		_exit_button.tooltip_text = tr("tutorial.exit")
+	if _idx < 0 or _idx >= _steps.size():
+		return
+	_render(tr(_steps[_idx].get("text", "")))
+
+func _on_locale_changed(_locale: String) -> void:
+	_refresh_localized_text()
+
+func _update_progress() -> void:
+	if _progress_label == null:
+		return
+	var active := _idx >= 0 and _idx < _steps.size()
+	_progress_label.visible = active
+	if active:
+		var format := tr("tutorial.progress")
+		if not format.contains("%"):
+			format = "%d / %d"
+		_progress_label.text = format % [_idx + 1, _steps.size()]
+
+func set_exit_enabled(enabled: bool) -> void:
+	_exit_enabled = enabled
+	if _exit_button != null:
+		_exit_button.disabled = not enabled
 
 # 현재 스텝이 화면 클릭으로 완료되는 스텝이면 클릭 캐처 활성화.
 func _update_click_catcher() -> void:
@@ -117,7 +185,7 @@ func _on_catcher_input(event: InputEvent) -> void:
 		notify("screen_clicked")
 
 func notify(event: String, data: Dictionary = {}) -> void:
-	if is_finished():
+	if _idx < 0 or is_finished():
 		return
 	var step: Dictionary = _steps[_idx]
 	if step.get("complete_event", "") != event:
@@ -137,4 +205,4 @@ func current_allowed_cards() -> Array:
 	return step.get("allowed_cards", [])
 
 func is_finished() -> bool:
-	return _idx >= _steps.size()
+	return _completed or _idx >= _steps.size()

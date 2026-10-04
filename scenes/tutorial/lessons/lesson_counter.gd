@@ -25,7 +25,7 @@ static func build_enemy() -> EnemyResource:
 	e.enemy_name = "enemy.greek.cyclops"
 	e.mythology = "greek"
 	e.grade = EnemyResource.Grade.NORMAL
-	# 카운터 후 기절 → 한 방으로 마무리되게 낮은 HP.
+	# 카운터 후 기절을 확인한 뒤 한 방으로 마무리되게 낮은 HP.
 	e.max_hp = 90
 	e.signatures_enabled = false
 	e.character_scene = load("res://characters/enemies/enemy_placeholder.tscn")
@@ -49,5 +49,6 @@ static func steps() -> Array:
 	return [
 		{"text": "tutorial.counter.s_intent", "complete_event": "screen_clicked", "allowed_cards": [], "end_turn": "lock"},
 		{"text": "tutorial.counter.s_counter", "complete_event": "counter_major", "allowed_cards": [CARD_COUNTER], "end_turn": "lock"},
-		{"text": "tutorial.counter.s_win", "complete_event": "battle_won", "allowed_cards": [CARD_STRIKE], "end_turn": "free"},
+		{"text": "tutorial.counter.s_stun", "complete_event": "enemy_turn_ended", "allowed_cards": [], "end_turn": "highlight"},
+		{"text": "tutorial.counter.s_win", "complete_event": "battle_won", "allowed_cards": [CARD_STRIKE], "end_turn": "lock"},
 	]
