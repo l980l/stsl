@@ -55,6 +55,10 @@ const CRIT_MULTIPLIER: float = 2.0
 
 # 튜토리얼 — true면 치명타 확정 (시연용). debug_hero_invincible 패턴.
 var tutorial_force_crit: bool = false
+var tutorial_active: bool = false
+var tutorial_allowed_cards: Array = []
+var tutorial_allow_end_turn: bool = false
+var tutorial_effect_pending: bool = false
 
 # 의존성 주입 — 프로덕션: BattleScene이 설정, 테스트: 직접 할당
 var team_mgr = null
@@ -158,6 +162,8 @@ signal synergy_drain_vfx(hero_ids: Array, value: int, target_enemy_index: int)
 # target_hero_id: 단일 타겟의 영웅 id ("" 이면 ALL 또는 미지정)
 signal intent_vfx_charge_start(enemy_index: int, intent: Resource, target_hero_id: String)
 signal card_vfx_charge_start(card: Resource, target_enemy_index: int, target_hero_id: String)
+# 카드의 모든 효과(VFX impact 포함)가 적용된 뒤 발생. 튜토리얼 등 순차 UI가 사용한다.
+signal card_effects_resolved(card: Resource)
 # fx 임팩트 도달(screen_effect) 시점 중계 — battle_scene 의 fx.screen_effect 가 emit.
 # popup·SFX 동기화: timer 보정 대신 fx 의 실제 임팩트 시점에 데미지 적용.
 signal vfx_impact_resolved
@@ -175,10 +181,14 @@ var _enemy_stolen_cards: Array = []
 # GameSettings autoload 안전 접근 — CLI test 환경에서 식별자 미인식 회피
 # null(=test 환경) 시 0 반환 → 모든 await 스킵 → 동기 즉시 적용 유지
 func _vfx_speed_mul() -> float:
+	if not is_inside_tree():
+		return 0.0
 	var gs := get_node_or_null("/root/GameSettings")
 	return gs.vfx_speed_multiplier if gs else 0.0
 
 func _turn_interval_mul() -> float:
+	if not is_inside_tree():
+		return 0.0
 	var gs := get_node_or_null("/root/GameSettings")
 	return gs.turn_interval_multiplier if gs else 0.0
 
@@ -456,6 +466,9 @@ func is_enemy_doomed(idx: int) -> bool:
 # fx 의 screen_effect 시그널(=실제 임팩트 시점) 까지 대기.
 # fx 가 emit 안 하는 경우(예: 비공격 즉발) fallback_timeout 후 진행.
 func _await_vfx_impact(fallback_timeout: float) -> void:
+	# 단위 테스트에서는 BattleManager가 SceneTree 밖에 있으므로 즉시 완료한다.
+	if not is_inside_tree() or fallback_timeout <= 0.0:
+		return
 	var done := [false]
 	var on_resolve := func() -> void:
 		if not done[0]:
@@ -480,7 +493,12 @@ func _holy_war_amplify(base_heal: int) -> int:
 	var morale: int = _hero_status.get("napoleon", {}).get("morale", 0)
 	return int(base_heal * (1.0 + morale * 0.07))
 
-func setup_battle(enemies: Array) -> void:
+func setup_battle(enemies: Array, is_tutorial: bool = false) -> void:
+	tutorial_active = is_tutorial
+	tutorial_force_crit = false
+	tutorial_allowed_cards = []
+	tutorial_allow_end_turn = false
+	tutorial_effect_pending = false
 	if deck_mgr != null:
 		deck_mgr.consolidate_for_battle()
 		# 영웅별 덱 분배 — owner_id 기준
@@ -870,6 +888,8 @@ func _phase_hero_post(hid: String) -> bool:
 func play_card(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> bool:
 	if not is_player_turn or not is_battle_active:
 		return false
+	if tutorial_active and (tutorial_effect_pending or card.card_name not in tutorial_allowed_cards):
+		return false
 	# silence — 시전 영웅이 silence 상태면 카드 사용 불가 (Ameno-sagiri Foolish Whisper 영감).
 	if _hero_status.get(card.owner_id, {}).get("silence", 0) > 0:
 		return false
@@ -881,7 +901,10 @@ func play_card(card: Resource, target_enemy_index: int, target_hero_id: String =
 	# ATTACK 카드 단일 타겟 — 사망 예정(앞 카드 누적으로 effective_hp 0) 적 거부
 	if target_enemy_index >= 0 and is_enemy_doomed(target_enemy_index) and _card_has_damage(card):
 		return false
+	# DeckManager emits hand/energy changes synchronously; lock the tutorial before those UI updates.
+	tutorial_effect_pending = tutorial_active
 	if deck_mgr == null or not deck_mgr.play_card(card):
+		tutorial_effect_pending = false
 		return false
 	_cards_played_this_turn += 1
 	_track_card_type_counters(card)
@@ -923,9 +946,13 @@ func _is_enemy_dead(enemy_index: int) -> bool:
 # play_card 를 동기로 유지하면서 _apply_card_effects 의 await 패턴을 흡수.
 func _start_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String) -> void:
 	await _apply_card_effects(card, target_enemy_index, target_hero_id)
+	tutorial_effect_pending = false
+	card_effects_resolved.emit(card)
 
 func end_player_turn() -> void:
 	if not is_player_turn or not is_battle_active:
+		return
+	if tutorial_active and (tutorial_effect_pending or not tutorial_allow_end_turn):
 		return
 	is_player_turn = false
 	_in_player_turn = false
@@ -1492,6 +1519,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				if deck_mgr and _enthralls_this_card > 0:
 					var _draw_amt: int = _enthralls_this_card * effect.value
 					deck_mgr.draw_cards_h(card.owner_id, _draw_amt)
+					_cards_drawn_this_turn += _draw_amt
 			EffectRes.EffectType.DAMAGE_PER_CHARMED_ENEMY:
 				# charm 스택 보유 적 수 × value 피해
 				var _charmed_count: int = 0
@@ -2632,7 +2660,8 @@ func _execute_special(_enemy_index: int, intent: Resource) -> void:
 					cards_exhausted_by_enemy.emit(removed_names)
 					deck_mgr.hand_changed.emit()
 		_:
-			push_warning("[battle_manager] 알 수 없는 SPECIAL variant: %s" % variant)
+			# 잘못된 데이터는 전투를 중단시키지 않고 무시한다. 상세 정보는 verbose 실행에서만 남긴다.
+			print_verbose("[battle_manager] 알 수 없는 SPECIAL variant: %s" % variant)
 
 # 적 사망 시 그 적이 부여한 영웅 status 정리 (taunt_source, marked_by).
 # enemy_died.emit 전에 호출 — UI 가 갱신된 status 를 읽도록.
@@ -2673,7 +2702,7 @@ var _test_disable_crit: bool = false  # 테스트 환경 — 정확한 데미지
 # 아군 시너지(독날·초원의 결투사·신의 원정) 적용 안 함.
 # 반환: {crit_mult: float, is_crit: bool}
 func _roll_crit_enemy(has_mark: bool) -> Dictionary:
-	if _test_disable_crit:
+	if _test_disable_crit or tutorial_active:
 		return {"crit_mult": 1.0, "is_crit": false}
 	var rate: float = CRIT_BASE_RATE + (CRIT_MARK_BONUS if has_mark else 0.0)
 	var is_crit: bool = randf() < rate
@@ -2685,7 +2714,7 @@ func _roll_crit_enemy(has_mark: bool) -> Dictionary:
 func _roll_crit(target_enemy_index: int, has_mark: bool) -> Dictionary:
 	if tutorial_force_crit:
 		return {"crit_mult": CRIT_MULTIPLIER, "is_crit": true}
-	if _test_disable_crit:
+	if _test_disable_crit or tutorial_active:
 		return {"crit_mult": 1.0, "is_crit": false}
 	var rate: float = CRIT_BASE_RATE + (CRIT_MARK_BONUS if has_mark else 0.0)
 	# 독날 (클레오파트라×무사시): 반함 상태 적에게 치명타 확률 100%
@@ -2914,6 +2943,11 @@ func get_all_active_powers() -> Dictionary:
 	return _active_powers.duplicate()
 
 func clear() -> void:
+	tutorial_active = false
+	tutorial_force_crit = false
+	tutorial_allowed_cards.clear()
+	tutorial_allow_end_turn = false
+	tutorial_effect_pending = false
 	_enemies.clear()
 	_enemy_hp.clear()
 	_enemy_alive.clear()

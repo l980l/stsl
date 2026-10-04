@@ -52,6 +52,7 @@ var _impact_emitted := false
 var _hit_burst_spawned: bool = false
 var _freeze_started: bool = false
 var _freeze_ended: bool = false
+var _previous_time_scale: float = 1.0
 var _particles: Array = []
 var _desat_overlay: ColorRect       # 흑백 postprocess overlay (hint_screen_texture)
 
@@ -74,10 +75,11 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	# 안전: VFX 가 어떻게 사라지든 time_scale 복원
 	if _freeze_started and not _freeze_ended:
-		Engine.time_scale = 1.0
+		Engine.time_scale = _previous_time_scale
 		_freeze_ended = true
 
 func _start_major_freeze() -> void:
+	_previous_time_scale = Engine.time_scale
 	Engine.time_scale = MAJOR_TIME_SCALE
 	# real time 0.6s 후 자동 복귀 (process_always=true, ignore_time_scale=true)
 	var t: SceneTreeTimer = get_tree().create_timer(MAJOR_FREEZE_TIME, true, false, true)
@@ -99,7 +101,7 @@ func _end_major_freeze() -> void:
 	if _freeze_ended:
 		return
 	_freeze_ended = true
-	Engine.time_scale = 1.0
+	Engine.time_scale = _previous_time_scale
 
 func _process(delta: float) -> void:
 	_age += delta

@@ -257,7 +257,9 @@ func set_disabled(v: bool) -> void:
 	if _owner_dead:
 		return
 	if _mode == Mode.HAND:
-		$Container/CostLabel.modulate = Color(1.0, 0.3, 0.3) if v else Color.WHITE
+		var cost_label := get_node_or_null("Container/CostLabel")
+		if cost_label != null:
+			cost_label.modulate = Color(1.0, 0.3, 0.3) if v else Color.WHITE
 	else:
 		modulate = Color(0.5, 0.5, 0.5) if v else Color.WHITE
 

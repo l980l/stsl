@@ -105,14 +105,15 @@ func test_dispel_clears_hero_strength() -> void:
 	print("[TestEnemyPatternsV2] test_dispel_clears_hero_strength")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
-	bm._apply_status_to_hero("napoleon", "strength", 5)
-	bm._apply_status_to_hero("napoleon", "block", 10)
 	var enemy := EnemyRes.new()
 	enemy.max_hp = 30
-	enemy.intent_pattern = [_make_intent(IntentRes.ActionType.DISPEL)]
+	var intent := _make_intent(IntentRes.ActionType.DISPEL)
+	intent.status_type = ""  # 빈 값 = strength + block 기본 제거
+	enemy.intent_pattern = [intent]
 	bm.setup_battle([enemy])
-	bm.start_player_turn()
-	bm.end_player_turn()
+	bm._apply_status_to_hero("napoleon", "strength", 5)
+	bm._apply_status_to_hero("napoleon", "block", 10)
+	bm._execute_enemy_turn()
 	_assert(bm._hero_status["napoleon"].get("strength", 0) == 0, "DISPEL 후 strength 0")
 	_assert(bm._hero_status["napoleon"].get("block", 0) == 0, "DISPEL 후 block 0")
 
@@ -122,15 +123,15 @@ func test_dispel_all_targets() -> void:
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
 	bm.team_mgr.add_hero(_make_hero("jeanne", 100))
-	bm._apply_status_to_hero("napoleon", "strength", 3)
-	bm._apply_status_to_hero("jeanne", "strength", 4)
 	var enemy := EnemyRes.new()
 	enemy.max_hp = 30
 	var intent := _make_intent(IntentRes.ActionType.DISPEL, 0, IntentRes.TargetType.ALL)
+	intent.status_type = ""  # 빈 값 = strength + block 기본 제거
 	enemy.intent_pattern = [intent]
 	bm.setup_battle([enemy])
-	bm.start_player_turn()
-	bm.end_player_turn()
+	bm._apply_status_to_hero("napoleon", "strength", 3)
+	bm._apply_status_to_hero("jeanne", "strength", 4)
+	bm._execute_enemy_turn()
 	_assert(bm._hero_status["napoleon"].get("strength", 0) == 0, "ALL DISPEL → napoleon strength 0")
 	_assert(bm._hero_status["jeanne"].get("strength", 0) == 0, "ALL DISPEL → jeanne strength 0")
 
@@ -139,16 +140,15 @@ func test_dispel_custom_status_type() -> void:
 	print("[TestEnemyPatternsV2] test_dispel_custom_status_type")
 	var bm := _make_bm()
 	bm.team_mgr.add_hero(_make_hero("napoleon", 100))
-	bm._apply_status_to_hero("napoleon", "strength", 5)
-	bm._apply_status_to_hero("napoleon", "block", 10)
 	var enemy := EnemyRes.new()
 	enemy.max_hp = 30
 	var intent := _make_intent(IntentRes.ActionType.DISPEL)
 	intent.status_type = "strength"  # strength 만 제거, block 유지
 	enemy.intent_pattern = [intent]
 	bm.setup_battle([enemy])
-	bm.start_player_turn()
-	bm.end_player_turn()
+	bm._apply_status_to_hero("napoleon", "strength", 5)
+	bm._apply_status_to_hero("napoleon", "block", 10)
+	bm._execute_enemy_turn()
 	_assert(bm._hero_status["napoleon"].get("strength", 0) == 0, "custom DISPEL strength → 0")
 	_assert(bm._hero_status["napoleon"].get("block", 0) == 10, "custom DISPEL strength 만 → block 유지")
 

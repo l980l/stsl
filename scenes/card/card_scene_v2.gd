@@ -229,7 +229,7 @@ func _create_glow_rect() -> void:
 	const H := 280.0 + PAD * 2.0
 	var glow := ColorRect.new()
 	var mat := ShaderMaterial.new()
-	var _theme := get_node_or_null("/root/SacredTheme")
+	var _theme := get_node_or_null("/root/SacredTheme") if is_inside_tree() else null
 	if _theme:
 		mat.shader = _theme._get_card_glow_shader()
 	mat.set_shader_parameter("opacity", 0.0)

@@ -4,13 +4,13 @@
 extends Node2D
 
 const MONO_FONT := preload("res://assets/fonts/SpaceMono-Regular.ttf")
+var _opening_lesson: bool = false
 
-# 레슨 목록 — basics 만 활성, 나머지는 준비 중(잠금).
+# 현재 완성된 세 레슨.
 const LESSONS := [
 	{"num": "01", "name": "tutorial.lesson.basics.name", "desc": "tutorial.lesson.basics.desc", "meta": "tutorial.lesson.basics.meta", "id": "basics"},
-	{"num": "02", "name": "tutorial.lesson.counter.name", "desc": "tutorial.lesson.counter.desc", "meta": "", "id": ""},
-	{"num": "03", "name": "tutorial.lesson.status.name", "desc": "tutorial.lesson.status.desc", "meta": "", "id": ""},
-	{"num": "04", "name": "tutorial.lesson.team.name", "desc": "tutorial.lesson.team.desc", "meta": "", "id": ""},
+	{"num": "02", "name": "tutorial.lesson.counter.name", "desc": "tutorial.lesson.counter.desc", "meta": "tutorial.lesson.counter.meta", "id": "counter"},
+	{"num": "03", "name": "tutorial.lesson.status.name", "desc": "tutorial.lesson.status.desc", "meta": "tutorial.lesson.status.meta", "id": "status"},
 ]
 
 func _ready() -> void:
@@ -35,7 +35,7 @@ func _build_ui() -> void:
 
 	SacredTheme.add_corner_brackets(root, P.LINE_2, 20, 42, 1)
 	_stamp(root, "TUTORIAL · INDEX", Vector2(96, 40), HORIZONTAL_ALIGNMENT_LEFT, true)
-	_stamp(root, "IV LESSONS", Vector2(1224, 40), HORIZONTAL_ALIGNMENT_RIGHT, false)
+	_stamp(root, "III LESSONS", Vector2(1224, 40), HORIZONTAL_ALIGNMENT_RIGHT, false)
 	_stamp(root, "THE SCHOOLING · I", Vector2(1224, 1012), HORIZONTAL_ALIGNMENT_RIGHT, false)
 
 	var body := MarginContainer.new()
@@ -186,7 +186,11 @@ func _add_index_row(parent: VBoxContainer, data: Dictionary) -> void:
 		label.add_theme_color_override("font_color", P.BONE_100)
 		desc.add_theme_color_override("font_color", P.FG_3)
 		rule.color = P.LINE_1)
-	row.pressed.connect(func() -> void: GameManager.start_tutorial(lesson_id))
+	row.pressed.connect(func() -> void:
+		if _opening_lesson:
+			return
+		_opening_lesson = true
+		GameManager.start_tutorial(lesson_id))
 
 func _on_back() -> void:
 	SceneTransition.go("res://scenes/main_menu/main_menu_scene.tscn")

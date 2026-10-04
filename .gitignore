@@ -10,6 +10,12 @@
 run_tests.bat
 run_tests.log
 
+# 로컬 개발 도구·캐시·로그
+.playwright-mcp/
+__pycache__/
+*.py[cod]
+*.log
+
 # 오디오 에셋 — 로컬에서만 관리
 assets/audio/
 
@@ -70,9 +76,6 @@ assets/art/ui/synergy/
 data_*/
 mono_crash.*.json
 
-# 내보내기 템플릿
-export_presets.cfg
-
 # 환경변수
 .env
 
@@ -83,6 +86,8 @@ Thumbs.db
 # 로컬 설정
 .claude/
 docs/.obsidian/
+docs/ai-wiki/.obsidian/
+docs/ai-wiki/AI-Sessions/raw/
 
 # 도감 (generate_catalog.gd로 재생성 가능)
 docs/catalog/*.csv
@@ -92,3 +97,6 @@ docs/catalog/*.md
 
 # 프레임 스파이크 로그 (로컬 디버그용)
 log/
+
+# 로컬 Git 이력 인수인계용 번들 (원격에 중복 업로드하지 않음)
+/git-handoff/

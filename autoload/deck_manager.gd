@@ -304,7 +304,10 @@ func add_card_to_deck(card: Resource) -> void:
 		_meta_deck.append(card)
 		hand_changed.emit()
 		return
-	var bm = Engine.get_main_loop().root.get_node_or_null("BattleManager")
+	var bm = null
+	var ml := Engine.get_main_loop()
+	if ml is SceneTree:
+		bm = (ml as SceneTree).root.get_node_or_null("BattleManager")
 	var current_hid: String = bm.get_current_hero_id() if bm and bm.has_method("get_current_hero_id") else ""
 	if current_hid == hid:
 		(_heroes[hid]["hand"] as Array).append(card)

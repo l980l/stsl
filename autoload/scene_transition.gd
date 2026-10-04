@@ -16,6 +16,7 @@ func _ready() -> void:
 	_fade_in(0.30)
 
 func go(path: String) -> void:
+	_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	if _tween:
 		_tween.kill()
 	_tween = create_tween()
@@ -28,8 +29,10 @@ func go(path: String) -> void:
 	_fade_in(0.28)
 
 func _fade_in(duration: float) -> void:
+	_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	if _tween:
 		_tween.kill()
 	_tween = create_tween()
 	_tween.tween_property(_overlay, "modulate:a", 0.0, duration) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_tween.tween_callback(func(): _overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE)

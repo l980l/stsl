@@ -1,0 +1,7 @@
+# STSL 전용 Obsidian AI 위키. 경로는 이 설정 파일 기준.
+scope: personal
+vault: docs/ai-wiki
+git:
+  commit_mode: manual
+  push: false
+  track_raw: false
