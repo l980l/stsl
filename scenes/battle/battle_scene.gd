@@ -216,10 +216,14 @@ func _battle_sig_desc_args(desc_key: String) -> Array:
 			return []  # battle.signature.karma.desc 및 일반 synergy desc
 
 func _ready() -> void:
+	var profile_started := Time.get_ticks_usec()
+	var stage_started := profile_started
 	# y-sort: 캐릭터·전경 SVG 모두 같은 좌표계 — y 큰(아래) 노드가 위로 자동 정렬
 	y_sort_enabled = true
 	_setup_ui_layer()  # UI 전용 CanvasLayer 먼저 — _build_ui 가 거기에 add_child
 	_build_ui()
+	_profile_cpu_span("battle.build_ui", stage_started)
+	stage_started = Time.get_ticks_usec()
 	_setup_kill_cam()
 	if OS.is_debug_build():
 		_build_debug_tooltip()
@@ -227,6 +231,7 @@ func _ready() -> void:
 	BattleManager.deck_mgr = DeckManager
 	_connect_signals()
 	_start_battle()
+	_profile_cpu_span("battle.setup_actors", stage_started)
 	_play_battle_bgm()
 	# 언어 변경 시 적 이름 갱신 (카드/intent 는 자체 갱신). 카드 프레임 변경 시 핸드 재구성.
 	LocaleManager.locale_changed.connect(_on_locale_changed_battle)
@@ -238,6 +243,12 @@ func _ready() -> void:
 		_debug_badge.add_theme_color_override("font_color", Color.RED)
 		_debug_badge.visible = false
 		add_child(_debug_badge)
+	_profile_cpu_span("battle.ready", profile_started)
+
+func _profile_cpu_span(stage: String, started_usec: int) -> void:
+	if OS.get_environment("STSL_PROFILE_CPU") == "1":
+		print("[stsl_cpu] ", JSON.stringify({"stage": stage, "ms": (Time.get_ticks_usec() - started_usec) / 1000.0,
+			"chapter": GameManager.current_chapter, "act": GameManager.current_act, "floor": GameManager.current_floor}))
 
 func _process(delta: float) -> void:
 	_update_camera_sway(delta)
@@ -254,6 +265,7 @@ func _build_debug_tooltip() -> void:
 # ─────────────────────────────────────────────
 
 func _build_ui() -> void:
+	var background_started := Time.get_ticks_usec()
 	# 배경 — M7.5 v2 SVG 컴포지션 + 무작위 환경(시각/날씨) + critters + weather 입자
 	if true:
 		var SBG := preload("res://scenes/components/scene_background.gd")
@@ -280,6 +292,7 @@ func _build_ui() -> void:
 		bg.size = Vector2(WINDOW_W, WINDOW_H)
 		add_child(bg)
 
+	_profile_cpu_span("battle.background", background_started)
 	# 상단 배너 (eyebrow + 메시지 + gradient 구분선)
 	var banner := Control.new()
 	banner.position = Vector2(WINDOW_W / 2.0 - 300, 0)
@@ -1276,8 +1289,12 @@ func _start_battle() -> void:
 	if not GameManager.pending_enemies.is_empty():
 		BattleManager.turn_interval = 0.4  # base — GameSettings.turn_interval_multiplier 가 곱셈 적용
 		BattleManager.setup_battle(GameManager.pending_enemies, GameManager.tutorial_lesson_id != "")
+		var heroes_started := Time.get_ticks_usec()
 		_setup_heroes()
+		_profile_cpu_span("battle.heroes", heroes_started)
+		var enemies_started := Time.get_ticks_usec()
 		_setup_enemies()
+		_profile_cpu_span("battle.enemies", enemies_started)
 		if GameManager.tutorial_lesson_id != "":
 			_init_tutorial(GameManager.tutorial_lesson_id)
 		await _play_battle_intro()

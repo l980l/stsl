@@ -54,6 +54,16 @@ up: "[[index]]"
 - 대상은 기존 `origin`의 `work/pearlfish`이며 `main`에 직접 올리거나 PR 생성·머지하지 않는다. 이번 push 성공 후 upstream은 `origin/work/pearlfish`로 맞춘다. 위의 2026-10-04 `origin/main` tracking 설명은 당시 상태다.
 - 로컬 아트·오디오·로그·raw·임시 초안·이번 작업과 무관한 기존 미추적 파일은 제외한다. LFS 미사용·평상시 Git manual 정책은 유지한다.
 - 성능 미해결 범위는 [[챕터-자동-플레이와-성능-측정]]에 기록한다. 원격 반영 여부와 커밋 ID는 실제 Git 조회로 확인한다.
+- 커밋 `8a6e7a1`을 `origin/work/pearlfish`에 푸시하고 원격 일치를 확인했다. 이어 사용자의 별도 요청으로 [PR #236](https://github.com/l980l/stsl/pull/236)을 생성했다(`work/pearlfish` → `main`). 검증 범위와 미해결 성능 문제를 본문에 명시했으며, PR 생성은 머지 승인이 아니다.
+- 생성 직후 재조회에서 #236은 이미 MERGED였다(2026-10-11 16:23:48 KST). 원격 main은 `1710ca63a05583ce9f4effbcde42017387eaf68a`로 확인했다. 에이전트는 머지 명령을 실행하지 않았다. 로컬 브랜치 동기화는 이번 PR 생성 범위에서 하지 않았다.
+- 사용자가 머지·원격 브랜치 삭제를 알렸고 `ls-remote`에서 `work/pearlfish` 부재를 확인했다. 로컬 worktree는 아직 같은 브랜치·기존 upstream 설정을 유지한다. 다음 작업 전에 기준을 새 main과 맞춰야 하며, 승인 없이 일반 push로 삭제된 원격 브랜치를 재생성하지 않는다. 로컬 위키 변경3개는 미커밋으로 보존한다.
+
+## 2026-10-11 머지 이후 새 작업 기준
+
+- 사용자 요청으로 `fetch --prune` 후 머지된 `origin/main`의 `1710ca6`에서 `perf/scene-stutters`를 생성·전환했다. 같은 pearlfish 폴더와 미추적 아트·기존 위키 변경을 보존했다. 옛 로컬 `work/pearlfish`도 남아 있다.
+- 새 브랜치 upstream은 현재 `origin/main`, `push.default=current`다. 다음 명시적 push 시 `git push -u origin perf/scene-stutters`로 새 원격 브랜치를 연결한다. 삭제된 이전 원격 브랜치를 재생성하지 않는다.
+- 당시 작업은 씬 사전 준비·캐릭터 아트 캐시·하트 생성 최적화이며 로컬 미커밋이었다. 결과와 한계는 [[챕터-자동-플레이와-성능-측정]]을 참조한다.
+- 사용자가 이후 이번 변경의 커밋·푸시·PR 생성을 명시적으로 요청했다. 대상은 `perf/scene-stutters` → 기존 저장소 `main`이며, 코드·회귀 검사·진단 도구·성능 문서·위키만 포함한다. 미추적 아트/초안/기존 UID·로그/raw는 제외한다. PR 생성은 머지 승인이 아니다. 평상시 Git manual 정책은 유지한다.
 
 ## 흔한 오해
 

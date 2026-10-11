@@ -278,7 +278,9 @@ static func heart_tex() -> Texture2D:
 		for y in 64:
 			for x in 64:
 				var p := Vector2(float(x) - 31.5, float(y) - 31.5)
-				if _point_in_polygon(p, pts):
+				# Native geometry keeps the same filled polygon while avoiding 4,096
+				# GDScript ray-casts over 32 edges during the first texture build.
+				if Geometry2D.is_point_in_polygon(p, pts):
 					inside_mask[y * 64 + x] = 1
 					img.set_pixel(x, y, col_inner)
 		# 2차: 외곽 2px outline (안쪽인데 인접 ±2 픽셀 중 바깥 있으면 외곽)

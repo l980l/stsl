@@ -35,6 +35,12 @@ func _run() -> void:
 	if transition == null:
 		quit(1)
 		return
+	await process_frame
+	_check(transition._battle_scene != null, "battle scene is prepared at startup")
+	_check(transition._battle_scene.resource_path == transition.BATTLE_PATH, "only the battle scene is cached")
+	var cached_scene = transition._battle_scene
+	transition._warm_battle_scene()
+	_check(transition._battle_scene == cached_scene, "warm scene resource is reused")
 
 	await transition.go(TARGET_SCENE)
 	_check(transition._overlay.mouse_filter == Control.MOUSE_FILTER_STOP, "input stays blocked while fading")

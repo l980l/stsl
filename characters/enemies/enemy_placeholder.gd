@@ -4,6 +4,8 @@
 # 페이즈 전환 시 battle_scene._on_boss_phase_changed 가 swap_to_phase(N) 호출 → _pN.png 가 있으면 교체.
 extends Node2D
 
+const CHARACTER_ART_CACHE := preload("res://characters/character_art_cache.gd")
+
 const _FLASH_SHADER := """
 shader_type canvas_item;
 uniform vec4 flash_color : source_color = vec4(0.0);
@@ -59,7 +61,7 @@ func swap_to_phase(phase: int) -> void:
 	if not ResourceLoader.exists(path):
 		return  # 이미지 없으면 swap 안 함
 	_phase = phase
-	_apply_texture(load(path))
+	_apply_texture(CHARACTER_ART_CACHE.get_texture(path))
 
 # phase 0 일러스트 로드 + Sprite2D 셋업
 func _load_sprite(phase: int) -> void:
@@ -74,7 +76,7 @@ func _load_sprite(phase: int) -> void:
 			path = _ENEMY_ART_DIR + _enemy_id + ".png"
 	if not ResourceLoader.exists(path):
 		return  # 이미지 없으면 placeholder ColorRect (빨강) 유지
-	_apply_texture(load(path))
+	_apply_texture(CHARACTER_ART_CACHE.get_texture(path))
 
 # Sprite2D 생성 (최초) 또는 텍스처 교체 (페이즈 swap). character_placeholder fit 알고리즘 그대로.
 func _apply_texture(tex: Texture2D) -> void:
