@@ -61,9 +61,10 @@ up: "[[index]]"
 ## 2026-10-11 머지 이후 새 작업 기준
 
 - 사용자 요청으로 `fetch --prune` 후 머지된 `origin/main`의 `1710ca6`에서 `perf/scene-stutters`를 생성·전환했다. 같은 pearlfish 폴더와 미추적 아트·기존 위키 변경을 보존했다. 옛 로컬 `work/pearlfish`도 남아 있다.
-- 새 브랜치 upstream은 현재 `origin/main`, `push.default=current`다. 다음 명시적 push 시 `git push -u origin perf/scene-stutters`로 새 원격 브랜치를 연결한다. 삭제된 이전 원격 브랜치를 재생성하지 않는다.
+- 새 브랜치 생성 당시 upstream은 `origin/main`이었다. 사용자 승인 push 이후 현재 upstream은 `origin/perf/scene-stutters`이며 `push.default=current`를 유지한다. 삭제된 이전 원격 브랜치를 재생성하지 않는다.
 - 당시 작업은 씬 사전 준비·캐릭터 아트 캐시·하트 생성 최적화이며 로컬 미커밋이었다. 결과와 한계는 [[챕터-자동-플레이와-성능-측정]]을 참조한다.
 - 사용자가 이후 이번 변경의 커밋·푸시·PR 생성을 명시적으로 요청했다. 대상은 `perf/scene-stutters` → 기존 저장소 `main`이며, 코드·회귀 검사·진단 도구·성능 문서·위키만 포함한다. 미추적 아트/초안/기존 UID·로그/raw는 제외한다. PR 생성은 머지 승인이 아니다. 평상시 Git manual 정책은 유지한다.
+- 코드 커밋 `4744e6b093f0e2bb1dca6c9f1527e2e610bf2a9f`을 원격에 푸시하고 일치를 확인했다. [PR #237](https://github.com/l980l/stsl/pull/237)(`perf/scene-stutters` → `main`)을 생성·조회했으며 2026-10-11 18:44 KST에 OPEN이다. 최신 재검증은 전체1888·캐시29·하트2 통과, 실패0. GPU 미확인/전환으로 비용 이동/전체 FPS 후속을 PR 본문에 명시했다. 생성 결과 기록만 후속 문서 커밋으로 함께 푸시하며 머지는 하지 않는다.
 
 ## 흔한 오해
 
