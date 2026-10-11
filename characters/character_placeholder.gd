@@ -4,6 +4,8 @@
 # AnimatedSprite2D + 실제 스프라이트로 교체하면 됨
 extends Node2D
 
+const CHARACTER_ART_CACHE := preload("res://characters/character_art_cache.gd")
+
 const _FLASH_SHADER := """
 shader_type canvas_item;
 uniform vec4 flash_color : source_color = vec4(0.0);
@@ -41,7 +43,7 @@ func _ready() -> void:
 	var illust_path: String = _HERO_ART_DIR + hero_id + ".png"
 	if ResourceLoader.exists(illust_path):
 		_illust_sprite = Sprite2D.new()
-		var tex: Texture2D = load(illust_path)
+		var tex: Texture2D = CHARACTER_ART_CACHE.get_texture(illust_path)
 		_illust_sprite.texture = tex
 		var src_size: Vector2 = tex.get_size()
 		# 외부 char_node.scale 비균등 (1.44, 2.4) 으로 sprite 가 시각상 늘어남 →
