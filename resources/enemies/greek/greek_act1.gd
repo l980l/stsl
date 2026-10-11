@@ -7,6 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func minotaur(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.greek.minotaur"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
@@ -21,6 +22,7 @@ static func minotaur(scene: PackedScene) -> Resource:
 
 static func medusa(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.greek.medusa"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
@@ -44,6 +46,7 @@ static func medusa(scene: PackedScene) -> Resource:
 
 static func gorgon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.greek.gorgon"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.5]
@@ -76,6 +79,7 @@ static func gorgon(scene: PackedScene) -> Resource:
 
 static func scylla(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.greek.scylla"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.5]

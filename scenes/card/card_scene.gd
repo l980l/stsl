@@ -159,7 +159,13 @@ func refresh() -> void:
 	if _card == null:
 		return
 	$Container/Frame.texture = _resolve_frame_texture(_card.owner_id)
-	$Container/CostLabel.text = str(_card.cost)
+	var cost: int = _card.cost
+	if _mode == Mode.HAND:
+		var ml = Engine.get_main_loop()
+		var dm = ml.root.get_node_or_null("DeckManager") if ml else null
+		if dm:
+			cost = dm.get_effective_cost(_card.owner_id, _card)
+	$Container/CostLabel.text = str(cost)
 	$Container/TitleLabel.text = tr(_card.card_name)
 	LabelUtils.fit_text($Container/TitleLabel, 50, 28)
 	$Container/ArtRect.texture = _card.art if _card.art != null else _resolve_art_texture(_card)
@@ -183,6 +189,8 @@ func _build_desc() -> String:
 	# autoload 는 글로벌 — get_node 대신 직접 참조 (tree 진입 전 호출 시 에러 회피).
 	# card_scene 은 battle 외 (shop/event) 에서도 쓰이므로 BattleManager 사용 여부는 mode 로 판단.
 	for eff in _card.effects:
+		if eff.effect_type == EffectResource.EffectType.BLOCK and eff.value == 0 and eff.rule_id == "":
+			continue
 		# 데미지 effect 면 hero strength/weak (+ 호버 시 타겟 vulnerable) 반영한 값 표시.
 		# 그 외 effect 는 raw value.
 		if _mode == Mode.HAND and eff.effect_type == EffectResource.EffectType.DAMAGE:

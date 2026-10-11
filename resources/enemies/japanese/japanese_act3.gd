@@ -5,6 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func iwato_guardian(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.japanese.iwato_guardian"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
@@ -21,6 +22,7 @@ static func iwato_guardian(scene: PackedScene) -> Resource:
 
 static func susanoo_blade(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.japanese.susanoo_blade"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
@@ -40,6 +42,7 @@ static func jorogumo(scene: PackedScene) -> Resource:
 	# 조로구모 — 거미 여인. 거미줄로 속박(speed_penalty)하며 독을 먹이는 엘리트
 	# (구 blizzard_queen 리스킨, 메커니즘 동일 — 공격 속성만 ice→poison)
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.japanese.jorogumo"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()

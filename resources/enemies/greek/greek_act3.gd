@@ -7,6 +7,7 @@ const IntentRes  = preload("res://resources/intent_resource.gd")
 
 static func ares_hound(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.greek.ares_hound"; e.max_hp = 2100; e.character_scene = scene
 	e.mythology = "greek"
 	# 4턴 순환: ATK RANDOM / ATK RANDOM / BUFF strength / ATK ALL
@@ -23,6 +24,7 @@ static func ares_hound(scene: PackedScene) -> Resource:
 
 static func poseidon_apostle(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.greek.poseidon_apostle"; e.max_hp = 1950; e.character_scene = scene
 	e.mythology = "greek"
 	# 4턴 순환: DEBUFF weak ALL / ATK RANDOM / ATK RANDOM / DEBUFF vulnerable ALL
@@ -41,6 +43,7 @@ static func poseidon_apostle(scene: PackedScene) -> Resource:
 
 static func hephaestus_automaton(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.greek.hephaestus_automaton"; e.max_hp = 2200; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.5]

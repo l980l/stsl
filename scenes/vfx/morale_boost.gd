@@ -229,6 +229,10 @@ func _draw_ring(canvas: CanvasItem, ga: float) -> void:
 		_draw_star(canvas, mp, 5.0, Color(COL_BRASS_300, alpha * 0.95))
 
 func _draw_star(canvas: CanvasItem, ctr: Vector2, r: float, col: Color) -> void:
+	# Subpixel diamonds at large screen coordinates are numerically degenerate
+	# during the flag's first unfurl frames; there is nothing visible to fill.
+	if r < 0.5 or col.a <= 0.0:
+		return
 	# 4점 다이아 (단순화)
 	canvas.draw_colored_polygon(PackedVector2Array([
 		ctr + Vector2(0, -r), ctr + Vector2(r, 0),
@@ -248,18 +252,22 @@ func _draw_sunburst(canvas: CanvasItem, ga: float) -> void:
 	var alpha: float = grow * fade * ga * 0.55
 	var ctr: Vector2 = _target + Vector2(0.0, -20.0)
 	var sb_r: float = SUNBURST_R * grow
+	if sb_r < 1.0:
+		return
 	var rot: float = _age * 0.18  # 천천히 회전
+	canvas.draw_set_transform(ctr)
 	for i in range(SUNBURST_RAYS):
 		var ang: float = rot + TAU * float(i) / float(SUNBURST_RAYS)
 		var perp_ang: float = ang + PI * 0.5
 		var perp: Vector2 = Vector2(cos(perp_ang), sin(perp_ang)) * sb_r * 0.04
-		var tip: Vector2 = ctr + Vector2(cos(ang), sin(ang)) * sb_r
-		var base_l: Vector2 = ctr + perp
-		var base_r: Vector2 = ctr - perp
+		var tip: Vector2 = Vector2(cos(ang), sin(ang)) * sb_r
+		var base_l: Vector2 = perp
+		var base_r: Vector2 = -perp
 		canvas.draw_colored_polygon(PackedVector2Array([base_l, tip, base_r]), Color(COL_BRASS, alpha))
 		# 내층 (옅은)
-		var tip2: Vector2 = ctr + Vector2(cos(ang), sin(ang)) * sb_r * 0.6
+		var tip2: Vector2 = Vector2(cos(ang), sin(ang)) * sb_r * 0.6
 		canvas.draw_colored_polygon(PackedVector2Array([base_l, tip2, base_r]), Color(COL_BRASS_300, alpha * 0.8))
+	canvas.draw_set_transform(Vector2.ZERO)
 
 # ── glow (가산, 캐릭터 앞) — 깃대 + flag + 3겹 trumpet ring + 머리 위 sigil + sparks ──
 func _draw_glow_pass(canvas: CanvasItem) -> void:
@@ -317,6 +325,8 @@ func _draw_pole_and_flag(canvas: CanvasItem, ga: float) -> void:
 	if unfurl <= 0.0:
 		return
 	var fw: float = FLAG_W * unfurl
+	if fw < 0.01:
+		return
 	var flag_top: Vector2 = pole_top + Vector2(0.0, 12.0)
 	# sway (좌우 휘날림)
 	var sway: float = sin(_age * (TAU / 2.0)) * 6.0 * unfurl
@@ -330,7 +340,7 @@ func _draw_pole_and_flag(canvas: CanvasItem, ga: float) -> void:
 	canvas.draw_colored_polygon(PackedVector2Array([f_tl, f_tr, f_mid_r, f_br, f_bl]),
 		Color(COL_BANNER, alpha * 0.9))
 	# 윗면 하이라이트
-	canvas.draw_colored_polygon(PackedVector2Array([f_tl, f_tr, flag_top + Vector2(fw * 0.5, sway * 0.3 + FLAG_H * 0.35), f_tl]),
+	canvas.draw_colored_polygon(PackedVector2Array([f_tl, f_tr, flag_top + Vector2(fw * 0.5, sway * 0.3 + FLAG_H * 0.35)]),
 		Color(COL_BANNER_SHADE, alpha * 0.45))
 	# 황금 윤곽
 	canvas.draw_polyline(PackedVector2Array([f_tl, f_tr, f_mid_r, f_br, f_bl, f_tl]),

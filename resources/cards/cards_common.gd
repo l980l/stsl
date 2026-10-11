@@ -3,6 +3,7 @@
 # 덱 최대 1장 — starter 만 보유, pool 풀에 추가 안 함 (자동으로 상점/카드보상씬 제외).
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
+const V3 = preload("res://resources/cards/card_revision_v3.gd")
 
 # 카운터 — RARE, 3코 (강화 시 2코), SKILL, exhaust.
 # 효과 분기 (EffectType.COUNTER_REFLECT 처리):
@@ -21,4 +22,4 @@ static func counter(owner_id: String) -> Resource:
 	e.effect_type = EffRes.EffectType.COUNTER_REFLECT
 	e.value = 0  # 효과 자체는 status 부여 / 차지 무효 — value 불필요
 	c.effects = [e]
-	return c
+	return V3.apply(c)

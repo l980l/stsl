@@ -141,6 +141,8 @@ var _pick_overlay: CanvasLayer = null
 var _picked_card: Resource = null
 var _pick_confirm_btn: Button = null
 var _card_pick_in_progress: bool = false
+var _pick_owner_id: String = ""
+var _pick_is_optional: bool = false
 
 
 const STATUS_EMOJI := {
@@ -162,7 +164,7 @@ const STATUS_INTERNAL_KEYS := [
 	"taunt_source",  # 도발 시전자 추적용 — UI 표시 X (tooltip 에서만 사용)
 	# 신규 적 메커니즘 internal — 별도 UI 표시 (현재 mode/affinity/weakness 는 weakness_alert/intent 라벨)
 	"current_mode_index", "current_mode", "current_affinity", "current_weakness",
-	"exiled"  # 영웅 노드 자체가 숨겨짐 — status 아이콘 표시 불필요
+	"exiled", "next_attack_first_hit_bonus"  # 예약 효과는 카드 설명에서 확인
 ]
 
 func _trf(key: String, args) -> String:
@@ -1258,11 +1260,7 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 		char_node.set_meta("ground_shadow", sh_node)
 		_enemy_char_nodes[enemy_index] = char_node
 	else:
-		var placeholder := ColorRect.new()
-		placeholder.color = Color(0.45, 0.45, 0.5, 0.6)
-		placeholder.size = Vector2(60, 120)
-		placeholder.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 30, slot_pos.y + 40)
-		placeholder.z_index = int(slot_pos.y + SLOT_H)
+		var placeholder := _make_enemy_fallback(slot_pos)
 		add_child(placeholder)
 		_enemy_char_nodes[enemy_index] = placeholder
 	# 새로 만든 적 panel 의 UI Control z_index 갱신
@@ -1464,11 +1462,7 @@ func _setup_enemies() -> void:
 			char_node.set_meta("ground_shadow", sh_enemy)
 			_enemy_char_nodes[i] = char_node
 		else:
-			var placeholder := ColorRect.new()
-			placeholder.color = Color(0.45, 0.45, 0.5, 0.6)
-			placeholder.size = Vector2(60, 120)
-			placeholder.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 30, slot_pos.y + 40)
-			placeholder.z_index = int(slot_pos.y + SLOT_H)
+			var placeholder := _make_enemy_fallback(slot_pos)
 			add_child(placeholder)
 			_enemy_char_nodes[i] = placeholder
 
@@ -1780,7 +1774,7 @@ func _drag_hint_text() -> String:
 	if _drag_card == null:
 		return ""
 	match _card_target_type(_drag_card):
-		"enemy":    return tr("battle.drag_enemy")
+		"enemy", "enemy_ally": return tr("battle.drag_enemy")
 		"ally":     return tr("battle.drag_ally")
 		"dead_ally": return tr("battle.drag_dead_ally")
 		_:          return tr("battle.drag_release")
@@ -2023,17 +2017,31 @@ func _refresh_message_for_current_actor() -> void:
 
 func _on_card_frame_changed_battle(_key: String) -> void:
 	# 핸드 노드 전부 swap. 덱 보기 열려 있으면 자동으로 닫히지는 않음 (다음 열 때 새 frame 반영).
-	_refresh_hand()
+	_refresh_hand(true)
 
-func _refresh_hand() -> void:
+func _refresh_hand(force_rebuild: bool = false) -> void:
+	var hid: String = BattleManager.get_current_hero_id()
+	var hand: Array = DeckManager.get_hand(hid) if hid != "" else []
+	# start_hero_turn and player_turn_started may both refresh the same hand.
+	# Keep nodes (and drag/hover state) when the ordered resources are unchanged.
+	var unchanged := not force_rebuild and hand.size() == _card_buttons.size()
+	for i in range(hand.size()):
+		if not unchanged:
+			break
+		var button = _card_buttons[i]
+		unchanged = is_instance_valid(button) and not button.is_queued_for_deletion() \
+			and button.get_meta("_card_res", null) == hand[i]
+	if unchanged:
+		for i in range(hand.size()):
+			_card_buttons[i].setup(hand[i], _card_buttons[i].Mode.HAND)
+			_apply_card_state(_card_buttons[i], hand[i])
+		return
 	for n in _card_buttons:
 		if is_instance_valid(n):
 			n.queue_free()
 	_card_buttons.clear()
 
 	# 본인 차례 영웅의 핸드만 표시 (적 차례 / 차례 사이엔 빈 핸드)
-	var hid: String = BattleManager.get_current_hero_id()
-	var hand: Array = DeckManager.get_hand(hid) if hid != "" else []
 	if hand.is_empty():
 		return
 
@@ -2077,6 +2085,9 @@ func _refresh_hand() -> void:
 func _on_card_clicked(card: Resource) -> void:
 	if not _card_pick_in_progress:
 		return
+	# 선택형 버리기는 카드 사용자의 손패만 대상으로 한다.
+	if _pick_owner_id != "" and card.owner_id != _pick_owner_id:
+		return
 	for node in _card_buttons:
 		if is_instance_valid(node):
 			node.hide_glow()
@@ -2118,7 +2129,8 @@ func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
 	SacredTheme.set_named_cursor(_drag_cursor_for(screen_pos))
 	_message_label.text = tr("battle.cancel_use") if _drag_cancel_ready and screen_pos.y >= BOTTOM_Y else _drag_hint_text()
 	# enemy 타겟 카드일 때 — 호버 중인 적 인덱스 검출 → 카드 데미지 표시에 target vulnerable 반영
-	if _card_target_type(_drag_card) == "enemy":
+	var target_type := _card_target_type(_drag_card)
+	if target_type == "enemy" or target_type == "enemy_ally":
 		var hover_idx: int = -1
 		for i in range(_enemy_nodes.size()):
 			var panel: ColorRect = _enemy_nodes[i]["panel"]
@@ -3444,6 +3456,19 @@ func _sfx_for_status(stype: String) -> String:
 
 # 단순 빔 spawn — screen_effect 시점에 SFX/flash/shake 발동
 # 캐릭터 노드의 발 좌표 (바닥 VFX anchor 용).
+func _make_enemy_fallback(slot_pos: Vector2) -> Node2D:
+	# VFX, hit feedback and death animations share a Node2D character contract.
+	# Preserve the fallback rectangle's visual placement inside that contract.
+	var character := Node2D.new()
+	character.position = Vector2(slot_pos.x + SLOT_W / 2.0 - 30, slot_pos.y + 40)
+	character.z_index = int(slot_pos.y + SLOT_H)
+	var body := ColorRect.new()
+	body.color = Color(0.45, 0.45, 0.5, 0.6)
+	body.size = Vector2(60, 120)
+	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	character.add_child(body)
+	return character
+
 func _foot_pos(char_node: Node2D) -> Vector2:
 	if char_node == null:
 		return Vector2.ZERO
@@ -5411,7 +5436,10 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 		var lines: Array[String] = []
 		var sign_str: String = "+" if key == "speed_bonus" else "-"
 		for ins in status[key]:
-			lines.append("%s%d / %d턴" % [sign_str, int(ins.get("value", 0)), int(ins.get("dur", 0))])
+			if ins.get("dur", 0) == -1:
+				lines.append(tr("effect.v3.permanent_speed").replace("{amount}", str(ins.get("value", 0))))
+			else:
+				lines.append("%s%d / %d턴" % [sign_str, int(ins.get("value", 0)), int(ins.get("dur", 0))])
 		tooltip = "%s\n  " % _trf("status.%s.desc" % key, val) + "\n  ".join(lines)
 	# taunt — 부여자(source) 에 따라 tooltip 의 이름 분기.
 	# - 영웅 status 에 적용: source = enemy_index (int) → 적 이름 표시
@@ -5617,11 +5645,16 @@ func _on_active_powers_changed() -> void:
 		var base_key: String = power_key.split(":")[0] if ":" in power_key else power_key
 		var v: int = power.get("value", 0)
 		var owner_id: String = power.get("owner_id", "")
-		_active_powers_box.add_child(_make_power_item(base_key, v, owner_id))
+		_active_powers_box.add_child(_make_power_item(base_key, v, owner_id, power.get("params", {})))
 	# strength_player 변경 시 카드 데미지 표시 갱신
 	_refresh_hand_card_damage()
 
-func _make_power_item(base_key: String, v: int, owner_id: String = "") -> Control:
+func _make_power_item(base_key: String, v: int, owner_id: String = "", params: Dictionary = {}) -> Control:
+	var visual_key := base_key
+	if base_key == "power.limited_team_heal":
+		visual_key = "power.heal_team_per_turn"
+	elif base_key == "power.on_kill_energy_once":
+		visual_key = "power.on_kill_energy"
 	var hbox := HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 4)
 	hbox.custom_minimum_size = Vector2(0, 24)
@@ -5632,7 +5665,7 @@ func _make_power_item(base_key: String, v: int, owner_id: String = "") -> Contro
 		var hero: Resource = TeamManager.get_hero(owner_id)
 		SacredTheme.attach_tooltip(hbox, tr(hero.hero_name))
 
-	var tex: Texture2D = IconUtils.get_power_icon(base_key)
+	var tex: Texture2D = IconUtils.get_power_icon(visual_key)
 	if tex != null:
 		var icon := TextureRect.new()
 		icon.texture = tex
@@ -5644,8 +5677,11 @@ func _make_power_item(base_key: String, v: int, owner_id: String = "") -> Contro
 		hbox.add_child(icon)
 
 	var lbl := Label.new()
-	var label_fmt: String = tr(base_key + ".label")
-	lbl.text = label_fmt % v if label_fmt.contains("%") else label_fmt
+	var label_fmt: String = tr(visual_key + ".label")
+	if base_key == "power.every_nth_attack_bonus":
+		lbl.text = label_fmt % [params.get("bonus_value", 3), v] if label_fmt.contains("%") else label_fmt
+	else:
+		lbl.text = label_fmt % v if label_fmt.contains("%") else label_fmt
 	lbl.theme_type_variation = "EyebrowLabel"
 	lbl.add_theme_font_size_override("font_size", 11)
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -6131,15 +6167,25 @@ func _close_deck_viewer() -> void:
 # 버리기 카드 선택 모달
 # ─────────────────────────────────────────────
 
-func _on_card_pick_requested(_action: String, _draw_count: int) -> void:
-	if _card_pick_in_progress or DeckManager.hand.is_empty():
+func _on_card_pick_requested(action: String, _draw_count: int) -> void:
+	if _card_pick_in_progress:
+		return
+	_pick_is_optional = action == "discard_optional"
+	_pick_owner_id = BattleManager.get_pending_discard_owner()
+	var selectable_hand: Array = DeckManager.get_hand(_pick_owner_id) if _pick_owner_id != "" else DeckManager.hand
+	# 명상은 빈 손에서도 사용 가능하다. 고를 카드가 없으면 즉시 건너뛴다.
+	if selectable_hand.is_empty():
+		if _pick_is_optional:
+			BattleManager.resolve_pending_discard_pick(null)
 		return
 	_card_pick_in_progress = true
 	_picked_card = null
 	for node in _card_buttons:
 		if is_instance_valid(node):
-			node.set_disabled(false)
-			node.set_pick_selectable(true)
+			var card_res: Resource = node.get_meta("_card_res", null)
+			var allowed: bool = card_res != null and (_pick_owner_id == "" or card_res.owner_id == _pick_owner_id)
+			node.set_disabled(not allowed)
+			node.set_pick_selectable(allowed)
 	_show_discard_pick_overlay()
 
 func _show_discard_pick_overlay() -> void:
@@ -6158,7 +6204,7 @@ func _show_discard_pick_overlay() -> void:
 	vbox.position = Vector2(WINDOW_W / 2.0 - 100.0, BOTTOM_Y - 360.0)
 
 	var lbl := Label.new()
-	lbl.text = tr("ui.battle.modal.discard_pick.title")
+	lbl.text = tr("ui.battle.modal.discard_optional.title") if _pick_is_optional else tr("ui.battle.modal.discard_pick.title")
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
 	lbl.add_theme_font_size_override("font_size", 18)
@@ -6173,6 +6219,14 @@ func _show_discard_pick_overlay() -> void:
 	vbox.add_child(btn)
 	SacredTheme.animate_button(btn)
 	btn.pressed.connect(_on_pick_confirmed)
+	if _pick_is_optional:
+		var skip_btn := Button.new()
+		skip_btn.text = tr("ui.battle.modal.discard_optional.skip")
+		skip_btn.custom_minimum_size = Vector2(200, 36)
+		skip_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		vbox.add_child(skip_btn)
+		SacredTheme.animate_button(skip_btn)
+		skip_btn.pressed.connect(_on_optional_pick_skipped)
 
 	_pick_confirm_btn = btn
 	_pick_overlay = canvas
@@ -6184,10 +6238,18 @@ func _on_pick_confirmed() -> void:
 	_close_discard_pick_overlay()
 	BattleManager.resolve_pending_discard_pick(picked)
 
+func _on_optional_pick_skipped() -> void:
+	if not _pick_is_optional:
+		return
+	_close_discard_pick_overlay()
+	BattleManager.resolve_pending_discard_pick(null)
+
 func _close_discard_pick_overlay() -> void:
 	_card_pick_in_progress = false
 	_picked_card = null
 	_pick_confirm_btn = null
+	_pick_owner_id = ""
+	_pick_is_optional = false
 	for node in _card_buttons:
 		if is_instance_valid(node):
 			node.set_pick_selectable(false)
@@ -6331,23 +6393,38 @@ func _make_border_rects(x: int, y: int, w: int, h: int, color: Color) -> Array:
 	return rects
 
 func _card_target_type(card: Resource) -> String:
-	# "enemy" / "ally" / "none"
+	# "enemy" / "ally" / "enemy_ally" / "dead_ally" / "none"
 	if card.card_type == CardResource.CardType.POWER:
 		return "none"
+	var has_enemy_target := false
+	var has_ally_target := false
+	var has_dead_ally_target := false
 	for effect in card.effects:
+		# rule_id 효과는 기존 EffectType을 확장한다. 표적이 필요한 규칙은 여기서
+		# 일반 효과와 같은 선택 흐름으로 합친다.
+		match effect.rule_id:
+			"heal_ally_if_owner_hp_below", "block_ally_if_owner_survives":
+				has_ally_target = true
+			"revive_or_heal":
+				for entry in _hero_nodes:
+					if entry["panel"].visible and not TeamManager.is_alive(entry["hero_id"]):
+						has_dead_ally_target = true
+						break
+				if not has_dead_ally_target:
+					has_ally_target = true
 		match effect.effect_type:
 			EffectRes.EffectType.DAMAGE:
 				if effect.target == "SINGLE":
-					return "enemy"
+					has_enemy_target = true
 			EffectRes.EffectType.APPLY_STATUS:
 				if effect.target == "SINGLE":
-					return "enemy"
+					has_enemy_target = true
 			EffectRes.EffectType.CHARM:
 				if effect.target == "SINGLE":
-					return "enemy"
+					has_enemy_target = true
 			EffectRes.EffectType.MARK_ENEMY:
 				if effect.target == "SINGLE":
-					return "enemy"
+					has_enemy_target = true
 			EffectRes.EffectType.COUNTER_BLOCK, \
 			EffectRes.EffectType.CONSUME_MORALE, \
 			EffectRes.EffectType.POISON_BURST, \
@@ -6357,23 +6434,31 @@ func _card_target_type(card: Resource) -> String:
 			EffectRes.EffectType.DAMAGE_PER_DEAD_ALLY, \
 			EffectRes.EffectType.ENERGY_TO_DAMAGE, \
 			EffectRes.EffectType.DAMAGE_PER_TOKEN, \
-				EffectRes.EffectType.DAMAGE_PER_TEAM_MORALE, \
+			EffectRes.EffectType.DAMAGE_PER_TEAM_MORALE, \
 				EffectRes.EffectType.DAMAGE_PER_TEAM_TOKEN:
-				return "enemy"
+				has_enemy_target = true
 			EffectRes.EffectType.STATUS_DOUBLE:
 				if effect.target != "ALL":
-					return "enemy"
-			EffectRes.EffectType.HEAL:
-				if effect.target == "SINGLE":
-					return "ally"
+					has_enemy_target = true
+			EffectRes.EffectType.HEAL, EffectRes.EffectType.BLOCK:
+				if effect.target == "SINGLE" or effect.target == "ALLY":
+					has_ally_target = true
 			EffectRes.EffectType.REVIVE:
-				return "dead_ally"
+				has_dead_ally_target = true
 			EffectRes.EffectType.BUFF_SPEED:
 				if effect.target == "ALLY":
-					return "ally"
+					has_ally_target = true
 			EffectRes.EffectType.DEBUFF_SPEED:
 				if effect.target == "SINGLE":
-					return "enemy"
+					has_enemy_target = true
+	if has_dead_ally_target:
+		return "dead_ally"
+	if has_enemy_target and has_ally_target:
+		return "enemy_ally"
+	if has_enemy_target:
+		return "enemy"
+	if has_ally_target:
+		return "ally"
 	return "none"
 
 func _start_drag(card: Resource) -> void:
@@ -6388,7 +6473,7 @@ func _start_drag(card: Resource) -> void:
 	_drag_card = card
 	_selected_card = null
 	match _card_target_type(card):
-		"enemy":
+		"enemy", "enemy_ally":
 			_message_label.text = tr("battle.drag_enemy")
 			for i in range(_enemy_nodes.size()):
 				if _enemy_nodes[i]["panel"].visible and BattleManager.is_enemy_alive(i):
@@ -6422,6 +6507,18 @@ func _finish_drag(drop_pos: Vector2) -> void:
 					_cleanup_drag()
 					return
 			_cleanup_drag()
+		"enemy_ally":
+			for i in range(_enemy_nodes.size()):
+				var dual_panel: ColorRect = _enemy_nodes[i]["panel"]
+				if not dual_panel.visible or not BattleManager.is_enemy_alive(i):
+					continue
+				if dual_panel.get_global_rect().has_point(drop_pos):
+					_last_card_play_pos = drop_pos
+					var dual_card := _drag_card
+					_cleanup_drag()
+					_show_enemy_ally_target_dialog(dual_card, i)
+					return
+			_cleanup_drag()
 		"ally":
 			for entry in _hero_nodes:
 				if not entry["panel"].visible:
@@ -6451,6 +6548,38 @@ func _finish_drag(drop_pos: Vector2) -> void:
 		"none":
 			BattleManager.play_card(_drag_card, -1)
 			_cleanup_drag()
+
+# 혈전처럼 적과 아군을 모두 지정하는 카드는 먼저 적을 고른 뒤 작은 선택창으로 회복 대상을 고른다.
+# 카드는 확인 전까지 사용되지 않으므로 취소해도 손패·에너지가 보존된다.
+func _show_enemy_ally_target_dialog(card: Resource, enemy_index: int) -> void:
+	var dlg := ConfirmationDialog.new()
+	dlg.title = tr("ui.battle.modal.ally_target.title")
+	dlg.ok_button_text = tr("ui.battle.modal.ally_target.confirm")
+	dlg.cancel_button_text = tr("ui.battle.modal.ally_target.cancel")
+	dlg.min_size = Vector2i(330, 140)
+	var choice := OptionButton.new()
+	choice.custom_minimum_size = Vector2(280, 36)
+	var target_ids: Array[String] = []
+	for entry in _hero_nodes:
+		var hero_id: String = entry["hero_id"]
+		if hero_id == "" or not entry["panel"].visible or not TeamManager.is_alive(hero_id):
+			continue
+		var hero_res = TeamManager.get_hero(hero_id)
+		choice.add_item(tr(hero_res.hero_name) if hero_res != null else hero_id)
+		target_ids.append(hero_id)
+	dlg.add_child(choice)
+	if target_ids.is_empty():
+		dlg.queue_free()
+		return
+	dlg.confirmed.connect(func() -> void:
+		var selected: int = choice.selected
+		if selected >= 0 and selected < target_ids.size():
+			BattleManager.play_card(card, enemy_index, target_ids[selected])
+		dlg.queue_free()
+	)
+	dlg.canceled.connect(func() -> void: dlg.queue_free())
+	add_child(dlg)
+	dlg.popup_centered()
 
 func _cleanup_drag() -> void:
 	SacredTheme.clear_named_cursor()
@@ -6505,7 +6634,7 @@ func _drag_cursor_for(pos: Vector2) -> String:
 	if _drag_cancel_ready and pos.y >= BOTTOM_Y:
 		return "denied"
 	match _card_target_type(_drag_card):
-		"enemy":
+		"enemy", "enemy_ally":
 			for i in range(_enemy_nodes.size()):
 				var panel: ColorRect = _enemy_nodes[i]["panel"]
 				if panel.visible and BattleManager.is_enemy_alive(i) \
@@ -6534,7 +6663,7 @@ func _drag_arrow_color(pos: Vector2) -> Color:
 	if pos.y >= BOTTOM_Y:
 		return _ARROW_GRAY
 	match _card_target_type(_drag_card):
-		"enemy":
+		"enemy", "enemy_ally":
 			for i in range(_enemy_nodes.size()):
 				var panel: ColorRect = _enemy_nodes[i]["panel"]
 				if panel.visible and BattleManager.is_enemy_alive(i) \

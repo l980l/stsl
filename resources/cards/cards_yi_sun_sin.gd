@@ -6,20 +6,24 @@
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
 const CommonRes = preload("res://resources/cards/cards_common.gd")
+const V3 = preload("res://resources/cards/card_revision_v3.gd")
 
 static func starter_deck() -> Array:
 	var cards: Array = []
-	for _i in range(4):
+	for _i in range(2):
 		cards.append(_strike())
-	for _i in range(4):
+	for _i in range(2):
 		cards.append(_defend())
-	cards.append(_shield())
-	cards.append(_counter_strike())
+	for _i in range(2):
+		cards.append(_shield())
+	for _i in range(2):
+		cards.append(_counter_strike())
+	cards.append(_counter())
 	cards.append(CommonRes.counter("yi_sun_sin"))
-	return cards
+	return V3.apply_all(cards)
 
 static func pool() -> Array:
-	return [
+	return V3.apply_all([
 		# ── 거북선 10 (F×3 / A×2 / P×2 / C×2 / Chaos×1) ──
 		_turtle_shield(), _turtle_ship_charge(), _counter(),              # F
 		_turtle_power(), _cannon_rhythm(),                                # A
@@ -46,7 +50,7 @@ static func pool() -> Array:
 		_united_bulwark(),
 		# 카운터 (universal) — 거북선 역공 빌드용 드래프트 카드
 		CommonRes.counter("yi_sun_sin"),
-		]
+		])
 
 static func _turtleship_drill() -> Resource:
 	# 거북선 점호 — RARE, 2코, SKILL, 학익진: 파티 전원 speed +4 (4턴)

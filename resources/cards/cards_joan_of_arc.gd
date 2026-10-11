@@ -6,20 +6,24 @@
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
 const CommonRes = preload("res://resources/cards/cards_common.gd")
+const V3 = preload("res://resources/cards/card_revision_v3.gd")
 
 static func starter_deck() -> Array:
 	var cards: Array = []
-	for _i in range(4):
+	for _i in range(2):
 		cards.append(_strike())
-	for _i in range(4):
+	for _i in range(2):
 		cards.append(_defend())
-	cards.append(_holy_smite())
-	cards.append(_shield_prayer())
+	for _i in range(2):
+		cards.append(_holy_smite())
+	for _i in range(2):
+		cards.append(_shield_prayer())
+	cards.append(_altar_flame())
 	cards.append(CommonRes.counter("joan_of_arc"))
-	return cards
+	return V3.apply_all(cards)
 
 static func pool() -> Array:
-	return [
+	return V3.apply_all([
 		# ── 신성 11 (F×4 / A×2 / P×2 / C×2 / Chaos×1) ──
 		_holy_bolt(), _orleans_charge(), _holy_wave(), _holy_fury(),   # F
 		_crusaders_faith(), _divine_echo(),                             # A
@@ -40,7 +44,7 @@ static func pool() -> Array:
 		_saints_flame(),                                                # Chaos
 		# speed buff ally (축복 추가)
 		_grace_of_spirit(),
-		]
+		])
 
 static func _grace_of_spirit() -> Resource:
 	# 성령의 가호 — UNCOMMON, 1코, SKILL, 축복: 파티원 1명 speed +4 (3턴)

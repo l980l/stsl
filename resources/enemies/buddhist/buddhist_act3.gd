@@ -4,6 +4,7 @@ const IntentRes  = preload("res://resources/intent_resource.gd")
 
 static func yama(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.buddhist.yama"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
@@ -37,6 +38,7 @@ static func yama(scene: PackedScene) -> Resource:
 
 static func ksitigarbha(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.buddhist.ksitigarbha"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
@@ -54,6 +56,7 @@ static func ksitigarbha(scene: PackedScene) -> Resource:
 static func virupaksha(scene: PackedScene) -> Resource:
 	# 광목천왕 — 사천왕의 하나. 모든 악을 보는 눈으로 약화·취약 부여 (구 vairocana 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.buddhist.virupaksha"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()

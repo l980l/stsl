@@ -7,6 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func jackal_warrior(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.egyptian.jackal_warrior"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
@@ -22,6 +23,7 @@ static func jackal_warrior(scene: PackedScene) -> Resource:
 
 static func scarab_queen(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.egyptian.scarab_queen"; e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
@@ -38,6 +40,7 @@ static func scarab_queen(scene: PackedScene) -> Resource:
 
 static func obelisk_guardian(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.egyptian.obelisk_guardian"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "egyptian"
 	e.phase_thresholds = [0.5]

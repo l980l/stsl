@@ -109,6 +109,8 @@ func _draw_ground_pass(canvas: CanvasItem) -> void:
 	var alpha: float = pop * _global_alpha()
 	var ctr: Vector2 = _target + Vector2(0.0, HEAD_OFFSET)
 	var r: float = TAIJI_R * sc
+	if r < 1.0:
+		return
 	# radial gradient — 가산 blend 로 동심원 다중 누적 (중심 진함 → 외곽 옅음). 층 안 보이게 16겹.
 	var halo_r: float = r * 1.35
 	var inner_r: float = r * 0.9
@@ -165,8 +167,12 @@ func _draw_taiji(canvas: CanvasItem, ga: float) -> void:
 	var seg := 32
 	for i in range(seg + 1):
 		var a: float = -PI / 2.0 + PI * float(i) / float(seg)
-		half_pts.append(_rotate_pt(ctr, cos(a) * r, sin(a) * r, rot))
+		half_pts.append(Vector2(cos(a) * r, sin(a) * r))
+	# Triangulate in local coordinates: fading world-space vertices can round
+	# onto the same point at large screen coordinates.
+	canvas.draw_set_transform(ctr, rot)
 	canvas.draw_colored_polygon(half_pts, c_yin)
+	canvas.draw_set_transform(Vector2.ZERO)
 	# 3. 작은 흰 원 (검 반원의 위쪽 끝 — S자 형성, 회전 위치)
 	canvas.draw_circle(_rotate_pt(ctr, 0.0, -small_r, rot), small_r, c_yang)
 	# 4. 작은 검 원 (흰 반원의 아래쪽 끝 — S자 완성, 회전 위치)

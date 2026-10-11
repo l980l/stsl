@@ -6,20 +6,24 @@
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
 const CommonRes = preload("res://resources/cards/cards_common.gd")
+const V3 = preload("res://resources/cards/card_revision_v3.gd")
 
 static func starter_deck() -> Array:
 	var cards: Array = []
-	for _i in range(4):
+	for _i in range(2):
 		cards.append(_strike())
-	for _i in range(4):
+	for _i in range(2):
 		cards.append(_defend())
-	cards.append(_niten_starter())
+	for _i in range(2):
+		cards.append(_niten_starter())
 	cards.append(_guard_stance())
+	cards.append(_meditation())
+	cards.append(_void_sword())
 	cards.append(CommonRes.counter("musashi"))
-	return cards
+	return V3.apply_all(cards)
 
 static func pool() -> Array:
-	return [
+	return V3.apply_all([
 		# ── 이도류 10 (F×3 / A×2 / P×2 / C×2 / Chaos×1) ──
 		_niten_slash(), _whirlwind_cut(), _twin_blades_basic(),  # F
 		_twin_sword_power(), _rhythm_of_strikes(),               # A
@@ -40,7 +44,7 @@ static func pool() -> Array:
 		_five_rings_realm(),                                     # Chaos
 		# speed buff power (무심 추가)
 		_swift_blade(),
-		]
+		])
 
 static func _swift_blade() -> Resource:
 	# 신속의 검 — RARE, 2코, POWER, 무심: 본인 speed_bonus +6 (999턴 = 전투 끝까지, 상태이상 UI 노출)

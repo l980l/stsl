@@ -6,20 +6,24 @@
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
 const CommonRes = preload("res://resources/cards/cards_common.gd")
+const V3 = preload("res://resources/cards/card_revision_v3.gd")
 
 static func starter_deck() -> Array:
 	var cards: Array = []
-	for _i in range(4):
+	for _i in range(2):
 		cards.append(_strike())
-	for _i in range(4):
+	for _i in range(2):
 		cards.append(_defend())
-	cards.append(_war_bugle())
-	cards.append(_swift_march())
+	for _i in range(2):
+		cards.append(_hussar_charge())
+	for _i in range(2):
+		cards.append(_war_bugle())
+	cards.append(_victory_proclamation())
 	cards.append(CommonRes.counter("napoleon"))
-	return cards
+	return V3.apply_all(cards)
 
 static func pool() -> Array:
-	return [
+	return V3.apply_all([
 		# ── 돌격 10 (F×3 / A×2 / P×2 / C×2 / Chaos×1) ──
 		_cavalry_threat(), _hussar_charge(), _austerlitz_maneuver(),   # F
 		_emperors_power(), _conquest_decree(),                          # A
@@ -43,7 +47,7 @@ static func pool() -> Array:
 		_blitz_advance(),
 		# 교차 영웅 — 팀 사기 합산 정산 (DAMAGE_PER_TEAM_MORALE)
 		_allied_bombardment(),
-		]
+		])
 
 static func _blitz_advance() -> Resource:
 	# 전격 진군 — UNCOMMON, 1코, SKILL, 돌격: 본인 speed +5 (3턴)

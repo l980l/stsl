@@ -5,6 +5,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func chaos_tengu(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.japanese.chaos_tengu"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
@@ -22,6 +23,7 @@ static func chaos_tengu(scene: PackedScene) -> Resource:
 
 static func yasha(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.japanese.yasha"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
@@ -38,6 +40,7 @@ static func yasha(scene: PackedScene) -> Resource:
 
 static func nureriyon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.japanese.nureriyon"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()

@@ -88,10 +88,7 @@ func _spawn_drool() -> void:
 		})
 		d.position = _caster + off
 		add_child(d)
-		var drool := d
-		get_tree().create_timer(CHARGE_TIME).timeout.connect(func() -> void:
-			if is_instance_valid(drool):
-				drool.emitting = false)
+		d.create_tween().tween_interval(CHARGE_TIME).finished.connect(d.set.bind("emitting", false))
 
 # ── SPRAY — 3 mouth 콘 분사 + 매 0.1s splatter ──
 func _start_spray() -> void:
@@ -211,8 +208,7 @@ func _spawn_pool() -> void:
 	})
 	sizzle.position = ground
 	add_child(sizzle)
-	get_tree().create_timer(POOL_TIME * 0.85).timeout.connect(func() -> void:
-		if is_instance_valid(sizzle): sizzle.emitting = false)
+	sizzle.create_tween().tween_interval(POOL_TIME * 0.85).finished.connect(sizzle.set.bind("emitting", false))
 
 func _spawn_burns() -> void:
 	# 타겟 몸 위 산성 드립 — drip 텍스처, 아래로 천천히
@@ -231,5 +227,4 @@ func _spawn_burns() -> void:
 	})
 	burns.position = _target + Vector2(0.0, -10.0)
 	add_child(burns)
-	get_tree().create_timer(POOL_TIME * 0.85).timeout.connect(func() -> void:
-		if is_instance_valid(burns): burns.emitting = false)
+	burns.create_tween().tween_interval(POOL_TIME * 0.85).finished.connect(burns.set.bind("emitting", false))

@@ -18,6 +18,21 @@ static var _halo_tex: Texture2D
 static var _mote_halo_tex: Texture2D
 static var _soul_tex: Texture2D
 
+# Test runners can release process-wide generated textures before the rendering
+# server shuts down. Only call after active particle scenes have been freed.
+static func release_cached_textures() -> void:
+	_circle_tex = null
+	_square_tex = null
+	_sparkle_tex = null
+	_feather_tex = null
+	_heart_tex = null
+	_bubble_tex = null
+	_drip_tex = null
+	_petal_tex = null
+	_halo_tex = null
+	_mote_halo_tex = null
+	_soul_tex = null
+
 # 100% 솔리드 원 + 가장자리 1px 안티앨리어싱.
 # CPU draw_circle(pos, r, col) 과 거의 동일 — 가장자리 페이드 없음.
 # 64×64, 솔리드 반경 31 → size_min/max 는 픽셀 반경 (helper / 32 매핑).

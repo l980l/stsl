@@ -46,6 +46,16 @@ const _TYPE_SKILL  := preload("res://assets/art/cards/cardtypes/card_type_skill.
 const _TYPE_POWER  := preload("res://assets/art/cards/cardtypes/card_type_power.png")
 const CARD_ART_DIR := "res://assets/art/cards/"
 static var _card_art_cache: Dictionary = {}
+# Bounded by the six fixed palettes and five rarities; shared textures are read-only.
+static var _cost_texture_cache: Dictionary = {}
+static var _gem_texture_cache: Dictionary = {}
+var _decor_hero := ""
+var _decor_rarity := ""
+
+static func release_cached_textures() -> void:
+	_card_art_cache.clear()
+	_cost_texture_cache.clear()
+	_gem_texture_cache.clear()
 
 # ── 노드 참조 (tscn 노드 트리에서) ──
 @onready var _frame:       Panel       = $Frame
@@ -113,6 +123,11 @@ func _refresh_from_card_res() -> void:
 		return
 	_card_name = tr(_card_res.card_name)
 	_cost = _card_res.cost
+	if _mode == Mode.HAND:
+		var ml = Engine.get_main_loop()
+		var dm = ml.root.get_node_or_null("DeckManager") if ml else null
+		if dm:
+			_cost = dm.get_effective_cost(_card_res.owner_id, _card_res)
 	_card_type = _card_res.card_type
 	_rarity_key = _rarity_to_key(_card_res.rarity)
 	_hero_key = _card_res.owner_id if _card_res.owner_id != "" else "napoleon"
@@ -150,6 +165,8 @@ func _build_desc() -> String:
 		return _desc
 	var lines: Array = []
 	for eff in _card_res.effects:
+		if eff.effect_type == EffectResource.EffectType.BLOCK and eff.value == 0 and eff.rule_id == "":
+			continue
 		if _mode == Mode.HAND and eff.effect_type == EffectResource.EffectType.DAMAGE:
 			# autoload 를 트리 안 root 에서 상대경로 조회 — 카드가 트리 밖(setup)일 때도 안전(절대경로 오류 방지)
 			var _ml = Engine.get_main_loop()
@@ -318,6 +335,23 @@ func _on_mouse_exited() -> void:
 	card_unhovered.emit(_card_res)
 
 func refresh() -> void:
+	var hero: String = _hero_key if _HERO_PALETTES.has(_hero_key) else "napoleon"
+	var rarity: String = _rarity_key if _GEM_COLORS.has(_rarity_key) else "common"
+	if _decor_hero != hero or _decor_rarity != rarity:
+		_refresh_decoration(hero, rarity)
+	# Text/cost/damage previews can change without rebuilding immutable ornaments.
+	_cost_label.text = str(_cost)
+	_title_label.text = _card_name
+	LabelUtils.fit_text(_title_label, 13, 9)
+	_desc_label.text = _desc
+	LabelUtils.fit_text(_desc_label, 10, 7)
+	_art_rect.texture = _art_texture
+	match _card_type:
+		1: _type_icon.texture = _TYPE_SKILL
+		2: _type_icon.texture = _TYPE_POWER
+		_: _type_icon.texture = _TYPE_ATTACK
+
+func _refresh_decoration(hero: String, rarity: String) -> void:
 	var pal: Dictionary = _HERO_PALETTES.get(_hero_key, _HERO_PALETTES["napoleon"])
 	var frame_col: Color = pal["frame"]
 	var base_col: Color = pal["base"]
@@ -340,29 +374,22 @@ func refresh() -> void:
 	_apply_line_color(_line_l, frame_col, true)
 	_apply_line_color(_line_r, frame_col, false)
 	# Cost circle — highlight_strength 0.25 (HTML rgba alpha 0.18 매칭)
-	_cost_bg.texture = _make_circle_texture(
-		Color(0.96, 0.94, 0.90, 1.0), Color("#070710"), Color("#070710"),
-		frame_col, 0.04, 64, 0.25
-	)
+	if not _cost_texture_cache.has(hero):
+		_cost_texture_cache[hero] = _make_circle_texture(
+			Color(0.96, 0.94, 0.90, 1.0), Color("#070710"), Color("#070710"),
+			frame_col, 0.04, 64, 0.25
+		)
+	_cost_bg.texture = _cost_texture_cache[hero]
 	# Gem — highlight_strength 0.65 (보석 highlight 보이되 과하지 않게)
 	var col: Dictionary = _GEM_COLORS.get(_rarity_key, _GEM_COLORS["common"])
-	_gem_tr.texture = _make_circle_texture(
-		col["hi"], col["mid"], col["lo"], frame_col, 0.08, 64, 0.65
-	)
-	# 텍스트 + 일러스트
-	_cost_label.text = str(_cost)
-	_title_label.text = _card_name
-	# 제목 폰트 자동 조절 — 긴 텍스트는 폭에 맞춰 축소 (기존 card_scene 패턴)
-	LabelUtils.fit_text(_title_label, 13, 9)
-	_desc_label.text = _desc
-	# 설명 폰트 자동 조절 — autowrap 라벨이므로 라인 수 × 라인 높이가 영역 초과 시 축소
-	LabelUtils.fit_text(_desc_label, 10, 7)
-	_art_rect.texture = _art_texture
-	# Type icon
-	match _card_type:
-		1: _type_icon.texture = _TYPE_SKILL
-		2: _type_icon.texture = _TYPE_POWER
-		_: _type_icon.texture = _TYPE_ATTACK
+	var gem_key := hero + "/" + rarity
+	if not _gem_texture_cache.has(gem_key):
+		_gem_texture_cache[gem_key] = _make_circle_texture(
+			col["hi"], col["mid"], col["lo"], frame_col, 0.08, 64, 0.65
+		)
+	_gem_tr.texture = _gem_texture_cache[gem_key]
+	_decor_hero = hero
+	_decor_rarity = rarity
 
 func _apply_line_color(rect: TextureRect, fc: Color, _left_side: bool) -> void:
 	# 라인 RGB 만 영웅별 교체 — tscn 의 alpha (fade 방향) / offsets / width 유지.

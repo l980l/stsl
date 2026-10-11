@@ -6,6 +6,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 static func ushi_oni(scene: PackedScene) -> Resource:
 	# 우시오니 — 소 머리의 흉포한 요괴. blunt 강타형 엘리트 (구 oni_general 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.japanese.ushi_oni"; e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
@@ -23,6 +24,7 @@ static func ushi_oni(scene: PackedScene) -> Resource:
 
 static func yamamba(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.japanese.yamamba"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
@@ -41,6 +43,7 @@ static func yamamba(scene: PackedScene) -> Resource:
 
 static func invincible_ronin(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.japanese.invincible_ronin"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "japanese"
 	var i1 := IntentRes.new()
