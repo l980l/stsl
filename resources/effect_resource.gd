@@ -63,6 +63,15 @@ enum EffectType {
 @export var condition: String = ""  # 빈 문자열=무조건 발동. "hand_size_0"등 조건 키 설정 시 조건 불충족이면 이 효과 스킵
 @export var damage_type: String = ""  # DAMAGE 계열 시각 타입. "" → slash fallback. slash/blunt/projectile/bullet/explosive/poison/curse/holy_strike/holy_slash/holy_bolt/holy_blunt/holy_fire
 
+# v3 카드 개편의 명시 강화와 자원 정산 계약.
+# upgrade_* 가 -1이면 해당 필드는 강화해도 유지한다.
+# rule_id 는 BattleManager가 카드별 특수 처리에 사용하는 안정 식별자다.
+@export var upgrade_value: int = -1
+@export var upgrade_bonus_value: int = -1
+@export var rule_id: String = ""
+@export var rule_params: Dictionary = {}
+@export var upgrade_rule_params: Dictionary = {}
+
 const _STATUS_NAME_KEYS := {
 	"weak":          "status.weak.name",
 	"vulnerable":    "status.vulnerable.name",
@@ -76,6 +85,14 @@ func display_text(override_value: int = -1) -> String:
 	# override_value >= 0 면 데미지 표시에 그 값 사용 (UI 가 buff/debuff 적용한 효과 데미지).
 	# DAMAGE / CONDITIONAL_DMG 등 데미지 계열만 override 의미 있음.
 	var v: int = override_value if override_value >= 0 else value
+	if rule_id != "":
+		return _revision_display_text()
+	if effect_type == EffectType.BLOCK and value == 0:
+		return ""
+	if effect_type == EffectType.APPLY_STATUS and status_type == "power.morale_per_turn" and rule_params.has("immediate_morale"):
+		return _revision_format("morale_power", {"amount": value, "immediate": rule_params.immediate_morale})
+	if effect_type == EffectType.APPLY_STATUS and status_type == "power.on_kill_energy_once":
+		return _revision_format("kill_energy", {"amount": value})
 	match effect_type:
 		EffectType.DAMAGE:
 			var hit_str: String = ""
@@ -202,6 +219,10 @@ func display_text(override_value: int = -1) -> String:
 		EffectType.DAMAGE_PER_CHARMED_ENEMY:
 			return TranslationServer.translate("effect.damage_per_charmed_enemy.text") % value
 		EffectType.BUFF_SPEED:
+			if bonus_value == 999:
+				return _revision_format("permanent_speed", {"amount": value})
+			if rule_params.get("exclude_current_turn_end", false):
+				return _revision_format("future_speed", {"amount": value, "turns": bonus_value})
 			var _bsk: String
 			match target:
 				"SELF": _bsk = "effect.buff_speed.self.text"
@@ -221,4 +242,55 @@ func display_text(override_value: int = -1) -> String:
 			return TranslationServer.translate("effect.consume_team_morale.text") % [value, bonus_value]
 		EffectType.DAMAGE_PER_TEAM_TOKEN:
 			return TranslationServer.translate("effect.damage_per_team_token.text") % value
+	return ""
+
+func _revision_format(key: String, values: Dictionary) -> String:
+	var result: String = tr("effect.v3." + key)
+	for token in values:
+		result = result.replace("{" + str(token) + "}", str(values[token]))
+	return result
+
+func _revision_display_text() -> String:
+	var values := rule_params.duplicate()
+	values["base"] = value
+	values["bonus"] = bonus_value
+	values["multiplier"] = rule_params.get("multiplier", bonus_value)
+	match rule_id:
+		"morale_spend_damage": return _revision_format("morale_spend", values)
+		"consume_own_block": return _revision_format("block_spend", values)
+		"consume_own_tokens", "consume_own_tokens_all":
+			values["cap"] = rule_params.get("consume_cap", rule_params.get("consume", 0))
+			return _revision_format("tokens_spend_all" if rule_id.ends_with("_all") else "tokens_spend", values)
+		"team_morale_damage", "team_token_damage": return _revision_format(rule_id, values)
+		"damage_per_debuff_type": return _revision_format("debuff_damage", values)
+		"poison_burst_multiplier": return _revision_format("poison_burst", values)
+		"consume_charm_damage": return _revision_format("charm_spend", values)
+		"poison_existing_all_bonus": return _revision_format("poison_increase", values)
+		"extend_enemy_debuffs": return _revision_format("extend_debuffs", values)
+		"formation_block":
+			values["base"] = rule_params.base
+			return _revision_format("formation", values)
+		"heal_ally_if_owner_hp_below": return _revision_format("low_hp_heal", values)
+		"team_block_consume_morale":
+			values["base"] = rule_params.base
+			return _revision_format("team_block", values)
+		"block_ally_if_owner_survives": return _revision_format("ally_block", values)
+		"delayed_team_heal": return _revision_format("limited_heal", values)
+		"revive_or_heal": return _revision_format("revive", values)
+		"sacrifice_then_power": return _revision_format("sacrifice_power", values)
+		"sacrifice_bank_payoff": return _revision_format("sacrifice_damage", values)
+		"sacrifice_bank_team_block":
+			values["base"] = rule_params.base
+			return _revision_format("sacrifice_block", values)
+		"other_card_this_turn_damage": return _revision_format("prior_card_damage", values)
+		"third_card_draw_once": return _revision_format("third_draw", values)
+		"block_per_prior_card": return _revision_format("prior_block", values)
+		"next_cards_cost_reduction": return _revision_format("next_cost", values)
+		"next_attack_cost_reduction": return _revision_format("next_attack_cost", values)
+		"next_attack_first_hit_bonus": return _revision_format("first_hit", values)
+		"discard_up_to_one_for_block": return _revision_format("meditation", values)
+		"block_if_target_survives": return _revision_format("survival_block", values)
+		"hand_empty_energy_once": return _revision_format("empty_energy", values)
+		"cleanse_self_weak_vulnerable_if_hand_empty": return _revision_format("empty_cleanse", values)
+		"counter_reflect": return _revision_format("counter", values)
 	return ""

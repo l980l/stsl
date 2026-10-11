@@ -192,8 +192,7 @@ func _spawn_inward_motes() -> void:
 	motes.local_coords = true  # emission radius 가 emitter 좌표계 기준
 	motes.position = _target
 	add_child(motes)
-	get_tree().create_timer(CHARGE_TIME).timeout.connect(func() -> void:
-		if is_instance_valid(motes): motes.emitting = false)
+	motes.create_tween().tween_interval(CHARGE_TIME).finished.connect(motes.set.bind("emitting", false))
 
 # ── BURST particles — 사방 80 motes (가산) + ground dust 32 ──
 func _spawn_burst_particles() -> void:
@@ -235,5 +234,4 @@ func _spawn_embers() -> void:
 	})
 	embers.position = _foot_anchor
 	add_child(embers)
-	get_tree().create_timer(HOLD_TIME).timeout.connect(func() -> void:
-		if is_instance_valid(embers): embers.emitting = false)
+	embers.create_tween().tween_interval(HOLD_TIME).finished.connect(embers.set.bind("emitting", false))

@@ -4,6 +4,7 @@ const IntentRes  = preload("res://resources/intent_resource.gd")
 
 static func white_tiger(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.daoist.white_tiger"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
@@ -20,6 +21,7 @@ static func white_tiger(scene: PackedScene) -> Resource:
 
 static func vermilion_bird(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.daoist.vermilion_bird"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
@@ -37,6 +39,7 @@ static func vermilion_bird(scene: PackedScene) -> Resource:
 
 static func black_tortoise(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.daoist.black_tortoise"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()

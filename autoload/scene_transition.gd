@@ -1,8 +1,11 @@
 # autoload/scene_transition.gd
 extends CanvasLayer
 
+signal transition_failed(path: String, error: Error)
+
 var _overlay: ColorRect
 var _tween: Tween = null
+var last_transition_error: Error = OK
 
 func _ready() -> void:
 	layer = 100
@@ -16,6 +19,7 @@ func _ready() -> void:
 	_fade_in(0.30)
 
 func go(path: String) -> void:
+	last_transition_error = OK
 	_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	if _tween:
 		_tween.kill()
@@ -23,7 +27,11 @@ func go(path: String) -> void:
 	_tween.tween_property(_overlay, "modulate:a", 1.0, 0.22) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await _tween.finished
-	get_tree().change_scene_to_file(path)
+	var scene_change_error: Error = get_tree().change_scene_to_file(path)
+	if scene_change_error != OK:
+		last_transition_error = scene_change_error
+		push_error("Scene transition failed (%d): %s" % [scene_change_error, path])
+		transition_failed.emit(path, scene_change_error)
 	await get_tree().process_frame
 	await get_tree().process_frame
 	_fade_in(0.28)

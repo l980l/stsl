@@ -144,16 +144,20 @@ func _draw_ground_pass(canvas: CanvasItem) -> void:
 	if ga <= 0.0:
 		return
 	var grow: float = clampf(_age / 0.4, 0.0, 1.0)
+	if grow * 30.0 < 1.0:
+		return
 	var alpha: float = grow * ga * 0.5
 	var foot: Vector2 = _foot_pos()
 	# 바닥 ellipse (납작)
 	var seg := 32
 	var pts := PackedVector2Array()
-	for i in range(seg + 1):
+	for i in range(seg):
 		var a: float = TAU * float(i) / float(seg)
-		pts.append(foot + Vector2(cos(a) * 90.0 * grow, sin(a) * 30.0 * grow))
+		pts.append(Vector2(cos(a) * 90.0 * grow, sin(a) * 30.0 * grow))
+	canvas.draw_set_transform(foot)
 	canvas.draw_colored_polygon(pts, Color(COL_LOTUS, alpha * 0.6))
 	canvas.draw_colored_polygon(pts, Color(COL_GOLD, alpha * 0.25))
+	canvas.draw_set_transform(Vector2.ZERO)
 
 # ── glow — lotus + 3 rings + beams + hero halos + petals ──
 func _draw_glow_pass(canvas: CanvasItem) -> void:
@@ -179,35 +183,39 @@ func _draw_lotus(canvas: CanvasItem, ga: float) -> void:
 	var alpha: float = bloom * fade * ga
 	var ctr: Vector2 = _caster + Vector2(0.0, -20.0)
 	var r: float = LOTUS_R * bloom
+	if r < 1.0 or alpha <= 0.0:
+		return
+	canvas.draw_set_transform(ctr)
 	# 4 외곽 잎 (분홍)
 	for i in range(4):
 		var ang: float = TAU * float(i) / 4.0
 		var seg := 16
 		var pts := PackedVector2Array()
-		for k in range(seg + 1):
+		for k in range(seg):
 			var t: float = TAU * float(k) / float(seg)
 			var lx: float = cos(t) * r * 0.32
 			var ly: float = sin(t) * r * 0.7
 			# 회전
 			var rx: float = lx * cos(ang) - ly * sin(ang)
 			var ry: float = lx * sin(ang) + ly * cos(ang)
-			pts.append(ctr + Vector2(rx, ry))
+			pts.append(Vector2(rx, ry))
 		canvas.draw_colored_polygon(pts, Color(COL_LOTUS, alpha * 0.5))
 	# 4 내곽 잎 (황금, 45도 회전)
 	for i in range(4):
 		var ang: float = TAU * float(i) / 4.0 + PI / 4.0
 		var seg := 12
 		var pts2 := PackedVector2Array()
-		for k in range(seg + 1):
+		for k in range(seg):
 			var t: float = TAU * float(k) / float(seg)
 			var lx: float = cos(t) * r * 0.20
 			var ly: float = sin(t) * r * 0.50
 			var rx: float = lx * cos(ang) - ly * sin(ang)
 			var ry: float = lx * sin(ang) + ly * cos(ang)
-			pts2.append(ctr + Vector2(rx, ry))
+			pts2.append(Vector2(rx, ry))
 		canvas.draw_colored_polygon(pts2, Color(COL_GOLD, alpha * 0.55))
 	# 중심 — 흰 코어
-	canvas.draw_circle(ctr, r * 0.12, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha))
+	canvas.draw_circle(Vector2.ZERO, r * 0.12, Color(COL_HOT.r, COL_HOT.g, COL_HOT.b, alpha))
+	canvas.draw_set_transform(Vector2.ZERO)
 
 # 3 expanding karma rings (staggered)
 func _draw_rings(canvas: CanvasItem, ga: float) -> void:

@@ -27,6 +27,10 @@ enum Rarity {
 @export var is_ethereal: bool = false  # 턴 끝 손에 있으면 소멸
 @export var is_retain: bool = false    # 턴 끝 손에 남음
 @export var is_innate: bool = false    # 전투 시작 시 손패 보장
+# 카드별 명시 강화 비용. -1이면 비용을 바꾸지 않는다.
+@export var upgrade_cost: int = -1
+# true면 이 카드의 효과는 명시된 upgrade_* 값만 바꾼다.
+@export var has_explicit_upgrade: bool = false
 
 func max_upgrade_level() -> int:
 	# 모든 등급 1강까지 통일 (COMMON 포함).

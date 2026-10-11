@@ -172,7 +172,7 @@ func _draw_call_ring(canvas: CanvasItem) -> void:
 		return
 	var sc: float = lerpf(0.2, 1.0, t) + post_t * 1.3
 	var rad: float = RING_MAX_R * sc
-	var thick: float = lerpf(8.0, 1.5, t + post_t * 0.5)
+	var thick: float = lerpf(8.0, 1.5, clampf(t + post_t * 0.5, 0.0, 1.0))
 	canvas.draw_arc(_caster, rad, 0.0, TAU, 64, Color(COL_HOT, alpha), thick, true)
 	canvas.draw_arc(_caster, rad * 0.92, 0.0, TAU, 48, Color(COL_MID, alpha * 0.7), thick * 0.5, true)
 
@@ -187,6 +187,8 @@ func _draw_pillar(canvas: CanvasItem, ctr: Vector2) -> void:
 	var w: float = PILLAR_W
 	var h: float = PILLAR_H * grow
 	var alpha: float = grow * fade
+	if h < 0.5 or alpha <= 0.0:
+		return
 	var bottom_y: float = ctr.y + 20.0
 	var top_y: float = bottom_y - h
 	# 외측 (밝은 황금)

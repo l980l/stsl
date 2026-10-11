@@ -8,6 +8,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 static func serqet(scene: PackedScene) -> Resource:
 	# 셀케트 — 전갈 여신. 독 누적 후 대형 독침 피니셔 (구 apep_snake 리스킨, 메커니즘 동일).
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.egyptian.serqet"; e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
@@ -28,6 +29,7 @@ static func serqet(scene: PackedScene) -> Resource:
 
 static func seth_hound(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.egyptian.seth_hound"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()
@@ -44,6 +46,7 @@ static func seth_hound(scene: PackedScene) -> Resource:
 
 static func ba_bird(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.egyptian.ba_bird"; e.max_hp = 1500; e.character_scene = scene
 	e.mythology = "egyptian"
 	var i1 := IntentRes.new()

@@ -7,6 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func troll_warrior(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.norse.troll_warrior"; e.max_hp = 2050; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
@@ -25,6 +26,7 @@ static func troll_warrior(scene: PackedScene) -> Resource:
 
 static func norn(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.norse.norn"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
@@ -42,6 +44,7 @@ static func norn(scene: PackedScene) -> Resource:
 
 static func vanir_elf(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.norse.vanir_elf"; e.max_hp = 1850; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.5]

@@ -1,6 +1,6 @@
 # tools/generate_catalog.gd
 # 실행: "H:/Program Files/Godot/Godot_v4.6.2-stable_win64_console.exe" --headless -s tools/generate_catalog.gd
-# 주의: SceneTree 모드 — autoload 미초기화. 업그레이드 공식은 game_manager.gd:315-353 기준 직접 포팅.
+# SceneTree 모드. 강화는 실제 GameManager 규칙을 호출한다.
 extends SceneTree
 
 const OUT_DIR := "res://docs/catalog/"
@@ -54,10 +54,11 @@ const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 func _init() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT_DIR))
 	_generate_cards()
-	_generate_enemies()
-	_generate_relics()
-	_generate_events()
-	_write_readme()
+	if not "--cards-only" in OS.get_cmdline_user_args():
+		_generate_enemies()
+		_generate_relics()
+		_generate_events()
+		_write_readme()
 	print("=== 도감 생성 완료 → ", OUT_DIR)
 	quit()
 
@@ -69,36 +70,10 @@ func _apply_upgrade(card: Resource, level: int) -> Resource:
 	if level == 0:
 		return card
 	var c: Resource = card.duplicate(true)
-	var rate: float = 0.0
-	match c.rarity:
-		CardRes.Rarity.UNCOMMON:  rate = 0.10
-		CardRes.Rarity.RARE:      rate = 0.12
-		CardRes.Rarity.LEGENDARY: rate = 0.14
-		CardRes.Rarity.DIVINE:    rate = 0.16
-	var PERCENT_TYPES: Array = [
-		EffRes.EffectType.DAMAGE, EffRes.EffectType.BLOCK,
-		EffRes.EffectType.HEAL, EffRes.EffectType.BLOCK_ALL,
-		EffRes.EffectType.HEAL_ALL, EffRes.EffectType.FORMATION_BLOCK,
-		EffRes.EffectType.COUNTER_BLOCK, EffRes.EffectType.POISON_BURST,
-		EffRes.EffectType.CONSUME_MORALE, EffRes.EffectType.CONDITIONAL_DMG,
-	]
-	var INT_TYPES: Array = [
-		EffRes.EffectType.DRAW, EffRes.EffectType.ENERGY,
-		EffRes.EffectType.GAIN_MORALE, EffRes.EffectType.APPLY_STATUS,
-		EffRes.EffectType.CHARM, EffRes.EffectType.COST_NEXT,
-		EffRes.EffectType.SUMMON_TOKEN,
-	]
-	for i in range(level):
-		for effect in c.effects:
-			if effect.effect_type in PERCENT_TYPES:
-				var lv: int = i + 1
-				effect.value = int(effect.base_value * (1.0 + rate * lv))
-				effect.bonus_value = int(effect.base_bonus_value * (1.0 + rate * lv))
-			elif effect.effect_type == EffRes.EffectType.APPLY_STATUS and effect.status_type.begins_with("power."):
-				effect.value = effect.base_value + (i + 1) * 5
-			elif effect.effect_type in INT_TYPES:
-				effect.value = effect.base_value + (i + 1)
-				effect.bonus_value = effect.base_bonus_value + (i + 1) if effect.base_bonus_value > 0 else 0
+	var gm = load("res://autoload/game_manager.gd").new()
+	for _level in range(level):
+		gm.upgrade_card(c)
+	gm.free()
 	return c
 
 func _format_effects(card: Resource) -> String:

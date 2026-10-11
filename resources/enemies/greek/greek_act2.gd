@@ -7,6 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func cerberus(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.greek.cerberus"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
@@ -22,6 +23,7 @@ static func cerberus(scene: PackedScene) -> Resource:
 
 static func charon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.greek.charon"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "greek"
 	var i1 := IntentRes.new()
@@ -39,6 +41,7 @@ static func charon(scene: PackedScene) -> Resource:
 static func erinyes(scene: PackedScene) -> Resource:
 	# MIMIC: 복수의 여신 — 영웅 누적 데미지 40% 카르마 반사 (페이즈 2)
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.greek.erinyes"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "greek"
 	e.phase_thresholds = [0.5]

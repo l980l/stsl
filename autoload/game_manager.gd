@@ -41,6 +41,7 @@ const _JapaneseNormals = preload("res://resources/enemies/japanese/japanese_norm
 const _JapaneseAct1    = preload("res://resources/enemies/japanese/japanese_act1.gd")
 const _JapaneseAct2    = preload("res://resources/enemies/japanese/japanese_act2.gd")
 const _JapaneseAct3    = preload("res://resources/enemies/japanese/japanese_act3.gd")
+const _EnemyRes        = preload("res://resources/enemy_resource.gd")
 
 enum GameState { MAP, BATTLE, CARD_PICK, EVENT, SHOP, REST, GAME_OVER, CARD_UPGRADE, HERO_RECRUIT }
 
@@ -603,6 +604,19 @@ func upgrade_card(card: Resource) -> void:
 	var level: int = card.upgrade_level
 	var CardRes = load("res://resources/card_resource.gd")
 	var EffRes = load("res://resources/effect_resource.gd")
+	# v3 카드에는 카드별로 승인된 1강 수치만 적용한다. 명시되지 않은
+	# 보조 효과는 그대로 두어, 예전 일괄 퍼센트 강화가 새 카드에 섞이지 않는다.
+	if card.has_explicit_upgrade:
+		if card.upgrade_cost >= 0:
+			card.cost = card.upgrade_cost
+		for effect in card.effects:
+			if effect.upgrade_value >= 0:
+				effect.value = effect.upgrade_value
+			if effect.upgrade_bonus_value >= 0:
+				effect.bonus_value = effect.upgrade_bonus_value
+			for key in effect.upgrade_rule_params:
+				effect.rule_params[key] = effect.upgrade_rule_params[key]
+		return
 
 	var rate: float = 0.0
 	match card.rarity:
@@ -804,14 +818,29 @@ func _apply_act_difficulty(enemies: Array, act: int) -> void:
 	var dmg_m: float = _ACT_DMG_MULT.get(act, 1.0)
 	var IntentRes = load("res://resources/intent_resource.gd")
 	for enemy in enemies:
+		# 한 Resource 안에서 intent_pattern이 phase_patterns[0]을 가리키는 보스가
+		# 있다. 객체별로 한 번만 변형해야 막 배율이 두 번 곱해지지 않는다.
+		if enemy.has_meta("stsl_act_difficulty"):
+			continue
 		enemy.max_hp = int(enemy.max_hp * hp_m)
-		for intent in enemy.intent_pattern:
-			if intent.action_type == IntentRes.ActionType.ATTACK:
-				intent.value = int(intent.value * dmg_m)
+		var scaled_intents: Dictionary = {}
+		_scale_attack_intents_once(enemy.intent_pattern, dmg_m, scaled_intents, IntentRes)
 		for phase_pattern in enemy.phase_patterns:
-			for intent in phase_pattern:
-				if intent.action_type == IntentRes.ActionType.ATTACK:
-					intent.value = int(intent.value * dmg_m)
+			_scale_attack_intents_once(phase_pattern, dmg_m, scaled_intents, IntentRes)
+		enemy.set_meta("stsl_act_difficulty", act)
+
+func _scale_attack_intents_once(intents: Array, damage_multiplier: float, scaled: Dictionary, IntentRes) -> void:
+	for intent in intents:
+		if intent == null:
+			continue
+		var intent_id: int = intent.get_instance_id()
+		if scaled.has(intent_id):
+			continue
+		scaled[intent_id] = true
+		if intent.action_type == IntentRes.ActionType.ATTACK:
+			intent.value = int(intent.value * damage_multiplier)
+		elif intent.action_type == IntentRes.ActionType.CHARGE_UP:
+			_scale_attack_intents_once(intent.payoff_intents, damage_multiplier, scaled, IntentRes)
 
 func _make_enemies_for_node(node: Resource) -> Array:
 	var enemies: Array
@@ -841,7 +870,11 @@ func _make_elite_enemies() -> Array:
 		return _make_normal_enemies()
 	var fn_name: String = elites.pick_random()
 	var scene: PackedScene = _scene_for(myth, fn_name)
-	return [act_mod.call(fn_name, scene)]
+	var elite: Resource = act_mod.call(fn_name, scene)
+	# 모든 정예 팩토리는 같은 경로로 전투에 들어온다. 여기서 등급을 확정해
+	# 기본 속도 폴백이 NORMAL 45가 아니라 ELITE 53을 사용하게 한다.
+	elite.grade = _EnemyRes.Grade.ELITE
+	return [elite]
 
 func _make_boss_enemies() -> Array:
 	var myth: String = act_mythologies[current_act - 1]

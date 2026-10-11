@@ -7,6 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func nidhogg_larva(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.norse.nidhogg_larva"; e.max_hp = 1750; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
@@ -24,6 +25,7 @@ static func nidhogg_larva(scene: PackedScene) -> Resource:
 
 static func skoll(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.norse.skoll"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "norse"
 	var i1 := IntentRes.new()
@@ -41,6 +43,7 @@ static func modgud(scene: PackedScene) -> Resource:
 	# 모드구드 — 죽음의 강 갈라르 다리 수문장. 페이즈 2 영웅 1명에 heal_block 2턴
 	# (삶으로 가는 길을 막는다 — 구 hrimthurs_scout 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.norse.modgud"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.5]

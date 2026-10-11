@@ -7,6 +7,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func fenrir_cub(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.norse.fenrir_cub"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.5]
@@ -28,6 +29,7 @@ static func fenrir_cub(scene: PackedScene) -> Resource:
 
 static func valkyrie(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.norse.valkyrie"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "norse"
 	# 단일 페이즈 5턴 패턴
@@ -50,6 +52,7 @@ static func valkyrie(scene: PackedScene) -> Resource:
 
 static func jormungandr_shard(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.norse.jormungandr_shard"; e.max_hp = 2000; e.character_scene = scene
 	e.mythology = "norse"
 	e.phase_thresholds = [0.4]

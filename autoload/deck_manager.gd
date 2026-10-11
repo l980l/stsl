@@ -13,7 +13,7 @@ var _heroes: Dictionary = {}  # hero_id → {draw, hand, discard, exhaust, energ
 
 # 전투 외 (메타) — start_run 시 add_card_to_deck 으로 누적되는 임시 풀.
 # setup_for_battle 시 owner_id 기반으로 _heroes 에 분배.
-var _meta_deck: Array = []  # 전투 외 보유 카드 전체
+var _meta_deck: Array = []  # 아직 영웅별 전투 더미에 배분하지 않은 카드 (중복 소유 없음)
 
 var debug_unlimited_energy: bool = false
 
@@ -81,14 +81,21 @@ func _all_pile(pile_name: String) -> Array:
 
 # ── 전투 초기화 ─────────────────────────────────────
 func setup_for_battle(hero_ids: Array) -> void:
+	# A battle leaves cards in per-hero piles while rewards and newly recruited
+	# heroes can still be pending in _meta_deck.  Snapshot the authoritative
+	# current piles before rebuilding entries; keeping old meta cards for these
+	# same owners would resurrect stale starter decks and lose earned cards.
+	var cards := get_full_deck()
 	_heroes.clear()
+	_meta_deck.clear()
 	for hid in hero_ids:
 		_heroes[hid] = _new_hero_entry()
-	# meta_deck 의 카드를 owner_id 기반으로 _heroes 에 분배
-	for card in _meta_deck:
+	# Snapshot cards are distributed by their current owner. Unknown owners stay
+	# pending so a recruited hero receives their initial deck next battle.
+	for card in cards:
 		var hid: String = card.owner_id
 		if not _heroes.has(hid):
-			# 영웅 없으면 무시 (사망 상태이지만 사용 안 함)
+			_meta_deck.append(card)
 			continue
 		(_heroes[hid]["draw"] as Array).append(card)
 	for hid in _heroes.keys():
@@ -102,6 +109,9 @@ func _new_hero_entry() -> Dictionary:
 		"exhaust": [],
 		"energy": 0,
 		"pending_cost_reduction": 0,
+		"cost_reduction_count": 0,
+		"attack_cost_reduction": 0,
+		"attack_cost_reduction_count": 0,
 		"pending_all_cost_zero": false,
 		"cards_played_this_turn": 0,
 		"draws_this_turn": 0,
@@ -114,6 +124,9 @@ func start_hero_turn(hero_id: String) -> void:
 	var entry: Dictionary = _heroes[hero_id]
 	entry["energy"] = MAX_ENERGY
 	entry["pending_cost_reduction"] = 0
+	entry["cost_reduction_count"] = 0
+	entry["attack_cost_reduction"] = 0
+	entry["attack_cost_reduction_count"] = 0
 	entry["pending_all_cost_zero"] = false
 	entry["cards_played_this_turn"] = 0
 	entry["draws_this_turn"] = 0
@@ -142,6 +155,10 @@ func end_hero_turn(hero_id: String) -> void:
 		else:
 			(entry["discard"] as Array).append(card)
 	entry["hand"] = retained
+	entry["pending_cost_reduction"] = 0
+	entry["cost_reduction_count"] = 0
+	entry["attack_cost_reduction"] = 0
+	entry["attack_cost_reduction_count"] = 0
 	hand_changed.emit()
 
 func draw_cards_h(hero_id: String, count: int) -> void:
@@ -187,7 +204,7 @@ func can_play_hero(hero_id: String, card: Resource) -> bool:
 		return (entry["hand"] as Array).has(card)
 	if entry["pending_all_cost_zero"]:
 		return (entry["hand"] as Array).has(card)
-	var effective_cost: int = max(0, card.cost - entry["pending_cost_reduction"])
+	var effective_cost: int = get_effective_cost(hero_id, card)
 	return (entry["hand"] as Array).has(card) and entry["energy"] >= effective_cost
 
 func play_card(card: Resource) -> bool:
@@ -197,8 +214,15 @@ func play_card_hero(hero_id: String, card: Resource) -> bool:
 	if not can_play_hero(hero_id, card):
 		return false
 	var entry: Dictionary = _heroes[hero_id]
-	var effective_cost: int = 0 if entry["pending_all_cost_zero"] else max(0, card.cost - entry["pending_cost_reduction"])
-	entry["pending_cost_reduction"] = 0
+	var effective_cost: int = get_effective_cost(hero_id, card)
+	if entry["pending_cost_reduction"] > 0:
+		entry["cost_reduction_count"] = maxi(0, entry.get("cost_reduction_count", 1) - 1)
+		if entry["cost_reduction_count"] == 0:
+			entry["pending_cost_reduction"] = 0
+	if int(card.card_type) == 0 and entry.get("attack_cost_reduction", 0) > 0:
+		entry["attack_cost_reduction_count"] = maxi(0, entry.get("attack_cost_reduction_count", 0) - 1)
+		if entry["attack_cost_reduction_count"] == 0:
+			entry["attack_cost_reduction"] = 0
 	if not debug_unlimited_energy:
 		entry["energy"] -= effective_cost
 	energy_changed.emit(entry["energy"])
@@ -242,13 +266,34 @@ func get_energy(hero_id: String) -> int:
 func get_pending_cost_reduction(hero_id: String) -> int:
 	return _heroes[hero_id]["pending_cost_reduction"] if _heroes.has(hero_id) else 0
 
+func get_effective_cost(hero_id: String, card: Resource) -> int:
+	if not _heroes.has(hero_id):
+		return card.cost
+	var entry: Dictionary = _heroes[hero_id]
+	if entry["pending_all_cost_zero"]:
+		return 0
+	var reduction: int = entry["pending_cost_reduction"]
+	if int(card.card_type) == 0:
+		reduction = maxi(reduction, entry.get("attack_cost_reduction", 0))
+	return maxi(0, card.cost - reduction)
+
+func reserve_cost_reduction(hero_id: String, amount: int, count: int, attacks_only: bool = false) -> void:
+	if not _heroes.has(hero_id):
+		return
+	var entry: Dictionary = _heroes[hero_id]
+	var amount_key := "attack_cost_reduction" if attacks_only else "pending_cost_reduction"
+	var count_key := "attack_cost_reduction_count" if attacks_only else "cost_reduction_count"
+	entry[amount_key] = maxi(entry.get(amount_key, 0), amount)
+	entry[count_key] = maxi(entry.get(count_key, 0), count)
+	hand_changed.emit()
+
 func set_pending_cost_reduction(hero_id: String, val: int) -> void:
 	if _heroes.has(hero_id):
 		_heroes[hero_id]["pending_cost_reduction"] = val
+		_heroes[hero_id]["cost_reduction_count"] = 1 if val > 0 else 0
 
 func add_pending_cost_reduction(hero_id: String, delta: int) -> void:
-	if _heroes.has(hero_id):
-		_heroes[hero_id]["pending_cost_reduction"] += delta
+	reserve_cost_reduction(hero_id, delta, 1)
 
 func set_pending_all_cost_zero(hero_id: String, val: bool) -> void:
 	if _heroes.has(hero_id):
@@ -319,11 +364,10 @@ func get_meta_deck() -> Array:
 	return _meta_deck.duplicate()
 
 func get_full_deck() -> Array:
-	# meta + 모든 영웅의 draw/hand/discard/exhaust 합산 (legacy 호환).
-	# 보통 전투 외 시 호출 → _heroes 비어있으면 _meta_deck 만.
+	# Pending cards plus all hero piles; each card has one authoritative home.
 	if _heroes.is_empty():
 		return _meta_deck.duplicate()
-	var full: Array = []
+	var full: Array = _meta_deck.duplicate()
 	for hid in _heroes.keys():
 		full.append_array(_heroes[hid]["draw"])
 		full.append_array(_heroes[hid]["hand"])
@@ -347,6 +391,9 @@ func discard_random(n: int) -> void:
 	hand_changed.emit()
 
 # ── 직렬화 v3 ────────────────────────────────────
+const _SAVED_CARD_FIELDS := ["card_name", "owner_id", "cost", "play_animation", "upgrade_level", "card_type", "rarity", "is_exhaust", "is_ethereal", "is_retain", "is_innate", "archetype", "has_explicit_upgrade", "upgrade_cost"]
+const _SAVED_EFFECT_FIELDS := ["effect_type", "value", "target", "status_type", "bonus_value", "base_value", "base_bonus_value", "hit_count", "condition", "damage_type", "rule_id", "rule_params", "upgrade_value", "upgrade_bonus_value", "upgrade_rule_params"]
+
 func to_dict() -> Dictionary:
 	# 전투 외 — _meta_deck 직렬화. 전투 중이면 모든 영웅 합쳐서.
 	var cards: Array = _meta_deck if _heroes.is_empty() else get_full_deck()
@@ -354,57 +401,64 @@ func to_dict() -> Dictionary:
 	for card in cards:
 		var effects_data := []
 		for eff in card.effects:
-			effects_data.append({
-				"effect_type": eff.effect_type,
-				"value": eff.value,
-				"target": eff.target,
-				"status_type": eff.status_type,
-				"bonus_value": eff.bonus_value,
-			})
-		card_data.append({
-			"card_name": card.card_name,
-			"owner_id": card.owner_id,
-			"cost": card.cost,
-			"play_animation": card.play_animation,
-			"upgrade_level": card.upgrade_level,
-			"effects": effects_data,
-		})
-	return {"version": 3, "base_draw_count": base_draw_count, "full_deck": card_data}
+			var saved_effect: Dictionary = {}
+			for field in _SAVED_EFFECT_FIELDS:
+				saved_effect[field] = eff.get(field)
+			effects_data.append(saved_effect)
+		var saved_card: Dictionary = {"effects": effects_data}
+		for field in _SAVED_CARD_FIELDS:
+			saved_card[field] = card.get(field)
+		card_data.append(saved_card)
+	return {"version": 4, "base_draw_count": base_draw_count, "full_deck": card_data}
 
 func from_dict(data: Dictionary) -> void:
 	clear()
 	base_draw_count = data.get("base_draw_count", 4)
 	var CardRes = load("res://resources/card_resource.gd")
 	var EffRes = load("res://resources/effect_resource.gd")
+	var canonical: Dictionary = {}
+	for definition in load("res://resources/card_catalog.gd").get_all_cards():
+		canonical[definition.owner_id + "|" + definition.card_name] = definition
+	var upgrader = load("res://autoload/game_manager.gd").new()
 	for cd in data.get("full_deck", []):
+		var key: String = cd.get("owner_id", "") + "|" + cd.get("card_name", "")
+		if canonical.has(key):
+			# Preserve deck count/order/ownership; restore current authored rules and keywords.
+			var known: Resource = canonical[key].duplicate(true)
+			for _level in range(clampi(int(cd.get("upgrade_level", 0)), 0, known.max_upgrade_level())):
+				upgrader.upgrade_card(known)
+			_meta_deck.append(known)
+			continue
 		var card: Resource = CardRes.new()
-		card.card_name = cd["card_name"]
-		card.owner_id = cd["owner_id"]
-		card.cost = cd["cost"]
-		card.play_animation = cd.get("play_animation", "idle")
-		card.upgrade_level = cd.get("upgrade_level", 0)
+		for field in _SAVED_CARD_FIELDS:
+			if cd.has(field):
+				card.set(field, cd[field])
 		var effects := []
 		for ed in cd.get("effects", []):
 			var eff: Resource = EffRes.new()
-			eff.effect_type = ed["effect_type"]
-			eff.value = ed["value"]
-			eff.target = ed.get("target", "SINGLE")
-			eff.status_type = ed.get("status_type", "")
-			eff.bonus_value = ed.get("bonus_value", 0)
+			for field in _SAVED_EFFECT_FIELDS:
+				if ed.has(field):
+					eff.set(field, ed[field])
+			if not ed.has("base_value"):
+				eff.base_value = eff.value
+			if not ed.has("base_bonus_value"):
+				eff.base_bonus_value = eff.bonus_value
 			effects.append(eff)
 		card.effects = effects
 		_meta_deck.append(card)
+	upgrader.free()
 
 func remove_from_deck(card: Resource) -> bool:
-	# meta + 모든 영웅 풀에서 검색
-	if _meta_deck.has(card):
-		_meta_deck.erase(card)
-		return true
+	# Live piles are authoritative for active owners; check them before pending
+	# meta so an old shadow entry cannot make a removed card reappear next fight.
 	for hid in _heroes.keys():
 		for pile in ["draw", "discard", "hand", "exhaust"]:
 			if (_heroes[hid][pile] as Array).has(card):
 				(_heroes[hid][pile] as Array).erase(card)
 				return true
+	if _meta_deck.has(card):
+		_meta_deck.erase(card)
+		return true
 	return false
 
 func remove_random_card() -> bool:

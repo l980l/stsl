@@ -4,6 +4,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func crimson_immortal(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.daoist.crimson_immortal"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
@@ -18,6 +19,7 @@ static func crimson_immortal(scene: PackedScene) -> Resource:
 
 static func nine_dragon(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.daoist.nine_dragon"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
@@ -36,6 +38,7 @@ static func nine_dragon(scene: PackedScene) -> Resource:
 
 static func twin_immortals(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.daoist.twin_immortals"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()

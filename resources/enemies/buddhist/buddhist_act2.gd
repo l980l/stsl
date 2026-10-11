@@ -4,6 +4,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func asura_king(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.buddhist.asura_king"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
@@ -20,6 +21,7 @@ static func asura_king(scene: PackedScene) -> Resource:
 
 static func naga_king(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.buddhist.naga_king"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
@@ -36,6 +38,7 @@ static func naga_king(scene: PackedScene) -> Resource:
 
 static func agni_buddha(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.buddhist.agni_buddha"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()

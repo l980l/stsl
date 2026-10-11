@@ -256,8 +256,11 @@ func _bake_gash(p0: Vector2, p1: Vector2, base_w: float, seed_v: int) -> Diction
 		var bpt: Vector2 = p0 * (iu * iu) + ctrl * (2.0 * iu * u) + p1 * (u * u)
 		mid.push_back(bpt)
 		var taper: float = pow(sin(u * PI), 0.7)
-		var w_top: float = base_w * taper * (0.55 + rng.randf() * 0.9) + (rng.randf() - 0.5) * 1.2
-		var w_bot: float = base_w * taper * (0.55 + rng.randf() * 0.9) + (rng.randf() - 0.5) * 1.2
+		# End-point taper is zero.  Unbounded jitter could therefore flip one
+		# edge across the centreline, producing a self-intersecting polygon that
+		# CanvasItem triangulation rejects.  Keep a tiny positive half-width.
+		var w_top: float = maxf(0.15, base_w * taper * (0.55 + rng.randf() * 0.9) + (rng.randf() - 0.5) * 1.2)
+		var w_bot: float = maxf(0.15, base_w * taper * (0.55 + rng.randf() * 0.9) + (rng.randf() - 0.5) * 1.2)
 		top.push_back(bpt + nrm * w_top)
 		bot.push_back(bpt - nrm * w_bot)
 		# 본체 색 그라데이션 (HTML 매핑): u<0.06 fade, 0.06~0.18 bright red, 0.18~0.4 blood, 0.4~0.7 deep, 0.7~0.95 near black, >0.95 fade
@@ -359,7 +362,8 @@ func _draw_gashes() -> void:
 			poly.push_back(bot[i])
 			var c2: Color = body_cols[i]
 			poly_cols.push_back(Color(c2.r, c2.g, c2.b, c2.a * alpha_envelope))
-		draw_polygon(poly, poly_cols)
+		if _is_drawable_polygon(poly):
+			draw_polygon(poly, poly_cols)
 		# 2. 어두운 중심 line (단색)
 		if mid.size() >= 2:
 			draw_polyline(mid, Color(0.031, 0.008, 0.016, 0.9 * alpha_envelope), 1.5)
@@ -376,3 +380,15 @@ func _draw_gashes() -> void:
 			if dp.size() >= 2:
 				draw_polyline(dp, Color(COL_BLOOD.r, COL_BLOOD.g, COL_BLOOD.b, 0.85 * alpha_envelope), 1.4)
 			draw_circle(d["bead_pos"], float(d["bead_r"]), Color(0.722, 0.082, 0.133, 0.95 * alpha_envelope))
+
+func _is_drawable_polygon(points: PackedVector2Array) -> bool:
+	if points.size() < 3:
+		return false
+	var twice_area := 0.0
+	for i in points.size():
+		var a := points[i]
+		var b := points[(i + 1) % points.size()]
+		if a.distance_squared_to(b) < 0.0001:
+			return false
+		twice_area += a.x * b.y - b.x * a.y
+	return absf(twice_area) >= 0.01

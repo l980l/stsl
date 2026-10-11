@@ -6,20 +6,24 @@
 const CardRes = preload("res://resources/card_resource.gd")
 const EffRes  = preload("res://resources/effect_resource.gd")
 const CommonRes = preload("res://resources/cards/cards_common.gd")
+const V3 = preload("res://resources/cards/card_revision_v3.gd")
 
 static func starter_deck() -> Array:
 	var cards: Array = []
-	for _i in range(4):
+	for _i in range(2):
 		cards.append(_strike())
-	for _i in range(4):
+	for _i in range(2):
 		cards.append(_defend())
-	cards.append(_horse_thrust())
-	cards.append(_rider_call())
+	for _i in range(2):
+		cards.append(_horse_thrust())
+	for _i in range(2):
+		cards.append(_cavalry_summon())
+	cards.append(_hunters_bow())
 	cards.append(CommonRes.counter("genghis_khan"))
-	return cards
+	return V3.apply_all(cards)
 
 static func pool() -> Array:
-	return [
+	return V3.apply_all([
 		# ── 기동 12 (F×4 / A×2 / P×3 / C×2 / Chaos×1) ──
 		_quick_strike(), _sprint(), _horse_charge(), _desert_cavalry(),    # F
 		_khans_fury(), _mobility_power(),                                   # A
@@ -40,7 +44,7 @@ static func pool() -> Array:
 		_khans_gamble(),                                                    # Chaos
 		# speed buff long (기동 추가)
 		_cavalry_charge_speed(),
-		]
+		])
 
 static func _cavalry_charge_speed() -> Resource:
 	# 기마 돌격 — RARE, 1코, SKILL, 기동: 본인 speed +6 (3턴) — 나폴레옹 전격 진군 (+5/3턴) 의 RARE 상위

@@ -109,6 +109,7 @@ var _cards_drawn_this_turn: int = 0
 var _kills_this_card: int = 0
 var _enthralls_this_card: int = 0
 var _in_echo_replay: bool = false
+var _turn_effect_uses: Dictionary = {}
 
 # 개체별 턴 큐 (ATB) — actor_id → 다음 차례 카운터 (작을수록 먼저)
 var _turn_queue_at: Dictionary = {}
@@ -365,13 +366,13 @@ func _card_has_damage(card: Resource) -> bool:
 # DAMAGE 아니면 effect.value 그대로.
 # 치명타·dnd 는 미포함 (실제 경로 _apply_card_effects 와 동일 버킷, 비치명타 기준)
 func estimate_effect_damage(effect: Resource, owner_id: String, target_enemy_index: int = -1) -> int:
-	if effect.effect_type != EffectRes.EffectType.DAMAGE:
+	if effect.effect_type not in [EffectRes.EffectType.DAMAGE, EffectRes.EffectType.CONDITIONAL_DMG]:
 		return effect.value
 	var owner_status: Dictionary = _hero_status.get(owner_id, {})
 	var ctx := DamageContext.new()
-	ctx.base = effect.value
+	ctx.base = _card_effect_base_damage(effect, owner_id, target_enemy_index, true)
 	# strength → flat
-	ctx.flat = _active_powers.get("power.strength_player:" + owner_id, {}).get("value", 0)
+	ctx.flat = _hero_strength(owner_id)
 	# weak → out_pct -0.25
 	if owner_status.get("weak", 0) > 0:
 		ctx.out_pct -= 0.25
@@ -389,13 +390,54 @@ func estimate_effect_damage(effect: Resource, owner_id: String, target_enemy_ind
 	# crit_mult = 1.0, dnd_mult = 1.0 (미리보기: 확률·1회성 미포함)
 	return compute_damage(ctx)
 
+# Pure projection used by card text and the queued-damage indicator.
+func _card_effect_base_damage(effect: Resource, owner_id: String, target: int, before_play: bool = false) -> int:
+	var st: Dictionary = _hero_status.get(owner_id, {})
+	var enemy_st: Dictionary = _enemy_status[target] if target >= 0 and target < _enemy_status.size() else {}
+	var p: Dictionary = effect.rule_params
+	match effect.rule_id:
+		"morale_spend_damage": return effect.bonus_value if st.get("morale", 0) >= int(p.consume) else effect.value
+		"consume_own_block": return effect.value + int(mini(_hero_block.get(owner_id, 0), p.consume_cap) * float(p.multiplier))
+		"consume_own_tokens", "consume_own_tokens_all": return effect.value + mini(st.get("tokens", 0), p.get("consume_cap", p.get("consume", 0))) * effect.bonus_value
+		"team_morale_damage", "team_token_damage":
+			var total := 0
+			var key := "morale" if effect.rule_id == "team_morale_damage" else "tokens"
+			if team_mgr:
+				for hero in team_mgr.get_living_heroes():
+					total += int(_hero_status.get(hero.hero_id, {}).get(key, 0))
+			return effect.value + mini(total * effect.bonus_value, p.cap)
+		"damage_per_debuff_type":
+			var count := 0
+			for key in ["weak", "vulnerable", "charm"]:
+				if enemy_st.get(key, 0) > 0:
+					count += 1
+			if enemy_st.get("poison_dmg", 0) > 0 and enemy_st.get("poison_dur", 0) > 0:
+				count += 1
+			return effect.value + mini(count, p.cap) * effect.bonus_value
+		"consume_charm_damage": return effect.value + mini(enemy_st.get("charm", 0), p.consume_cap) * effect.bonus_value
+		"poison_burst_multiplier": return int(enemy_st.get("poison_dmg", 0)) * int(p.multiplier) if enemy_st.get("poison_dur", 0) > 0 else 0
+		"sacrifice_bank_payoff": return effect.value + mini(st.get("sacrifice_bank", 0), p.consume_cap)
+		"other_card_this_turn_damage":
+			var prior: int = deck_mgr.get_cards_played_this_turn(owner_id) if deck_mgr else 0
+			return effect.bonus_value if prior >= (1 if before_play else 2) else effect.value
+	if effect.effect_type == EffectRes.EffectType.CONDITIONAL_DMG:
+		match effect.status_type:
+			"hand_size_0":
+				if deck_mgr and deck_mgr.get_hand(owner_id).size() <= (1 if before_play else 0):
+					return effect.bonus_value
+			"enemy_hp_below_30", "enemy_hp_below_50":
+				var threshold := 30 if effect.status_type.ends_with("30") else 50
+				if target >= 0 and target < _enemies.size() and _enemy_hp[target] * 100 <= _enemies[target].max_hp * threshold:
+					return effect.bonus_value
+	return effect.value
+
 # 카드의 단일 타겟/ALL 데미지 추정 — compute_damage 파이프라인 사용 (실제 경로 동일 버킷)
 # 결과: enemy_index → 예측 데미지 합 (hit_count 포함)
 # 치명타·dnd·bonus_per_hit 는 미포함 (확률·1회성)
 func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionary:
 	var result: Dictionary = {}
 	var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
-	var _str_flat: int = _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+	var _str_flat: int = _hero_strength(card.owner_id)
 	var _base_out_pct: float = 0.0
 	if owner_status.get("weak", 0) > 0:
 		_base_out_pct -= 0.25
@@ -418,8 +460,8 @@ func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionar
 		for ti in targets:
 			var t_status: Dictionary = _enemy_status[ti] if ti < _enemy_status.size() else {}
 			var ctx := DamageContext.new()
-			ctx.base = effect.value
-			ctx.flat = _str_flat
+			ctx.base = _card_effect_base_damage(effect, card.owner_id, ti)
+			ctx.flat = 0 if effect.rule_id == "poison_burst_multiplier" else _str_flat
 			ctx.out_pct = _base_out_pct
 			# 황제의 무도: 취약 적에게 out_pct +0.25
 			if _ed_active and t_status.get("vulnerable", 0) > 0:
@@ -519,6 +561,8 @@ func setup_battle(enemies: Array, is_tutorial: bool = false) -> void:
 	_hero_status.clear()
 	_last_attacker.clear()
 	_active_powers.clear()
+	_turn_effect_uses.clear()
+	_pending_discard_pick.clear()
 	_enemy_card_counters.clear()
 	# 부활 시그널 연결 (중복 방지)
 	if team_mgr != null:
@@ -757,6 +801,14 @@ func _start_hero_turn(hid: String) -> void:
 		await get_tree().create_timer(turn_interval).timeout
 	if not is_battle_active:
 		return
+	# A poison tick may have killed this actor during the pre-turn animation.
+	# Never reopen input for a dead hero; advance the surviving queue instead.
+	if team_mgr == null or not team_mgr.is_alive(hid):
+		is_player_turn = false
+		_in_player_turn = false
+		_current_actor_id = ""
+		await _run_next_actor_turn()
+		return
 	_phase_hero_main(hid)
 	turn_started.emit(_current_actor_id)
 	# 스턴 체크 — 카드 뽑기·power trigger 까지는 정상이지만 본인 행동은 막고 자동 종료.
@@ -847,9 +899,10 @@ func _phase_hero_main(hid: String) -> void:
 	is_player_turn = true
 	_cards_played_this_turn = 0
 	_cards_drawn_this_turn = 0
-	_trigger_active_powers("player_turn_start", {"hero_id": hid})
+	_turn_effect_uses[hid] = {}
 	if deck_mgr:
 		deck_mgr.start_hero_turn(hid)
+	_trigger_active_powers("player_turn_start", {"hero_id": hid})
 	var _gm_pts = _get_gm()
 	if _gm_pts and _gm_pts.is_inside_tree():
 		_gm_pts.trigger_relics(RelicRes.TriggerType.PLAYER_TURN_START, {"turn": turn_count, "hero_id": hid})
@@ -858,7 +911,10 @@ func _phase_hero_main(hid: String) -> void:
 # 본인 영웅 차례 종료 — 본인 status -1
 func _phase_hero_post(hid: String) -> bool:
 	var did_work: bool = false
-	for stype: String in ["weak", "vulnerable", "taunt"]:
+	var old_speed: int = _hero_effective_speed(hid)
+	if _hero_status.has(hid):
+		_hero_status[hid].erase("next_attack_first_hit_bonus")
+	for stype: String in ["weak", "vulnerable", "taunt", "silence"]:
 		var cur: int = _hero_status.get(hid, {}).get(stype, 0)
 		if cur > 0:
 			if not _hero_status.has(hid):
@@ -875,6 +931,13 @@ func _phase_hero_post(hid: String) -> bool:
 			continue
 		var kept: Array = []
 		for ins in arr:
+			if ins.get("dur", 0) == -1:
+				kept.append(ins)
+				continue
+			if ins.get("skip_current_end", false):
+				ins.erase("skip_current_end")
+				kept.append(ins)
+				continue
 			var new_dur: int = int(ins.get("dur", 0)) - 1
 			if new_dur > 0:
 				kept.append({"value": int(ins.get("value", 0)), "dur": new_dur})
@@ -882,11 +945,14 @@ func _phase_hero_post(hid: String) -> bool:
 			_hero_status[hid] = {}
 		_hero_status[hid][key] = kept
 		did_work = true
+	_adjust_turn_queue_for_speed_change(_actor_id_for_hero(hid), old_speed)
 	_check_win_condition()
 	return did_work
 
 func play_card(card: Resource, target_enemy_index: int, target_hero_id: String = "") -> bool:
 	if not is_player_turn or not is_battle_active:
+		return false
+	if not _pending_discard_pick.is_empty():
 		return false
 	if tutorial_active and (tutorial_effect_pending or card.card_name not in tutorial_allowed_cards):
 		return false
@@ -952,6 +1018,8 @@ func _start_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 func end_player_turn() -> void:
 	if not is_player_turn or not is_battle_active:
 		return
+	if not _pending_discard_pick.is_empty():
+		return
 	if tutorial_active and (tutorial_effect_pending or not tutorial_allow_end_turn):
 		return
 	is_player_turn = false
@@ -982,6 +1050,210 @@ func end_player_turn() -> void:
 
 const DND_KEY := "power.double_next_damage:__global__"
 
+func _hero_strength(owner_id: String) -> int:
+	return int(_hero_status.get(owner_id, {}).get("strength", 0)) + int(_active_powers.get("power.strength_player:" + owner_id, {}).get("value", 0))
+
+func _gain_block(hero_id: String, amount: int) -> void:
+	if amount <= 0 or (team_mgr != null and not team_mgr.is_alive(hero_id)):
+		return
+	_hero_block[hero_id] = _hero_block.get(hero_id, 0) + amount
+	hero_block_gained.emit(hero_id, amount)
+
+func _use_turn_effect(owner_id: String, key: String) -> bool:
+	if not _turn_effect_uses.has(owner_id):
+		_turn_effect_uses[owner_id] = {}
+	if _turn_effect_uses[owner_id].get(key, false):
+		return false
+	_turn_effect_uses[owner_id][key] = true
+	return true
+
+func _spend_hero_resource(owner_id: String, key: String, cap: int) -> int:
+	if not _hero_status.has(owner_id):
+		_hero_status[owner_id] = {}
+	var spent: int = mini(_hero_status[owner_id].get(key, 0), cap)
+	_hero_status[owner_id][key] = _hero_status[owner_id].get(key, 0) - spent
+	status_applied.emit(owner_id, key, _hero_status[owner_id][key])
+	if key == "morale":
+		morale_changed.emit(owner_id, _hero_status[owner_id][key])
+	return spent
+
+func _revision_damage(card: Resource, effect: Resource, target: int, amount: int, all: bool = false, first_bonus: int = 0) -> void:
+	var ctx := DamageContext.new()
+	ctx.base = amount
+	ctx.flat = _hero_strength(card.owner_id) + first_bonus
+	var base_out_pct := 0.0
+	if _hero_status.get(card.owner_id, {}).get("weak", 0) > 0:
+		base_out_pct -= 0.25
+	var targets: Array = range(_enemies.size()) if all else [target]
+	for idx in targets:
+		if idx < 0 or idx >= _enemies.size() or not _enemy_alive[idx]:
+			continue
+		var crit := _roll_crit(idx, not _enemy_status[idx].get("marked_by", []).is_empty())
+		ctx.out_pct = base_out_pct
+		if card.owner_id in ["napoleon", "musashi"] and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi") and _enemy_status[idx].get("vulnerable", 0) > 0:
+			ctx.out_pct += 0.25
+		ctx.crit_mult = crit.crit_mult
+		_last_attacker[idx] = card.owner_id
+		_deal_damage_to_enemy(idx, compute_damage(ctx), effect.damage_type, crit.is_crit, card.owner_id)
+
+func _apply_revision_effect(card: Resource, effect: Resource, target: int, ally: String, first_bonus: int = 0) -> void:
+	var p: Dictionary = effect.rule_params
+	var hid: String = card.owner_id
+	var ally_id: String = ally if ally != "" else hid
+	var target_alive: bool = target >= 0 and target < _enemies.size() and _enemy_alive[target]
+	match effect.rule_id:
+		"morale_spend_damage":
+			var damage: int = effect.value
+			if _hero_status.get(hid, {}).get("morale", 0) >= int(p.consume):
+				_spend_hero_resource(hid, "morale", p.consume)
+				damage = effect.bonus_value
+			_revision_damage(card, effect, target, damage, false, first_bonus)
+		"consume_own_block":
+			var spent: int = mini(_hero_block.get(hid, 0), p.consume_cap)
+			_hero_block[hid] = _hero_block.get(hid, 0) - spent
+			hero_block_gained.emit(hid, -spent)
+			_revision_damage(card, effect, target, effect.value + int(spent * float(p.multiplier)), false, first_bonus)
+		"consume_own_tokens", "consume_own_tokens_all":
+			var spent: int = _spend_hero_resource(hid, "tokens", p.get("consume_cap", p.get("consume", 0)))
+			_revision_damage(card, effect, target, effect.value + spent * effect.bonus_value, effect.rule_id.ends_with("_all"), first_bonus)
+		"team_morale_damage", "team_token_damage":
+			var total := 0
+			var key := "morale" if effect.rule_id == "team_morale_damage" else "tokens"
+			if team_mgr:
+				for hero in team_mgr.get_living_heroes():
+					total += int(_hero_status.get(hero.hero_id, {}).get(key, 0))
+			_revision_damage(card, effect, target, effect.value + mini(total * effect.bonus_value, p.cap), false, first_bonus)
+		"damage_per_debuff_type":
+			if target_alive:
+				var count := 0
+				var st: Dictionary = _enemy_status[target]
+				for key in ["weak", "vulnerable", "charm"]:
+					if st.get(key, 0) > 0:
+						count += 1
+				if st.get("poison_dmg", 0) > 0 and st.get("poison_dur", 0) > 0:
+					count += 1
+				_revision_damage(card, effect, target, effect.value + mini(count, p.cap) * effect.bonus_value, false, first_bonus)
+		"poison_burst_multiplier":
+			if target_alive:
+				var poison: int = _enemy_status[target].get("poison_dmg", 0) if _enemy_status[target].get("poison_dur", 0) > 0 else 0
+				_enemy_status[target]["poison_dmg"] = 0
+				_enemy_status[target]["poison_dur"] = 0
+				if poison > 0:
+					_deal_damage_to_enemy(target, poison * int(p.multiplier), effect.damage_type, false, hid)
+		"consume_charm_damage":
+			if target_alive:
+				# Base hit resolves first; a killed target cannot pay the follow-up.
+				_revision_damage(card, effect, target, effect.value, false, first_bonus)
+				if _enemy_alive[target]:
+					var spent: int = mini(_enemy_status[target].get("charm", 0), p.consume_cap)
+					_enemy_status[target]["charm"] = _enemy_status[target].get("charm", 0) - spent
+					status_applied.emit("enemy_%d" % target, "charm", _enemy_status[target]["charm"])
+					if spent > 0:
+						_deal_damage_to_enemy(target, spent * effect.bonus_value, effect.damage_type, false, hid)
+		"poison_existing_all_bonus", "extend_enemy_debuffs":
+			for i in range(_enemies.size()):
+				if not _enemy_alive[i]:
+					continue
+				if effect.rule_id == "poison_existing_all_bonus":
+					if _enemy_status[i].get("poison_dmg", 0) > 0 and _enemy_status[i].get("poison_dur", 0) > 0:
+						_enemy_status[i]["poison_dmg"] += int(p.amount)
+						status_applied.emit("enemy_%d" % i, "poison", p.amount)
+				else:
+					for key in p.statuses:
+						if _enemy_status[i].get(key, 0) > 0:
+							_enemy_status[i][key] += int(p.turns)
+							status_applied.emit("enemy_%d" % i, key, p.turns)
+		"formation_block":
+			_gain_block(hid, int(p.base) + maxi(0, team_mgr.get_living_heroes().size() - 1) * int(p.per_other_ally))
+		"heal_ally_if_owner_hp_below":
+			if team_mgr.get_current_hp(hid) * 100 <= team_mgr.get_hero(hid).max_hp * int(p.hp_percent):
+				_heal_hero_safe(ally_id, _holy_war_amplify(p.amount))
+		"team_block_consume_morale":
+			var spent := 0
+			for hero in team_mgr.get_living_heroes():
+				spent += _spend_hero_resource(hero.hero_id, "morale", p.morale_per_hero)
+			for hero in team_mgr.get_living_heroes():
+				_gain_block(hero.hero_id, int(p.base) + spent * int(p.per_morale))
+		"block_ally_if_owner_survives":
+			if team_mgr.is_alive(hid):
+				_gain_block(ally_id, p.amount)
+		"delayed_team_heal":
+			_register_power("power.limited_team_heal", hid, p.amount, {"remaining_turns": p.turns})
+		"revive_or_heal":
+			var dead_id := ""
+			for hero in team_mgr.heroes:
+				if not team_mgr.is_alive(hero.hero_id):
+					dead_id = hero.hero_id
+					if dead_id == ally:
+						break
+			if dead_id != "":
+				team_mgr.revive(dead_id, maxi(1, int(team_mgr.get_hero(dead_id).max_hp * float(p.revive_percent) / 100.0)))
+			else:
+				_heal_hero_safe(ally_id, _holy_war_amplify(p.heal))
+		"sacrifice_then_power":
+			var hp_before: int = team_mgr.get_current_hp(hid)
+			team_mgr.take_damage(hid, p.sacrifice)
+			if not _hero_status.has(hid):
+				_hero_status[hid] = {}
+			_hero_status[hid]["sacrifice_bank"] = _hero_status[hid].get("sacrifice_bank", 0) + hp_before - team_mgr.get_current_hp(hid)
+			status_applied.emit(hid, "sacrifice_bank", _hero_status[hid]["sacrifice_bank"])
+			if team_mgr.is_alive(hid):
+				_register_power(p.power, hid, p.amount, {"card_name": card.card_name})
+			_check_lose_condition()
+		"sacrifice_bank_payoff", "sacrifice_bank_team_block":
+			var spent := _spend_hero_resource(hid, "sacrifice_bank", p.consume_cap)
+			if effect.rule_id == "sacrifice_bank_payoff":
+				_revision_damage(card, effect, target, effect.value + spent, true, first_bonus)
+			else:
+				for hero in team_mgr.get_living_heroes():
+					_gain_block(hero.hero_id, int(p.base) + spent)
+		"other_card_this_turn_damage":
+			var prior: int = deck_mgr.get_cards_played_this_turn(hid) - 1 if deck_mgr else 0
+			_revision_damage(card, effect, target, effect.bonus_value if prior > 0 else effect.value, false, first_bonus)
+		"third_card_draw_once":
+			if deck_mgr and deck_mgr.get_cards_played_this_turn(hid) >= int(p.threshold) and _use_turn_effect(hid, "third_card_draw"):
+				deck_mgr.draw_cards_h(hid, p.draw)
+		"block_per_prior_card":
+			var prior: int = maxi(0, deck_mgr.get_cards_played_this_turn(hid) - 1) if deck_mgr else 0
+			_gain_block(hid, mini(prior * int(p.per_card), p.cap))
+		"next_cards_cost_reduction", "next_attack_cost_reduction":
+			if deck_mgr:
+				deck_mgr.reserve_cost_reduction(hid, p.amount, p.count, effect.rule_id == "next_attack_cost_reduction")
+		"next_attack_first_hit_bonus":
+			if not _hero_status.has(hid):
+				_hero_status[hid] = {}
+			_hero_status[hid]["next_attack_first_hit_bonus"] = maxi(_hero_status[hid].get("next_attack_first_hit_bonus", 0), p.amount)
+		"discard_up_to_one_for_block":
+			_gain_block(hid, p.amount)
+			_trigger_discard_pick(0, 0, hid, true)
+		"block_if_target_survives":
+			if target_alive:
+				_gain_block(hid, p.amount)
+		"hand_empty_energy_once":
+			if deck_mgr and deck_mgr.get_hand(hid).is_empty() and _use_turn_effect(hid, "empty_hand_energy"):
+				deck_mgr.add_energy_h(hid, p.amount)
+		"cleanse_self_weak_vulnerable_if_hand_empty":
+			if deck_mgr and deck_mgr.get_hand(hid).is_empty() and _hero_status.has(hid):
+				_hero_status[hid].erase("weak")
+				_hero_status[hid].erase("vulnerable")
+		"counter_reflect":
+			if target < 0:
+				for i in range(_enemies.size()):
+					if is_counter_window_active(i):
+						target = i
+						break
+			if is_counter_window_active(target):
+				_enemy_status[target].erase("charge_remaining")
+				_enemy_status[target].erase("_charge_block_advance")
+				_enemy_intent_index[target] = 0
+				_apply_status_to_enemy(target, "stun", 1)
+				counter_triggered.emit(hid, target, true)
+			else:
+				if not _hero_status.has(hid):
+					_hero_status[hid] = {}
+				_hero_status[hid]["counter_pending"] = 1
+				status_applied.emit(hid, "counter_pending", 1)
+
 func _dnd_key(hid: String) -> String:
 	return "power.double_next_damage:" + hid
 
@@ -1004,47 +1276,85 @@ func _consume_double_next_damage(amount: int) -> int:
 		active_powers_changed.emit()
 	return amount
 
-func _apply_discard_pick_reward(draw_count: int, energy_gain: int) -> void:
+func _apply_discard_pick_reward(draw_count: int, energy_gain: int, owner_id: String = "") -> void:
 	if not deck_mgr:
 		return
-	deck_mgr.draw_cards(draw_count)
+	if owner_id == "":
+		owner_id = get_current_hero_id()
+	if owner_id == "" and not deck_mgr._heroes.is_empty():
+		owner_id = deck_mgr._heroes.keys()[0]
+	deck_mgr.draw_cards_h(owner_id, draw_count)
 	_cards_drawn_this_turn += draw_count
 	if energy_gain > 0:
-		deck_mgr.current_energy += energy_gain
-		deck_mgr.energy_changed.emit(deck_mgr.current_energy)
+		deck_mgr.add_energy_h(owner_id, energy_gain)
 
-func _trigger_discard_pick(draw_count: int, energy_gain: int) -> void:
+func _trigger_discard_pick(draw_count: int, energy_gain: int, owner_id: String = "", optional: bool = false) -> void:
 	if not deck_mgr:
 		return
-	if deck_mgr.hand.is_empty():
-		_apply_discard_pick_reward(draw_count, energy_gain)
+	if owner_id == "":
+		owner_id = get_current_hero_id()
+	if owner_id == "" and not deck_mgr._heroes.is_empty():
+		owner_id = deck_mgr._heroes.keys()[0]
+	if deck_mgr.get_hand(owner_id).is_empty():
+		_apply_discard_pick_reward(draw_count, energy_gain, owner_id)
 	else:
-		_pending_discard_pick = {"draw_count": draw_count, "energy_gain": energy_gain}
-		card_pick_requested.emit("discard", draw_count)
+		_pending_discard_pick = {"draw_count": draw_count, "energy_gain": energy_gain, "owner_id": owner_id, "optional": optional}
+		card_pick_requested.emit("discard_optional" if optional else "discard", draw_count)
+
+func get_pending_discard_owner() -> String:
+	return _pending_discard_pick.get("owner_id", "")
+
+func is_discard_pick_optional() -> bool:
+	return _pending_discard_pick.get("optional", false)
 
 func resolve_pending_discard_pick(picked_card: Resource) -> void:
 	if _pending_discard_pick.is_empty():
 		return
 	var draw_count: int = _pending_discard_pick.get("draw_count", 0)
 	var energy_gain: int = _pending_discard_pick.get("energy_gain", 0)
+	var owner_id: String = get_pending_discard_owner()
+	if picked_card == null and not is_discard_pick_optional():
+		return
+	if picked_card != null and (picked_card.owner_id != owner_id or not deck_mgr.get_hand(owner_id).has(picked_card)):
+		return
 	_pending_discard_pick = {}
-	if deck_mgr:
+	if deck_mgr and picked_card != null:
 		deck_mgr.discard_card(picked_card)
-	_apply_discard_pick_reward(draw_count, energy_gain)
+	_apply_discard_pick_reward(draw_count, energy_gain, owner_id)
 
 func _register_power(key: String, owner_id: String, value: int, params: Dictionary = {}) -> void:
 	var power_key: String = key + ":" + owner_id
+	if key == "power.strength_player" and params.has("card_name"):
+		var source: String = params.card_name
+		var sources: Dictionary = _active_powers.get(power_key, {}).get("params", {}).get("sources", {})
+		sources[source] = maxi(sources.get(source, 0), value)
+		var total := 0
+		for strength in sources.values():
+			total += int(strength)
+		_active_powers[power_key] = {"value": total, "owner_id": owner_id, "params": {"sources": sources}}
+		active_powers_changed.emit()
+		return
+	if _active_powers.has(power_key):
+		var existing: Dictionary = _active_powers[power_key]
+		existing["value"] = maxi(existing.get("value", 0), value)
+		for param in params:
+			if typeof(params[param]) == TYPE_INT:
+				existing["params"][param] = maxi(existing["params"].get(param, 0), params[param])
+			elif not existing["params"].has(param):
+				existing["params"][param] = params[param]
+		active_powers_changed.emit()
+		return
 	_active_powers[power_key] = {
 		"value": value,
 		"owner_id": owner_id,
-		"params": params,
+		"params": params.duplicate(true),
 	}
 	active_powers_changed.emit()
 
 func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
 	# 본인 영웅 차례 한정 — owner_id 영웅 power 만 발동 (owner 없는 글로벌 power 는 모든 영웅 차례에 발동, 3× 효과)
 	var target_hero: String = ctx.get("hero_id", "")
-	for power_key in _active_powers:
+	for power_key in _active_powers.keys():
 		var power: Dictionary = _active_powers[power_key]
 		var key: String = power_key.split(":")[0] if ":" in power_key else power_key
 		var owner_id: String = power.get("owner_id", "")
@@ -1061,10 +1371,14 @@ func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
 			"power.block_per_turn":
 				if phase == "player_turn_start":
 					_hero_block[owner_id] = _hero_block.get(owner_id, 0) + v
-			"power.heal_team_per_turn":
+			"power.heal_team_per_turn", "power.limited_team_heal":
 				if phase == "player_turn_start" and team_mgr:
 					for hero in team_mgr.heroes:
 						_heal_hero_safe(hero.hero_id, v)
+					if power.get("params", {}).has("remaining_turns"):
+						power["params"]["remaining_turns"] -= 1
+						if power["params"]["remaining_turns"] <= 0:
+							_active_powers.erase(power_key)
 			"power.draw_per_turn":
 				if phase == "player_turn_start" and deck_mgr:
 					# 본인 영웅에게 추가 드로우
@@ -1155,12 +1469,20 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 	var _ordered: Array = []
 	for _oi in range(card.effects.size()):
 		_ordered.append([_effect_stage_delay(card, card.effects[_oi], target_enemy_index), _oi, card.effects[_oi]])
-	_ordered.sort_custom(func(a, b): return a[1] < b[1] if a[0] == b[0] else a[0] < b[0])
+	# Effects resolve in authored order; VFX timing must not reorder sacrifice/payoff.
 	_kills_this_card = 0
 	_enthralls_this_card = 0
+	var next_hit_bonus: int = 0
+	if card.card_type == CardRes.CardType.ATTACK:
+		next_hit_bonus = _hero_status.get(card.owner_id, {}).get("next_attack_first_hit_bonus", 0)
+		if _hero_status.has(card.owner_id):
+			_hero_status[card.owner_id].erase("next_attack_first_hit_bonus")
+	var first_damage_effect := true
 	var _stage_elapsed := 0.0
 	var _pending_cleared := false
 	for _op in _ordered:
+		if team_mgr and not team_mgr.is_alive(card.owner_id):
+			break
 		var _stage_d: float = _op[0]
 		var effect = _op[2]
 		if _stage_d > _stage_elapsed:
@@ -1185,11 +1507,16 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 		# condition 필드 평가 — 조건 불충족 시 이 효과 스킵
 		if effect.condition != "" and not _evaluate_condition(effect.condition, card):
 			continue
+		if effect.rule_id != "":
+			_apply_revision_effect(card, effect, target_enemy_index, target_hero_id, next_hit_bonus if first_damage_effect else 0)
+			if effect.effect_type == EffectRes.EffectType.DAMAGE:
+				first_damage_effect = false
+			continue
 		match effect.effect_type:
 			EffectRes.EffectType.DAMAGE:
 				var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
 				# power.strength_player: 영웅 측 strength 플랫 보너스
-				var _str_flat: int = _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+				var _str_flat: int = _hero_strength(card.owner_id)
 				# 공격자 out_pct 기본값 — weak(-0.25), 황제의 무도(+0.25) 는 hit 루프 안에서 합산
 				var _base_out_pct: float = 0.0
 				if owner_status.get("weak", 0) > 0:
@@ -1215,11 +1542,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 										synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
 								var _all_ctx := DamageContext.new()
 								_all_ctx.base = effect.value
-								_all_ctx.flat = _str_flat
+								_all_ctx.flat = _str_flat + (next_hit_bonus if _hit == 0 and first_damage_effect else 0)
 								_all_ctx.out_pct = _all_out_pct
 								_all_ctx.crit_mult = _all_cr["crit_mult"]
 								var _all_dmg: int = compute_damage(_all_ctx)
-								_deal_damage_to_enemy(i, _all_dmg, effect.damage_type, _all_cr["is_crit"])
+								_deal_damage_to_enemy(i, _all_dmg, effect.damage_type, _all_cr["is_crit"], card.owner_id)
 								if _bph > 0:
 									_deal_damage_to_enemy(i, _bph, effect.damage_type)
 								_last_attacker[i] = card.owner_id
@@ -1236,15 +1563,16 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 									synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
 							var _sgl_ctx := DamageContext.new()
 							_sgl_ctx.base = effect.value
-							_sgl_ctx.flat = _str_flat
+							_sgl_ctx.flat = _str_flat + (next_hit_bonus if _hit == 0 and first_damage_effect else 0)
 							_sgl_ctx.out_pct = _sgl_out_pct
 							_sgl_ctx.crit_mult = _cr["crit_mult"]
 							var _sgl_dmg: int = compute_damage(_sgl_ctx)
-							_deal_damage_to_enemy(target_enemy_index, _sgl_dmg, effect.damage_type, _cr["is_crit"])
+							_deal_damage_to_enemy(target_enemy_index, _sgl_dmg, effect.damage_type, _cr["is_crit"], card.owner_id)
 							if _bph > 0:
 								_deal_damage_to_enemy(target_enemy_index, _bph, effect.damage_type)
 							_last_attacker[target_enemy_index] = card.owner_id
 				# power.every_nth_attack_bonus: N번째 DAMAGE 효과마다 추가 피해
+				first_damage_effect = false
 				for _nth_pk in _active_powers:
 					if _nth_pk.begins_with("power.every_nth_attack_bonus:") and _active_powers[_nth_pk].get("owner_id", "") == card.owner_id:
 						var _nth: Dictionary = _active_powers[_nth_pk]
@@ -1265,16 +1593,21 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								elif target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 									_deal_damage_to_enemy(target_enemy_index, _nth_bonus, effect.damage_type)
 			EffectRes.EffectType.BLOCK:
-				_hero_block[card.owner_id] = _hero_block.get(card.owner_id, 0) + effect.value
-				hero_block_gained.emit(card.owner_id, effect.value)
+				var block_id: String = target_hero_id if effect.target == "ALLY" and target_hero_id != "" else card.owner_id
+				_gain_block(block_id, effect.value)
 			EffectRes.EffectType.APPLY_STATUS:
 				if effect.status_type.begins_with("power."):
 					var _pw_params: Dictionary = {}
 					if effect.bonus_value > 0:
 						_pw_params["bonus_value"] = effect.bonus_value
+					_pw_params.merge(effect.rule_params, true)
+					_pw_params["card_name"] = card.card_name
 					var _pw_aid: String = "hero:" + card.owner_id
 					var _pw_old_sp: int = _actor_speed(_pw_aid) if effect.status_type == "power.speed_buff" else 0
 					_register_power(effect.status_type, card.owner_id, effect.value, _pw_params)
+					if effect.rule_params.get("immediate_morale", 0) > 0:
+						_apply_status_to_hero(card.owner_id, "morale", effect.rule_params.immediate_morale)
+						morale_changed.emit(card.owner_id, _hero_status[card.owner_id].get("morale", 0))
 					if effect.status_type == "power.speed_buff":
 						_adjust_turn_queue_for_speed_change(_pw_aid, _pw_old_sp)
 				else:
@@ -1309,12 +1642,11 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								_apply_status_to_enemy(target_enemy_index, effect.status_type, _as_stacks)
 			EffectRes.EffectType.DRAW:
 				if deck_mgr:
-					deck_mgr.draw_cards(effect.value)
+					deck_mgr.draw_cards_h(card.owner_id, effect.value)
 					_cards_drawn_this_turn += effect.value
 			EffectRes.EffectType.ENERGY:
 				if deck_mgr:
-					deck_mgr.current_energy += effect.value
-					deck_mgr.energy_changed.emit(deck_mgr.current_energy)
+					deck_mgr.add_energy_h(card.owner_id, effect.value)
 			EffectRes.EffectType.HEAL:
 				if team_mgr:
 					var heal_id: String
@@ -1327,7 +1659,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								min_ratio = ratio
 								heal_id = hero.hero_id
 					else:
-						heal_id = target_hero_id if target_hero_id != "" else card.owner_id
+						heal_id = target_hero_id if effect.target != "SELF" and target_hero_id != "" else card.owner_id
 					_heal_hero_safe(heal_id, _holy_war_amplify(effect.value))
 					# 성녀의 방패 (잔다르크×이순신): 잔다르크 힐 시 대상 방어구 +40
 					if card.owner_id == "joan_of_arc" and team_mgr.is_alive("yi_sun_sin"):
@@ -1427,7 +1759,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								if not team_mgr.is_alive(h.hero_id):
 									dead_count += 1
 						var total_dmg: int = effect.value + effect.bonus_value * dead_count
-						_deal_damage_to_enemy(target_enemy_index, total_dmg, effect.damage_type)
+						_revision_damage(card, effect, target_enemy_index, total_dmg, false, next_hit_bonus if first_damage_effect else 0)
 					else:
 						var condition_met: bool
 						var es: Dictionary = _enemy_status[target_enemy_index]
@@ -1451,7 +1783,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							"enemy_count_1":
 								condition_met = _get_living_enemy_count() == 1
 							"hand_size_0":
-								condition_met = deck_mgr != null and deck_mgr.hand.size() == 0
+								condition_met = deck_mgr != null and deck_mgr.get_hand(card.owner_id).is_empty()
+							"cards_played_before":
+								condition_met = deck_mgr != null and deck_mgr.get_cards_played_this_turn(card.owner_id) >= 2
 							"enemy_hp_below_30":
 								var _max_hp_30: int = _enemies[target_enemy_index].max_hp
 								condition_met = _max_hp_30 > 0 and float(_enemy_hp[target_enemy_index]) / float(_max_hp_30) <= 0.30
@@ -1471,7 +1805,8 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							_:
 								condition_met = es.get(effect.status_type, 0) > 0
 						var dmg: int = effect.bonus_value if condition_met else effect.value
-						_deal_damage_to_enemy(target_enemy_index, dmg, effect.damage_type)
+						_revision_damage(card, effect, target_enemy_index, dmg, false, next_hit_bonus if first_damage_effect else 0)
+					first_damage_effect = false
 			EffectRes.EffectType.SUMMON_TOKEN:
 				if not _hero_status.has(card.owner_id):
 					_hero_status[card.owner_id] = {}
@@ -1493,11 +1828,12 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							team_mgr.revive(revive_id, revive_hp)
 			EffectRes.EffectType.SACRIFICE_HP:
 				if team_mgr:
+					var hp_before: int = team_mgr.get_current_hp(card.owner_id)
 					team_mgr.take_damage(card.owner_id, effect.value)
 					# 전투 중 누적 희생 HP — 잔다르크 고유 상태이상 sacrifice_bank (상태이상 UI 표시)
 					if not _hero_status.has(card.owner_id):
 						_hero_status[card.owner_id] = {}
-					var _bank_total: int = _hero_status[card.owner_id].get("sacrifice_bank", 0) + effect.value
+					var _bank_total: int = _hero_status[card.owner_id].get("sacrifice_bank", 0) + hp_before - team_mgr.get_current_hp(card.owner_id)
 					_hero_status[card.owner_id]["sacrifice_bank"] = _bank_total
 					status_applied.emit(card.owner_id, "sacrifice_bank", _bank_total)
 					_check_lose_condition()
@@ -1577,7 +1913,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				_active_powers[DND_KEY] = {"value": 1, "owner_id": "__global__", "params": {}}
 				active_powers_changed.emit()
 			EffectRes.EffectType.DISCARD_PICK_DRAW:
-				_trigger_discard_pick(effect.value, 1)
+				_trigger_discard_pick(effect.value, 1, card.owner_id)
 			EffectRes.EffectType.MORALE_TO_BLOCK:
 				var morale: int = _hero_status.get(card.owner_id, {}).get("morale", 0)
 				if morale > 0:
@@ -1745,7 +2081,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					var _types: int = 0
 					if _dst.get("weak", 0) > 0: _types += 1
 					if _dst.get("vulnerable", 0) > 0: _types += 1
-					if _dst.get("poison", 0) > 0: _types += 1
+					if _dst.get("poison_dmg", 0) > 0 and _dst.get("poison_dur", 0) > 0: _types += 1
 					if _dst.get("charm", 0) > 0: _types += 1
 					if _types > 0:
 						_deal_damage_to_enemy(_di, _types * effect.value, effect.damage_type)
@@ -1767,7 +2103,17 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						_hero_status[_bs_hid] = {}
 					if not _hero_status[_bs_hid].has("speed_bonus") or typeof(_hero_status[_bs_hid]["speed_bonus"]) != TYPE_ARRAY:
 						_hero_status[_bs_hid]["speed_bonus"] = []
-					_hero_status[_bs_hid]["speed_bonus"].append({"value": effect.value, "dur": effect.bonus_value})
+					var speed_instance: Dictionary = {"value": effect.value, "dur": effect.bonus_value}
+					if effect.rule_params.get("exclude_current_turn_end", false):
+						speed_instance["skip_current_end"] = true
+					if card.card_type == CardRes.CardType.POWER:
+						speed_instance["dur"] = -1
+						for ins in _hero_status[_bs_hid]["speed_bonus"]:
+							if ins.get("card_name", "") == card.card_name:
+								speed_instance["value"] = maxi(speed_instance["value"], ins.get("value", 0))
+						_hero_status[_bs_hid]["speed_bonus"] = _hero_status[_bs_hid]["speed_bonus"].filter(func(ins): return ins.get("card_name", "") != card.card_name)
+						speed_instance["card_name"] = card.card_name
+					_hero_status[_bs_hid]["speed_bonus"].append(speed_instance)
 					_adjust_turn_queue_for_speed_change(_bs_aid, _bs_old_sp)
 					status_applied.emit(_bs_hid, "speed_bonus", effect.value)
 			EffectRes.EffectType.DEBUFF_SPEED:
@@ -1829,13 +2175,18 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 			for effect in card.effects:
 				if effect.condition != "" and not _evaluate_condition(effect.condition, card):
 					continue
+				if effect.rule_id != "":
+					_apply_revision_effect(card, effect, target_enemy_index, target_hero_id)
+					continue
 				match effect.effect_type:
+					EffectRes.EffectType.CONDITIONAL_DMG:
+						_revision_damage(card, effect, target_enemy_index, _card_effect_base_damage(effect, card.owner_id, target_enemy_index))
 					EffectRes.EffectType.DAMAGE:
 						var dmg2: int = effect.value
 						var _os2: Dictionary = _hero_status.get(card.owner_id, {})
 						if _os2.get("weak", 0) > 0:
 							dmg2 = int(dmg2 * 0.75)
-						dmg2 += _active_powers.get("power.strength_player:" + card.owner_id, {}).get("value", 0)
+						dmg2 += _hero_strength(card.owner_id)
 						var _bph2: int = _active_powers.get("power.bonus_per_hit:" + card.owner_id, {}).get("value", 0)
 						for _eh in range(effect.hit_count):
 							if effect.target == "ALL":
@@ -1873,7 +2224,7 @@ func _consume_dnd_flag() -> bool:
 	return consumed
 
 
-func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "", is_crit: bool = false) -> void:
+func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "", is_crit: bool = false, source_owner: String = "") -> void:
 	if not _enemy_alive[enemy_index]:
 		return
 	# ── 받는 측 DamageContext 구성 ──
@@ -1925,8 +2276,11 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 		for _pke in _active_powers:
 			if _pke.split(":")[0] == "power.on_kill_energy":
 				if deck_mgr:
-					deck_mgr.current_energy += _active_powers[_pke].get("value", 1)
-					deck_mgr.energy_changed.emit(deck_mgr.current_energy)
+					deck_mgr.add_energy_h(_active_powers[_pke].get("owner_id", ""), _active_powers[_pke].get("value", 1))
+		if source_owner != "" and deck_mgr:
+			var bounty: Dictionary = _active_powers.get("power.on_kill_energy_once:" + source_owner, {})
+			if not bounty.is_empty() and _use_turn_effect(source_owner, "kill_energy"):
+				deck_mgr.add_energy_h(source_owner, bounty.get("value", 1))
 	_check_phase_transition(enemy_index)
 	_check_win_condition()
 
@@ -2165,6 +2519,7 @@ func _tick_hero_poison(hero_id: String) -> void:
 		_hero_status[hero_id]["poison_dur"] = 0
 	else:
 		_hero_status[hero_id]["poison_dur"] = dur
+	_check_lose_condition()
 
 func _tick_enemy_poison(enemy_index: int) -> void:
 	var dmg: int = _enemy_status[enemy_index].get("poison_dmg", 0)
@@ -2175,6 +2530,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 	_enemy_hp[enemy_index] = max(0, _enemy_hp[enemy_index] - tick_dmg)
 	enemy_damaged.emit(enemy_index, tick_dmg, "poison", false)
 	poison_tick_applied.emit("enemy_%d" % enemy_index, tick_dmg)
+	SignatureSys.on_enemy_damaged(self, enemy_index, tick_dmg)
 	dur -= 1
 	if dur <= 0:
 		_enemy_status[enemy_index]["poison_dmg"] = 0
@@ -2185,6 +2541,7 @@ func _tick_enemy_poison(enemy_index: int) -> void:
 		_enemy_alive[enemy_index] = false
 		_remove_from_queue(_actor_id_for_enemy(enemy_index))
 		_fire_death_trigger(enemy_index)
+		SignatureSys.on_enemy_death(self, enemy_index)
 		_cleanup_enemy_status_on_death(enemy_index)
 		enemy_died.emit(enemy_index)
 		_check_win_condition()
@@ -2241,7 +2598,7 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 			return
 	# weak/vulnerable: 자기 턴 시작 시 -1 (즉시 본인 행동에 영향 없음 — 표준 디버프 decay)
 	# taunt: 부여 시점부터 N turn 유지가 자연스러우므로 turn 종료 시점에 decay (아래 turn_ended 직전)
-	for stype: String in ["weak", "vulnerable"]:
+	for stype: String in ["vulnerable"]:
 		if _enemy_status[i].get(stype, 0) > 0:
 			_enemy_status[i][stype] -= 1
 	# speed_bonus / speed_penalty — Array of {value, dur}. 각 instance dur -1, dur<=0 제거
@@ -2337,6 +2694,8 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 						_enemy_intent_index[i] = (_enemy_intent_index[i] + 1) % pattern2.size()
 	# 적 turn 종료 시 도발 decay — 부여 시점부터 N turn 유지 보장 (시작 decay 대신).
 	if i < _enemy_status.size():
+		if _enemy_status[i].get("weak", 0) > 0:
+			_enemy_status[i]["weak"] -= 1
 		var t_cur: int = _enemy_status[i].get("taunt", 0)
 		if t_cur > 0:
 			_enemy_status[i]["taunt"] = t_cur - 1
@@ -2982,10 +3341,12 @@ func _on_hero_died_queue(hero_id: String) -> void:
 	_remove_from_queue(_actor_id_for_hero(hero_id))
 	_cleanup_hero_status_on_death(hero_id)
 
-func _evaluate_condition(cond: String, _card: Resource) -> bool:
+func _evaluate_condition(cond: String, card: Resource) -> bool:
 	match cond:
 		"hand_size_0":
-			return deck_mgr != null and deck_mgr.hand.size() == 0
+			return deck_mgr != null and deck_mgr.get_hand(card.owner_id).is_empty()
+		"owner_hp_below_50":
+			return team_mgr != null and team_mgr.get_current_hp(card.owner_id) * 2 <= team_mgr.get_hero(card.owner_id).max_hp
 		"enemy_count_1":
 			return _get_living_enemy_count() == 1
 		"not_enemy_count_1":

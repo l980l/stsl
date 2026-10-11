@@ -4,6 +4,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func golden_elixir(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.daoist.golden_elixir"; e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
@@ -26,6 +27,7 @@ static func golden_elixir(scene: PackedScene) -> Resource:
 
 static func silver_elixir(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.daoist.silver_elixir"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()
@@ -43,6 +45,7 @@ static func silver_elixir(scene: PackedScene) -> Resource:
 
 static func black_wind_immortal(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.daoist.black_wind_immortal"; e.max_hp = 1800; e.character_scene = scene
 	e.mythology = "daoist"
 	var i1 := IntentRes.new()

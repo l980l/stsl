@@ -4,6 +4,7 @@ const IntentRes = preload("res://resources/intent_resource.gd")
 
 static func vaisravana(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.buddhist.vaisravana"; e.max_hp = 1600; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
@@ -24,6 +25,7 @@ static func vaisravana(scene: PackedScene) -> Resource:
 static func mahoraga(scene: PackedScene) -> Resource:
 	# 마후라가 — 천룡팔부의 大蟒神. 최면 가락으로 아군 전체 약화·취약 (구 deva_guardian 리스킨, 메커니즘 동일)
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.buddhist.mahoraga"; e.max_hp = 1700; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
@@ -42,6 +44,7 @@ static func mahoraga(scene: PackedScene) -> Resource:
 
 static func dharma_general(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
+	e.grade = EnemyRes.Grade.ELITE
 	e.enemy_name = "enemy.buddhist.dharma_general"; e.max_hp = 1900; e.character_scene = scene
 	e.mythology = "buddhist"
 	var i1 := IntentRes.new()
