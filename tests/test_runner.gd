@@ -48,6 +48,10 @@ var TestDamagePipeline = preload("res://tests/test_damage_pipeline.gd")
 var TestTutorial = preload("res://tests/test_tutorial.gd")
 var TestCardRevision = preload("res://tests/test_card_revision_acceptance.gd")
 var TestRevisionDifficulty = preload("res://tests/test_revision_difficulty.gd")
+var TestCardContentEffects = preload("res://tests/test_card_content_effects.gd")
+var TestCardUpgradeCompleteness = preload("res://tests/test_card_upgrade_completeness.gd")
+var TestSmallNumberProfile = preload("res://tests/test_small_number_profile.gd")
+var TestSmallNumberRuntime = preload("res://tests/test_small_number_runtime.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -100,6 +104,10 @@ func _init() -> void:
 		TestTutorial.new(),
 		TestCardRevision.new(),
 		TestRevisionDifficulty.new(),
+		TestCardContentEffects.new(),
+		TestCardUpgradeCompleteness.new(),
+		TestSmallNumberProfile.new(),
+		TestSmallNumberRuntime.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()

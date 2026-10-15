@@ -5,6 +5,8 @@
 class_name EnemySignatureSystem
 extends RefCounted
 
+const CombatScale = preload("res://resources/balance/combat_scale.gd")
+
 # ─── Hook: 적이 데미지 받음 ───
 # 그리스 휴브리스 — 단일 25+ 피해 → 다음 턴 strength +2 (pending 플래그)
 # 북유럽 라그나로크 — HP 30% 미만 도달 → 모든 적 strength +1 (전투당 1회)
@@ -16,7 +18,7 @@ static func on_enemy_damaged(bm: Object, idx: int, amount: int) -> void:
 	bm._enemy_status[idx]["damage_taken"] = bm._enemy_status[idx].get("damage_taken", 0) + amount
 	match enemy.mythology:
 		"greek":
-			if amount >= 25 and not bm._enemy_status[idx].get("greek_hubris_pending", false):
+			if amount >= CombatScale.amount(25) and not bm._enemy_status[idx].get("greek_hubris_pending", false):
 				bm._enemy_status[idx]["greek_hubris_pending"] = true
 				bm.signature_fired.emit(idx, "hubris", "")  # 토스트용
 		"norse":
@@ -68,20 +70,24 @@ static func on_enemy_turn_start(bm: Object, idx: int) -> int:
 	var emitted: int = 0
 	# Greek: hubris pending 처리
 	if enemy.mythology == "greek" and bm._enemy_status[idx].get("greek_hubris_pending", false):
-		bm._apply_status_to_enemy(idx, "strength", 2)
+		var strength_gain: int = bm.gain_authored_enemy_strength(idx, 2, "hubris")
 		bm._enemy_status[idx]["greek_hubris_pending"] = false
-		bm.passive_buff_applied.emit(idx, "strength", 2)
-		emitted += 1
+		if strength_gain > 0:
+			bm.passive_buff_applied.emit(idx, "strength", strength_gain)
+			emitted += 1
 	# Daoist: 음양 자세 교대
 	elif enemy.mythology == "daoist":
 		var stance: int = bm._enemy_status[idx].get("daoist_stance", 0)
 		if stance == 0:
-			bm._apply_status_to_enemy(idx, "strength", 1)
-			bm.passive_buff_applied.emit(idx, "strength", 1)
+			var strength_gain: int = bm.gain_authored_enemy_strength(idx, 1, "yin_yang")
+			if strength_gain > 0:
+				bm.passive_buff_applied.emit(idx, "strength", strength_gain)
+				emitted += 1
 		else:
-			bm._enemy_block[idx] += 15
-			bm.passive_buff_applied.emit(idx, "block", 15)
-		emitted += 1
+			var defense_block := CombatScale.amount(15)
+			bm._enemy_block[idx] += defense_block
+			bm.passive_buff_applied.emit(idx, "block", defense_block)
+			emitted += 1
 		bm._enemy_status[idx]["daoist_stance"] = 1 - stance
 		bm.signature_fired.emit(idx, "yin_yang", "")  # 토스트 (1턴 1회 throttle)
 	# Japanese: 결계 매 5턴마다
@@ -89,8 +95,9 @@ static func on_enemy_turn_start(bm: Object, idx: int) -> int:
 		var turn_count: int = bm._enemy_status[idx].get("japanese_turn_count", 0) + 1
 		bm._enemy_status[idx]["japanese_turn_count"] = turn_count
 		if turn_count % 5 == 0:
-			bm._enemy_block[idx] += 20
-			bm.passive_buff_applied.emit(idx, "block", 20)
+			var ward_block := CombatScale.amount(20)
+			bm._enemy_block[idx] += ward_block
+			bm.passive_buff_applied.emit(idx, "block", ward_block)
 			emitted += 1
 			bm.signature_fired.emit(idx, "kekkai", "")  # 토스트용 (5턴마다)
 	return emitted

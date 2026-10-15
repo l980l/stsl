@@ -610,6 +610,8 @@ func upgrade_card(card: Resource) -> void:
 		if card.upgrade_cost >= 0:
 			card.cost = card.upgrade_cost
 		for effect in card.effects:
+			if effect.upgrade_target != "":
+				effect.target = effect.upgrade_target
 			if effect.upgrade_value >= 0:
 				effect.value = effect.upgrade_value
 			if effect.upgrade_bonus_value >= 0:
@@ -686,7 +688,7 @@ func generate_shop_inventory() -> Dictionary:
 		"remove_price": 100,
 		"upgrade_price": 150,
 		"heal_price": 30,
-		"heal_amount": 20,
+		"heal_amount": preload("res://resources/balance/combat_scale.gd").amount(20),
 	}
 
 func _shop_price_for_rarity(rarity: int) -> int:
@@ -854,6 +856,9 @@ func _make_enemies_for_node(node: Resource) -> Array:
 		_:
 			enemies = []
 	_apply_act_difficulty(enemies, current_act)
+	if preload("res://resources/balance/combat_scale.gd").enabled():
+		for i in range(enemies.size()):
+			enemies[i] = preload("res://resources/balance/enemy_small_numbers.gd").convert(enemies[i])
 	return enemies
 
 func _make_elite_enemies() -> Array:
@@ -1226,6 +1231,7 @@ func _apply_relic_effect(relic: Resource, value: int, context: Dictionary) -> vo
 					per_hit = true
 				"kills_strength":
 					amount = enemies_killed_this_run * value
+			amount = preload("res://resources/balance/combat_scale.gd").accumulated(amount)
 			if amount <= 0:
 				return
 			if per_hit:

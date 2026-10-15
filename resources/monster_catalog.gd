@@ -4,6 +4,8 @@
 class_name MonsterCatalog
 extends RefCounted
 
+const EnemySmallNumbers = preload("res://resources/balance/enemy_small_numbers.gd")
+
 # 도감 표시 순서 (= 그룹 순서)
 const MYTH_ORDER := ["greek", "egyptian", "norse", "buddhist", "daoist", "japanese"]
 
@@ -51,4 +53,7 @@ static func _add(file, method: String, out: Array, seen: Dictionary) -> void:
 	if e == null or e.enemy_name == "" or e.enemy_name in seen:
 		return
 	seen[e.enemy_name] = true
-	out.append(e)
+	# The codex is a live-facing surface, so it must show the same unit system
+	# as battles.  The converter returns an unscaled clone when explicit legacy
+	# comparison mode is active.
+	out.append(EnemySmallNumbers.convert(e))

@@ -4,12 +4,12 @@ const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
 	# _valhalla_invitation 제거 — ADD_HERO 이벤트. 영입은 Act1 trigger 로 일원화.
-	return [
+	return EventRes.scale_pool_for_combat([
 		_odin_ravens(), _yggdrasil_fruit(), _ragnarok_prophecy(),
 		_mimirs_well(), _dragon_gold(),
 		_rune_stone(), _thor_hammer_mark(), _frost_giant_corpse(),
 		_freyja_tears(), _ymir_blood(),
-	]
+	])
 
 static func _odin_ravens() -> Resource:
 	# 다양화: 1번 60% 드로우 +1, 2번 까마귀 사냥 (GOLD + 오딘 분노 cost_hp)

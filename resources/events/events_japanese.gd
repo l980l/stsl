@@ -5,12 +5,12 @@ const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
 	# _shuten_doji_feast 제거 — ADD_HERO 이벤트. 영입은 Act1 trigger 로 일원화.
-	return [
+	return EventRes.scale_pool_for_combat([
 		_ise_shrine_blessing(), _oni_shogi(), _yuki_onna_blizzard(),
 		_tengu_training(), _shrine_omamori(), _tanuki_illusion(),
 		_kappa_river_crossing(), _fujisan_spirit(),
 		_amaterasu_return(), _kitsune_kit(),
-	]
+	])
 
 static func _ise_shrine_blessing() -> Resource:
 	var e: Resource = EventRes.new()

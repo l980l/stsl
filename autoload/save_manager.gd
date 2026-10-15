@@ -3,6 +3,11 @@ class_name SaveManagerClass
 extends Node
 
 const SAVE_PATH := "user://save.json"
+const CombatScale = preload("res://resources/balance/combat_scale.gd")
+
+# Keep the container version stable: this is a units migration inside the
+# established v2 format.  A legacy v2 file has no combat_unit_version.
+const COMBAT_UNIT_VERSION := 2
 
 func save() -> void:
 	# autoload는 Engine 싱글톤이 아니라 /root 아래 노드 — get_node_or_null로 접근
@@ -16,6 +21,7 @@ func save() -> void:
 		return
 	var data := {
 		"version": 2,
+		"combat_unit_version": COMBAT_UNIT_VERSION if CombatScale.enabled() else 1,
 		"game_manager": _gm.to_dict(),
 		"team_manager": _tm.to_dict(),
 		"deck_manager": _dm.to_dict(),
@@ -38,9 +44,14 @@ func load_save() -> bool:
 	if data == null or not data.has("version"):
 		return false
 	if int(data["version"]) != 2:
-		push_warning("[SaveManager] 세이브 버전 %s 미지원 — 초기화합니다." % data["version"])
-		clear_save()
+		push_warning("[SaveManager] 세이브 버전 %s 미지원 — 원본을 보존합니다." % data["version"])
 		return false
+	# A file written by a newer combat-unit migration must not be interpreted
+	# with older rules or removed. This branch deliberately fails closed.
+	if int(data.get("combat_unit_version", 1)) > COMBAT_UNIT_VERSION:
+		push_warning("[SaveManager] 전투 단위 버전 %s 미지원 — 원본을 보존합니다." % data["combat_unit_version"])
+		return false
+	data = prepare_for_load(data)
 	var _gm = get_node_or_null("/root/GameManager")
 	var _tm = get_node_or_null("/root/TeamManager")
 	var _dm = get_node_or_null("/root/DeckManager")
@@ -51,6 +62,23 @@ func load_save() -> bool:
 	_dm.from_dict(data["deck_manager"])
 	_deserialize_relics(_gm, data.get("relics", []))
 	return true
+
+# Load-time only conversion for historical v2 saves.  The source file is left
+# untouched; the next normal save writes the explicit small-unit marker.  This
+# keeps a failed/aborted load from destructively rewriting user data.
+static func prepare_for_load(data: Dictionary) -> Dictionary:
+	var prepared: Dictionary = data.duplicate(true)
+	if not CombatScale.enabled() or int(prepared.get("combat_unit_version", 1)) >= COMBAT_UNIT_VERSION:
+		return prepared
+	var team_data: Dictionary = prepared.get("team_manager", {})
+	for hero_data in team_data.get("heroes", []):
+		if not (hero_data is Dictionary):
+			continue
+		hero_data["max_hp"] = CombatScale.amount(int(hero_data.get("max_hp", 0)))
+		hero_data["current_hp"] = CombatScale.amount(int(hero_data.get("current_hp", 0)))
+	prepared["team_manager"] = team_data
+	prepared["combat_unit_version"] = COMBAT_UNIT_VERSION
+	return prepared
 
 func has_save() -> bool:
 	return FileAccess.file_exists(SAVE_PATH)

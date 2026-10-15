@@ -4,6 +4,9 @@
 class_name HeroRegistry
 extends RefCounted
 
+const CombatScale = preload("res://resources/balance/combat_scale.gd")
+const BASE_MAX_HP := 1000
+
 static func all_hero_ids() -> Array:
 	return ["napoleon", "cleopatra", "yi_sun_sin", "joan_of_arc", "genghis_khan", "musashi"]
 
@@ -15,7 +18,7 @@ static func make_hero(hero_id: String) -> Resource:
 		"napoleon":
 			hero.hero_name = "hero.napoleon.name"
 			hero.historical_figure = "hero.napoleon.figure"
-			hero.max_hp = 1000
+			hero.max_hp = CombatScale.amount(BASE_MAX_HP)
 			hero.speed = 53  # 공격형 지휘관 — 평균
 			hero.character_scene = load("res://characters/heroes/napoleon/napoleon.tscn")
 			hero.unlock_condition = "default"
@@ -23,7 +26,7 @@ static func make_hero(hero_id: String) -> Resource:
 		"cleopatra":
 			hero.hero_name = "hero.cleopatra.name"
 			hero.historical_figure = "hero.cleopatra.figure"
-			hero.max_hp = 1000
+			hero.max_hp = CombatScale.amount(BASE_MAX_HP)
 			hero.speed = 55  # 디버프/조종형 — 평균
 			hero.character_scene = load("res://characters/heroes/cleopatra/cleopatra.tscn")
 			hero.unlock_condition = "default"
@@ -31,7 +34,7 @@ static func make_hero(hero_id: String) -> Resource:
 		"yi_sun_sin":
 			hero.hero_name = "hero.yi_sun_sin.name"
 			hero.historical_figure = "hero.yi_sun_sin.figure"
-			hero.max_hp = 1000
+			hero.max_hp = CombatScale.amount(BASE_MAX_HP)
 			hero.speed = 50  # 방어형 역공 — 가장 느림
 			hero.character_scene = load("res://characters/heroes/yi_sun_sin/yi_sun_sin.tscn")
 			hero.unlock_condition = "default"
@@ -39,7 +42,7 @@ static func make_hero(hero_id: String) -> Resource:
 		"joan_of_arc":
 			hero.hero_name = "hero.joan_of_arc.name"
 			hero.historical_figure = "hero.joan_of_arc.figure"
-			hero.max_hp = 1000
+			hero.max_hp = CombatScale.amount(BASE_MAX_HP)
 			hero.speed = 53  # 서포트/생존형 — 평균
 			hero.character_scene = load("res://characters/heroes/joan_of_arc/joan_of_arc.tscn")
 			hero.unlock_condition = "clear_chapter_1"
@@ -47,7 +50,7 @@ static func make_hero(hero_id: String) -> Resource:
 		"genghis_khan":
 			hero.hero_name = "hero.genghis_khan.name"
 			hero.historical_figure = "hero.genghis_khan.figure"
-			hero.max_hp = 1000
+			hero.max_hp = CombatScale.amount(BASE_MAX_HP)
 			hero.speed = 58  # 기동형 정복자 — 빠름
 			hero.character_scene = load("res://characters/heroes/genghis_khan/genghis_khan.tscn")
 			hero.unlock_condition = "flag:kill_boss:enemy.egyptian.osiris"
@@ -55,7 +58,7 @@ static func make_hero(hero_id: String) -> Resource:
 		"musashi":
 			hero.hero_name = "hero.musashi.name"
 			hero.historical_figure = "hero.musashi.figure"
-			hero.max_hp = 1000
+			hero.max_hp = CombatScale.amount(BASE_MAX_HP)
 			hero.speed = 60  # 결투형 검사 — 가장 빠름
 			hero.character_scene = load("res://characters/heroes/musashi/musashi.tscn")
 			hero.unlock_condition = "elite_kills_total>=10"

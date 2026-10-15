@@ -19,7 +19,7 @@ static func build_deck() -> Array:
 	var deck: Array = [CN._strike(), CN._defend(), CN._conquest_decree()]
 	for c in deck:
 		c.is_innate = true
-	return deck
+	return preload("res://resources/cards/card_revision_v3.gd").apply_all(deck)
 
 static func build_enemy() -> EnemyResource:
 	var e := EnemyResource.new()
@@ -29,15 +29,17 @@ static func build_enemy() -> EnemyResource:
 	e.mythology = "greek"
 	e.grade = EnemyResource.Grade.NORMAL
 	# 튜토리얼 진행에 맞춘 HP — strike 100 → 치명타 200 → strike 100 (3타) 로 처치되게 튜닝.
-	e.max_hp = 350
+	e.max_hp = preload("res://resources/balance/combat_scale.gd").amount(350)
 	e.signatures_enabled = false
 	e.character_scene = load("res://characters/enemies/enemy_placeholder.tscn")
 	var atk := IntentResource.new()
 	atk.action_type = IntentResource.ActionType.ATTACK
-	atk.value = 8  # 약하게 — 방어(BLOCK 125)로 충분히 막히고, 안 막아도 치명적이지 않게
+	atk.value = preload("res://resources/balance/combat_scale.gd").amount(8)
 	atk.target = IntentResource.TargetType.RANDOM
 	atk.damage_type = "blunt"
 	e.intent_pattern = [atk]
+	if preload("res://resources/balance/combat_scale.gd").enabled():
+		e.set_meta("stsl_enemy_small_numbers_v1", true)
 	return e
 
 # 스텝: text(i18n) + 완료 이벤트 + allowed_cards(이 스텝에 사용 가능한 카드 이름).

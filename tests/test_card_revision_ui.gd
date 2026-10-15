@@ -50,6 +50,15 @@ func _run() -> void:
 		await process_frame
 	_check(bm.is_player_turn, "real battle starts an owner turn")
 	var scene = current_scene
+	var original_locale := TranslationServer.get_locale()
+	for locale in ["ko", "en"]:
+		TranslationServer.set_locale(locale)
+		var badge: Control = scene._make_status_label("duel_lock", 3, {"duel_lock_owner": "musashi"})
+		var tooltip: String = badge.get_meta("_sacred_tip", "")
+		_check(tooltip.contains("50%") and tooltip.contains("3"), "duel badge damage and remaining turns (" + locale + ")")
+		_check(tooltip.contains(tr("hero.musashi.name")), "duel badge identifies its caster (" + locale + ")")
+		badge.free()
+	TranslationServer.set_locale(original_locale)
 	var cards: Dictionary = {}
 	for card in load("res://resources/card_catalog.gd").get_all_cards():
 		cards[card.card_name] = card

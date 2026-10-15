@@ -16,3 +16,7 @@ enum TargetType { LOWEST_HP, LAST_ATTACKER, RANDOM, ALL }
 # CHARGE_UP 전용 — N턴 숨고르기 후 페이오프 intents 순차 실행
 @export var charge_turns: int = 0
 @export var payoff_intents: Array = []  # Array[IntentResource]
+# SACRIFICE 의 HP 비용은 value(strength gain)와 다른 차원이다. 작은 수치
+# 변환 후에도 deep duplicate 에 보존되어야 하므로 metadata 대신 export 한다.
+# -1은 기존 authored resource의 "value × 현재 HP 단위" fallback을 뜻한다.
+@export var small_sacrifice_hp_cost: int = -1
