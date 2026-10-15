@@ -1014,7 +1014,10 @@ func _passes_card(card) -> bool:
 		if not _is_seen(card):  # 미발견은 검색 제외 (이름 노출 방지)
 			return false
 		var nm := tr(card.card_name).to_lower()
-		var ds := tr(card.description).to_lower() if card.description != "" else ""
+		var effects: PackedStringArray = []
+		for effect in card.effects:
+			effects.append(effect.display_text())
+		var ds: String = " ".join(effects).to_lower()
 		if _search not in nm and _search not in ds:
 			return false
 	return true
@@ -1030,7 +1033,7 @@ func _passes_relic(relic) -> bool:
 		if not _is_seen(relic):  # 미발견은 검색 제외 (이름 노출 방지)
 			return false
 		var nm := tr(relic.relic_name).to_lower()
-		var ds := tr(relic.description).to_lower() if relic.description != "" else ""
+		var ds: String = relic.format_description(tr(relic.display_description_key())).to_lower() if relic.description != "" else ""
 		if _r_search not in nm and _r_search not in ds:
 			return false
 	return true
@@ -1658,7 +1661,7 @@ func _make_relic_cell(relic) -> Control:
 		desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc.add_theme_color_override("font_color", P.BONE_400)
-		desc.text = tr(relic.description)
+		desc.text = relic.format_description(tr(relic.display_description_key()))
 		desc.clip_text = true
 		desc.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		cell.add_child(desc)

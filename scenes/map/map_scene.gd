@@ -649,7 +649,7 @@ func _refresh_relics() -> void:
 			_relic_container.add_child(lbl)
 			SacredTheme.attach_tooltip(lbl, tip)
 	for relic in GameManager.relics:
-		var tip: String = "%s\n%s" % [tr(relic.relic_name), tr(relic.description)]
+		var tip: String = "%s\n%s" % [tr(relic.relic_name), relic.format_description(tr(relic.display_description_key()))]
 		var _lk: String = relic.lore_key()
 		if _lk != "":
 			var _lt: String = tr(_lk)

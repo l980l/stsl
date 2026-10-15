@@ -7,12 +7,14 @@ const CardRes = preload("res://resources/card_resource.gd")
 const EffRes = preload("res://resources/effect_resource.gd")
 
 static func apply_all(cards: Array) -> Array:
-	for card in cards:
-		apply(card)
+	for index in range(cards.size()):
+		cards[index] = apply(cards[index])
 	return cards
 
 static func apply(card: Resource) -> Resource:
 	if card == null:
+		return card
+	if card.combat_unit_version == 2 or card.has_meta("stsl_small_number_profile_v2"):
 		return card
 	var original_damage_type := ""
 	for effect in card.effects:
@@ -86,6 +88,23 @@ static func apply(card: Resource) -> Resource:
 		"card.musashi.flying_swallow.name": _configure_card(card, 1, [_damage(35, 45, "SINGLE", 2), _rule("hand_empty_energy_once", {"amount": 1})])
 		"card.musashi.clear_wind.name": _configure_card(card, 2, [_conditional(140, 170, 260, 300, "hand_size_0"), _rule("cleanse_self_weak_vulnerable_if_hand_empty")])
 		"card.musashi.swift_blade.name": _configure_card(card, 1, [_speed(6, 9, 999)])
+
+		# 기존 강화식이 값이 없는 효과 유형을 건너뛰어 실제 변화가 없던 카드.
+		# 역할은 보존하고, 해당 효과의 고정 1강 수치만 명시한다.
+		"card.cleopatra.desert_recipe.name": _set_upgrades(card, [3])
+		"card.cleopatra.pharaoh_venom.name":
+			# 일회성 소비 효과는 value를 쓰지 않아 기존 +1은 무효 강화다.
+			# 독 증폭은 유지하고 1강에서 본인 방어 20을 추가한다.
+			card.effects.append(_block(0, 20))
+			card.has_explicit_upgrade = true
+		"card.cleopatra.seductive_stillness.name": _set_upgrades(card, [7], [4])
+		"card.yi_sun_sin.fleet_fire.name": _set_upgrades(card, [55])
+		"card.yi_sun_sin.fighting_spirit.name": _set_upgrades(card, [60])
+		"card.yi_sun_sin.turtleship_drill.name": _set_upgrades(card, [6], [5])
+		"card.joan_of_arc.grace_of_spirit.name": _set_upgrades(card, [6], [4])
+		"card.genghis_khan.plunderers_instinct.name": _set_upgrades(card, [50])
+		"card.musashi.steel_strike.name": _set_upgrades(card, [140])
+		"card.musashi.demon_swordsman.name": _set_upgrades(card, [40])
 	if card.card_name.ends_with(".strike.name") or card.card_name.ends_with(".defend.name"):
 		card.has_explicit_upgrade = true
 		card.effects[0].upgrade_value = 120 if card.card_name.ends_with(".strike.name") else 150
@@ -93,6 +112,8 @@ static func apply(card: Resource) -> Resource:
 		for effect in card.effects:
 			if effect.damage_type != "" and original_damage_type != "":
 				effect.damage_type = original_damage_type
+	if preload("res://resources/balance/combat_scale.gd").enabled():
+		return load("res://resources/balance/small_number_profile.gd").live_card(card)
 	return card
 
 static func _configure_card(card: Resource, cost: int, effects: Array, exhaust: bool = false, retain: bool = false, innate: bool = false) -> void:
@@ -102,6 +123,13 @@ static func _configure_card(card: Resource, cost: int, effects: Array, exhaust: 
 	card.is_retain = retain
 	card.is_innate = innate
 	card.is_ethereal = false
+	card.has_explicit_upgrade = true
+
+static func _set_upgrades(card: Resource, values: Array, bonuses: Array = []) -> void:
+	for index in range(min(values.size(), card.effects.size())):
+		card.effects[index].upgrade_value = values[index]
+	for index in range(min(bonuses.size(), card.effects.size())):
+		card.effects[index].upgrade_bonus_value = bonuses[index]
 	card.has_explicit_upgrade = true
 
 static func _counter(card: Resource) -> void:

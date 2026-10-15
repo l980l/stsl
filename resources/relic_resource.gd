@@ -2,6 +2,8 @@
 class_name RelicResource
 extends Resource
 
+const CombatScale = preload("res://resources/balance/combat_scale.gd")
+
 enum TriggerType {
 	PASSIVE,            # 런 시작 시 1회 적용 (최대 HP 등)
 	BATTLE_START,       # 전투 시작
@@ -38,3 +40,62 @@ func lore_key() -> String:
 	if relic_name.ends_with(".name"):
 		return relic_name.trim_suffix(".name") + ".lore"
 	return ""
+
+# Keep RUN_STRENGTH's per-run coefficient in legacy units. Its aggregate is
+# converted only after multiplying by battles/kills in GameManager; scaling the
+# coefficient itself would make low values disproportionately strong.
+func scale_for_combat() -> Resource:
+	if not CombatScale.enabled() or has_meta("stsl_combat_scaled"):
+		return self
+	var display_numbers: Dictionary = {}
+	if _effect_uses_combat_units(effect_type, status_type):
+		value = _scale_display_value(value, display_numbers)
+		bonus_value = _scale_display_value(bonus_value, display_numbers)
+	if _effect_uses_combat_units(penalty_effect_type, ""):
+		penalty_value = _scale_display_value(penalty_value, display_numbers)
+	if trigger == TriggerType.ON_HERO_DAMAGED:
+		condition_value = _scale_display_value(condition_value, display_numbers)
+	if not display_numbers.is_empty():
+		set_meta("stsl_combat_display_numbers", display_numbers)
+	set_meta("stsl_combat_scaled", true)
+	return self
+
+static func _effect_uses_combat_units(effect: EffectType, applied_status: String) -> bool:
+	if effect in [EffectType.HEAL, EffectType.MAX_HP, EffectType.BLOCK, EffectType.DAMAGE_HERO]:
+		return true
+	# GameManager's empty status defaults to poison, not a count-like status.
+	return effect == EffectType.APPLY_STATUS_ENEMY and applied_status in ["", "poison", "charm", "strength"]
+
+func format_description(localized: String) -> String:
+	var replacements: Dictionary = get_meta("stsl_combat_display_numbers", {})
+	if replacements.is_empty():
+		return localized
+	# Replace complete numeric tokens in a single pass. Sequential String.replace
+	# would corrupt 100 through its "10" entry or rewrite a freshly inserted 1.
+	var numbers := RegEx.new()
+	numbers.compile("[0-9]+")
+	var result := ""
+	var cursor := 0
+	for hit in numbers.search_all(localized):
+		var start := hit.get_start()
+		var legacy_text := hit.get_string()
+		result += localized.substr(cursor, start - cursor)
+		var legacy_value := legacy_text.to_int()
+		result += str(replacements.get(legacy_value, legacy_value))
+		cursor = hit.get_end()
+	return result + localized.substr(cursor)
+
+func display_description_key() -> String:
+	if not CombatScale.enabled() or effect_type != EffectType.RUN_STRENGTH:
+		return description
+	match status_type:
+		"kills_strength": return "relic.rune_of_fate.small.desc"
+		"battles_strength": return "relic.tengu_feather.small.desc"
+		"battles_per_hit": return "relic.conquerors_whip.small.desc"
+	return description
+
+static func _scale_display_value(legacy_value: int, replacements: Dictionary) -> int:
+	var scaled := CombatScale.amount(legacy_value)
+	if legacy_value > 0 and scaled != legacy_value:
+		replacements[legacy_value] = scaled
+	return scaled

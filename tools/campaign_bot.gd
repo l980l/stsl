@@ -24,6 +24,10 @@ var _seed := 42
 var _max_seconds := DEFAULT_MAX_SECONDS
 var _report_path := ""
 var _speed := 1.0
+var _profile_frames := false
+var _diagnose_battles := false
+var _replay_encounter := ""
+var _policy := "corrected"
 var _started_usec := 0
 var _last_activity_usec := 0
 var _actions := 0
@@ -62,6 +66,14 @@ func _init() -> void:
 
 func _parse_args() -> void:
 	for raw in OS.get_cmdline_user_args():
+		if raw == "--diagnose-battles":
+			_diagnose_battles = true
+		elif raw.begins_with("--replay-encounter="):
+			_replay_encounter = raw.trim_prefix("--replay-encounter=")
+		elif raw.begins_with("--policy="):
+			_policy = raw.trim_prefix("--policy=")
+		if raw == "--profile-frames":
+			_profile_frames = true
 		if raw.begins_with("--chapter="):
 			_chapter_arg = raw.trim_prefix("--chapter=")
 		elif raw.begins_with("--seed="):
@@ -108,6 +120,9 @@ func _start() -> void:
 	if _chapters.is_empty():
 		_finish("error", "--chapter must be 1, 2, or both")
 		return
+	if _policy not in ["baseline", "corrected", "status-aware"]:
+		_finish("error", "--policy must be baseline, corrected or status-aware")
+		return
 	var progress := root.get_node("ProgressManager")
 	if not progress.is_hero_unlocked(_initial_hero):
 		_finish("error", "--hero must be an unlocked starting hero")
@@ -116,15 +131,25 @@ func _start() -> void:
 	BattleManager.turn_started.connect(_on_actor_turn_started)
 	BattleManager.hero_turn_skipped.connect(_on_hero_turn_skipped)
 	BattleManager.card_effects_resolved.connect(_on_card_resolved)
-	_probe = FRAME_PROBE.new()
-	root.add_child(_probe)
-	_probe.configure(_report_path + ".frames.jsonl")
+	BattleManager.battle_won.connect(_on_battle_won)
+	if _diagnose_battles or _replay_encounter != "":
+		_diagnose_battles = true
+		BattleManager.hero_damaged.connect(func(hid: String, amount: int, kind: String, _crit: bool): _act("hero_damage", {"hero": hid, "amount": amount, "kind": kind, "state": _combat_snapshot()}))
+		BattleManager.poison_tick_applied.connect(func(target: String, amount: int): _act("poison_tick", {"target": target, "amount": amount}))
+	if _profile_frames:
+		_probe = FRAME_PROBE.new()
+		root.add_child(_probe)
+		_probe.configure(_report_path + ".frames.jsonl")
 	_mark("boot")
 	# SceneTransition is a real production autoload; loading the menu first makes
 	# this a rendered project run rather than a data-only test.
 	change_scene_to_file("res://scenes/main_menu/main_menu_scene.tscn")
 	await process_frame
-	await _start_chapter()
+	if _replay_encounter != "":
+		if not _restore_encounter():
+			return
+	else:
+		await _start_chapter()
 	await _tick()
 
 func _isolated_user_directory() -> bool:
@@ -243,7 +268,92 @@ func _choose_map_node() -> void:
 	_route.append({"chapter": GameManager.current_chapter, "act": GameManager.current_act,
 		"floor": node.floor_num, "node_id": chosen, "room_type": node.room_type})
 	_act("enter_node")
+	if _diagnose_battles and node.room_type in [MapNode.RoomType.BATTLE, MapNode.RoomType.ELITE, MapNode.RoomType.BOSS]:
+		_capture_encounter(chosen)
+		if _outcome != "running":
+			return
 	GameManager.enter_node(chosen)
+
+func _capture_encounter(chosen: int) -> void:
+	# Test-only pre-entry checkpoint. The normal save format deliberately omits
+	# transient battle state, so capture BEFORE entering, never midway through it.
+	var entry_seed: int = _seed + GameManager.current_chapter * 100000 + GameManager.current_act * 1000 + chosen
+	var sm := root.get_node("SaveManager")
+	var data := {"kind": "stsl_encounter_checkpoint_v1", "combat_units": BattleManager.combat_unit_divisor,
+		"entry_seed": entry_seed, "node_id": chosen, "game_manager": GameManager.to_dict(),
+		"act_mythologies": GameManager.act_mythologies.duplicate(),
+		"team_manager": TeamManager.to_dict(), "deck_manager": DeckManager.to_dict(),
+		"relics": sm._serialize_relics(GameManager), "source_hash": OS.get_environment("STSL_BOT_SOURCE_HASH"), "gameplay_hash": OS.get_environment("STSL_BOT_GAMEPLAY_HASH")}
+	var path := _report_path.get_base_dir().path_join("encounter-c%d-a%d-n%d.json" % [GameManager.current_chapter, GameManager.current_act, chosen])
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		_finish("error", "Could not write encounter checkpoint")
+		return
+	file.store_string(JSON.stringify(data, "\t"))
+	file.close()
+	_act("encounter_checkpoint", {"path": path, "team": data.team_manager, "relics": data.relics})
+	seed(entry_seed)
+
+func _restore_encounter() -> bool:
+	var data = JSON.parse_string(FileAccess.get_file_as_string(_replay_encounter))
+	if not (data is Dictionary) or data.get("kind", "") != "stsl_encounter_checkpoint_v1" or int(data.get("combat_units", 0)) != BattleManager.combat_unit_divisor:
+		_finish("error", "Invalid or incompatible encounter checkpoint")
+		return false
+	if data.get("gameplay_hash", "") != "" and data.gameplay_hash != OS.get_environment("STSL_BOT_GAMEPLAY_HASH"):
+		_finish("error", "Checkpoint gameplay rules changed; recapture before paired testing")
+		return false
+	GameManager.start_run(_initial_hero, int(data.game_manager.current_chapter))
+	GameManager.from_dict(data.game_manager)
+	var mythologies: Array = data.get("act_mythologies", [])
+	if mythologies.is_empty():
+		# Early diagnostic checkpoints lacked this non-save field. Recover only
+		# the current encounter's observed mythology from its original report;
+		# never silently reroll a different encounter and call it a paired test.
+		var original = JSON.parse_string(FileAccess.get_file_as_string(_replay_encounter.get_base_dir().path_join("report.json")))
+		var floor_num: int = int(data.game_manager.run_map[int(data.node_id)].floor_num)
+		if original is Dictionary:
+			for action in original.get("action_log", []):
+				if action.label == "battle_context" and int(action.chapter) == GameManager.current_chapter and int(action.act) == GameManager.current_act and int(action.floor) == floor_num:
+					var names: Array = action.detail.enemies
+					if not names.is_empty():
+						var myth: String = String(names[0]).split(".")[1]
+						mythologies = [myth, myth, myth]
+						_act("checkpoint_context_recovered", {"current_mythology": myth, "from_original_report": true})
+	if mythologies.size() != 3:
+		_finish("error", "Checkpoint lacks proven mythology context")
+		return false
+	GameManager.act_mythologies.assign(mythologies)
+	# JSON numbers are floats; Array.has compares their Variant types. Keep
+	# replay's legal-node IDs integral before enter_node's membership guard.
+	GameManager.available_node_ids = _integer_ids(GameManager.available_node_ids)
+	TeamManager.from_dict(data.team_manager)
+	DeckManager.from_dict(data.deck_manager)
+	root.get_node("SaveManager")._deserialize_relics(GameManager, data.relics)
+	var node_id: int = int(data.node_id)
+	if node_id not in GameManager.available_node_ids:
+		_finish("error", "Checkpoint node is not available")
+		return false
+	_last_act_seeded = GameManager.current_act
+	seed(int(data.entry_seed))
+	_act("encounter_replay", {"checkpoint": _replay_encounter, "checkpoint_source_hash": data.source_hash, "team": data.team_manager})
+	GameManager.enter_node(node_id)
+	return true
+
+static func _integer_ids(values: Array) -> Array:
+	return values.map(func(value): return int(value))
+
+func _combat_snapshot() -> Dictionary:
+	var heroes: Array = []
+	for hero in TeamManager.heroes:
+		heroes.append({"id": hero.hero_id, "hp": TeamManager.get_current_hp(hero.hero_id), "block": BattleManager.get_hero_block(hero.hero_id), "status": BattleManager._hero_status.get(hero.hero_id, {}).duplicate(true)})
+	return {"heroes": heroes, "enemy_hp": BattleManager._enemy_hp.duplicate(), "enemy_status": BattleManager._enemy_status.duplicate(true), "actor": BattleManager._current_actor_id}
+
+func _on_battle_won() -> void:
+	if _diagnose_battles:
+		_act("battle_result", {"won": true, "state": _combat_snapshot()})
+	if _replay_encounter != "":
+		_runs.append(_run_summary("clear", "Checkpoint encounter won (not a chapter clear)"))
+		_finish.call_deferred("clear", "Checkpoint encounter won (not a chapter clear)")
 
 func _route_score(id: int, memo: Dictionary) -> float:
 	if memo.has(id):
@@ -284,6 +394,11 @@ func _drive_battle(scene: Node) -> void:
 	var hero_id: String = BattleManager.get_current_hero_id()
 	var hand: Array = DeckManager.get_hand(hero_id)
 	var selected: Resource = _best_playable_card(hero_id, hand)
+	if _diagnose_battles:
+		var options: Array = []
+		for card in hand:
+			options.append({"card": card.card_name, "cost": DeckManager.get_effective_cost(hero_id, card), "playable": DeckManager.can_play_hero(hero_id, card), "score": _card_score(card, hero_id)})
+		_act("card_decision", {"hero": hero_id, "energy": DeckManager.get_energy(hero_id), "chosen": selected.card_name if selected else "", "options": options, "state": _combat_snapshot()})
 	if selected != null:
 		_battle_waiting = true
 		_pending_bot_card = selected
@@ -304,6 +419,8 @@ func _on_actor_turn_started(actor_id: String) -> void:
 	_hero_input_ready = actor_id.begins_with("hero:")
 	_hero_turn_actor = actor_id
 	_hero_turn_scene_id = current_scene.get_instance_id() if current_scene != null else 0
+	if _diagnose_battles:
+		_act("actor_turn", {"state": _combat_snapshot()})
 
 static func _input_matches_turn(scene_id: int, turn_scene_id: int, actor: String, announced_actor: String, ready: bool) -> bool:
 	return ready and scene_id == turn_scene_id and actor.begins_with("hero:") and actor == announced_actor
@@ -387,7 +504,7 @@ func _is_unavailable_counter(card: Resource) -> bool:
 			for index in BattleManager._enemy_hp.size():
 				if BattleManager.is_counter_window_active(index):
 					return false
-			return _incoming_damage() < 120.0
+			return _policy_hp_value(_incoming_damage()) < 120.0
 	return false
 
 func _incoming_damage() -> float:
@@ -396,8 +513,23 @@ func _incoming_damage() -> float:
 		if BattleManager.is_enemy_alive(enemy):
 			for intent in BattleManager.get_enemy_current_intents(enemy):
 				if int(intent.action_type) == 0:
-					damage += intent.value
+					damage += BattleManager.get_intent_display_damage(enemy, intent) if _policy == "status-aware" else intent.value
 	return damage
+
+static func _cleanse_value(status: Dictionary, unit_divisor: int) -> float:
+	# Actual runtime keys, and the remaining HP loss (poison bypasses block).
+	return float(status.get("poison_dmg", 0)) * float(status.get("poison_dur", 0)) * unit_divisor * 3.0 + float(status.get("weak", 0) + status.get("vulnerable", 0)) * 50.0
+
+static func _guard_demand(incoming: float, block: int, max_hp: int) -> float:
+	# Block persists across turns; keep a small reserve even on debuff turns.
+	# Do not count poison as blockable damage.
+	return maxf(0.0, incoming + ceil(max_hp * 0.1) - block)
+
+# Strategy scores use the original policy's comparison scale. This changes
+# no game state: damage/HP inputs alone are normalized so draw/energy weights
+# don't become ten times more attractive after the combat-unit migration.
+func _policy_hp_value(value: float) -> float:
+	return value * float(BattleManager.combat_unit_divisor)
 
 func _karma_reserve() -> float:
 	# Buddhist death retaliation is 25% of cumulative damage, to EVERY hero.
@@ -408,7 +540,7 @@ func _karma_reserve() -> float:
 		var enemy: Resource = BattleManager._enemies[index]
 		if BattleManager.is_enemy_alive(index) and enemy.mythology == "buddhist" and enemy.signatures_enabled:
 			retaliation += maxf(enemy.max_hp, BattleManager._enemy_status[index].get("damage_taken", 0)) * 0.25
-	return retaliation * 1.5 + 300.0 if retaliation > 0.0 else 0.0
+	return retaliation * 1.5 + 300.0 / float(BattleManager.combat_unit_divisor) if retaliation > 0.0 else 0.0
 
 func _best_guard_health() -> float:
 	var best := 0.0
@@ -429,6 +561,8 @@ func _card_score(card: Resource, hero_id: String) -> float:
 	var target := _target_for_card(card)
 	var incoming := _incoming_damage()
 	var unblocked := maxf(0.0, incoming - BattleManager.get_hero_block(hero_id))
+	if _policy == "status-aware":
+		unblocked = _guard_demand(incoming, BattleManager.get_hero_block(hero_id), hero.max_hp)
 	var karma_reserve := _karma_reserve()
 	var preparing_karma := karma_reserve > _best_guard_health()
 	# Do not seed delayed poison/token/counter kills while still banking a
@@ -444,22 +578,22 @@ func _card_score(card: Resource, hero_id: String) -> float:
 			"poison_burst_multiplier":
 				var burst: int = BattleManager._card_effect_base_damage(effect, hero_id, target, true)
 				projected_damage += burst
-				score += burst * 1.8
+				score += _policy_hp_value(burst) * 1.8
 			"next_cards_cost_reduction", "next_attack_cost_reduction":
 				score += float(effect.rule_params.get("amount", 0)) * 120.0
 			"formation_block":
-				score += float(effect.rule_params.get("base", 0)) * (5.0 if preparing_karma else 1.5)
+				score += _policy_hp_value(float(effect.rule_params.get("base", 0))) * (5.0 if preparing_karma else 1.5)
 		match effect.effect_type:
-			Effect.EffectType.DAMAGE, Effect.EffectType.CONSUME_MORALE, Effect.EffectType.CONDITIONAL_DMG, Effect.EffectType.DAMAGE_PER_BLOCK, Effect.EffectType.DAMAGE_PER_HAND_SIZE, Effect.EffectType.DAMAGE_PER_TOKEN, Effect.EffectType.ENERGY_TO_DAMAGE, Effect.EffectType.CHARM_TO_DAMAGE, Effect.EffectType.DAMAGE_PER_STATUS_TYPE, Effect.EffectType.DAMAGE_PER_TEAM_MORALE, Effect.EffectType.DAMAGE_PER_TEAM_TOKEN:
+			Effect.EffectType.DAMAGE, Effect.EffectType.CONSUME_MORALE, Effect.EffectType.CONDITIONAL_DMG, Effect.EffectType.DAMAGE_PER_BLOCK, Effect.EffectType.DAMAGE_PER_HAND_SIZE, Effect.EffectType.DAMAGE_PER_TOKEN, Effect.EffectType.ENERGY_TO_DAMAGE, Effect.EffectType.CHARM_TO_DAMAGE, Effect.EffectType.DAMAGE_PER_STATUS_TYPE, Effect.EffectType.DAMAGE_PER_TEAM_MORALE, Effect.EffectType.DAMAGE_PER_TEAM_TOKEN, Effect.EffectType.PER_DRAW_DMG:
 				var damage: int = BattleManager.estimate_effect_damage(effect, hero_id, target)
 				projected_damage += damage
 				if target >= 0:
 					if BattleManager._enemies[target].mythology == "buddhist" and damage >= BattleManager._enemy_hp[target] and preparing_karma:
 						return -1000.0
 					damage = mini(damage, BattleManager._enemy_hp[target])
-				score += damage * 1.8
+				score += _policy_hp_value(damage) * 1.8
 			Effect.EffectType.BLOCK, Effect.EffectType.BLOCK_ALL, Effect.EffectType.FORMATION_BLOCK, Effect.EffectType.MORALE_TO_BLOCK:
-				score += effect.value * 5.0 if preparing_karma else minf(effect.value, unblocked) * (2.5 if hp_ratio < 0.65 else 1.5)
+				score += _policy_hp_value(effect.value) * 5.0 if preparing_karma else _policy_hp_value(minf(effect.value, unblocked)) * (2.5 if hp_ratio < 0.65 else 1.5)
 			Effect.EffectType.HEAL, Effect.EffectType.HEAL_ALL:
 				for ally in TeamManager.heroes:
 					if not TeamManager.is_alive(ally.hero_id):
@@ -470,7 +604,7 @@ func _card_score(card: Resource, hero_id: String) -> float:
 						continue
 					var hp: int = TeamManager.get_current_hp(ally.hero_id)
 					var ratio := float(hp) / maxf(1.0, ally.max_hp)
-					score += mini(effect.value, ally.max_hp - hp) * (6.0 if ratio < 0.35 else (3.0 if ratio < 0.7 else 0.5))
+					score += _policy_hp_value(mini(effect.value, ally.max_hp - hp)) * (6.0 if ratio < 0.35 else (3.0 if ratio < 0.7 else 0.5))
 			Effect.EffectType.DRAW:
 				score += 45.0
 			Effect.EffectType.ENERGY:
@@ -482,19 +616,24 @@ func _card_score(card: Resource, hero_id: String) -> float:
 			Effect.EffectType.GAIN_MORALE, Effect.EffectType.SUMMON_TOKEN:
 				score += 32.0
 			Effect.EffectType.CHARM:
-				score += effect.value * 2.5
+				score += _policy_hp_value(effect.value) * 2.5
 			Effect.EffectType.PURGE_STATUS:
-				for status in ["poison", "weak", "vulnerable"]:
-					score += float(BattleManager._hero_status.get(hero_id, {}).get(status, 0)) * 4.0
+				if _policy != "baseline":
+					for ally in TeamManager.heroes:
+						if TeamManager.is_alive(ally.hero_id) and (effect.target == "ALL" or ally.hero_id == hero_id):
+							score += _cleanse_value(BattleManager._hero_status.get(ally.hero_id, {}), BattleManager.combat_unit_divisor)
+				else:
+					for status in ["poison", "weak", "vulnerable"]:
+						score += float(BattleManager._hero_status.get(hero_id, {}).get(status, 0)) * 4.0
 			Effect.EffectType.APPLY_STATUS:
 				if effect.status_type.begins_with("power."):
 					score += 1000.0 if preparing_karma and "block" in effect.status_type else 150.0
 				elif effect.status_type == "poison":
-					score += effect.value * 4.0
+					score += _policy_hp_value(effect.value) * 4.0
 				elif effect.status_type in ["weak", "vulnerable"]:
 					score += effect.value * 50.0
 			Effect.EffectType.COUNTER_REFLECT:
-				score += 700.0 if target >= 0 and BattleManager.is_counter_window_active(target) else incoming * 1.5
+				score += 700.0 if target >= 0 and BattleManager.is_counter_window_active(target) else _policy_hp_value(incoming) * 1.5
 			_:
 				pass
 	if int(card.card_type) == 0 and target >= 0 and BattleManager._enemy_hp[target] <= 0:
@@ -567,15 +706,17 @@ func _choose_reward() -> void:
 	_act("take_reward")
 
 func _reward_score(card: Resource) -> float:
+	if _policy != "baseline" and not TeamManager.is_alive(card.owner_id):
+		return -1.0
 	var score := 0.0
 	for effect in card.effects:
 		match effect.effect_type:
 			Effect.EffectType.DAMAGE, Effect.EffectType.CONDITIONAL_DMG:
-				score += effect.value * maxi(1, effect.hit_count)
+				score += _policy_hp_value(effect.value) * maxi(1, effect.hit_count)
 			Effect.EffectType.BLOCK, Effect.EffectType.BLOCK_ALL:
-				score += effect.value * 0.5
+				score += _policy_hp_value(effect.value) * 0.5
 			Effect.EffectType.HEAL, Effect.EffectType.HEAL_ALL:
-				score += effect.value
+				score += _policy_hp_value(effect.value)
 			Effect.EffectType.APPLY_STATUS:
 				if effect.status_type.begins_with("power."):
 					score += 160.0
@@ -586,7 +727,7 @@ func _reward_score(card: Resource) -> float:
 			Effect.EffectType.DRAW:
 				score += 40.0 * effect.value
 			Effect.EffectType.CHARM:
-				score += effect.value * 2.0
+				score += _policy_hp_value(effect.value) * 2.0
 			Effect.EffectType.PURGE_STATUS:
 				score += 100.0
 	return score / maxf(1.0, float(card.cost))
@@ -644,11 +785,11 @@ func _choose_event(scene: Node) -> void:
 		var available: bool = scene.call("_is_choice_available", candidate) if scene.has_method("_is_choice_available") else candidate.cost_gold <= GameManager.gold
 		var is_battle: bool = candidate.effect_type == EventChoice.EffectType.TRIGGER_BATTLE
 		if available:
-			var value: float = -float(candidate.cost_hp) * 2.0 - float(candidate.cost_gold) * 0.25
+			var value: float = -_policy_hp_value(candidate.cost_hp) * 2.0 - float(candidate.cost_gold) * 0.25
 			if is_battle:
 				value -= 500.0
 			elif candidate.effect_type == EventChoice.EffectType.HEAL:
-				value += candidate.value * 2.0
+				value += _policy_hp_value(candidate.value) * 2.0
 			elif candidate.effect_type in [EventChoice.EffectType.ADD_HERO, EventChoice.EffectType.ADD_RELIC, EventChoice.EffectType.DRAW_UP]:
 				value += 100.0
 			elif candidate.effect_type == EventChoice.EffectType.GOLD:
@@ -699,7 +840,8 @@ func _record_chapter_clear() -> void:
 
 func _act(label: String, detail: Dictionary = {}) -> void:
 	_last_activity_usec = Time.get_ticks_usec()
-	_actions += 1
+	if label not in ["actor_turn", "hero_damage", "poison_tick", "battle_entry", "battle_result", "card_decision", "encounter_checkpoint", "encounter_replay"]:
+		_actions += 1
 	_action_counts[label] = int(_action_counts.get(label, 0)) + 1
 	if _action_log.size() < MAX_ACTIONS:
 		_action_log.append({"index": _actions, "label": label, "chapter": GameManager.current_chapter,
@@ -721,6 +863,8 @@ func _record_battle_context() -> void:
 	for enemy in GameManager.pending_enemies:
 		enemies.append(String(enemy.enemy_name))
 	_act("battle_context", {"enemies": enemies})
+	if _diagnose_battles:
+		_act("battle_entry", {"state": _combat_snapshot(), "deck": DeckManager.to_dict(), "relics": root.get_node("SaveManager")._serialize_relics(GameManager)})
 
 func _event_overlay_open(scene: Node) -> bool:
 	for child in scene.get_children():
@@ -763,6 +907,8 @@ func _finish(status: String, detail: String) -> void:
 			"window_focused": root.has_focus(), "viewport_size": [root.get_visible_rect().size.x, root.get_visible_rect().size.y],
 			"master_muted": AudioServer.is_bus_mute(AudioServer.get_bus_index("Master"))},
 		"config": {"chapter": _chapter_arg, "hero": _initial_hero, "seed": _seed, "max_seconds": _max_seconds,
+			"policy": _policy, "diagnose_battles": _diagnose_battles, "replay_encounter": _replay_encounter,
+			"combat_unit_divisor": BattleManager.combat_unit_divisor if BattleManager != null else 0, "profile_frames": _profile_frames,
 			"speed": _speed, "actual_scene_run": true, "rendered_scene_run": DisplayServer.get_name() != "headless",
 			"headless": DisplayServer.get_name() == "headless"},
 		"elapsed_seconds": _elapsed_seconds(), "actions": _actions, "action_counts": _action_counts,
@@ -771,7 +917,7 @@ func _finish(status: String, detail: String) -> void:
 			"input_ready": _hero_input_ready, "waiting_card": _battle_waiting} if BattleManager != null else {},
 		"route": _route, "action_log": _action_log, "runs": _runs, "frame_probe": _probe.summary() if _probe != null else {},
 		"source": {"commit": OS.get_environment("STSL_BOT_SOURCE_COMMIT"),
-			"hash": OS.get_environment("STSL_BOT_SOURCE_HASH"), "dirty_entries": OS.get_environment("STSL_BOT_SOURCE_DIRTY")},
+			"hash": OS.get_environment("STSL_BOT_SOURCE_HASH"), "gameplay_hash": OS.get_environment("STSL_BOT_GAMEPLAY_HASH"), "dirty_entries": OS.get_environment("STSL_BOT_SOURCE_DIRTY")},
 		"limits": ["Uses production battle, scene transitions and win/loss rules; it does not alter HP or force wins.",
 			"Map route is deliberately seeded; global VFX/random presentation may still vary.",
 			"Frame intervals include transitions, VSync and scheduling; they are not GPU timings."]

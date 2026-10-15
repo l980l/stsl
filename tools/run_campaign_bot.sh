@@ -61,6 +61,7 @@ fi
 export STSL_BOT_SOURCE_COMMIT="$(git -C "$repo_path" rev-parse HEAD)"
 export STSL_BOT_SOURCE_DIRTY="$(git -C "$repo_path" status --porcelain | wc -l | tr -d ' ')"
 export STSL_BOT_SOURCE_HASH="$(find "$repo_path/autoload" "$repo_path/resources" "$repo_path/scenes" "$repo_path/tools" -type f \( -name '*.gd' -o -name '*.tscn' -o -name '*.csv' \) -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256 | awk '{print $1}')"
+export STSL_BOT_GAMEPLAY_HASH="$(find "$repo_path/autoload" "$repo_path/resources" "$repo_path/scenes" -type f \( -name '*.gd' -o -name '*.tscn' -o -name '*.csv' \) -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256 | awk '{print $1}')"
 echo "Isolated test project: $test_project"
 echo "Default report: $artifact_dir/report.json"
 set +e

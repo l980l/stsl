@@ -5,12 +5,12 @@ const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
 	# _arhat_joins 제거 — ADD_HERO 이벤트. 영입은 Act1 trigger 로 일원화.
-	return [
+	return EventRes.scale_pool_for_combat([
 		_yama_toll(), _dharma_wheel(), _mara_illusion(),
 		_monk_blessing(), _guanyin_mercy(), _buddha_prophecy(),
 		_temple_trial(), _naga_king_test(),
 		_nirvana_gate(), _bodhi_tree(),
-	]
+	])
 
 static func _yama_toll() -> Resource:
 	# 재설계: 1번 통행세 지불받음 (GOLD, HP cost), 2번 우회 (cost_gold 통행료)

@@ -361,7 +361,7 @@ func _build_relic_section() -> void:
 
 		var desc_lbl := Label.new()
 		desc_lbl.theme_type_variation = "SubLabel"
-		desc_lbl.text                 = tr(relic.description)
+		desc_lbl.text                 = relic.format_description(tr(relic.display_description_key()))
 		desc_lbl.autowrap_mode        = TextServer.AUTOWRAP_WORD_SMART
 		desc_lbl.add_theme_font_size_override("font_size", 14)
 		desc_box.add_child(desc_lbl)

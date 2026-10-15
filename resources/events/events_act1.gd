@@ -4,12 +4,12 @@ const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
 	# _companion_encounter 제거 — 영입은 첫 ELITE 전투 승리 / Act1 보스 클리어 trigger 로 일원화
-	return [
+	return EventRes.scale_pool_for_combat([
 		_golden_chest(), _wounded_warrior(), _ancient_library(),
 		_cursed_altar(), _prometheus_fire(),
 		_heracles_trial(), _circe_magic(), _hades_contract(),
 		_hermes_gamble(), _devils_deal(),
-	]
+	])
 
 static func _golden_chest() -> Resource:
 	# 재설계: 1번 상자 연다 → 70% +60 골드 / 30% 경비병에게 들킴 (TRIGGER_BATTLE 보통)

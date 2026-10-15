@@ -68,6 +68,7 @@ enum EffectType {
 # rule_id 는 BattleManager가 카드별 특수 처리에 사용하는 안정 식별자다.
 @export var upgrade_value: int = -1
 @export var upgrade_bonus_value: int = -1
+@export var upgrade_target: String = ""
 @export var rule_id: String = ""
 @export var rule_params: Dictionary = {}
 @export var upgrade_rule_params: Dictionary = {}
@@ -82,6 +83,22 @@ const _STATUS_NAME_KEYS := {
 }
 
 func display_text(override_value: int = -1) -> String:
+	var text := _display_text(override_value)
+	# Generic optional effects also need their gate in the visible description.
+	# CHARM already renders its target-HP condition in its own branch below.
+	if condition != "" and effect_type != EffectType.CHARM and text != "":
+		var gate := ""
+		match condition:
+			"low_hp", "owner_hp_below_50": gate = tr("effect.condition.low_hp")
+			"very_low_hp": gate = tr("effect.condition.very_low_hp")
+			"team_count_3": gate = tr("effect.condition.team_count_n") % 3
+			"hand_size_0": gate = tr("effect.condition.hand_size_n") % 0
+			"enemy_count_1": gate = tr("effect.condition.enemy_count_n") % 1
+		if gate != "":
+			text = gate + ": " + text
+	return text
+
+func _display_text(override_value: int = -1) -> String:
 	# override_value >= 0 면 데미지 표시에 그 값 사용 (UI 가 buff/debuff 적용한 효과 데미지).
 	# DAMAGE / CONDITIONAL_DMG 등 데미지 계열만 override 의미 있음.
 	var v: int = override_value if override_value >= 0 else value
@@ -107,7 +124,13 @@ func display_text(override_value: int = -1) -> String:
 		EffectType.FORMATION_BLOCK:
 			return TranslationServer.translate("effect.formation_block.text") % value
 		EffectType.APPLY_STATUS:
-			if status_type == "poison":
+			if status_type == "duel_lock":
+				return _revision_format("duel", {"turns": value})
+			elif status_type == "power.spend_all_energy_poison_double":
+				return _revision_format("energy_poison", {})
+			elif status_type == "power.charm_double_apply":
+				return _revision_format("charm_multiplier", {"amount": 1 + value})
+			elif status_type == "poison":
 				var _pk: String = "effect.apply_status_poison.all.text" if target == "ALL" else "effect.apply_status_poison.single.text"
 				return TranslationServer.translate(_pk) % value
 			elif status_type == "power.every_nth_attack_bonus":
@@ -115,7 +138,10 @@ func display_text(override_value: int = -1) -> String:
 				return fmt % [bonus_value, value] if fmt.contains("%") else fmt
 			elif status_type.begins_with("power."):
 				var fmt: String = TranslationServer.translate(status_type + ".label")
-				return fmt % value if fmt.contains("%") else fmt
+				var text: String = fmt % value if fmt.contains("%") else fmt
+				if rule_params.has("upgrade_tick_period"):
+					text += " " + _revision_format("power_cadence", {"period": rule_params.upgrade_tick_period, "bonus": rule_params.upgrade_tick_bonus})
+				return text
 			else:
 				var st_key: String = _STATUS_NAME_KEYS.get(status_type, "")
 				var st_name: String = tr(st_key) if st_key else status_type
@@ -133,9 +159,7 @@ func display_text(override_value: int = -1) -> String:
 		EffectType.GAIN_MORALE: return TranslationServer.translate("effect.gain_morale.text") % value
 		EffectType.CONSUME_MORALE: return TranslationServer.translate("effect.consume_morale.text") % bonus_value
 		EffectType.POISON_BURST:
-			if target == "ALL":
-				return TranslationServer.translate("effect.poison_burst_all.text")
-			return TranslationServer.translate("effect.poison_burst.text")
+			return _revision_format("poison_burst_all_percent" if target == "ALL" else "poison_burst_percent", {"amount": value})
 		EffectType.COUNTER_BLOCK:  return TranslationServer.translate("effect.counter_block.text") % value
 		EffectType.COST_NEXT:      return TranslationServer.translate("effect.cost_next.text") % value
 		EffectType.CONDITIONAL_DMG:
@@ -194,7 +218,7 @@ func display_text(override_value: int = -1) -> String:
 		EffectType.DAMAGE_PER_DEAD_ALLY: return TranslationServer.translate("effect.damage_per_dead_ally.text") % value
 		EffectType.DOUBLE_NEXT_DAMAGE:   return TranslationServer.translate("effect.double_next_damage.text")
 		EffectType.DISCARD_PICK_DRAW:    return TranslationServer.translate("effect.discard_pick_draw.text") % value
-		EffectType.MORALE_TO_BLOCK:      return TranslationServer.translate("effect.morale_to_block.text")
+		EffectType.MORALE_TO_BLOCK:      return _revision_format("morale_block", {"amount": value})
 		EffectType.DAMAGE_PER_HAND_SIZE: return TranslationServer.translate("effect.damage_per_hand_size.text") % value
 		EffectType.DAMAGE_PER_TOKEN:     return TranslationServer.translate("effect.damage_per_token.text") % value
 		EffectType.HEAL_PER_DEAD_ALLY:
@@ -256,8 +280,14 @@ func _revision_display_text() -> String:
 	values["bonus"] = bonus_value
 	values["multiplier"] = rule_params.get("multiplier", bonus_value)
 	match rule_id:
+		"paired_draw_damage":
+			values["upgrade_suffix"] = _revision_format("draw_pairs_upgrade", {"amount": int(rule_params.get("upgrade_bonus", 0))}) if int(rule_params.get("upgrade_bonus", 0)) > 0 else ""
+			return _revision_format("draw_pairs", values)
 		"morale_spend_damage": return _revision_format("morale_spend", values)
-		"consume_own_block": return _revision_format("block_spend", values)
+		"consume_own_block":
+			# Keep the runtime ratio, but show 150%, never a decimal ×1.5.
+			values["multiplier_percent"] = int(round(float(rule_params.get("multiplier", 1)) * 100.0))
+			return _revision_format("block_spend", values)
 		"consume_own_tokens", "consume_own_tokens_all":
 			values["cap"] = rule_params.get("consume_cap", rule_params.get("consume", 0))
 			return _revision_format("tokens_spend_all" if rule_id.ends_with("_all") else "tokens_spend", values)

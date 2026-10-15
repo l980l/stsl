@@ -152,7 +152,16 @@ func _refresh_localized_text() -> void:
 		_exit_button.tooltip_text = tr("tutorial.exit")
 	if _idx < 0 or _idx >= _steps.size():
 		return
-	_render(tr(_steps[_idx].get("text", "")))
+	_render(localized_step_text())
+
+func localized_step_text() -> String:
+	if _idx < 0 or _idx >= _steps.size():
+		return ""
+	var step: Dictionary = _steps[_idx]
+	var text: String = tr(step.get("text", ""))
+	for token in step.get("text_values", {}):
+		text = text.replace("{" + str(token) + "}", str(step.text_values[token]))
+	return text
 
 func _on_locale_changed(_locale: String) -> void:
 	_refresh_localized_text()

@@ -162,16 +162,21 @@ const STATUS_INTERNAL_KEYS := [
 	"daoist_stance", "japanese_turn_count",
 	"charge_remaining", "_charge_block_advance",
 	"taunt_source",  # 도발 시전자 추적용 — UI 표시 X (tooltip 에서만 사용)
+	"duel_lock_owner", # 결투 시전자 — 결투 툴팁에서만 표시
 	# 신규 적 메커니즘 internal — 별도 UI 표시 (현재 mode/affinity/weakness 는 weakness_alert/intent 라벨)
 	"current_mode_index", "current_mode", "current_affinity", "current_weakness",
 	"exiled", "next_attack_first_hit_bonus"  # 예약 효과는 카드 설명에서 확인
 ]
 
 func _trf(key: String, args) -> String:
+	if key in ["signature.greek.desc", "signature.daoist.desc", "battle.signature.hubris.desc", "battle.signature.yin_yang.desc"] and preload("res://resources/balance/combat_scale.gd").enabled():
+		key += ".small"
+	if key == "synergy.napoleon_yi.desc" and preload("res://resources/balance/combat_scale.gd").enabled():
+		key = "synergy.napoleon_yi.small.desc"
 	var s := tr(key)
 	if "%d" in s or "%s" in s or "%f" in s:
 		return s % args
-	return s
+	return s.replace("%%", "%")
 
 # damage_type 영어 키 → i18n 번역. 미등록 dtype 은 raw 영어 fallback.
 func _i18n_dtype(dtype: String) -> String:
@@ -189,14 +194,16 @@ func _i18n_status_kw(status_type: String) -> String:
 # signature.X.desc 가 동적 합성 형식으로 변경 (Attack/Vulnerable 등 raw 영어 제거).
 func _signature_desc_args(mythology: String) -> Array:
 	match mythology:
-		"greek", "norse":
+		"greek":
+			return [BattleManager._combat_literal(25), tr("status.strength.name"), BattleManager._combat_literal(2)]
+		"norse":
 			return [tr("status.strength.name")]
 		"egyptian":
 			return [tr("keyword.attack"), tr("status.vulnerable.name")]
 		"daoist":
-			return [tr("status.strength.name"), tr("keyword.block")]
+			return [tr("status.strength.name"), tr("keyword.block"), BattleManager._combat_literal(15)]
 		"japanese":
-			return [tr("keyword.block")]
+			return [tr("keyword.block"), BattleManager._combat_literal(20)]
 		_:
 			return []  # buddhist 등 raw 키워드 없는 desc
 
@@ -204,14 +211,24 @@ func _signature_desc_args(mythology: String) -> Array:
 # 시그니처 보스 emoji 아이콘 / 활성 시너지 tooltip 에 사용.
 func _battle_sig_desc_args(desc_key: String) -> Array:
 	match desc_key:
-		"battle.signature.hubris.desc", "battle.signature.ragnarok.desc":
+		"battle.signature.hubris.desc":
+			return [BattleManager._combat_literal(25), tr("status.strength.name"), BattleManager._combat_literal(2)]
+		"battle.signature.ragnarok.desc":
 			return [tr("status.strength.name")]
 		"battle.signature.egyptian_curse.desc":
 			return [tr("status.vulnerable.name")]
 		"battle.signature.yin_yang.desc":
-			return [tr("status.strength.name"), tr("keyword.block")]
+			return [tr("status.strength.name"), tr("keyword.block"), BattleManager._combat_literal(15)]
 		"battle.signature.kekkai.desc":
-			return [tr("keyword.block")]
+			return [tr("keyword.block"), BattleManager._combat_literal(20)]
+		"synergy.yi_cleopatra.desc", "synergy.joan_yi.desc", "synergy.joan_genghis.desc":
+			return [BattleManager._combat_literal(30)]
+		"synergy.joan_cleopatra.desc":
+			return [BattleManager._combat_literal(15)]
+		"synergy.napoleon_cleopatra.desc":
+			return [BattleManager._combat_literal(3)]
+		"synergy.genghis_cleopatra.desc":
+			return [BattleManager._combat_literal(5)]
 		_:
 			return []  # battle.signature.karma.desc 및 일반 synergy desc
 
@@ -705,7 +722,7 @@ func _refresh_hud() -> void:
 	if not GameManager or not GameManager.is_inside_tree():
 		return
 	for relic in GameManager.relics:
-		var tip: String = "%s\n%s" % [tr(relic.relic_name), tr(relic.description)]
+		var tip: String = "%s\n%s" % [tr(relic.relic_name), relic.format_description(tr(relic.display_description_key()))]
 		var _lk: String = relic.lore_key()
 		if _lk != "":
 			var _lt: String = tr(_lk)
@@ -1317,7 +1334,7 @@ func _start_test_battle() -> void:
 		var hero = HeroRes.new()
 		hero.hero_id = hid
 		hero.hero_name = "hero.%s.name" % hid
-		hero.max_hp = 1000
+		hero.max_hp = BattleManager._combat_literal(1000)
 		hero.character_scene = load("res://characters/heroes/%s/%s.tscn" % [hid, hid])
 		TeamManager.add_hero(hero)
 
@@ -1334,7 +1351,7 @@ func _start_test_battle() -> void:
 		MusashiCards._strike(), MusashiCards._strike(), MusashiCards._twin_blades_basic(),
 		MusashiCards._niten_slash(), MusashiCards._whirlwind_cut(), MusashiCards._defend(),
 	]
-	for card in test_deck:
+	for card in preload("res://resources/cards/card_revision_v3.gd").apply_all(test_deck):
 		DeckManager.add_card_to_deck(card)
 
 	# 적 설정 — 2마리 (다른 일러스트로 확인하기 위해 satyr + hydra), 영웅 공격
@@ -1345,13 +1362,15 @@ func _start_test_battle() -> void:
 	for ei in range(2):
 		var dummy = EnemyRes.new()
 		dummy.enemy_name = enemy_names[ei]
-		dummy.max_hp = 3000
+		dummy.max_hp = BattleManager._combat_literal(3000)
 		dummy.character_scene = enemy_placeholder
 		var intent = IntentResClass.new()
 		intent.action_type = IntentResClass.ActionType.ATTACK
-		intent.value = 30
+		intent.value = BattleManager._combat_literal(30)
 		intent.target = IntentResClass.TargetType.RANDOM
 		dummy.intent_pattern = [intent]
+		if preload("res://resources/balance/combat_scale.gd").enabled():
+			dummy.set_meta("stsl_enemy_small_numbers_v1", true)
 		enemies.append(dummy)
 
 	BattleManager.turn_interval = 0.4
@@ -1769,7 +1788,7 @@ func _format_intent_tooltip(_enemy_index: int, intent: Resource) -> String:
 		IntentRes.ActionType.MARK_TARGET:
 			return tr("battle.intent.tooltip.mark_target")
 		IntentRes.ActionType.SACRIFICE:
-			return _trf("battle.intent.tooltip.sacrifice", v)
+			return _trf("battle.intent.tooltip.sacrifice", intent.small_sacrifice_hp_cost if intent.small_sacrifice_hp_cost >= 0 else v * BattleManager._combat_literal(10))
 		IntentRes.ActionType.WARD:
 			return _trf("battle.intent.tooltip.ward", v)
 		IntentRes.ActionType.SUMMON:
@@ -5445,7 +5464,7 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	# placeholder 가 1개 (단일 val) 인 status 만 default format. 2개 이상은 elif 분기가 처리 (charm_resistance 등).
 	var raw_desc: String = tr("status.%s.desc" % key)
 	var n_placeholders: int = raw_desc.count("%d") + raw_desc.count("%s") + raw_desc.count("%f")
-	var tooltip: String = raw_desc
+	var tooltip: String = raw_desc.replace("%%", "%")
 	if n_placeholders == 1:
 		tooltip = raw_desc % val
 	# speed_bonus / speed_penalty — 각 instance 별 "+N/M턴" list tooltip
@@ -5475,12 +5494,19 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 			tooltip = tr("status.taunt.desc")
 	# charm_resistance — 저항값과 함께 동적으로 계산된 매혹 임계값 표시
 	elif key == "charm_resistance":
-		var threshold: int = BattleManager.CHARM_THRESHOLD_BASE + val
+		var threshold: int = BattleManager._combat_literal(BattleManager.CHARM_THRESHOLD_BASE) + val
+		for power_key in BattleManager._active_powers:
+			if power_key.begins_with("power.charm_threshold_minus:"):
+				threshold -= int(BattleManager._active_powers[power_key].get("value", 0))
+		threshold = maxi(1, threshold)
 		tooltip = tr("status.charm_resistance.desc") % [val, threshold]
 	# poison_dmg — 피해량 + 남은 지속 턴 수 동적 표시
 	elif key == "poison_dmg":
 		var dur: int = status.get("poison_dur", 0)
 		tooltip = tr("status.poison_dmg.desc") % [val, dur]
+	elif key == "duel_lock":
+		var duelist := _get_hero_name_for_tooltip(status.get("duel_lock_owner", ""))
+		tooltip = tr("status.duel_lock.desc") % [duelist, val]
 	# marked_by — Array. 적용 대상 (영웅/적) 으로 desc 분기.
 	# - 영웅 status: Array of enemy_index → 적 공격이 그 영웅에 치명타 +30%
 	# - 적 status: Array of hero_id → 모든 영웅 공격이 그 적에 치명타 +30%
@@ -5699,6 +5725,9 @@ func _make_power_item(base_key: String, v: int, owner_id: String = "", params: D
 		lbl.text = label_fmt % [params.get("bonus_value", 3), v] if label_fmt.contains("%") else label_fmt
 	else:
 		lbl.text = label_fmt % v if label_fmt.contains("%") else label_fmt
+	if params.has("upgrade_tick_period"):
+		var period: int = int(params.upgrade_tick_period)
+		lbl.text += " [%d/%d +%d]" % [int(params.get("_upgrade_tick_count", 0)) % period, period, int(params.get("upgrade_tick_bonus", 0))]
 	lbl.theme_type_variation = "EyebrowLabel"
 	lbl.add_theme_font_size_override("font_size", 11)
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -6366,7 +6395,9 @@ func _refresh_enemy_counter(enemy_index: int) -> void:
 func _counter_tooltip_text(info: Dictionary) -> String:
 	var tkey: String = info.get("tooltip_key", "")
 	if tkey != "":
-		return tr(tkey)
+		var localized: String = tr(tkey)
+		if localized != tkey:
+			return localized
 	# tooltip_key 없는 경우 동적 생성 (fallback)
 	var card_type: int = info.get("card_type", -1)
 	var threshold: int = info.get("threshold", 0)

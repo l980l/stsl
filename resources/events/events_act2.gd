@@ -4,12 +4,12 @@ const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
 	# _ra_sunboat 제거 — ADD_HERO 이벤트. 영입은 Act1 trigger 로 일원화.
-	return [
+	return EventRes.scale_pool_for_combat([
 		_book_of_the_dead(), _anubis_judgment(), _scarab_beetle(),
 		_pharaoh_tomb(), _nile_flood(), _thoth_wisdom(),
 		_bastet_cats(), _oasis_merchant(), _mummy_curse(),
 		_sphinx_gate(),
-	]
+	])
 
 static func _book_of_the_dead() -> Resource:
 	# 다양화: 1번 TRIGGER_BATTLE → 영구 드로우 +1, 2번 책장에서 한 페이지 찢어 골드로 판다

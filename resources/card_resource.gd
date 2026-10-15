@@ -18,6 +18,7 @@ enum Rarity {
 @export var card_type: CardType = CardType.ATTACK
 @export var rarity: Rarity = Rarity.COMMON
 @export var upgrade_level: int = 0
+@export var combat_unit_version: int = 1  # 1: legacy authoring, 2: live small integers
 @export var effects: Array = []
 @export var description: String = ""
 @export var art: Texture2D

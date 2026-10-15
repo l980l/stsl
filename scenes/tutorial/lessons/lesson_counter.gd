@@ -17,7 +17,7 @@ static func build_deck() -> Array:
 	var deck: Array = [CommonCards.counter(HERO_ID), NapoleonCards._strike(), NapoleonCards._strike()]
 	for c in deck:
 		c.is_innate = true
-	return deck
+	return preload("res://resources/cards/card_revision_v3.gd").apply_all(deck)
 
 static func build_enemy() -> EnemyResource:
 	var e := EnemyResource.new()
@@ -26,7 +26,7 @@ static func build_enemy() -> EnemyResource:
 	e.mythology = "greek"
 	e.grade = EnemyResource.Grade.NORMAL
 	# 카운터 후 기절을 확인한 뒤 한 방으로 마무리되게 낮은 HP.
-	e.max_hp = 90
+	e.max_hp = preload("res://resources/balance/combat_scale.gd").amount(90)
 	e.signatures_enabled = false
 	e.character_scene = load("res://characters/enemies/enemy_placeholder.tscn")
 	# 카운터 윈도우 — CHARGE_UP 의도 표시 시점부터 카운터 카드로 무효 가능.
@@ -37,11 +37,13 @@ static func build_enemy() -> EnemyResource:
 	charge.charge_turns = 2
 	var payoff := IntentResource.new()
 	payoff.action_type = IntentResource.ActionType.ATTACK
-	payoff.value = 45
+	payoff.value = preload("res://resources/balance/combat_scale.gd").amount(45)
 	payoff.target = IntentResource.TargetType.RANDOM
 	payoff.damage_type = "blunt"
 	charge.payoff_intents = [payoff]
 	e.intent_pattern = [charge]
+	if preload("res://resources/balance/combat_scale.gd").enabled():
+		e.set_meta("stsl_enemy_small_numbers_v1", true)
 	return e
 
 # end_turn: "lock"=강제 / "highlight"=유도 / "free"=자유. complete_event 은 battle_scene 브리지가 notify.

@@ -392,7 +392,7 @@ func discard_random(n: int) -> void:
 
 # ── 직렬화 v3 ────────────────────────────────────
 const _SAVED_CARD_FIELDS := ["card_name", "owner_id", "cost", "play_animation", "upgrade_level", "card_type", "rarity", "is_exhaust", "is_ethereal", "is_retain", "is_innate", "archetype", "has_explicit_upgrade", "upgrade_cost"]
-const _SAVED_EFFECT_FIELDS := ["effect_type", "value", "target", "status_type", "bonus_value", "base_value", "base_bonus_value", "hit_count", "condition", "damage_type", "rule_id", "rule_params", "upgrade_value", "upgrade_bonus_value", "upgrade_rule_params"]
+const _SAVED_EFFECT_FIELDS := ["effect_type", "value", "target", "status_type", "bonus_value", "base_value", "base_bonus_value", "hit_count", "condition", "damage_type", "rule_id", "rule_params", "upgrade_value", "upgrade_bonus_value", "upgrade_target", "upgrade_rule_params"]
 
 func to_dict() -> Dictionary:
 	# 전투 외 — _meta_deck 직렬화. 전투 중이면 모든 영웅 합쳐서.
@@ -409,7 +409,7 @@ func to_dict() -> Dictionary:
 		for field in _SAVED_CARD_FIELDS:
 			saved_card[field] = card.get(field)
 		card_data.append(saved_card)
-	return {"version": 4, "base_draw_count": base_draw_count, "full_deck": card_data}
+	return {"version": 4, "combat_units": "small-integers-v2" if preload("res://resources/balance/combat_scale.gd").enabled() else "legacy", "base_draw_count": base_draw_count, "full_deck": card_data}
 
 func from_dict(data: Dictionary) -> void:
 	clear()
@@ -445,6 +445,15 @@ func from_dict(data: Dictionary) -> void:
 				eff.base_bonus_value = eff.bonus_value
 			effects.append(eff)
 		card.effects = effects
+		if preload("res://resources/balance/combat_scale.gd").enabled():
+			var profile = load("res://resources/balance/small_number_profile.gd")
+			if data.get("combat_units", "legacy") == "small-integers-v2":
+				card.set_meta(profile.PROFILE_META, true)
+				card.combat_unit_version = 2
+			elif card.upgrade_level == 0:
+				card = profile.live_card(card)
+			else:
+				card = profile.candidate_from_actual_card(card)
 		_meta_deck.append(card)
 	upgrader.free()
 

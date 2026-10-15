@@ -48,6 +48,30 @@ const TOKEN_DMG_PER_STACK: int = 25
 const TOKEN_MAX_STACK: int = 6
 const CHARM_THRESHOLD_BASE: int = 100
 
+# Resources already use the selected units; never divide incoming card/intent
+# values again. Explicit legacy mode is reserved for comparison harnesses.
+var combat_unit_divisor: int = 10 if preload("res://resources/balance/combat_scale.gd").enabled() else 1
+var _enemy_strength_remainders: Dictionary = {}
+
+# Preserve the rate of repeated tiny enemy gains without fractional strength
+# or rounding every authored +1 into an entire new combat point.
+@warning_ignore("integer_division")
+func gain_authored_enemy_strength(index: int, legacy_amount: int, source: String) -> int:
+	var divisor := maxi(1, combat_unit_divisor)
+	var key := "%d:%s" % [index, source]
+	var total: int = int(_enemy_strength_remainders.get(key, 0)) + legacy_amount
+	var gained: int = total / divisor
+	_enemy_strength_remainders[key] = total % divisor
+	if gained > 0:
+		_apply_status_to_enemy(index, "strength", gained)
+	return gained
+
+func _combat_literal(legacy_amount: int) -> int:
+	if legacy_amount <= 0:
+		return legacy_amount
+	var divisor: int = max(1, combat_unit_divisor)
+	return max(1, int((legacy_amount + divisor / 2) / divisor))
+
 # 치명타 시스템 — 기본 확률 5%, 마킹(marked_by) 시 +30% (총 35%), 발동 시 데미지 ×2
 const CRIT_BASE_RATE: float = 0.05
 const CRIT_MARK_BONUS: float = 0.30
@@ -366,6 +390,20 @@ func _card_has_damage(card: Resource) -> bool:
 # DAMAGE 아니면 effect.value 그대로.
 # 치명타·dnd 는 미포함 (실제 경로 _apply_card_effects 와 동일 버킷, 비치명타 기준)
 func estimate_effect_damage(effect: Resource, owner_id: String, target_enemy_index: int = -1) -> int:
+	if effect.rule_id == "paired_draw_damage":
+		var pair_ctx := DamageContext.new()
+		pair_ctx.base = _paired_draw_damage(owner_id, effect.rule_params)
+		if target_enemy_index >= 0 and target_enemy_index < _enemy_status.size():
+			var pair_status: Dictionary = _enemy_status[target_enemy_index]
+			if pair_status.get("invuln", 0) > 0:
+				return 0
+			if pair_status.get("vulnerable", 0) > 0:
+				pair_ctx.in_pct += 0.5
+			if pair_status.get("duel_lock", 0) > 0 and pair_status.get("duel_lock_owner", "") == owner_id:
+				pair_ctx.in_pct += 0.5
+			if _is_enemy_in_defense_mode(target_enemy_index):
+				pair_ctx.mitigation.append(0.5)
+		return compute_damage(pair_ctx)
 	if effect.effect_type not in [EffectRes.EffectType.DAMAGE, EffectRes.EffectType.CONDITIONAL_DMG]:
 		return effect.value
 	var owner_status: Dictionary = _hero_status.get(owner_id, {})
@@ -383,6 +421,8 @@ func estimate_effect_damage(effect: Resource, owner_id: String, target_enemy_ind
 			and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi")
 		if _ed_active and t_status.get("vulnerable", 0) > 0:
 			ctx.out_pct += 0.25
+		if t_status.get("duel_lock", 0) > 0 and t_status.get("duel_lock_owner", "") == owner_id:
+			ctx.in_pct += 0.5
 		# FORM_SWITCH offense → out_pct +0.5 (적이 공격자인 경우는 없으므로 영웅 측 카드 기준 불필요)
 		# vulnerable → in_pct +0.5
 		if t_status.get("vulnerable", 0) > 0:
@@ -396,6 +436,7 @@ func _card_effect_base_damage(effect: Resource, owner_id: String, target: int, b
 	var enemy_st: Dictionary = _enemy_status[target] if target >= 0 and target < _enemy_status.size() else {}
 	var p: Dictionary = effect.rule_params
 	match effect.rule_id:
+		"paired_draw_damage": return _paired_draw_damage(owner_id, p)
 		"morale_spend_damage": return effect.bonus_value if st.get("morale", 0) >= int(p.consume) else effect.value
 		"consume_own_block": return effect.value + int(mini(_hero_block.get(owner_id, 0), p.consume_cap) * float(p.multiplier))
 		"consume_own_tokens", "consume_own_tokens_all": return effect.value + mini(st.get("tokens", 0), p.get("consume_cap", p.get("consume", 0))) * effect.bonus_value
@@ -422,6 +463,38 @@ func _card_effect_base_damage(effect: Resource, owner_id: String, target: int, b
 			return effect.bonus_value if prior >= (1 if before_play else 2) else effect.value
 	if effect.effect_type == EffectRes.EffectType.CONDITIONAL_DMG:
 		match effect.status_type:
+			"low_hp", "very_low_hp":
+				var owner: Resource = team_mgr.get_hero(owner_id) if team_mgr else null
+				var threshold := 30 if effect.status_type == "very_low_hp" else 50
+				if owner != null and team_mgr.get_current_hp(owner_id) * 100 <= owner.max_hp * threshold:
+					return effect.bonus_value
+			"morale":
+				if st.get("morale", 0) > 0:
+					return effect.bonus_value
+			"has_poison":
+				if enemy_st.get("poison_dmg", 0) > 0:
+					return effect.bonus_value
+			"has_poison_1", "has_poison_2", "has_poison_5", "has_poison_10":
+				var gate: int = effect.status_type.trim_prefix("has_poison_").to_int()
+				if gate >= 5:
+					gate = _combat_literal(gate)
+				if enemy_st.get("poison_dmg", 0) >= gate:
+					return effect.bonus_value
+			"enemy_count_1":
+				if _get_living_enemy_count() == 1:
+					return effect.bonus_value
+			"has_debuffs_3":
+				var count := int(enemy_st.get("weak", 0) > 0) + int(enemy_st.get("vulnerable", 0) > 0) + int(enemy_st.get("poison_dmg", 0) > 0)
+				if count >= 3:
+					return effect.bonus_value
+			"cards_played_before":
+				if deck_mgr and deck_mgr.get_cards_played_this_turn(owner_id) >= (1 if before_play else 2):
+					return effect.bonus_value
+			"team_hp_below_30":
+				if team_mgr:
+					for hero in team_mgr.get_living_heroes():
+						if team_mgr.get_current_hp(hero.hero_id) * 100 <= hero.max_hp * 30:
+							return effect.bonus_value
 			"hand_size_0":
 				if deck_mgr and deck_mgr.get_hand(owner_id).size() <= (1 if before_play else 0):
 					return effect.bonus_value
@@ -430,6 +503,13 @@ func _card_effect_base_damage(effect: Resource, owner_id: String, target: int, b
 				if target >= 0 and target < _enemies.size() and _enemy_hp[target] * 100 <= _enemies[target].max_hp * threshold:
 					return effect.bonus_value
 	return effect.value
+
+@warning_ignore("integer_division")
+func _paired_draw_damage(owner_id: String, params: Dictionary) -> int:
+	var draws: int = deck_mgr.get_draws_this_turn(owner_id) if deck_mgr else 0
+	if draws <= 0:
+		return 0
+	return (draws / 2) * int(params.per_pair) + (draws % 2) * int(params.per_odd) + int(params.get("upgrade_bonus", 0))
 
 # 카드의 단일 타겟/ALL 데미지 추정 — compute_damage 파이프라인 사용 (실제 경로 동일 버킷)
 # 결과: enemy_index → 예측 데미지 합 (hit_count 포함)
@@ -458,6 +538,9 @@ func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionar
 			if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 				targets.append(target_enemy_index)
 		for ti in targets:
+			if effect.rule_id == "paired_draw_damage":
+				result[ti] = int(result.get(ti, 0)) + estimate_effect_damage(effect, card.owner_id, ti)
+				continue
 			var t_status: Dictionary = _enemy_status[ti] if ti < _enemy_status.size() else {}
 			var ctx := DamageContext.new()
 			ctx.base = _card_effect_base_damage(effect, card.owner_id, ti)
@@ -466,6 +549,8 @@ func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionar
 			# 황제의 무도: 취약 적에게 out_pct +0.25
 			if _ed_active and t_status.get("vulnerable", 0) > 0:
 				ctx.out_pct += 0.25
+			if t_status.get("duel_lock", 0) > 0 and t_status.get("duel_lock_owner", "") == card.owner_id:
+				ctx.in_pct += 0.5
 			# vulnerable → in_pct +0.5
 			if t_status.get("vulnerable", 0) > 0:
 				ctx.in_pct += 0.5
@@ -550,8 +635,12 @@ func setup_battle(enemies: Array, is_tutorial: bool = false) -> void:
 				hero_ids.append(hero.hero_id)
 			deck_mgr.setup_for_battle(hero_ids)
 	turn_count = 0
+	_enemy_strength_remainders.clear()
 	damage_taken_this_battle = 0
 	_enemies = enemies.duplicate()
+	if combat_unit_divisor > 1 and preload("res://resources/balance/combat_scale.gd").enabled():
+		for i in range(_enemies.size()):
+			_enemies[i] = preload("res://resources/balance/enemy_small_numbers.gd").convert(_enemies[i])
 	_enemy_hp.clear()
 	_enemy_alive.clear()
 	_enemy_block.clear()
@@ -774,7 +863,7 @@ func _run_next_actor_turn() -> void:
 	turn_queue_changed.emit(get_turn_queue_preview())
 	if next_id.begins_with("hero:"):
 		var hid: String = next_id.substr(5)
-		_start_hero_turn(hid)
+		await _start_hero_turn(hid)
 	elif next_id.begins_with("enemy:"):
 		var idx: int = int(next_id.substr(6))
 		await _run_one_enemy_turn(idx)
@@ -816,9 +905,10 @@ func _start_hero_turn(hid: String) -> void:
 	if _hero_status.get(hid, {}).get("stun", 0) > 0:
 		_hero_status[hid]["stun"] = max(0, _hero_status[hid]["stun"] - 1)
 		hero_turn_skipped.emit(hid)
-		await get_tree().create_timer(1.0 * _turn_interval_mul()).timeout
+		if is_inside_tree() and turn_interval > 0.0:
+			await get_tree().create_timer(1.0 * _turn_interval_mul()).timeout
 		if is_player_turn and is_battle_active:
-			end_player_turn()
+			await end_player_turn()
 
 # 영웅별 병사 토큰 공격 종류 — 이순신: 함포 폭발 / 칭기즈칸: 화살 / 그 외: 총탄
 @warning_ignore("shadowed_variable_base_class")
@@ -844,18 +934,18 @@ func _run_token_attacks(owner: String, count: int) -> bool:
 		_last_attacker[pick] = owner
 		# 토큰 인덱스 + 타겟 적 전달 — battle_scene 이 병사 타일 위치에서 VFX 발사
 		token_attack_fired.emit(owner, _ti, pick)
-		_deal_damage_to_enemy(pick, TOKEN_DMG_PER_STACK, dtype)
+		_deal_damage_to_enemy(pick, _combat_literal(TOKEN_DMG_PER_STACK), dtype)
 		# 혼란의 돌격 (황제×파라오): 나폴레옹 병사 공격 1회당 매혹 +3
 		if owner == "napoleon" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
-			_apply_status_to_enemy(pick, "charm", 3)
+			_apply_status_to_enemy(pick, "charm", _combat_literal(3))
 			synergy_triggered.emit("synergy.napoleon_cleopatra.name", owner)
 		# 약탈과 독 (정복자×파라오): 칭기즈칸 병사 공격 1회당 독 +5
 		if owner == "genghis_khan" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
-			_apply_status_to_enemy(pick, "poison", 5)
+			_apply_status_to_enemy(pick, "poison", _combat_literal(5))
 			synergy_triggered.emit("synergy.genghis_cleopatra.name", owner)
 		did = true
 		# 토큰 사이 짧은 랜덤 지연 — SFX 겹침 방지 (0.08~0.18s)
-		if count > 1:
+		if count > 1 and is_inside_tree():
 			await get_tree().create_timer(0.08 + randf() * 0.10).timeout
 			if not is_battle_active:
 				return did
@@ -881,7 +971,8 @@ func _phase_hero_pre(hid: String) -> bool:
 			if _jt_extra > 0:
 				synergy_triggered.emit("synergy.yi_genghis.name", hid)
 				# 본인 병사가 모두 복귀할 때까지 대기 후 파트너 병사 출현
-				await get_tree().create_timer(0.6).timeout
+				if is_inside_tree():
+					await get_tree().create_timer(0.6).timeout
 				if not is_battle_active:
 					return did_work
 				if await _run_token_attacks(_jt_partner, _jt_extra):
@@ -1094,7 +1185,7 @@ func _revision_damage(card: Resource, effect: Resource, target: int, amount: int
 			ctx.out_pct += 0.25
 		ctx.crit_mult = crit.crit_mult
 		_last_attacker[idx] = card.owner_id
-		_deal_damage_to_enemy(idx, compute_damage(ctx), effect.damage_type, crit.is_crit, card.owner_id)
+		_deal_damage_to_enemy(idx, _outgoing_damage(ctx), effect.damage_type, crit.is_crit, card.owner_id)
 
 func _apply_revision_effect(card: Resource, effect: Resource, target: int, ally: String, first_bonus: int = 0) -> void:
 	var p: Dictionary = effect.rule_params
@@ -1102,6 +1193,11 @@ func _apply_revision_effect(card: Resource, effect: Resource, target: int, ally:
 	var ally_id: String = ally if ally != "" else hid
 	var target_alive: bool = target >= 0 and target < _enemies.size() and _enemy_alive[target]
 	match effect.rule_id:
+		"paired_draw_damage":
+			var damage: int = _paired_draw_damage(hid, p)
+			# Preserve legacy PER_DRAW_DMG: no strength, weak or crit additions.
+			if target_alive and damage > 0:
+				_deal_damage_to_enemy(target, damage)
 		"morale_spend_damage":
 			var damage: int = effect.value
 			if _hero_status.get(hid, {}).get("morale", 0) >= int(p.consume):
@@ -1362,6 +1458,13 @@ func _trigger_active_powers(phase: String, ctx: Dictionary = {}) -> void:
 		# player_turn_start 시 본인 영웅 power 만 발동 (다른 영웅 차례에는 skip)
 		if phase == "player_turn_start" and target_hero != "" and owner_id != "" and owner_id != target_hero:
 			continue
+		if phase == "player_turn_start" and key in ["power.poison_per_turn", "power.block_per_turn", "power.heal_team_per_turn"]:
+			var params: Dictionary = power.get("params", {})
+			var period: int = int(params.get("upgrade_tick_period", 0))
+			if period > 0:
+				params["_upgrade_tick_count"] = int(params.get("_upgrade_tick_count", 0)) + 1
+				if int(params["_upgrade_tick_count"]) % period == 0:
+					v += int(params.get("upgrade_tick_bonus", 0))
 		match key:
 			"power.poison_per_turn":
 				if phase == "player_turn_start":
@@ -1545,7 +1648,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								_all_ctx.flat = _str_flat + (next_hit_bonus if _hit == 0 and first_damage_effect else 0)
 								_all_ctx.out_pct = _all_out_pct
 								_all_ctx.crit_mult = _all_cr["crit_mult"]
-								var _all_dmg: int = compute_damage(_all_ctx)
+								var _all_dmg: float = _outgoing_damage(_all_ctx)
 								_deal_damage_to_enemy(i, _all_dmg, effect.damage_type, _all_cr["is_crit"], card.owner_id)
 								if _bph > 0:
 									_deal_damage_to_enemy(i, _bph, effect.damage_type)
@@ -1566,7 +1669,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							_sgl_ctx.flat = _str_flat + (next_hit_bonus if _hit == 0 and first_damage_effect else 0)
 							_sgl_ctx.out_pct = _sgl_out_pct
 							_sgl_ctx.crit_mult = _cr["crit_mult"]
-							var _sgl_dmg: int = compute_damage(_sgl_ctx)
+							var _sgl_dmg: float = _outgoing_damage(_sgl_ctx)
 							_deal_damage_to_enemy(target_enemy_index, _sgl_dmg, effect.damage_type, _cr["is_crit"], card.owner_id)
 							if _bph > 0:
 								_deal_damage_to_enemy(target_enemy_index, _bph, effect.damage_type)
@@ -1604,7 +1707,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_pw_params["card_name"] = card.card_name
 					var _pw_aid: String = "hero:" + card.owner_id
 					var _pw_old_sp: int = _actor_speed(_pw_aid) if effect.status_type == "power.speed_buff" else 0
-					_register_power(effect.status_type, card.owner_id, effect.value, _pw_params)
+					if effect.status_type == "power.spend_all_energy_poison_double":
+						_spend_all_energy_poison_double(card.owner_id)
+					else:
+						_register_power(effect.status_type, card.owner_id, effect.value, _pw_params)
 					if effect.rule_params.get("immediate_morale", 0) > 0:
 						_apply_status_to_hero(card.owner_id, "morale", effect.rule_params.immediate_morale)
 						morale_changed.emit(card.owner_id, _hero_status[card.owner_id].get("morale", 0))
@@ -1618,7 +1724,9 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					# power.poison_double_application: 독 부여 시 스택 ×2
 					if effect.status_type == "poison" and _active_powers.has("power.poison_double_application:" + card.owner_id):
 						_as_stacks = _as_stacks * 2
-					if effect.target == "ALL":
+					if effect.status_type == "duel_lock":
+						_apply_duel_lock(target_enemy_index, card.owner_id, _as_stacks)
+					elif effect.target == "ALL":
 						for i in range(_enemies.size()):
 							if _enemy_alive[i]:
 								if effect.status_type == "taunt":
@@ -1663,8 +1771,8 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					_heal_hero_safe(heal_id, _holy_war_amplify(effect.value))
 					# 성녀의 방패 (잔다르크×이순신): 잔다르크 힐 시 대상 방어구 +40
 					if card.owner_id == "joan_of_arc" and team_mgr.is_alive("yi_sun_sin"):
-						_hero_block[heal_id] = _hero_block.get(heal_id, 0) + 40
-						hero_block_gained.emit(heal_id, 40)
+						_hero_block[heal_id] = _hero_block.get(heal_id, 0) + _combat_literal(40)
+						hero_block_gained.emit(heal_id, _combat_literal(40))
 						hero_block_vfx.emit(heal_id)
 			EffectRes.EffectType.GAIN_MORALE:
 				if not _hero_status.has(card.owner_id):
@@ -1764,14 +1872,18 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 						var condition_met: bool
 						var es: Dictionary = _enemy_status[target_enemy_index]
 						match effect.status_type:
+							"low_hp", "very_low_hp":
+								condition_met = _evaluate_condition(effect.status_type, card)
 							"morale":
 								condition_met = _hero_status.get(card.owner_id, {}).get("morale", 0) > 0
 							"has_poison":
 								condition_met = es.get("poison_dmg", 0) > 0
 							"has_poison_5":
-								condition_met = es.get("poison_dmg", 0) >= 5
+								condition_met = es.get("poison_dmg", 0) >= _combat_literal(5)
 							"has_poison_10":
-								condition_met = es.get("poison_dmg", 0) >= 10
+								condition_met = es.get("poison_dmg", 0) >= _combat_literal(10)
+							"has_poison_1", "has_poison_2":
+								condition_met = es.get("poison_dmg", 0) >= effect.status_type.trim_prefix("has_poison_").to_int()
 							"has_debuffs_3":
 								var dc: int = 0
 								for dt: String in ["weak", "vulnerable"]:
@@ -1887,7 +1999,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					# 성스러운 독 (잔다르크×클레오파트라): 정화한 아군을 힐 100
 					if card.owner_id == "joan_of_arc" and team_mgr.is_alive("cleopatra"):
 						for _sv_h in heroes_to_purge:
-							_heal_hero_safe(_sv_h.hero_id, 100)
+							_heal_hero_safe(_sv_h.hero_id, _combat_literal(100))
 			EffectRes.EffectType.PER_DRAW_DMG:
 				# 본인 영웅의 이번 차례 드로우 수 × value
 				var drawn: int = deck_mgr.get_draws_this_turn(card.owner_id) if deck_mgr else 0
@@ -2025,7 +2137,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				var _banked: int = _hero_status.get(card.owner_id, {}).get("sacrifice_bank", 0)
 				if _banked > 0:
 					@warning_ignore("integer_division")
-					var _payout: int = (_banked / 100) * effect.value
+					var _payout: int = (_banked / _combat_literal(100)) * effect.value
 					if _payout > 0:
 						if effect.status_type == "block":
 							if effect.target == "ALL" and team_mgr:
@@ -2182,11 +2294,19 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					EffectRes.EffectType.CONDITIONAL_DMG:
 						_revision_damage(card, effect, target_enemy_index, _card_effect_base_damage(effect, card.owner_id, target_enemy_index))
 					EffectRes.EffectType.DAMAGE:
-						var dmg2: int = effect.value
+						var dmg2: float = effect.value
 						var _os2: Dictionary = _hero_status.get(card.owner_id, {})
-						if _os2.get("weak", 0) > 0:
-							dmg2 = int(dmg2 * 0.75)
-						dmg2 += _hero_strength(card.owner_id)
+						if preload("res://resources/balance/combat_scale.gd").enabled():
+							var echo_ctx := DamageContext.new()
+							echo_ctx.base = effect.value
+							echo_ctx.flat = _hero_strength(card.owner_id)
+							if _os2.get("weak", 0) > 0:
+								echo_ctx.out_pct = -0.25
+							dmg2 = _outgoing_damage(echo_ctx)
+						else:
+							if _os2.get("weak", 0) > 0:
+								dmg2 = int(dmg2 * 0.75)
+							dmg2 += _hero_strength(card.owner_id)
 						var _bph2: int = _active_powers.get("power.bonus_per_hit:" + card.owner_id, {}).get("value", 0)
 						for _eh in range(effect.hit_count):
 							if effect.target == "ALL":
@@ -2224,12 +2344,12 @@ func _consume_dnd_flag() -> bool:
 	return consumed
 
 
-func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = "", is_crit: bool = false, source_owner: String = "") -> void:
+func _deal_damage_to_enemy(enemy_index: int, incoming_amount: float, damage_type: String = "", is_crit: bool = false, source_owner: String = "") -> void:
 	if not _enemy_alive[enemy_index]:
 		return
 	# ── 받는 측 DamageContext 구성 ──
 	var ctx := DamageContext.new()
-	ctx.base = amount
+	ctx.base = incoming_amount
 	# T3-WARD: invuln 활성화 시 데미지 무시 — dnd 소진 전에 early-return
 	if _enemy_status[enemy_index].get("invuln", 0) > 0:
 		enemy_damaged.emit(enemy_index, 0, damage_type, false)
@@ -2240,6 +2360,14 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	# vulnerable: 받는 측 +50%
 	if _enemy_status[enemy_index].get("vulnerable", 0) > 0:
 		ctx.in_pct += 0.5
+	# Fate Duel: only its caster gains the bonus against the marked enemy.
+	# Most card damage calls omit source_owner, so use the active hero turn as the
+	# authoritative owner for normal play while retaining explicit-source callers.
+	var duel_owner: String = source_owner
+	if duel_owner == "" and _current_actor_id.begins_with("hero:"):
+		duel_owner = _current_actor_id.substr(5)
+	if _enemy_status[enemy_index].get("duel_lock", 0) > 0 and _enemy_status[enemy_index].get("duel_lock_owner", "") == duel_owner:
+		ctx.in_pct += 0.5
 	# FORM_SWITCH defense — turn_modes 의 index 0 = defense 모드. 받는 damage 50%.
 	if _is_enemy_in_defense_mode(enemy_index):
 		ctx.mitigation.append(0.5)
@@ -2247,7 +2375,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	var _cur_weak: String = _enemy_status[enemy_index].get("current_weakness", "")
 	if _cur_weak != "" and damage_type != "" and damage_type != _cur_weak:
 		ctx.mitigation.append(0.2)
-	amount = compute_damage(ctx)
+	var amount: int = compute_damage(ctx)
 	var absorbed: int = min(_enemy_block[enemy_index], amount)
 	_enemy_block[enemy_index] -= absorbed
 	amount -= absorbed
@@ -2284,7 +2412,7 @@ func _deal_damage_to_enemy(enemy_index: int, amount: int, damage_type: String = 
 	_check_phase_transition(enemy_index)
 	_check_win_condition()
 
-func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = "", is_crit: bool = false, from_enemy_index: int = -1) -> void:
+func _deal_damage_to_hero(hero_id: String, incoming_amount: float, damage_type: String = "", is_crit: bool = false, from_enemy_index: int = -1) -> void:
 	if debug_hero_invincible:
 		return
 	if team_mgr == null or not team_mgr.is_alive(hero_id):
@@ -2292,14 +2420,19 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 	var status: Dictionary = _hero_status.get(hero_id, {})
 	# ── 받는 측 DamageContext 구성 ──
 	var ctx := DamageContext.new()
-	ctx.base = amount
+	ctx.base = incoming_amount
 	# vulnerable: 받는 측 +50%
 	if status.get("vulnerable", 0) > 0:
 		ctx.in_pct += 0.5
+	# Fate Duel: the marked enemy's damage is amplified only against its duelist.
+	if from_enemy_index >= 0 and from_enemy_index < _enemy_status.size():
+		var duel_status: Dictionary = _enemy_status[from_enemy_index]
+		if duel_status.get("duel_lock", 0) > 0 and duel_status.get("duel_lock_owner", "") == hero_id:
+			ctx.in_pct += 0.5
 	# counter_pending: 반감(×0.5)만 mitigation에 추가 — 반사·소진·VFX는 아래에서 그대로 처리
 	if status.get("counter_pending", 0) > 0 and from_enemy_index >= 0 and from_enemy_index < _enemies.size():
 		ctx.mitigation.append(0.5)
-	amount = compute_damage(ctx)
+	var amount: int = compute_damage(ctx)
 	# counter_pending — 다음 받는 공격 100% 반사 + 1회 소멸 + VFX. (반감은 위 ctx에서 완료)
 	if status.get("counter_pending", 0) > 0 and from_enemy_index >= 0 and from_enemy_index < _enemies.size():
 		var _reflect_amt: int = int(ctx.base * (1.0 + ctx.in_pct))  # vulnerable 적용 후 반사 (구버전 동작 복원)
@@ -2321,9 +2454,9 @@ func _deal_damage_to_hero(hero_id: String, amount: int, damage_type: String = ""
 			var _vc_ei: int = from_enemy_index
 			get_tree().create_timer(0.2).timeout.connect(func() -> void:
 				if _vc_ei < _enemy_alive.size() and _enemy_alive[_vc_ei]:
-					synergy_counter_vfx.emit("cleopatra", _vc_ei, "poison", 30))
+					synergy_counter_vfx.emit("cleopatra", _vc_ei, "poison", _combat_literal(30)))
 		else:
-			_apply_status_to_enemy(from_enemy_index, "poison", 30)  # 테스트 환경 — VFX 없이 즉시
+			_apply_status_to_enemy(from_enemy_index, "poison", _combat_literal(30))  # 테스트 환경 — VFX 없이 즉시
 	var block: int = _hero_block.get(hero_id, 0)
 	var absorbed: int = min(block, amount)
 	_hero_block[hero_id] = block - absorbed
@@ -2358,7 +2491,7 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 		for _cpk in _active_powers:
 			if _cpk.begins_with("power.charm_threshold_minus:"):
 				_charm_reduce += _active_powers[_cpk].get("value", 0)
-		var threshold: int = max(1, CHARM_THRESHOLD_BASE + _enemy_status[enemy_index].get("charm_resistance", 0) - _charm_reduce)
+		var threshold: int = max(1, _combat_literal(CHARM_THRESHOLD_BASE) + _enemy_status[enemy_index].get("charm_resistance", 0) - _charm_reduce)
 		if new_charm >= threshold:
 			_enemy_status[enemy_index]["charm"] = 0
 			_enemy_status[enemy_index]["enthrall"] = _enemy_status[enemy_index].get("enthrall", 0) + 1
@@ -2371,6 +2504,38 @@ func _apply_status_to_enemy(enemy_index: int, status_type: String, stacks: int) 
 	else:
 		_enemy_status[enemy_index][status_type] = _enemy_status[enemy_index].get(status_type, 0) + stacks
 	status_applied.emit("enemy_%d" % enemy_index, status_type, stacks)
+
+# 파라오의 독력: 남은 에너지를 한 번에 비우고, 이미 걸린 독만
+# 에너지당 2배(2 * spent)로 선형 증폭한다. 새 독을 만들거나 권능을 남기지 않는다.
+func _spend_all_energy_poison_double(owner_id: String) -> void:
+	if deck_mgr == null:
+		return
+	var spent: int = deck_mgr.get_energy(owner_id)
+	if spent <= 0:
+		return
+	deck_mgr.set_energy_h(owner_id, 0)
+	var multiplier: int = spent * 2
+	for enemy_index in range(_enemies.size()):
+		if not _enemy_alive[enemy_index]:
+			continue
+		var status: Dictionary = _enemy_status[enemy_index]
+		if status.get("poison_dmg", 0) <= 0 or status.get("poison_dur", 0) <= 0:
+			continue
+		status["poison_dmg"] = int(status["poison_dmg"]) * multiplier
+		status_applied.emit("enemy_%d" % enemy_index, "poison", status["poison_dmg"])
+
+# 운명의 결투: 지정 적과 시전 영웅 사이의 피해만 +50%. 적 자신의 차례가
+# 끝날 때 하나씩 줄어들어 value=3이면 적의 세 번 행동에 정확히 적용된다.
+func _apply_duel_lock(enemy_index: int, owner_id: String, turns: int) -> void:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size() or not _enemy_alive[enemy_index] or turns <= 0:
+		return
+	var status: Dictionary = _enemy_status[enemy_index]
+	if status.get("duel_lock_owner", "") == owner_id:
+		status["duel_lock"] = max(int(status.get("duel_lock", 0)), turns)
+	else:
+		status["duel_lock"] = turns
+		status["duel_lock_owner"] = owner_id
+	status_applied.emit("enemy_%d" % enemy_index, "duel_lock", status["duel_lock"])
 
 
 # 시너지 VFX 임팩트 시점에 battle_scene 이 호출 — 상태이상 적용 (status_applied → 폰트 동기).
@@ -2482,7 +2647,7 @@ func _heal_hero_safe(hero_id: String, amount: int) -> bool:
 	team_mgr.heal(hero_id, amount)
 	# 성녀의 방패 (성녀×통제사): 힐 적용 시 대상 방어구 +30
 	if amount > 0 and team_mgr.is_alive("joan_of_arc") and team_mgr.is_alive("yi_sun_sin"):
-		_hero_block[hero_id] = _hero_block.get(hero_id, 0) + 30
+		_hero_block[hero_id] = _hero_block.get(hero_id, 0) + _combat_literal(30)
 		hero_block_vfx.emit(hero_id)
 		synergy_triggered.emit("synergy.joan_yi.name", hero_id)
 	return true
@@ -2583,7 +2748,7 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 	var _tlsrc: Resource = _enemies[i]
 	var _tlturns: int = int(_tlsrc.get("time_limit_turns")) if _tlsrc.get("time_limit_turns") != null else 0
 	if _tlturns > 0 and turn_count >= _tlturns:
-		_apply_status_to_enemy(i, "strength", 5)
+		gain_authored_enemy_strength(i, 5, "time_limit")
 	# dynamic_resistance (Kunino Quad-Converge 영감) — 매 enemy turn 시작 시 풀에서 1개 픽
 	var _drpool: Array = _tlsrc.get("dynamic_resistance_pool") if _tlsrc.get("dynamic_resistance_pool") != null else []
 	if not _drpool.is_empty():
@@ -2634,7 +2799,7 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 	for _cpk2 in _active_powers:
 		if _cpk2.begins_with("power.charm_threshold_minus:"):
 			_charm_reduce_turn += _active_powers[_cpk2].get("value", 0)
-	var charm_threshold: int = max(1, CHARM_THRESHOLD_BASE + _enemy_status[i].get("charm_resistance", 0) - _charm_reduce_turn)
+	var charm_threshold: int = max(1, _combat_literal(CHARM_THRESHOLD_BASE) + _enemy_status[i].get("charm_resistance", 0) - _charm_reduce_turn)
 	if charm >= charm_threshold:
 		_enemy_status[i]["charm"] = 0
 		_enemy_status[i]["enthrall"] = _enemy_status[i].get("enthrall", 0) + 1
@@ -2702,6 +2867,12 @@ func _run_one_enemy_turn(i: int, legacy: bool = false) -> void:
 			if _enemy_status[i]["taunt"] == 0 and _enemy_status[i].has("taunt_source"):
 				_enemy_status[i].erase("taunt_source")
 				status_applied.emit("enemy_%d" % i, "taunt", 0)
+		var duel_turns: int = _enemy_status[i].get("duel_lock", 0)
+		if duel_turns > 0:
+			_enemy_status[i]["duel_lock"] = duel_turns - 1
+			if _enemy_status[i]["duel_lock"] <= 0:
+				_enemy_status[i].erase("duel_lock_owner")
+			status_applied.emit("enemy_%d" % i, "duel_lock", _enemy_status[i]["duel_lock"])
 	if not legacy:
 		if is_battle_active:
 			_advance_turn_counter(_current_actor_id)
@@ -2761,7 +2932,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 						var _all_hm: bool = not _hero_status.get(hero.hero_id, {}).get("marked_by", []).is_empty()
 						var _all_crit_e: Dictionary = _roll_crit_enemy(_all_hm)
 						_atk_ctx.crit_mult = _all_crit_e["crit_mult"]
-						var _all_outgoing: int = compute_damage(_atk_ctx)
+						var _all_outgoing: float = _outgoing_damage(_atk_ctx)
 						_deal_damage_to_hero(hero.hero_id, _all_outgoing, resolved_dmg_type, _all_crit_e["is_crit"], enemy_index)
 				_trigger_active_powers("enemy_attack", {"enemy_index": enemy_index, "target_hero_id": ""})
 			else:
@@ -2774,7 +2945,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 					var has_mark: bool = not _hero_status.get(target_id, {}).get("marked_by", []).is_empty()
 					var crit_result_e: Dictionary = _roll_crit_enemy(has_mark)
 					_atk_ctx.crit_mult = crit_result_e["crit_mult"]
-					var outgoing: int = compute_damage(_atk_ctx)
+					var outgoing: float = _outgoing_damage(_atk_ctx)
 					_deal_damage_to_hero(target_id, outgoing, resolved_dmg_type, crit_result_e["is_crit"], enemy_index)
 					# 시그니처 hook: 적의 단일 타겟 공격 (이집트 저주 누적)
 					SignatureSys.on_enemy_attack(self, enemy_index, target_id)
@@ -2884,7 +3055,7 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 					_hero_status[mark_target]["marked_by"].append(enemy_index)
 		IntentRes.ActionType.SACRIFICE:
 			# T3-SACRIFICE: 자기 HP -10×value 깎고 strength +value (intent.value = strength gain)
-			var hp_cost: int = intent.value * 10
+			var hp_cost: int = intent.small_sacrifice_hp_cost if intent.small_sacrifice_hp_cost >= 0 else intent.value * _combat_literal(10)
 			_enemy_hp[enemy_index] = max(1, _enemy_hp[enemy_index] - hp_cost)
 			_apply_status_to_enemy(enemy_index, "strength", intent.value)
 			enemy_damaged.emit(enemy_index, hp_cost, "", false)
@@ -2966,6 +3137,8 @@ func _execute_intent(enemy_index: int, intent: Resource) -> void:
 func _add_enemy_to_battle(enemy: Resource) -> void:
 	if enemy == null:
 		return
+	if combat_unit_divisor > 1 and preload("res://resources/balance/combat_scale.gd").enabled():
+		enemy = preload("res://resources/balance/enemy_small_numbers.gd").convert(enemy)
 	_enemies.append(enemy)
 	_enemy_alive.append(true)
 	_enemy_hp.append(enemy.max_hp)
@@ -3091,10 +3264,10 @@ func _roll_crit(target_enemy_index: int, has_mark: bool) -> Dictionary:
 		for _de_h in team_mgr.get_living_heroes():
 			_jg_ids.append(_de_h.hero_id)
 		if is_inside_tree():
-			synergy_drain_vfx.emit(_jg_ids, 30, target_enemy_index)
+			synergy_drain_vfx.emit(_jg_ids, _combat_literal(30), target_enemy_index)
 		else:
 			for _jg_id in _jg_ids:
-				_heal_hero_safe(_jg_id, 30)
+				_heal_hero_safe(_jg_id, _combat_literal(30))
 	return {"crit_mult": crit_mult if is_crit else 1.0, "is_crit": is_crit}
 
 func _pick_highest_hp(hero_ids: Array) -> String:
@@ -3235,7 +3408,7 @@ func will_enthrall_enemy(enemy_index: int, charm_stacks: int) -> bool:
 	for _cpk in _active_powers:
 		if _cpk.begins_with("power.charm_threshold_minus:"):
 			charm_reduce += _active_powers[_cpk].get("value", 0)
-	var threshold: int = max(1, CHARM_THRESHOLD_BASE + _enemy_status[enemy_index].get("charm_resistance", 0) - charm_reduce)
+	var threshold: int = max(1, _combat_literal(CHARM_THRESHOLD_BASE) + _enemy_status[enemy_index].get("charm_resistance", 0) - charm_reduce)
 	return new_charm >= threshold
 
 func get_enemy_current_intent(index: int) -> Resource:
@@ -3302,6 +3475,7 @@ func get_all_active_powers() -> Dictionary:
 	return _active_powers.duplicate()
 
 func clear() -> void:
+	_enemy_strength_remainders.clear()
 	tutorial_active = false
 	tutorial_force_crit = false
 	tutorial_allowed_cards.clear()
@@ -3345,8 +3519,12 @@ func _evaluate_condition(cond: String, card: Resource) -> bool:
 	match cond:
 		"hand_size_0":
 			return deck_mgr != null and deck_mgr.get_hand(card.owner_id).is_empty()
-		"owner_hp_below_50":
-			return team_mgr != null and team_mgr.get_current_hp(card.owner_id) * 2 <= team_mgr.get_hero(card.owner_id).max_hp
+		"owner_hp_below_50", "low_hp", "very_low_hp":
+			var owner: Resource = team_mgr.get_hero(card.owner_id) if team_mgr else null
+			var threshold := 30 if cond == "very_low_hp" else 50
+			return owner != null and team_mgr.get_current_hp(card.owner_id) * 100 <= owner.max_hp * threshold
+		"team_count_3":
+			return team_mgr != null and team_mgr.get_living_heroes().size() >= 3
 		"enemy_count_1":
 			return _get_living_enemy_count() == 1
 		"not_enemy_count_1":
@@ -3415,7 +3593,7 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 				# 철벽 진군 (나폴레옹×이순신) — 사기 획득 시 아군 전원 방어도 +(획득 사기×5)
 				if card_owner == "napoleon" and team_mgr.is_alive("yi_sun_sin"):
 					for _iw_h in team_mgr.get_living_heroes():
-						_hero_block[_iw_h.hero_id] = _hero_block.get(_iw_h.hero_id, 0) + effect.value * 5
+						_hero_block[_iw_h.hero_id] = _hero_block.get(_iw_h.hero_id, 0) + _combat_literal(effect.value * 5)
 						hero_block_vfx.emit(_iw_h.hero_id)
 					synergy_triggered.emit("synergy.napoleon_yi.name", card_owner)
 				# 정복자의 기세 (나폴레옹×칭기즈칸) — 사기 획득 카드 시 파트너도 동일 사기
@@ -3479,10 +3657,10 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 					for _hc_h in team_mgr.get_living_heroes():
 						_hc_ids.append(_hc_h.hero_id)
 					if is_inside_tree():
-						synergy_drain_vfx.emit(_hc_ids, 15, target_enemy_index)
+						synergy_drain_vfx.emit(_hc_ids, _combat_literal(15), target_enemy_index)
 					else:
 						for _hc_id in _hc_ids:
-							_heal_hero_safe(_hc_id, 15)
+							_heal_hero_safe(_hc_id, _combat_literal(15))
 
 
 func get_active_synergies() -> Array:
@@ -3585,7 +3763,7 @@ func debug_add_dummy_enemy(max_count: int = 6) -> bool:
 		return false
 	var e := EnemyResource.new()
 	e.enemy_name = "debug.dummy_enemy"
-	e.max_hp = 100
+	e.max_hp = _combat_literal(100)
 	_enemies.append(e)
 	_enemy_hp.append(e.max_hp)
 	_enemy_alive.append(true)
@@ -3626,7 +3804,7 @@ func debug_set_enemy_hp(index: int, hp: int) -> void:
 ## 데미지 계산에 필요한 모든 수치를 담는 값 객체.
 ## block 차감은 호출부 책임 — 이 구조체는 block을 다루지 않는다.
 class DamageContext extends RefCounted:
-	var base: int = 0
+	var base: float = 0.0
 	var flat: int = 0            # 공격자 평탄 보너스 합산 (strength 등)
 	var out_pct: float = 0.0     # 공격자 증폭 % 합산 풀 (weak −0.25, 황제의무도 +0.25 등)
 	var crit_mult: float = 1.0   # 치명타 배율 (비치명타 시 1.0)
@@ -3640,9 +3818,21 @@ class DamageContext extends RefCounted:
 ## 공식: (base + flat) × (1 + out_pct) × crit_mult × dnd_mult × (1 + in_pct) × mitigation 곱연쇄
 ## block 차감은 호출부 책임이므로 이 함수는 block을 다루지 않는다.
 static func compute_damage(ctx: DamageContext) -> int:
+	var d := _unrounded_damage(ctx)
+	if preload("res://resources/balance/combat_scale.gd").enabled() and d > 0.0:
+		return maxi(1, int(floor(d)))
+	return max(0, int(floor(d)))
+
+# Attacker and receiver modifiers form one calculation in small units. Only
+# the final HP/block outcome is rounded; the historical harness keeps its
+# original intermediate truncation so before/after comparisons stay valid.
+static func _outgoing_damage(ctx: DamageContext) -> float:
+	return _unrounded_damage(ctx) if preload("res://resources/balance/combat_scale.gd").enabled() else float(compute_damage(ctx))
+
+static func _unrounded_damage(ctx: DamageContext) -> float:
 	if ctx.invuln:
-		return 0
+		return 0.0
 	var d: float = (ctx.base + ctx.flat) * (1.0 + ctx.out_pct) * ctx.crit_mult * ctx.dnd_mult * (1.0 + ctx.in_pct)
 	for m in ctx.mitigation:
 		d *= m
-	return max(0, int(floor(d)))
+	return maxf(0.0, d)

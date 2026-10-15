@@ -5,12 +5,12 @@ const ChoiceRes = preload("res://resources/event_choice_resource.gd")
 
 static func build_pool() -> Array:
 	# _cosmic_remnant 제거 — ADD_HERO 이벤트. 영입은 Act1 trigger 로 일원화.
-	return [
+	return EventRes.scale_pool_for_combat([
 		_peach_of_immortality(), _immortal_duel(), _jade_scripture(),
 		_celestial_feast(), _heavenly_bazaar(), _dragon_palace_summons(),
 		_dao_purification(), _elixir_garden(),
 		_vermilion_rebirth(), _eight_immortals(),
-	]
+	])
 
 static func _peach_of_immortality() -> Resource:
 	# 재설계: 1번 복숭아 먹기 (HEAL), 2번 복숭아 훔쳐 팔기 (GOLD, 천상 분노 cost_hp)

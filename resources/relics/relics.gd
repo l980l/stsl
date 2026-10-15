@@ -2,7 +2,7 @@
 const RelicRes = preload("res://resources/relic_resource.gd")
 
 static func build_pool() -> Array:
-	return [
+	var pool := [
 		_burning_blood(), _phoenix_feather(), _poison_vial(),
 		_war_drum(), _ancient_artifact(), _hourglass(),
 		_blood_stone(), _emperors_seal(), _serpent_bracelet(),
@@ -25,6 +25,9 @@ static func build_pool() -> Array:
 		# 속도 관련 보편 렐릭
 		_swift_seal(), _time_hourglass(),
 	]
+	for relic in pool:
+		relic.scale_for_combat()
+	return pool
 
 static func _swift_seal() -> Resource:
 	# 신속의 인장 — 전투 시작 시 모든 영웅 speed +3 (전투 끝까지)
@@ -40,7 +43,7 @@ static func _time_hourglass() -> Resource:
 	r.trigger = RelicRes.TriggerType.PLAYER_TURN_END
 	r.effect_type = RelicRes.EffectType.TIME_HOURGLASS
 	r.value = 1; r.condition_value = 5
-	return r
+	return r.scale_for_combat()
 
 ## 이벤트 보상으로만 지급 — 랜덤 풀에 포함하지 않음.
 ## 1/2/3번째 턴 두루마리 중 무작위. 해당 턴에만 카드 2장 추가 드로우.
