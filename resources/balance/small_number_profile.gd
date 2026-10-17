@@ -155,6 +155,7 @@ static func _effect_bonus_is_hp_like(effect: Resource) -> bool:
 		return true
 	# Rule damage cards use bonus_value as a damage-per-stack coefficient.
 	return effect.rule_id in [
+		"debuff_cash_damage", "marked_cash_all", "duel_status_damage",
 		"morale_spend_damage",
 		"other_card_this_turn_damage",
 		"consume_own_tokens",
@@ -168,6 +169,16 @@ static func _convert_rule_params(rule_id: String, params: Dictionary) -> void:
 	if params.is_empty():
 		return
 	match rule_id:
+		"resource_to_block": _scale_keys(params, ["base", "per_resource"])
+		"poison_seed_spread": _scale_keys(params, ["seed", "spread"])
+		"charm_to_block": _scale_keys(params, ["consume_cap", "block_cap"])
+		"guard_attack_discount": _scale_keys(params, ["threshold"])
+		"block_transfer": _scale_keys(params, ["consume_cap", "base"])
+		"formation_drill", "empty_reload": _scale_keys(params, ["block"])
+		"heal_if_enemy_debuff": _scale_keys(params, ["amount"])
+		"overflow_heal": _scale_keys(params, ["heal", "block_cap"])
+		"block_to_heal", "bank_draw", "block_multi_hit": _scale_keys(params, ["consume_cap"])
+		"duel_preparation": _scale_keys(params, ["amount", "solo_amount"])
 		"consume_own_block":
 			_scale_keys(params, ["consume_cap"])
 			# Runtime consumes this as a direct float ratio. Keep it as 1.5
@@ -246,6 +257,10 @@ static func _apply_monotonic_upgrade_guard(base: Resource, upgraded: Resource) -
 # to the effect that retains the card's intended role. The live factory and
 # comparison harness both consume this same tuning table.
 static func _apply_candidate_rounding_tuning(base: Resource, upgraded: Resource) -> void:
+	# New authored synergy contracts have exact integer upgrades; old per-card
+	# compensation must not assume their former effect order or effect count.
+	if base.has_meta("archetype_synergy_revision"):
+		return
 	match base.card_name:
 		"card.cleopatra.nile_mist.name":
 			# Preserve poison 1; a single +1 block is a meaningful defensive
@@ -338,6 +353,22 @@ static func _known_numeric_param(rule_id: String, status_type: String, key: Stri
 	if status_type == "power.morale_per_turn" and key == "immediate_morale":
 		return true
 	match rule_id:
+		"morale_if_survives", "morale_attack_discount", "opening_status": return key == "amount"
+		"resource_to_block": return key in ["consume_cap", "per_resource", "base"]
+		"recruit_or_draw": return key == "tokens"
+		"poison_seed_spread": return key in ["seed", "spread"]
+		"curse_weave": return key in ["weak", "vulnerable"]
+		"debuff_cash_damage": return key == "consume_cap"
+		"charm_to_block": return key in ["consume_cap", "block_per_charm", "block_cap"]
+		"guard_attack_discount": return key == "amount"
+		"block_transfer": return key in ["consume_cap", "base"]
+		"formation_drill", "empty_reload": return key in ["block", "fallback_draw"]
+		"heal_if_enemy_debuff": return key == "amount"
+		"overflow_heal": return key in ["heal", "block_cap"]
+		"block_to_heal", "bank_draw", "block_multi_hit": return key in ["consume_cap", "bonus_draw"]
+		"combo_energy_once": return key in ["normal", "combo"]
+		"marked_scout": return key == "marked_draw"
+		"duel_preparation": return key in ["amount", "solo_amount"]
 		"consume_own_block": return key in ["consume_cap", "multiplier"]
 		"consume_own_tokens", "consume_own_tokens_all": return key in ["consume_cap", "consume", "multiplier"]
 		"team_token_damage", "team_morale_damage": return key in ["cap"]

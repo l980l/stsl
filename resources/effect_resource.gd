@@ -279,6 +279,7 @@ func _revision_display_text() -> String:
 	values["base"] = value
 	values["bonus"] = bonus_value
 	values["multiplier"] = rule_params.get("multiplier", bonus_value)
+	values["hits"] = hit_count
 	match rule_id:
 		"paired_draw_damage":
 			values["upgrade_suffix"] = _revision_format("draw_pairs_upgrade", {"amount": int(rule_params.get("upgrade_bonus", 0))}) if int(rule_params.get("upgrade_bonus", 0)) > 0 else ""
@@ -323,4 +324,64 @@ func _revision_display_text() -> String:
 		"hand_empty_energy_once": return _revision_format("empty_energy", values)
 		"cleanse_self_weak_vulnerable_if_hand_empty": return _revision_format("empty_cleanse", values)
 		"counter_reflect": return _revision_format("counter", values)
+		"morale_if_survives": return _revision_format("morale_if_survives", values)
+		"resource_to_block":
+			values["base"] = rule_params.get("base", value)
+			values["resource"] = _revision_resource_name(str(rule_params.get("resource", "")))
+			return _revision_format("resource_to_block_all" if target == "ALL" else "resource_to_block", values)
+		"recruit_or_draw": return _revision_format("recruit_or_draw", values)
+		"discard_for_draw":
+			return _revision_format("discard_only" if int(rule_params.get("draw", 0)) == 0 else "discard_for_draw", values)
+		"morale_attack_discount": return _revision_format("morale_attack_discount", values)
+		"poison_seed_spread": return _revision_format("poison_seed_spread", values)
+		"poison_tick_now": return _revision_format("poison_tick_now", values)
+		"curse_weave": return _revision_format("curse_weave", values)
+		"debuff_cash_damage":
+			values["statuses"] = _revision_status_names(rule_params.get("statuses", []))
+			return _revision_format("debuff_cash_damage_all" if target == "ALL" else "debuff_cash_damage", values)
+		"charm_to_block": return _revision_format("charm_to_block", values)
+		"guard_attack_discount": return _revision_format("guard_attack_discount", values)
+		"block_transfer":
+			values["base"] = rule_params.get("base", value)
+			return _revision_format("block_transfer", values)
+		"formation_drill": return _revision_format("formation_drill", values)
+		"heal_if_enemy_debuff":
+			values["status"] = _revision_status_name(str(rule_params.get("status", "")))
+			return _revision_format("heal_if_enemy_debuff", values)
+		"overflow_heal": return _revision_format("overflow_heal", values)
+		"block_to_heal": return _revision_format("block_to_heal", values)
+		"bank_draw": return _revision_format("bank_draw", values)
+		"opening_status":
+			values["status"] = _revision_status_name(str(rule_params.get("status", status_type)))
+			return _revision_format("opening_status", values)
+		"combo_energy_once": return _revision_format("combo_energy_once", values)
+		"marked_scout": return _revision_format("marked_scout", values)
+		"marked_cash_all": return _revision_format("marked_cash_all", values)
+		"block_multi_hit": return _revision_format("block_multi_hit", values)
+		"duel_preparation": return _revision_format("duel_preparation", values)
+		"duel_status_damage":
+			values["status"] = _revision_status_name(str(rule_params.get("status", "")))
+			return _revision_format("duel_status_damage", values)
+		"empty_reload": return _revision_format("empty_reload", values)
 	return ""
+
+func _revision_resource_name(resource: String) -> String:
+	if resource == "morale":
+		return tr("status.morale.name")
+	if resource == "tokens":
+		return tr("effect.v3.tokens_name")
+	return resource
+
+func _revision_status_name(status: String) -> String:
+	if _STATUS_NAME_KEYS.has(status):
+		return tr(_STATUS_NAME_KEYS[status])
+	match status:
+		"poison": return tr("effect.v3.poison_name")
+		"marked": return tr("effect.v3.marked_name")
+	return status
+
+func _revision_status_names(statuses: Array) -> String:
+	var names: Array[String] = []
+	for status in statuses:
+		names.append(_revision_status_name(str(status)))
+	return ", ".join(names)

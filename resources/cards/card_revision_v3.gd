@@ -64,8 +64,8 @@ static func apply(card: Resource) -> Resource:
 		"card.joan_of_arc.angel_wings.name": _configure_card(card, 2, [_heal_all(30, 40), _rule("delayed_team_heal", {"amount": 30, "turns": 3}, {"amount": 40})])
 		"card.joan_of_arc.miracle_revive.name": _configure_card(card, 2, [_rule("revive_or_heal", {"revive_percent": 30, "heal": 120}, {"revive_percent": 40, "heal": 160})], true)
 		"card.joan_of_arc.martyr_strength.name": _configure_card(card, 1, [_rule("sacrifice_then_power", {"sacrifice": 50, "power": "power.strength_player", "amount": 18}, {"amount": 23})])
-		"card.joan_of_arc.saints_revelation.name": _configure_card(card, 2, [_rule_damage("sacrifice_bank_payoff", 70, 100, 1, -1, {"consume_cap": 150, "target": "ALL"})])
-		"card.joan_of_arc.martyrs_light.name": _configure_card(card, 2, [_rule("sacrifice_bank_team_block", {"base": 60, "consume_cap": 150}, {"base": 90})], true)
+		"card.joan_of_arc.saints_revelation.name": _configure_card(card, 2, [_rule_damage("sacrifice_bank_payoff", 100, 130, 1, -1, {"consume_cap": 150, "target": "ALL"})])
+		"card.joan_of_arc.martyrs_light.name": _configure_card(card, 2, [_rule("sacrifice_bank_team_block", {"base": 80, "consume_cap": 150}, {"base": 110})], true)
 
 		# 칭기즈칸
 		"card.genghis_khan.horse_thrust.name": _configure_card(card, 1, [_rule_damage("other_card_this_turn_damage", 80, 100, 110, 130)])
@@ -108,6 +108,8 @@ static func apply(card: Resource) -> Resource:
 	if card.card_name.ends_with(".strike.name") or card.card_name.ends_with(".defend.name"):
 		card.has_explicit_upgrade = true
 		card.effects[0].upgrade_value = 120 if card.card_name.ends_with(".strike.name") else 150
+	# Reward archetypes add resource/timing choices without replacing starters.
+	preload("res://resources/cards/archetype_synergy_revision.gd").apply(card)
 	if card.has_explicit_upgrade:
 		for effect in card.effects:
 			if effect.damage_type != "" and original_damage_type != "":

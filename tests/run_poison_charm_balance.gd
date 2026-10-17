@@ -57,7 +57,7 @@ func _starter_cards(hero_id: String, grade: int, candidate: bool) -> Array:
 		result.append(_variant_card(card, grade, candidate))
 	return result
 
-func _play_hand_order(bm: Object, hero_id: String) -> int:
+func _attach_meters(bm: Object) -> void:
 	if not _meters.has(bm.get_instance_id()):
 		var meter := {"poison_signal_damage": 0, "enthrall_applications": 0, "cards_played": 0}
 		var enthrall_levels := {}
@@ -75,6 +75,9 @@ func _play_hand_order(bm: Object, hero_id: String) -> int:
 				meter.enthrall_applications += maxi(0, current - int(enthrall_levels.get(target, 0)))
 				enthrall_levels[target] = current
 		)
+
+func _play_hand_order(bm: Object, hero_id: String) -> int:
+	_attach_meters(bm)
 	var played := super._play_hand_order(bm, hero_id)
 	_meters[bm.get_instance_id()].cards_played += played
 	return played

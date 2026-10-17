@@ -9,8 +9,8 @@ var failed: int = 0
 
 func run_all() -> Dictionary:
 	test_floor0_low_indices()
-	test_floor5_mid_indices()
-	test_floor9_high_indices()
+	test_floor6_mid_indices()
+	test_floor12_high_indices()
 	test_weighted_pick_deterministic()
 	test_fallback_zero_weights()
 	return {"passed": passed, "failed": failed}
@@ -35,6 +35,10 @@ func _sample_index(gm, encounters: Array, floor_idx: int, trials: int) -> Dictio
 	for i in range(encounters.size()):
 		counts[i] = 0
 	for _t in range(trials):
+		# Independent first encounters test the weights, not run-local quotas.
+		gm.encounter_counts.clear()
+		gm.encounter_species_counts.clear()
+		gm.last_encounters.clear()
 		var enc: Array = gm._pick_weighted_encounter(encounters, floor_idx)
 		var idx: int = int(enc[0])
 		counts[idx] += 1
@@ -57,34 +61,31 @@ func test_floor0_low_indices() -> void:
 	_assert(counts[1] > counts[2], "floor=0 에서 idx1 > idx2")
 	gm.free()
 
-func test_floor5_mid_indices() -> void:
-	print("[TestEncounterWeighting] test_floor5_mid_indices")
+func test_floor6_mid_indices() -> void:
+	print("[TestEncounterWeighting] test_floor6_mid_indices")
 	var gm = _GMScript.new()
 	var encounters := _mock_encounters(10)
-	var counts := _sample_index(gm, encounters, 5, 3000)
-	# floor=5 → target=5 → window [2,8]에서 추출. 인덱스 0,1,9는 가중치 0
-	_assert(counts[0] == 0, "floor=5 에서 인덱스 0 추출 없음")
-	_assert(counts[1] == 0, "floor=5 에서 인덱스 1 추출 없음")
-	_assert(counts[9] == 0, "floor=5 에서 인덱스 9 추출 없음")
-	# 인덱스 5가 가장 빈번 (가중치 4)
-	var peak: int = counts[5]
-	_assert(peak > counts[2] and peak > counts[8], "floor=5 에서 idx5 피크")
+	var counts := _sample_index(gm, encounters, 6, 3000)
+	# 15-floor map: floor6 → target4.5, eligible indices1..8.
+	_assert(counts[0] == 0, "floor=6 에서 인덱스 0 추출 없음")
+	_assert(counts[9] == 0, "floor=6 에서 인덱스 9 추출 없음")
+	_assert(counts[4] > counts[1] and counts[5] > counts[8], "floor=6 중앙 조합 가중치 우세")
 	gm.free()
 
-func test_floor9_high_indices() -> void:
-	print("[TestEncounterWeighting] test_floor9_high_indices")
+func test_floor12_high_indices() -> void:
+	print("[TestEncounterWeighting] test_floor12_high_indices")
 	var gm = _GMScript.new()
 	var encounters := _mock_encounters(10)
-	var counts := _sample_index(gm, encounters, 9, 2000)
-	# floor=9 → target=9 → window [6,9]에서 추출. 인덱스 0~5는 가중치 0
+	var counts := _sample_index(gm, encounters, 12, 2000)
+	# Last possible normal floor12 → target9, eligible indices6..9.
 	var low_zone_total: int = 0
 	for i in range(0, 6):
 		low_zone_total += counts[i]
-	_assert(low_zone_total == 0, "floor=9 에서 인덱스 0~5 추출 없음")
+	_assert(low_zone_total == 0, "floor=12 에서 인덱스 0~5 추출 없음")
 	var high_zone_total: int = counts[6] + counts[7] + counts[8] + counts[9]
-	_assert(high_zone_total == 2000, "floor=9 에서 인덱스 6~9가 전부 차지")
+	_assert(high_zone_total == 2000, "floor=12 에서 인덱스 6~9가 전부 차지")
 	# 인덱스 9가 가장 빈번
-	_assert(counts[9] > counts[8], "floor=9 에서 idx9 > idx8")
+	_assert(counts[9] > counts[8], "floor=12 에서 idx9 > idx8")
 	gm.free()
 
 func test_weighted_pick_deterministic() -> void:

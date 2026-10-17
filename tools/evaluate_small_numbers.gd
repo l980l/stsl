@@ -102,7 +102,7 @@ func _fingerprints() -> Dictionary:
 		"res://autoload/deck_manager.gd", "res://autoload/team_manager.gd",
 		"res://resources/effect_resource.gd", "res://resources/card_resource.gd",
 		"res://tests/test_card_revision_runtime.gd", "res://resources/translations/strings_card.csv",
-		"res://resources/balance/small_number_profile.gd", "res://resources/cards/card_revision_v3.gd",
+		"res://resources/balance/small_number_profile.gd", "res://resources/cards/card_revision_v3.gd", "res://resources/cards/archetype_synergy_revision.gd",
 		"res://resources/card_catalog.gd", "res://tools/evaluate_small_numbers.gd"]:
 		result[path] = FileAccess.get_sha256(path)
 	for owner in OWNERS:

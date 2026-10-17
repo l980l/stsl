@@ -2,6 +2,12 @@
 # Silent, isolated production-unit checks; never loads the player's user://.
 set -euo pipefail
 repo_path="$(cd "$(dirname "$0")/.." && pwd)"
+export STSL_BOT_SOURCE_COMMIT="${STSL_BOT_SOURCE_COMMIT:-$(git -C "$repo_path" rev-parse HEAD)}"
+if [[ -z "${STSL_BOT_SOURCE_DIRTY:-}" ]]; then
+  STSL_BOT_SOURCE_DIRTY=0
+  if [[ -n "$(git -C "$repo_path" status --porcelain)" ]]; then STSL_BOT_SOURCE_DIRTY=1; fi
+  export STSL_BOT_SOURCE_DIRTY
+fi
 godot_bin="${GODOT_BIN:-/Applications/Godot_mono.app/Contents/MacOS/Godot}"
 task_project="$(mktemp -d /tmp/STSL-tutorial-validation-live-XXXXXX)"
 artifact_dir="$repo_path/log/live-balance/$(basename "$task_project")"

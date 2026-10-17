@@ -58,6 +58,10 @@ var run_won: bool = false
 var battles_completed: int = 0
 var enemies_killed_this_run: int = 0
 var act_mythologies: Array[String] = []
+# Run-local chosen encounters, not the unvisited branches of the map.
+var encounter_counts: Dictionary = {}
+var encounter_species_counts: Dictionary = {}
+var last_encounters: Dictionary = {}
 
 # 스토리 오버레이 transient 가드 (비저장 — 게임 실행 단위)
 var _awakening_shown_run: bool = false  # 런당 각성 라인 1회
@@ -184,6 +188,9 @@ func reset() -> void:
 	relics.clear()
 	battles_completed = 0
 	enemies_killed_this_run = 0
+	encounter_counts.clear()
+	encounter_species_counts.clear()
+	last_encounters.clear()
 	run_map.clear()
 	available_node_ids.clear()
 	current_node_id = -1
@@ -781,7 +788,7 @@ func _make_normal_enemies() -> Array:
 	if encounters.is_empty():
 		push_warning("신화 %s 에 일반 인카운터가 없음" % myth)
 		return []
-	var encounter: Array = _pick_weighted_encounter(encounters, current_floor)
+	var encounter: Array = _pick_weighted_encounter(encounters, current_floor, "normal:" + myth)
 	var result: Array = []
 	for fn_name in encounter:
 		var scene: PackedScene = _scene_for(myth, fn_name)
@@ -789,14 +796,70 @@ func _make_normal_enemies() -> Array:
 		result.append(enemy)
 	return result
 
-func _pick_weighted_encounter(encounters: Array, floor_idx: int) -> Array:
-	var progress: float = clamp(float(floor_idx) / 9.0, 0.0, 1.0)
-	var target: float = progress * float(encounters.size() - 1)
+func _normal_encounter_weights(count: int, floor_idx: int) -> Array[float]:
+	# The final normal room can be floor12; floor13 is rest, floor14 boss.
+	var MapGen = preload("res://autoload/map_generator.gd")
+	var progress: float = clampf(float(floor_idx) / maxi(1, MapGen.FLOORS - 3), 0.0, 1.0)
+	var target: float = progress * float(count - 1)
 	var weights: Array[float] = []
-	for i in range(encounters.size()):
+	for i in range(count):
 		var dist: float = abs(float(i) - target)
 		weights.append(maxf(0.0, 4.0 - dist))
-	return _weighted_pick(encounters, weights)
+	return weights
+
+func _pick_weighted_encounter(encounters: Array, floor_idx: int, scope: String = "normal:generic") -> Array:
+	return _pick_fresh_encounter(encounters, _normal_encounter_weights(encounters.size(), floor_idx), scope)
+
+func _encounter_key(scope: String, encounter: Array) -> String:
+	var names: Array = encounter.duplicate()
+	names.sort()
+	return scope + ":" + JSON.stringify(names)
+
+func _pick_fresh_encounter(encounters: Array, weights: Array[float], scope: String) -> Array:
+	# Never widen the difficulty window just to force novelty. Within it,
+	# exhaust unseen packs first, then reuse the least seen non-consecutive pack.
+	var eligible: Array[int] = []
+	for i in range(encounters.size()):
+		if i < weights.size() and weights[i] > 0.0 and not encounters[i].is_empty():
+			eligible.append(i)
+	if eligible.is_empty():
+		return []
+	var previous: String = str(last_encounters.get(scope, ""))
+	if eligible.size() > 1:
+		var non_repeating: Array[int] = eligible.filter(func(i: int) -> bool: return _encounter_key(scope, encounters[i]) != previous)
+		if not non_repeating.is_empty():
+			eligible = non_repeating
+	var candidates: Array = []
+	var candidate_weights: Array[float] = []
+	var best_count := 2147483647
+	var best_species := 2147483647
+	var myth: String = scope.get_slice(":", 1)
+	for i in eligible:
+		var count: int = int(encounter_counts.get(_encounter_key(scope, encounters[i]), 0))
+		var species := 0
+		var unique: Dictionary = {}
+		for name in encounters[i]:
+			unique[str(name)] = true
+		for name in unique:
+			species += int(encounter_species_counts.get(myth + ":" + name, 0))
+		if count < best_count or (count == best_count and species < best_species):
+			best_count = count
+			best_species = species
+			candidates.clear()
+			candidate_weights.clear()
+		if count == best_count and species == best_species:
+			candidates.append(encounters[i])
+			candidate_weights.append(weights[i])
+	var chosen: Array = _weighted_pick(candidates, candidate_weights)
+	var key := _encounter_key(scope, chosen)
+	encounter_counts[key] = int(encounter_counts.get(key, 0)) + 1
+	last_encounters[scope] = key
+	var chosen_species: Dictionary = {}
+	for name in chosen:
+		chosen_species[myth + ":" + str(name)] = true
+	for name in chosen_species:
+		encounter_species_counts[name] = int(encounter_species_counts.get(name, 0)) + 1
+	return chosen
 
 func _weighted_pick(items: Array, weights: Array[float]) -> Variant:
 	var total: float = 0.0
@@ -873,7 +936,12 @@ func _make_elite_enemies() -> Array:
 	if elites.is_empty():
 		push_warning("신화 %s Act %d 엘리트 없음 — 일반 전투로 대체" % [myth, current_act])
 		return _make_normal_enemies()
-	var fn_name: String = elites.pick_random()
+	var elite_packs: Array = []
+	var weights: Array[float] = []
+	for name in elites:
+		elite_packs.append([name])
+		weights.append(1.0)
+	var fn_name: String = _pick_fresh_encounter(elite_packs, weights, "elite:" + myth)[0]
 	var scene: PackedScene = _scene_for(myth, fn_name)
 	var elite: Resource = act_mod.call(fn_name, scene)
 	# 모든 정예 팩토리는 같은 경로로 전투에 들어온다. 여기서 등급을 확정해
@@ -1005,6 +1073,8 @@ func to_dict() -> Dictionary:
 		"current_chapter": current_chapter,
 		"current_act": current_act,
 		"current_floor": current_floor,
+		"act_mythologies": act_mythologies.duplicate(),
+		"encounter_history": {"counts": encounter_counts.duplicate(true), "species_counts": encounter_species_counts.duplicate(true), "last": last_encounters.duplicate(true)},
 		"gold": gold,
 		"battles_completed": battles_completed,
 		"enemies_killed_this_run": enemies_killed_this_run,
@@ -1018,6 +1088,34 @@ func from_dict(data: Dictionary) -> void:
 	current_chapter = data.get("current_chapter", 1)
 	current_act = data.get("current_act", 1)
 	current_floor = data.get("current_floor", 0)
+	act_mythologies.clear()
+	var saved_myths = data.get("act_mythologies", [])
+	if saved_myths is Array:
+		var registry := _get_mythology_registry()
+		for myth in saved_myths:
+			if registry.has(str(myth)) and act_mythologies.size() < MAX_ACTS:
+				act_mythologies.append(str(myth))
+	if act_mythologies.size() < current_act:
+		# Historical saves did not contain the mythology order or encounter log.
+		act_mythologies = _get_chapter_mythology_pool(current_chapter)
+		act_mythologies.shuffle()
+	encounter_counts.clear()
+	encounter_species_counts.clear()
+	last_encounters.clear()
+	var history = data.get("encounter_history", {})
+	if history is Dictionary:
+		for entry in [["counts", encounter_counts], ["species_counts", encounter_species_counts]]:
+			var saved_counts = history.get(entry[0], {})
+			if saved_counts is Dictionary:
+				for key in saved_counts:
+					var count = saved_counts[key]
+					if (count is int or count is float) and count > 0:
+						entry[1][str(key)] = int(count)
+		var saved_last = history.get("last", {})
+		if saved_last is Dictionary:
+			for scope in saved_last:
+				if saved_last[scope] is String:
+					last_encounters[str(scope)] = saved_last[scope]
 	gold = data.get("gold", 0)
 	battles_completed = data.get("battles_completed", 0)
 	enemies_killed_this_run = data.get("enemies_killed_this_run", 0)

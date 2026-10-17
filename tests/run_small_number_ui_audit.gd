@@ -157,6 +157,8 @@ func _run() -> void:
 func _capture_samples(cards: Array, battle: Node) -> void:
 	Engine.max_fps = 60
 	var examples: Array = cards.filter(func(card): return card.upgrade_level == 1 and card.card_name in ["card.cleopatra.venom_needle.name", "card.cleopatra.poison_purge.name", "card.musashi.whirlwind_cut.name", "card.yi_sun_sin.decisive_strike.name"])
+	if OS.get_environment("STSL_UI_SYNERGY_SAMPLES") == "1":
+		examples = cards.filter(func(card): return card.upgrade_level == 1 and card.card_name in ["card.cleopatra.charming_perfume.name", "card.genghis_khan.war_tribute.name", "card.yi_sun_sin.naval_training.name", "card.cleopatra.poison_party.name"])
 	for requested in [Vector2i(1280, 720), Vector2i(1920, 1080)]:
 		root.size = requested
 		root.content_scale_size = requested
