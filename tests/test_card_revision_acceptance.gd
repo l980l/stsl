@@ -171,7 +171,7 @@ func _test_powers_and_death() -> void:
 	_check(not bm._active_powers.has("power.limited_team_heal:joan_of_arc"), "limited heal expires")
 	bm._hero_status["joan_of_arc"]["sacrifice_bank"] = 250
 	_apply(bm, "card.joan_of_arc.martyrs_light.name")
-	_check(bm.get_hero_status("joan_of_arc").sacrifice_bank == 100 and bm.get_hero_block("napoleon") == 210, "sacrifice payout spends capped150")
+	_check(bm.get_hero_status("joan_of_arc").sacrifice_bank == 100 and bm.get_hero_block("napoleon") == 230, "buffed sacrifice payout spends capped150 and adds base80")
 	bm.team_mgr.take_damage("joan_of_arc", 9999)
 	_apply(bm, "card.napoleon.hussar_charge.name")
 	var revive = _find("card.joan_of_arc.miracle_revive.name")

@@ -191,7 +191,7 @@ func _paired_run(enemy_source: Resource, segment: Dictionary, grade: int, seed_v
 func _simulate(enemy_source: Resource, segment: Dictionary, grade: int, seed_value: int, candidate: bool) -> Dictionary:
 	seed(seed_value)
 	_set_legacy_combat(true)
-	var bm := BM.new()
+	var bm = _make_battle_manager()
 	bm.turn_interval = 0.0
 	bm._test_disable_crit = true
 	bm.combat_unit_divisor = UNIT_DIVISOR if candidate else 1
@@ -209,8 +209,8 @@ func _simulate(enemy_source: Resource, segment: Dictionary, grade: int, seed_val
 		var probe := _catalog_card(segment.probe_card)
 		if probe != null:
 			bm.deck_mgr.add_card_to_deck(_variant_card(probe, grade, candidate))
-	var enemy := _variant_enemy(enemy_source, candidate)
-	bm.setup_battle([enemy])
+	bm.setup_battle(_battle_enemies(enemy_source, candidate))
+	_on_battle_ready(bm)
 	var trace: Array = []
 	bm.turn_started.connect(func(actor_id: String) -> void:
 		trace.append(_snapshot(bm, "turn_started", actor_id, 0))
@@ -249,6 +249,15 @@ func _simulate(enemy_source: Resource, segment: Dictionary, grade: int, seed_val
 	var result := _result(bm, hero_input_turns, trace)
 	_dispose_battle(bm)
 	return result
+
+func _make_battle_manager():
+	return BM.new()
+
+func _battle_enemies(enemy_source: Resource, candidate: bool) -> Array:
+	return [_variant_enemy(enemy_source, candidate)]
+
+func _on_battle_ready(_bm: Object) -> void:
+	pass
 
 func _dispose_battle(bm: Object) -> void:
 	bm.deck_mgr.free()
@@ -439,6 +448,7 @@ func _fingerprints() -> Dictionary:
 		paths.append("res://resources/enemies/%s/%s_normals.gd" % [mythology, mythology])
 		for act in [1, 2, 3]:
 			paths.append("res://resources/enemies/%s/%s_act%d.gd" % [mythology, mythology, act])
+	paths.append("res://resources/cards/archetype_synergy_revision.gd")
 	for hero_id in HeroRegistry.all_hero_ids():
 		paths.append("res://resources/cards/cards_%s.gd" % hero_id)
 	var result := {}

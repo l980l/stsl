@@ -1529,6 +1529,8 @@ func _update_hero_ui(hero_id: String) -> void:
 		var block_str: String = "🛡%d " % block if block > 0 else ""
 		var morale_str: String = "★%d" % morale if morale > 0 else ""
 		entry["block_lbl"].text = block_str + morale_str
+		entry["block_lbl"].tooltip_text = tr("keyword.block.lifetime") if block > 0 else ""
+		entry["block_lbl"].mouse_filter = Control.MOUSE_FILTER_PASS if block > 0 else Control.MOUSE_FILTER_IGNORE
 		if not TeamManager.is_alive(hero_id):
 			entry["panel"].modulate = Color(0.4, 0.4, 0.4)
 		_refresh_status_icons_hero(hero_id)

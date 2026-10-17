@@ -103,7 +103,7 @@ func _test_dimensional_conversion_rules() -> void:
 	var martyr_strength: Dictionary = Profile.candidate_pair(_card("joan_of_arc", "card.joan_of_arc.martyr_strength.name"), manager)
 	_check(martyr_strength.base.effects[0].rule_params.amount == 2 and martyr_strength.upgraded.effects[0].rule_params.amount == 3, "martyr strength preserves a beneficial power upgrade without increasing sacrifice")
 	var whirlwind: Dictionary = Profile.candidate_pair(_card("musashi", "card.musashi.whirlwind_cut.name"), manager)
-	_check(whirlwind.upgraded.effects[0].value == 4 and whirlwind.upgraded.effects[1].value == 5, "whirlwind upgrade preserves two-hit damage and improves block")
+	_check(whirlwind.base.effects.size() == 1 and whirlwind.base.effects[0].rule_id == "block_multi_hit" and whirlwind.base.effects[0].value == 3 and whirlwind.upgraded.effects[0].value == 4 and whirlwind.upgraded.effects[0].hit_count == 2 and whirlwind.upgraded.effects[0].rule_params.consume_cap == 4, "synergy whirlwind preserves its two-hit block-spend contract and integer upgrade")
 	var desert: Dictionary = Profile.candidate_pair(_card("genghis_khan", "card.genghis_khan.desert_cavalry.name"), manager)
 	_check(desert.base.effects[0].rule_id == "paired_draw_damage" and desert.upgraded.effects[0].rule_params.upgrade_bonus == 1, "desert cavalry uses integer pairs and a fixed one-damage upgrade")
 	manager.free()

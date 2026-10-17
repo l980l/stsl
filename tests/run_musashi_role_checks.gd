@@ -58,7 +58,7 @@ func _run() -> void:
 		fixture._free(bm)
 	for row in rows:
 		if row.card == "card.musashi.whirlwind_cut.name":
-			_check(row.block == 4 + row.grade, "whirlwind fixed defense upgrade")
+			_check(row.block == 0, "synergy whirlwind cannot invent block when no block was supplied")
 		if row.card == "card.musashi.flying_swallow.name":
 			_check(row.energy_refund_empty_hand == 1, "swallow empty-hand refund")
 		if row.strength == 0 and not row.weak and not row.vulnerable and row.party_size == 1:
@@ -66,6 +66,7 @@ func _run() -> void:
 	var sources: Dictionary = {}
 	for path in ["res://autoload/battle_manager.gd", "res://autoload/game_manager.gd", "res://resources/balance/small_number_profile.gd", "res://resources/cards/cards_musashi.gd", "res://resources/cards/card_revision_v3.gd", "res://tests/test_card_revision_runtime.gd", "res://tests/run_musashi_role_checks.gd"]:
 		sources[path] = FileAccess.get_sha256(path)
+	sources["res://resources/cards/archetype_synergy_revision.gd"] = FileAccess.get_sha256("res://resources/cards/archetype_synergy_revision.gd")
 	var report_path := "user://musashi-role-checks.json"
 	var file := FileAccess.open(report_path, FileAccess.WRITE)
 	file.store_string(JSON.stringify({"schema": 1, "unit": "fixed immediate card-effect state", "cases": rows.size(), "crit": false, "boundary": "empty hand; no active powers or enemy defense; controlled role comparison, not universal dominance or fun", "source_files_sha256": sources, "rows": rows}, "\t"))
