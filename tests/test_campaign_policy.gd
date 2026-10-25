@@ -5,6 +5,12 @@ func _initialize() -> void:
 	var restored_ids: Array = policy._integer_ids(JSON.parse_string("[24, 59]"))
 	var restored_node_ok: bool = 24 in restored_ids and 59 in restored_ids
 	var ok: bool = policy._budget_pick([180.0, 288.0, 180.0, 180.0], [1, 2, 1, 1], 3) != 1
+	ok = ok and policy._valid_decision_ablation("none", "", "corrected")
+	ok = ok and policy._valid_decision_ablation("corrected-targets", "checkpoint.json", "guard-aware")
+	ok = ok and policy._valid_decision_ablation("corrected-targets", "checkpoint.json", "synergy-aware")
+	ok = ok and not policy._valid_decision_ablation("corrected-targets", "", "guard-aware")
+	ok = ok and not policy._valid_decision_ablation("corrected-targets", "checkpoint.json", "corrected")
+	ok = ok and not policy._valid_decision_ablation("typo", "checkpoint.json", "guard-aware")
 	ok = ok and restored_node_ok
 	ok = ok and policy._budget_pick([180.0, 45.0], [1, 0], 1) == 1
 	ok = ok and policy._budget_pick([-10.0, 0.0], [1, 1], 3) == -1

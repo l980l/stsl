@@ -7,6 +7,7 @@ const _INTENT_GRAD_SHADER = preload("res://assets/shaders/intent_gradient.gdshad
 const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
 const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
 const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
+const CardReadout := preload("res://scenes/battle/battle_card_readout.gd")
 # GameSettings.card_frame_key 따라 분기
 func _make_card() -> Control:
 	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
@@ -84,6 +85,11 @@ var _energy_hbox: HBoxContainer
 var _end_turn_btn: TextureButton
 var _deck_btn: TextureButton  # 덱 보기 버튼 — 튜토리얼 잠금 대상
 var _message_label: Label
+var _card_readout: PanelContainer
+var _card_readout_title: Label
+var _card_readout_body: Label
+var _readout_card: Resource = null
+var _readout_target: int = -1
 var _tutorial_driver = null  # 튜토리얼 모드일 때만 생성 (TutorialDriver)
 var _relic_container: FlowContainer
 var _turn_queue_box: HBoxContainer
@@ -268,6 +274,8 @@ func _profile_cpu_span(stage: String, started_usec: int) -> void:
 			"chapter": GameManager.current_chapter, "act": GameManager.current_act, "floor": GameManager.current_floor}))
 
 func _process(delta: float) -> void:
+	if _readout_card != null and (not BattleManager.is_player_turn or not BattleManager.is_battle_active or _card_pick_in_progress or _deck_viewer != null or not DeckManager.get_hand(_readout_card.owner_id).has(_readout_card)):
+		_hide_card_readout()
 	_update_camera_sway(delta)
 	if _drag_card != null and not _drag_chevrons.is_empty():
 		_drag_t_offset = fmod(_drag_t_offset + delta * 0.165, 1.0)
@@ -349,6 +357,7 @@ func _build_ui() -> void:
 	_message_label.position = Vector2(0, 24)
 	_message_label.size = Vector2(600, 36)
 	banner.add_child(_message_label)
+	_build_card_readout()
 
 	var banner_grad := Gradient.new()
 	banner_grad.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
@@ -490,7 +499,7 @@ func _build_ui() -> void:
 	# (영웅/적 패널은 캐릭터 따라가야 해서 self 자식 유지)
 	if _ui_layer:
 		for n in [banner, _end_turn_btn, deck_btn, hand_rule, hand_diamond,
-				_relic_container, _active_powers_box, _turn_queue_box, _energy_hbox]:
+				_relic_container, _active_powers_box, _turn_queue_box, _energy_hbox, _card_readout]:
 			if n != null and is_instance_valid(n):
 				n.reparent(_ui_layer)
 
@@ -2058,6 +2067,7 @@ func _on_card_frame_changed_battle(_key: String) -> void:
 	_refresh_hand(true)
 
 func _refresh_hand(force_rebuild: bool = false) -> void:
+	_refresh_card_readout()
 	var hid: String = BattleManager.get_current_hero_id()
 	var hand: Array = DeckManager.get_hand(hid) if hid != "" else []
 	# start_hero_turn and player_turn_started may both refresh the same hand.
@@ -2180,6 +2190,8 @@ func _on_card_drag_moved(_card: Resource, screen_pos: Vector2) -> void:
 		_set_drag_card_target(hover_idx)
 
 func _set_drag_card_target(enemy_index: int) -> void:
+	if _readout_card != _drag_card or _readout_target != enemy_index:
+		_show_card_readout(_drag_card, enemy_index)
 	for btn in _card_buttons:
 		if is_instance_valid(btn) and btn.get_meta("_card_res", null) == _drag_card and btn.has_method("set_target_enemy_index"):
 			btn.set_target_enemy_index(enemy_index)
@@ -2195,6 +2207,7 @@ func _on_card_drag_released(_card: Resource, screen_pos: Vector2) -> void:
 func _on_card_hovered(_card: Resource, card_node: Control) -> void:
 	if _drag_card != null:
 		return
+	_show_card_readout(_card)
 	AudioManager.play_sfx("card_hover", -10.0)  # 호버 사운드 -10dB (시끄러움 완화)
 	var hover_idx: int = card_node.get_meta("_fan_idx", -1)
 	if hover_idx < 0:
@@ -2228,7 +2241,66 @@ func _on_card_hovered(_card: Resource, card_node: Control) -> void:
 			btn.z_index = 1500 + idx
 
 func _on_card_unhovered(_card: Resource) -> void:
+	if _drag_card == null and _readout_card == _card:
+		_hide_card_readout()
 	_reset_hand_fan()
+
+func _build_card_readout() -> void:
+	_card_readout = PanelContainer.new()
+	_card_readout.name = "CardDecisionReadout"
+	_card_readout.position = Vector2(24, 560)
+	_card_readout.custom_minimum_size = Vector2(420, 0)
+	_card_readout.size = Vector2(420, 0)
+	_card_readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_card_readout.z_index = 1800
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.055, 0.047, 0.09, 1.0)
+	style.border_color = SacredPalette.BRASS_500
+	style.set_border_width_all(1)
+	style.content_margin_left = 14
+	style.content_margin_right = 14
+	style.content_margin_top = 10
+	style.content_margin_bottom = 10
+	_card_readout.add_theme_stylebox_override("panel", style)
+	var stack := VBoxContainer.new()
+	stack.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stack.add_theme_constant_override("separation", 6)
+	_card_readout.add_child(stack)
+	_card_readout_title = Label.new()
+	_card_readout_title.add_theme_font_size_override("font_size", 24)
+	_card_readout_title.add_theme_color_override("font_color", Color(1.0, 0.9, 0.64))
+	_card_readout_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_card_readout_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stack.add_child(_card_readout_title)
+	_card_readout_body = Label.new()
+	_card_readout_body.add_theme_font_size_override("font_size", 21)
+	_card_readout_body.add_theme_color_override("font_color", Color(0.94, 0.94, 0.96))
+	_card_readout_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_card_readout_body.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stack.add_child(_card_readout_body)
+	add_child(_card_readout)
+	_card_readout.hide()
+
+func _show_card_readout(card: Resource, target: int = -1) -> void:
+	if card == null or not BattleManager.is_player_turn or not BattleManager.is_battle_active or _card_pick_in_progress or not DeckManager.get_hand(card.owner_id).has(card):
+		_hide_card_readout()
+		return
+	_readout_card = card
+	_readout_target = target
+	var info := CardReadout.describe(card, BattleManager, DeckManager, target)
+	_card_readout_title.text = tr("battle.readout.title") % tr(card.card_name)
+	_card_readout_body.text = "\n".join(info.lines)
+	_card_readout.show()
+
+func _hide_card_readout() -> void:
+	_readout_card = null
+	_readout_target = -1
+	if is_instance_valid(_card_readout):
+		_card_readout.hide()
+
+func _refresh_card_readout() -> void:
+	if _readout_card != null:
+		_show_card_readout(_readout_card, _readout_target)
 
 func _reset_hand_fan() -> void:
 	for btn in _card_buttons:
@@ -2408,6 +2480,7 @@ func _on_enemy_turn_started() -> void:
 	_cam_on_enemy_turn_start()
 
 func _on_energy_changed(new_energy: int) -> void:
+	_refresh_card_readout()
 	_energy_label.text = "%d / %d" % [new_energy, DeckManager.MAX_ENERGY]
 	# 카드 노드 활성/비활성 갱신 — 본인 차례 영웅 핸드 기준
 	var hid: String = BattleManager.get_current_hero_id()
@@ -5886,6 +5959,7 @@ func _update_persistent_enthrall_vfx(target: String, stacks: int) -> void:
 		_enthrall_vfx_by_target.erase(target)
 
 func _refresh_hand_card_damage() -> void:
+	_refresh_card_readout()
 	for btn in _card_buttons:
 		if is_instance_valid(btn) and btn.has_method("refresh"):
 			btn.refresh()
@@ -6521,6 +6595,7 @@ func _start_drag(card: Resource) -> void:
 	SacredTheme.set_named_cursor("grabbing")
 	_reset_hand_fan()
 	_drag_card = card
+	_show_card_readout(card)
 	_selected_card = null
 	match _card_target_type(card):
 		"enemy", "enemy_ally":
@@ -6632,6 +6707,7 @@ func _show_enemy_ally_target_dialog(card: Resource, enemy_index: int) -> void:
 	dlg.popup_centered()
 
 func _cleanup_drag() -> void:
+	_hide_card_readout()
 	SacredTheme.clear_named_cursor()
 	for spr in _drag_chevrons:
 		if is_instance_valid(spr):

@@ -10,6 +10,9 @@ const MapGenerator := preload("res://autoload/map_generator.gd")
 const MapNode := preload("res://resources/map_node_resource.gd")
 const EventChoice := preload("res://resources/event_choice_resource.gd")
 const Effect := preload("res://resources/effect_resource.gd")
+const SYNERGY_POLICY := preload("res://tools/synergy_decision_policy.gd")
+const GUARD_POLICY := preload("res://tools/guard_decision_policy.gd")
+const TEMPO_POLICY := preload("res://tools/tempo_decision_policy.gd")
 const GPU_HELPERS := preload("res://scenes/vfx/gpu_particle_helpers.gd")
 const CLASSIC_CARD := preload("res://scenes/card/card_scene.gd")
 const MODERN_CARD := preload("res://scenes/card/card_scene_v2.gd")
@@ -27,6 +30,8 @@ var _speed := 1.0
 var _profile_frames := false
 var _diagnose_battles := false
 var _replay_encounter := ""
+var _decision_ablation := "none"
+var _replay_identity: Dictionary = {}
 var _policy := "corrected"
 var _started_usec := 0
 var _last_activity_usec := 0
@@ -72,6 +77,8 @@ func _parse_args() -> void:
 			_replay_encounter = raw.trim_prefix("--replay-encounter=")
 		elif raw.begins_with("--policy="):
 			_policy = raw.trim_prefix("--policy=")
+		elif raw.begins_with("--decision-ablation="):
+			_decision_ablation = raw.trim_prefix("--decision-ablation=")
 		if raw == "--profile-frames":
 			_profile_frames = true
 		if raw.begins_with("--chapter="):
@@ -120,8 +127,11 @@ func _start() -> void:
 	if _chapters.is_empty():
 		_finish("error", "--chapter must be 1, 2, or both")
 		return
-	if _policy not in ["baseline", "corrected", "status-aware"]:
-		_finish("error", "--policy must be baseline, corrected or status-aware")
+	if _policy not in ["baseline", "corrected", "status-aware", "synergy-aware", "guard-aware", "tempo-aware"]:
+		_finish("error", "--policy must be baseline, corrected, status-aware, synergy-aware, guard-aware or tempo-aware")
+		return
+	if not _valid_decision_ablation(_decision_ablation, _replay_encounter, _policy):
+		_finish("error", "Decision ablation requires corrected-targets, an encounter replay and synergy-aware/guard-aware")
 		return
 	var progress := root.get_node("ProgressManager")
 	if not progress.is_hero_unlocked(_initial_hero):
@@ -295,10 +305,12 @@ func _capture_encounter(chosen: int) -> void:
 	seed(entry_seed)
 
 func _restore_encounter() -> bool:
-	var data = JSON.parse_string(FileAccess.get_file_as_string(_replay_encounter))
+	var checkpoint_text := FileAccess.get_file_as_string(_replay_encounter)
+	var data = JSON.parse_string(checkpoint_text)
 	if not (data is Dictionary) or data.get("kind", "") != "stsl_encounter_checkpoint_v1" or int(data.get("combat_units", 0)) != BattleManager.combat_unit_divisor:
 		_finish("error", "Invalid or incompatible encounter checkpoint")
 		return false
+	_replay_identity = {"sha256": checkpoint_text.sha256_text(), "entry_seed": int(data.entry_seed)}
 	if data.get("gameplay_hash", "") != "" and data.gameplay_hash != OS.get_environment("STSL_BOT_GAMEPLAY_HASH"):
 		_finish("error", "Checkpoint gameplay rules changed; recapture before paired testing")
 		return false
@@ -341,6 +353,9 @@ func _restore_encounter() -> bool:
 
 static func _integer_ids(values: Array) -> Array:
 	return values.map(func(value): return int(value))
+
+static func _valid_decision_ablation(ablation: String, replay: String, policy: String) -> bool:
+	return ablation == "none" or (ablation == "corrected-targets" and replay != "" and policy in ["synergy-aware", "guard-aware"])
 
 func _combat_snapshot() -> Dictionary:
 	var heroes: Array = []
@@ -394,22 +409,37 @@ func _drive_battle(scene: Node) -> void:
 	var hero_id: String = BattleManager.get_current_hero_id()
 	var hand: Array = DeckManager.get_hand(hero_id)
 	var selected: Resource = _best_playable_card(hero_id, hand)
+	var synergy_choice := {}
+	if _uses_synergy_policy():
+		# Keep the established campaign karma/counter gates; shared choices are
+		# opt-in and never replace the existing default or reward/route policy.
+		var decision_policy = TEMPO_POLICY if _policy == "tempo-aware" else (GUARD_POLICY if _policy == "guard-aware" else SYNERGY_POLICY)
+		synergy_choice = decision_policy.choose(BattleManager, hero_id, func(card: Resource) -> bool: return _card_score(card, hero_id) >= 0.0)
+		selected = synergy_choice.get("card")
 	if _diagnose_battles:
 		var options: Array = []
 		for card in hand:
 			options.append({"card": card.card_name, "cost": DeckManager.get_effective_cost(hero_id, card), "playable": DeckManager.can_play_hero(hero_id, card), "score": _card_score(card, hero_id)})
-		_act("card_decision", {"hero": hero_id, "energy": DeckManager.get_energy(hero_id), "chosen": selected.card_name if selected else "", "options": options, "state": _combat_snapshot()})
+		_act("card_decision", {"hero": hero_id, "energy": DeckManager.get_energy(hero_id), "chosen": selected.card_name if selected else "", "options": options, "synergy_choice": {"reason": synergy_choice.get("reason", ""), "score": synergy_choice.get("score", 0.0)}, "state": _combat_snapshot()})
 	if selected != null:
 		_battle_waiting = true
 		_pending_bot_card = selected
 		var enemy_target := _target_for_card(selected)
-		var ok: bool = BattleManager.play_card(selected, enemy_target, _lowest_hero())
+		var hero_target := _lowest_hero()
+		if not synergy_choice.is_empty():
+			enemy_target = synergy_choice.target
+			hero_target = synergy_choice.ally
+			# Diagnostic intervention only: keep shared card/ally selection, replace
+			# enemy targeting with the existing campaign rule. Never used by default.
+			if _decision_ablation == "corrected-targets":
+				enemy_target = _target_for_card(selected)
+		var ok: bool = BattleManager.play_card(selected, enemy_target, hero_target)
 		if not ok:
 			_battle_waiting = false
 			_pending_bot_card = null
 			_act("card_rejected", {"card": selected.card_name, "owner": hero_id})
 		else:
-			_act("play_card", {"card": selected.card_name, "owner": hero_id, "enemy_target": enemy_target, "hero_target": _lowest_hero()})
+			_act("play_card", {"card": selected.card_name, "owner": hero_id, "enemy_target": enemy_target, "hero_target": hero_target})
 		return
 	_act("end_turn", {"owner": hero_id})
 	_hero_input_ready = false
@@ -454,6 +484,18 @@ func _best_playable_card(hero_id: String, hand: Array) -> Resource:
 		costs.append(DeckManager.get_effective_cost(hero_id, card))
 	var index := _budget_pick(scores, costs, DeckManager.get_energy(hero_id))
 	return playable[index] if index >= 0 else fallback
+
+func _uses_synergy_policy() -> bool:
+	return _shared_policy_allowed(_policy, BattleManager)
+
+static func _shared_policy_allowed(policy: String, bm: Object) -> bool:
+	if policy not in ["synergy-aware", "guard-aware", "tempo-aware"]: return false
+	# Karma gates were authored for _target_for_card. Do not apply them to a
+	# different shared-policy target until a Buddhist-specific paired test exists.
+	for index in range(bm._enemies.size()):
+		if bm.is_enemy_alive(index) and bm._enemies[index].mythology == "buddhist":
+			return false
+	return true
 
 static func _budget_pick(scores: Array, costs: Array, energy: int) -> int:
 	# Free draws/energy should precede paid cards. Then solve the small energy
@@ -561,7 +603,7 @@ func _card_score(card: Resource, hero_id: String) -> float:
 	var target := _target_for_card(card)
 	var incoming := _incoming_damage()
 	var unblocked := maxf(0.0, incoming - BattleManager.get_hero_block(hero_id))
-	if _policy == "status-aware":
+	if _policy in ["status-aware", "synergy-aware", "guard-aware", "tempo-aware"]:
 		unblocked = _guard_demand(incoming, BattleManager.get_hero_block(hero_id), hero.max_hp)
 	var karma_reserve := _karma_reserve()
 	var preparing_karma := karma_reserve > _best_guard_health()
@@ -671,7 +713,9 @@ func _lowest_hero() -> String:
 func _resolve_discard(scene: Node) -> void:
 	var owner: String = BattleManager.get_pending_discard_owner()
 	var hand: Array = DeckManager.get_hand(owner)
-	if BattleManager.is_discard_pick_optional():
+	var use_synergy := _uses_synergy_policy()
+	var picked: Resource = SYNERGY_POLICY.discard_choice(BattleManager, owner) if use_synergy else (hand[0] if not hand.is_empty() else null)
+	if BattleManager.is_discard_pick_optional() and (not use_synergy or picked == null):
 		if scene.has_method("_on_optional_pick_skipped"):
 			scene.call("_on_optional_pick_skipped")
 		else:
@@ -682,10 +726,10 @@ func _resolve_discard(scene: Node) -> void:
 		_finish("stall", "Mandatory discard requested with an empty hand")
 		return
 	if scene.has_method("_on_card_clicked") and scene.has_method("_on_pick_confirmed"):
-		scene.call("_on_card_clicked", hand[0])
+		scene.call("_on_card_clicked", picked)
 		scene.call("_on_pick_confirmed")
 	else:
-		BattleManager.resolve_pending_discard_pick(hand[0])
+		BattleManager.resolve_pending_discard_pick(picked)
 	_act("discard_pick")
 
 func _choose_reward() -> void:
@@ -908,6 +952,8 @@ func _finish(status: String, detail: String) -> void:
 			"master_muted": AudioServer.is_bus_mute(AudioServer.get_bus_index("Master"))},
 		"config": {"chapter": _chapter_arg, "hero": _initial_hero, "seed": _seed, "max_seconds": _max_seconds,
 			"policy": _policy, "diagnose_battles": _diagnose_battles, "replay_encounter": _replay_encounter,
+			"decision_ablation": _decision_ablation,
+			"replay_identity": _replay_identity,
 			"combat_unit_divisor": BattleManager.combat_unit_divisor if BattleManager != null else 0, "profile_frames": _profile_frames,
 			"speed": _speed, "actual_scene_run": true, "rendered_scene_run": DisplayServer.get_name() != "headless",
 			"headless": DisplayServer.get_name() == "headless"},

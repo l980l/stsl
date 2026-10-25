@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 200">
+  <title>동북아 지도 크레스트</title>
+  <defs>
+    <pattern id="sp" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="0.65" fill="#c8a850" opacity="0.18"/>
+    </pattern>
+  </defs>
+  <rect width="280" height="200" fill="url(#sp)"/>
+  <path d="M 0.0,0.0 L 0.0,200.0 L 55.0,200.0 L 60.0,182.0 L 70.0,172.0 L 75.0,148.0 L 72.0,135.0 L 64.0,112.0 L 64.0,99.0 L 76.0,91.0 L 85.0,85.0 L 75.0,75.0 L 70.0,65.0 L 78.0,52.0 L 90.0,55.0 L 104.0,59.0 L 157.0,40.0 L 165.0,30.0 L 190.0,10.0 L 280.0,0.0 L 0.0,0.0 Z" fill="#1e1535" stroke="#c8a850" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M 104.0,59.0 L 108.0,62.0 L 115.0,72.0 L 120.0,77.0 L 122.0,82.0 L 123.0,92.0 L 125.0,97.0 L 123.0,105.0 L 124.0,110.0 L 125.0,116.0 L 130.0,117.0 L 137.0,115.0 L 140.0,113.0 L 147.0,111.0 L 150.0,109.0 L 152.0,105.0 L 153.0,100.0 L 154.0,93.0 L 154.0,85.0 L 152.0,77.0 L 150.0,70.0 L 153.0,55.0 L 157.0,40.0 L 104.0,59.0 Z" fill="#1e1535" stroke="#c8a850" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M 169.0,120.0 L 175.0,120.0 L 182.0,120.0 L 190.0,122.0 L 206.0,117.0 L 213.0,114.0 L 227.0,112.0 L 238.0,113.0 L 247.0,111.0 L 258.0,107.0 L 269.0,103.0 L 270.0,95.0 L 275.0,75.0 L 278.0,64.0 L 273.0,53.0 L 270.0,46.0 L 260.0,50.0 L 250.0,60.0 L 242.0,75.0 L 230.0,90.0 L 228.0,92.0 L 215.0,103.0 L 202.0,105.0 L 193.0,105.0 L 185.0,116.0 L 172.0,120.0 L 169.0,120.0 Z" fill="#1e1535" stroke="#c8a850" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M 169.0,120.0 L 174.0,128.0 L 170.0,132.0 L 166.0,144.0 L 165.0,149.0 L 167.0,150.0 L 171.0,145.0 L 177.0,140.0 L 180.0,135.0 L 175.0,125.0 L 168.0,122.0 L 164.0,124.0 L 158.0,128.0 L 156.0,132.0 L 158.0,136.0 L 160.0,140.0 L 162.0,142.0 L 165.0,149.0 L 166.0,144.0 L 162.0,136.0 L 159.0,132.0 L 162.0,127.0 L 168.0,122.0 L 169.0,120.0 Z" fill="#1e1535" stroke="#c8a850" stroke-width="1.0" stroke-linejoin="round"/>
+  <path d="M 265.0,45.0 L 275.0,40.0 L 292.0,40.0 L 293.0,35.0 L 310.0,23.0 L 315.0,21.0 L 315.0,16.0 L 310.0,15.0 L 298.0,15.0 L 285.0,17.0 L 278.0,7.0 L 273.0,5.0 L 264.0,11.0 L 260.0,26.0 L 265.0,45.0 Z" fill="#1e1535" stroke="#c8a850" stroke-width="1.0" stroke-linejoin="round"/>
+  <path d="M 185.0,116.0 L 195.0,118.0 L 207.0,118.0 L 212.0,120.0 L 195.0,125.0 L 187.0,125.0 L 183.0,122.0 L 185.0,116.0 Z" fill="#1e1535" stroke="#c8a850" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M 74.0,207.0 L 80.0,210.0 L 79.0,220.0 L 75.0,240.0 L 63.0,236.0 L 60.0,230.0 L 65.0,220.0 L 70.0,210.0 L 74.0,207.0 Z" fill="#1e1535" stroke="#c8a850" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M 123.0,128.0 L 128.0,125.0 L 129.0,124.0 L 125.0,125.0 L 122.0,127.0 L 123.0,128.0 Z" fill="#1e1535" stroke="#c8a850" stroke-width="0.7" stroke-linejoin="round"/>
+  <g transform="translate(36,168)" opacity="0.75">
+    <circle cx="0" cy="0" r="11" fill="none" stroke="#c8a850" stroke-width="0.6"/>
+    <line x1="0" y1="-14" x2="0" y2="14" stroke="#c8a850" stroke-width="0.9"/>
+    <line x1="-14" y1="0" x2="14" y2="0" stroke="#c8a850" stroke-width="0.9"/>
+    <line x1="-9" y1="-9" x2="9" y2="9" stroke="#c8a850" stroke-width="0.4" opacity="0.5"/>
+    <line x1="9" y1="-9" x2="-9" y2="9" stroke="#c8a850" stroke-width="0.4" opacity="0.5"/>
+    <polygon points="0,-14 -3,-6 3,-6" fill="#c8a850"/>
+    <polygon points="0,14 -3,6 3,6" fill="#c8a850" opacity="0.35"/>
+    <polygon points="-14,0 -6,-3 -6,3" fill="#c8a850" opacity="0.35"/>
+    <polygon points="14,0 6,-3 6,3" fill="#c8a850" opacity="0.35"/>
+  </g>
+  <rect x="2" y="2" width="276" height="196" fill="none" stroke="#c8a850" stroke-width="1.5" opacity="0.6"/>
+  <rect x="5" y="5" width="270" height="190" fill="none" stroke="#c8a850" stroke-width="0.4" opacity="0.28"/>
+  <g stroke="#c8a850" stroke-width="0.8" opacity="0.45">
+    <line x1="2" y1="2" x2="15" y2="15"/>
+    <line x1="278" y1="2" x2="265" y2="15"/>
+    <line x1="2" y1="198" x2="15" y2="185"/>
+    <line x1="278" y1="198" x2="265" y2="185"/>
+  </g>
+</svg>
