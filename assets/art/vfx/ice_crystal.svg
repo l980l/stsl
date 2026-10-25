@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="100" viewBox="0 0 36 100">
+  <defs>
+    <linearGradient id="body" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#2288ee" stop-opacity="0.55"/>
+      <stop offset="35%"  stop-color="#bbeeFF" stop-opacity="0.95"/>
+      <stop offset="65%"  stop-color="#88ccff" stop-opacity="0.90"/>
+      <stop offset="100%" stop-color="#2266cc" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="inner" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0.10"/>
+    </linearGradient>
+  </defs>
+  <!-- 메인 결정 몸체 -->
+  <polygon points="18,1 32,28 32,72 18,99 4,72 4,28"
+           fill="url(#body)" stroke="#cceeff" stroke-width="1.4" stroke-linejoin="round"/>
+  <!-- 내부 반사면 -->
+  <polygon points="18,9 25,29 24,68 18,86 12,68 11,29"
+           fill="url(#inner)"/>
+  <!-- 왼쪽 모서리 하이라이트 -->
+  <line x1="4" y1="28" x2="18" y2="1"
+        stroke="white" stroke-width="1.8" stroke-opacity="0.80" stroke-linecap="round"/>
+  <!-- 오른쪽 모서리 미광 -->
+  <line x1="18" y1="1" x2="32" y2="28"
+        stroke="white" stroke-width="0.7" stroke-opacity="0.30" stroke-linecap="round"/>
+  <!-- 중간 수평 내부선 (결정 구조) -->
+  <line x1="5" y1="50" x2="31" y2="50"
+        stroke="#99ddff" stroke-width="0.6" stroke-opacity="0.40"/>
+</svg>

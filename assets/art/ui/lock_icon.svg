@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+  <!-- 걸쇠 (U자 형) -->
+  <path d="M 14,28 L 14,18 Q 14,8 30,8 Q 46,8 46,18 L 46,28"
+        fill="none" stroke="#c8a850" stroke-width="5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 몸체 -->
+  <rect x="8" y="26" width="44" height="30" rx="4"
+        fill="#1e1535" stroke="#c8a850" stroke-width="2"/>
+  <!-- 열쇠구멍 -->
+  <circle cx="30" cy="38" r="5" fill="#c8a850"/>
+  <rect x="27.5" y="38" width="5" height="8" rx="1" fill="#c8a850"/>
+</svg>
