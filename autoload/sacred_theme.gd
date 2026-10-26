@@ -7,6 +7,11 @@ const _FONT_DIR  := "res://assets/fonts/"
 const _NOTO_PATH := "res://resources/theme/fonts/NotoSans-Regular.ttf"
 const _NOTO_CJK  := "res://resources/theme/fonts/NotoSansCJK-Regular.ttc"
 
+# 글자 크기 하한 (1920×1080 설계 기준 — 1280×720 창에서는 2/3로 줄어든다).
+# 장식 글리프(✦·▼)를 뜻하는 경우가 아니면 이보다 작은 숫자를 직접 쓰지 않는다.
+const FS_SMALL := 14  # 모노/대문자 라벨, 아이콘 위 숫자처럼 자리가 좁은 글자
+const FS_TEXT  := 16  # 일반 글자·버튼·설명
+
 const _HERO_COUNTRY := {
 	"napoleon":     "france",
 	"joan_of_arc":  "france",
@@ -245,11 +250,11 @@ func _setup_fonts() -> void:
 	theme.set_color("font_color", "TitleLabel", SacredPalette.BONE_100)
 
 	theme.set_font("font", "EyebrowLabel", font_mono)
-	theme.set_font_size("font_size", "EyebrowLabel", 10)
+	theme.set_font_size("font_size", "EyebrowLabel", FS_SMALL)
 	theme.set_color("font_color", "EyebrowLabel", SacredPalette.BRASS_400)
 
 	theme.set_font("font", "SubLabel", font_italic)
-	theme.set_font_size("font_size", "SubLabel", 13)
+	theme.set_font_size("font_size", "SubLabel", FS_TEXT)
 	theme.set_color("font_color", "SubLabel", SacredPalette.FG_3)
 
 	theme.set_font("font", "AccentLabel", font_display)
@@ -258,7 +263,7 @@ func _setup_fonts() -> void:
 
 	theme.set_type_variation("ToastLabel", "Label")
 	theme.set_font("font", "ToastLabel", font_mono)
-	theme.set_font_size("font_size", "ToastLabel", 12)
+	theme.set_font_size("font_size", "ToastLabel", FS_SMALL)
 	theme.set_color("font_color", "ToastLabel", SacredPalette.BRASS_300)
 
 # ── 영웅별 장식체 폰트 ────────────────────────────────────────────────
@@ -292,7 +297,7 @@ func _make_box(bg: Color, border: Color, bw: int = 1,
 # ── 버튼 ──────────────────────────────────────────────────────────────
 
 func _apply_button_styles(type: String, normal: StyleBoxFlat, hover: StyleBoxFlat,
-		pressed: StyleBoxFlat, font_col: Color, font_sz: int = 12) -> void:
+		pressed: StyleBoxFlat, font_col: Color, font_sz: int = FS_TEXT) -> void:
 	var focus := normal.duplicate() as StyleBoxFlat
 	focus.border_color = SacredPalette.BRASS_500
 	var disabled := normal.duplicate() as StyleBoxFlat
@@ -372,7 +377,7 @@ func _setup_buttons() -> void:
 	var room_normal  := _make_box(P.INK_1000, P.BRASS_700, 1, 10, 6)
 	var room_hover   := _make_box(P.INK_1000, P.BRASS_500, 1, 10, 6)
 	var room_pressed := _make_box(P.INK_900, P.BRASS_600, 1, 10, 7)
-	_apply_button_styles("RoomButton", room_normal, room_hover, room_pressed, P.BONE_100, 12)
+	_apply_button_styles("RoomButton", room_normal, room_hover, room_pressed, P.BONE_100, FS_TEXT)
 	theme.set_color("font_hover_color", "RoomButton", P.BRASS_300)
 
 	# ── EliteRoomButton (엘리트 방 — AMETHYST 톤) ──
@@ -381,7 +386,7 @@ func _setup_buttons() -> void:
 	var elite_normal  := _make_box(elite_bg, P.AMETHYST_500, 1, 10, 6)
 	var elite_hover   := _make_box(elite_bg, P.AMETHYST_400, 1, 10, 6)
 	var elite_pressed := _make_box(P.INK_1000, P.AMETHYST_500, 1, 10, 7)
-	_apply_button_styles("EliteRoomButton", elite_normal, elite_hover, elite_pressed, P.AMETHYST_300, 12)
+	_apply_button_styles("EliteRoomButton", elite_normal, elite_hover, elite_pressed, P.AMETHYST_300, FS_TEXT)
 
 	# ── BossRoomButton (보스 방 — BLOOD 톤) ──
 	theme.set_type_variation("BossRoomButton", "Button")
@@ -389,7 +394,7 @@ func _setup_buttons() -> void:
 	var boss_normal  := _make_box(boss_bg, P.BLOOD_500, 1, 10, 6)
 	var boss_hover   := _make_box(boss_bg, P.BLOOD_400, 1, 10, 6)
 	var boss_pressed := _make_box(P.INK_1000, P.BLOOD_500, 1, 10, 7)
-	_apply_button_styles("BossRoomButton", boss_normal, boss_hover, boss_pressed, P.BLOOD_300, 12)
+	_apply_button_styles("BossRoomButton", boss_normal, boss_hover, boss_pressed, P.BLOOD_300, FS_TEXT)
 
 	# ── DangerButton (이벤트 도박/저주 — 투명 배경 + BLOOD 테두리) ──
 	theme.set_type_variation("DangerButton", "Button")
@@ -436,7 +441,7 @@ func _ensure_global_tooltip() -> void:
 	_gt_layer.add_child(_gt_panel)
 	_gt_label = Label.new()
 	_gt_label.position = Vector2(12, 8)
-	_gt_label.add_theme_font_size_override("font_size", 15)
+	_gt_label.add_theme_font_size_override("font_size", FS_TEXT)
 	_gt_label.add_theme_color_override("font_color", SacredPalette.BONE_100)
 	_gt_panel.add_child(_gt_label)
 

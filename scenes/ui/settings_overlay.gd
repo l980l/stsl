@@ -77,14 +77,14 @@ func _ready() -> void:
 	_btn_defaults.theme_type_variation = "VowButton"
 	_btn_defaults.text = tr("ui.settings.btn_defaults").to_upper()
 	_btn_defaults.add_theme_font_override("font", mono)
-	_btn_defaults.add_theme_font_size_override("font_size", 11)
+	_btn_defaults.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	_btn_cancel.theme_type_variation = "VowButton"
 	_btn_cancel.text = tr("ui.settings.btn_cancel").to_upper()
 	_btn_cancel.add_theme_font_override("font", mono)
-	_btn_cancel.add_theme_font_size_override("font_size", 11)
+	_btn_cancel.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	_btn_apply.text = tr("ui.settings.btn_apply").to_upper()
 	_btn_apply.add_theme_font_override("font", mono)
-	_btn_apply.add_theme_font_size_override("font_size", 11)
+	_btn_apply.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	SacredTheme.animate_button(_btn_apply)
 	_btn_cancel.pressed.connect(_on_cancel)
 	_btn_apply.pressed.connect(_on_apply)
@@ -159,7 +159,7 @@ func _build_tab_bar(panel: Control, mono: Font) -> void:
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		btn.add_theme_font_override("font", mono)
-		btn.add_theme_font_size_override("font_size", 10)
+		btn.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 		btn.pressed.connect(_switch_tab.bind(key))
 		box.add_child(btn)
 		_tab_btns[key] = btn
@@ -380,7 +380,7 @@ func _build_sound_panel() -> void:
 		lbl.offset_right  = 170.0
 		lbl.offset_bottom = row_y + 36.0
 		p.add_child(lbl)
-		LabelUtils.fit_text(lbl, 16, 11)
+		LabelUtils.fit_text(lbl, 16, SacredTheme.FS_SMALL)
 
 		var slider := HSlider.new()
 		slider.min_value = 0.0
@@ -511,7 +511,7 @@ func _build_seg_row(parent: Control, mono: Font, row_y: float, label_text: Strin
 	lbl.offset_right  = 170.0
 	lbl.offset_bottom = row_y + 36.0
 	parent.add_child(lbl)
-	LabelUtils.fit_text(lbl, 16, 11)
+	LabelUtils.fit_text(lbl, 16, SacredTheme.FS_SMALL)
 
 	var seg_box := HBoxContainer.new()
 	seg_box.offset_left   = 180.0
@@ -530,7 +530,7 @@ func _build_seg_row(parent: Control, mono: Font, row_y: float, label_text: Strin
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.add_theme_font_override("font", mono)
-		btn.add_theme_font_size_override("font_size", 11)
+		btn.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 		btn.pressed.connect(_on_seg_pressed.bind(group_id, key, on_select))
 
 		var base_style := StyleBoxFlat.new()
@@ -593,7 +593,7 @@ func _build_option_row(parent: Control, row_y: float, label_text: String,
 	lbl.offset_right  = 170.0
 	lbl.offset_bottom = row_y + 36.0
 	parent.add_child(lbl)
-	LabelUtils.fit_text(lbl, 16, 11)
+	LabelUtils.fit_text(lbl, 16, SacredTheme.FS_SMALL)
 
 	# 메인 버튼 (닫힌 상태에서 표시)
 	var main_btn := Button.new()
@@ -604,7 +604,7 @@ func _build_option_row(parent: Control, row_y: float, label_text: String,
 	main_btn.focus_mode = Control.FOCUS_NONE
 	main_btn.text = label_map.get(current_key, current_key)
 	main_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	main_btn.add_theme_font_size_override("font_size", 14)
+	main_btn.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 	var normal_sb := StyleBoxFlat.new()
 	normal_sb.bg_color = P.INK_900
 	normal_sb.border_color = P.BRASS_700
@@ -628,7 +628,7 @@ func _build_option_row(parent: Control, row_y: float, label_text: String,
 	var arrow_lbl := Label.new()
 	arrow_lbl.text = "▼"
 	arrow_lbl.add_theme_color_override("font_color", P.BRASS_300)
-	arrow_lbl.add_theme_font_size_override("font_size", 10)
+	arrow_lbl.add_theme_font_size_override("font_size", 10)  # 장식 글리프 — 글자 크기 하한 예외
 	arrow_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	arrow_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	arrow_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -665,7 +665,7 @@ func _build_option_row(parent: Control, row_y: float, label_text: String,
 		item_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		item_btn.focus_mode = Control.FOCUS_NONE
 		item_btn.custom_minimum_size = Vector2(0, 28)
-		item_btn.add_theme_font_size_override("font_size", 14)
+		item_btn.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		var item_normal := StyleBoxFlat.new()
 		item_normal.bg_color = Color.TRANSPARENT
 		item_normal.set_content_margin(SIDE_LEFT, 10)
@@ -716,7 +716,7 @@ func _build_cursor_seg_row(parent: Control, mono: Font, row_y: float) -> void:
 	lbl.offset_right  = 170.0
 	lbl.offset_bottom = row_y + 36.0
 	parent.add_child(lbl)
-	LabelUtils.fit_text(lbl, 16, 11)
+	LabelUtils.fit_text(lbl, 16, SacredTheme.FS_SMALL)
 
 	var seg_box := HBoxContainer.new()
 	seg_box.offset_left   = 180.0
@@ -735,7 +735,7 @@ func _build_cursor_seg_row(parent: Control, mono: Font, row_y: float) -> void:
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.add_theme_font_override("font", mono)
-		btn.add_theme_font_size_override("font_size", 11)
+		btn.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 		btn.pressed.connect(_set_pending_cursor.bind(_CURSOR_SIZES[key]))
 
 		var base_style := StyleBoxFlat.new()
@@ -826,7 +826,7 @@ func _style_option_button(opt: OptionButton) -> void:
 	popup.add_theme_color_override("font_focus_color",      P.BONE_100)
 	popup.add_theme_color_override("font_accelerator_color", P.BONE_100)
 	popup.add_theme_color_override("font_separator_color",  P.BRASS_500)
-	popup.add_theme_font_size_override("font_size", 14)
+	popup.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 
 func _style_slider(slider: HSlider) -> void:
 	var P := SacredPalette
