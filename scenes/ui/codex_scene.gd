@@ -225,7 +225,7 @@ func _group_order() -> Array:
 
 # 도감 글자 크기 — 고정 배율(가독성). 모든 라벨 폰트가 이 배율을 거침.
 func _fs(base: int) -> int:
-	return maxi(1, int(round(base * FONT_SCALE)))
+	return maxi(SacredTheme.FS_SMALL, int(round(base * FONT_SCALE)))
 
 # 발견(미보유) 카드 흑백 처리 — 루트에 머티리얼, 전 자식 use_parent_material
 func _apply_grayscale(root: CanvasItem) -> void:

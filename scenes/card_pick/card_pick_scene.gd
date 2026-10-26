@@ -77,7 +77,7 @@ func _build_header(sx: float, sw: float, cx: float) -> void:
 	sub.position = Vector2(sx, 162.0)
 	sub.size = Vector2(sw, 26.0)
 	add_child(sub)
-	LabelUtils.fit_text(sub, 15, 11)
+	LabelUtils.fit_text(sub, SacredTheme.FS_TEXT, SacredTheme.FS_SMALL)
 
 	# 수평 룰 라인
 	var rule_w: float = 280.0
@@ -105,7 +105,7 @@ func _build_header(sx: float, sw: float, cx: float) -> void:
 	orn.text = "✦"
 	orn.theme_type_variation = "AccentLabel"
 	orn.add_theme_color_override("font_color", P.BRASS_300)
-	orn.add_theme_font_size_override("font_size", 14)
+	orn.add_theme_font_size_override("font_size", 14)  # 장식 글리프 — 글자 크기 하한 예외
 	orn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	orn.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	orn.position = Vector2(cx - orn_w * 0.5, rule_y - orn_h * 0.5)
@@ -151,14 +151,14 @@ func _build_tally(cx: float) -> void:
 		var lbl := Label.new()
 		lbl.text = tr(d["key"])
 		lbl.add_theme_font_override("font", mono_font)
-		lbl.add_theme_font_size_override("font_size", 9)
+		lbl.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 		lbl.add_theme_color_override("font_color", P.BONE_400)
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		lbl_wrap.add_child(lbl)
 		lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		LabelUtils.fit_text(lbl, 9, 7, box_w)
+		LabelUtils.fit_text(lbl, SacredTheme.FS_SMALL, SacredTheme.FS_SMALL, box_w)
 
 		var num_wrap := Control.new()
 		num_wrap.position = Vector2(0.0, 28.0)
@@ -234,7 +234,7 @@ func _build_section_header(sx: float, sw: float, cx: float) -> void:
 	sec_title.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	sec_title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row_hbox.add_child(sec_title)
-	LabelUtils.fit_text(sec_title, 19, 13, 480.0)
+	LabelUtils.fit_text(sec_title, 19, SacredTheme.FS_SMALL, 480.0)
 
 	var pad_r := Control.new()
 	pad_r.custom_minimum_size = Vector2(16.0, 0.0)
@@ -318,7 +318,7 @@ func _build_card_grid(cx: float) -> void:
 		cta.text = tr("ui.reward.btn_take").to_upper()
 		cta.theme_type_variation = "VowButton"
 		cta.add_theme_font_override("font", mono_font)
-		cta.add_theme_font_size_override("font_size", 10)
+		cta.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 		cta.position = Vector2(16.0, 52.0 + scaled_h + 20.0)
 		cta.size = Vector2(cell_w - 32.0, 36.0)
 		SacredTheme.animate_button(cta)
@@ -366,7 +366,7 @@ func _build_skip(cx: float) -> void:
 	skip_btn.text = tr("ui.reward.btn_skip").to_upper()
 	skip_btn.theme_type_variation = "VowButton"
 	skip_btn.add_theme_font_override("font", mono_font)
-	skip_btn.add_theme_font_size_override("font_size", 10)
+	skip_btn.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	# 카드 하단(~872) ~ 화면 하단(1080) 중앙 = 976, 버튼 높이 40 → y=956
 	skip_btn.position = Vector2(cx - 140.0, 940.0)
 	skip_btn.size = Vector2(280.0, 40.0)

@@ -258,7 +258,7 @@ func _make_chapter_card(chapter: Dictionary, idx: int) -> void:
 	desc_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	desc_box.add_child(desc_lbl)
 	desc_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	LabelUtils.fit_text(desc_lbl, 13, 10)
+	LabelUtils.fit_text(desc_lbl, SacredTheme.FS_TEXT, SacredTheme.FS_SMALL)
 
 	# ── 잠금 힌트 ──
 	if not unlocked:
@@ -271,7 +271,7 @@ func _make_chapter_card(chapter: Dictionary, idx: int) -> void:
 		hint.size = Vector2(card_w - 40, 40)
 		hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(hint)
-		LabelUtils.fit_text(hint, 12, 10)
+		LabelUtils.fit_text(hint, SacredTheme.FS_TEXT, SacredTheme.FS_SMALL)
 
 	# ── 모서리 L자 브라켓 ──
 	var bracket_color := P.BRASS_500 if unlocked else P.BRASS_700

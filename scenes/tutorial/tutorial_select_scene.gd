@@ -160,7 +160,7 @@ func _add_index_row(parent: VBoxContainer, data: Dictionary) -> void:
 
 	var meta := Label.new()
 	meta.add_theme_font_override("font", MONO_FONT)
-	meta.add_theme_font_size_override("font_size", 13)
+	meta.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	meta.add_theme_color_override("font_color", P.FG_4)
 	meta.text = (tr("tutorial.select.locked") if locked else tr(data["meta"]))
 	meta.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -206,7 +206,7 @@ func _stamp(parent: Control, text: String, pos: Vector2, halign: int, dot: bool)
 		parent.add_child(d)
 	var lbl := Label.new()
 	lbl.add_theme_font_override("font", MONO_FONT)
-	lbl.add_theme_font_size_override("font_size", 13)
+	lbl.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	lbl.add_theme_color_override("font_color", P.FG_4)
 	lbl.text = text
 	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE

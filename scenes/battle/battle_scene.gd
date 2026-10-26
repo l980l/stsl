@@ -93,7 +93,9 @@ var _readout_target: int = -1
 var _tutorial_driver = null  # 튜토리얼 모드일 때만 생성 (TutorialDriver)
 var _relic_container: FlowContainer
 var _turn_queue_box: HBoxContainer
-var _turn_queue_slots: Array = []  # 각 슬롯: {root: PanelContainer, swatch: ColorRect, label: Label}
+var _turn_queue_slots: Array = []  # 각 슬롯: {root: PanelContainer, style: StyleBoxFlat, face: TextureRect, initials: Label}
+var _turn_queue_faces: Dictionary = {}  # 일러스트 경로 → 윗부분 정사각 AtlasTexture
+const TURN_QUEUE_CHIP := 48
 const TURN_QUEUE_PREVIEW_COUNT: int = 5
 
 # UI 전용 CanvasLayer — 카메라 zoom 영향 없음 (카드/패널/버튼/라벨 등)
@@ -378,7 +380,7 @@ func _build_ui() -> void:
 	var banner_diamond := Label.new()
 	banner_diamond.text = "✦"
 	banner_diamond.add_theme_color_override("font_color", SacredPalette.BRASS_300)
-	banner_diamond.add_theme_font_size_override("font_size", 10)
+	banner_diamond.add_theme_font_size_override("font_size", 10)  # 장식 글리프 — 글자 크기 하한 예외
 	banner_diamond.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	banner_diamond.position = Vector2(0, 57)
 	banner_diamond.size = Vector2(600, 12)
@@ -460,7 +462,7 @@ func _build_ui() -> void:
 	var hand_diamond := Label.new()
 	hand_diamond.text = "✦"
 	hand_diamond.add_theme_color_override("font_color", SacredPalette.BRASS_300)
-	hand_diamond.add_theme_font_size_override("font_size", 10)
+	hand_diamond.add_theme_font_size_override("font_size", 10)  # 장식 글리프 — 글자 크기 하한 예외
 	hand_diamond.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hand_diamond.position = Vector2(0, BOTTOM_Y - 17)
 	hand_diamond.size = Vector2(WINDOW_W, 12)
@@ -568,25 +570,28 @@ func _make_hero_slot(index: int) -> Dictionary:
 	var name_lbl := _make_label(Vector2(bar_x, pos.y + 4), Vector2(bar_w, 22), 16)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.theme_type_variation = "AccentLabel"
+	_outline_hud_label(name_lbl, SacredPalette.BRASS_400)
 	name_lbl.z_index = 1
 	name_lbl.visible = false
 
-	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 28), bar_w)
+	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 26), bar_w)
 	hp_bar.z_index = 1
 	hp_bar.visible = false
 
-	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 23), Vector2(bar_w, 24), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 23), Vector2(bar_w, 24), SacredTheme.FS_SMALL)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hp_lbl.theme_type_variation = "EyebrowLabel"
+	_outline_hud_label(hp_lbl, SacredPalette.BONE_100)
 	hp_lbl.z_index = 1
 	hp_lbl.visible = false
 
-	var block_lbl := _make_label(Vector2(bar_x, pos.y + 23), Vector2(bar_w, 24), 12)
+	var block_lbl := _make_label(Vector2(bar_x, pos.y + 23), Vector2(bar_w, 24), SacredTheme.FS_SMALL)
 	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	block_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	block_lbl.theme_type_variation = "EyebrowLabel"
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
+	_outline_hud_label(block_lbl, Color.WHITE)
 	block_lbl.z_index = 2
 	block_lbl.visible = false
 
@@ -660,29 +665,32 @@ func _make_enemy_slot(index: int, total: int) -> Dictionary:
 	btn.pressed.connect(func(): _on_enemy_pressed(captured_index))
 	add_child(btn)
 
-	var name_lbl := _make_label(Vector2(bar_x, pos.y + 28), Vector2(bar_w, 18), 14)
+	var name_lbl := _make_label(Vector2(bar_x, pos.y + 24), Vector2(bar_w, 18), SacredTheme.FS_SMALL)  # 높아진 HP 바(18px)와 겹치지 않게
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.theme_type_variation = "AccentLabel"
+	_outline_hud_label(name_lbl, SacredPalette.BRASS_400)
 	name_lbl.z_index = 1
 
-	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 48), bar_w, is_boss)
+	var hp_bar := _make_hp_bar(Vector2(bar_x, pos.y + 46), bar_w, is_boss)
 	hp_bar.z_index = 1
 
-	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 43), Vector2(bar_w, 24), 12)
+	var hp_lbl := _make_label(Vector2(bar_x, pos.y + 43), Vector2(bar_w, 24), SacredTheme.FS_SMALL)
 	hp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hp_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hp_lbl.theme_type_variation = "EyebrowLabel"
+	_outline_hud_label(hp_lbl, SacredPalette.BONE_100)
 	hp_lbl.z_index = 1
 
-	var block_lbl := _make_label(Vector2(bar_x, pos.y + 43), Vector2(bar_w, 24), 12)
+	var block_lbl := _make_label(Vector2(bar_x, pos.y + 43), Vector2(bar_w, 24), SacredTheme.FS_SMALL)
 	block_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	block_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	block_lbl.theme_type_variation = "EyebrowLabel"
 	block_lbl.modulate = Color(0.5, 0.8, 1.0)
+	_outline_hud_label(block_lbl, Color.WHITE)
 	block_lbl.z_index = 2
 
 	var status_box := HBoxContainer.new()
-	var status_y: float = pos.y + (72.0 if is_boss else 62.0)
+	var status_y: float = pos.y + (74.0 if is_boss else 66.0)
 	status_box.position = Vector2(bar_x, status_y)
 	status_box.size = Vector2(bar_w, 18)
 	status_box.z_index = 1
@@ -724,7 +732,7 @@ func _refresh_hud() -> void:
 			var lbl := Label.new()
 			lbl.text = "[%s]" % tr(s["name_key"])
 			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-			lbl.add_theme_font_size_override("font_size", 13)
+			lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 			lbl.modulate = Color(1.0, 0.0, 1.0)
 			_relic_container.add_child(lbl)
 			SacredTheme.attach_tooltip(lbl, tip)
@@ -751,13 +759,19 @@ func _refresh_hud() -> void:
 			var lbl := Label.new()
 			lbl.text = "[%s]" % tr(relic.relic_name)
 			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-			lbl.add_theme_font_size_override("font_size", 13)
+			lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 			lbl.modulate = Color(1.0, 0.85, 0.3)
 			_relic_container.add_child(lbl)
 			SacredTheme.attach_tooltip(lbl, tip)
 
 func _refresh_relics() -> void:
 	_refresh_hud()
+
+# 영웅/적 이름·HP·방어 숫자 — 붉은 HP 바와 밝은 배경 위에서도 읽히도록 어두운 외곽선.
+func _outline_hud_label(lbl: Label, color: Color) -> void:
+	lbl.add_theme_color_override("font_color", color)
+	lbl.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.06, 0.95))
+	lbl.add_theme_constant_override("outline_size", 5)
 
 func _make_label(pos: Vector2, sz: Vector2, font_size: int) -> Label:
 	var lbl := Label.new()
@@ -833,7 +847,8 @@ func _get_bloom_shader() -> Shader:
 	return sh
 
 func _make_hp_bar(pos: Vector2, width: float, is_boss: bool = false) -> Control:
-	var height: float = 14.0
+	# HP 숫자(FS_SMALL + 외곽선)가 바 안에 들어가는 높이 — 숫자가 테두리에 걸리지 않게.
+	var height: float = 18.0
 	var P := SacredPalette
 
 	var wrapper := Control.new()
@@ -920,7 +935,8 @@ func _make_hp_bar(pos: Vector2, width: float, is_boss: bool = false) -> Control:
 	var border := Panel.new()
 	border.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	border.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	border.z_index = 10
+	# 바 내부(채움·노치) 위, HP 라벨(Z_LBL = Z_BAR + 10) 아래.
+	border.z_index = 5
 	var bstyle := StyleBoxFlat.new()
 	bstyle.bg_color = Color(0, 0, 0, 0)
 	bstyle.border_color = P.BRASS_500 if is_boss else P.BRASS_700
@@ -1278,7 +1294,7 @@ func _on_enemy_spawned(enemy_index: int) -> void:
 	entry["btn"].disabled = false
 	entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
 	# layout_mode=0 에서 add_child 후 size 가 minimum_size 로 덮어써질 수 있어 target_w 명시 (bar_w=211)
-	LabelUtils.fit_text(entry["name_lbl"], 14, 9, 211.0)
+	LabelUtils.fit_text(entry["name_lbl"], SacredTheme.FS_TEXT, SacredTheme.FS_SMALL, 211.0)
 	var sig_node_spawn: Control = _attach_signature_icon(entry["panel"], enemy.get("mythology"))
 	entry["sig_icon"] = sig_node_spawn
 	if sig_node_spawn != null:
@@ -1424,7 +1440,7 @@ func _setup_heroes() -> void:
 		entry["status_box"].visible = true
 		entry["hero_id"] = hero.hero_id
 		entry["name_lbl"].text = tr(hero.get("hero_name")) if hero.get("hero_name") != null else hero.hero_id
-		LabelUtils.fit_text(entry["name_lbl"], 16, 10, 211.0)
+		LabelUtils.fit_text(entry["name_lbl"], 16, SacredTheme.FS_SMALL, 211.0)
 
 		if hero.character_scene != null:
 			var char_node = hero.character_scene.instantiate()
@@ -1484,7 +1500,7 @@ func _setup_enemies() -> void:
 		entry["btn"].visible = true
 		entry["btn"].disabled = false
 		entry["name_lbl"].text = tr(enemy.get("enemy_name")) if enemy.get("enemy_name") != null else "적"
-		LabelUtils.fit_text(entry["name_lbl"], 14, 9, 211.0)
+		LabelUtils.fit_text(entry["name_lbl"], SacredTheme.FS_TEXT, SacredTheme.FS_SMALL, 211.0)
 
 		# 신화 시그니처 아이콘 + 툴팁 — panel 우측 상단
 		var sig_node_setup: Control = _attach_signature_icon(entry["panel"], enemy.get("mythology"))
@@ -1913,36 +1929,37 @@ func _any_counter_window_charging() -> bool:
 
 ## ── 좌상단 Turn Queue 미리보기 (ATB 큐) ──
 func _build_turn_queue_widget() -> void:
+	# 이름 글자 대신 초상화 칩 — 긴 이름을 좁은 칸에 줄이거나 줄바꿈하지 않는다. 전체 이름은 툴팁.
 	_turn_queue_box = HBoxContainer.new()
-	_turn_queue_box.position = Vector2(20, 18)
-	_turn_queue_box.size = Vector2(WINDOW_W - 40, 34)  # 줄바꿈 fallback 시 2줄 수용 (이론 최소)
+	_turn_queue_box.position = Vector2(20, 14)
+	_turn_queue_box.size = Vector2(WINDOW_W - 40, TURN_QUEUE_CHIP)
 	_turn_queue_box.add_theme_constant_override("separation", 6)
 	add_child(_turn_queue_box)  # _build_ui 끝에서 _ui_layer 로 reparent 됨
 	for i in range(TURN_QUEUE_PREVIEW_COUNT):
 		var slot := PanelContainer.new()
-		slot.custom_minimum_size = Vector2(96, 34)
+		slot.custom_minimum_size = Vector2(TURN_QUEUE_CHIP, TURN_QUEUE_CHIP)
+		slot.mouse_filter = Control.MOUSE_FILTER_STOP
 		var sbx := StyleBoxFlat.new()
 		sbx.bg_color = Color(0.08, 0.07, 0.05, 0.85)
-		sbx.border_color = SacredPalette.BRASS_300
+		sbx.border_color = SacredPalette.BRASS_500
 		sbx.set_border_width_all(1)
 		sbx.set_corner_radius_all(4)
-		sbx.set_content_margin_all(4)
+		sbx.set_content_margin_all(2)
 		slot.add_theme_stylebox_override("panel", sbx)
-		var vb := VBoxContainer.new()
-		vb.add_theme_constant_override("separation", 2)
-		slot.add_child(vb)
-		var swatch := ColorRect.new()
-		swatch.custom_minimum_size = Vector2(0, 4)
-		swatch.color = SacredPalette.BRASS_500
-		vb.add_child(swatch)
-		var lbl := Label.new()
-		lbl.text = ""
-		lbl.add_theme_font_size_override("font_size", 11)
-		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lbl.clip_text = true
-		vb.add_child(lbl)
+		var face := TextureRect.new()
+		face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot.add_child(face)
+		# 일러스트가 없을 때(로컬 에셋 미설치 등) 이름 앞 두 글자
+		var initials := Label.new()
+		initials.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
+		initials.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		initials.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		initials.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot.add_child(initials)
 		_turn_queue_box.add_child(slot)
-		_turn_queue_slots.append({"root": slot, "swatch": swatch, "label": lbl})
+		_turn_queue_slots.append({"root": slot, "style": sbx, "face": face, "initials": initials})
 	_refresh_turn_queue_widget()
 
 func _on_turn_queue_changed(_preview: Array) -> void:
@@ -1974,11 +1991,14 @@ func _refresh_turn_queue_widget() -> void:
 		slot["root"].visible = true
 		var aid: String = preview[i]
 		var info: Dictionary = _resolve_actor_info(aid)
-		slot["label"].text = info["name"]
-		slot["swatch"].color = info["color"]
-		# 폰트 크기 자동 조절 — 슬롯 너비 72px 안에 맞춤. min 폰트에서도 초과면 줄바꿈 (idempotent).
-		LabelUtils.fit_text(slot["label"], 11, 7, 72.0, -1.0, true)
-		# 현재 차례 = 첫 슬롯 강조 (밝게)
+		var face: Texture2D = _turn_queue_face(info.get("art", ""))
+		slot["face"].texture = face
+		slot["initials"].text = "" if face != null else info["name"].left(2)
+		SacredTheme.attach_tooltip(slot["root"], info["name"])
+		# 테두리 색 = 진영(영웅 황동/적 적색), 현재 차례 = 첫 슬롯 굵은 테두리 + 밝게
+		var style: StyleBoxFlat = slot["style"]
+		style.border_color = info["color"]
+		style.set_border_width_all(3 if i == 0 else 1)
 		slot["root"].modulate = Color(1.0, 1.0, 1.0, 1.0) if i == 0 else Color(1.0, 1.0, 1.0, 0.7)
 
 func _resolve_actor_info(actor_id: String) -> Dictionary:
@@ -1989,15 +2009,39 @@ func _resolve_actor_info(actor_id: String) -> Dictionary:
 			var hero_res = TeamManager.get_hero(hid)
 			if hero_res != null:
 				nm = tr(hero_res.hero_name)
-		return {"name": nm, "color": SacredPalette.BRASS_500}
+				if hero_res.portrait != null:
+					return {"name": nm, "color": SacredPalette.BRASS_500, "art": hero_res.portrait.resource_path}
+		return {"name": nm, "color": SacredPalette.BRASS_500, "art": "res://assets/art/heroes/%s.png" % hid}
 	if actor_id.begins_with("enemy:"):
 		var idx: int = int(actor_id.substr(6))
 		var nm2: String = "enemy"
+		var art2: String = ""
 		var enemy_res: Resource = BattleManager.get_enemy(idx)
 		if enemy_res != null:
 			nm2 = tr(enemy_res.enemy_name)
-		return {"name": nm2, "color": Color(0.7, 0.25, 0.25)}
+			# "enemy.{myth}.{name}" → assets/art/enemies/{myth}_{name}.png (enemy_placeholder 와 같은 규칙)
+			var parts: PackedStringArray = String(enemy_res.enemy_name).split(".")
+			if parts.size() >= 3:
+				art2 = "res://assets/art/enemies/%s_%s.png" % [parts[1], parts[2]]
+		return {"name": nm2, "color": Color(0.7, 0.25, 0.25), "art": art2}
 	return {"name": actor_id, "color": Color(0.5, 0.5, 0.5)}
+
+# 전신 일러스트에서 머리 쪽(가운데 위, 너비 55% 정사각)만 잘라 큐 칩에 쓴다.
+func _turn_queue_face(path: String) -> Texture2D:
+	if path == "":
+		return null
+	if _turn_queue_faces.has(path):
+		return _turn_queue_faces[path]
+	var tex: Texture2D = CharacterArtCache.get_texture(path)
+	var face: Texture2D = null
+	if tex != null:
+		var side: float = minf(tex.get_width(), tex.get_height()) * 0.55
+		var atlas := AtlasTexture.new()
+		atlas.atlas = tex
+		atlas.region = Rect2((tex.get_width() - side) * 0.5, tex.get_height() * 0.06, side, side)
+		face = atlas
+	_turn_queue_faces[path] = face
+	return face
 
 func _on_locale_changed_battle(_locale: String) -> void:
 	# 적 이름
@@ -2028,7 +2072,7 @@ func _on_locale_changed_battle(_locale: String) -> void:
 				break
 		if hero != null and hero.get("hero_name") != null:
 			h_lbl.text = tr(hero.get("hero_name"))
-			LabelUtils.fit_text(h_lbl, 16, 10, 211.0)
+			LabelUtils.fit_text(h_lbl, 16, SacredTheme.FS_SMALL, 211.0)
 	# turn queue 라벨 즉시 갱신 (한 턴 기다리지 않도록)
 	_refresh_turn_queue_widget()
 	# status_box 안의 상태이상 아이콘 + intent 라벨 즉시 갱신
@@ -4895,7 +4939,7 @@ func _draw_bg_debug_box(node: Node2D, label: String, color: Color) -> void:
 	]
 	lbl.position = Vector2(r.position.x, r.position.y - 50)
 	lbl.add_theme_color_override("font_color", color)
-	lbl.add_theme_font_size_override("font_size", 14)
+	lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 	_bg_debug_overlay.add_child(lbl)
 
 # 캐릭터 영역 Rect2 array — fg 충돌 검사용 (UI 는 z_index 1000 이라 fg 가 가릴 수 없음 → 제외).
@@ -5620,7 +5664,7 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 			else:
 				lbl.text = "%d" % val
 			lbl.theme_type_variation = "EyebrowLabel"
-			lbl.add_theme_font_size_override("font_size", 11)
+			lbl.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 			lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -5637,7 +5681,7 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 		fallback_lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
 	fallback_lbl.theme_type_variation = "EyebrowLabel"
 	SacredTheme.attach_tooltip(fallback_lbl, tooltip)
-	fallback_lbl.add_theme_font_size_override("font_size", 12)
+	fallback_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	fallback_lbl.custom_minimum_size = Vector2(0, 18)
 	fallback_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	fallback_lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -5700,7 +5744,7 @@ func _refresh_status_icons_enemy(index: int) -> void:
 			hbox.add_child(icon)
 		var lbl := Label.new()
 		lbl.text = _trf("battle.counter.label", [cinfo["count"], cinfo["threshold"]])
-		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		lbl.modulate = Color(1.0, 0.75, 0.3)
@@ -5712,7 +5756,7 @@ func _refresh_status_icons_enemy(index: int) -> void:
 	if cur_weak != "":
 		var weak_lbl := Label.new()
 		weak_lbl.text = "약점: %s" % cur_weak
-		weak_lbl.add_theme_font_size_override("font_size", 12)
+		weak_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		weak_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		weak_lbl.mouse_filter = Control.MOUSE_FILTER_STOP
 		weak_lbl.modulate = Color(1.0, 0.85, 0.3)  # 황금색 — 강조
@@ -5804,7 +5848,7 @@ func _make_power_item(base_key: String, v: int, owner_id: String = "", params: D
 		var period: int = int(params.upgrade_tick_period)
 		lbl.text += " [%d/%d +%d]" % [int(params.get("_upgrade_tick_count", 0)) % period, period, int(params.get("upgrade_tick_bonus", 0))]
 	lbl.theme_type_variation = "EyebrowLabel"
-	lbl.add_theme_font_size_override("font_size", 11)
+	lbl.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	lbl.modulate = Color(0.75, 0.45, 1.0)
@@ -6131,7 +6175,7 @@ func _show_deck_viewer_in_battle() -> void:
 	var accent_font: Font = SacredTheme.theme.get_font("font", "AccentLabel") if SacredTheme.theme else null
 	if accent_font:
 		tabs.add_theme_font_override("font", accent_font)
-	tabs.add_theme_font_size_override("font_size", 15)
+	tabs.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 	tabs.add_theme_color_override("font_selected_color", SacredPalette.BRASS_400)
 	tabs.add_theme_color_override("font_unselected_color", SacredPalette.BRASS_700)
 	tabs.add_theme_color_override("font_hovered_color", SacredPalette.BRASS_300)
@@ -6223,7 +6267,7 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 	var lbl := Label.new()
 	lbl.text = header
 	lbl.theme_type_variation = "AccentLabel"
-	lbl.add_theme_font_size_override("font_size", 15)
+	lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 	col.add_child(lbl)
 
 	var clip_box := Control.new()
@@ -6248,7 +6292,7 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 		var empty_lbl := Label.new()
 		empty_lbl.text = tr("ui.battle.deck_viewer.empty")
 		empty_lbl.theme_type_variation = "SubLabel"
-		empty_lbl.add_theme_font_size_override("font_size", 15)
+		empty_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		grid.add_child(empty_lbl)
 		return
 

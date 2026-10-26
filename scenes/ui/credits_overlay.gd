@@ -154,7 +154,7 @@ func _build() -> void:
 	btn_back.theme_type_variation = "VowButton"
 	btn_back.text = tr("ui.credits.back").to_upper()
 	btn_back.add_theme_font_override("font", mono)
-	btn_back.add_theme_font_size_override("font_size", 12)
+	btn_back.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	btn_back.offset_left = PANEL_W / 2.0 - 110.0
 	btn_back.offset_right = PANEL_W / 2.0 + 110.0
 	btn_back.offset_top = PANEL_H - 62.0
@@ -170,7 +170,7 @@ func _add_inspired(parent: VBoxContainer, header: String) -> void:
 	hd.theme_type_variation = "EyebrowLabel"
 	hd.text = header
 	hd.add_theme_color_override("font_color", P.BRASS_300)
-	hd.add_theme_font_size_override("font_size", 14)
+	hd.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 	hd.custom_minimum_size = Vector2(_content_w, 0)
 	parent.add_child(hd)
 
@@ -186,7 +186,7 @@ func _add_inspired(parent: VBoxContainer, header: String) -> void:
 		desc.theme_type_variation = "SubLabel"
 		desc.text = tr(g[1])
 		desc.add_theme_color_override("font_color", P.BONE_400)
-		desc.add_theme_font_size_override("font_size", 12)
+		desc.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc.custom_minimum_size = Vector2(_content_w - 16.0, 0)
 		desc.offset_left = 16.0  # 살짝 들여쓰기 효과 (VBox 내 무시되면 무해)
@@ -203,7 +203,7 @@ func _add_section(parent: VBoxContainer, header: String, lines: Array) -> void:
 	hd.theme_type_variation = "EyebrowLabel"
 	hd.text = header
 	hd.add_theme_color_override("font_color", P.BRASS_300)
-	hd.add_theme_font_size_override("font_size", 14)
+	hd.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 	hd.custom_minimum_size = Vector2(_content_w, 0)
 	parent.add_child(hd)
 

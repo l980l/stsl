@@ -128,7 +128,7 @@ func _build_illo(frame: Panel) -> void:
 	plate_lbl.text = "— Rest · " + tr("ui.rest.title") + " —"
 	if mono_font:
 		plate_lbl.add_theme_font_override("font", mono_font)
-	plate_lbl.add_theme_font_size_override("font_size", 11)
+	plate_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	plate_lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
 	plate_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	plate_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -201,7 +201,7 @@ func _build_illo(frame: Panel) -> void:
 	var gem := Label.new()
 	gem.text = "✦"
 	gem.add_theme_color_override("font_color", SacredPalette.BRASS_300)
-	gem.add_theme_font_size_override("font_size", 13)
+	gem.add_theme_font_size_override("font_size", 13)  # 장식 글리프 — 글자 크기 하한 예외
 	div_row.add_child(gem)
 
 	var line_r := TextureRect.new()
@@ -270,7 +270,7 @@ func _build_choices(frame: Panel) -> void:
 	hdr.text = "— 선택하라 —"
 	if mono_font:
 		hdr.add_theme_font_override("font", mono_font)
-	hdr.add_theme_font_size_override("font_size", 11)
+	hdr.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	hdr.add_theme_color_override("font_color", SacredPalette.BRASS_400)
 	hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	area.add_child(hdr)
@@ -404,7 +404,7 @@ func _build_choice_card(row: HBoxContainer, ch: Dictionary) -> void:
 	verb_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	verb_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_child(verb_lbl)
-	LabelUtils.fit_text(verb_lbl, 20, 13)
+	LabelUtils.fit_text(verb_lbl, 20, SacredTheme.FS_SMALL)
 
 	var tags: Array = ch["tags"]
 	if not tags.is_empty():
@@ -417,7 +417,7 @@ func _build_choice_card(row: HBoxContainer, ch: Dictionary) -> void:
 			t.text = tag["text"]
 			if mono_font:
 				t.add_theme_font_override("font", mono_font)
-			t.add_theme_font_size_override("font_size", 10)
+			t.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 			t.add_theme_color_override("font_color", tag["color"] as Color)
 			var ts := StyleBoxFlat.new()
 			ts.bg_color = Color(0.027, 0.020, 0.012, 0.70)

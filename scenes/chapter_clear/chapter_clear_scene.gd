@@ -100,7 +100,7 @@ func _build_ui() -> void:
 	chapter_name_lbl.size = Vector2(PANEL_W - 40, 24)
 	chapter_name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(chapter_name_lbl)
-	LabelUtils.fit_text(chapter_name_lbl, 10, 8)
+	LabelUtils.fit_text(chapter_name_lbl, SacredTheme.FS_SMALL, SacredTheme.FS_SMALL)
 
 	var inner_line := ColorRect.new()
 	inner_line.color = Color(P.BRASS_700.r, P.BRASS_700.g, P.BRASS_700.b, 0.5)
@@ -154,7 +154,7 @@ func _build_ui() -> void:
 		btn_next.add_theme_font_size_override("font_size", 18)
 		btn_next.pressed.connect(_on_next_chapter)
 		add_child(btn_next)
-		LabelUtils.fit_text(btn_next, 18, 12)
+		LabelUtils.fit_text(btn_next, 18, SacredTheme.FS_SMALL)
 		SacredTheme.animate_button(btn_next)
 
 		var btn_menu := Button.new()
@@ -162,10 +162,10 @@ func _build_ui() -> void:
 		btn_menu.text = tr("ui.chapter_clear.btn_main_menu")
 		btn_menu.position = Vector2(1000, btn_y)
 		btn_menu.size = Vector2(180, 52)
-		btn_menu.add_theme_font_size_override("font_size", 14)
+		btn_menu.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		btn_menu.pressed.connect(_on_main_menu)
 		add_child(btn_menu)
-		LabelUtils.fit_text(btn_menu, 14, 11)
+		LabelUtils.fit_text(btn_menu, SacredTheme.FS_TEXT, SacredTheme.FS_SMALL)
 		SacredTheme.animate_button(btn_menu)
 	else:
 		var btn_menu := Button.new()

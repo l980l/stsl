@@ -327,7 +327,7 @@ func _build_ui() -> void:
 	gold_lbl.position = Vector2(30, 22)
 	gold_lbl.size     = Vector2(200, 32)
 	add_child(gold_lbl)
-	LabelUtils.fit_text(gold_lbl, 21, 13)
+	LabelUtils.fit_text(gold_lbl, 21, SacredTheme.FS_SMALL)
 
 	# 릴릭 표시
 	_relic_container = FlowContainer.new()
@@ -404,7 +404,7 @@ func _build_party_panel() -> void:
 	hdr.text = "— PARTY —"
 	if mono_font:
 		hdr.add_theme_font_override("font", mono_font)
-	hdr.add_theme_font_size_override("font_size", 11)
+	hdr.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	hdr.add_theme_color_override("font_color", SacredPalette.BRASS_300)
 	hdr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hdr.position = Vector2(1610, 492)
@@ -431,7 +431,7 @@ func _build_party_panel() -> void:
 
 		var name_lbl := Label.new()
 		name_lbl.text = tr(hero.hero_name)
-		name_lbl.add_theme_font_size_override("font_size", 14)
+		name_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		name_lbl.add_theme_color_override("font_color", SacredPalette.BRASS_300)
 		hero_col.add_child(name_lbl)
 
@@ -440,7 +440,7 @@ func _build_party_panel() -> void:
 
 		var hp_lbl := Label.new()
 		hp_lbl.text = "%d / %d" % [cur_hp, hero.max_hp]
-		hp_lbl.add_theme_font_size_override("font_size", 12)
+		hp_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 		var hp_color: Color
 		if ratio <= 0.15:
 			hp_color = SacredPalette.BLOOD_300
@@ -534,8 +534,8 @@ func _create_node_button(node: Resource) -> void:
 		btn.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
 	else:
 		btn.text = _room_type_text(node.room_type)
-		btn.add_theme_font_size_override("font_size", 13)
-		LabelUtils.fit_text(btn, 13, 10)
+		btn.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
+		LabelUtils.fit_text(btn, SacredTheme.FS_TEXT, SacredTheme.FS_SMALL)
 	match node.room_type:
 		MapNodeRes.RoomType.ELITE:
 			btn.theme_type_variation = "EliteRoomButton"
@@ -644,7 +644,7 @@ func _refresh_relics() -> void:
 			var lbl := Label.new()
 			lbl.text = "[%s]" % tr(s["name_key"])
 			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-			lbl.add_theme_font_size_override("font_size", 13)
+			lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 			lbl.modulate = SacredPalette.AMETHYST_300
 			_relic_container.add_child(lbl)
 			SacredTheme.attach_tooltip(lbl, tip)
@@ -669,7 +669,7 @@ func _refresh_relics() -> void:
 			var lbl := Label.new()
 			lbl.text = "[%s]" % tr(relic.relic_name)
 			lbl.mouse_filter = Control.MOUSE_FILTER_STOP
-			lbl.add_theme_font_size_override("font_size", 14)
+			lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 			lbl.modulate = SacredPalette.BRASS_300
 			_relic_container.add_child(lbl)
 			SacredTheme.attach_tooltip(lbl, tip)
@@ -954,7 +954,7 @@ func _show_confirm_popup() -> void:
 	btn_ok.theme_type_variation = "VowButton"
 	if mono_font:
 		btn_ok.add_theme_font_override("font", mono_font)
-	btn_ok.add_theme_font_size_override("font_size", 13)
+	btn_ok.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	btn_ok.position = Vector2(bx, BTN_Y)
 	btn_ok.size = Vector2(BTN_W, BTN_H)
 	btn_ok.pressed.connect(_on_confirm_back)
@@ -966,7 +966,7 @@ func _show_confirm_popup() -> void:
 	btn_cancel.theme_type_variation = "PrimaryButton"
 	if mono_font:
 		btn_cancel.add_theme_font_override("font", mono_font)
-	btn_cancel.add_theme_font_size_override("font_size", 13)
+	btn_cancel.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	btn_cancel.position = Vector2(bx + BTN_W + GAP, BTN_Y)
 	btn_cancel.size = Vector2(BTN_W, BTN_H)
 	btn_cancel.pressed.connect(_close_confirm_popup)

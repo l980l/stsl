@@ -138,7 +138,7 @@ func _build_ui() -> void:
 	gold_lbl.position = Vector2(30, 22)
 	gold_lbl.size     = Vector2(200, 32)
 	add_child(gold_lbl)
-	LabelUtils.fit_text(gold_lbl, 21, 13)
+	LabelUtils.fit_text(gold_lbl, 21, SacredTheme.FS_SMALL)
 
 	var title_div := TextureRect.new()
 	title_div.texture = SacredTheme.make_center_bright_h_tex()
@@ -161,7 +161,7 @@ func _build_ui() -> void:
 	exit_btn.pressed.connect(_on_exit)
 	add_child(exit_btn)
 	exit_btn.size = Vector2(200, 50)
-	LabelUtils.fit_text(exit_btn, 20, 12)
+	LabelUtils.fit_text(exit_btn, 20, SacredTheme.FS_SMALL)
 	SacredTheme.animate_button(exit_btn)
 
 # ── 카드 섹션 ─────────────────────────────────────────────
@@ -217,7 +217,7 @@ func _build_card_section() -> void:
 		btn.text     = tr("ui.shop.btn_buy_simple")
 		btn.position = Vector2(cx, 408)
 		btn.size     = Vector2(CARD_W, 36)
-		btn.add_theme_font_size_override("font_size", 13)
+		btn.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		var captured_card := card
 		var captured_btn  := btn
 		btn.pressed.connect(func(): _on_buy_card(captured_card, captured_btn, price))
@@ -337,7 +337,7 @@ func _build_relic_section() -> void:
 		name_lbl.position = Vector2(100, 12)
 		name_lbl.size     = Vector2(288, 30)
 		panel.add_child(name_lbl)
-		LabelUtils.fit_text(name_lbl, 22, 13)
+		LabelUtils.fit_text(name_lbl, 22, SacredTheme.FS_SMALL)
 
 		# 영웅 전용 태그
 		if relic.owner_hero_id != "":
@@ -345,7 +345,7 @@ func _build_relic_section() -> void:
 			bound_lbl.theme_type_variation = "EyebrowLabel"
 			bound_lbl.text    = "— " + relic.owner_hero_id.to_upper() + " ONLY —"
 			bound_lbl.modulate = Color(hero_col.r, hero_col.g, hero_col.b, 0.85)
-			bound_lbl.add_theme_font_size_override("font_size", 11)
+			bound_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 			bound_lbl.position = Vector2(100, 44)
 			bound_lbl.size     = Vector2(288, 18)
 			panel.add_child(bound_lbl)
@@ -363,10 +363,10 @@ func _build_relic_section() -> void:
 		desc_lbl.theme_type_variation = "SubLabel"
 		desc_lbl.text                 = relic.format_description(tr(relic.display_description_key()))
 		desc_lbl.autowrap_mode        = TextServer.AUTOWRAP_WORD_SMART
-		desc_lbl.add_theme_font_size_override("font_size", 14)
+		desc_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		desc_box.add_child(desc_lbl)
 		desc_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		LabelUtils.fit_text(desc_lbl, 14, 9, -1.0, 70.0)
+		LabelUtils.fit_text(desc_lbl, SacredTheme.FS_TEXT, SacredTheme.FS_SMALL, -1.0, 70.0)
 
 		# 가격
 		var price_lbl := Label.new()
@@ -382,7 +382,7 @@ func _build_relic_section() -> void:
 		btn.text     = tr("ui.shop.btn_buy_simple")
 		btn.position = Vector2(260, 140)
 		btn.size     = Vector2(124, 38)
-		btn.add_theme_font_size_override("font_size", 14)
+		btn.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		var captured_relic := relic
 		var captured_btn   := btn
 		btn.pressed.connect(func(): _on_buy_relic(captured_relic, captured_btn, relic_price))
@@ -482,11 +482,11 @@ func _build_service_section() -> void:
 		var name_lbl := Label.new()
 		name_lbl.theme_type_variation = "AccentLabel"
 		name_lbl.text = svc["name"]
-		name_lbl.add_theme_font_size_override("font_size", 15)
+		name_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		name_lbl.position = Vector2(68, 14)
 		name_lbl.size     = Vector2(184, 26)
 		panel.add_child(name_lbl)
-		LabelUtils.fit_text(name_lbl, 15, 11)
+		LabelUtils.fit_text(name_lbl, SacredTheme.FS_TEXT, SacredTheme.FS_SMALL)
 
 		# 설명
 		var desc_box := Control.new()
@@ -501,10 +501,10 @@ func _build_service_section() -> void:
 		desc_lbl.theme_type_variation = "SubLabel"
 		desc_lbl.text                 = svc["desc"]
 		desc_lbl.autowrap_mode        = TextServer.AUTOWRAP_WORD_SMART
-		desc_lbl.add_theme_font_size_override("font_size", 13)
+		desc_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		desc_box.add_child(desc_lbl)
 		desc_lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		LabelUtils.fit_text(desc_lbl, 13, 9, -1.0, 54.0)
+		LabelUtils.fit_text(desc_lbl, SacredTheme.FS_TEXT, SacredTheme.FS_SMALL, -1.0, 54.0)
 
 		# 가격
 		var price_lbl := Label.new()
@@ -521,7 +521,7 @@ func _build_service_section() -> void:
 		btn.text     = tr("ui.shop.btn_buy_simple")
 		btn.position = Vector2(260, 60)
 		btn.size     = Vector2(108, 35)
-		btn.add_theme_font_size_override("font_size", 14)
+		btn.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
 		var captured_cb: Callable = svc["callback"]
 		btn.pressed.connect(captured_cb)
 		panel.add_child(btn)

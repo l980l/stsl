@@ -35,6 +35,7 @@ func _build_ui(upgradeable: Array) -> void:
 	add_child(bg)
 
 	var title := Label.new()
+	title.theme_type_variation = "TitleLabel"  # 상점·카드 선택과 같은 제목 서체
 	title.text = tr("ui.card_upgrade.title")
 	title.position = Vector2(560, 30)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -62,15 +63,27 @@ func _build_ui(upgradeable: Array) -> void:
 		node.setup(card, node.Mode.UPGRADE)
 		node.card_clicked.connect(func(c): _on_card_selected(c))
 		grid.add_child(node)
+	# 카드 노드의 실제 레이아웃 크기는 CARD_W 가정보다 넓다(모던 프레임 196px).
+	# 가정값으로 만든 940px 영역은 오른쪽 열을 잘라 가로 스크롤을 만들므로,
+	# 그리드가 실제로 필요한 너비에 맞춰 영역을 넓히고 다시 가운데 정렬한다.
+	_fit_scroll_to_grid.call_deferred(scroll, grid)
 
 	var skip_btn := Button.new()
+	skip_btn.theme_type_variation = "VowButton"  # 상점 나가기·카드 선택 건너뛰기와 같은 버튼
 	skip_btn.position = Vector2(880, 1000)
 	skip_btn.text = tr("ui.card_upgrade.btn_skip")
 	skip_btn.add_theme_font_size_override("font_size", 18)
 	skip_btn.pressed.connect(GameManager.complete_card_upgrade)
 	add_child(skip_btn)
 	skip_btn.size = Vector2(160, 50)
-	LabelUtils.fit_text(skip_btn, 18, 12)
+	LabelUtils.fit_text(skip_btn, 18, SacredTheme.FS_SMALL)
+
+func _fit_scroll_to_grid(scroll: ScrollContainer, grid: GridContainer) -> void:
+	var need_w: float = minf(grid.get_combined_minimum_size().x, 1920.0 - 80.0)
+	if need_w <= scroll.size.x:
+		return
+	scroll.size.x = need_w
+	scroll.position.x = (1920.0 - need_w) / 2.0
 
 func _on_card_selected(card: Resource) -> void:
 	GameManager.upgrade_card(card)

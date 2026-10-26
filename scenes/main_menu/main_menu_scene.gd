@@ -145,7 +145,7 @@ func _stamp(parent: Control, text: String, pos: Vector2, halign: int, dot: bool)
 func _make_stamp_label(text: String, color: Color) -> Label:
 	var lbl := Label.new()
 	lbl.add_theme_font_override("font", MONO_FONT)
-	lbl.add_theme_font_size_override("font_size", 13)
+	lbl.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
 	lbl.add_theme_color_override("font_color", color)
 	lbl.add_theme_constant_override("line_spacing", 0)
 	lbl.text = text
