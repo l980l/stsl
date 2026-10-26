@@ -56,6 +56,8 @@ ui.reward.btn_skip,지나친다 — 받지 않음,Skip — Take none,Passer — 
 ui.reward.progress,— %d / %d 선택됨 —,— %d / %d CHOSEN —,— %d / %d CHOISI —,— %d / %d SCELTO —,— %d / %d ELEGIDO —,— %d / %d 選択済み —,— %d / %d ΕΠΙΛΕΓΜΈΝΟ —,— %d / %d 已选择 —,— %d / %d 已选择 —,— %d / %d ВЫБРАНО —,— %d / %d ESCOLHIDO —,— %d / %d WYBRANO —,— %d / %d GEWÄHLT —
 ui.card_upgrade.title,카드 강화,Card Upgrade,Amélioration,Potenziamento,Mejora de carta,カード強化,Αναβάθμιση Κάρτας,强化卡牌,强化卡牌,Улучшение карты,Melhoria de Carta,Ulepszenie Karty,Kartenverbesserung
 ui.card_upgrade.btn_skip,건너뛰기,Skip,Passer,Salta,Omitir,スキップ,Παράλειψη,跳过,跳过,Пропустить,Pular,Pomiń,Überspringen
+ui.card_upgrade.eyebrow,단련,Tempering,Trempe,Tempra,Temple,鍛錬,Σφυρηλάτηση,锻造,鍛造,Закалка,Têmpera,Hartowanie,Härtung
+ui.card_upgrade.subtitle,덱의 카드 한 장을 골라 더 날카롭게 벼려라.,Choose one card from your deck to hone.,Choisissez une carte de votre deck à affûter.,Scegli una carta del tuo mazzo da affinare.,Elige una carta de tu mazo para afilar.,デッキからカードを1枚選んで鍛えよ。,Επέλεξε μια κάρτα της τράπουλας για ακόνισμα.,从牌组中选一张卡牌加以锤炼。,從牌組中選一張卡牌加以鍛鍊。,Выбери карту из колоды для улучшения.,Escolha uma carta do baralho para aprimorar.,Wybierz kartę z talii do ulepszenia.,Wähle eine Karte aus deinem Deck zum Schärfen.
 ui.game_over.victory,승리!,Victory!,Victoire !,Vittoria!,¡Victoria!,勝利！,Νίκη!,胜利！,胜利！,Победа!,Vitória!,Zwycięstwo!,Sieg!
 ui.game_over.defeat,패배...,Defeat...,Défaite...,Sconfitta...,Derrota...,敗北...,Ήττα...,失败...,失败...,Поражение...,Derrota...,Porażka...,Niederlage...
 ui.game_over.btn_main_menu,메인 메뉴,Main Menu,Menu Principal,Menu Principale,Menú Principal,メインメニュー,Κύριο Μενού,主菜单,主菜单,Главное меню,Menu Principal,Menu Główne,Hauptmenü

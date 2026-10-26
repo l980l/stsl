@@ -28,26 +28,28 @@ func _get_upgradeable_cards() -> Array:
 	return result
 
 func _build_ui(upgradeable: Array) -> void:
+	# 카드 선택·상점과 같은 바탕: 잉크 배경 + 위쪽 빛 번짐 + 사선 무늬
 	var bg := ColorRect.new()
-	bg.color = Color(0.05, 0.05, 0.1)
-	bg.position = Vector2.ZERO
+	bg.color = SacredPalette.INK_1000
 	bg.size = Vector2(1920, 1080)
 	add_child(bg)
 
-	var title := Label.new()
-	title.theme_type_variation = "TitleLabel"  # 상점·카드 선택과 같은 제목 서체
-	title.text = tr("ui.card_upgrade.title")
-	title.position = Vector2(560, 30)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 32)
-	add_child(title)
-	title.size = Vector2(800, 60)
-	LabelUtils.fit_text(title, 32, 18)
+	var bloom := SacredTheme.make_top_ellipse_bloom(0.0)
+	bloom.size = Vector2(1920.0, 560.0)
+	add_child(bloom)
+
+	var crosshatch := SacredTheme.make_crosshatch_overlay()
+	crosshatch.size = Vector2(1920, 1080)
+	add_child(crosshatch)
+
+	_build_header(960.0)
 
 	var scroll_w: int = COLS * (CARD_W + 20) - 20  # 940
 	var scroll := ScrollContainer.new()
-	scroll.position = Vector2((1920 - scroll_w) / 2.0, 110)
-	scroll.size = Vector2(scroll_w, 870)
+	scroll.position = Vector2((1920 - scroll_w) / 2.0, 240)
+	scroll.size = Vector2(scroll_w, 680)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	SacredTheme.style_sacred_scrollbar(scroll)
 	add_child(scroll)
 
 	var grid := GridContainer.new()
@@ -68,22 +70,87 @@ func _build_ui(upgradeable: Array) -> void:
 	# 그리드가 실제로 필요한 너비에 맞춰 영역을 넓히고 다시 가운데 정렬한다.
 	_fit_scroll_to_grid.call_deferred(scroll, grid)
 
+	# 카드 선택 화면의 "지나친다" 버튼과 같은 모양·위치
 	var skip_btn := Button.new()
-	skip_btn.theme_type_variation = "VowButton"  # 상점 나가기·카드 선택 건너뛰기와 같은 버튼
-	skip_btn.position = Vector2(880, 1000)
-	skip_btn.text = tr("ui.card_upgrade.btn_skip")
-	skip_btn.add_theme_font_size_override("font_size", 18)
+	skip_btn.theme_type_variation = "VowButton"
+	skip_btn.text = tr("ui.card_upgrade.btn_skip").to_upper()
+	skip_btn.add_theme_font_override("font", load("res://assets/fonts/SpaceMono-Regular.ttf") as Font)
+	skip_btn.add_theme_font_size_override("font_size", SacredTheme.FS_SMALL)
+	skip_btn.position = Vector2(960.0 - 140.0, 940.0)
+	skip_btn.size = Vector2(280.0, 40.0)
 	skip_btn.pressed.connect(GameManager.complete_card_upgrade)
+	SacredTheme.animate_button(skip_btn)
 	add_child(skip_btn)
-	skip_btn.size = Vector2(160, 50)
-	LabelUtils.fit_text(skip_btn, 18, SacredTheme.FS_SMALL)
+
+# 카드 선택 화면과 같은 머리말: 작은 표제 · 제목 · 부제 · ✦ 가로줄
+func _build_header(cx: float) -> void:
+	var P := SacredPalette
+	var sx: float = 320.0
+	var sw: float = 1280.0
+
+	var eyebrow := Label.new()
+	eyebrow.text = tr("ui.card_upgrade.eyebrow")
+	eyebrow.theme_type_variation = "EyebrowLabel"
+	eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	eyebrow.position = Vector2(sx, 62.0)
+	eyebrow.size = Vector2(sw, 18.0)
+	add_child(eyebrow)
+
+	var title := Label.new()
+	title.text = tr("ui.card_upgrade.title")
+	title.theme_type_variation = "TitleLabel"
+	title.add_theme_font_size_override("font_size", 52)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.position = Vector2(sx, 86.0)
+	title.size = Vector2(sw, 68.0)
+	add_child(title)
+	LabelUtils.fit_text(title, 52, 28)
+
+	var sub := Label.new()
+	sub.text = tr("ui.card_upgrade.subtitle")
+	sub.theme_type_variation = "SubLabel"
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub.position = Vector2(sx, 162.0)
+	sub.size = Vector2(sw, 26.0)
+	add_child(sub)
+	LabelUtils.fit_text(sub, SacredTheme.FS_TEXT, SacredTheme.FS_SMALL)
+
+	var rule_w: float = 280.0
+	var rule_y: float = 200.0
+	var rule := TextureRect.new()
+	rule.texture = SacredTheme.make_center_bright_h_tex(P.BRASS_400, 0.9)
+	rule.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rule.stretch_mode = TextureRect.STRETCH_SCALE
+	rule.position = Vector2(cx - rule_w * 0.5, rule_y)
+	rule.size = Vector2(rule_w, 1.0)
+	add_child(rule)
+
+	var orn_w: float = 32.0
+	var orn_h: float = 20.0
+	var orn_bg := ColorRect.new()
+	orn_bg.color = P.INK_1000
+	orn_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	orn_bg.position = Vector2(cx - orn_w * 0.5, rule_y - orn_h * 0.5)
+	orn_bg.size = Vector2(orn_w, orn_h)
+	add_child(orn_bg)
+
+	var orn := Label.new()
+	orn.text = "✦"
+	orn.theme_type_variation = "AccentLabel"
+	orn.add_theme_color_override("font_color", P.BRASS_300)
+	orn.add_theme_font_size_override("font_size", 14)  # 장식 글리프 — 글자 크기 하한 예외
+	orn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	orn.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	orn.position = Vector2(cx - orn_w * 0.5, rule_y - orn_h * 0.5)
+	orn.size = Vector2(orn_w, orn_h)
+	orn.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(orn)
 
 func _fit_scroll_to_grid(scroll: ScrollContainer, grid: GridContainer) -> void:
+	# 가로 스크롤을 끄면 ScrollContainer가 스스로 그리드 폭만큼 커지므로 위치는 항상 다시 맞춘다.
 	var need_w: float = minf(grid.get_combined_minimum_size().x, 1920.0 - 80.0)
-	if need_w <= scroll.size.x:
-		return
-	scroll.size.x = need_w
-	scroll.position.x = (1920.0 - need_w) / 2.0
+	scroll.size.x = maxf(scroll.size.x, need_w)
+	scroll.position.x = (1920.0 - scroll.size.x) / 2.0
 
 func _on_card_selected(card: Resource) -> void:
 	GameManager.upgrade_card(card)
