@@ -69,11 +69,40 @@ func _overlays(out: String, id: String) -> void:
 			await _settle(30)
 			await _shot(out, "settings")
 			settings.queue_free()
+		"rest":
+			current_scene._show_upgrade_panel()
+			await _settle(60)
+			await _shot(out, "rest_upgrade")
+			current_scene._hide_upgrade_panel()
+		"card_upgrade":
+			await _upgrade_hover(out, "card_upgrade_hover")
+
+# 첫 카드에 마우스를 올린 상태(빛 효과 + 강화 전후 미리보기)를 찍는다.
+func _upgrade_hover(out: String, id: String) -> void:
+	var grid: Node = current_scene.find_children("*", "GridContainer", true, false)[0]
+	var node: Control = grid.get_child(0)
+	node.card_hovered.emit(node._card_res)
+	await _settle(30)
+	await _shot(out, id)
 
 func _battle_extras(out: String) -> void:
 	var bm := root.get_node("BattleManager")
 	var scene: Node = current_scene
 	var hid: String = bm.get_current_hero_id()
+	# 행동 순서 칩: 마우스를 올렸을 때의 이름 툴팁, 일러스트가 없을 때의 이니셜 대체 표시.
+	var sacred: Node = root.get_node("SacredTheme")
+	sacred._on_tip_enter(scene._turn_queue_slots[1]["root"])
+	await _settle(20)
+	await _shot(out, "battle_queue_tooltip")
+	sacred._on_tip_exit()
+	var cached: Dictionary = scene._turn_queue_faces.duplicate()
+	for path in scene._turn_queue_faces.keys():
+		scene._turn_queue_faces[path] = null
+	scene._refresh_turn_queue_widget()
+	await _settle(5)
+	await _shot(out, "battle_queue_initials")
+	scene._turn_queue_faces = cached
+	scene._refresh_turn_queue_widget()
 	# Status badges, block and enemy debuffs as they would appear mid-fight.
 	for s in [["strength", 2], ["weak", 1]]:
 		bm._apply_status_to_hero(hid, s[0], s[1])
@@ -95,6 +124,12 @@ func _shot(out: String, id: String) -> void:
 		return
 	await RenderingServer.frame_post_draw
 	var image := root.get_texture().get_image()
+	if id.begins_with("battle_queue_"):
+		# 왼쪽 위 행동 순서 칩 주변만 2배로 저장한다.
+		var crop := image.get_region(Rect2i(0, 0, 480, 160))
+		crop.resize(960, 320, Image.INTERPOLATE_NEAREST)
+		crop.save_png(out.path_join(id + ".png"))
+		return
 	image.save_png(out.path_join(id + ".png"))
 	if id == "battle":
 		# Turn-queue chips (top-left) at 2× for close inspection.

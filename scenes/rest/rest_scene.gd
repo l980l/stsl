@@ -1,7 +1,10 @@
 # scenes/rest/rest_scene.gd
 extends Node2D
 
-const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const CARD_SCENE := preload("res://scenes/card/card_scene_v2.tscn")
+# 강화 목록 카드: 기본 배율·자리. 마우스를 올리면 1.5배로 키운다.
+const UPGRADE_CARD_SCALE := 0.975
+const UPGRADE_CARD_POS   := Vector2(-1.75, -5.0)
 
 const ROMAN      := ["I", "II", "III"]
 const FRAME_L    := 80.0
@@ -632,13 +635,11 @@ func _show_upgrade_panel() -> void:
 		wrapper.custom_minimum_size = Vector2(137.0, 195.0)
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
 		grid.add_child(wrapper)
-		var card_node: CardScene = CARD_SCENE.instantiate()
-		card_node.position     = Vector2(-1.75, -5.0)
-		card_node.pivot_offset = Vector2(70.0, 200.0)
-		card_node.scale        = Vector2(0.975, 0.975)
-		card_node.setup(card, CardScene.Mode.REWARD)
+		var card_node: Control = CARD_SCENE.instantiate()
+		GameSettings.apply_card_transform(card_node, UPGRADE_CARD_POS, Vector2(70.0, 200.0), UPGRADE_CARD_SCALE)
+		card_node.setup(card, card_node.Mode.REWARD)
 		wrapper.add_child(card_node)
-		var captured_node: CardScene = card_node
+		var captured_node: Control = card_node
 		card_node.card_hovered.connect(func(_c): _show_upgrade_card_hover(captured_node))
 		card_node.card_unhovered.connect(func(_c): _clear_upgrade_card_hover(captured_node))
 		card_node.gui_input.connect(func(ev: InputEvent):
@@ -693,7 +694,7 @@ func _hide_upgrade_panel() -> void:
 	else:
 		if is_instance_valid(layer): layer.queue_free()
 
-func _show_upgrade_card_hover(node: CardScene) -> void:
+func _show_upgrade_card_hover(node: Control) -> void:
 	if node in _upgrade_card_tweens:
 		_upgrade_card_tweens[node].kill()
 	if _upgrade_overlay and node.get_parent() != _upgrade_overlay:
@@ -701,14 +702,14 @@ func _show_upgrade_card_hover(node: CardScene) -> void:
 		node.reparent(_upgrade_overlay, true)
 	node.z_index = 50
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(1.5, 1.5), 0.22)
+	tw.tween_property(node, "scale", GameSettings.get_card_scale(1.5), 0.22)
 	_upgrade_card_tweens[node] = tw
 
-func _clear_upgrade_card_hover(node: CardScene) -> void:
+func _clear_upgrade_card_hover(node: Control) -> void:
 	if node in _upgrade_card_tweens:
 		_upgrade_card_tweens[node].kill()
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(node, "scale", Vector2(0.975, 0.975), 0.16)
+	tw.tween_property(node, "scale", GameSettings.get_card_scale(UPGRADE_CARD_SCALE), 0.16)
 	tw.tween_callback(func():
 		if not is_instance_valid(node):
 			return
@@ -718,14 +719,13 @@ func _clear_upgrade_card_hover(node: CardScene) -> void:
 			_upgrade_card_parents.erase(node)
 			if is_instance_valid(orig):
 				node.reparent(orig, false)
-				node.position = Vector2(-1.75, -5.0)
-				node.scale    = Vector2(0.975, 0.975)
+				GameSettings.apply_card_transform(node, UPGRADE_CARD_POS, Vector2(70.0, 200.0), UPGRADE_CARD_SCALE)
 	)
 	_upgrade_card_tweens[node] = tw
 
-func _on_select_upgrade_card(card: Resource, node: CardScene) -> void:
+func _on_select_upgrade_card(card: Resource, node: Control) -> void:
 	if is_instance_valid(_selected_upgrade_node):
-		(_selected_upgrade_node as CardScene).tween_glow(0.0, 0.12)
+		_selected_upgrade_node.tween_glow(0.0, 0.12)
 	_selected_upgrade_card = card
 	_selected_upgrade_node = node
 	node.tween_glow(1.0, 0.15)

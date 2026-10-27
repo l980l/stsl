@@ -1,10 +1,9 @@
 # scenes/card_pick/card_pick_scene.gd
 extends Node2D
 
-const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
-const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
+const CARD_SCENE := preload("res://scenes/card/card_scene_v2.tscn")
 func _make_card() -> Control:
-	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
+	return CARD_SCENE.instantiate()
 
 var _picked_count: int = 0
 var _pick_max: int = 1
@@ -311,7 +310,7 @@ func _build_card_grid(cx: float) -> void:
 
 		var card_node: Control = _make_card()
 		GameSettings.apply_card_transform(card_node, Vector2(70.0 * (card_scale - 1.0), 200.0 * (card_scale - 1.0)), Vector2(70.0, 200.0), card_scale)
-		card_node.setup(card, CardScene.Mode.REWARD)
+		card_node.setup(card, card_node.Mode.REWARD)
 		wrapper.add_child(card_node)
 
 		var cta := Button.new()

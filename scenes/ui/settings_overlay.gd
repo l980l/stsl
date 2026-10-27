@@ -219,7 +219,6 @@ func open() -> void:
 		"hero_zoom":        "on" if GameSettings.hero_zoom_enabled else "off",
 		"cam_zoom_speed":   GameSettings.cam_zoom_speed_key,
 		"kill_cam":         "on" if GameSettings.kill_cam_enabled else "off",
-		"card_frame":       GameSettings.card_frame_key,
 		"msaa":             GameSettings.msaa_key,
 		"window_size":      GameSettings.window_size_key,
 		"language":         LocaleManager.current_locale,
@@ -298,7 +297,6 @@ func _on_defaults() -> void:
 		"hero_zoom":        "on" if GameSettings.HERO_ZOOM_DEFAULT else "off",
 		"cam_zoom_speed":   GameSettings.CAM_ZOOM_SPEED_DEFAULT,
 		"kill_cam":         "on" if GameSettings.KILL_CAM_DEFAULT else "off",
-		"card_frame":       GameSettings.CARD_FRAME_DEFAULT,
 		"msaa":             GameSettings.MSAA_DEFAULT,
 		"window_size":      GameSettings.WINDOW_SIZE_DEFAULT,
 		"language":         LocaleManager.LOCALES[_initial_locale_idx],
@@ -443,15 +441,8 @@ func _build_graphics_panel() -> void:
 		GameSettings.particle_key,
 		func(k: String) -> void: GameSettings.set_particle_quality(k))
 
-	# Row 4: 카드 프레임 (classic / modern) — 전투/상점 포함 라이브 swap
-	_build_seg_row(p, mono, 192.0, tr("ui.settings.card_frame"), "card_frame",
-		GameSettings.CARD_FRAME_KEYS,
-		{"classic": tr("ui.settings.card_frame.classic"), "modern": tr("ui.settings.card_frame.modern")},
-		GameSettings.card_frame_key,
-		func(k: String) -> void: GameSettings.set_card_frame(k))
-
-	# Row 5: 커서 크기 (cursor segment)
-	_build_cursor_seg_row(p, mono, 248.0)
+	# Row 4: 커서 크기 (cursor segment)
+	_build_cursor_seg_row(p, mono, 192.0)
 
 func _build_gameplay_panel() -> void:
 	var p := _tab_panels["gameplay"] as Control

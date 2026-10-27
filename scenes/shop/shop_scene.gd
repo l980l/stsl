@@ -1,12 +1,11 @@
 # scenes/shop/shop_scene.gd
 extends Node2D
 
-const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
-const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
+const CARD_SCENE := preload("res://scenes/card/card_scene_v2.tscn")
 const CARD_REMOVAL_OVERLAY := preload("res://scenes/components/card_removal_overlay.gd")
 
 func _make_card() -> Control:
-	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
+	return CARD_SCENE.instantiate()
 const CARD_W  := 140
 const CARD_H  := 200
 const CARD_GAP := 20
@@ -41,11 +40,10 @@ func _ready() -> void:
 	_inventory = GameManager.generate_shop_inventory()
 	_build_ui()
 	AudioManager.play_bgm_dynamic("shop", "")
-	# 언어/카드 프레임 변경 시 진열 라벨·카드 노드만 다시 그림 (_inventory 는 유지 → 진열 reroll 방지)
-	LocaleManager.locale_changed.connect(_on_locale_or_frame_changed)
-	GameSettings.card_frame_changed.connect(_on_locale_or_frame_changed)
+	# 언어 변경 시 진열 라벨·카드 노드만 다시 그림 (_inventory 는 유지 → 진열 reroll 방지)
+	LocaleManager.locale_changed.connect(_on_locale_changed)
 
-func _on_locale_or_frame_changed(_v) -> void:
+func _on_locale_changed(_v) -> void:
 	_rebuild_ui()
 
 func _rebuild_ui() -> void:
@@ -197,7 +195,7 @@ func _build_card_section() -> void:
 
 		var node: Control = _make_card()
 		GameSettings.apply_card_transform(node, Vector2(cx, 174), Vector2(CARD_W / 2.0, CARD_H), 1.0)
-		node.setup(card, CardScene.Mode.REWARD)
+		node.setup(card, node.Mode.REWARD)
 		add_child(node)
 
 		var captured_node: Control = node
@@ -744,7 +742,7 @@ func _show_upgrade_panel(price: int) -> void:
 
 		var card_node: Control = _make_card()
 		GameSettings.apply_card_transform(card_node, Vector2(-1.75, -5.0), Vector2(70.0, 200.0), 0.975)
-		card_node.setup(card, CardScene.Mode.REWARD)
+		card_node.setup(card, card_node.Mode.REWARD)
 		wrapper.add_child(card_node)
 
 		var captured_node: Control = card_node

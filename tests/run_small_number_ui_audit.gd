@@ -4,7 +4,6 @@ extends SceneTree
 # from a string match. All artifacts stay inside the isolated test user://.
 const Catalog = preload("res://resources/card_catalog.gd")
 const GM = preload("res://autoload/game_manager.gd")
-const Classic = preload("res://scenes/card/card_scene.gd")
 const Modern = preload("res://scenes/card/card_scene_v2.gd")
 const Relics = preload("res://resources/relics/relics.gd")
 const Effect = preload("res://resources/effect_resource.gd")
@@ -54,7 +53,6 @@ func _flatten_intents(enemy: Resource) -> Array:
 func _run() -> void:
 	AudioServer.set_bus_mute(0, true)
 	var gm := GM.new()
-	var classic := Classic.new()
 	var modern := Modern.new()
 	var battle = load("res://scenes/battle/battle_scene.gd").new()
 	var tutorial = load("res://scenes/tutorial/tutorial_driver.gd").new()
@@ -82,19 +80,14 @@ func _run() -> void:
 		_check(lesson_text.contains("1") and lesson_text.contains("2") and not lesson_text.contains("10") and not lesson_text.contains("20"), locale + "/tutorial-actual-poison", lesson_text)
 		for card in all_cards:
 			var label: String = "%s/%s/+%d" % [locale, card.card_name, card.upgrade_level]
-			classic._card = card
 			modern._card_res = card
-			classic._mode = Classic.Mode.REWARD
 			modern._mode = Modern.Mode.REWARD
-			var old_text: String = classic._build_desc()
-			var new_text: String = modern._build_desc()
-			_text_ok(old_text, label + "/classic")
-			_text_ok(new_text, label + "/modern")
-			_check(old_text == new_text, label + "/frame-parity")
+			var text: String = modern._build_desc()
+			_text_ok(text, label)
 			for effect in card.effects:
 				if effect.effect_type in [Effect.EffectType.DAMAGE, Effect.EffectType.BLOCK, Effect.EffectType.HEAL, Effect.EffectType.HEAL_ALL, Effect.EffectType.CHARM, Effect.EffectType.SACRIFICE_HP] and effect.rule_id == "" and effect.value > 0:
 					_check(effect.display_text().contains(str(effect.value)), label + "/effect-value", effect.display_text())
-			rows.append({"locale": locale, "card": card.card_name, "grade": card.upgrade_level, "text": old_text})
+			rows.append({"locale": locale, "card": card.card_name, "grade": card.upgrade_level, "text": text})
 		for relic in relics:
 			_text_ok(relic.format_description(tr(relic.display_description_key())), locale + "/" + relic.relic_name)
 		for myth in ["greek", "norse", "egyptian", "buddhist", "daoist", "japanese"]:
@@ -128,18 +121,15 @@ func _run() -> void:
 	if DisplayServer.get_name() != "headless":
 		await _capture_samples(all_cards, battle)
 	var sources: Dictionary = {}
-	for path in ["res://autoload/battle_manager.gd", "res://autoload/debug_manager.gd", "res://resources/effect_resource.gd", "res://resources/balance/small_number_profile.gd", "res://resources/translations/strings_card.csv", "res://resources/translations/strings_status.csv", "res://resources/translations/strings_synergy.csv", "res://resources/translations/strings_tutorial.csv", "res://resources/translations/strings_relic.csv", "res://scenes/battle/battle_scene.gd", "res://scenes/card/card_scene.gd", "res://scenes/card/card_scene_v2.gd", "res://scenes/ui/codex_scene.gd", "res://scenes/tutorial/tutorial_driver.gd", "res://scenes/tutorial/lessons/lesson_status.gd"]:
+	for path in ["res://autoload/battle_manager.gd", "res://autoload/debug_manager.gd", "res://resources/effect_resource.gd", "res://resources/balance/small_number_profile.gd", "res://resources/translations/strings_card.csv", "res://resources/translations/strings_status.csv", "res://resources/translations/strings_synergy.csv", "res://resources/translations/strings_tutorial.csv", "res://resources/translations/strings_relic.csv", "res://scenes/battle/battle_scene.gd", "res://scenes/card/card_scene_v2.gd", "res://scenes/ui/codex_scene.gd", "res://scenes/tutorial/tutorial_driver.gd", "res://scenes/tutorial/lessons/lesson_status.gd"]:
 		sources[path] = FileAccess.get_sha256(path)
 	var file := FileAccess.open("user://small-number-ui-audit.json", FileAccess.WRITE)
-	file.store_string(JSON.stringify({"schema": 1, "unit": "localized card-grade description, both frames", "unique_cards": all_cards.size() / 2, "card_grade_locale_states": rows.size(), "frame_descriptions": rows.size() * 2, "unique_monsters": monsters.size(), "intent_locale_states": intent_states, "relics": relics.size(), "passed": passed, "failed": failed, "issues": issues, "rows": rows, "sources": sources, "captures": captures, "boundary": "text/data and formatter contracts; rendered samples are real card/badge components, not whole-game pointer/layout/human comprehension coverage"}, "\t"))
+	file.store_string(JSON.stringify({"schema": 1, "unit": "localized card-grade description", "unique_cards": all_cards.size() / 2, "card_grade_locale_states": rows.size(), "unique_monsters": monsters.size(), "intent_locale_states": intent_states, "relics": relics.size(), "passed": passed, "failed": failed, "issues": issues, "rows": rows, "sources": sources, "captures": captures, "boundary": "text/data and formatter contracts; rendered samples are real card/badge components, not whole-game pointer/layout/human comprehension coverage"}, "\t"))
 	file.close()
-	classic.free()
 	modern.free()
 	battle.free()
 	tutorial.free()
 	await process_frame
-	Classic._art_cache.clear()
-	Classic._frame_cache.clear()
 	Modern.release_cached_textures()
 	preload("res://scenes/vfx/gpu_particle_helpers.gd").release_cached_textures()
 	for shape in range(Input.CURSOR_ARROW, Input.CURSOR_HELP + 1):
@@ -164,40 +154,39 @@ func _capture_samples(cards: Array, battle: Node) -> void:
 		root.content_scale_size = requested
 		for locale in ["ko", "en"]:
 			TranslationServer.set_locale(locale)
-			for style in ["classic", "modern"]:
-				root.get_node("GameSettings").card_frame_key = style
-				var group := Control.new()
-				root.add_child(group)
-				var bg := ColorRect.new()
-				bg.color = Color("18222b")
-				bg.size = Vector2(requested)
-				group.add_child(bg)
-				var heading := Label.new()
-				heading.text = "LIVE NUMBERS / %s / %s / +1" % [style, locale]
-				heading.position = Vector2(24, 20)
-				heading.add_theme_font_size_override("font_size", 24)
-				group.add_child(heading)
-				var measured: Array = []
-				for index in examples.size():
-					var node: Control = load("res://scenes/card/card_scene%s.tscn" % ("_v2" if style == "modern" else "")).instantiate()
-					group.add_child(node)
-					node.setup(examples[index], 1)
-					node.position = Vector2(30 + index * 300, 100)
-					node.scale = Vector2.ONE * (2.0 / 1.4 if style == "modern" else 2.0)
-					var label: Label = node.get_node("DescLabel" if style == "modern" else "Container/DescLabel")
-					measured.append({"card": examples[index].card_name, "text": label.text, "rect_canvas": [label.get_global_rect().position.x, label.get_global_rect().position.y, label.get_global_rect().size.x, label.get_global_rect().size.y]})
-				var badges := HBoxContainer.new()
-				badges.position = Vector2(30, 550)
-				badges.add_theme_constant_override("separation", 24)
-				group.add_child(badges)
-				badges.add_child(battle._make_status_label("poison_dmg", 3, {"poison_dur": 2}))
-				badges.add_child(battle._make_power_item("power.block_per_turn", 1, "", {"upgrade_tick_period": 5, "upgrade_tick_bonus": 1, "_upgrade_tick_count": 3}))
-				await process_frame
-				await process_frame
-				await RenderingServer.frame_post_draw
-				var screenshot := root.get_texture().get_image()
-				var path := "user://ui-numbers-%s-%s-%d.png" % [style, locale, requested.x]
-				_check(screenshot.save_png(path) == OK, "save rendered number sample")
-				captures.append({"style": style, "locale": locale, "requested": [requested.x, requested.y], "viewport_canvas": [root.get_visible_rect().size.x, root.get_visible_rect().size.y], "image_px": [screenshot.get_width(), screenshot.get_height()], "screenshot": ProjectSettings.globalize_path(path), "descriptions": measured})
-				group.queue_free()
-				await process_frame
+			var style := "modern"
+			var group := Control.new()
+			root.add_child(group)
+			var bg := ColorRect.new()
+			bg.color = Color("18222b")
+			bg.size = Vector2(requested)
+			group.add_child(bg)
+			var heading := Label.new()
+			heading.text = "LIVE NUMBERS / %s / %s / +1" % [style, locale]
+			heading.position = Vector2(24, 20)
+			heading.add_theme_font_size_override("font_size", 24)
+			group.add_child(heading)
+			var measured: Array = []
+			for index in examples.size():
+				var node: Control = load("res://scenes/card/card_scene_v2.tscn").instantiate()
+				group.add_child(node)
+				node.setup(examples[index], 1)
+				node.position = Vector2(30 + index * 300, 100)
+				node.scale = Vector2.ONE * 2.0 / 1.4
+				var label: Label = node.get_node("DescLabel")
+				measured.append({"card": examples[index].card_name, "text": label.text, "rect_canvas": [label.get_global_rect().position.x, label.get_global_rect().position.y, label.get_global_rect().size.x, label.get_global_rect().size.y]})
+			var badges := HBoxContainer.new()
+			badges.position = Vector2(30, 550)
+			badges.add_theme_constant_override("separation", 24)
+			group.add_child(badges)
+			badges.add_child(battle._make_status_label("poison_dmg", 3, {"poison_dur": 2}))
+			badges.add_child(battle._make_power_item("power.block_per_turn", 1, "", {"upgrade_tick_period": 5, "upgrade_tick_bonus": 1, "_upgrade_tick_count": 3}))
+			await process_frame
+			await process_frame
+			await RenderingServer.frame_post_draw
+			var screenshot := root.get_texture().get_image()
+			var path := "user://ui-numbers-%s-%s-%d.png" % [style, locale, requested.x]
+			_check(screenshot.save_png(path) == OK, "save rendered number sample")
+			captures.append({"style": style, "locale": locale, "requested": [requested.x, requested.y], "viewport_canvas": [root.get_visible_rect().size.x, root.get_visible_rect().size.y], "image_px": [screenshot.get_width(), screenshot.get_height()], "screenshot": ProjectSettings.globalize_path(path), "descriptions": measured})
+			group.queue_free()
+			await process_frame

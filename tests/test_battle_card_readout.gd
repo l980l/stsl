@@ -119,48 +119,47 @@ func _run() -> void:
 	var second: Resource = block.effects[0].duplicate(true)
 	attack.effects.append(second)
 	_check(not _text(attack).contains("gain 7 Block"), "later effect is not projected from stale current state")
-	# Freeze a small layout matrix before captures: 2 frames × 2 languages ×
+	# Freeze a small layout matrix before captures: 2 languages ×
 	# 2 requested window sizes; dense gated attack and resource-spend state.
 	# These are real scene / handler fixtures, not human or pointer E2E tests.
 	attack.effects.resize(1)
 	attack.effects[0].condition = "hand_size_0"
 	dm._heroes.musashi.hand = [attack, block, tokens, sacrifice, charm]
 	dm.set_energy_h("musashi", 3)
-	for frame in ["classic", "modern"]:
-		root.get_node("GameSettings").card_frame_key = frame
-		scene._refresh_hand(true)
-		await process_frame
-		for locale in ["ko", "en"]:
-			TranslationServer.set_locale(locale)
-			for window_size in [Vector2i(1920, 1080), Vector2i(1280, 720)]:
-				root.size = window_size
-				for variant in ["gate", "consume"]:
-					var card: Resource = attack if variant == "gate" else charm
-					scene._on_card_hovered(card, scene._card_buttons[0 if variant == "gate" else 4])
-					scene._show_card_readout(card, 0)
-					await process_frame
-					await process_frame
-					var panel: Control = scene._card_readout
-					var body: Label = scene._card_readout_body
-					var rect: Rect2 = panel.get_global_rect()
-					_check(panel.visible and panel.get_parent() == scene._ui_layer, "readout is camera-independent " + frame + locale)
-					_check(panel.mouse_filter == Control.MOUSE_FILTER_IGNORE and body.mouse_filter == Control.MOUSE_FILTER_IGNORE, "readout cannot steal target input")
-					_check(Rect2(Vector2.ZERO, Vector2(1920, 1080)).encloses(rect), "panel stays inside design viewport")
-					_check(rect.end.y < 830, "panel stays above hand/power HUD")
-					_check(body.get_visible_line_count() == body.get_line_count(), "body has no truncated lines")
-					_check(not body.text.contains("battle.readout."), "localized readout has no missing keys")
-					var id := "%s-%s-%dx%d-%s" % [frame, locale, window_size.x, window_size.y, variant]
-					var capture := {"id": id, "requested_width": window_size.x, "requested_height": window_size.y, "language": locale, "text": body.text, "panel_canvas_rect": [rect.position.x, rect.position.y, rect.size.x, rect.size.y], "body_lines": body.get_line_count(), "body_visible_lines": body.get_visible_line_count(), "driver": "real-scene handler fixture"}
-					if DisplayServer.get_name() != "headless":
-						await RenderingServer.frame_post_draw
-						var image := root.get_texture().get_image()
-						capture["width"] = image.get_width()
-						capture["height"] = image.get_height()
-						capture["screenshot"] = id + ".png"
-						_check(image.save_png(_output().path_join(capture.screenshot)) == OK, "save actual rendered capture")
-					captures.append(capture)
-					scene._on_card_unhovered(card)
-					_check(not panel.visible, "unhover clears readout")
+	var frame := "modern"
+	scene._refresh_hand(true)
+	await process_frame
+	for locale in ["ko", "en"]:
+		TranslationServer.set_locale(locale)
+		for window_size in [Vector2i(1920, 1080), Vector2i(1280, 720)]:
+			root.size = window_size
+			for variant in ["gate", "consume"]:
+				var card: Resource = attack if variant == "gate" else charm
+				scene._on_card_hovered(card, scene._card_buttons[0 if variant == "gate" else 4])
+				scene._show_card_readout(card, 0)
+				await process_frame
+				await process_frame
+				var panel: Control = scene._card_readout
+				var body: Label = scene._card_readout_body
+				var rect: Rect2 = panel.get_global_rect()
+				_check(panel.visible and panel.get_parent() == scene._ui_layer, "readout is camera-independent " + frame + locale)
+				_check(panel.mouse_filter == Control.MOUSE_FILTER_IGNORE and body.mouse_filter == Control.MOUSE_FILTER_IGNORE, "readout cannot steal target input")
+				_check(Rect2(Vector2.ZERO, Vector2(1920, 1080)).encloses(rect), "panel stays inside design viewport")
+				_check(rect.end.y < 830, "panel stays above hand/power HUD")
+				_check(body.get_visible_line_count() == body.get_line_count(), "body has no truncated lines")
+				_check(not body.text.contains("battle.readout."), "localized readout has no missing keys")
+				var id := "%s-%s-%dx%d-%s" % [frame, locale, window_size.x, window_size.y, variant]
+				var capture := {"id": id, "requested_width": window_size.x, "requested_height": window_size.y, "language": locale, "text": body.text, "panel_canvas_rect": [rect.position.x, rect.position.y, rect.size.x, rect.size.y], "body_lines": body.get_line_count(), "body_visible_lines": body.get_visible_line_count(), "driver": "real-scene handler fixture"}
+				if DisplayServer.get_name() != "headless":
+					await RenderingServer.frame_post_draw
+					var image := root.get_texture().get_image()
+					capture["width"] = image.get_width()
+					capture["height"] = image.get_height()
+					capture["screenshot"] = id + ".png"
+					_check(image.save_png(_output().path_join(capture.screenshot)) == OK, "save actual rendered capture")
+				captures.append(capture)
+				scene._on_card_unhovered(card)
+				_check(not panel.visible, "unhover clears readout")
 	# Actual drag handlers update target and reset on cancellation.
 	scene._start_drag(charm)
 	scene._set_drag_card_target(0)

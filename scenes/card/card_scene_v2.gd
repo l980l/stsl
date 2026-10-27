@@ -342,9 +342,11 @@ func refresh() -> void:
 	# Text/cost/damage previews can change without rebuilding immutable ornaments.
 	_cost_label.text = str(_cost)
 	_title_label.text = _card_name
-	LabelUtils.fit_text(_title_label, 13, 9)
+	LabelUtils.fit_text(_title_label, 15, 10)
 	_desc_label.text = _desc
-	LabelUtils.fit_text(_desc_label, 10, 7)
+	# 손패·보상 화면에서 카드는 0.7~1.5배로 그려지므로 설명은 14px부터 시작해 넘칠 때만 줄인다.
+	# 줄바꿈 라벨은 글이 길면 스스로 키가 커지므로 원래 설명 칸 높이(70)를 기준으로 판단한다.
+	LabelUtils.fit_text(_desc_label, 14, 9, -1.0, 70.0)
 	_art_rect.texture = _art_texture
 	match _card_type:
 		1: _type_icon.texture = _TYPE_SKILL

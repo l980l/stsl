@@ -14,7 +14,6 @@ const SYNERGY_POLICY := preload("res://tools/synergy_decision_policy.gd")
 const GUARD_POLICY := preload("res://tools/guard_decision_policy.gd")
 const TEMPO_POLICY := preload("res://tools/tempo_decision_policy.gd")
 const GPU_HELPERS := preload("res://scenes/vfx/gpu_particle_helpers.gd")
-const CLASSIC_CARD := preload("res://scenes/card/card_scene.gd")
 const MODERN_CARD := preload("res://scenes/card/card_scene_v2.gd")
 
 const DEFAULT_MAX_SECONDS := 3600.0
@@ -1006,8 +1005,6 @@ func _cleanup_and_quit(exit_code: int) -> void:
 	await process_frame
 	await process_frame
 	GPU_HELPERS.release_cached_textures()
-	CLASSIC_CARD._art_cache.clear()
-	CLASSIC_CARD._frame_cache.clear()
 	MODERN_CARD.release_cached_textures()
 	# Input holds custom cursor ImageTextures beyond scene teardown unless every
 	# shape is reset.  Release those references before RenderingServer shutdown.

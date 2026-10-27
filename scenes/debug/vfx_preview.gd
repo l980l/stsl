@@ -61,7 +61,7 @@ const NEEDLE_STING := preload("res://scenes/vfx/needle_sting.gd")
 const BITE_ATTACK := preload("res://scenes/vfx/bite_attack.gd")
 const CLAW_ATTACK := preload("res://scenes/vfx/claw_attack_gpu.gd")
 const MONSTER_PHASE := preload("res://scenes/vfx/monster_phase_changed_gpu.gd")
-const _CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
+const _CARD_SCENE := preload("res://scenes/card/card_scene_v2.tscn")
 const _CardResourceClass := preload("res://resources/card_resource.gd")
 
 # kind: "impact"=피격 버스트(타겟 위치) / "self"=자기 버프 버스트 / "beam"=시전자→타겟 빔
@@ -775,7 +775,7 @@ func _make_dummy_card(center: Vector2) -> Control:
 	card_res.description = "EXHAUST 데모"
 	card_res.owner_id = "napoleon"
 	var card: Control = _CARD_SCENE.instantiate()
-	card.setup(card_res, CardScene.Mode.HAND)
+	card.setup(card_res, card.Mode.HAND)
 	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# 위치는 호출자에서 size 확인 후 재조정
 	card.position = center

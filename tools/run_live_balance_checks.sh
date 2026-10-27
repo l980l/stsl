@@ -58,7 +58,10 @@ return_focus() {
 if [[ "$#" == 0 ]]; then set -- run_small_number_live; fi
 for suite in "$@"; do
   if [[ ! "$suite" =~ ^[a-zA-Z0-9_]+$ ]]; then exit 2; fi
-  "$godot_bin" ${display_args[@]+"${display_args[@]}"} --audio-driver Dummy --path "$task_project" \
+  # test_runner's unit tests assert legacy (×10) combat numbers; live mode fails ~150 of them.
+  legacy_combat="${STSL_LEGACY_COMBAT:-}"
+  if [[ "$suite" == "test_runner" && -z "$legacy_combat" ]]; then legacy_combat=1; fi
+  STSL_LEGACY_COMBAT="$legacy_combat" "$godot_bin" ${display_args[@]+"${display_args[@]}"} --audio-driver Dummy --path "$task_project" \
     -s "res://tests/$suite.gd" > "$artifact_dir/$suite.log" 2>&1 &
   godot_pid=$!
   if [[ -n "${return_app_id:-}" ]]; then return_focus "$godot_pid" & fi
