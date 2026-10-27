@@ -69,16 +69,9 @@ func _run() -> void:
 	dm._heroes["cleopatra"].pending_all_cost_zero = true
 	hand_scene._refresh_hand()
 	_check(hand_scene._card_buttons[0] == first and first._cost_label.text == "0", "same hand updates effective cost")
-	var settings = root.get_node("GameSettings")
-	var saved_frame: String = settings.card_frame_key
-	settings.card_frame_key = "classic"
-	hand_scene._on_card_frame_changed_battle("classic")
-	_check(hand_scene._card_buttons[0].get_script() == load("res://scenes/card/card_scene.gd"), "frame change rebuilds classic nodes")
-	settings.card_frame_key = "modern"
-	hand_scene._on_card_frame_changed_battle("modern")
-	_check(hand_scene._card_buttons[0].get_script() == SCRIPT, "frame change rebuilds modern nodes")
+	hand_scene._refresh_hand(true)
+	_check(hand_scene._card_buttons[0] != first and hand_scene._card_buttons[0].get_script() == SCRIPT, "forced refresh rebuilds card nodes")
 	first = hand_scene._card_buttons[0]
-	settings.card_frame_key = saved_frame
 	dm._heroes["cleopatra"].hand.reverse()
 	hand_scene._refresh_hand()
 	_check(hand_scene._card_buttons[0] != first and hand_scene._card_buttons[0].get_meta("_card_res") == starter[1], "reordered hand rebuilds")

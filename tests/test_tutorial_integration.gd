@@ -57,7 +57,6 @@ func _run() -> void:
 	pm = root.get_node("ProgressManager")
 	var tm := root.get_node("TeamManager")
 	var sm := root.get_node("SaveManager")
-	var settings := root.get_node("GameSettings")
 	Engine.time_scale = 8.0
 	gm.reset()
 	tm.clear()
@@ -68,12 +67,8 @@ func _run() -> void:
 	sm.save()
 	saved_run = FileAccess.get_file_as_string(save_path)
 	pm.reset_progress()
-	for frame in ["classic", "modern"]:
-		settings.card_frame_key = frame
-		for lesson in ["basics", "counter", "status"]:
-			await _complete_lesson(lesson, frame)
-			if failed > 0:
-				break
+	for lesson in ["basics", "counter", "status"]:
+		await _complete_lesson(lesson, "modern")
 		if failed > 0:
 			break
 	if failed == 0:

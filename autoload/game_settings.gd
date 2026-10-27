@@ -31,10 +31,6 @@ const CAM_ZOOM_SPEED_KEYS    := ["slow", "normal", "fast"]
 const CAM_ZOOM_SPEED_VALUES  := [0.6, 1.0, 1.7]  # slow=0.5s / normal=0.3s / fast=0.18s
 const CAM_ZOOM_SPEED_DEFAULT := "normal"
 
-# 카드 프레임 — classic (기존 PNG frame + 좌상 gem) / modern (신규 — 중앙 gem + brass border)
-const CARD_FRAME_KEYS    := ["classic", "modern"]
-const CARD_FRAME_DEFAULT := "modern"
-
 # MSAA 2D — 카드 부채꼴 회전·StyleBox 외곽·둥근 모서리 가장자리 anti-alias.
 # Viewport.MSAA enum: 0=DISABLED, 1=MSAA_2X, 2=MSAA_4X, 3=MSAA_8X
 const MSAA_KEYS    := ["off", "2x", "4x", "8x"]
@@ -66,16 +62,12 @@ var kill_cam_enabled: bool = KILL_CAM_DEFAULT
 var hero_zoom_enabled: bool = HERO_ZOOM_DEFAULT
 var cam_zoom_speed_key: String = CAM_ZOOM_SPEED_DEFAULT
 var cam_zoom_speed_multiplier: float = 1.0
-var card_frame_key: String = CARD_FRAME_DEFAULT
 var msaa_key: String = MSAA_DEFAULT
 var window_size_key: String = WINDOW_SIZE_DEFAULT
 
 # 설정 변경 시그널 — 변경 즉시 반영 필요한 곳에서 구독
 @warning_ignore("unused_signal")
 signal hero_zoom_enabled_changed(enabled: bool)
-# 카드 프레임 변경 — battle_scene 등이 구독해 hand 재구성
-@warning_ignore("unused_signal")
-signal card_frame_changed(key: String)
 
 func _ready() -> void:
 	load_settings()
@@ -164,19 +156,18 @@ func set_cam_zoom_speed(key: String) -> void:
 	cam_zoom_speed_key = key
 	cam_zoom_speed_multiplier = CAM_ZOOM_SPEED_VALUES[idx]
 
-# v2 카드(modern) 는 native size 가 v1 의 1.4 배 (font raster atlas 가 render size 와 일치 → sharp).
+# 카드(card_scene_v2) 는 native size 가 옛 카드 기준의 1.4 배 (font raster atlas 가 render size 와 일치 → sharp).
 # 외부 spawn 사이트가 v1 기준 scale 을 적용해도 effective size 가 동일하도록 1/1.4 보정 multiplier 제공.
 # pivot_offset 도 같은 값으로 곱해야 함 (multiplier 의 역수 — pivot 은 native 좌표라 v2 가 이미 1.4 배).
 func get_card_native_scale() -> float:
-	return 1.0 / 1.4 if card_frame_key == "modern" else 1.0
+	return 1.0 / 1.4
 
 func get_card_native_pivot_mul() -> float:
-	return 1.4 if card_frame_key == "modern" else 1.0
+	return 1.4
 
 # v2 native 1.4 배 + pivot/scale multiplier 적용 시 카드 visual offset 어긋남 (우측 하단 이동) 보정.
 # 기존 spawn 코드가 v1 기준 (pivot × (1 - outer_scale)) 의 visual offset 을 가정하고 position 계산.
 # v2 변경으로 그 보정이 사라져서 spawn 위치 차이 발생 → 이 헬퍼로 position 보정값 반환.
-# v1 인 경우 multiplier 1.0 라 반환값 0 (영향 없음).
 func get_card_visual_offset(base_pivot: Vector2, outer_scale: float) -> Vector2:
 	var pivot_mul := get_card_native_pivot_mul()
 	var scale_mul := get_card_native_scale()
@@ -197,14 +188,6 @@ func apply_card_transform(node: Control, base_pos: Vector2, base_pivot: Vector2,
 # 사용: tw.tween_property(node, "scale", GameSettings.get_card_scale(1.5), 0.22)
 func get_card_scale(outer_scale: float) -> Vector2:
 	return Vector2(outer_scale, outer_scale) * get_card_native_scale()
-
-func set_card_frame(key: String) -> void:
-	if CARD_FRAME_KEYS.find(key) < 0:
-		return
-	if card_frame_key == key:
-		return
-	card_frame_key = key
-	card_frame_changed.emit(key)
 
 func set_msaa(key: String) -> void:
 	var idx := MSAA_KEYS.find(key)
@@ -267,7 +250,6 @@ func save_settings() -> void:
 	cfg.set_value("gameplay", "kill_cam_enabled", kill_cam_enabled)
 	cfg.set_value("gameplay", "hero_zoom_enabled", hero_zoom_enabled)
 	cfg.set_value("gameplay", "cam_zoom_speed", cam_zoom_speed_key)
-	cfg.set_value("graphics", "card_frame", card_frame_key)
 	cfg.set_value("graphics", "msaa", msaa_key)
 	cfg.set_value("graphics", "window_size", window_size_key)
 	cfg.save(_CONFIG_PATH)
@@ -283,7 +265,6 @@ func load_settings() -> void:
 		set_kill_cam_enabled(KILL_CAM_DEFAULT)
 		set_hero_zoom_enabled(HERO_ZOOM_DEFAULT)
 		set_cam_zoom_speed(CAM_ZOOM_SPEED_DEFAULT)
-		set_card_frame(CARD_FRAME_DEFAULT)
 		set_msaa(MSAA_DEFAULT)
 		set_window_size(WINDOW_SIZE_DEFAULT)
 		return
@@ -296,6 +277,5 @@ func load_settings() -> void:
 	set_kill_cam_enabled(cfg.get_value("gameplay", "kill_cam_enabled", KILL_CAM_DEFAULT))
 	set_hero_zoom_enabled(cfg.get_value("gameplay", "hero_zoom_enabled", HERO_ZOOM_DEFAULT))
 	set_cam_zoom_speed(cfg.get_value("gameplay", "cam_zoom_speed", CAM_ZOOM_SPEED_DEFAULT))
-	set_card_frame(cfg.get_value("graphics", "card_frame", CARD_FRAME_DEFAULT))
 	set_msaa(cfg.get_value("graphics", "msaa", MSAA_DEFAULT))
 	set_window_size(cfg.get_value("graphics", "window_size", WINDOW_SIZE_DEFAULT))

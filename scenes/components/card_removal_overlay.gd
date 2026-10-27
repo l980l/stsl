@@ -4,10 +4,9 @@
 # 컴포넌트는 카드 선택 UI만 담당 — 실제 제거/후처리는 confirmed 시그널 수신자가 한다.
 extends CanvasLayer
 
-const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
-const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
+const CARD_SCENE := preload("res://scenes/card/card_scene_v2.tscn")
 func _make_card() -> Control:
-	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
+	return CARD_SCENE.instantiate()
 
 ## 카드 선택 확정 시 발신. 인자는 선택된 카드 Resource.
 signal confirmed(card: Resource)
@@ -137,7 +136,7 @@ func open(deck: Array, opts: Dictionary = {}) -> void:
 
 		var card_node: Control = _make_card()
 		GameSettings.apply_card_transform(card_node, Vector2(-1.75, -5.0), Vector2(70.0, 200.0), 0.975)
-		card_node.setup(card, CardScene.Mode.REWARD)
+		card_node.setup(card, card_node.Mode.REWARD)
 		wrapper.add_child(card_node)
 
 		var captured_node: Control = card_node

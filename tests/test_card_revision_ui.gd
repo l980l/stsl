@@ -62,31 +62,27 @@ func _run() -> void:
 	var cards: Dictionary = {}
 	for card in load("res://resources/card_catalog.gd").get_all_cards():
 		cards[card.card_name] = card
-	for frame in ["classic", "modern"]:
-		root.get_node("GameSettings").card_frame_key = frame
-		bm._current_actor_id = "hero:musashi"
-		var meditation = cards["card.musashi.meditation.name"].duplicate(true)
-		var sword = cards["card.musashi.void_sword.name"].duplicate(true)
-		dm._heroes["musashi"]["hand"] = [meditation, sword]
-		dm.set_energy_h("musashi", 3)
-		scene._refresh_hand()
+	var frame := "modern"
+	bm._current_actor_id = "hero:musashi"
+	var meditation = cards["card.musashi.meditation.name"].duplicate(true)
+	var sword = cards["card.musashi.void_sword.name"].duplicate(true)
+	dm._heroes["musashi"]["hand"] = [meditation, sword]
+	dm.set_energy_h("musashi", 3)
+	scene._refresh_hand()
+	await process_frame
+	bm.turn_interval = 0.0
+	_check(bm.play_card(meditation, -1), frame + " meditation playable")
+	while not bm.is_discard_pick_optional():
 		await process_frame
-		bm.turn_interval = 0.0
-		_check(bm.play_card(meditation, -1), frame + " meditation playable")
-		while not bm.is_discard_pick_optional():
-			await process_frame
-		_check(scene._card_pick_in_progress and scene._pick_owner_id == "musashi", frame + " optional own-hand selector opens")
-		_check(scene._pick_overlay != null, frame + " skip overlay present")
-		scene._on_optional_pick_skipped()
-		_check(dm.get_hand("musashi").has(sword) and bm._pending_discard_pick.is_empty(), frame + " actual skip handler preserves sword")
-		dm.reserve_cost_reduction("musashi", 1, 1, true)
-		scene._refresh_hand()
-		await process_frame
-		var button = scene._card_buttons[0]
-		if frame == "classic":
-			_check(button.get_node("Container/CostLabel").text == "0", "classic displays effective discounted cost")
-		else:
-			_check(button.get_node("CostLabel").text == "0", "modern displays effective discounted cost")
+	_check(scene._card_pick_in_progress and scene._pick_owner_id == "musashi", frame + " optional own-hand selector opens")
+	_check(scene._pick_overlay != null, frame + " skip overlay present")
+	scene._on_optional_pick_skipped()
+	_check(dm.get_hand("musashi").has(sword) and bm._pending_discard_pick.is_empty(), frame + " actual skip handler preserves sword")
+	dm.reserve_cost_reduction("musashi", 1, 1, true)
+	scene._refresh_hand()
+	await process_frame
+	var button = scene._card_buttons[0]
+	_check(button.get_node("CostLabel").text == "0", "modern displays effective discounted cost")
 	_check(scene._card_target_type(cards["card.yi_sun_sin.bloody_battle.name"]) == "enemy_ally", "bloodbattle requests enemy then ally")
 	_check(scene._card_target_type(cards["card.joan_of_arc.shield_prayer.name"]) == "ally", "prayer targets living ally")
 	_check(scene._card_target_type(cards["card.genghis_khan.horde_volley.name"]) == "none", "area volley does not require a single target")

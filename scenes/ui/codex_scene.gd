@@ -1,13 +1,12 @@
 # scenes/ui/codex_scene.gd
 # 도감 — 카드/렐릭 탭. 전체를 자동 집계(CardCatalog/RelicCatalog)해 그룹·정렬·필터·검색으로 열람.
 # 수집/잠금: ProgressManager.is_card/relic_discovered. 미발견은 흑백/카드백으로 표시.
-# 카드 렌더는 실제 CardScene 재사용(classic/modern). 렐릭은 아이콘+이름+설명 셀.
+# 카드 렌더는 실제 카드 장면(card_scene_v2) 재사용. 렐릭은 아이콘+이름+설명 셀.
 # 오버레이(CanvasLayer) — 메인메뉴/맵/배틀/상점 위에 열리고 닫으면 원래 씬으로 복귀.
 # 필터/정렬/그룹/검색 상태는 static 으로 세션 내 유지 (탭별 독립, 다시 열어도 보존).
 extends CanvasLayer
 
-const CARD_SCENE_CLASSIC := preload("res://scenes/card/card_scene.tscn")
-const CARD_SCENE_MODERN  := preload("res://scenes/card/card_scene_v2.tscn")
+const CARD_SCENE := preload("res://scenes/card/card_scene_v2.tscn")
 const CardRes      := preload("res://resources/card_resource.gd")
 const RelicRes     := preload("res://resources/relic_resource.gd")
 # CardCatalog/RelicCatalog/MonsterCatalog/HeroRegistry/MuseumMatFrame 는 class_name 전역 클래스 — 직접 사용 (const preload 시 shadow 경고)
@@ -33,7 +32,7 @@ const _GEM_COLORS := {
 	"legendary": {"hi": Color("#fce6a8"), "mid": Color("#d4a948"), "lo": Color("#6b5418")},
 	"divine":    {"hi": Color("#ffd2d4"), "mid": Color("#d94a50"), "lo": Color("#4a0d10")},
 }
-const TARGET_CARD_W := 132.0  # 도감 카드 표시 폭 (classic/modern 공통, 비율 0.7 동일)
+const TARGET_CARD_W := 132.0  # 도감 카드 표시 폭 (카드 비율 0.7)
 const CELL_W := 150.0
 
 # 발견(관측, 미보유) 카드 흑백 — 카드 각 자식에 use_parent_material 로 적용
@@ -238,9 +237,8 @@ func _set_use_parent_mat(node: Node) -> void:
 			c.use_parent_material = true
 			_set_use_parent_mat(c)
 
-# card_frame 설정 분기 — 게임 내 카드 렌더와 동일 (classic/modern)
 func _new_card() -> Control:
-	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE_CLASSIC.instantiate()
+	return CARD_SCENE.instantiate()
 
 # 모던 카드 보석 텍스처 생성 (card_scene_v2._make_circle_texture 미러, ring = lo 색)
 func _make_gem_tex(rarity_key: String) -> ImageTexture:
@@ -1209,7 +1207,7 @@ func _make_card_cell(card) -> Control:
 	var P := SacredPalette
 	var owned := _is_discovered(card)
 	var seen := _is_seen(card)
-	# classic(140×200)·modern(196×280) 모두 비율 0.7 → disp 동일
+	# 카드(196×280) 비율 0.7
 	var disp := Vector2(TARGET_CARD_W, TARGET_CARD_W / 0.7)
 
 	var holder := Control.new()

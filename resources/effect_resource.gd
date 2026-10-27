@@ -96,7 +96,27 @@ func display_text(override_value: int = -1) -> String:
 			"enemy_count_1": gate = tr("effect.condition.enemy_count_n") % 1
 		if gate != "":
 			text = gate + ": " + text
+	if TranslationServer.get_locale().begins_with("ko"):
+		text = fix_korean_number_particles(text)
 	return text
+
+# 번역문은 "%d을"처럼 조사를 하나로 고정해 두었으므로, 숫자의 마지막 읽기
+# (2·4·5·9로 끝나면 모음: 이·사·오·구)에 맞춰 을/를·이/가·은/는·과/와를 고른다.
+# 조사 뒤가 공백·문장부호·끝일 때만 바꿔 "2이상" 같은 낱말은 건드리지 않는다.
+static func fix_korean_number_particles(text: String) -> String:
+	var re := RegEx.new()
+	re.compile("(\\d)(을|를|이|가|은|는|과|와)(?=[\\s.,)\\]]|$)")
+	var pairs := {"을": "를", "이": "가", "은": "는", "과": "와"}
+	var out := ""
+	var last := 0
+	for m in re.search_all(text):
+		var digit := m.get_string(1)
+		var particle := m.get_string(2)
+		var consonant_form: String = particle if pairs.has(particle) else pairs.find_key(particle)
+		var vowel_end := digit in ["2", "4", "5", "9"]
+		out += text.substr(last, m.get_start() - last) + digit + (pairs[consonant_form] if vowel_end else consonant_form)
+		last = m.get_end()
+	return out + text.substr(last)
 
 func _display_text(override_value: int = -1) -> String:
 	# override_value >= 0 면 데미지 표시에 그 값 사용 (UI 가 buff/debuff 적용한 효과 데미지).

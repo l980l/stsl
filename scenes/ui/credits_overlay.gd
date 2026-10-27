@@ -11,7 +11,6 @@ const _SOUND_SOURCE := "Sound Effect Lab — soundeffect-lab.info"
 const _AI_BGM       := "ACE-Step 1.5"
 const _AI_ILLUST    := "Nano Banana"
 const _AI_IMGEDIT   := "Qwen Image Edit"
-const _AI_FRAME     := "Z-Image Turbo"
 const _AI_VFXUI     := "Claude"
 const _AI_TRANSLATE := "Claude & Gemini"
 const _ENGINE       := "Godot Engine 4.6.2"
@@ -142,7 +141,6 @@ func _build() -> void:
 		"%s — %s" % [tr("ui.credits.ai.bgm"), _AI_BGM],
 		"%s — %s" % [tr("ui.credits.ai.illust"), _AI_ILLUST],
 		"%s — %s" % [tr("ui.credits.ai.imgedit"), _AI_IMGEDIT],
-		"%s — %s" % [tr("ui.credits.ai.frame"), _AI_FRAME],
 		"%s — %s" % [tr("ui.credits.ai.vfxui"), _AI_VFXUI],
 		"%s — %s" % [tr("ui.credits.ai.translation"), _AI_TRANSLATE],
 	])

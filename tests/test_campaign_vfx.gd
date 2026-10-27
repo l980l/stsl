@@ -102,9 +102,6 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	particle_helpers.release_cached_textures()
-	var classic = load("res://scenes/card/card_scene.gd")
-	classic._art_cache.clear()
-	classic._frame_cache.clear()
 	load("res://scenes/card/card_scene_v2.gd").release_cached_textures()
 	for shape in range(Input.CURSOR_ARROW, Input.CURSOR_HELP + 1):
 		Input.set_custom_mouse_cursor(null, shape)

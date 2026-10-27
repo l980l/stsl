@@ -5,12 +5,10 @@ const EffectRes = preload("res://resources/effect_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
 const _INTENT_GRAD_SHADER = preload("res://assets/shaders/intent_gradient.gdshader")
 const SoldierScene = preload("res://characters/summons/soldier/soldier.tscn")
-const CARD_SCENE := preload("res://scenes/card/card_scene.tscn")
-const CARD_SCENE_MODERN := preload("res://scenes/card/card_scene_v2.tscn")
+const CARD_SCENE := preload("res://scenes/card/card_scene_v2.tscn")
 const CardReadout := preload("res://scenes/battle/battle_card_readout.gd")
-# GameSettings.card_frame_key 따라 분기
 func _make_card() -> Control:
-	return CARD_SCENE_MODERN.instantiate() if GameSettings.card_frame_key == "modern" else CARD_SCENE.instantiate()
+	return CARD_SCENE.instantiate()
 const ARROW_CHEVRON_TEX := preload("res://assets/art/ui/arrow_chevron.svg")
 const ARROW_HEAD_TEX    := preload("res://assets/art/ui/arrow_head.svg")
 const CURSOR_TEX        := preload("res://assets/art/ui/cursor.svg")
@@ -258,9 +256,8 @@ func _ready() -> void:
 	_start_battle()
 	_profile_cpu_span("battle.setup_actors", stage_started)
 	_play_battle_bgm()
-	# 언어 변경 시 적 이름 갱신 (카드/intent 는 자체 갱신). 카드 프레임 변경 시 핸드 재구성.
+	# 언어 변경 시 적 이름 갱신 (카드/intent 는 자체 갱신).
 	LocaleManager.locale_changed.connect(_on_locale_changed_battle)
-	GameSettings.card_frame_changed.connect(_on_card_frame_changed_battle)
 	if OS.is_debug_build():
 		_debug_badge = Label.new()
 		_debug_badge.position = Vector2(1500, 20)
@@ -2106,10 +2103,6 @@ func _refresh_message_for_current_actor() -> void:
 			label_text = "%s — %s" % [tr(ename.enemy_name), tr("battle.msg_enemy_turn")]
 		_message_label.text = label_text
 
-func _on_card_frame_changed_battle(_key: String) -> void:
-	# 핸드 노드 전부 swap. 덱 보기 열려 있으면 자동으로 닫히지는 않음 (다음 열 때 새 frame 반영).
-	_refresh_hand(true)
-
 func _refresh_hand(force_rebuild: bool = false) -> void:
 	_refresh_card_readout()
 	var hid: String = BattleManager.get_current_hero_id()
@@ -2266,7 +2259,7 @@ func _on_card_hovered(_card: Resource, card_node: Control) -> void:
 		if idx == hover_idx:
 			var hover_scale_vec := GameSettings.get_card_scale(BASE_CARD_SCALE * 1.4)
 			# 카드 하단 screen y = pos.y + pivot.y + scale.y*(높이 - pivot.y).
-			# 프레임별(classic 140×200 / modern 196×280) native 크기·pivot 을 노드에서 직접 읽어 반영.
+			# 카드 native 크기(196×280)·pivot 을 노드에서 직접 읽어 반영.
 			var card_h: float = btn.custom_minimum_size.y
 			var pivot_y: float = btn.pivot_offset.y
 			var card_bottom := base_pos.y + pivot_y + hover_scale_vec.y * (card_h - pivot_y)
@@ -6311,7 +6304,7 @@ func _add_deck_column(parent: HBoxContainer, header: String, cards: Array) -> vo
 
 		var card_node: Control = _make_card()
 		GameSettings.apply_card_transform(card_node, base_pos, Vector2(70.0, 200.0), card_scale)
-		card_node.setup(card_res, CardScene.Mode.REWARD)
+		card_node.setup(card_res, card_node.Mode.REWARD)
 		wrapper.add_child(card_node)
 
 func _close_deck_viewer() -> void:
