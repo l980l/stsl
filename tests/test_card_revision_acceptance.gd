@@ -72,7 +72,11 @@ func _test_resources() -> void:
 	_check(bm.get_enemy_hp(0) == 4400 and bm.get_hero_status("napoleon").tokens == 4, "legion spends two soldiers for 300")
 	bm._hero_status["genghis_khan"] = {"tokens": 6}
 	_apply(bm, "card.genghis_khan.horde_volley.name", false)
-	_check(bm.get_enemy_hp(0) == 4210 and bm.get_enemy_hp(1) == 4810 and bm.get_hero_status("genghis_khan").tokens == 3, "volley spends once and hits every enemy")
+	# 질주 개편: 모든 적 40 + 병사 6명 즉시 사격, 적보다 빠르면 한 번 더 (병사 대상은 랜덤이라 합계로 검사).
+	_check(9400 - bm.get_enemy_hp(0) - bm.get_enemy_hp(1) == 2 * 40 + 2 * 6 * 25 and bm.get_hero_status("genghis_khan").tokens == 6, "volley fires every soldier twice when faster and keeps them")
+	# 이후 검사들이 기대하는 이전 상태(적 4210/4810, 병사 3)로 되돌린다.
+	bm._enemy_hp[0] = 4210; bm._enemy_hp[1] = 4810
+	bm._hero_status["genghis_khan"]["tokens"] = 3
 	bm._hero_block["yi_sun_sin"] = 500
 	_apply(bm, "card.yi_sun_sin.counter.name")
 	_check(bm.get_enemy_hp(0) == 4030 and bm.get_hero_block("yi_sun_sin") == 420, "counter block consumption caps at 80")
@@ -179,6 +183,7 @@ func _test_powers_and_death() -> void:
 	bm._apply_card_effects(revive, -1, "joan_of_arc")
 	_check(bm.team_mgr.get_current_hp("joan_of_arc") == 300 and bm.get_hero_status("joan_of_arc").get("sacrifice_bank", 0) == 0, "revive restores30percent and clears sacrifice")
 	_apply(bm, "card.genghis_khan.executioners_bounty.name")
+	bm._hero_status["genghis_khan"]["tokens"] = 0
 	bm._enemy_hp = [50, 50]
 	_apply(bm, "card.genghis_khan.horde_volley.name")
 	_check(bm.deck_mgr.get_energy("genghis_khan") == 0, "no kill means no bounty")

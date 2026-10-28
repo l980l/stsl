@@ -197,7 +197,7 @@ static func _divine_echo() -> Resource:
 	c.card_name = "card.joan_of_arc.divine_echo.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = ["card.joan_of_arc.divine_echo.archetype", "card.joan_of_arc.holy_touch.archetype"]
+	c.archetype = ["card.joan_of_arc.holy_touch.archetype"]  # 축복
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.APPLY_STATUS
 	ea.status_type = "power.block_per_turn"; ea.value = 50; ea.base_value = 50; ea.target = "SELF"
@@ -341,7 +341,7 @@ static func _guardian_angel() -> Resource:
 	c.card_name = "card.joan_of_arc.guardian_angel.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.POWER
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = ["card.joan_of_arc.guardian_angel.archetype", "card.joan_of_arc.holy_touch.archetype"]
+	c.archetype = ["card.joan_of_arc.holy_touch.archetype"]  # 축복
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.APPLY_STATUS
 	e.status_type = "power.heal_team_per_turn"; e.value = 20; e.base_value = 20; e.target = "SELF"
@@ -424,7 +424,7 @@ static func _flag_of_orleans() -> Resource:
 	c.card_name = "card.joan_of_arc.flag_of_orleans.name"; c.owner_id = "joan_of_arc"
 	c.cost = 2; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.LEGENDARY; c.play_animation = "idle"
-	c.archetype = ["card.joan_of_arc.flag_of_orleans.archetype", "card.joan_of_arc.holy_touch.archetype"]
+	c.archetype = ["card.joan_of_arc.holy_touch.archetype"]  # 축복
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.HEAL_ALL
 	ea.value = 80; ea.base_value = 80
@@ -443,7 +443,7 @@ static func _martyrs_will() -> Resource:
 	c.card_name = "card.joan_of_arc.martyrs_will.name"; c.owner_id = "joan_of_arc"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = ["card.joan_of_arc.martyrs_will.archetype"]
+	c.archetype = ["card.joan_of_arc.martyrs_will.archetype", "card.joan_of_arc.holy_touch.archetype"]  # 순교 ↔ 축복 다리
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SACRIFICE_HP
 	ea.value = 50; ea.base_value = 50

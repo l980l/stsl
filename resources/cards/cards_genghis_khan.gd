@@ -52,7 +52,7 @@ static func _cavalry_charge_speed() -> Resource:
 	c.card_name = "card.genghis_khan.cavalry_charge_speed.name"; c.owner_id = "genghis_khan"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.RARE; c.play_animation = "idle"
-	c.archetype = ["card.genghis_khan.horse_charge.archetype"]  # 기동
+	c.archetype = ["card.genghis_khan.cavalry_summon.archetype"]  # 몽골 기병 (질주: 속도가 병사 공격 빈도)
 	var e := EffRes.new()
 	e.effect_type = EffRes.EffectType.BUFF_SPEED
 	e.value = 6; e.base_value = 6

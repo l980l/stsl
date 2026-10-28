@@ -319,7 +319,7 @@ static func _trench_construction() -> Resource:
 	c.card_name = "card.napoleon.trench_construction.name"; c.owner_id = "napoleon"
 	c.cost = 1; c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.COMMON; c.play_animation = "idle"
-	c.archetype = ["card.napoleon.trench_construction.archetype", "card.napoleon.glory_shout.archetype"]
+	c.archetype = ["card.napoleon.trench_construction.archetype"]
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.BLOCK
 	ea.value = 80; ea.base_value = 80; ea.target = "SELF"
