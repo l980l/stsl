@@ -679,7 +679,7 @@ func test_synergy_joan_napoleon_heal_all() -> void:
 	bm.team_mgr.add_hero(_make_hero("napoleon", 1000))
 	bm.setup_battle([_make_enemy(100, [])])
 	bm.start_player_turn()
-	bm._hero_status["napoleon"] = {"morale": 10}  # 사기 10 → 힐 ×1.7
+	bm._current_actor_id = "hero:joan_of_arc"
 	bm.team_mgr.take_damage("joan_of_arc", 300)
 	var card := CardRes.new()
 	card.card_name = "성가_테스트"
@@ -691,8 +691,11 @@ func test_synergy_joan_napoleon_heal_all() -> void:
 	card.effects = [eff]
 	bm.deck_mgr.hand.append(card)
 	bm.play_card(card, -1)
-	_assert(bm.team_mgr.get_current_hp("joan_of_arc") == 802,
-		"성전: 나폴레옹 사기 10 → HEAL_ALL 60 ×1.7 = 102 (잔다르크 700→802)")
+	_assert(bm.team_mgr.get_current_hp("joan_of_arc") == 760 and bm._hero_status.get("napoleon", {}).get("morale", 0) == 1,
+		"성전: 잔다르크 회복은 증폭 없이 760, 실제 회복이 있으면 나폴레옹 사기 +1")
+	bm._apply_card_effects(card, -1)
+	_assert(bm._hero_status.get("napoleon", {}).get("morale", 0) == 1,
+		"성전: 나폴레옹 사기는 잔다르크 차례당 1회만")
 
 func test_synergy_joan_napoleon_not_present() -> void:
 	print("[TestBattleManager] test_synergy_joan_napoleon_not_present")
@@ -758,8 +761,8 @@ func test_synergy_musashi_yisunsin_duel() -> void:
 	bm.play_card(card, 0)
 	var m_spd: int = bm._sum_speed_instances(bm._hero_status.get("musashi", {}).get("speed_bonus", []))
 	var y_spd: int = bm._sum_speed_instances(bm._hero_status.get("yi_sun_sin", {}).get("speed_bonus", []))
-	_assert(m_spd == 1 and y_spd == 1,
-		"검사의 약속: 무사시 공격 → 무사시·이순신 속도 +1")
+	_assert(m_spd == 0 and y_spd == 0,
+		"검사의 약속: 공격만으로는 속도가 오르지 않음 (방어 이전 보상으로 개편)")
 
 func test_synergy_musashi_yisunsin_not_present() -> void:
 	print("[TestBattleManager] test_synergy_musashi_yisunsin_not_present")

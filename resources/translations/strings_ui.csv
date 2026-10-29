@@ -54,6 +54,7 @@ ui.reward.rarity.divine,신성,Divine,Divin,Divino,Divino,ディバイン,Θεί
 ui.reward.btn_take,선택,Take this,Prendre,Prendi,Tomar,選ぶ,Πάρε αυτό,选择,选择,Взять это,Levar,Weź to,Nimm dies
 ui.reward.btn_skip,지나친다 — 받지 않음,Skip — Take none,Passer — Ne rien prendre,Salta — Non prendere,Pasar — No tomar,スキップ — 何も取らない,Παράλειψη — Μη πάρεις τίποτα,跳过 — 不选取,跳过 — 不选取,Пропустить — ничего,Pular — Nada,Pomiń — Nic nie bierz,Überspringen — Nichts
 ui.reward.progress,— %d / %d 선택됨 —,— %d / %d CHOSEN —,— %d / %d CHOISI —,— %d / %d SCELTO —,— %d / %d ELEGIDO —,— %d / %d 選択済み —,— %d / %d ΕΠΙΛΕΓΜΈΝΟ —,— %d / %d 已选择 —,— %d / %d 已选择 —,— %d / %d ВЫБРАНО —,— %d / %d ESCOLHIDO —,— %d / %d WYBRANO —,— %d / %d GEWÄHLT —
+ui.reward.archetype_owned,%s · 덱에 %d장,%s · %d in deck,%s · %d dans le deck,%s · %d nel mazzo,%s · %d en el mazo,%s · デッキに%d枚,%s · %d στην τράπουλα,%s · 牌组中%d张,%s · 牌組中%d張,%s · в колоде: %d,%s · %d no baralho,%s · %d w talii,%s · %d im Deck
 ui.card_upgrade.title,카드 강화,Card Upgrade,Amélioration,Potenziamento,Mejora de carta,カード強化,Αναβάθμιση Κάρτας,强化卡牌,强化卡牌,Улучшение карты,Melhoria de Carta,Ulepszenie Karty,Kartenverbesserung
 ui.card_upgrade.btn_skip,건너뛰기,Skip,Passer,Salta,Omitir,スキップ,Παράλειψη,跳过,跳过,Пропустить,Pular,Pomiń,Überspringen
 ui.card_upgrade.eyebrow,단련,Tempering,Trempe,Tempra,Temple,鍛錬,Σφυρηλάτηση,锻造,鍛造,Закалка,Têmpera,Hartowanie,Härtung

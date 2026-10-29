@@ -76,6 +76,7 @@ func _combat_literal(legacy_amount: int) -> int:
 const CRIT_BASE_RATE: float = 0.05
 const CRIT_MARK_BONUS: float = 0.30
 const CRIT_MULTIPLIER: float = 2.0
+const SWORDSMAN_VOW_BANK_CAP: int = 60  # 검사의 약속: 이순신 차례 끝 방어 이월 상한 (기존 단위)
 
 # 튜토리얼 — true면 치명타 확정 (시연용). debug_hero_invincible 패턴.
 var tutorial_force_crit: bool = false
@@ -424,11 +425,6 @@ func estimate_effect_damage(effect: Resource, owner_id: String, target_enemy_ind
 		ctx.out_pct -= 0.25
 	if target_enemy_index >= 0 and target_enemy_index < _enemy_status.size():
 		var t_status: Dictionary = _damage_status_after_spend(effect, _enemy_status[target_enemy_index])
-		# 황제의 무도 (나폴레옹×무사시): 취약 적에게 out_pct +0.25
-		var _ed_active: bool = (owner_id == "napoleon" or owner_id == "musashi") \
-			and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi")
-		if _ed_active and t_status.get("vulnerable", 0) > 0:
-			ctx.out_pct += 0.25
 		if t_status.get("duel_lock", 0) > 0 and t_status.get("duel_lock_owner", "") == owner_id:
 			ctx.in_pct += 0.5
 		# FORM_SWITCH offense → out_pct +0.5 (적이 공격자인 경우는 없으므로 영웅 측 카드 기준 불필요)
@@ -548,9 +544,6 @@ func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionar
 	var _base_out_pct: float = 0.0
 	if owner_status.get("weak", 0) > 0:
 		_base_out_pct -= 0.25
-	# 황제의 무도 활성 여부 (타겟별 vulnerable 확인은 루프 내에서)
-	var _ed_active: bool = (card.owner_id == "napoleon" or card.owner_id == "musashi") \
-		and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi")
 	for effect in card.effects:
 		if effect.damage_type == "":
 			continue
@@ -576,9 +569,6 @@ func _estimate_card_damage(card: Resource, target_enemy_index: int) -> Dictionar
 			ctx.base = _card_effect_base_damage(effect, card.owner_id, ti)
 			ctx.flat = 0 if effect.rule_id == "poison_burst_multiplier" else _str_flat
 			ctx.out_pct = _base_out_pct
-			# 황제의 무도: 취약 적에게 out_pct +0.25
-			if _ed_active and t_status.get("vulnerable", 0) > 0:
-				ctx.out_pct += 0.25
 			if t_status.get("duel_lock", 0) > 0 and t_status.get("duel_lock_owner", "") == card.owner_id:
 				ctx.in_pct += 0.5
 			# vulnerable → in_pct +0.5
@@ -643,12 +633,18 @@ func _await_synergy_impact(vfx_status: String) -> void:
 	if _d > 0.0:
 		await _await_vfx_impact(_d + 0.5)
 
-# 성전 (잔다르크×나폴레옹) — 두 영웅 생존 시 힐량을 나폴레옹 사기에 비례 증폭 (사기 1당 +7%)
-func _holy_war_amplify(base_heal: int) -> int:
-	if team_mgr == null or not team_mgr.is_alive("joan_of_arc") or not team_mgr.is_alive("napoleon"):
-		return base_heal
-	var morale: int = _hero_status.get("napoleon", {}).get("morale", 0)
-	return int(base_heal * (1.0 + morale * 0.07))
+func _add_first_hit_bonus(hero_id: String, amount: int) -> void:
+	if not _hero_status.has(hero_id):
+		_hero_status[hero_id] = {}
+	_hero_status[hero_id]["next_attack_first_hit_bonus"] = _hero_status[hero_id].get("next_attack_first_hit_bonus", 0) + amount
+
+func _grant_morale(hero_id: String, amount: int) -> void:
+	if not _hero_status.has(hero_id):
+		_hero_status[hero_id] = {}
+	var new_morale: int = _hero_status[hero_id].get("morale", 0) + amount
+	_hero_status[hero_id]["morale"] = new_morale
+	status_applied.emit(hero_id, "morale", amount)
+	morale_changed.emit(hero_id, new_morale)
 
 func setup_battle(enemies: Array, is_tutorial: bool = false) -> void:
 	tutorial_active = is_tutorial
@@ -1085,6 +1081,12 @@ func _phase_hero_post(hid: String) -> bool:
 	var old_speed: int = _hero_effective_speed(hid)
 	if _hero_status.has(hid):
 		_hero_status[hid].erase("next_attack_first_hit_bonus")
+	# 검사의 약속 (이순신×무사시): 이순신 차례가 끝날 때 남은 방어의 절반(최대 6)을 무사시 다음 공격 첫 타에 더한다.
+	if hid == "yi_sun_sin" and team_mgr.is_alive("musashi"):
+		var banked: int = mini(_hero_block.get(hid, 0) / 2, _combat_literal(SWORDSMAN_VOW_BANK_CAP))
+		if banked > 0:
+			_add_first_hit_bonus("musashi", banked)
+			synergy_triggered.emit("synergy.musashi_yi.name", hid)
 	for stype: String in ["weak", "vulnerable", "taunt", "silence"]:
 		var cur: int = _hero_status.get(hid, {}).get(stype, 0)
 		if cur > 0:
@@ -1259,10 +1261,8 @@ func _revision_damage(card: Resource, effect: Resource, target: int, amount: int
 	for idx in targets:
 		if idx < 0 or idx >= _enemies.size() or not _enemy_alive[idx]:
 			continue
-		var crit := _roll_crit(idx, not _enemy_status[idx].get("marked_by", []).is_empty())
+		var crit := _roll_crit(idx, not _enemy_status[idx].get("marked_by", []).is_empty(), card.owner_id)
 		ctx.out_pct = base_out_pct
-		if card.owner_id in ["napoleon", "musashi"] and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi") and _enemy_status[idx].get("vulnerable", 0) > 0:
-			ctx.out_pct += 0.25
 		ctx.crit_mult = crit.crit_mult
 		_last_attacker[idx] = card.owner_id
 		_deal_damage_to_enemy(idx, _outgoing_damage(ctx), effect.damage_type, crit.is_crit, card.owner_id)
@@ -1343,6 +1343,10 @@ func _apply_revision_effect(card: Resource, effect: Resource, target: int, ally:
 			if team_mgr.is_alive(ally_id):
 				var moved := _spend_block(hid, p.consume_cap) if ally_id != hid else 0
 				_gain_block(ally_id, int(p.base) + moved)
+				# 검사의 약속 (이순신×무사시): 이순신이 옮긴 방어만큼 무사시의 다음 공격 첫 타 피해 +
+				if hid == "yi_sun_sin" and moved > 0 and team_mgr.is_alive("musashi"):
+					_add_first_hit_bonus("musashi", moved)
+					synergy_triggered.emit("synergy.musashi_yi.name", hid)
 		"formation_drill":
 			for hero in team_mgr.get_living_heroes():
 				if _hero_block.get(hero.hero_id, 0) <= 0:
@@ -1352,11 +1356,11 @@ func _apply_revision_effect(card: Resource, effect: Resource, target: int, ally:
 					morale_changed.emit(hero.hero_id, _hero_status[hero.hero_id].morale)
 		"heal_if_enemy_debuff":
 			if target_alive and _enemy_status[target].get(p.status, 0) > 0:
-				_heal_hero_safe(hid, _holy_war_amplify(p.amount))
+				_heal_hero_safe(hid, p.amount)
 		"overflow_heal":
 			if team_mgr.is_alive(ally_id):
 				var before: int = team_mgr.get_current_hp(ally_id)
-				var amount: int = _holy_war_amplify(p.heal)
+				var amount: int = p.heal
 				if _heal_hero_safe(ally_id, amount):
 					var restored: int = team_mgr.get_current_hp(ally_id) - before
 					_gain_block(ally_id, mini(p.block_cap, maxi(0, amount - restored)))
@@ -1364,7 +1368,7 @@ func _apply_revision_effect(card: Resource, effect: Resource, target: int, ally:
 			if team_mgr.is_alive(ally_id):
 				var spent := _spend_block(ally_id, p.consume_cap)
 				if spent > 0:
-					_heal_hero_safe(ally_id, _holy_war_amplify(spent))
+					_heal_hero_safe(ally_id, spent)
 				deck_mgr.draw_cards_h(hid, p.draw)
 		"bank_draw":
 			var spent := _spend_hero_resource(hid, "sacrifice_bank", p.consume_cap)
@@ -1526,7 +1530,7 @@ func _apply_revision_effect(card: Resource, effect: Resource, target: int, ally:
 			_gain_block(hid, int(p.base) + maxi(0, team_mgr.get_living_heroes().size() - 1) * int(p.per_other_ally))
 		"heal_ally_if_owner_hp_below":
 			if team_mgr.get_current_hp(hid) * 100 <= team_mgr.get_hero(hid).max_hp * int(p.hp_percent):
-				_heal_hero_safe(ally_id, _holy_war_amplify(p.amount))
+				_heal_hero_safe(ally_id, p.amount)
 		"team_block_consume_morale":
 			var spent := 0
 			for hero in team_mgr.get_living_heroes():
@@ -1548,7 +1552,7 @@ func _apply_revision_effect(card: Resource, effect: Resource, target: int, ally:
 			if dead_id != "":
 				team_mgr.revive(dead_id, maxi(1, int(team_mgr.get_hero(dead_id).max_hp * float(p.revive_percent) / 100.0)))
 			else:
-				_heal_hero_safe(ally_id, _holy_war_amplify(p.heal))
+				_heal_hero_safe(ally_id, p.heal)
 		"sacrifice_then_power":
 			var hp_before: int = team_mgr.get_current_hp(hid)
 			team_mgr.take_damage(hid, p.sacrifice)
@@ -1882,6 +1886,10 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 		next_hit_bonus = _hero_status.get(card.owner_id, {}).get("next_attack_first_hit_bonus", 0)
 		if _hero_status.has(card.owner_id):
 			_hero_status[card.owner_id].erase("next_attack_first_hit_bonus")
+		# 황제의 무도 (나폴레옹×무사시): 적이 1명뿐일 때 무사시가 공격하면 나폴레옹 사기 +1 (무사시 차례당 1회)
+		if card.owner_id == "musashi" and _get_living_enemy_count() == 1 and team_mgr.is_alive("napoleon") and _use_turn_effect("musashi", "synergy_emperor_dance_solo"):
+			_grant_morale("napoleon", 1)
+			synergy_triggered.emit("synergy.napoleon_musashi.name", "musashi")
 	var first_damage_effect := true
 	var _stage_elapsed := 0.0
 	var _pending_cleared := false
@@ -1922,29 +1930,20 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 				var owner_status: Dictionary = _hero_status.get(card.owner_id, {})
 				# power.strength_player: 영웅 측 strength 플랫 보너스
 				var _str_flat: int = _hero_strength(card.owner_id)
-				# 공격자 out_pct 기본값 — weak(-0.25), 황제의 무도(+0.25) 는 hit 루프 안에서 합산
+				# 공격자 out_pct 기본값 — weak(-0.25)
 				var _base_out_pct: float = 0.0
 				if owner_status.get("weak", 0) > 0:
 					_base_out_pct -= 0.25
 				# power.bonus_per_hit: 히트당 추가 피해
 				var _bph: int = _active_powers.get("power.bonus_per_hit:" + card.owner_id, {}).get("value", 0)
-				# 황제의 무도 (나폴레옹×무사시): 취약 적에게 가하는 피해 +25%
-				var _ed_active: bool = (card.owner_id == "napoleon" or card.owner_id == "musashi") and team_mgr != null and team_mgr.is_alive("napoleon") and team_mgr.is_alive("musashi")
-				var _ed_fired: bool = false  # 황제의 무도 라벨 1회/카드
 				for _hit in range(effect.hit_count):
 					if effect.target == "ALL":
 						for i in range(_enemies.size()):
 							if _enemy_alive[i]:
 								# 치명타 — 적 status.marked_by 비어있지 않으면 +30%
 								var _all_hm: bool = not _enemy_status[i].get("marked_by", []).is_empty()
-								var _all_cr: Dictionary = _roll_crit(i, _all_hm)
-								# 황제의 무도: 취약 적에게 +25% 합산
+								var _all_cr: Dictionary = _roll_crit(i, _all_hm, card.owner_id)
 								var _all_out_pct: float = _base_out_pct
-								if _ed_active and _enemy_status[i].get("vulnerable", 0) > 0:
-									_all_out_pct += 0.25
-									if not _ed_fired:
-										_ed_fired = true
-										synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
 								var _all_ctx := DamageContext.new()
 								_all_ctx.base = effect.value
 								_all_ctx.flat = _str_flat + (next_hit_bonus if _hit == 0 and first_damage_effect else 0)
@@ -1958,14 +1957,8 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 					else:
 						if target_enemy_index >= 0 and target_enemy_index < _enemies.size():
 							var _hm: bool = not _enemy_status[target_enemy_index].get("marked_by", []).is_empty()
-							var _cr: Dictionary = _roll_crit(target_enemy_index, _hm)
-							# 황제의 무도: 취약 적에게 +25% 합산
+							var _cr: Dictionary = _roll_crit(target_enemy_index, _hm, card.owner_id)
 							var _sgl_out_pct: float = _base_out_pct
-							if _ed_active and _enemy_status[target_enemy_index].get("vulnerable", 0) > 0:
-								_sgl_out_pct += 0.25
-								if not _ed_fired:
-									_ed_fired = true
-									synergy_triggered.emit("synergy.napoleon_musashi.name", card.owner_id)
 							var _sgl_ctx := DamageContext.new()
 							_sgl_ctx.base = effect.value
 							_sgl_ctx.flat = _str_flat + (next_hit_bonus if _hit == 0 and first_damage_effect else 0)
@@ -2052,7 +2045,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 								heal_id = hero.hero_id
 					else:
 						heal_id = target_hero_id if effect.target != "SELF" and target_hero_id != "" else card.owner_id
-					_heal_hero_safe(heal_id, _holy_war_amplify(effect.value))
+					_heal_hero_safe(heal_id, effect.value)
 					# 성녀의 방패 (잔다르크×이순신): 잔다르크 힐 시 대상 방어구 +40
 					if card.owner_id == "joan_of_arc" and team_mgr.is_alive("yi_sun_sin"):
 						_hero_block[heal_id] = _hero_block.get(heal_id, 0) + _combat_literal(40)
@@ -2129,7 +2122,7 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 							if not team_mgr.is_alive(hero.hero_id):
 								dead_count += 1
 						heal_amt = effect.value * dead_count
-					heal_amt = _holy_war_amplify(heal_amt)
+					heal_amt = heal_amt
 					# 사망 영웅 제외 — 살아있는 영웅만 HEAL (REVIVE 는 별도 effect_type)
 					for hero in team_mgr.heroes:
 						if team_mgr.is_alive(hero.hero_id):
@@ -2696,6 +2689,10 @@ func _deal_damage_to_enemy(enemy_index: int, incoming_amount: float, damage_type
 			var bounty: Dictionary = _active_powers.get("power.on_kill_energy_once:" + source_owner, {})
 			if not bounty.is_empty() and _use_turn_effect(source_owner, "kill_energy"):
 				deck_mgr.add_energy_h(source_owner, bounty.get("value", 1))
+		# 황제의 무도 (나폴레옹×무사시): 무사시가 처치해 적이 1명만 남으면 나폴레옹 사기 +2 (차례당 1회)
+		if duel_owner == "musashi" and _get_living_enemy_count() == 1 and team_mgr.is_alive("napoleon") and _use_turn_effect("musashi", "synergy_emperor_dance"):
+			_grant_morale("napoleon", 2)
+			synergy_triggered.emit("synergy.napoleon_musashi.name", "musashi")
 	_check_phase_transition(enemy_index)
 	_check_win_condition()
 
@@ -2940,6 +2937,10 @@ func _heal_hero_safe(hero_id: String, amount: int) -> bool:
 	var healed: int = team_mgr.get_current_hp(hero_id) - before_hp
 	_team_healed_turn += healed
 	_team_healed_battle += healed
+	# 성전 (잔다르크×나폴레옹): 잔다르크 차례에 실제로 회복시키면 나폴레옹 사기 +1 (차례당 1회)
+	if healed > 0 and get_current_hero_id() == "joan_of_arc" and team_mgr.is_alive("napoleon") and _use_turn_effect("joan_of_arc", "synergy_holy_war"):
+		_grant_morale("napoleon", 1)
+		synergy_triggered.emit("synergy.joan_napoleon.name", "joan_of_arc")
 	# 성녀의 방패 (성녀×통제사): 힐 적용 시 대상 방어구 +30
 	if amount > 0 and team_mgr.is_alive("joan_of_arc") and team_mgr.is_alive("yi_sun_sin"):
 		_hero_block[hero_id] = _hero_block.get(hero_id, 0) + _combat_literal(30)
@@ -3553,20 +3554,23 @@ func _roll_crit_enemy(has_mark: bool) -> Dictionary:
 
 # 치명타 굴림 (배율 전용) — _apply_card_effects DAMAGE 분기에서 사용.
 # 반환: {crit_mult: float, is_crit: bool}
-func _roll_crit(target_enemy_index: int, has_mark: bool) -> Dictionary:
+func _roll_crit(target_enemy_index: int, has_mark: bool, attacker: String = "") -> Dictionary:
 	if tutorial_force_crit:
 		return {"crit_mult": CRIT_MULTIPLIER, "is_crit": true}
-	if _test_disable_crit or tutorial_active:
+	if tutorial_active:
 		return {"crit_mult": 1.0, "is_crit": false}
-	var rate: float = CRIT_BASE_RATE + (CRIT_MARK_BONUS if has_mark else 0.0)
-	# 독날 (클레오파트라×무사시): 반함 상태 적에게 치명타 확률 100%
-	if team_mgr != null and team_mgr.is_alive("cleopatra") and team_mgr.is_alive("musashi") and target_enemy_index < _enemy_status.size() and _enemy_status[target_enemy_index].get("enthrall", 0) > 0:
-		rate = 1.0
-	var is_crit: bool = randf() < rate
-	# 초원의 결투사 (칭기즈칸×무사시): 파티 치명타 데미지 ×3 (기본 ×2)
+	# 초원의 결투사 (칭기즈칸×무사시): 무사시가 칭기즈칸 표식이 있는 적을 치면 표식을 지우고 치명타 확정 (차례당 1회).
+	# 확률이 아닌 확정 규칙이라 테스트의 치명타 끄기보다 먼저 판정한다.
+	var is_crit: bool = _steppe_duel_crit(target_enemy_index, attacker)
+	if not is_crit:
+		if _test_disable_crit:
+			return {"crit_mult": 1.0, "is_crit": false}
+		var rate: float = CRIT_BASE_RATE + (CRIT_MARK_BONUS if has_mark else 0.0)
+		# 독날 (클레오파트라×무사시): 반함 상태 적에게 치명타 확률 100%
+		if team_mgr != null and team_mgr.is_alive("cleopatra") and team_mgr.is_alive("musashi") and target_enemy_index < _enemy_status.size() and _enemy_status[target_enemy_index].get("enthrall", 0) > 0:
+			rate = 1.0
+		is_crit = randf() < rate
 	var crit_mult: float = CRIT_MULTIPLIER
-	if team_mgr != null and team_mgr.is_alive("genghis_khan") and team_mgr.is_alive("musashi"):
-		crit_mult = 3.0
 	# 신의 원정 (잔다르크×칭기즈칸): 아군 치명타 발동 시 아군 전체 힐 +30
 	if is_crit and team_mgr != null and team_mgr.is_alive("joan_of_arc") and team_mgr.is_alive("genghis_khan"):
 		synergy_triggered.emit("synergy.joan_genghis.name", "joan_of_arc")
@@ -3579,6 +3583,18 @@ func _roll_crit(target_enemy_index: int, has_mark: bool) -> Dictionary:
 			for _jg_id in _jg_ids:
 				_heal_hero_safe(_jg_id, _combat_literal(30))
 	return {"crit_mult": crit_mult if is_crit else 1.0, "is_crit": is_crit}
+
+func _steppe_duel_crit(target_enemy_index: int, attacker: String) -> bool:
+	if attacker != "musashi" or team_mgr == null or not team_mgr.is_alive("genghis_khan") or target_enemy_index < 0 or target_enemy_index >= _enemy_status.size():
+		return false
+	var marks: Array = _enemy_status[target_enemy_index].get("marked_by", []).duplicate()
+	if not "genghis_khan" in marks or not _use_turn_effect("musashi", "synergy_steppe_duel"):
+		return false
+	marks.erase("genghis_khan")
+	_enemy_status[target_enemy_index]["marked_by"] = marks
+	status_applied.emit("enemy_%d" % target_enemy_index, "marked_by", marks.size())
+	synergy_triggered.emit("synergy.genghis_musashi.name", attacker)
+	return true
 
 func _pick_highest_hp(hero_ids: Array) -> String:
 	if hero_ids.is_empty():
@@ -3935,30 +3951,6 @@ func _apply_synergy_bonus(card: Resource, target_enemy_index: int) -> void:
 					else:
 						for _jm_id in _jm_ids:
 							apply_speed_bonus(_jm_id, 5, 3)
-			EffectRes.EffectType.DAMAGE:
-				# 검사의 약속 (이순신×무사시): 두 영웅 공격 시 둘 다 속도 +1 (전투 지속)
-				if (card_owner == "yi_sun_sin" or card_owner == "musashi") and team_mgr.is_alive("yi_sun_sin") and team_mgr.is_alive("musashi"):
-					for _sv_h in ["yi_sun_sin", "musashi"]:
-						var _sv_aid: String = "hero:" + _sv_h
-						var _sv_old: int = _actor_speed(_sv_aid)
-						if not _hero_status.has(_sv_h):
-							_hero_status[_sv_h] = {}
-						if not _hero_status[_sv_h].has("speed_bonus") or typeof(_hero_status[_sv_h]["speed_bonus"]) != TYPE_ARRAY:
-							_hero_status[_sv_h]["speed_bonus"] = []
-						# 기존 영구(dur 999) 항목에 누적 — 매번 새 줄 추가 방지 (툴팁 1줄 유지)
-						var _sv_arr: Array = _hero_status[_sv_h]["speed_bonus"]
-						var _sv_perm = null
-						for _sv_e in _sv_arr:
-							if typeof(_sv_e) == TYPE_DICTIONARY and int(_sv_e.get("dur", 0)) >= 999:
-								_sv_perm = _sv_e
-								break
-						if _sv_perm != null:
-							_sv_perm["value"] = int(_sv_perm.get("value", 0)) + 1
-						else:
-							_sv_arr.append({"value": 1, "dur": 999})
-						_adjust_turn_queue_for_speed_change(_sv_aid, _sv_old)
-						status_applied.emit(_sv_h, "speed_bonus", 1)
-					synergy_triggered.emit("synergy.musashi_yi.name", card_owner)
 			EffectRes.EffectType.APPLY_STATUS:
 				# 성스러운 독 (성녀×파라오): 클레오파트라 독 부여 시 아군 전체 회복 +15 — 흡수 VFX 임팩트에 적용
 				if card_owner == "cleopatra" and effect.status_type == "poison" and team_mgr.is_alive("joan_of_arc"):

@@ -108,8 +108,12 @@ func _test_data_contract() -> void:
 		pool_count += pool.size()
 		var starters: Array = source.starter_deck()
 		_check(starters.size() == 10, "starter deck stays at ten cards")
+		var pool_names: Array = pool.map(func(card: Resource) -> String: return card.card_name)
 		for starter in starters:
 			starter_keys[starter.owner_id + "|" + starter.card_name] = true
+			# 시작 덱에 넣은 보상 카드(예: 이판사판)는 보상 풀과 같은 개편 효과를 쓴다.
+			if starter.card_name in pool_names:
+				continue
 			_check(not starter.has_meta("archetype_synergy_revision"), "starter effect preserved " + starter.owner_id + "/" + starter.card_name)
 	_check(pool_count == 189, "reward pool remains 189", {"actual": pool_count})
 

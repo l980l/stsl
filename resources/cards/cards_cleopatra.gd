@@ -14,8 +14,9 @@ static func starter_deck() -> Array:
 		cards.append(_strike())
 	for _i in range(2):
 		cards.append(_defend())
-	for _i in range(2):
-		cards.append(_venom_needle())
+	# 세 아키타입을 첫 전투부터 맛보게: 독살(독침·의식) · 저주(왕실 방어) · 조종(유혹)
+	cards.append(_venom_needle())
+	cards.append(_temptation())
 	for _i in range(2):
 		cards.append(_royal_guard())
 	cards.append(_poison_ritual())

@@ -16,8 +16,9 @@ static func starter_deck() -> Array:
 		cards.append(_defend())
 	for _i in range(2):
 		cards.append(_hussar_charge())
-	for _i in range(2):
-		cards.append(_war_bugle())
+	# 세 아키타입을 첫 전투부터 맛보게: 돌격(경기병) · 지휘(나팔·포고) · 군단(참호 구축)
+	cards.append(_war_bugle())
+	cards.append(_trench_construction())
 	cards.append(_victory_proclamation())
 	cards.append(CommonRes.counter("napoleon"))
 	return V3.apply_all(cards)

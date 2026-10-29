@@ -14,10 +14,11 @@ static func starter_deck() -> Array:
 		cards.append(_strike())
 	for _i in range(2):
 		cards.append(_defend())
-	for _i in range(2):
-		cards.append(_shield())
-	for _i in range(2):
-		cards.append(_counter_strike())
+	# 세 아키타입을 첫 전투부터 맛보게: 거북선(방패·역공·반격) · 학익진(진형 결속) · 필사즉생(이판사판)
+	cards.append(_shield())
+	cards.append(_formation_bond())
+	cards.append(_counter_strike())
+	cards.append(_all_in())
 	cards.append(_counter())
 	cards.append(CommonRes.counter("yi_sun_sin"))
 	return V3.apply_all(cards)
