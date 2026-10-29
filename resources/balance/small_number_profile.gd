@@ -46,6 +46,7 @@ const HP_POWER_STATUS := {
 	"power.token_bonus_dmg": true,
 	"power.on_enthrall_strength": true,
 	"power.charm_threshold_minus": true,
+	"power.vulnerable_hit_block": true,
 }
 
 static func candidate_pair(card: Resource, game_manager: Object = null) -> Dictionary:
@@ -186,6 +187,8 @@ static func _convert_rule_params(rule_id: String, params: Dictionary) -> void:
 		"consume_own_tokens", "consume_own_tokens_all":
 			_scale_keys(params, ["multiplier"])
 		"team_token_damage", "team_morale_damage":
+			_scale_keys(params, ["cap"])
+		"heal_battle_damage":
 			_scale_keys(params, ["cap"])
 		"consume_charm_damage":
 			_scale_keys(params, ["consume_cap"])
@@ -372,6 +375,8 @@ static func _known_numeric_param(rule_id: String, status_type: String, key: Stri
 		"consume_own_block": return key in ["consume_cap", "multiplier"]
 		"consume_own_tokens", "consume_own_tokens_all": return key in ["consume_cap", "consume", "multiplier"]
 		"team_token_damage", "team_morale_damage": return key in ["cap"]
+		"heal_turn_damage", "heal_battle_damage": return key in ["percent", "cap"]
+		"weak_enemy_draw": return key == "cap"
 		"consume_charm_damage": return key == "consume_cap"
 		"formation_block": return key in ["base", "per_other_ally"]
 		"heal_ally_if_owner_hp_below", "block_ally_if_owner_survives", "next_attack_first_hit_bonus", "discard_up_to_one_for_block", "block_if_target_survives", "delayed_team_heal", "poison_existing_all_bonus": return key == "amount"

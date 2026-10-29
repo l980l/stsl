@@ -305,6 +305,10 @@ func _revision_display_text() -> String:
 			values["upgrade_suffix"] = _revision_format("draw_pairs_upgrade", {"amount": int(rule_params.get("upgrade_bonus", 0))}) if int(rule_params.get("upgrade_bonus", 0)) > 0 else ""
 			return _revision_format("draw_pairs", values)
 		"morale_spend_damage": return _revision_format("morale_spend", values)
+		"soldier_volley": return _revision_format("soldier_volley", values)
+		"heal_turn_damage", "heal_battle_damage": return _revision_format(rule_id, values)
+		"weak_enemy_draw": return _revision_format("weak_enemy_draw", values)
+		"block_damage_all": return _revision_format("block_damage_all_bonus" if value > 0 else "block_damage_all", values)
 		"consume_own_block":
 			# Keep the runtime ratio, but show 150%, never a decimal ×1.5.
 			values["multiplier_percent"] = int(round(float(rule_params.get("multiplier", 1)) * 100.0))

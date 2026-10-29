@@ -29,7 +29,6 @@ func run_all() -> Dictionary:
 	# 데이터 자체가 완전히 같았던 카드다. 효과 소비자는 별도 전투 테스트가 담당하고,
 	# 여기서는 명시값이 실제 GameManager 경로로 적용되는지를 고정한다.
 	var expected := {
-		"cleopatra|card.cleopatra.desert_recipe.name": [[3, -1]],
 		"cleopatra|card.cleopatra.seductive_stillness.name": [[7, 4]],
 		"yi_sun_sin|card.yi_sun_sin.fleet_fire.name": [[55, -1]],
 		"yi_sun_sin|card.yi_sun_sin.fighting_spirit.name": [[60, -1]],
@@ -52,7 +51,8 @@ func run_all() -> Dictionary:
 			_check(upgraded.effects[index].value == values[0], "fixed upgraded value " + key)
 			if values[1] >= 0:
 				_check(upgraded.effects[index].bonus_value == values[1], "fixed upgraded bonus " + key)
-	_check(expected.size() == 9, "nine previously no-op upgrades are covered")
+	# 사막의 약법은 덱 정체성 개편 5단계에서 규칙 드로우(1 → 2장)로 바뀌어 위 서명 검사가 강화를 확인한다.
+	_check(expected.size() == 8, "eight previously no-op upgrades are covered")
 	gm.free()
 	return {"passed": passed, "failed": failed}
 

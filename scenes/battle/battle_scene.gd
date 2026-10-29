@@ -5606,11 +5606,7 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 			tooltip = tr("status.taunt.desc")
 	# charm_resistance — 저항값과 함께 동적으로 계산된 매혹 임계값 표시
 	elif key == "charm_resistance":
-		var threshold: int = BattleManager._combat_literal(BattleManager.CHARM_THRESHOLD_BASE) + val
-		for power_key in BattleManager._active_powers:
-			if power_key.begins_with("power.charm_threshold_minus:"):
-				threshold -= int(BattleManager._active_powers[power_key].get("value", 0))
-		threshold = maxi(1, threshold)
+		var threshold: int = BattleManager.charm_threshold_for_resistance(val)
 		tooltip = tr("status.charm_resistance.desc") % [val, threshold]
 	# poison_dmg — 피해량 + 남은 지속 턴 수 동적 표시
 	elif key == "poison_dmg":
@@ -5654,6 +5650,9 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 			if key == "poison_dmg":
 				var dur: int = status.get("poison_dur", 0)
 				lbl.text = "%d/%d" % [val, dur]
+			elif key == "charm":
+				# 조종 덱: 반함까지 남은 양이 보이도록 현재 매혹/임계치
+				lbl.text = "%d/%d" % [val, BattleManager.charm_threshold_for_resistance(int(status.get("charm_resistance", 0)))]
 			else:
 				lbl.text = "%d" % val
 			lbl.theme_type_variation = "EyebrowLabel"
@@ -5670,6 +5669,8 @@ func _make_status_label(key: String, val: int, status: Dictionary) -> Control:
 	if key == "poison_dmg":
 		var dur: int = status.get("poison_dur", 0)
 		fallback_lbl.text = "☠%d/%d" % [val, dur]
+	elif key == "charm":
+		fallback_lbl.text = "♥%d/%d" % [val, BattleManager.charm_threshold_for_resistance(int(status.get("charm_resistance", 0)))]
 	else:
 		fallback_lbl.text = "%s%d" % [STATUS_EMOJI.get(key, key), val]
 	fallback_lbl.theme_type_variation = "EyebrowLabel"

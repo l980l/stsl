@@ -110,6 +110,7 @@ static func apply(card: Resource) -> Resource:
 		card.effects[0].upgrade_value = 120 if card.card_name.ends_with(".strike.name") else 150
 	# Reward archetypes add resource/timing choices without replacing starters.
 	preload("res://resources/cards/archetype_synergy_revision.gd").apply(card)
+	preload("res://resources/cards/deck_identity_revision.gd").apply(card)
 	if card.has_explicit_upgrade:
 		for effect in card.effects:
 			if effect.damage_type != "" and original_damage_type != "":

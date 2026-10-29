@@ -117,6 +117,12 @@ var _in_player_turn: bool = false  # MIMIC 트래커 게이트
 
 # 영웅 상태 (HP는 TeamManager가 관리)
 var _hero_block: Dictionary = {}
+# 성전 보상용 아군 실제 회복량 — 이번 영웅 차례 / 이번 전투 누적 (_heal_hero_safe 에서 집계).
+var _team_healed_turn: int = 0
+var _team_healed_battle: int = 0
+# 람세스의 방패: 이번 영웅 차례에 취약한 적 공격으로 클레오파트라가 방어를 얻은 횟수.
+var _vulnerable_guard_hits: int = 0
+const VULNERABLE_GUARD_LIMIT: int = 3
 var _hero_status: Dictionary = {}
 
 # 지속 효과 (권능 카드): { "<key>": { "value": int, "owner_id": String, "params": Dictionary }, ... }
@@ -449,6 +455,8 @@ func _card_effect_base_damage(effect: Resource, owner_id: String, target: int, b
 		"duel_status_damage": return effect.bonus_value if _get_living_enemy_count() == 1 and enemy_st.get(p.status, 0) >= int(p.consume) else effect.value
 		"paired_draw_damage": return _paired_draw_damage(owner_id, p)
 		"morale_spend_damage": return effect.bonus_value if st.get("morale", 0) >= int(p.consume) else effect.value
+		"block_damage_all": return effect.value + _hero_block.get(owner_id, 0)
+		"heal_turn_damage", "heal_battle_damage": return _heal_cash_damage(effect)
 		"consume_own_block": return effect.value + int(mini(_hero_block.get(owner_id, 0), p.consume_cap) * float(p.multiplier))
 		"consume_own_tokens", "consume_own_tokens_all": return effect.value + mini(st.get("tokens", 0), p.get("consume_cap", p.get("consume", 0))) * effect.bonus_value
 		"team_morale_damage", "team_token_damage":
@@ -658,6 +666,9 @@ func setup_battle(enemies: Array, is_tutorial: bool = false) -> void:
 			deck_mgr.setup_for_battle(hero_ids)
 	turn_count = 0
 	_enemy_strength_remainders.clear()
+	_team_healed_turn = 0
+	_vulnerable_guard_hits = 0
+	_team_healed_battle = 0
 	damage_taken_this_battle = 0
 	_enemies = enemies.duplicate()
 	if combat_unit_divisor > 1 and preload("res://resources/balance/combat_scale.gd").enabled():
@@ -944,27 +955,9 @@ func _token_dtype_for(owner: String) -> String:
 @warning_ignore("shadowed_variable_base_class")
 func _run_token_attacks(owner: String, count: int) -> bool:
 	var did: bool = false
-	var dtype: String = _token_dtype_for(owner)
 	for _ti in range(count):
-		var alive_indices: Array = []
-		for ei in range(_enemies.size()):
-			if _enemy_alive[ei]:
-				alive_indices.append(ei)
-		if alive_indices.is_empty():
+		if not _fire_token(owner, _ti):
 			break
-		var pick: int = alive_indices[randi() % alive_indices.size()]
-		_last_attacker[pick] = owner
-		# 토큰 인덱스 + 타겟 적 전달 — battle_scene 이 병사 타일 위치에서 VFX 발사
-		token_attack_fired.emit(owner, _ti, pick)
-		_deal_damage_to_enemy(pick, _combat_literal(TOKEN_DMG_PER_STACK), dtype)
-		# 혼란의 돌격 (황제×파라오): 나폴레옹 병사 공격 1회당 매혹 +3
-		if owner == "napoleon" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
-			_apply_status_to_enemy(pick, "charm", _combat_literal(3))
-			synergy_triggered.emit("synergy.napoleon_cleopatra.name", owner)
-		# 약탈과 독 (정복자×파라오): 칭기즈칸 병사 공격 1회당 독 +5
-		if owner == "genghis_khan" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
-			_apply_status_to_enemy(pick, "poison", _combat_literal(5))
-			synergy_triggered.emit("synergy.genghis_cleopatra.name", owner)
 		did = true
 		# 토큰 사이 짧은 랜덤 지연 — SFX 겹침 방지 (0.08~0.18s)
 		if count > 1 and is_inside_tree():
@@ -973,10 +966,75 @@ func _run_token_attacks(owner: String, count: int) -> bool:
 				return did
 	return did
 
+# 병사 1명의 공격 1회 — 랜덤 생존 적에게 병사 피해(+칸의 깃발 보너스)와 조합 시너지. 생존 적이 없으면 false.
+@warning_ignore("shadowed_variable_base_class")
+func _fire_token(owner: String, token_index: int) -> bool:
+	var alive_indices: Array = []
+	for ei in range(_enemies.size()):
+		if _enemy_alive[ei]:
+			alive_indices.append(ei)
+	if alive_indices.is_empty():
+		return false
+	var pick: int = alive_indices[randi() % alive_indices.size()]
+	_last_attacker[pick] = owner
+	# 토큰 인덱스 + 타겟 적 전달 — battle_scene 이 병사 타일 위치에서 VFX 발사
+	token_attack_fired.emit(owner, token_index, pick)
+	var bonus: int = _active_powers.get("power.token_bonus_dmg:" + owner, {}).get("value", 0)
+	_deal_damage_to_enemy(pick, _combat_literal(TOKEN_DMG_PER_STACK) + bonus, _token_dtype_for(owner))
+	# 혼란의 돌격 (황제×파라오): 나폴레옹 병사 공격 1회당 매혹 +3
+	if owner == "napoleon" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
+		_apply_status_to_enemy(pick, "charm", _combat_literal(3))
+		synergy_triggered.emit("synergy.napoleon_cleopatra.name", owner)
+	# 약탈과 독 (정복자×파라오): 칭기즈칸 병사 공격 1회당 독 +5
+	if owner == "genghis_khan" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
+		_apply_status_to_enemy(pick, "poison", _combat_literal(5))
+		synergy_triggered.emit("synergy.genghis_cleopatra.name", owner)
+	return true
+
+# 람세스의 방패: 아군 영웅(차례 중인 영웅 포함)이 취약한 적을 칠 때마다 클레오파트라 방어 (차례당 3회).
+func _vulnerable_guard(source_owner: String) -> void:
+	var hitter: String = source_owner
+	if hitter == "" and _current_actor_id.begins_with("hero:"):
+		hitter = _current_actor_id.substr(5)
+	if hitter == "" or team_mgr == null or not team_mgr.is_alive("cleopatra"):
+		return
+	var power: Dictionary = _active_powers.get("power.vulnerable_hit_block:cleopatra", {})
+	if power.is_empty() or _vulnerable_guard_hits >= VULNERABLE_GUARD_LIMIT:
+		return
+	_vulnerable_guard_hits += 1
+	_gain_block("cleopatra", int(power.get("value", 0)))
+
+# 매혹 저항을 반영한 반함 임계치 (모든 영웅의 power.charm_threshold_minus 합산 차감).
+func charm_threshold_for_resistance(resistance: int) -> int:
+	var reduce: int = 0
+	for key in _active_powers:
+		if key.begins_with("power.charm_threshold_minus:"):
+			reduce += int(_active_powers[key].get("value", 0))
+	return maxi(1, _combat_literal(CHARM_THRESHOLD_BASE) + resistance - reduce)
+
+# 성전 회복량 피해 — 기본 피해 + 회복량의 percent% (cap 이 있으면 보너스 상한).
+func _heal_cash_damage(effect: Resource) -> int:
+	var p: Dictionary = effect.rule_params
+	var healed: int = _team_healed_turn if effect.rule_id == "heal_turn_damage" else _team_healed_battle
+	var bonus: int = int(healed * int(p.get("percent", 0)) / 100)
+	if p.has("cap"):
+		bonus = mini(bonus, int(p.cap))
+	return effect.value + bonus
+
+# 본인이 모든 생존 적보다 빠른가 — 질주 보상 조건.
+func _owner_outpaces_enemies(hid: String) -> bool:
+	var speed: int = _hero_effective_speed(hid)
+	for ei in range(_enemies.size()):
+		if _enemy_alive[ei] and _enemy_effective_speed(ei) >= speed:
+			return false
+	return true
+
 # 본인 영웅 차례 시작 사전 처리 — 본인 토큰 공격 + 본인 poison tick
 func _phase_hero_pre(hid: String) -> bool:
 	if team_mgr == null or not team_mgr.is_alive(hid):
 		return false
+	_team_healed_turn = 0
+	_vulnerable_guard_hits = 0
 	var did_work: bool = false
 	var token_count: int = _hero_status.get(hid, {}).get("tokens", 0)
 	# 본인 병사가 있을 때만 토큰 공격 — 본인 병사가 없으면 파트너 병사도 합류하지 않음
@@ -1383,6 +1441,26 @@ func _apply_revision_effect(card: Resource, effect: Resource, target: int, ally:
 			# Preserve legacy PER_DRAW_DMG: no strength, weak or crit additions.
 			if target_alive and damage > 0:
 				_deal_damage_to_enemy(target, damage)
+		"weak_enemy_draw":
+			# 저주 보상: 약화된 생존 적 1명당 1장 더 (최대 cap).
+			var weakened := 0
+			for ei in range(_enemies.size()):
+				if _enemy_alive[ei] and _enemy_status[ei].get("weak", 0) > 0:
+					weakened += 1
+			deck_mgr.draw_cards_h(hid, int(p.draw) + mini(weakened, int(p.cap)))
+		"heal_turn_damage", "heal_battle_damage":
+			# 성전 보상: 아군이 실제로 회복한 양을 모든 적 피해로 바꾼다.
+			_revision_damage(card, effect, target, _heal_cash_damage(effect), true, first_bonus)
+		"block_damage_all":
+			# 거북선 이정표: 현재 방어만큼 모든 적에게 피해, 방어는 소비하지 않는다.
+			_revision_damage(card, effect, target, effect.value + _hero_block.get(hid, 0), true, first_bonus)
+		"soldier_volley":
+			# 질주 보상: 모든 적 피해 후 병사 전원이 즉시 공격하고, 모든 적보다 빠르면 한 번 더 공격한다.
+			_revision_damage(card, effect, target, effect.value, true, first_bonus)
+			var volleys: int = 2 if _owner_outpaces_enemies(hid) else 1
+			for _v in range(volleys):
+				for ti in range(int(_hero_status.get(hid, {}).get("tokens", 0))):
+					_fire_token(hid, ti)
 		"morale_spend_damage":
 			var damage: int = effect.value
 			if _hero_status.get(hid, {}).get("morale", 0) >= int(p.consume):
@@ -2568,6 +2646,7 @@ func _deal_damage_to_enemy(enemy_index: int, incoming_amount: float, damage_type
 	# vulnerable: 받는 측 +50%
 	if _enemy_status[enemy_index].get("vulnerable", 0) > 0:
 		ctx.in_pct += 0.5
+		_vulnerable_guard(source_owner)
 	# Fate Duel: only its caster gains the bonus against the marked enemy.
 	# Most card damage calls omit source_owner, so use the active hero turn as the
 	# authoritative owner for normal play while retaining explicit-source callers.
@@ -2856,7 +2935,11 @@ func _heal_hero_safe(hero_id: String, amount: int) -> bool:
 		return false
 	if team_mgr == null:
 		return false
+	var before_hp: int = team_mgr.get_current_hp(hero_id)
 	team_mgr.heal(hero_id, amount)
+	var healed: int = team_mgr.get_current_hp(hero_id) - before_hp
+	_team_healed_turn += healed
+	_team_healed_battle += healed
 	# 성녀의 방패 (성녀×통제사): 힐 적용 시 대상 방어구 +30
 	if amount > 0 and team_mgr.is_alive("joan_of_arc") and team_mgr.is_alive("yi_sun_sin"):
 		_hero_block[hero_id] = _hero_block.get(hero_id, 0) + _combat_literal(30)

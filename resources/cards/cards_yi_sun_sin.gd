@@ -80,12 +80,12 @@ static func _united_bulwark() -> Resource:
 	c.effects = [e]; return c
 
 static func _naval_muster() -> Resource:
-	# 수군 소집 — UNCOMMON, 1코, SKILL, 거북선: SUMMON_TOKEN 2 + BLOCK 40 (이순신 토큰 소스)
+	# 수군 소집 — UNCOMMON, 1코, SKILL, 학익진: SUMMON_TOKEN 2 + BLOCK 40 (이순신 토큰 소스)
 	var c := CardRes.new()
 	c.card_name = "card.yi_sun_sin.naval_muster.name"; c.owner_id = "yi_sun_sin"; c.cost = 1
 	c.card_type = CardRes.CardType.SKILL
 	c.rarity = CardRes.Rarity.UNCOMMON; c.play_animation = "idle"
-	c.archetype = ["card.yi_sun_sin.turtle_shield.archetype"]
+	c.archetype = ["card.yi_sun_sin.formation_bond.archetype"]  # 학익진(함대): 팀 병사 덱
 	var ea := EffRes.new()
 	ea.effect_type = EffRes.EffectType.SUMMON_TOKEN; ea.value = 2; ea.base_value = 2
 	var eb := EffRes.new()

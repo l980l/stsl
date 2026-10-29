@@ -95,8 +95,9 @@ func test_yi_sun_sin_archetype_distribution() -> void:
 			var a: String = TranslationServer.translate(a_key)
 			if a in archetypes:
 				archetypes[a] += 1
-	_assert(archetypes["거북선"] == 11, "이순신 거북선 11장 (실제: %d)" % archetypes["거북선"])
-	_assert(archetypes["학익진"] == 11, "이순신 학익진 11장 (실제: %d)" % archetypes["학익진"])
+	# 덱 정체성 개편 3단계: 병사 카드 3장(수군 소집·일제 사격·함포 일제사)을 거북선 → 학익진(함대)으로 옮겼다.
+	_assert(archetypes["거북선"] == 8, "이순신 거북선 8장 (실제: %d)" % archetypes["거북선"])
+	_assert(archetypes["학익진"] == 14, "이순신 학익진 14장 (실제: %d)" % archetypes["학익진"])
 	# 필사즉생 10 + fleet_command 다중 archetype (학익진+필사즉생) = 11
 	_assert(archetypes["필사즉생"] == 11, "이순신 필사즉생 11장 (실제: %d)" % archetypes["필사즉생"])
 
@@ -153,21 +154,29 @@ func test_joan_rarity_distribution() -> void:
 	# DIVINE 1: saints_flame
 	_assert(counts["DIVINE"] == 1, "잔다르크 DIVINE 1장 (실제: %d)" % counts["DIVINE"])
 
+const JOAN_MARTYR := 10
+const JOAN_BLESSING := 14
+const JOAN_CRUSADE := 11
+
 func test_joan_archetype_distribution() -> void:
 	print("[TestCardPoolDistribution] test_joan_archetype_distribution")
 	var JoanCards = load("res://resources/cards/cards_joan_of_arc.gd")
 	var pool: Array = JoanCards.pool()
-	var archetypes := {"신성": 0, "부활": 0, "순교": 0}
+	# 덱 정체성 개편 4단계: 태그 8개를 순교 / 축복 / 성전 3개로 합쳤다.
+	var archetypes := {"순교": 0, "축복": 0, "성전": 0}
+	var stray: Array = []
 	for c in pool:
 		var arr: Array = c.get("archetype") if c.get("archetype") != null else []
 		for a_key in arr:
 			var a: String = TranslationServer.translate(a_key)
 			if a in archetypes:
 				archetypes[a] += 1
-	# 순교 8 + divine_punishment(신성공격→+순교) + oracle_light(신성→+순교) = 10
-	_assert(archetypes["신성"] == 3, "잔다르크 신성 3장 (실제: %d)" % archetypes["신성"])
-	_assert(archetypes["부활"] == 4, "잔다르크 부활 4장 (실제: %d)" % archetypes["부활"])
-	_assert(archetypes["순교"] == 10, "잔다르크 순교 10장 (실제: %d)" % archetypes["순교"])
+			else:
+				stray.append(a)
+	_assert(stray.is_empty(), "잔다르크 태그는 순교/축복/성전뿐 (그 외: %s)" % str(stray))
+	_assert(archetypes["순교"] == JOAN_MARTYR, "잔다르크 순교 %d장 (실제: %d)" % [JOAN_MARTYR, archetypes["순교"]])
+	_assert(archetypes["축복"] == JOAN_BLESSING, "잔다르크 축복 %d장 (실제: %d)" % [JOAN_BLESSING, archetypes["축복"]])
+	_assert(archetypes["성전"] == JOAN_CRUSADE, "잔다르크 성전 %d장 (실제: %d)" % [JOAN_CRUSADE, archetypes["성전"]])
 
 func test_genghis_rarity_distribution() -> void:
 	print("[TestCardPoolDistribution] test_genghis_rarity_distribution")
@@ -198,8 +207,9 @@ func test_genghis_archetype_distribution() -> void:
 			if a in archetypes:
 				archetypes[a] += 1
 	# 약탈 8 + red_horizon(기동→+약탈) = 9
-	_assert(archetypes["기동"] == 13, "칭기즈칸 기동 13장 (실제: %d)" % archetypes["기동"])
-	_assert(archetypes["몽골 기병"] == 10, "칭기즈칸 몽골 기병 10장 (실제: %d)" % archetypes["몽골 기병"])
+	# 질주 명령은 덱 정체성 개편 2단계에서 기동 → 몽골 기병(질주)으로 옮겼다.
+	_assert(archetypes["기동"] == 12, "칭기즈칸 기동 12장 (실제: %d)" % archetypes["기동"])
+	_assert(archetypes["몽골 기병"] == 11, "칭기즈칸 몽골 기병 11장 (실제: %d)" % archetypes["몽골 기병"])
 	_assert(archetypes["약탈"] == 9, "칭기즈칸 약탈 9장 (실제: %d)" % archetypes["약탈"])
 
 func test_musashi_rarity_distribution() -> void:
