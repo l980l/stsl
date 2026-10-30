@@ -6,6 +6,8 @@ extends RefCounted
 # 3단계(이순신 거북선/함대 분리): 병사 카드는 학익진으로, 철갑 충각은 방어를 유지한 채 방어만큼 광역 피해.
 # 4단계(잔다르크 삼각 순환): 성전 공격은 아군이 실제로 회복한 양을 모든 적 피해로 바꾼다.
 # 5단계(클레오파트라 저주 보상): 약화된 적 수만큼 드로우, 취약한 적을 아군이 칠 때 클레오파트라 방어.
+# 6단계(시작 덱 규칙): 스트라이크·디펜드·카운터를 뺀 시작 카드가 영웅의 세 아키타입을 모두 담는다.
+#   보상 화면은 아키타입과 덱 보유 장수를 보여 주고, 수치형 영웅 조합 시너지 4개는 자원 다리로 바뀐다.
 # 기존 단위(×10) 수치로 검사한다.
 
 const BM = preload("res://autoload/battle_manager.gd")
@@ -15,6 +17,7 @@ const Hero = preload("res://resources/hero_resource.gd")
 const Enemy = preload("res://resources/enemy_resource.gd")
 const Intent = preload("res://resources/intent_resource.gd")
 const Catalog = preload("res://resources/card_catalog.gd")
+const ArchetypeTally = preload("res://resources/cards/archetype_tally.gd")
 var passed := 0
 var failed := 0
 
@@ -88,6 +91,8 @@ func run_all() -> Dictionary:
 	_run_yi()
 	_run_joan()
 	_run_cleopatra()
+	_run_starters()
+	_run_party_synergies()
 	return {"passed": passed, "failed": failed}
 
 # 토큰 일제 사격: 모든 적 40 + 병사 수 x 25, 적보다 빠르면 병사가 한 번 더 쏜다.
@@ -198,3 +203,122 @@ func _recipe_draw(bm, recipe: Resource, weak: int) -> int:
 	var before: int = (entry["hand"] as Array).size()
 	bm._apply_card_effects(recipe, 0)
 	return (entry["hand"] as Array).size() - before
+
+# 보상 풀에서 주 태그(첫 태그)로 5장 이상 쓰이는 아키타입 = 그 영웅의 덱 방향.
+func _run_starters() -> void:
+	for hid in Catalog.HERO_ORDER:
+		var source = Catalog._HERO_CARDS[hid]
+		var counts := {}
+		for card in source.pool():
+			if not card.archetype.is_empty():
+				var label: String = TranslationServer.translate(card.archetype[0])
+				counts[label] = counts.get(label, 0) + 1
+		var seen := {}
+		for card in source.starter_deck():
+			if card.card_name.ends_with(".strike.name") or card.card_name.ends_with(".defend.name") or card.card_name == "card.counter.name":
+				continue
+			for tag in card.archetype:
+				seen[TranslationServer.translate(tag)] = true
+		var missing: Array = []
+		for label in counts:
+			if counts[label] >= 5 and not seen.has(label):
+				missing.append(label)
+		_check(missing.is_empty(), "%s starter covers every archetype (missing %s)" % [hid, missing])
+	# 보상 화면 태그: 나폴레옹 시작 덱에서 군단 카드는 참호 구축 1장(스트라이크·디펜드 제외).
+	var deck: Array = Catalog._HERO_CARDS["napoleon"].starter_deck()
+	var tally: Dictionary = ArchetypeTally.of(_card("imperial_artillery"), deck)
+	_check(tally.get("label", "") == TranslationServer.translate("card.napoleon.trench_construction.archetype") and tally.get("owned", -1) == 1, "reward tag counts owned legion cards (got %s)" % tally)
+	_check(ArchetypeTally.of(_card("imperial_artillery"), Catalog._HERO_CARDS["cleopatra"].starter_deck()).get("owned", -1) == 0, "reward tag ignores other heroes' cards")
+
+func _party(ids: Array, enemy_count: int = 1):
+	var bm = BM.new()
+	bm.team_mgr = TM.new()
+	bm.deck_mgr = DM.new()
+	bm._test_disable_crit = true
+	for hid in ids:
+		var hero = Hero.new()
+		hero.hero_id = hid
+		hero.max_hp = 1000
+		bm.team_mgr.add_hero(hero)
+	var enemies: Array = []
+	for i in range(enemy_count):
+		var enemy = Enemy.new()
+		enemy.max_hp = 5000
+		enemy.signatures_enabled = false
+		var intent = Intent.new()
+		intent.action_type = Intent.ActionType.ATTACK
+		intent.value = 100
+		enemy.intent_pattern = [intent]
+		enemies.append(enemy)
+	bm.setup_battle(enemies)
+	return bm
+
+func _attack(owner: String, value: int) -> Resource:
+	var card = load("res://resources/card_resource.gd").new()
+	card.card_name = "test_attack"
+	card.owner_id = owner
+	card.card_type = card.CardType.ATTACK
+	var eff = load("res://resources/effect_resource.gd").new()
+	eff.effect_type = eff.EffectType.DAMAGE
+	eff.value = value
+	eff.base_value = value
+	eff.target = "SINGLE"
+	card.effects = [eff]
+	return card
+
+func _run_party_synergies() -> void:
+	# 검사의 약속: 이순신이 무사시에게 방어 60을 옮기면 무사시 다음 공격 첫 타 +60, 한 번 쓰면 사라진다.
+	var bm = _party(["yi_sun_sin", "musashi"])
+	bm._hero_block["yi_sun_sin"] = 100
+	bm._apply_card_effects(_card("formation_boost", "yi_sun_sin"), -1, "musashi")
+	_check(bm._hero_status.get("musashi", {}).get("next_attack_first_hit_bonus", 0) == 60, "swordsman's vow banks transferred block for Musashi")
+	bm._apply_card_effects(_attack("musashi", 30), 0)
+	_check(5000 - bm.get_enemy_hp(0) == 90, "swordsman's vow adds the block to Musashi's first hit")
+	bm._apply_card_effects(_attack("musashi", 30), 0)
+	_check(5000 - bm.get_enemy_hp(0) == 120, "swordsman's vow bonus is spent once")
+	_free(bm)
+	bm = _party(["yi_sun_sin"])
+	bm._hero_block["yi_sun_sin"] = 100
+	bm._apply_card_effects(_card("formation_boost", "yi_sun_sin"), -1, "yi_sun_sin")
+	_check(not bm._hero_status.get("musashi", {}).has("next_attack_first_hit_bonus"), "swordsman's vow needs Musashi and a real transfer")
+	_free(bm)
+	# 검사의 약속 이월: 이순신 차례 끝 남은 방어의 절반(상한 60)이 무사시 첫 타로.
+	bm = _party(["yi_sun_sin", "musashi"])
+	bm._hero_block["yi_sun_sin"] = 100
+	bm._phase_hero_post("yi_sun_sin")
+	_check(bm._hero_status.get("musashi", {}).get("next_attack_first_hit_bonus", 0) == 50, "swordsman's vow banks half of Yi's leftover block")
+	bm._hero_status["musashi"].erase("next_attack_first_hit_bonus")
+	bm._hero_block["yi_sun_sin"] = 400
+	bm._phase_hero_post("yi_sun_sin")
+	_check(bm._hero_status.get("musashi", {}).get("next_attack_first_hit_bonus", 0) == 60, "swordsman's vow bank is capped")
+	_free(bm)
+	# 황제의 무도(보스전): 적이 1명뿐이면 무사시 공격마다가 아니라 차례당 1회 사기 +1.
+	bm = _party(["napoleon", "musashi"])
+	bm._apply_card_effects(_attack("musashi", 30), 0)
+	bm._apply_card_effects(_attack("musashi", 30), 0)
+	_check(bm._hero_status.get("napoleon", {}).get("morale", 0) == 1, "emperor's dance grants 1 morale per Musashi turn against a lone enemy")
+	_free(bm)
+	# 황제의 무도: 무사시가 처치해 적이 1명 남을 때만 나폴레옹 사기 +2.
+	bm = _party(["napoleon", "musashi"], 3)
+	bm._current_actor_id = "hero:musashi"
+	bm._deal_damage_to_enemy(0, 99999)
+	_check(bm._hero_status.get("napoleon", {}).get("morale", 0) == 0, "emperor's dance waits until one enemy remains")
+	bm._deal_damage_to_enemy(1, 99999)
+	_check(bm._hero_status.get("napoleon", {}).get("morale", 0) == 2, "emperor's dance grants Napoleon 2 morale")
+	_free(bm)
+	bm = _party(["napoleon", "musashi"], 2)
+	bm._current_actor_id = "hero:napoleon"
+	bm._deal_damage_to_enemy(0, 99999)
+	_check(bm._hero_status.get("napoleon", {}).get("morale", 0) == 0, "emperor's dance needs Musashi's kill")
+	_free(bm)
+	# 초원의 결투사: 무사시가 칭기즈칸 표식 적을 치면 표식을 지우고 치명타(×2) 확정, 차례당 1회.
+	bm = _party(["genghis_khan", "musashi"])
+	bm._enemy_status[0]["marked_by"] = ["genghis_khan"]
+	bm._apply_card_effects(_attack("genghis_khan", 30), 0)
+	_check(5000 - bm.get_enemy_hp(0) == 30, "steppe duelist ignores Genghis's own hit")
+	bm._apply_card_effects(_attack("musashi", 30), 0)
+	_check(5000 - bm.get_enemy_hp(0) == 90 and bm._enemy_status[0].get("marked_by", []).is_empty(), "steppe duelist consumes the mark for a sure crit")
+	bm._enemy_status[0]["marked_by"] = ["genghis_khan"]
+	bm._apply_card_effects(_attack("musashi", 30), 0)
+	_check(5000 - bm.get_enemy_hp(0) == 120, "steppe duelist fires once per turn")
+	_free(bm)

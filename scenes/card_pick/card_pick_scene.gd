@@ -2,6 +2,7 @@
 extends Node2D
 
 const CARD_SCENE := preload("res://scenes/card/card_scene_v2.tscn")
+const ArchetypeTally := preload("res://resources/cards/archetype_tally.gd")
 func _make_card() -> Control:
 	return CARD_SCENE.instantiate()
 
@@ -275,6 +276,7 @@ func _build_card_grid(cx: float) -> void:
 	var scaled_h: float = 200.0 * card_scale  # 300
 
 	var mono_font := load("res://assets/fonts/SpaceMono-Regular.ttf") as Font
+	var deck: Array = DeckManager.get_full_deck()
 
 	for i in range(count):
 		var card: Resource = cards[i]
@@ -291,16 +293,27 @@ func _build_card_grid(cx: float) -> void:
 		_cells.append(cell)
 		SacredTheme.add_corner_brackets(cell, P.BRASS_500, 12, 6)
 
+		# 아키타입 태그 + 이미 덱에 있는 같은 아키타입 장수 — 보상을 고를 때 덱 방향을 판단하게 한다.
+		# 태그가 없는 카드는 기존 ✦ 장식을 둔다.
+		var tally := ArchetypeTally.of(card, deck)
 		var halo_lbl := Label.new()
-		halo_lbl.text = "✦"
 		halo_lbl.theme_type_variation = "AccentLabel"
 		halo_lbl.add_theme_color_override("font_color", P.BRASS_300)
-		halo_lbl.add_theme_font_size_override("font_size", 28)
 		halo_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		halo_lbl.position = Vector2(0.0, 12.0)
-		halo_lbl.size = Vector2(cell_w, 36.0)
+		halo_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		halo_lbl.position = Vector2(8.0, 12.0)
+		halo_lbl.size = Vector2(cell_w - 16.0, 36.0)
 		halo_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		cell.add_child(halo_lbl)
+		if tally.is_empty():
+			halo_lbl.text = "✦"
+			halo_lbl.add_theme_font_size_override("font_size", 28)
+		else:
+			halo_lbl.name = "ArchetypeTag"
+			halo_lbl.text = tr("ui.reward.archetype_owned") % [tally["label"], tally["owned"]]
+			halo_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			halo_lbl.add_theme_font_size_override("font_size", SacredTheme.FS_TEXT)
+			LabelUtils.fit_text(halo_lbl, SacredTheme.FS_TEXT, SacredTheme.FS_SMALL, cell_w - 16.0)
 
 		var wrapper := Control.new()
 		wrapper.custom_minimum_size = Vector2(scaled_w, scaled_h)
