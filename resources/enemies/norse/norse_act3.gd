@@ -2,6 +2,7 @@
 # 북유럽 신화 — Act3 엘리트 3종 + 보스(요르문간드르)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 # ──── 엘리트 3종 ────
 
@@ -25,6 +26,9 @@ static func fenrir_cub(scene: PackedScene) -> Resource:
 	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 200; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "bite_attack"
 	e.phase_patterns = [[p0i1, p0i_taunt, p0i2], [p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
+	# 상성: 돌격 견제 — 포효로 영웅 전체 사기를 지운다
+	Counters.insert(e, Counters.dispel("morale"), 1)
+	Counters.harden(e, 3)
 	return e
 
 static func valkyrie(scene: PackedScene) -> Resource:
@@ -48,6 +52,9 @@ static func valkyrie(scene: PackedScene) -> Resource:
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.SPECIAL; i5.value = 2
 	e.intent_pattern = [i1, i2, i3, i4, i5]
+	# 상성: 필사즉생 견제 — 죽을 자를 마킹하고 고른다
+	Counters.insert(e, Counters.execute_mark(), 3)
+	Counters.harden(e, 3)
 	return e
 
 static func jormungandr_shard(scene: PackedScene) -> Resource:
@@ -72,6 +79,9 @@ static func jormungandr_shard(scene: PackedScene) -> Resource:
 	p1i2.target = IntentRes.TargetType.ALL
 	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
+	# 상성: 독살 견제 — 세계뱀의 독은 자기 몸을 해치지 않는다
+	Counters.insert(e, Counters.cleanse("cleanse_poison"), 2)
+	Counters.harden(e, 3)
 	return e
 
 # ──── 보스 ────

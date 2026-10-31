@@ -1,6 +1,7 @@
 # resources/enemies/daoist/daoist_act3.gd
 const EnemyRes   = preload("res://resources/enemy_resource.gd")
 const IntentRes  = preload("res://resources/intent_resource.gd")
+const Counters   = preload("res://resources/enemies/elite_counters.gd")
 
 static func white_tiger(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
@@ -17,6 +18,10 @@ static func white_tiger(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 순교 견제 — 포식자가 약한 영웅을 마킹하고 노린다
+	Counters.insert(e, Counters.execute_mark(), 1)
+	e.intent_pattern[2].target = IntentRes.TargetType.LOWEST_HP
+	Counters.harden(e, 3)
 	return e
 
 static func vermilion_bird(scene: PackedScene) -> Resource:
@@ -35,6 +40,9 @@ static func vermilion_bird(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 2; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 학익진 견제 — 불길이 영웅마다 병사 4명을 태운다
+	Counters.insert(e, Counters.dispel("tokens", 4), 1)
+	Counters.harden(e, 3)
 	return e
 
 static func black_tortoise(scene: PackedScene) -> Resource:
@@ -55,6 +63,9 @@ static func black_tortoise(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 210; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
+	# 상성: 이도류 견제 — 가시 등껍질
+	Counters.insert(e, Counters.thorns(40), 0)
+	Counters.harden(e, 3)
 	return e
 
 static func jade_emperor(scene: PackedScene) -> Resource:
