@@ -2,6 +2,7 @@
 # 이집트 신화 — Act1 초반 사막 엘리트 3종 + 보스(세크메트)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 # ──── 엘리트 3종 ────
 
@@ -19,6 +20,9 @@ static func jackal_warrior(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 170; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "claw_attack"
 	e.intent_pattern = [i1, i2, i3, i4]
+	# 상성: 결투 견제 — 무리를 불러 일대일을 깬다
+	Counters.insert(e, Counters.summon("sand_rat", 1), 2)
+	Counters.harden(e, 1)
 	return e
 
 static func scarab_queen(scene: PackedScene) -> Resource:
@@ -36,6 +40,9 @@ static func scarab_queen(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "bite_attack"
 	e.intent_pattern = [i1, i2, i3, i4]
+	# 상성: 독살 견제 — 독에 익숙한 여왕이 자기 독을 씻는다
+	Counters.insert(e, Counters.cleanse("cleanse_poison"), 2)
+	Counters.harden(e, 1)
 	return e
 
 static func obelisk_guardian(scene: PackedScene) -> Resource:
@@ -54,6 +61,9 @@ static func obelisk_guardian(scene: PackedScene) -> Resource:
 	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 220; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "holy_strike"
 	e.phase_patterns = [[p0i1, p0i2], [p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
+	# 상성: 몽골 기병 견제 — 빛줄기가 영웅마다 병사 2명을 쓸어 낸다
+	Counters.insert(e, Counters.dispel("tokens", 2), 1)
+	Counters.harden(e, 1)
 	return e
 
 # ──── 보스 ────

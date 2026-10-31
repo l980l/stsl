@@ -50,9 +50,13 @@ static func _add(file, method: String, out: Array, seen: Dictionary) -> void:
 	if method == "" or not file.has_method(method):
 		return
 	var e = file.call(method, null)
-	if e == null or e.enemy_name == "" or e.enemy_name in seen:
+	if e == null or e.enemy_name == "":
 		return
-	seen[e.enemy_name] = true
+	# 같은 이름이라도 등급이 다르면 다른 몬스터다(일반 케르베로스와 2막 엘리트 케르베로스).
+	var key: String = "%s|%d" % [e.enemy_name, int(e.grade)]
+	if key in seen:
+		return
+	seen[key] = true
 	# The codex is a live-facing surface, so it must show the same unit system
 	# as battles.  The converter returns an unscaled clone when explicit legacy
 	# comparison mode is active.

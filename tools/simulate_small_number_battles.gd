@@ -273,6 +273,9 @@ func _result(bm: Object, hero_input_turns: int, trace: Array, incomplete_reason:
 			won = false
 			break
 	var all_heroes_dead: bool = bm.team_mgr.get_living_heroes().is_empty()
+	# 게임과 같이 적과 영웅이 함께 쓰러지면 패배다(BattleManager._check_win_condition).
+	if all_heroes_dead:
+		won = false
 	var capped: bool = bm.is_battle_active and hero_input_turns >= _cap
 	var outcome := "win" if won else ("loss" if all_heroes_dead else ("capped" if capped else "incomplete"))
 	return {"outcome": outcome, "incomplete_reason": incomplete_reason, "won": won, "capped": capped, "hero_input_turns": hero_input_turns, "remaining_hp": _team_hp(bm), "enemy_hp": bm.get_enemy_hp(0), "trace": trace}

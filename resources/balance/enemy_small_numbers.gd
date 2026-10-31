@@ -70,7 +70,7 @@ static func _intent_value_is_hp_like(intent: Resource) -> bool:
 		IntentRes.ActionType.ATTACK, IntentRes.ActionType.HEAL_ALLY, IntentRes.ActionType.SACRIFICE:
 			return true
 		IntentRes.ActionType.BUFF, IntentRes.ActionType.BUFF_ALLY:
-			return intent.status_type in ["block", "strength"]
+			return intent.status_type in ["block", "strength", "thorns"]
 		IntentRes.ActionType.DEBUFF:
 			return intent.status_type == "poison"
 	return false

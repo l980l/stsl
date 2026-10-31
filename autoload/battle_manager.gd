@@ -115,6 +115,9 @@ var damage_taken_this_battle: int = 0
 # T3-MIMIC: 플레이어 턴 동안 적에게 가한 누적 데미지 — start_player_turn에서 리셋, MIMIC 인텐트가 비율로 반사
 var _player_damage_this_turn: int = 0
 var _in_player_turn: bool = false  # MIMIC 트래커 게이트
+# 가시(엘리트 견제): 공격 카드를 해결하는 동안 그 카드 주인. 병사 공격은 제외한다.
+var _thorns_attacker: String = ""
+var _firing_token: bool = false
 
 # 영웅 상태 (HP는 TeamManager가 관리)
 var _hero_block: Dictionary = {}
@@ -1001,7 +1004,9 @@ func _fire_token(owner: String, token_index: int) -> bool:
 	# 토큰 인덱스 + 타겟 적 전달 — battle_scene 이 병사 타일 위치에서 VFX 발사
 	token_attack_fired.emit(owner, token_index, pick)
 	var bonus: int = _active_powers.get("power.token_bonus_dmg:" + owner, {}).get("value", 0)
+	_firing_token = true
 	_deal_damage_to_enemy(pick, _combat_literal(TOKEN_DMG_PER_STACK) + bonus, _token_dtype_for(owner))
+	_firing_token = false
 	# 혼란의 돌격 (황제×파라오): 나폴레옹 병사 공격 1회당 매혹 +3
 	if owner == "napoleon" and team_mgr.is_alive("cleopatra") and _enemy_alive[pick]:
 		_apply_status_to_enemy(pick, "charm", _combat_literal(3))
@@ -1209,7 +1214,9 @@ func _is_enemy_dead(enemy_index: int) -> bool:
 
 # play_card 를 동기로 유지하면서 _apply_card_effects 의 await 패턴을 흡수.
 func _start_card_effects(card: Resource, target_enemy_index: int, target_hero_id: String) -> void:
+	_thorns_attacker = card.owner_id if int(card.card_type) == CardRes.CardType.ATTACK else ""
 	await _apply_card_effects(card, target_enemy_index, target_hero_id)
+	_thorns_attacker = ""
 	tutorial_effect_pending = false
 	card_effects_resolved.emit(card)
 
@@ -2699,6 +2706,7 @@ func _deal_damage_to_enemy(enemy_index: int, incoming_amount: float, damage_type
 	# 시그니처 hook: 받음 (휴브리스/라그나로크/damage_taken 누적)
 	if amount > 0:
 		SignatureSys.on_enemy_damaged(self, enemy_index, amount)
+	_apply_thorns(enemy_index)
 	if _enemy_hp[enemy_index] == 0:
 		_enemy_alive[enemy_index] = false
 		_remove_from_queue(_actor_id_for_enemy(enemy_index))
@@ -3437,10 +3445,8 @@ func _execute_intent_effects(enemy_index: int, intent: Resource, action_block: D
 				if tid != "":
 					targets.append(tid)
 			for tid in targets:
-				if _hero_status.has(tid):
-					for k in keys_to_remove:
-						_hero_status[tid][k] = 0
-						status_applied.emit(tid, k, 0)
+				for k in keys_to_remove:
+					_dispel_hero_key(tid, k, intent.value)
 		IntentRes.ActionType.FORM_SWITCH:
 			# Form 전환 — turn_modes 순환. enemy.turn_modes = ["offense", "defense", ...] 면 status 의 current_mode_index +1.
 			# Melancholia Zorba 영감. 효과는 보스별 phase_patterns / damage 처리에서 mode 키 참조.
@@ -3529,9 +3535,53 @@ func _execute_special(_enemy_index: int, intent: Resource) -> void:
 				if not removed_names.is_empty():
 					cards_exhausted_by_enemy.emit(removed_names)
 					deck_mgr.hand_changed.emit()
+		"cleanse_poison":
+			_cleanse_enemy(_enemy_index, ["poison_dmg", "poison_dur"])
+		"cleanse_debuff":
+			_cleanse_enemy(_enemy_index, ["weak", "vulnerable"])
+		"cleanse_marks":
+			_cleanse_enemy(_enemy_index, ["marked_by"])
 		_:
 			# 잘못된 데이터는 전투를 중단시키지 않고 무시한다. 상세 정보는 verbose 실행에서만 남긴다.
 			print_verbose("[battle_manager] 알 수 없는 SPECIAL variant: %s" % variant)
+
+# 영웅 상태 하나 지우기. value > 0 이면 그만큼만 줄인다(병사 일부 지우기).
+# 방어는 _hero_status 가 아니라 _hero_block 에 있다.
+func _dispel_hero_key(hero_id: String, key: String, amount: int = 0) -> void:
+	if key == "block":
+		if _hero_status.get(hero_id, {}).has("block"):
+			_hero_status[hero_id]["block"] = 0  # 예전 경로로 상태에 들어간 방어도 함께 지운다
+		var block: int = _hero_block.get(hero_id, 0)
+		if block <= 0:
+			return
+		_hero_block[hero_id] = maxi(0, block - amount) if amount > 0 else 0
+		status_applied.emit(hero_id, "block", _hero_block[hero_id])
+		return
+	if not _hero_status.has(hero_id) or int(_hero_status[hero_id].get(key, 0)) <= 0:
+		return
+	var left: int = maxi(0, int(_hero_status[hero_id][key]) - amount) if amount > 0 else 0
+	_hero_status[hero_id][key] = left
+	status_applied.emit(hero_id, key, left)
+
+# 엘리트 자기 정화 — 독·약화/취약·표식처럼 영웅이 쌓은 적 상태를 지운다.
+func _cleanse_enemy(enemy_index: int, keys: Array) -> void:
+	if enemy_index < 0 or enemy_index >= _enemy_status.size():
+		return
+	var status: Dictionary = _enemy_status[enemy_index]
+	for k in keys:
+		if not status.has(k):
+			continue
+		status[k] = [] if typeof(status[k]) == TYPE_ARRAY else 0
+		status_applied.emit("enemy_%d" % enemy_index, k, 0)
+
+# 가시 — 공격 카드로 맞을 때마다 때린 영웅에게 고정 피해. 영웅 방어가 먼저 막는다.
+func _apply_thorns(enemy_index: int) -> void:
+	if _thorns_attacker == "" or _firing_token or enemy_index >= _enemy_status.size():
+		return
+	var thorns: int = int(_enemy_status[enemy_index].get("thorns", 0))
+	if thorns <= 0 or team_mgr == null or not team_mgr.is_alive(_thorns_attacker):
+		return
+	_deal_damage_to_hero(_thorns_attacker, thorns, "thorns")
 
 # 적 사망 시 그 적이 부여한 영웅 status 정리 (taunt_source, marked_by).
 # enemy_died.emit 전에 호출 — UI 가 갱신된 status 를 읽도록.

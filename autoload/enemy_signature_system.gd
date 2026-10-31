@@ -54,8 +54,11 @@ static func on_enemy_death(bm: Object, idx: int) -> void:
 		var taken: int = bm._enemy_status[idx].get("damage_taken", 0)
 		var reflect: int = int(taken * 0.25)
 		if reflect > 0 and bm.team_mgr:
+			# 인과응보는 이긴 전투를 뒤집지 않는다: 영웅 체력을 1 아래로 내리지 않는다(사용자 결정 2026-10-31).
 			for hero in bm.team_mgr.get_living_heroes():
-				bm._deal_damage_to_hero(hero.hero_id, reflect, "")
+				var survivable: int = mini(reflect, bm.team_mgr.get_current_hp(hero.hero_id) - 1 + bm._hero_block.get(hero.hero_id, 0))
+				if survivable > 0:
+					bm._deal_damage_to_hero(hero.hero_id, survivable, "")
 			bm.signature_fired.emit(idx, "karma", "")  # 토스트용 (사망 시 1회)
 
 # ─── Hook: 적 턴 시작 ───

@@ -32,6 +32,8 @@ bash tools/run_live_balance_checks.sh run_archetype_deck_balance
 bash tools/run_live_balance_checks.sh run_archetype_deck_stress
 ```
 
+2026-10-31 갱신: 동료가 영웅마다 달라 덱 비교가 치우쳤다(무사시·칭기즈·잔다르크 덱만 클레오파트라 없이 나폴레옹+이순신과 묶임, `deck_attractiveness_proposal.md` 14절). 이제 덱마다 나머지 다섯 영웅 중 두 명의 조합 10쌍을 모두 돌린다(기본 시드 2개면 덱당 40전투, 전체 720전투). 보고서의 `by_party`에 덱·동료 조합별 승리가 있다. 예전 방식은 `STSL_STRESS_PARTNERS=fixed`, 시드 수는 `STSL_STRESS_SEED_COUNT`로 바꾼다.
+
 ## 결과 — 2026-10-17
 
 현재 덱576전투 모두승리, 전멸/제한/미완료0·고유궤적576. 각 덱 보상6장·전체108장의 실제 사용을 관측했다. 희귀도 상한/16장 크기는 맞췄지만 카드 획득 비용과 파트너가 영웅별로 달라 승리만으로 영웅 랭킹을 매기지 않는다. 강화1은 소유자와 파트너의 카드 모두 강화한 조건이다.

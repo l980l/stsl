@@ -145,8 +145,10 @@ func test_minotaur_pattern() -> void:
 	print("[TestEnemies] test_minotaur_pattern")
 	var gm := _make_gm()
 	var m: Resource = GreekAct1.minotaur(_make_dummy_scene())
-	_assert(m.intent_pattern.size() == 3, "미노타우로스 패턴 3개")
-	_assert(m.intent_pattern[2].value == 260, "미노타우로스 세 번째 공격 260")
+	# 엘리트 상성(elite_counter_design.md): 병사 2명 지우기가 세 번째에 끼고, 공격은 1막 배율 3.5배.
+	_assert(m.intent_pattern.size() == 4, "미노타우로스 패턴 4개 (병사 지우기 포함)")
+	_assert(m.intent_pattern[2].action_type == IntentRes.ActionType.DISPEL and m.intent_pattern[2].status_type == "tokens" and m.intent_pattern[2].value == 2, "미노타우로스 세 번째 = 병사 2명 지우기")
+	_assert(m.intent_pattern[3].value == 910, "미노타우로스 네 번째 공격 260 × 3.5 = 910")
 
 func test_medusa_pattern_and_status_type() -> void:
 	print("[TestEnemies] test_medusa_pattern_and_status_type")
@@ -157,18 +159,19 @@ func test_medusa_pattern_and_status_type() -> void:
 	_assert(med.intent_pattern[2].action_type == IntentRes.ActionType.CHARGE_UP, "메두사 3번째 = CHARGE_UP (석화 시선)")
 	_assert(med.intent_pattern[2].payoff_intents.size() == 2, "메두사 3번째 payoff = ATTACK + stun")
 	_assert(med.intent_pattern[2].payoff_intents[1].status_type == "stun", "메두사 3번째 payoff[1] = stun")
-	_assert(med.max_hp == 1700, "메두사 HP = 1700")
+	_assert(med.max_hp == 3400, "메두사 HP = 1700 × 2 (1막 엘리트 배율)")
+	_assert(med.charm_resistance == 60, "메두사 매혹 저항 60 (조종 견제)")
 
 func test_scylla_pattern() -> void:
 	print("[TestEnemies] test_scylla_pattern")
 	var gm := _make_gm()
 	var s: Resource = GreekAct1.scylla(_make_dummy_scene())
 	_assert(s.enemy_name == "enemy.greek.scylla", "스킬라 이름")
-	_assert(s.max_hp == 1900, "스킬라 HP = 1900")
+	_assert(s.max_hp == 3800, "스킬라 HP = 1900 × 2 (1막 엘리트 배율)")
 	_assert(s.phase_thresholds.size() == 1, "스킬라 페이즈 임계값 1개")
 	_assert(s.phase_patterns.size() == 2, "스킬라 페이즈 패턴 2개")
-	_assert(s.phase_patterns[0].size() == 7, "스킬라 페이즈 0 패턴 7개")
-	_assert(s.phase_patterns[1].size() == 3, "스킬라 페이즈 1 패턴 3개")
+	_assert(s.phase_patterns[0].size() == 8, "스킬라 페이즈 0 패턴 8개 (병사 지우기 포함)")
+	_assert(s.phase_patterns[1].size() == 4, "스킬라 페이즈 1 패턴 4개 (병사 지우기 포함)")
 	_assert(s.phase_patterns[1][1].status_type == "poison", "스킬라 페이즈 1 독 DEBUFF")
 
 func _make_hydra() -> Array:
@@ -637,7 +640,7 @@ func test_buddhist_act1_shape() -> void:
 	_assert(b.mythology == "buddhist", "대일여래 mythology=buddhist")
 	_assert(b.charm_resistance == 20, "대일여래 charm_resistance=20")
 	var dharma_general = M.dharma_general(scene)
-	_assert(dharma_general.max_hp == 1900, "호법신중 엘리트 HP 1900")
+	_assert(dharma_general.max_hp == 3800, "호법신중 엘리트 HP 1900 × 2 (1막 엘리트 배율)")
 	_assert(dharma_general.charm_resistance == 20, "호법신중 charm_resistance=20")
 
 func test_buddhist_act2_shape() -> void:
@@ -692,7 +695,7 @@ func test_daoist_act1_shape() -> void:
 	_assert(b.mythology == "daoist", "동왕공 mythology=daoist")
 	_assert(b.charm_resistance == 20, "동왕공 charm_resistance=20")
 	var elite = M.golden_elixir(scene)
-	_assert(elite.max_hp == 1600, "금단도사 HP 1600")
+	_assert(elite.max_hp == 3200, "금단도사 HP 1600 × 2 (1막 엘리트 배율)")
 	_assert(elite.charm_resistance == 20, "금단도사 charm_resistance=20")
 
 func test_daoist_act2_shape() -> void:
@@ -744,7 +747,7 @@ func test_japanese_act1_shape() -> void:
 	_assert(b.mythology == "japanese", "라이덴 mythology=japanese")
 	_assert(b.charm_resistance == 20, "라이덴 charm_resistance=20")
 	var elite = M.ushi_oni(scene)
-	_assert(elite.max_hp == 1600, "우시오니 HP 1600")
+	_assert(elite.max_hp == 3200, "우시오니 HP 1600 × 2 (1막 엘리트 배율)")
 	_assert(elite.charm_resistance == 20, "우시오니 charm_resistance=20")
 
 func test_japanese_act2_shape() -> void:
