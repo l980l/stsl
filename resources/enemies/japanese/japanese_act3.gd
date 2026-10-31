@@ -2,6 +2,7 @@
 # 일본 신화 Act 3 — 엘리트 3종(아마노이와토 수문장·스사노오의 검·유키온나의 여왕) + 보스(야마타노오로치)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters   = preload("res://resources/enemies/elite_counters.gd")
 
 static func iwato_guardian(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
@@ -18,6 +19,9 @@ static func iwato_guardian(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 190; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "holy_arrow"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 저주 견제 — 신성한 바위가 자기 약화·취약을 씻는다
+	Counters.insert(e, Counters.cleanse("cleanse_debuff"), 2)
+	Counters.harden(e, 3)
 	return e
 
 static func susanoo_blade(scene: PackedScene) -> Resource:
@@ -36,6 +40,9 @@ static func susanoo_blade(scene: PackedScene) -> Resource:
 	i4.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 무심 견제 — 폭풍의 응보: 받은 피해 75%를 모아 되갚는다
+	Counters.insert(e, Counters.counter_prepare(75), 1)
+	Counters.harden(e, 3)
 	return e
 
 static func jorogumo(scene: PackedScene) -> Resource:
@@ -60,6 +67,9 @@ static func jorogumo(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.BUFF; i5.value = 2; i5.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
+	# 상성: 기동 견제 — 거미줄이 영웅 전체 속도를 묶는다
+	e.intent_pattern[2].target = IntentRes.TargetType.ALL
+	Counters.harden(e, 3)
 	return e
 
 static func yamata_no_orochi(scene: PackedScene) -> Resource:

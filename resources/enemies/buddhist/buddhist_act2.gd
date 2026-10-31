@@ -1,6 +1,7 @@
 # resources/enemies/buddhist/buddhist_act2.gd
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 static func asura_king(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
@@ -17,6 +18,10 @@ static func asura_king(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 150; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 순교 견제 — 쓰러지는 영웅을 마킹하고 그쪽을 친다
+	Counters.insert(e, Counters.execute_mark(), 2)
+	e.intent_pattern[3].target = IntentRes.TargetType.LOWEST_HP
+	Counters.harden(e, 2)
 	return e
 
 static func naga_king(scene: PackedScene) -> Resource:
@@ -34,6 +39,9 @@ static func naga_king(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 약탈 견제 — 허물을 벗어 자기 몸의 마킹을 없앤다
+	Counters.insert(e, Counters.cleanse("cleanse_marks"), 3)
+	Counters.harden(e, 2)
 	return e
 
 static func agni_buddha(scene: PackedScene) -> Resource:
@@ -54,6 +62,10 @@ static func agni_buddha(scene: PackedScene) -> Resource:
 	i5.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
+	# 상성: 무심 견제 — 불의 응보: 받은 피해 40%를 모아 되갚는다
+	Counters.insert(e, Counters.counter_prepare(40), 2)
+	# 되갚기가 공격을 키우므로 공격 배율을 낮춘다(시뮬레이션: 3.5배·되갚기 60% 손실 66%, 2.5배 57%).
+	Counters.harden(e, 2, 2.0)
 	return e
 
 static func guanyin(scene: PackedScene) -> Resource:

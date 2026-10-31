@@ -52,7 +52,9 @@ static func on_enemy_death(bm: Object, idx: int) -> void:
 	var enemy: Resource = bm._enemies[idx]
 	if enemy.mythology == "buddhist":
 		var taken: int = bm._enemy_status[idx].get("damage_taken", 0)
-		var reflect: int = int(taken * 0.25)
+		# 엘리트 난이도 배율로 늘어난 체력만큼 반사가 커지지 않게 원래 체력 기준으로 되돌린다.
+		var hp_mul: float = float(enemy.get_meta("hp_mul", 1.0))
+		var reflect: int = int(taken * 0.25 / hp_mul)
 		if reflect > 0 and bm.team_mgr:
 			# 인과응보는 이긴 전투를 뒤집지 않는다: 영웅 체력을 1 아래로 내리지 않는다(사용자 결정 2026-10-31).
 			for hero in bm.team_mgr.get_living_heroes():

@@ -1,6 +1,7 @@
 # resources/enemies/daoist/daoist_act2.gd
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 static func crimson_immortal(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
@@ -15,6 +16,9 @@ static func crimson_immortal(scene: PackedScene) -> Resource:
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 170; i3.target = IntentRes.TargetType.ALL; i3.damage_type = "fire"
 	e.intent_pattern = [i1, i2, i3]
 	e.charm_resistance = 20
+	# 상성: 군단 견제 — 불길이 영웅마다 병사 3명을 태운다
+	Counters.insert(e, Counters.dispel("tokens", 3), 2)
+	Counters.harden(e, 2)
 	return e
 
 static func nine_dragon(scene: PackedScene) -> Resource:
@@ -34,6 +38,9 @@ static func nine_dragon(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 220; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "holy_slash"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
+	# 상성: 이도류 견제 — 용 비늘 가시
+	Counters.insert(e, Counters.thorns(30), 0)
+	Counters.harden(e, 2)
 	return e
 
 static func twin_immortals(scene: PackedScene) -> Resource:
@@ -59,6 +66,9 @@ static func twin_immortals(scene: PackedScene) -> Resource:
 	i6.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3, i4, i5, i6]
 	e.charm_resistance = 20
+	# 상성: 결투 견제 — 제자를 불러 일대일을 깬다
+	Counters.insert(e, Counters.summon("dao_disciple", 1), 3)
+	Counters.harden(e, 2)
 	return e
 
 static func xuanwu(scene: PackedScene) -> Resource:

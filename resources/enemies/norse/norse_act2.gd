@@ -2,6 +2,7 @@
 # 북유럽 신화 — Act2 요툰헤임 침입 엘리트 3종 + 보스(수르트)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 # ──── 엘리트 3종 ────
 
@@ -22,6 +23,9 @@ static func troll_warrior(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 140; i4.target = IntentRes.TargetType.ALL; i4.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4]
+	# 상성: 거북선 견제 — 몽둥이가 영웅 전체 방어를 부순다
+	Counters.insert(e, Counters.dispel("block"), 3)
+	Counters.harden(e, 2)
 	return e
 
 static func norn(scene: PackedScene) -> Resource:
@@ -40,6 +44,9 @@ static func norn(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 6; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
+	# 상성: 저주 견제 — 운명은 저주를 받아들이지 않는다
+	Counters.insert(e, Counters.cleanse("cleanse_debuff"), 2)
+	Counters.harden(e, 2)
 	return e
 
 static func vanir_elf(scene: PackedScene) -> Resource:
@@ -61,6 +68,9 @@ static func vanir_elf(scene: PackedScene) -> Resource:
 	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 220; p1i2.target = IntentRes.TargetType.LOWEST_HP; p1i2.damage_type = "projectile"
 	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
+	# 상성: 몽골 기병 견제 — 화살비가 영웅마다 병사 3명을 쓸어 낸다
+	Counters.insert(e, Counters.dispel("tokens", 3), 2)
+	Counters.harden(e, 2)
 	return e
 
 # ──── 보스 ────
