@@ -292,6 +292,17 @@ func _run_party_synergies() -> void:
 	bm._phase_hero_post("yi_sun_sin")
 	_check(bm._hero_status.get("musashi", {}).get("next_attack_first_hit_bonus", 0) == 60, "swordsman's vow bank is capped")
 	_free(bm)
+	# 검사의 약속 속도: 무사시가 공격할 때 이순신에게 방어가 있으면 공격마다 두 영웅 속도 +1, 방어가 없으면 없음.
+	bm = _party(["yi_sun_sin", "musashi"])
+	var m_before: int = bm._hero_effective_speed("musashi")
+	var y_before: int = bm._hero_effective_speed("yi_sun_sin")
+	bm._apply_card_effects(_attack("musashi", 30), 0)
+	_check(bm._hero_effective_speed("musashi") == m_before, "swordsman's vow speed needs Yi's block")
+	bm._hero_block["yi_sun_sin"] = 10
+	bm._apply_card_effects(_attack("musashi", 30), 0)
+	bm._apply_card_effects(_attack("musashi", 30), 0)
+	_check(bm._hero_effective_speed("musashi") == m_before + 2 and bm._hero_effective_speed("yi_sun_sin") == y_before + 2, "swordsman's vow speeds both heroes on each Musashi attack")
+	_free(bm)
 	# 황제의 무도(보스전): 적이 1명뿐이면 무사시 공격마다가 아니라 차례당 1회 사기 +1.
 	bm = _party(["napoleon", "musashi"])
 	bm._apply_card_effects(_attack("musashi", 30), 0)

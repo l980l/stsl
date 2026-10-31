@@ -1,6 +1,14 @@
 extends "res://tests/run_archetype_deck_balance.gd"
 
 # Post-hoc wounded-entry boundary, not the normal difficulty target.
+# STSL_STRESS_SEED_COUNT=N widens the sample to seeds 101, 202, ... 101*N (default 2).
+func _stress_seeds() -> Array:
+	var count := maxi(2, int(OS.get_environment("STSL_STRESS_SEED_COUNT")))
+	var seeds: Array = []
+	for i in range(count):
+		seeds.append(101 * (i + 1))
+	return seeds
+
 func _run() -> void:
 	AudioServer.set_bus_mute(0, true)
 	_set_legacy_combat(true)
@@ -28,7 +36,7 @@ func _run() -> void:
 				heroes.append(partner)
 		for encounter in ["sekhmet", "surtr"]:
 			_encounter = [enemies["enemy." + ("egyptian." if encounter == "sekhmet" else "norse.") + encounter]]
-			for seed_value in [101, 202]:
+			for seed_value in _stress_seeds():
 				var segment := {"label": definition.id, "hero_ids": heroes, "probe_card": ""}
 				_revert_martyr = false
 				var result := await _simulate(_encounter[0], segment, 0, seed_value, true)
@@ -52,7 +60,7 @@ func _run() -> void:
 	var hashes := _fingerprints()
 	for path in ["res://tests/run_archetype_deck_stress.gd", "res://tests/run_archetype_deck_balance.gd", "res://tests/archetype_balance_decks.gd", "res://tests/run_block_balance.gd", "res://tests/block_balance_battle_manager.gd", "res://tests/run_archetype_playtest.gd"]:
 		hashes[path] = FileAccess.get_sha256(path)
-	var report := {"schema": 1, "contract": "docs/game_design/archetype_deck_balance_evaluation.md", "post_hoc": true, "source_commit": _source_commit, "dirty": _dirty, "source_sha256": hashes, "boundary": "25 percent wounded entry; base cards; same hand-order policy; not a normal target win-rate", "integrity_failures": invalid, "summary": _deck_summary(rows), "runs": rows}
+	var report := {"schema": 1, "contract": "docs/game_design/archetype_deck_balance_evaluation.md", "post_hoc": true, "seeds": _stress_seeds(), "source_commit": _source_commit, "dirty": _dirty, "source_sha256": hashes, "boundary": "25 percent wounded entry; base cards; same hand-order policy; not a normal target win-rate", "integrity_failures": invalid, "summary": _deck_summary(rows), "runs": rows}
 	var path := "user://archetype_deck_stress.json"
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if file == null:
@@ -63,4 +71,4 @@ func _run() -> void:
 	file.close()
 	print("Archetype stress report: " + ProjectSettings.globalize_path(path))
 	print(JSON.stringify(report.summary))
-	quit(0 if invalid == 0 and rows.size() == 72 else 1)
+	quit(0 if invalid == 0 and rows.size() == Definitions.DECKS.size() * 2 * _stress_seeds().size() else 1)

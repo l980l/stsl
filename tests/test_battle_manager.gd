@@ -762,7 +762,7 @@ func test_synergy_musashi_yisunsin_duel() -> void:
 	var m_spd: int = bm._sum_speed_instances(bm._hero_status.get("musashi", {}).get("speed_bonus", []))
 	var y_spd: int = bm._sum_speed_instances(bm._hero_status.get("yi_sun_sin", {}).get("speed_bonus", []))
 	_assert(m_spd == 0 and y_spd == 0,
-		"검사의 약속: 공격만으로는 속도가 오르지 않음 (방어 이전 보상으로 개편)")
+		"검사의 약속: 이순신에게 방어가 없으면 무사시 공격으로 속도가 오르지 않음")
 
 func test_synergy_musashi_yisunsin_not_present() -> void:
 	print("[TestBattleManager] test_synergy_musashi_yisunsin_not_present")
