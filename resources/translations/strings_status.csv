@@ -68,3 +68,5 @@ keyword.draw,드로우,Draw,Pioche,Pesca,Robar,ドロー,Τραβηγμα,抽牌
 keyword.discard,버리기,Discard,Défausse,Scarta,Descartar,捨てる,Απόρριψη,弃牌,棄牌,Сброс,Descartar,Odrzuć,Abwerfen
 keyword.exhaust,소멸,Exhaust,Épuise,Esaurisci,Agotar,消費,Εξάντληση,消耗,消耗,Истощение,Exaurir,Wyczerp,Erschöpfen
 keyword.summon,소환,Summon,Invocation,Evocazione,Invocar,召喚,Κάλεσμα,召唤,召喚,Призыв,Invocação,Przywołanie,Beschwörung
+status.thorns.name,가시,Thorns,Épines,Spine,Espinas,トゲ,Αγκάθια,荆棘,荊棘,Шипы,Espinhos,Kolce,Dornen
+status.thorns.desc,공격 카드로 맞을 때마다 때린 영웅에게 %d 피해,Each attack card hit deals %d damage to the attacker,Chaque coup de carte d'attaque inflige %d dégâts à l'attaquant,Ogni colpo di carta attacco infligge %d danni all'attaccante,Cada golpe de carta de ataque inflige %d de daño al atacante,攻撃カードで殴られるたび、攻撃した英雄に%dダメージ,Κάθε χτύπημα κάρτας επίθεσης προκαλεί %d ζημιά στον επιτιθέμενο,每次被攻击牌击中，对攻击者造成%d伤害,每次被攻擊牌擊中，對攻擊者造成%d傷害,Каждый удар картой атаки наносит атакующему %d урона,Cada golpe de carta de ataque causa %d de dano ao atacante,Każde trafienie kartą ataku zadaje atakującemu %d obrażeń,Jeder Treffer einer Angriffskarte fügt dem Angreifer %d Schaden zu

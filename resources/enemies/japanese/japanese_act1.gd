@@ -2,6 +2,7 @@
 # 일본 신화 Act 1 — 엘리트 3종(오니 장군·야마우바·로닌 무적) + 보스(라이덴)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 static func ushi_oni(scene: PackedScene) -> Resource:
 	# 우시오니 — 소 머리의 흉포한 요괴. blunt 강타형 엘리트 (구 oni_general 리스킨, 메커니즘 동일)
@@ -20,6 +21,9 @@ static func ushi_oni(scene: PackedScene) -> Resource:
 	i4.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 돌격 견제 — 포효로 영웅 전체 사기를 지운다
+	Counters.insert(e, Counters.dispel("morale"), 1)
+	Counters.harden(e, 1)
 	return e
 
 static func yamamba(scene: PackedScene) -> Resource:
@@ -39,6 +43,9 @@ static func yamamba(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 160; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 순교 견제 — 체력이 가장 낮은 영웅을 마킹하고 노린다
+	Counters.insert(e, Counters.execute_mark(), 3)
+	Counters.harden(e, 1)
 	return e
 
 static func invincible_ronin(scene: PackedScene) -> Resource:
@@ -56,6 +63,9 @@ static func invincible_ronin(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 거북선 견제 — 공격 전에 영웅 전체 방어를 베어 낸다
+	Counters.insert(e, Counters.dispel("block"), 1)
+	Counters.harden(e, 1)
 	return e
 
 static func raijin(scene: PackedScene) -> Resource:

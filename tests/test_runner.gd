@@ -53,6 +53,7 @@ var TestCardUpgradeCompleteness = preload("res://tests/test_card_upgrade_complet
 var TestSmallNumberProfile = preload("res://tests/test_small_number_profile.gd")
 var TestSmallNumberRuntime = preload("res://tests/test_small_number_runtime.gd")
 var TestDeckIdentityRevision = preload("res://tests/test_deck_identity_revision.gd")
+var TestEliteCounters = preload("res://tests/test_elite_counters.gd")
 
 func _init() -> void:
 	var total_passed: int = 0
@@ -110,6 +111,7 @@ func _init() -> void:
 		TestSmallNumberProfile.new(),
 		TestSmallNumberRuntime.new(),
 		TestDeckIdentityRevision.new(),
+		TestEliteCounters.new(),
 	]
 	for suite in suites:
 		var result: Dictionary = suite.run_all()

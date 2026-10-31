@@ -1,6 +1,7 @@
 # resources/enemies/daoist/daoist_act1.gd
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 static func golden_elixir(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
@@ -23,6 +24,9 @@ static func golden_elixir(scene: PackedScene) -> Resource:
 	i6.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [i1, i2, i3, i4, i5, i6]
 	e.charm_resistance = 20
+	# 상성: 지휘 견제 — 스킬 카드 3장마다 무작위 영웅에게 반격
+	Counters.skill_counter(e, 3, 60, "holy_fire")
+	Counters.harden(e, 1)
 	return e
 
 static func silver_elixir(scene: PackedScene) -> Resource:
@@ -41,6 +45,9 @@ static func silver_elixir(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 170; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "holy_slash"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 기동 견제 — 수은이 영웅 전체 속도를 2턴 묶는다
+	Counters.insert(e, Counters.slow(3, 2), 0)
+	Counters.harden(e, 1)
 	return e
 
 static func black_wind_immortal(scene: PackedScene) -> Resource:
@@ -62,6 +69,9 @@ static func black_wind_immortal(scene: PackedScene) -> Resource:
 	i5.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
+	# 상성: 약탈 견제 — 검은 바람이 자기 몸의 마킹을 날린다
+	Counters.insert(e, Counters.cleanse("cleanse_marks"), 3)
+	Counters.harden(e, 1)
 	return e
 
 static func eastern_king(scene: PackedScene) -> Resource:

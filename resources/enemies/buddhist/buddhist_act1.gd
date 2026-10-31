@@ -1,6 +1,7 @@
 # resources/enemies/buddhist/buddhist_act1.gd
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 static func vaisravana(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
@@ -20,6 +21,9 @@ static func vaisravana(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 180; i5.target = IntentRes.TargetType.RANDOM; i5.damage_type = "holy_strike"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
+	# 상성: 무심 견제 — 수호 천왕이 받은 피해의 절반을 모아 되갚는다
+	Counters.insert(e, Counters.counter_prepare(50), 3)
+	Counters.harden(e, 1)
 	return e
 
 static func mahoraga(scene: PackedScene) -> Resource:
@@ -40,6 +44,9 @@ static func mahoraga(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 120; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "blunt"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 신성 견제 — 뱀신이 영웅 한 명의 회복을 끊는다
+	Counters.insert(e, Counters.heal_block(2, IntentRes.TargetType.RANDOM), 0)
+	Counters.harden(e, 1)
 	return e
 
 static func dharma_general(scene: PackedScene) -> Resource:
@@ -59,6 +66,9 @@ static func dharma_general(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 180; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "holy_arrow"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
+	# 상성: 저주 견제 — 법력으로 자기 약화·취약을 씻는다
+	Counters.insert(e, Counters.cleanse("cleanse_debuff"), 2)
+	Counters.harden(e, 1)
 	return e
 
 static func mahavairocana(scene: PackedScene) -> Resource:

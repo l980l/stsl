@@ -2,6 +2,7 @@
 # 북유럽 신화 — Act1 미드가르드 변경 초반 엘리트 3종 + 보스(피요르기닌)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 # ──── 엘리트 3종 ────
 
@@ -21,6 +22,9 @@ static func nidhogg_larva(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.DEBUFF; i4.value = 50; i4.status_type = "poison"
 	i4.target = IntentRes.TargetType.ALL
 	e.intent_pattern = [i1, i2, i3, i4]
+	# 상성: 독살 견제 — 독을 먹고 자라 자기 독을 씻는다
+	Counters.insert(e, Counters.cleanse("cleanse_poison"), 2)
+	Counters.harden(e, 1)
 	return e
 
 static func skoll(scene: PackedScene) -> Resource:
@@ -37,6 +41,9 @@ static func skoll(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 180; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "bite_attack"
 	e.intent_pattern = [i1, i2, i3, i4]
+	# 상성: 필사즉생 견제 — 늑대가 약한 먹잇감을 마킹하고 쫓는다
+	Counters.insert(e, Counters.execute_mark(), 0)
+	Counters.harden(e, 1)
 	return e
 
 static func modgud(scene: PackedScene) -> Resource:
@@ -60,6 +67,10 @@ static func modgud(scene: PackedScene) -> Resource:
 	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 200; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "ice"
 	e.phase_patterns = [[p0i1, p0i2], [p1i_freeze, p1i1, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
+	# 상성: 회복 견제 — 첫 페이즈부터 영웅 전체 회복을 막는다
+	Counters.insert_phase(e, 0, Counters.heal_block(2, IntentRes.TargetType.ALL), 0)
+	p1i_freeze.target = IntentRes.TargetType.ALL
+	Counters.harden(e, 1)
 	return e
 
 # ──── 보스 ────

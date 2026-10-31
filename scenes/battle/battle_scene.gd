@@ -156,7 +156,7 @@ const STATUS_EMOJI := {
 	"morale": "★", "charm": "♥", "strength": "↑",
 	"taunt": "►", "counter_block": "🛡", "charm_resistance": "💜",
 	"invuln": "🛡", "counter_pool": "🔄", "marked_by": "🎯",
-	"death_rattle": "💀", "sacrifice_bank": "🩸",
+	"death_rattle": "💀", "sacrifice_bank": "🩸", "thorns": "🌵",
 	"sig_greek": "⚔", "sig_norse": "🌪", "sig_egyptian": "👁",
 	"sig_buddhist": "☸", "sig_daoist": "☯", "sig_japanese": "🌸",
 }
@@ -1782,7 +1782,11 @@ func _format_intent_label(enemy_index: int, intent: Resource) -> String:
 		IntentRes.ActionType.WARD:       return _trf("battle.intent.ward", intent.value)
 		IntentRes.ActionType.SUMMON:     return _trf("battle.intent.summon", max(1, intent.value))
 		IntentRes.ActionType.MIMIC:      return _trf("battle.intent.mimic", intent.value)
-		IntentRes.ActionType.SPECIAL:    return tr("battle.intent.special")
+		IntentRes.ActionType.DISPEL:     return tr("battle.intent.dispel")
+		IntentRes.ActionType.SPECIAL:
+			if String(intent.status_type).begins_with("cleanse_"):
+				return tr("battle.intent.cleanse")
+			return tr("battle.intent.special")
 		_:                                return "?"
 
 func _format_intent_tooltip(_enemy_index: int, intent: Resource) -> String:
@@ -1823,10 +1827,18 @@ func _format_intent_tooltip(_enemy_index: int, intent: Resource) -> String:
 			match intent.status_type:
 				"remove_card": return _trf("battle.intent.tooltip.special_remove_card", max(1, v))
 				"summon": return tr("battle.intent.tooltip.special_summon")
+				"cleanse_poison", "cleanse_debuff", "cleanse_marks":
+					return tr("battle.intent.tooltip." + intent.status_type)
 				_:
 					if intent.status_type != "":
 						return _trf("battle.intent.tooltip.special_generic", intent.status_type)
 					return tr("battle.intent.tooltip.special_unknown")
+		IntentRes.ActionType.DISPEL:
+			var kw: String = _i18n_status_kw(intent.status_type) if intent.status_type != "" else "%s, %s" % [tr("status.strength.name"), tr("keyword.block")]
+			var scope: String = "all" if intent.target == IntentRes.TargetType.ALL else "one"
+			if v > 0:
+				return _trf("battle.intent.tooltip.dispel_%s_amount" % scope, [kw, v])
+			return _trf("battle.intent.tooltip.dispel_%s" % scope, kw)
 		_:
 			return tr("battle.intent.tooltip.unknown")
 

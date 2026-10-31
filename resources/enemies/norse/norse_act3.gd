@@ -44,7 +44,7 @@ static func valkyrie(scene: PackedScene) -> Resource:
 	i3.action_type = IntentRes.ActionType.BUFF; i3.status_type = "block"; i3.value = 60
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 250; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "slash"
-	# SPECIAL value=2: 자가 회복 표시
+	# SPECIAL value=2: 카드 2장을 이번 전투 동안 빼앗는다 (remove_card)
 	var i5 := IntentRes.new()
 	i5.action_type = IntentRes.ActionType.SPECIAL; i5.value = 2
 	e.intent_pattern = [i1, i2, i3, i4, i5]
