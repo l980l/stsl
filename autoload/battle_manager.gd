@@ -633,6 +633,31 @@ func _await_synergy_impact(vfx_status: String) -> void:
 	if _d > 0.0:
 		await _await_vfx_impact(_d + 0.5)
 
+# 검사의 약속 (이순신×무사시): 무사시가 공격할 때 이순신에게 방어가 있으면 두 영웅 속도 +1 (전투 동안).
+func _swordsman_vow_speed() -> void:
+	if not team_mgr.is_alive("yi_sun_sin") or _hero_block.get("yi_sun_sin", 0) <= 0:
+		return
+	for hid in ["musashi", "yi_sun_sin"]:
+		var aid: String = "hero:" + hid
+		var old_speed: int = _actor_speed(aid)
+		if not _hero_status.has(hid):
+			_hero_status[hid] = {}
+		if typeof(_hero_status[hid].get("speed_bonus")) != TYPE_ARRAY:
+			_hero_status[hid]["speed_bonus"] = []
+		# 전투 지속(dur 999) 항목 하나에 누적 — 툴팁 1줄 유지
+		var perm = null
+		for entry in _hero_status[hid]["speed_bonus"]:
+			if typeof(entry) == TYPE_DICTIONARY and int(entry.get("dur", 0)) >= 999:
+				perm = entry
+				break
+		if perm != null:
+			perm["value"] = int(perm.get("value", 0)) + 1
+		else:
+			_hero_status[hid]["speed_bonus"].append({"value": 1, "dur": 999})
+		_adjust_turn_queue_for_speed_change(aid, old_speed)
+		status_applied.emit(hid, "speed_bonus", 1)
+	synergy_triggered.emit("synergy.musashi_yi.name", "musashi")
+
 func _add_first_hit_bonus(hero_id: String, amount: int) -> void:
 	if not _hero_status.has(hero_id):
 		_hero_status[hero_id] = {}
@@ -1886,6 +1911,8 @@ func _apply_card_effects(card: Resource, target_enemy_index: int, target_hero_id
 		next_hit_bonus = _hero_status.get(card.owner_id, {}).get("next_attack_first_hit_bonus", 0)
 		if _hero_status.has(card.owner_id):
 			_hero_status[card.owner_id].erase("next_attack_first_hit_bonus")
+		if card.owner_id == "musashi":
+			_swordsman_vow_speed()
 		# 황제의 무도 (나폴레옹×무사시): 적이 1명뿐일 때 무사시가 공격하면 나폴레옹 사기 +1 (무사시 차례당 1회)
 		if card.owner_id == "musashi" and _get_living_enemy_count() == 1 and team_mgr.is_alive("napoleon") and _use_turn_effect("musashi", "synergy_emperor_dance_solo"):
 			_grant_morale("napoleon", 1)
