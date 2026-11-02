@@ -103,8 +103,11 @@ static func insert_phase(e: Resource, phase: int, intent: Resource, at: int) -> 
 const HP_MUL := {1: 2.0, 2: 2.0, 3: 2.0}
 const ATTACK_MUL := {1: 3.5, 2: 3.5, 3: 3.5}
 
-static func harden(e: Resource, act: int) -> void:
+# attack_mul 을 주면 그 엘리트만 공격 배율을 따로 쓴다(원래부터 강한 엘리트).
+static func harden(e: Resource, act: int, attack_mul: float = -1.0) -> void:
 	e.max_hp = int(round(e.max_hp * HP_MUL[act]))
+	# 불교 인과응보는 받은 피해에 비례한다. 체력 배율만큼 커지지 않도록 기록해 둔다.
+	e.set_meta("hp_mul", HP_MUL[act])
 	var seen := {}
 	var intents: Array = e.intent_pattern.duplicate()
 	for pattern in e.phase_patterns:
@@ -115,5 +118,5 @@ static func harden(e: Resource, act: int) -> void:
 			continue
 		seen[it.get_instance_id()] = true
 		if it.action_type == IntentRes.ActionType.ATTACK:
-			it.value = int(round(it.value * ATTACK_MUL[act]))
+			it.value = int(round(it.value * (attack_mul if attack_mul > 0.0 else ATTACK_MUL[act])))
 		intents.append_array(it.payoff_intents)

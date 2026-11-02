@@ -2,6 +2,7 @@
 # 일본 신화 Act 2 — 엘리트 3종(혼돈의 텐구·야샤·누레리온) + 보스(슈텐도지)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 static func chaos_tengu(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
@@ -19,6 +20,9 @@ static func chaos_tengu(scene: PackedScene) -> Resource:
 	i3.duration = 3; i3.target = IntentRes.TargetType.RANDOM
 	e.intent_pattern = [i1, i2, i3]
 	e.charm_resistance = 20
+	# 상성: 기동 견제 — 텐구의 바람이 영웅 전체 속도를 늦춘다
+	e.intent_pattern[2].target = IntentRes.TargetType.ALL
+	Counters.harden(e, 2)
 	return e
 
 static func yasha(scene: PackedScene) -> Resource:
@@ -36,6 +40,9 @@ static func yasha(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 1; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 회복 견제 — 영웅 전체 회복을 막는다
+	Counters.insert(e, Counters.heal_block(2, IntentRes.TargetType.ALL), 0)
+	Counters.harden(e, 2)
 	return e
 
 static func nureriyon(scene: PackedScene) -> Resource:
@@ -57,6 +64,9 @@ static func nureriyon(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 150; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
+	# 상성: 지휘 견제 — 스킬 카드 3장마다 무작위 영웅에게 반격
+	Counters.skill_counter(e, 3, 80, "curse")
+	Counters.harden(e, 2)
 	return e
 
 static func shuten_doji(scene: PackedScene) -> Resource:

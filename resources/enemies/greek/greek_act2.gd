@@ -2,6 +2,7 @@
 # 그리스 신화 — Act2 하계·저승 엘리트 3종 + 보스(하데스)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 # ──── 엘리트 3종 ────
 
@@ -19,6 +20,9 @@ static func cerberus(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.BUFF; i4.value = 5; i4.status_type = "strength"
 	e.intent_pattern = [i1, i2, i3, i4]
+	# 상성: 학익진 견제 — 세 머리가 영웅마다 병사 3명을 삼킨다
+	Counters.insert(e, Counters.dispel("tokens", 3), 2)
+	Counters.harden(e, 2)
 	return e
 
 static func charon(scene: PackedScene) -> Resource:
@@ -36,6 +40,9 @@ static func charon(scene: PackedScene) -> Resource:
 	var i4 := IntentRes.new()
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 200; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4]
+	# 상성: 필사즉생 견제 — 죽음 가까운 영웅을 마킹하고 태운다
+	Counters.insert(e, Counters.execute_mark(), 1)
+	Counters.harden(e, 2)
 	return e
 
 static func erinyes(scene: PackedScene) -> Resource:
@@ -61,6 +68,9 @@ static func erinyes(scene: PackedScene) -> Resource:
 	p1i2.action_type = IntentRes.ActionType.ATTACK; p1i2.value = 180; p1i2.target = IntentRes.TargetType.RANDOM; p1i2.damage_type = "curse"
 	e.phase_patterns = [[p0i1, p0i2, p0i3], [p1i1, p1i_mimic, p1i2]]
 	e.intent_pattern = e.phase_patterns[0]
+	# 상성: 조종 견제 — 복수의 여신은 홀리지 않는다
+	e.charm_resistance = 60
+	Counters.harden(e, 2)
 	return e
 
 # ──── 보스 ────

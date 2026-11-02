@@ -351,7 +351,7 @@ func test_act2_normal_ka_spirit() -> void:
 func test_act2_elite_serqet() -> void:
 	print("[TestEnemies] test_act2_elite_serqet")
 	var e := EgyptianAct2.serqet(_make_dummy_scene())
-	_assert(e.max_hp == 1600, "HP 1600")
+	_assert(e.max_hp == 3200, "HP 1600 × 2 (엘리트 배율)")
 	var has_poison := false
 	for i in e.intent_pattern:
 		if i.action_type == IntentRes.ActionType.DEBUFF and i.status_type == "poison":
@@ -361,15 +361,15 @@ func test_act2_elite_serqet() -> void:
 func test_act2_elite_seth_hound() -> void:
 	print("[TestEnemies] test_act2_elite_seth_hound")
 	var e := EgyptianAct2.seth_hound(_make_dummy_scene())
-	_assert(e.max_hp == 1800, "HP 1800 (최고 엘리트)")
+	_assert(e.max_hp == 3600, "HP 1800 × 2 (엘리트 배율)")
 	var last_intent: Resource = e.intent_pattern[e.intent_pattern.size() - 1]
 	_assert(last_intent.target == IntentRes.TargetType.LOWEST_HP, "마지막 인텐트 LOWEST_HP")
-	_assert(last_intent.value >= 280, "암살 280 이상")
+	_assert(last_intent.value >= 980, "암살 280 × 3.5 이상")
 
 func test_act2_elite_ba_bird() -> void:
 	print("[TestEnemies] test_act2_elite_ba_bird")
 	var e := EgyptianAct2.ba_bird(_make_dummy_scene())
-	_assert(e.max_hp == 1500, "HP 1500")
+	_assert(e.max_hp == 3000, "HP 1500 × 2 (엘리트 배율)")
 	var has_special := false
 	for i in e.intent_pattern:
 		if i.action_type == IntentRes.ActionType.SPECIAL and i.value == 2: has_special = true
@@ -480,7 +480,7 @@ func test_norse_act3_elites() -> void:
 		NorseAct3.jormungandr_shard(scene),
 	]
 	for e in elite_enemies:
-		_assert(e.max_hp >= 1800, "HP >= 1800")
+		_assert(e.max_hp >= 3600, "HP >= 1800 × 2 (엘리트 배율)")
 		_assert(e.mythology == "norse", "mythology = norse")
 
 func test_relic_pool_count() -> void:
@@ -655,7 +655,7 @@ func test_buddhist_act2_shape() -> void:
 	_assert(b.mythology == "buddhist", "관세음보살 mythology=buddhist")
 	_assert(b.charm_resistance == 20, "관세음보살 charm_resistance=20")
 	var agni_buddha = M.agni_buddha(scene)
-	_assert(agni_buddha.max_hp == 1900, "화신여래 엘리트 HP 1900")
+	_assert(agni_buddha.max_hp == 3800, "화신여래 엘리트 HP 1900 × 2 (엘리트 배율)")
 	_assert(agni_buddha.charm_resistance == 20, "화신여래 charm_resistance=20")
 
 func test_buddhist_act3_shape() -> void:

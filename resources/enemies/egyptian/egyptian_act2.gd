@@ -2,6 +2,7 @@
 # 이집트 신화 — Act2 엘리트 3종 + 보스(오시리스)
 const EnemyRes  = preload("res://resources/enemy_resource.gd")
 const IntentRes = preload("res://resources/intent_resource.gd")
+const Counters  = preload("res://resources/enemies/elite_counters.gd")
 
 # ──── 엘리트 3종 ────
 
@@ -25,6 +26,9 @@ static func serqet(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 200; i4.target = IntentRes.TargetType.RANDOM; i4.damage_type = "needle_sting"
 	e.intent_pattern = [i1, i1b, i2, i2b, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 독살 견제 — 독을 치유하는 전갈 여신이 자기 독을 씻는다
+	Counters.insert(e, Counters.cleanse("cleanse_poison"), 3)
+	Counters.harden(e, 2)
 	return e
 
 static func seth_hound(scene: PackedScene) -> Resource:
@@ -42,6 +46,9 @@ static func seth_hound(scene: PackedScene) -> Resource:
 	i3.action_type = IntentRes.ActionType.ATTACK; i3.value = 280; i3.target = IntentRes.TargetType.LOWEST_HP; i3.damage_type = "claw_attack"
 	e.intent_pattern = [i1, i2, i2b, i3]
 	e.charm_resistance = 20
+	# 상성: 돌격 견제 — 혼돈의 울부짖음이 영웅 전체 사기를 지운다
+	Counters.insert(e, Counters.dispel("morale"), 1)
+	Counters.harden(e, 2)
 	return e
 
 static func ba_bird(scene: PackedScene) -> Resource:
@@ -61,6 +68,9 @@ static func ba_bird(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.SPECIAL; i5.value = 2
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
+	# 상성: 신성 견제 — 영혼이 영웅 한 명의 회복을 끊는다
+	Counters.insert(e, Counters.heal_block(2, IntentRes.TargetType.RANDOM), 0)
+	Counters.harden(e, 2)
 	return e
 
 # ──── 보스 ────

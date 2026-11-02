@@ -78,6 +78,7 @@ func run_all() -> Dictionary:
 	_run_thorns()
 	_run_catalog()
 	_run_karma()
+	_run_karma_scaled()
 	return {"passed": passed, "failed": failed}
 
 func _run_dispel() -> void:
@@ -159,3 +160,18 @@ func _run_karma() -> void:
 	_check(bm.team_mgr.get_current_hp("joan_of_arc") == 1, "karma leaves a wounded hero at 1 HP")
 	_check(bm.team_mgr.get_current_hp("napoleon") == 200, "karma still deals damage past block when survivable (1000 - 800)")
 	_free(bm)
+
+func _run_karma_scaled() -> void:
+	# 난이도 배율(체력 ×2)로 단단해진 불교 엘리트는 인과응보 반사도 원래 체력 기준(÷2)이다.
+	var bm = _party(["joan_of_arc"])
+	bm._enemies[0].mythology = "buddhist"
+	bm._enemies[0].signatures_enabled = true
+	bm._enemies[0].set_meta("hp_mul", 2.0)
+	bm._enemy_status[0]["damage_taken"] = 2000
+	Signatures.on_enemy_death(bm, 0)
+	_check(bm.team_mgr.get_current_hp("joan_of_arc") == 750, "karma on a hardened elite reflects 2000 x 25% / 2 = 250")
+	_free(bm)
+	# 실제 엘리트 팩토리가 남긴 배율이 수치 변환·전투 복사 후에도 남는다.
+	var yama = load("res://resources/enemies/buddhist/buddhist_act3.gd").yama(null)
+	var converted = preload("res://resources/balance/enemy_small_numbers.gd").convert(yama)
+	_check(float(converted.get_meta("hp_mul", 0.0)) == 2.0, "hp_mul survives small-number conversion")

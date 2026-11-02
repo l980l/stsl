@@ -1,6 +1,7 @@
 # resources/enemies/buddhist/buddhist_act3.gd
 const EnemyRes   = preload("res://resources/enemy_resource.gd")
 const IntentRes  = preload("res://resources/intent_resource.gd")
+const Counters   = preload("res://resources/enemies/elite_counters.gd")
 
 static func yama(scene: PackedScene) -> Resource:
 	var e := EnemyRes.new()
@@ -34,6 +35,11 @@ static func yama(scene: PackedScene) -> Resource:
 		"repeat": true,
 		"tooltip_key": "enemy.buddhist.yama.counter",
 	}
+	# 상성: 지휘 견제 — 염라의 심판: 공격 카드 4장 대신 스킬 카드 3장마다 반격
+	e.card_count_trigger["card_type"] = CardResource.CardType.SKILL
+	e.card_count_trigger["threshold"] = 3
+	# 원래부터 가장 강한 엘리트라 공격 배율을 낮춘다(시뮬레이션: 3.5배 손실 81%·승률 89%, 2배 60%).
+	Counters.harden(e, 3, 1.5)
 	return e
 
 static func ksitigarbha(scene: PackedScene) -> Resource:
@@ -51,6 +57,9 @@ static func ksitigarbha(scene: PackedScene) -> Resource:
 	i4.action_type = IntentRes.ActionType.ATTACK; i4.value = 200; i4.target = IntentRes.TargetType.LOWEST_HP; i4.damage_type = "curse"
 	e.intent_pattern = [i1, i2, i3, i4]
 	e.charm_resistance = 20
+	# 상성: 회복 견제 — 영웅 전체 회복을 막는다
+	Counters.insert(e, Counters.heal_block(2, IntentRes.TargetType.ALL), 0)
+	Counters.harden(e, 3)
 	return e
 
 static func virupaksha(scene: PackedScene) -> Resource:
@@ -73,6 +82,9 @@ static func virupaksha(scene: PackedScene) -> Resource:
 	i5.action_type = IntentRes.ActionType.ATTACK; i5.value = 190; i5.target = IntentRes.TargetType.LOWEST_HP; i5.damage_type = "holy_arrow"
 	e.intent_pattern = [i1, i2, i3, i4, i5]
 	e.charm_resistance = 20
+	# 상성: 결투 견제 — 나가 둘을 불러 일대일을 깬다
+	Counters.insert(e, Counters.summon("naga_spawn", 2), 3)
+	Counters.harden(e, 3)
 	return e
 
 static func acalanatha(scene: PackedScene) -> Resource:
